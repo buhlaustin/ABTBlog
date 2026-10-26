@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Austin Buhl</title>
+    <link>https://austinbuhltech.com</link>
+    <description>Personal site — writing and work at austinbuhltech.com</description>
+    
+    <item>
+      <title>Welcome to austinbuhltech.com</title>
+      <link>https://austinbuhltech.com/blog/welcome-to-austinbuhltech/</link>
+      <guid>https://austinbuhltech.com/blog/welcome-to-austinbuhltech/</guid>
+      <pubDate>Sun, 25 Oct 2026 00:00:00 GMT</pubDate>
+      <description>One monolith for my personal site, writing, and hosted projects—including House of Strategy.</description>
+    </item>
+  </channel>
+</rss>
