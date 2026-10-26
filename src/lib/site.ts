@@ -7,6 +7,7 @@ export const siteConfig = {
   github: "https://github.com/buhlaustin",
   githubUsername: "buhlaustin",
   location: "Knoxville, Tennessee",
+  hometown: "Maryville, Tennessee",
   logoSignature: "/abuhl-signature.svg",
   favicon: "/ab-favicon.svg",
   ogImage: "/social-open-graph.png",

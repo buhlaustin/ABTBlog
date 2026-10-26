@@ -2,28 +2,43 @@ import { siteConfig } from "@/lib/site";
 
 /** Public profile facts (aligned with https://github.com/buhlaustin). */
 export const profile = {
-  tagline:
-    "Co-Founder, CEO & Chief Architect at ClassQuip. Former Stride / K12. Builder of edtech, simulations, games, and dev tools.",
-  bio: "Building a better virtual classroom experience for K–12.",
   role: "Co-Founder & CEO",
   company: "ClassQuip",
   companyUrl: "https://www.classquip.com",
   previousEmployer: "Stride / K12",
   avatarUrl: "https://avatars.githubusercontent.com/u/287395945?v=4",
-  githubOrg: {
-    name: "ClassQuip",
-    url: "https://github.com/ClassQuip",
-  },
   linkedIn: "https://www.linkedin.com/in/austinbuhl20",
   email: "abuhl@classquip.com",
+  daughters: ["Nevaeh", "Ashlynne"] as const,
+  bioParagraphs: [
+    `I'm from ${siteConfig.hometown}, based in the ${siteConfig.location} area. I like building and creating new things—products, games, simulations, and whatever idea won't leave me alone until I try it.`,
+    "Day job that's also a calling: edtech and real-time software for schools. Nights and weekends: writing here, open-source repos, and browser toys you can find under Work.",
+    "Most of what I make is for other people to use, but this site is the personal layer—less pitch deck, more notebook with demos attached.",
+  ] as const,
 } as const;
+
+export type QuickFact = {
+  label: string;
+  value: string;
+};
+
+export const quickFacts: QuickFact[] = [
+  { label: "Born", value: "June 5, 1998" },
+  { label: "Sign", value: "Gemini" },
+  { label: "From", value: "Maryville, TN" },
+  { label: "Based in", value: "Knoxville, TN area" },
+  { label: "Family", value: "Daughters Nevaeh & Ashlynne" },
+  { label: "Politics", value: "Independent (left-leaning)" },
+  { label: "Work", value: "Co-Founder & CEO, ClassQuip" },
+  { label: "Before that", value: "Stride / K12 (edtech operations)" },
+];
 
 export type OpenSourceHighlight = {
   name: string;
   href: string;
   blurb: string;
   languages: string[];
-  /** Link to a page on this site when we host or document the project. */
+  /** Link to a page on this site when the project is hosted or documented here. */
   sitePath?: string;
 };
 
