@@ -14,7 +14,7 @@ import { WorkCard } from "@/components/work-card";
 
 export const metadata: Metadata = {
   title: "About",
-  description: `${siteConfig.name} — builder from Maryville, TN. Edtech, side projects, writing, and open source.`,
+  description: `${siteConfig.name} — software engineer in Knoxville, TN. Real-time edtech, simulations, games, and open source.`,
 };
 
 function AboutSection({
@@ -101,12 +101,12 @@ export default function AboutPage() {
       </header>
 
       <div className="mt-14">
-        <AboutSection title="Quick facts">
-          <dl className="grid gap-3 sm:grid-cols-2">
+        <AboutSection title="Quick facts" centered>
+          <dl className="mx-auto grid max-w-2xl gap-3 sm:grid-cols-2">
             {quickFacts.map((fact) => (
               <div
                 key={fact.label}
-                className="rounded-lg border border-border bg-surface px-4 py-3"
+                className="rounded-lg border border-border bg-surface px-4 py-3 text-center"
               >
                 <dt className="font-mono text-[11px] font-medium uppercase tracking-wider text-muted">
                   {fact.label}

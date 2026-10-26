@@ -10,9 +10,10 @@ export const profile = {
   linkedIn: "https://www.linkedin.com/in/austinbuhl20",
   email: "abuhl@classquip.com",
   bioParagraphs: [
-    "I'm a creator and engineer from Maryville, Tennessee, living and building in the Knoxville area.",
-    "By day, I design edtech and real-time software that helps schools run smoother. Nights and weekends are for whatever idea won't leave me alone until I build it—whether that's open-source projects, game prototypes, browser-based tools, or interactive simulations.",
-    "Most of my daily work is built for districts and classrooms, but this site is the personal layer. Less pitch deck, more open notebook with live code and working demos attached.",
+    "I'm a builder and software engineer based in Knoxville, TN.",
+    "Over the past eight years, my focus has been on real-time software and K–12 education technology. Having spent over seven years supporting teachers, students, and school administrators on platform operations, I saw firsthand how existing video and virtual learning platforms fail in real-world environments—crashing budget hardware, choking on weak home Wi-Fi, and creating massive attendance compliance burdens for districts.",
+    "That experience led me to found ClassQuip, where I serve as CEO and system architect. I designed and built our custom, low-latency AWS WebRTC media engine specifically for low-spec K–12 hardware, bringing video infrastructure costs down to $0.50 per seat while delivering zero-drop reliability. My work spans deep media pipeline engineering, LTI 1.3 / OneRoster LMS integrations, and building scalable software that removes administrative friction from classrooms.",
+    "Outside of core edtech, I regularly design interactive simulations, browser-based games, and open-source developer tools.",
   ] as const,
 } as const;
 
