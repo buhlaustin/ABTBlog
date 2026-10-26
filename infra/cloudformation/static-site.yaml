@@ -57,6 +57,26 @@ Resources:
         SigningBehavior: always
         SigningProtocol: sigv4
 
+  UriRewriteFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: austinbuhltech-uri-rewrite
+      AutoPublish: true
+      FunctionConfig:
+        Comment: Append index.html for directory-style static export paths
+        Runtime: cloudfront-js-2.0
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          var uri = request.uri;
+          if (uri.endsWith('/')) {
+            request.uri += 'index.html';
+          } else if (!uri.includes('.')) {
+            request.uri += '/index.html';
+          }
+          return request;
+        }
+
   SiteDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -75,6 +95,9 @@ Resources:
           AllowedMethods: [GET, HEAD, OPTIONS]
           CachedMethods: [GET, HEAD, OPTIONS]
           Compress: true
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt UriRewriteFunction.FunctionARN
           ForwardedValues:
             QueryString: false
         CustomErrorResponses:
