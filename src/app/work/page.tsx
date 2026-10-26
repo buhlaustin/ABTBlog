@@ -10,12 +10,12 @@ export const metadata: Metadata = {
 export default function WorkIndexPage() {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
-      <h1 className="text-3xl font-semibold tracking-tight">Work</h1>
-      <p className="mt-3 max-w-2xl text-zinc-600 dark:text-zinc-400">
+      <h1 className="font-display text-4xl font-bold tracking-tight">Work</h1>
+      <p className="mt-4 max-w-2xl text-muted">
         Games, tools, and experiments built in this repo—plus links to other
         open-source projects.
       </p>
-      <div className="mt-10 grid gap-5 sm:grid-cols-2">
+      <div className="mt-12 grid gap-6 sm:grid-cols-2">
         {workItems.map((item) => (
           <WorkCard key={item.slug} item={item} />
         ))}

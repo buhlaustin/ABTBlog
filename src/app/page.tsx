@@ -9,27 +9,38 @@ export default function HomePage() {
   const latestPost = getAllPosts()[0];
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
-      <section className="mb-16 max-w-2xl">
-        <p className="mb-3 text-sm font-medium uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
-          {siteConfig.url.replace("https://", "")}
+    <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-20 pt-12 sm:px-6 sm:pt-20">
+      <section className="relative mb-20 overflow-hidden rounded-3xl border border-border/80 bg-surface/60 px-6 py-12 sm:px-10 sm:py-14">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
+        <p className="mb-4 font-mono text-xs font-medium uppercase tracking-[0.25em] text-accent">
+          Personal monolith
         </p>
-        <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 sm:text-5xl dark:text-zinc-50">
-          {siteConfig.name}
+        <h1 className="font-display max-w-2xl text-4xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+          Build for work.
+          <span className="block text-muted">Ship for fun.</span>
         </h1>
-        <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-          {siteConfig.description}
+        <p className="mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
+          {siteConfig.description} Writing, open source, and playable projects
+          live at{" "}
+          <span className="font-medium text-foreground">austinbuhltech.com</span>
+          .
         </p>
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-10 flex flex-wrap gap-3">
           <Link
             href="/work/"
-            className="rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
+            className="inline-flex items-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-zinc-950 shadow-lg shadow-emerald-500/25 transition hover:bg-emerald-300"
           >
             Explore work
           </Link>
           <Link
+            href="/work/hos/"
+            className="inline-flex items-center rounded-full border border-border bg-surface-raised px-6 py-3 text-sm font-semibold text-foreground transition hover:border-emerald-500/50"
+          >
+            Play House of Strategy
+          </Link>
+          <Link
             href="/blog/"
-            className="rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-800 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-900"
+            className="inline-flex items-center rounded-full px-6 py-3 text-sm font-semibold text-muted transition hover:text-foreground"
           >
             Read the blog
           </Link>
@@ -37,16 +48,23 @@ export default function HomePage() {
       </section>
 
       <section className="mb-16">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <h2 className="text-2xl font-semibold tracking-tight">Featured work</h2>
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-2xl font-bold tracking-tight">
+              Featured work
+            </h2>
+            <p className="mt-1 text-sm text-muted">
+              Hosted here and elsewhere on GitHub.
+            </p>
+          </div>
           <Link
             href="/work/"
-            className="text-sm font-medium text-emerald-700 dark:text-emerald-400"
+            className="text-sm font-semibold text-accent hover:text-emerald-300"
           >
             View all
           </Link>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-2">
           {featuredWork.map((item) => (
             <WorkCard key={item.slug} item={item} />
           ))}
@@ -54,16 +72,19 @@ export default function HomePage() {
       </section>
 
       {latestPost ? (
-        <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900/40">
-          <p className="text-sm font-medium uppercase tracking-widest text-zinc-500">
+        <section className="rounded-2xl border border-border/80 bg-surface/50 p-6 sm:p-8">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
             Latest post
           </p>
-          <h2 className="mt-2 text-xl font-semibold">
-            <Link href={`/blog/${latestPost.slug}/`} className="hover:underline">
+          <h2 className="font-display mt-3 text-2xl font-bold">
+            <Link
+              href={`/blog/${latestPost.slug}/`}
+              className="text-foreground hover:text-accent"
+            >
               {latestPost.title}
             </Link>
           </h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 text-sm leading-relaxed text-muted">
             {latestPost.description}
           </p>
         </section>

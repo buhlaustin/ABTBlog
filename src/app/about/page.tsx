@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
-      <h1 className="text-3xl font-semibold tracking-tight">About</h1>
-      <div className="mt-6 space-y-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+      <h1 className="font-display text-4xl font-bold tracking-tight">About</h1>
+      <div className="mt-8 space-y-5 text-base leading-relaxed text-muted">
         <p>
           I&apos;m {siteConfig.name}, based in {siteConfig.location}. I build
           software for work and for fun—edtech, dev tools, simulations, and
@@ -21,7 +21,7 @@ export default function AboutPage() {
           By day I&apos;m co-founder &amp; CEO at{" "}
           <a
             href="https://www.classquip.com"
-            className="font-medium text-emerald-700 underline-offset-2 hover:underline dark:text-emerald-400"
+            className="font-medium text-accent underline-offset-2 hover:underline"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -32,11 +32,11 @@ export default function AboutPage() {
         </p>
         <p>
           This site is the monolith for everything I ship here: writing at{" "}
-          <strong className="font-medium text-zinc-800 dark:text-zinc-200">
+          <strong className="font-medium text-foreground">
             austinbuhltech.com
           </strong>
           , plus hosted projects under{" "}
-          <Link href="/work/" className="text-emerald-700 dark:text-emerald-400">
+          <Link href="/work/" className="text-accent hover:underline">
             /work
           </Link>
           .
@@ -45,7 +45,7 @@ export default function AboutPage() {
           Find me on{" "}
           <a
             href={siteConfig.github}
-            className="font-medium text-emerald-700 underline-offset-2 hover:underline dark:text-emerald-400"
+            className="font-medium text-accent underline-offset-2 hover:underline"
             target="_blank"
             rel="noopener noreferrer"
           >

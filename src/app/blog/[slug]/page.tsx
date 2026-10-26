@@ -31,14 +31,14 @@ export default async function BlogPostPage({ params }: PageProps) {
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
       <Link
         href="/blog/"
-        className="text-sm font-medium text-emerald-700 dark:text-emerald-400"
+        className="text-sm font-semibold text-accent hover:text-emerald-300"
       >
         ← Blog
       </Link>
-      <article className="mt-4">
+      <article className="mt-6">
         <time
           dateTime={post.date}
-          className="text-sm text-zinc-500 dark:text-zinc-400"
+          className="font-mono text-xs uppercase tracking-wider text-muted"
         >
           {new Date(post.date).toLocaleDateString("en-US", {
             year: "numeric",
@@ -46,7 +46,9 @@ export default async function BlogPostPage({ params }: PageProps) {
             day: "numeric",
           })}
         </time>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">{post.title}</h1>
+        <h1 className="font-display mt-3 text-4xl font-bold tracking-tight">
+          {post.title}
+        </h1>
         <div className="mt-8">
           <MarkdownContent content={post.content} />
         </div>

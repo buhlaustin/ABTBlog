@@ -12,16 +12,14 @@ export default function BlogIndexPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
-      <h1 className="text-3xl font-semibold tracking-tight">Blog</h1>
-      <p className="mt-3 text-zinc-600 dark:text-zinc-400">
-        Notes on what I&apos;m building and learning.
-      </p>
-      <ul className="mt-10 divide-y divide-zinc-200 dark:divide-zinc-800">
+      <h1 className="font-display text-4xl font-bold tracking-tight">Blog</h1>
+      <p className="mt-4 text-muted">Notes on what I&apos;m building and learning.</p>
+      <ul className="mt-12 divide-y divide-border/80">
         {posts.map((post) => (
-          <li key={post.slug} className="py-6">
+          <li key={post.slug} className="py-8 first:pt-0">
             <time
               dateTime={post.date}
-              className="text-sm text-zinc-500 dark:text-zinc-400"
+              className="font-mono text-xs uppercase tracking-wider text-muted"
             >
               {new Date(post.date).toLocaleDateString("en-US", {
                 year: "numeric",
@@ -29,12 +27,15 @@ export default function BlogIndexPage() {
                 day: "numeric",
               })}
             </time>
-            <h2 className="mt-1 text-xl font-semibold">
-              <Link href={`/blog/${post.slug}/`} className="hover:underline">
+            <h2 className="font-display mt-2 text-xl font-bold">
+              <Link
+                href={`/blog/${post.slug}/`}
+                className="text-foreground hover:text-accent"
+              >
                 {post.title}
               </Link>
             </h2>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-2 text-sm leading-relaxed text-muted">
               {post.description}
             </p>
           </li>

@@ -5,12 +5,13 @@
   "scripts": {
     "dev": "npm run copy-work && next dev",
     "prebuild": "node scripts/copy-work-assets.mjs && node scripts/generate-rss.mjs && node scripts/generate-sitemap.mjs",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "copy-work": "node scripts/copy-work-assets.mjs"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/typography": "^0.5.20",
     "gray-matter": "^4.0.3",
     "next": "16.4.3",
