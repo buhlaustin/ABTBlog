@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "npm run copy-work && next dev",
     "prebuild": "node scripts/copy-work-assets.mjs && node scripts/generate-rss.mjs && node scripts/generate-sitemap.mjs",
     "build": "next build",
     "start": "next start",
