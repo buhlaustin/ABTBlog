@@ -31,13 +31,17 @@ export default function AboutPage() {
           K12.
         </p>
         <p>
-          This site is the monolith for everything I ship here: writing at{" "}
+          On{" "}
           <strong className="font-medium text-foreground">
             austinbuhltech.com
-          </strong>
-          , plus hosted projects under{" "}
+          </strong>{" "}
+          I publish{" "}
+          <Link href="/blog/" className="text-accent hover:underline">
+            writing
+          </Link>{" "}
+          and host side projects you can try in the browser—see{" "}
           <Link href="/work/" className="text-accent hover:underline">
-            /work
+            work
           </Link>
           .
         </p>

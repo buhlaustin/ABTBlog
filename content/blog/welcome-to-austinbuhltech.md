@@ -2,13 +2,13 @@
 title: Welcome to austinbuhltech.com
 slug: welcome-to-austinbuhltech
 date: 2026-10-25
-description: One monolith for my personal site, writing, and hosted projects—including House of Strategy.
+description: A home for my writing and side projects—including House of Strategy.
 tags:
-  - meta
+  - site
 ---
 
-This site is my personal home on the web: **austinbuhltech.com**.
+This is my corner of the web: notes on what I’m building, plus games and experiments you can play in the browser.
 
-Everything lives in one Next.js repo—blog posts, marketing pages, and playable work under `/work`. [House of Strategy](/work/hos/) was imported from the old open-source repo; from here on, changes happen in this monolith only.
+If you want somewhere to start, try [House of Strategy](/work/hos/)—a text-based social strategy game inspired by reality competition shows.
 
 More posts and projects coming soon.

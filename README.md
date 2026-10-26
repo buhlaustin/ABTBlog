@@ -1,6 +1,6 @@
 # austinbuhltech.com
 
-Personal site monolith for [Austin Buhl](https://github.com/buhlaustin): marketing pages, blog, and hosted projects under `/work`.
+Personal website for [Austin Buhl](https://github.com/buhlaustin): about, blog, and hosted projects under `/work`.
 
 - **Production URL:** [austinbuhltech.com](https://austinbuhltech.com)
 - **Stack:** Next.js (static export), Tailwind CSS, Markdown blog
@@ -26,9 +26,7 @@ Hosted project assets live in `work/` (source of truth). `npm run prebuild` copi
 
 ## House of Strategy (HOS)
 
-Game source is in `work/hos/`. Canonical development happens in **this repo**; the [original HOS repository](https://github.com/buhlaustin/HOS) is no longer the source of truth for the hosted version.
-
-Play at `/work/hos/`.
+Game source is in `work/hos/`. Play at `/work/hos/`. Upstream history lives in [buhlaustin/HOS](https://github.com/buhlaustin/HOS).
 
 ## Blog
 
