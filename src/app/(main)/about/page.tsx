@@ -5,19 +5,16 @@ import { ResumeTimeline } from "@/components/resume-timeline";
 import {
   openSourceHighlights,
   profile,
+  quickFacts,
   siteConfig,
 } from "@/lib/profile";
-import {
-  classQuipIntro,
-  focusAreas,
-  resumeGroups,
-} from "@/lib/resume";
+import { focusAreas, resumeGroups } from "@/lib/resume";
 import { workItems } from "@/lib/work-registry";
 import { WorkCard } from "@/components/work-card";
 
 export const metadata: Metadata = {
   title: "About",
-  description: `${siteConfig.name} — ${profile.role} at ${profile.company}, based in ${siteConfig.location}. Edtech, research simulations, games, and open source.`,
+  description: `${siteConfig.name} — builder from Maryville, TN. Edtech, side projects, writing, and open source.`,
 };
 
 function AboutSection({
@@ -62,12 +59,17 @@ export default function AboutPage() {
             {siteConfig.name}
           </h1>
           <p className="mt-2 font-mono text-sm text-muted">
-            {siteConfig.location}
+            {siteConfig.hometown} → {siteConfig.location}
           </p>
-          <p className="mt-4 text-lg leading-relaxed text-foreground">
-            {profile.tagline}
-          </p>
-          <p className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+          <div className="mt-5 space-y-4 text-base leading-relaxed text-foreground">
+            {profile.bioParagraphs.map((paragraph) => (
+              <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+            ))}
+            <p className="text-muted">
+              Dad to {profile.daughters[0]} and {profile.daughters[1]}.
+            </p>
+          </div>
+          <p className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
             <a
               href={siteConfig.github}
               className="font-semibold text-accent underline-offset-2 hover:underline"
@@ -76,14 +78,6 @@ export default function AboutPage() {
             >
               GitHub @
               {siteConfig.githubUsername}
-            </a>
-            <a
-              href={profile.companyUrl}
-              className="font-semibold text-accent underline-offset-2 hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {profile.company}
             </a>
             <a
               href={profile.linkedIn}
@@ -104,43 +98,22 @@ export default function AboutPage() {
       </header>
 
       <div className="mt-14">
-        <AboutSection title="ClassQuip">
-          <p>
-            I&apos;m {profile.role} &amp; Chief Architect at{" "}
-            <a
-              href={profile.companyUrl}
-              className="font-medium text-accent underline-offset-2 hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {profile.company}
-            </a>
-            . {classQuipIntro.headline}
-          </p>
-          <p className="text-sm">
-            <strong className="font-medium text-foreground">ClassQuip</strong>{" "}
-            equips every teacher with a smarter classroom—live video, real-time
-            participation analytics, interactive polls, instant breakout groups,
-            and moderated chat in one high-performance platform.
-          </p>
-          <ul className="list-disc space-y-2 pl-5 text-sm">
-            {classQuipIntro.platformBullets.map((item) => (
-              <li key={item}>{item}</li>
+        <AboutSection title="Quick facts">
+          <dl className="grid gap-3 sm:grid-cols-2">
+            {quickFacts.map((fact) => (
+              <div
+                key={fact.label}
+                className="rounded-lg border border-border bg-surface px-4 py-3"
+              >
+                <dt className="font-mono text-[11px] font-medium uppercase tracking-wider text-muted">
+                  {fact.label}
+                </dt>
+                <dd className="mt-1 text-sm font-medium text-foreground">
+                  {fact.value}
+                </dd>
+              </div>
             ))}
-          </ul>
-          <p className="text-sm">{classQuipIntro.architectNote}</p>
-          <p className="text-sm">
-            The team ships in the open under{" "}
-            <a
-              href={profile.githubOrg.url}
-              className="font-medium text-accent underline-offset-2 hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {profile.githubOrg.name} on GitHub
-            </a>
-            .
-          </p>
+          </dl>
         </AboutSection>
 
         <AboutSection title="Experience">
@@ -282,7 +255,7 @@ export default function AboutPage() {
             >
               GitHub
             </a>
-            . For ClassQuip, visit{" "}
+            . Work stuff:{" "}
             <a
               href={profile.companyUrl}
               className="font-medium text-accent underline-offset-2 hover:underline"

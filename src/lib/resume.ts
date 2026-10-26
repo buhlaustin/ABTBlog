@@ -14,21 +14,6 @@ export type ResumeGroup = {
   roles: ResumeRole[];
 };
 
-export const classQuipIntro = {
-  headline:
-    "Building the action-first virtual classroom for K–12—where teachers get frictionless tools, students stay engaged, and districts can roll out safely at scale.",
-  platformBullets: [
-    "Live participation analytics—see who's engaged and who needs a nudge in real time",
-    "Quip polls & tools—polls, word clouds, and exit tickets without leaving the room",
-    "Instant breakout groups—spin up rooms with one click and bring everyone back seamlessly",
-    "Moderated live chat with teacher-controlled safety",
-    "FERPA-aware design with role-based controls for schools and districts",
-    "Deep LTI 1.3 integration with Canvas, Blackboard, Schoology, and Clever",
-  ],
-  architectNote:
-    "As Chief Architect, I design and ship the platform end to end—from real-time classroom infrastructure to teacher workflows that have to work on a Tuesday morning with 28 seventh graders.",
-} as const;
-
 export const focusAreas = [
   {
     area: "Product",
@@ -63,9 +48,9 @@ export const resumeGroups: ResumeGroup[] = [
         period: "Sep 2026 – Present",
         location: "Remote",
         highlights: [
-          "Lead company direction, product vision, and technical architecture for an enterprise virtual classroom platform built for K–12 districts—business operations and full-stack engineering for real-time instruction, LMS integration, and automated compliance tools.",
-          "Architect core infrastructure: low-latency WebRTC video, zero-cookie LTI 1.3 Advantage auth, and network fallbacks for low-bandwidth environments; systems that automate attendance and session logs for district audits.",
-          "Drive go-to-market and institutional growth through the AltaIR Capital AltaLab Fall 2026 cohort and district pilot programs; partner with the Chief Academic Officer to align the platform with real teaching workflows.",
+          "Company direction, product vision, and technical architecture for an enterprise virtual classroom platform built for K–12 districts—business operations and full-stack engineering for real-time instruction, LMS integration, and automated compliance tools.",
+          "Core infrastructure: low-latency WebRTC video, zero-cookie LTI 1.3 Advantage auth, and network fallbacks for low-bandwidth environments; attendance and session logging for district audits.",
+          "Go-to-market through the AltaIR Capital AltaLab Fall 2026 cohort and district pilot programs; work with the Chief Academic Officer to align the platform with classroom workflows.",
         ],
       },
       {
