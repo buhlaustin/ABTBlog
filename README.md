@@ -15,7 +15,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Hosted project assets live in `work/` (source of truth). `npm run prebuild` copies them to `public/work/` for static serving.
+Hosted project assets live in `work/` (source of truth). `npm run prebuild` copies them to `public/play/` (e.g. `/play/hos/index.html`) so they do not collide with Next routes under `/work/[slug]/`.
 
 ## Adding hosted work
 

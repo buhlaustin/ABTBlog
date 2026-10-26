@@ -31,7 +31,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
       <Link
         href="/blog/"
-        className="text-sm font-semibold text-accent hover:text-emerald-300"
+        className="text-sm font-semibold text-accent hover:text-blue-700"
       >
         ← Blog
       </Link>

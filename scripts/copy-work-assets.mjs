@@ -3,17 +3,18 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const publicWork = join(root, "public", "work");
+const publicPlay = join(root, "public", "play");
 
-mkdirSync(publicWork, { recursive: true });
+mkdirSync(publicPlay, { recursive: true });
 
-const projects = ["hos"];
+/** slug → source folder under work/ */
+const projects = [{ slug: "hos", dir: "hos" }];
 
-for (const slug of projects) {
-  const src = join(root, "work", slug);
-  const dest = join(publicWork, slug);
+for (const { slug, dir } of projects) {
+  const src = join(root, "work", dir);
+  const dest = join(publicPlay, slug);
   rmSync(dest, { recursive: true, force: true });
   cpSync(src, dest, { recursive: true });
 }
 
-console.log(`Copied ${projects.length} work project(s) to public/work/`);
+console.log(`Copied ${projects.length} playable project(s) to public/play/`);

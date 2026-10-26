@@ -11,27 +11,27 @@ export function HostedWorkFrame({
 }) {
   return (
     <div
-      className="flex flex-col bg-[#0f1419]"
+      className="flex flex-col bg-zinc-100"
       style={{ height: "100svh", minHeight: "100vh" }}
     >
-      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-zinc-800/80 bg-[#0f1419]/95 px-4 py-3 backdrop-blur sm:px-6">
-        <div className="flex items-center gap-3 text-sm">
+      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-white px-4 py-2.5 sm:px-6">
+        <div className="flex items-center gap-2 text-sm text-muted">
           <Link
             href="/work/"
-            className="font-medium text-emerald-400/90 transition hover:text-emerald-300"
+            className="font-medium text-foreground transition hover:text-accent"
           >
             ← Work
           </Link>
-          <span className="text-zinc-600">/</span>
-          <span className="font-medium text-zinc-100">{title}</span>
+          <span aria-hidden>/</span>
+          <span className="font-medium text-foreground">{title}</span>
         </div>
         <a
           href={entryPath}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs font-medium text-zinc-500 transition hover:text-zinc-300"
+          className="text-xs font-medium text-muted transition hover:text-accent"
         >
-          Open fullscreen
+          Open in new tab
         </a>
       </div>
       <iframe

@@ -16,7 +16,7 @@
 # next.js
 /.next/
 /out/
-/public/work/
+/public/play/
 
 # production
 /build

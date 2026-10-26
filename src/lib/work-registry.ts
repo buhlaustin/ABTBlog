@@ -10,7 +10,7 @@ export interface WorkItem {
   tags: string[];
   featured?: boolean;
   repoUrl?: string;
-  /** Path under public/ for hosted iframe entry (e.g. /work/hos/index.html) */
+  /** Static game entry under public/play/ (must not overlap /work/[slug] routes) */
   hostedEntry?: string;
 }
 
@@ -25,7 +25,7 @@ export const workItems: WorkItem[] = [
     tags: ["game", "javascript"],
     featured: true,
     repoUrl: "https://github.com/buhlaustin/HOS",
-    hostedEntry: "/work/hos/index.html",
+    hostedEntry: "/play/hos/index.html",
   },
   {
     slug: "hvit-engine",
