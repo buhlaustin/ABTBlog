@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "Austin Buhl",
   title: "Austin Buhl — austinbuhltech.com",
   description:
-    "I build software for work and for fun—writing, experiments, and playable side projects.",
+    "Builder and software engineer in Knoxville, TN—real-time edtech, browser games, simulations, and open source.",
   url: "https://austinbuhltech.com",
   github: "https://github.com/buhlaustin",
   githubUsername: "buhlaustin",
