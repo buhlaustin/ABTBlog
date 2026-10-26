@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { ResumeTimeline } from "@/components/resume-timeline";
 import {
   openSourceHighlights,
   profile,
   siteConfig,
 } from "@/lib/profile";
+import {
+  classQuipIntro,
+  focusAreas,
+  resumeGroups,
+} from "@/lib/resume";
 import { workItems } from "@/lib/work-registry";
 import { WorkCard } from "@/components/work-card";
 
@@ -17,12 +23,16 @@ export const metadata: Metadata = {
 function AboutSection({
   title,
   children,
+  className,
 }: {
   title: string;
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <section className="mt-12 border-t border-border pt-10 first:mt-0 first:border-t-0 first:pt-0">
+    <section
+      className={`mt-12 border-t border-border pt-10 first:mt-0 first:border-t-0 first:pt-0 ${className ?? ""}`}
+    >
       <h2 className="font-display text-xl font-bold tracking-tight text-foreground">
         {title}
       </h2>
@@ -75,6 +85,20 @@ export default function AboutPage() {
             >
               {profile.company}
             </a>
+            <a
+              href={profile.linkedIn}
+              className="font-semibold text-accent underline-offset-2 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              LinkedIn
+            </a>
+            <a
+              href={`mailto:${profile.email}`}
+              className="font-semibold text-accent underline-offset-2 hover:underline"
+            >
+              Email
+            </a>
           </p>
         </div>
       </header>
@@ -82,7 +106,7 @@ export default function AboutPage() {
       <div className="mt-14">
         <AboutSection title="ClassQuip">
           <p>
-            I&apos;m {profile.role} at{" "}
+            I&apos;m {profile.role} &amp; Chief Architect at{" "}
             <a
               href={profile.companyUrl}
               className="font-medium text-accent underline-offset-2 hover:underline"
@@ -91,11 +115,21 @@ export default function AboutPage() {
             >
               {profile.company}
             </a>
-            . {profile.bio} ClassQuip is focused on giving teachers and students
-            a virtual classroom that feels purposeful—not a patchwork of
-            disconnected tools.
+            . {classQuipIntro.headline}
           </p>
-          <p>
+          <p className="text-sm">
+            <strong className="font-medium text-foreground">ClassQuip</strong>{" "}
+            equips every teacher with a smarter classroom—live video, real-time
+            participation analytics, interactive polls, instant breakout groups,
+            and moderated chat in one high-performance platform.
+          </p>
+          <ul className="list-disc space-y-2 pl-5 text-sm">
+            {classQuipIntro.platformBullets.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <p className="text-sm">{classQuipIntro.architectNote}</p>
+          <p className="text-sm">
             The team ships in the open under{" "}
             <a
               href={profile.githubOrg.url}
@@ -109,27 +143,46 @@ export default function AboutPage() {
           </p>
         </AboutSection>
 
-        <AboutSection title="Background">
-          <p>
-            Before ClassQuip I worked at{" "}
-            <strong className="font-medium text-foreground">
-              {profile.previousEmployer}
-            </strong>
-            , where I learned what large-scale online learning looks like in
-            production—scheduling, live instruction, and the operational weight
-            behind every virtual class. That experience shapes how I think about
-            reliability, clarity for educators, and products that have to work on
-            a school-day clock.
-          </p>
+        <AboutSection title="Experience">
+          <div className="text-foreground">
+            <ResumeTimeline groups={resumeGroups} />
+          </div>
+        </AboutSection>
+
+        <AboutSection title="Focus areas">
+          <div className="overflow-x-auto rounded-xl border border-border">
+            <table className="w-full min-w-[280px] border-collapse text-left text-sm">
+              <thead>
+                <tr className="border-b border-border bg-surface">
+                  <th className="px-4 py-3 font-semibold text-foreground">
+                    Area
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-foreground">
+                    What I care about
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {focusAreas.map((row) => (
+                  <tr
+                    key={row.area}
+                    className="border-b border-border last:border-b-0"
+                  >
+                    <td className="px-4 py-3 align-top font-medium text-foreground">
+                      {row.area}
+                    </td>
+                    <td className="px-4 py-3 text-muted">{row.detail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </AboutSection>
 
         <AboutSection title="What I build outside work">
           <p>
-            I like projects that sit at different altitudes: playful games,
-            research-grade simulations, and small devtools that remove friction.
-            A few themes show up again and again—autonomous agents (whether AI
-            houseguests or particle systems), browser-first experiences, and
-            Python when the problem is numerical or scientific.
+            Open-source and side projects from my public GitHub—games,
+            research-grade simulations, and small devtools.
           </p>
           <ul className="list-none space-y-6 pl-0">
             {openSourceHighlights.map((project) => (
@@ -205,7 +258,22 @@ export default function AboutPage() {
 
         <AboutSection title="Say hello">
           <p>
-            The fastest way to see what I&apos;m building is{" "}
+            <a
+              href={`mailto:${profile.email}`}
+              className="font-medium text-accent underline-offset-2 hover:underline"
+            >
+              {profile.email}
+            </a>
+            {" · "}
+            <a
+              href={profile.linkedIn}
+              className="font-medium text-accent underline-offset-2 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              LinkedIn
+            </a>
+            {" · "}
             <a
               href={siteConfig.github}
               className="font-medium text-accent underline-offset-2 hover:underline"
@@ -214,7 +282,7 @@ export default function AboutPage() {
             >
               GitHub
             </a>
-            . For ClassQuip, reach out through{" "}
+            . For ClassQuip, visit{" "}
             <a
               href={profile.companyUrl}
               className="font-medium text-accent underline-offset-2 hover:underline"
