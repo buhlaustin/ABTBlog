@@ -3,7 +3,7 @@ import { siteConfig } from "@/lib/site";
 /** Public profile facts (aligned with https://github.com/buhlaustin). */
 export const profile = {
   tagline:
-    "Co-Founder & CEO at ClassQuip. Former Stride / K12. Builder of edtech, simulations, games, and dev tools.",
+    "Co-Founder, CEO & Chief Architect at ClassQuip. Former Stride / K12. Builder of edtech, simulations, games, and dev tools.",
   bio: "Building a better virtual classroom experience for K–12.",
   role: "Co-Founder & CEO",
   company: "ClassQuip",
@@ -14,6 +14,8 @@ export const profile = {
     name: "ClassQuip",
     url: "https://github.com/ClassQuip",
   },
+  linkedIn: "https://www.linkedin.com/in/austinbuhl20",
+  email: "abuhl@classquip.com",
 } as const;
 
 export type OpenSourceHighlight = {
@@ -47,20 +49,22 @@ export const openSourceHighlights: OpenSourceHighlight[] = [
     name: "Cursor Cloud to Paxel Converter",
     href: "https://github.com/buhlaustin/Cursor-Cloud-to-Paxel-Converter",
     sitePath: "/work/cursor-cloud-to-paxel-converter/",
-    blurb: "Turn Cursor Cloud tool definitions into Paxel-compatible formats.",
+    blurb:
+      "Unofficial bridge that exports Cursor Cloud Agent transcripts, converts them to Paxel's format, and uploads them for founder reflection and session analysis.",
     languages: ["Python"],
   },
   {
     name: "AmericanPong",
     href: "https://github.com/buhlaustin/AmericanPong",
     blurb:
-      "A patriotic twist on a classic arcade game for America’s 250th birthday.",
+      "Patriotic paddle Pong as a web app—classic CPU vs. player, first to 7 wins.",
     languages: ["JavaScript"],
   },
   {
     name: "AmericanPongMobile",
     href: "https://github.com/buhlaustin/AmericanPongMobile",
-    blurb: "Android take on AmericanPong.",
+    blurb:
+      "Mobile Android build of American Pong with four game modes, power-ups, campaign levels, touch controls, and procedural audio.",
     languages: ["TypeScript"],
   },
 ];
