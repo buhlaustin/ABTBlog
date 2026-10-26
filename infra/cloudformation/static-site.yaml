@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Static site for austinbuhltech.com (S3 + CloudFront OAC)
+
+Parameters:
+  SiteDomainName:
+    Type: String
+    Default: austinbuhltech.com
+    Description: Apex domain served by CloudFront
+  AcmCertificateArn:
+    Type: String
+    Description: ACM certificate ARN in us-east-1 for CloudFront (must cover apex and www if used)
+  HostedZoneId:
+    Type: String
+    Default: ""
+    Description: Optional Route 53 hosted zone ID to create A/AAAA alias records
+
+Conditions:
+  CreateDnsRecords: !Not [!Equals [!Ref HostedZoneId, ""]]
+
+Resources:
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCloudFrontServicePrincipal
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${SiteBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}"
+
+  SiteOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${SiteDomainName}-oac"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  UriRewriteFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: austinbuhltech-uri-rewrite
+      AutoPublish: true
+      FunctionConfig:
+        Comment: Append index.html for directory-style static export paths
+        Runtime: cloudfront-js-2.0
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          var uri = request.uri;
+          if (uri.endsWith('/')) {
+            request.uri += 'index.html';
+          } else if (!uri.includes('.')) {
+            request.uri += '/index.html';
+          }
+          return request;
+        }
+
+  SiteDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Aliases:
+          - !Ref SiteDomainName
+        ViewerCertificate:
+          AcmCertificateArn: !Ref AcmCertificateArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+        DefaultCacheBehavior:
+          TargetOriginId: SiteS3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD, OPTIONS]
+          Compress: true
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt UriRewriteFunction.FunctionARN
+          ForwardedValues:
+            QueryString: false
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+          - ErrorCode: 403
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+        Origins:
+          - Id: SiteS3Origin
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !Ref SiteOAC
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+
+  DnsARecord:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateDnsRecords
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref SiteDomainName
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt SiteDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+  DnsAAAARecord:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateDnsRecords
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref SiteDomainName
+      Type: AAAA
+      AliasTarget:
+        DNSName: !GetAtt SiteDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+Outputs:
+  BucketName:
+    Value: !Ref SiteBucket
+  DistributionId:
+    Value: !Ref SiteDistribution
+  DistributionDomainName:
+    Value: !GetAtt SiteDistribution.DomainName

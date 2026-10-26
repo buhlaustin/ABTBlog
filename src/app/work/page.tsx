@@ -1,0 +1,25 @@
+import type { Metadata } from "next";
+import { workItems } from "@/lib/work-registry";
+import { WorkCard } from "@/components/work-card";
+
+export const metadata: Metadata = {
+  title: "Work",
+  description: "Projects hosted on austinbuhltech.com and selected open-source work.",
+};
+
+export default function WorkIndexPage() {
+  return (
+    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+      <h1 className="text-3xl font-semibold tracking-tight">Work</h1>
+      <p className="mt-3 max-w-2xl text-zinc-600 dark:text-zinc-400">
+        Games, tools, and experiments built in this repo—plus links to other
+        open-source projects.
+      </p>
+      <div className="mt-10 grid gap-5 sm:grid-cols-2">
+        {workItems.map((item) => (
+          <WorkCard key={item.slug} item={item} />
+        ))}
+      </div>
+    </main>
+  );
+}
