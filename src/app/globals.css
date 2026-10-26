@@ -2,14 +2,14 @@
 @plugin "@tailwindcss/typography";
 
 @theme inline {
-  --color-background: #09090b;
-  --color-foreground: #fafafa;
-  --color-muted: #a1a1aa;
-  --color-accent: #34d399;
-  --color-accent-dim: #10b981;
-  --color-surface: #18181b;
-  --color-surface-raised: #27272a;
-  --color-border: #3f3f46;
+  --color-background: #ffffff;
+  --color-foreground: #18181b;
+  --color-muted: #71717a;
+  --color-accent: #2563eb;
+  --color-accent-soft: #eff6ff;
+  --color-surface: #fafafa;
+  --color-surface-raised: #f4f4f5;
+  --color-border: #e4e4e7;
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
@@ -23,21 +23,9 @@
   body {
     @apply min-h-full bg-background text-foreground antialiased;
     font-family: var(--font-sans);
-    background-image:
-      radial-gradient(
-        ellipse 80% 50% at 50% -20%,
-        rgb(16 185 129 / 0.15),
-        transparent
-      ),
-      radial-gradient(
-        ellipse 60% 40% at 100% 0%,
-        rgb(59 130 246 / 0.08),
-        transparent
-      );
-    background-attachment: fixed;
   }
 
   ::selection {
-    @apply bg-emerald-500/30 text-white;
+    @apply bg-blue-200 text-zinc-900;
   }
 }

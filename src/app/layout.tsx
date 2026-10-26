@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { DM_Sans, Geist_Mono, Syne } from "next/font/google";
-import { SiteChrome } from "@/components/site-chrome";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -48,7 +47,7 @@ export default function RootLayout({
       className={`${dmSans.variable} ${syne.variable} ${geistMono.variable} h-full`}
     >
       <body className="flex min-h-full flex-col">
-        <SiteChrome>{children}</SiteChrome>
+        {children}
       </body>
     </html>
   );

@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { HostedWorkFrame } from "@/components/hosted-work-frame";
 import { MarkdownContent } from "@/components/markdown-content";
-import {
-  getAllWorkSlugs,
-  getWorkItem,
-  type WorkItem,
-} from "@/lib/work-registry";
+import { getWorkItem, type WorkItem, workItems } from "@/lib/work-registry";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
@@ -24,7 +19,9 @@ function getWorkMarkdown(slug: string): string | null {
 }
 
 export function generateStaticParams() {
-  return getAllWorkSlugs().map((slug) => ({ slug }));
+  return workItems
+    .filter((entry) => entry.kind !== "hosted")
+    .map((entry) => ({ slug: entry.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -44,7 +41,7 @@ function ExternalWorkDetail({ item }: { item: WorkItem }) {
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
       <Link
         href="/work/"
-        className="text-sm font-semibold text-accent hover:text-emerald-300"
+        className="text-sm font-semibold text-accent hover:text-blue-700"
       >
         ← All work
       </Link>
@@ -55,7 +52,7 @@ function ExternalWorkDetail({ item }: { item: WorkItem }) {
       {item.repoUrl ? (
         <a
           href={item.repoUrl}
-          className="mt-8 inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-emerald-300"
+          className="mt-8 inline-flex rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -76,8 +73,8 @@ export default async function WorkDetailPage({ params }: PageProps) {
   const item = getWorkItem(slug);
   if (!item) notFound();
 
-  if (item.kind === "hosted" && item.hostedEntry) {
-    return <HostedWorkFrame title={item.title} entryPath={item.hostedEntry} />;
+  if (item.kind === "hosted") {
+    notFound();
   }
 
   return <ExternalWorkDetail item={item} />;
