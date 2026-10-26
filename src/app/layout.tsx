@@ -27,12 +27,29 @@ export const metadata: Metadata = {
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  icons: {
+    icon: [{ url: siteConfig.favicon, type: "image/svg+xml" }],
+  },
   openGraph: {
     title: siteConfig.title,
     description: siteConfig.description,
     url: siteConfig.url,
     siteName: siteConfig.name,
     type: "website",
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.name} — austinbuhltech.com`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
   },
 };
 
@@ -46,9 +63,7 @@ export default function RootLayout({
       lang="en"
       className={`${dmSans.variable} ${syne.variable} ${geistMono.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col">
-        {children}
-      </body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }
