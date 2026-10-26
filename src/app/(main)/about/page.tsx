@@ -65,7 +65,7 @@ export default function AboutPage() {
             {siteConfig.name}
           </h1>
           <p className="mt-2 font-mono text-sm text-muted">
-            {siteConfig.hometown} → {siteConfig.location}
+            {siteConfig.location}
           </p>
           <div className="mt-5 space-y-4 text-base leading-relaxed text-foreground">
             {profile.bioParagraphs.map((paragraph) => (

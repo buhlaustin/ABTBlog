@@ -25,7 +25,6 @@ export type QuickFact = {
 export const quickFacts: QuickFact[] = [
   { label: "Born", value: "June 5, 1998" },
   { label: "Sign", value: "Gemini" },
-  { label: "From", value: "Maryville, TN" },
   { label: "Based in", value: "Knoxville, TN" },
   { label: "Politics", value: "Independent" },
   { label: "Work", value: "Co-Founder & CEO, ClassQuip" },
