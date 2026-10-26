@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
+import { SiteLogo } from "@/components/site-logo";
 import { siteConfig } from "@/lib/site";
 import { workItems } from "@/lib/work-registry";
 import { WorkCard } from "@/components/work-card";
@@ -11,11 +12,11 @@ export default function HomePage() {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-20 pt-12 sm:px-6 sm:pt-16">
       <section className="mb-16 max-w-2xl">
-        <p className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted">
+        <p className="mb-4 font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted">
           austinbuhltech.com
         </p>
-        <h1 className="font-display text-4xl font-extrabold leading-[1.12] tracking-tight text-foreground sm:text-5xl">
-          {siteConfig.name}
+        <h1 className="mb-2 max-w-md">
+          <SiteLogo variant="hero" />
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-muted">
           {siteConfig.description}
