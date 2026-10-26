@@ -2,9 +2,9 @@
 
 A single-player text-based social strategy game inspired by reality competition shows like Big Brother.
 
-> **Canonical copy:** This directory is the source for the version hosted at [austinbuhltech.com/work/hos/](https://austinbuhltech.com/work/hos/). Edit here in the monolith repo, not the legacy [buhlaustin/HOS](https://github.com/buhlaustin/HOS) repo.
+**Play online:** [austinbuhltech.com/work/hos/](https://austinbuhltech.com/work/hos/)
 
-## Play
+## Play locally
 
 Open `index.html` in a modern browser, or serve the folder locally:
 
