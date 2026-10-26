@@ -21,19 +21,25 @@ function AboutSection({
   title,
   children,
   className,
+  centered,
 }: {
   title: string;
   children: React.ReactNode;
   className?: string;
+  centered?: boolean;
 }) {
   return (
     <section
       className={`mt-12 border-t border-border pt-10 first:mt-0 first:border-t-0 first:pt-0 ${className ?? ""}`}
     >
-      <h2 className="font-display text-xl font-bold tracking-tight text-foreground">
+      <h2
+        className={`font-display text-xl font-bold tracking-tight text-foreground ${centered ? "text-center" : ""}`}
+      >
         {title}
       </h2>
-      <div className="mt-4 space-y-4 text-base leading-relaxed text-muted">
+      <div
+        className={`mt-4 space-y-4 text-base leading-relaxed text-muted ${centered ? "mx-auto text-center" : ""}`}
+      >
         {children}
       </div>
     </section>
