@@ -9,11 +9,10 @@ export const profile = {
   avatarUrl: "https://avatars.githubusercontent.com/u/287395945?v=4",
   linkedIn: "https://www.linkedin.com/in/austinbuhl20",
   email: "abuhl@classquip.com",
-  daughters: ["Nevaeh", "Ashlynne"] as const,
   bioParagraphs: [
-    `I'm from ${siteConfig.hometown}, based in the ${siteConfig.location} area. I like building and creating new things—products, games, simulations, and whatever idea won't leave me alone until I try it.`,
-    "Day job that's also a calling: edtech and real-time software for schools. Nights and weekends: writing here, open-source repos, and browser toys you can find under Work.",
-    "Most of what I make is for other people to use, but this site is the personal layer—less pitch deck, more notebook with demos attached.",
+    "I'm a creator and engineer from Maryville, Tennessee, living and building in the Knoxville area.",
+    "By day, I design edtech and real-time software that helps schools run smoother. Nights and weekends are for whatever idea won't leave me alone until I build it—whether that's open-source projects, game prototypes, browser-based tools, or interactive simulations.",
+    "Most of my daily work is built for districts and classrooms, but this site is the personal layer. Less pitch deck, more open notebook with live code and working demos attached.",
   ] as const,
 } as const;
 
@@ -27,8 +26,7 @@ export const quickFacts: QuickFact[] = [
   { label: "Sign", value: "Gemini" },
   { label: "From", value: "Maryville, TN" },
   { label: "Based in", value: "Knoxville, TN area" },
-  { label: "Family", value: "Daughters Nevaeh & Ashlynne" },
-  { label: "Politics", value: "Independent (left-leaning)" },
+  { label: "Politics", value: "Independent" },
   { label: "Work", value: "Co-Founder & CEO, ClassQuip" },
   { label: "Before that", value: "Stride / K12 (edtech operations)" },
 ];

@@ -65,9 +65,6 @@ export default function AboutPage() {
             {profile.bioParagraphs.map((paragraph) => (
               <p key={paragraph.slice(0, 40)}>{paragraph}</p>
             ))}
-            <p className="text-muted">
-              Dad to {profile.daughters[0]} and {profile.daughters[1]}.
-            </p>
           </div>
           <p className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
             <a
