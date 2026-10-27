@@ -6,35 +6,11 @@
     <description>Personal site — writing and work at austinbuhltech.com</description>
     
     <item>
-      <title>House of Strategy — Big Brother Rules in the Browser</title>
-      <link>https://austinbuhltech.com/blog/house-of-strategy-big-brother-browser/</link>
-      <guid>https://austinbuhltech.com/blog/house-of-strategy-big-brother-browser/</guid>
-      <pubDate>Thu, 22 Oct 2026 00:00:00 GMT</pubDate>
-      <description>A text-based social strategy game with HOH, veto, jury, and Final 3—built for fun and for testing narrative systems.</description>
-      <author>Austin Buhl</author>
-    </item>
-    <item>
-      <title>Open Source Side Quests — HVIT, Paxel, and Pong</title>
-      <link>https://austinbuhltech.com/blog/open-source-side-quests/</link>
-      <guid>https://austinbuhltech.com/blog/open-source-side-quests/</guid>
-      <pubDate>Tue, 20 Oct 2026 00:00:00 GMT</pubDate>
-      <description>Physics simulations, Cursor Cloud tooling, and patriotic Pong—projects that keep my engineering instincts sharp.</description>
-      <author>Austin Buhl</author>
-    </item>
-    <item>
-      <title>Why I Built a WebRTC Stack for K–12 Chromebooks</title>
-      <link>https://austinbuhltech.com/blog/webrtc-for-k12-chromebooks/</link>
-      <guid>https://austinbuhltech.com/blog/webrtc-for-k12-chromebooks/</guid>
-      <pubDate>Sun, 18 Oct 2026 00:00:00 GMT</pubDate>
-      <description>Seven years in edtech ops showed me where video platforms break—and what we built at ClassQuip instead.</description>
-      <author>Austin Buhl</author>
-    </item>
-    <item>
-      <title>From Edtech Operations to Founder</title>
-      <link>https://austinbuhltech.com/blog/stride-ops-to-founder/</link>
-      <guid>https://austinbuhltech.com/blog/stride-ops-to-founder/</guid>
-      <pubDate>Mon, 12 Oct 2026 00:00:00 GMT</pubDate>
-      <description>What seven years supporting teachers and admins taught me before starting ClassQuip.</description>
+      <title>Hello — I'm Austin Buhl</title>
+      <link>https://austinbuhltech.com/blog/hello/</link>
+      <guid>https://austinbuhltech.com/blog/hello/</guid>
+      <pubDate>Tue, 27 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Builder in Knoxville, TN—ClassQuip, browser games, and open source. This is my corner of the web.</description>
       <author>Austin Buhl</author>
     </item>
   </channel>
