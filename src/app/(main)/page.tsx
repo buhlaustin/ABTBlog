@@ -55,7 +55,7 @@ function PlayHosBanner() {
             text-based social strategy game.
           </p>
         </div>
-        <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition group-hover:bg-blue-50">
+        <span className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition group-hover:bg-blue-50 sm:w-auto">
           Play now
           <span aria-hidden className="transition group-hover:translate-x-0.5">
             →
@@ -81,7 +81,7 @@ export default function HomePage() {
           className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(250,250,250,0)_0%,rgb(255_255_255)_85%),radial-gradient(ellipse_90%_60%_at_50%_-20%,rgba(37,99,235,0.12),transparent)]"
           aria-hidden
         />
-        <div className="relative mx-auto grid max-w-5xl gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1fr_minmax(0,17rem)] lg:items-start lg:gap-14">
+        <div className="relative mx-auto grid max-w-5xl gap-10 px-safe py-12 sm:py-20 lg:grid-cols-[1fr_minmax(0,17rem)] lg:items-start lg:gap-14">
           <div className="min-w-0">
             <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted">
               {siteConfig.location}
@@ -98,19 +98,19 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/work/"
-                className="inline-flex rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
+                className="inline-flex min-h-11 items-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 active:bg-zinc-700"
               >
                 Explore work
               </Link>
               <Link
                 href="/about/"
-                className="inline-flex rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface"
+                className="inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
               >
                 About
               </Link>
               <Link
                 href="/blog/"
-                className="inline-flex rounded-full px-5 py-2.5 text-sm font-semibold text-muted transition hover:text-foreground"
+                className="inline-flex min-h-11 items-center rounded-full px-5 py-2.5 text-sm font-semibold text-muted transition hover:text-foreground active:text-foreground"
               >
                 Blog
               </Link>
@@ -133,7 +133,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/work/hos/"
-              className="rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised"
+              className="flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
             >
               Play House of Strategy →
             </Link>
@@ -141,7 +141,7 @@ export default function HomePage() {
               href={siteConfig.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised"
+              className="flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
             >
               GitHub @
               {siteConfig.githubUsername} ↗
@@ -150,7 +150,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-5xl px-4 pb-24 pt-14 sm:px-6 sm:pt-16">
+      <div className="mx-auto max-w-5xl px-safe pb-20 pt-12 sm:pb-24 sm:pt-16">
         <section className="mb-16">
           <PlayHosBanner />
         </section>
@@ -177,7 +177,7 @@ export default function HomePage() {
         </section>
 
         <section className="mb-16">
-          <div className="mb-8 flex items-end justify-between gap-4">
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="font-display text-2xl font-bold tracking-tight">
                 Selected work
@@ -188,9 +188,9 @@ export default function HomePage() {
             </div>
             <Link
               href="/work/"
-              className="shrink-0 text-sm font-semibold text-accent hover:text-blue-700"
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:text-blue-700 active:text-blue-800"
             >
-              View all
+              View all →
             </Link>
           </div>
           <div className="grid gap-6 sm:grid-cols-2">
@@ -206,10 +206,10 @@ export default function HomePage() {
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
                 Latest post
               </p>
-              <h2 className="font-display mt-3 text-2xl font-bold tracking-tight">
+              <h2 className="font-display mt-3 text-xl font-bold tracking-tight sm:text-2xl">
                 <Link
                   href={`/blog/${latestPost.slug}/`}
-                  className="text-foreground hover:text-accent"
+                  className="text-foreground hover:text-accent active:text-accent"
                 >
                   {latestPost.title}
                 </Link>

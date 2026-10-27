@@ -18,11 +18,29 @@
 @layer base {
   html {
     @apply h-full scroll-smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
-    @apply min-h-full bg-background text-foreground antialiased;
+    @apply min-h-full overflow-x-clip bg-background text-foreground antialiased;
     font-family: var(--font-sans);
+  }
+
+  .px-safe {
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+
+  @media (min-width: 640px) {
+    .px-safe {
+      padding-left: max(1.5rem, env(safe-area-inset-left, 0px));
+      padding-right: max(1.5rem, env(safe-area-inset-right, 0px));
+    }
+  }
+
+  .pb-safe {
+    padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
   }
 
   ::selection {

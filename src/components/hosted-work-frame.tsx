@@ -14,24 +14,26 @@ export function HostedWorkFrame({
       className="flex flex-col bg-zinc-100"
       style={{ height: "100svh", minHeight: "100vh" }}
     >
-      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-border bg-white px-4 py-2.5 sm:px-6">
-        <div className="flex items-center gap-2 text-sm text-muted">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border bg-white px-safe py-2.5 pt-[max(0.625rem,env(safe-area-inset-top,0px))]">
+        <div className="flex min-w-0 flex-1 items-center gap-2 text-sm text-muted">
           <Link
             href="/work/"
-            className="font-medium text-foreground transition hover:text-accent"
+            className="inline-flex min-h-10 shrink-0 items-center font-medium text-foreground transition hover:text-accent active:text-accent"
           >
             ← Work
           </Link>
-          <span aria-hidden>/</span>
-          <span className="font-medium text-foreground">{title}</span>
+          <span className="hidden shrink-0 sm:inline" aria-hidden>
+            /
+          </span>
+          <span className="truncate font-medium text-foreground">{title}</span>
         </div>
         <a
           href={entryPath}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs font-medium text-muted transition hover:text-accent"
+          className="inline-flex min-h-10 shrink-0 items-center whitespace-nowrap px-2 text-xs font-medium text-muted transition hover:text-accent active:text-accent"
         >
-          Open in new tab
+          New tab
         </a>
       </div>
       <iframe

@@ -9,8 +9,10 @@ export const metadata: Metadata = {
 
 export default function WorkIndexPage() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
-      <h1 className="font-display text-4xl font-bold tracking-tight">Work</h1>
+    <main className="mx-auto w-full max-w-5xl flex-1 px-safe py-10 sm:py-16">
+      <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        Work
+      </h1>
       <p className="mt-4 max-w-2xl text-muted">
         Games, tools, and experiments you can run here, plus selected
         open-source work on GitHub.

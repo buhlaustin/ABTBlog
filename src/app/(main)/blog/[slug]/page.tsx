@@ -29,14 +29,14 @@ export default async function BlogPostPage({ params }: PageProps) {
   if (!post) notFound();
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+    <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-10 sm:py-16">
       <Link
         href="/blog/"
-        className="text-sm font-semibold text-accent hover:text-blue-700"
+        className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:text-blue-700 active:text-blue-800"
       >
         ← Blog
       </Link>
-      <article className="mt-6">
+      <article className="mt-4 sm:mt-6">
         <time
           dateTime={post.date}
           className="font-mono text-xs uppercase tracking-wider text-muted"
@@ -47,7 +47,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             day: "numeric",
           })}
         </time>
-        <h1 className="font-display mt-3 text-4xl font-bold tracking-tight">
+        <h1 className="font-display mt-3 text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
           {post.title}
         </h1>
         <PostAuthorCard variant="byline" authorName={post.author} />

@@ -38,21 +38,21 @@ function ExternalWorkDetail({ item }: { item: WorkItem }) {
   const extra = getWorkMarkdown(item.slug);
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+    <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-10 sm:py-16">
       <Link
         href="/work/"
-        className="text-sm font-semibold text-accent hover:text-blue-700"
+        className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:text-blue-700 active:text-blue-800"
       >
         ← All work
       </Link>
-      <h1 className="font-display mt-6 text-4xl font-bold tracking-tight">
+      <h1 className="font-display mt-4 text-3xl font-bold tracking-tight sm:mt-6 sm:text-4xl">
         {item.title}
       </h1>
       <p className="mt-4 text-muted">{item.summary}</p>
       {item.repoUrl ? (
         <a
           href={item.repoUrl}
-          className="mt-8 inline-flex rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
+          className="mt-8 inline-flex min-h-11 items-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 active:bg-zinc-700"
           target="_blank"
           rel="noopener noreferrer"
         >

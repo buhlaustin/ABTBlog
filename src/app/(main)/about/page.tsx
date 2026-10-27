@@ -50,7 +50,7 @@ export default function AboutPage() {
   const featuredWork = workItems.filter((item) => item.featured);
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-safe py-10 sm:py-16">
       <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
         <Image
           src={profile.avatarUrl}
@@ -61,7 +61,7 @@ export default function AboutPage() {
           priority
         />
         <div className="min-w-0">
-          <h1 className="font-display text-4xl font-bold tracking-tight">
+          <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
             {siteConfig.name}
           </h1>
           <p className="mt-2 font-mono text-sm text-muted">

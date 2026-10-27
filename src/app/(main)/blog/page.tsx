@@ -11,8 +11,10 @@ export default function BlogIndexPage() {
   const posts = getAllPosts();
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
-      <h1 className="font-display text-4xl font-bold tracking-tight">Blog</h1>
+    <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-10 sm:py-16">
+      <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        Blog
+      </h1>
       <p className="mt-4 text-muted">Notes on what I&apos;m building and learning.</p>
       <ul className="mt-12 divide-y divide-border/80">
         {posts.map((post) => (
