@@ -6,11 +6,11 @@
     <description>Personal site — writing and work at austinbuhltech.com</description>
     
     <item>
-      <title>Hello — I'm Austin Buhl</title>
+      <title>Hello World: Building Real-Time Systems, Tackling EdTech Friction, and Engineering in the Open</title>
       <link>https://austinbuhltech.com/blog/hello/</link>
       <guid>https://austinbuhltech.com/blog/hello/</guid>
       <pubDate>Tue, 27 Oct 2026 00:00:00 GMT</pubDate>
-      <description>Builder in Knoxville, TN—ClassQuip, browser games, and open source. This is my corner of the web.</description>
+      <description>A decade in K–12 edtech ops and real-time software—and why I built ClassQuip and write about the work in public.</description>
       <author>Austin Buhl</author>
     </item>
   </channel>
