@@ -38,7 +38,7 @@ That led to building ClassQuip from the ground up—not as a general video meeti
 
 ### Architectural priorities
 
-**Custom low-bandwidth AWS WebRTC stack:** Rather than routing streams through generic third-party video APIs that charge high per-minute rates and consume massive client overhead, we built a custom WebRTC media engine on AWS. By optimizing selective forwarding unit (SFU) architecture, dynamic bitrate adaptation, and packet loss concealment (PLC), we dropped video infrastructure costs down to sub-dollar rates per seat while maintaining sub-200ms latency even on degraded connections.
+**Custom low-bandwidth AWS WebRTC stack:** Rather than routing streams through generic third-party video APIs that add heavy client overhead, we built a custom WebRTC media engine on AWS. By optimizing selective forwarding unit (SFU) architecture, dynamic bitrate adaptation, and packet loss concealment (PLC), we keep latency low on degraded connections while staying lean on budget hardware.
 
 **The single-deck model:** To solve teacher cognitive overload, ClassQuip unifies presentation slides, interactive whiteboards, live AI-driven polls, and exit tickets into a single, cohesive presentation deck. Teachers don't manage five open applications; they advance through a single unified interface that drives the student experience in real time.
 

@@ -54,7 +54,7 @@ export default function AboutPage() {
       <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
         <Image
           src={profile.avatarUrl}
-          alt=""
+          alt={`${siteConfig.name} headshot`}
           width={112}
           height={112}
           className="h-28 w-28 shrink-0 rounded-2xl border border-border bg-surface object-cover shadow-sm"
@@ -155,10 +155,10 @@ export default function AboutPage() {
           </div>
         </AboutSection>
 
-        <AboutSection title="What I build outside work">
+        <AboutSection title="Side projects & open source">
           <p>
-            Open-source and side projects from my public GitHub—games,
-            research-grade simulations, and small devtools.
+            Games, simulations, and devtools I ship publicly on GitHub when an
+            idea won&apos;t leave me alone.
           </p>
           <ul className="list-none space-y-6 pl-0">
             {openSourceHighlights.map((project) => (
@@ -195,12 +195,8 @@ export default function AboutPage() {
           </ul>
         </AboutSection>
 
-        <AboutSection title="Featured on austinbuhltech.com">
-          <p>
-            Some of the projects above are playable or documented here—not
-            everything in my GitHub, but the ones I want to share in one place.
-          </p>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 [&>*]:text-foreground">
+        <AboutSection title="Playable & documented here">
+          <div className="grid gap-6 sm:grid-cols-2 [&>*]:text-foreground">
             {featuredWork.map((item) => (
               <WorkCard key={item.slug} item={item} />
             ))}
@@ -210,29 +206,12 @@ export default function AboutPage() {
               href="/work/"
               className="font-semibold text-accent hover:text-blue-700"
             >
-              Browse all work →
+              All projects →
             </Link>
           </p>
         </AboutSection>
 
-        <AboutSection title="This site">
-          <p>
-            <strong className="font-medium text-foreground">
-              austinbuhltech.com
-            </strong>{" "}
-            is my personal home on the web: long-form{" "}
-            <Link href="/blog/" className="text-accent hover:underline">
-              writing
-            </Link>
-            , an index of{" "}
-            <Link href="/work/" className="text-accent hover:underline">
-              projects
-            </Link>
-            , and hosted experiences you can launch without cloning a repo.
-          </p>
-        </AboutSection>
-
-        <AboutSection title="Say hello">
+        <AboutSection title="Contact">
           <p>
             <a
               href={`mailto:${profile.email}`}
@@ -258,16 +237,15 @@ export default function AboutPage() {
             >
               GitHub
             </a>
-            . Work stuff:{" "}
+            {" · "}
             <a
               href={profile.companyUrl}
               className="font-medium text-accent underline-offset-2 hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              classquip.com
+              ClassQuip
             </a>
-            .
           </p>
         </AboutSection>
       </div>

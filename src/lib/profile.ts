@@ -17,10 +17,10 @@ export const profile = {
   linkedIn: "https://www.linkedin.com/in/austinbuhl20",
   email: "abuhl@classquip.com",
   bioParagraphs: [
-    "I'm a builder and software engineer based in Knoxville, TN.",
-    "Over the past eight years, my focus has been on real-time software and K–12 education technology. Having spent over seven years supporting teachers, students, and school administrators on platform operations, I saw firsthand how existing video and virtual learning platforms fail in real-world environments—crashing budget hardware, choking on weak home Wi-Fi, and creating massive attendance compliance burdens for districts.",
-    "That experience led me to found ClassQuip, where I serve as CEO and system architect. I designed and built our custom, low-latency AWS WebRTC media engine specifically for low-spec K–12 hardware, bringing video infrastructure costs down to $0.50 per seat while delivering zero-drop reliability. My work spans deep media pipeline engineering, LTI 1.3 / OneRoster LMS integrations, and building scalable software that removes administrative friction from classrooms.",
-    "Outside of core edtech, I regularly design interactive simulations, browser-based games, and open-source developer tools.",
+    "I'm a builder and software engineer in Knoxville, TN—Co-Founder and CEO of ClassQuip.",
+    "For the better part of a decade I've worked inside real-time software and K–12 edtech, mostly on the ground: support with IT directors at 7 AM, teachers mid-lesson when a tab freezes, and streams that die on district firewalls and student Chromebooks. That work taught me to treat a live classroom as an environment, not a feature checklist.",
+    "I founded ClassQuip to build a classroom engine from scratch for those constraints—custom low-latency WebRTC on AWS, unified teacher workflows, and compliance tooling (LTI 1.3, OneRoster) so attendance and participation logging doesn't land on teachers after school.",
+    "When I'm not in the edtech stack, I build browser simulations, games, and open-source tools—the same engineering muscle, different playgrounds.",
   ] as const,
 } as const;
 
