@@ -1,4 +1,5 @@
 import { randomInt, clamp } from './utils.js';
+import { FINALE_PHASES } from './GameState.js';
 
 /**
  * Big Brother Final 3: R1 (3-way) → R2 (R1 losers) → R3 (R1 winner vs R2 winner) → Final HOH pick → jury vote.
@@ -59,7 +60,7 @@ export class FinaleManager {
       'Final Head of Household — Part 1 (all three compete)'
     );
     this.state.finaleR1WinnerId = winner.id;
-    this.state.finalePhase = 'r2';
+    this.state.finalePhase = FINALE_PHASES.R2;
     return { results, r1Winner: winner, losers: three.filter((c) => c.id !== winner.id) };
   }
 
@@ -72,7 +73,7 @@ export class FinaleManager {
       'Final Head of Household — Part 2 (Round 1 losers)'
     );
     this.state.finaleR2WinnerId = winner.id;
-    this.state.finalePhase = 'r3';
+    this.state.finalePhase = FINALE_PHASES.R3;
     return { results, r2Winner: winner };
   }
 
@@ -90,7 +91,7 @@ export class FinaleManager {
     this.state.finaleR3WinnerId = winner.id;
     winner.isHOH = true;
     this.state.currentHOH = winner;
-    this.state.finalePhase = 'final_pick';
+    this.state.finalePhase = FINALE_PHASES.FINAL_PICK;
     return { results, finalHOH: winner };
   }
 
@@ -112,7 +113,7 @@ export class FinaleManager {
     });
 
     this.state.processEviction(evicted, results);
-    this.state.finalePhase = 'jury_vote';
+    this.state.finalePhase = FINALE_PHASES.JURY_VOTE;
     return { results, finalist, evicted };
   }
 
@@ -165,7 +166,7 @@ export class FinaleManager {
         finalists[0].reputation >= finalists[1].reputation ? finalists[0] : finalists[1];
       this.state.gameOver = true;
       this.state.winner = winner;
-      this.state.finalePhase = 'complete';
+      this.state.finalePhase = FINALE_PHASES.COMPLETE;
       results.push({
         type: 'success',
         text: `<strong>${winner.name} wins Big Brother!</strong>`
@@ -207,7 +208,7 @@ export class FinaleManager {
 
     this.state.gameOver = true;
     this.state.winner = winner;
-    this.state.finalePhase = 'complete';
+    this.state.finalePhase = FINALE_PHASES.COMPLETE;
     return { results, winner, voteCounts: votes };
   }
 

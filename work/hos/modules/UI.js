@@ -91,16 +91,21 @@ export class UIManager {
     this.elements.storyLog.scrollTop = this.elements.storyLog.scrollHeight;
   }
 
+  _statBarWidth(value, scale = 10) {
+    const pct = scale === 10 ? value * 10 : value;
+    return Math.min(100, Math.max(0, pct));
+  }
+
   renderPlayer(player) {
     if (!player) return;
 
     this.elements.playerNameDisplay.textContent = player.name;
 
     const stats = [
-      { label: 'Social', value: player.social, cls: 'social' },
-      { label: 'Competition', value: player.competition, cls: 'competition' },
-      { label: 'Threat', value: player.threat, cls: 'threat' },
-      { label: 'Trust', value: player.trust, cls: 'trust' },
+      { label: 'Social', value: player.social, cls: 'social', scale: 10 },
+      { label: 'Competition', value: player.competition, cls: 'competition', scale: 10 },
+      { label: 'Threat', value: player.threat, cls: 'threat', scale: 100 },
+      { label: 'Trust', value: player.trust, cls: 'trust', scale: 100 },
       { label: 'Intelligence', value: player.intelligence },
       { label: 'Aggression', value: player.aggression },
       { label: 'Reputation', value: player.reputation },
@@ -109,9 +114,10 @@ export class UIManager {
 
     this.elements.playerStats.innerHTML = stats.map((s) => {
       if (s.cls) {
+        const width = this._statBarWidth(s.value, s.scale ?? 10);
         return `<div class="stat-bar-wrap">
           <div class="stat-row"><span class="stat-label">${s.label}</span><span>${s.value}</span></div>
-          <div class="stat-bar"><div class="stat-bar-fill ${s.cls}" style="width:${s.value * 10}%"></div></div>
+          <div class="stat-bar"><div class="stat-bar-fill ${s.cls}" style="width:${width}%"></div></div>
         </div>`;
       }
       return `<div class="stat-row"><span class="stat-label">${s.label}</span><span>${s.value}</span></div>`;

@@ -1,4 +1,4 @@
-import { randomInt, clamp } from './utils.js';
+import { randomInt, clamp, pickRandom } from './utils.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -118,13 +118,22 @@ export class EvictionSystem {
       vetoWinner = player;
     } else if (playerInComp && !playerWonVeto) {
       const aiPlayers = vetoPlayers.filter((p) => !p.isPlayer);
-      vetoWinner = aiPlayers.reduce((best, c) => (c.competition > best.competition ? c : best), aiPlayers[0]);
+      vetoWinner = aiPlayers.length
+        ? aiPlayers.reduce((best, c) => (c.competition > best.competition ? c : best), aiPlayers[0])
+        : pickRandom(vetoPlayers);
     } else {
-      vetoWinner = vetoPlayers.reduce((best, c) => {
-        const score = c.competition + randomInt(-2, 3);
-        const bestScore = best.competition + randomInt(-2, 3);
-        return score > bestScore ? c : best;
-      }, vetoPlayers[0]);
+      vetoWinner = vetoPlayers.length
+        ? vetoPlayers.reduce((best, c) => {
+            const score = c.competition + randomInt(-2, 3);
+            const bestScore = best.competition + randomInt(-2, 3);
+            return score > bestScore ? c : best;
+          }, vetoPlayers[0])
+        : null;
+    }
+
+    if (!vetoWinner) {
+      results.push({ type: 'system', text: 'Veto competition could not run — no eligible players.' });
+      return { results, vetoWinner: null, needsPlayerInput: false };
     }
 
     vetoWinner.hasVeto = true;
@@ -253,7 +262,7 @@ export class EvictionSystem {
 
     // Player vote (HOH does not vote)
     const player = this.state.getPlayer();
-    if (!player.isNominated && !player.isHOH && playerVoteTarget) {
+    if (player && !player.evicted && !player.isNominated && !player.isHOH && playerVoteTarget) {
       const vote = this.state.getContestant(playerVoteTarget);
       if (vote) {
         vote.votesReceived += 1;

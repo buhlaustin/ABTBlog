@@ -2,8 +2,8 @@
 
 export const SAVE_VERSION = 2;
 
-/** Jury begins on the eviction that brings the house from 10 → 9 (9 remain after). */
-export const JURY_START_HOUSE_COUNT = 9;
+/** Jury begins when 10 houseguests remain; seven jurors are seated by Final 3 (16-person cast). */
+export const JURY_START_HOUSE_COUNT = 10;
 
 export const CAST_PRESETS = {
   legacy: { label: 'Legacy (11 HGs)', aiCount: 10 },
