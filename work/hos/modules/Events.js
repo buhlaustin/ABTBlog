@@ -160,7 +160,15 @@ export class NarrativeEngine {
       sections.push(`<p>${reasons.join(' ')}</p>`);
     } else {
       sections.push(`<p class="winner-name">${winner?.name || 'Unknown'} wins!</p>`);
-      sections.push(`<p>You were evicted in Week ${player.evictedWeek || this.state.week}. ${winner?.name} played a stronger endgame.</p>`);
+      if (player.evicted) {
+        sections.push(
+          `<p>You were evicted in Week ${player.evictedWeek || this.state.week}. ${winner?.name} played a stronger endgame.</p>`
+        );
+      } else {
+        sections.push(
+          `<p>You made the Final 2, but the jury chose <strong>${winner?.name}</strong>.</p>`
+        );
+      }
       sections.push('<h3>What Went Wrong</h3>');
       const reasons = [];
       if (player.threat > 60) reasons.push('You were perceived as too big a threat.');

@@ -12,7 +12,7 @@ import { FinaleManager } from './modules/Finale.js';
 import { PlayerActions } from './modules/PlayerActions.js';
 import { UIManager, setStorageRef } from './modules/UI.js';
 import { StorageManager } from './modules/Storage.js';
-import { aiCountForCast, escapeHtml } from './modules/utils.js';
+import { aiCountForCast, escapeHtml, SAVE_VERSION } from './modules/utils.js';
 
 class Game {
   constructor() {
@@ -103,6 +103,12 @@ class Game {
       return;
     }
 
+    const loadError = this._validateSave(data);
+    if (loadError) {
+      this.ui.showToast(loadError);
+      return;
+    }
+
     this._resetGame();
     this.state = GameState.fromJSON(data);
     this._initSystems();
@@ -138,6 +144,21 @@ class Game {
       this._resetGame();
       this.ui.showSetup();
     }
+  }
+
+  _validateSave(data) {
+    if (!data.contestants?.length) {
+      return 'Save file is corrupted.';
+    }
+    const version = data.saveVersion ?? 1;
+    if (version < SAVE_VERSION) {
+      return 'This save uses an older ruleset. Start a new season.';
+    }
+    const hasPlayer = data.contestants.some((c) => c.isPlayer);
+    if (!hasPlayer) {
+      return 'Save file is missing your houseguest.';
+    }
+    return null;
   }
 
   _maybeStartFinale() {
@@ -195,7 +216,11 @@ class Game {
         this._showFinalHOHPick(finalHOH, candidates);
         return;
       }
-      const evict = this.finale.aiFinalPick(finalHOH, candidates);
+      const evict = this.finale.aiChooseEvictee(finalHOH, candidates);
+      if (!evict) {
+        this.logAndRender([{ type: 'system', text: 'Final eviction could not be resolved.' }]);
+        return;
+      }
       const { results } = this.finale.applyFinalPick(finalHOH, evict.id);
       this.logAndRender(results);
       setTimeout(() => this.runFinalePhase(), 1400);
@@ -203,11 +228,46 @@ class Game {
     }
 
     if (phase === FINALE_PHASES.JURY_VOTE) {
-      const { results, winner } = this.finale.runJuryVote();
+      const player = this.state.getPlayer();
+      if (player?.isJuror) {
+        this._showPlayerJuryVote();
+        return;
+      }
+      const { results } = this.finale.runJuryVote();
       this.logAndRender(results);
       this.render();
       setTimeout(() => this.endGame(), 1500);
     }
+  }
+
+  _showPlayerJuryVote() {
+    const finalists = this.state.getActiveContestants();
+    if (finalists.length !== 2) {
+      const { results } = this.finale.runJuryVote();
+      this.logAndRender(results);
+      setTimeout(() => this.endGame(), 1500);
+      return;
+    }
+
+    let html = '<p>You are on the jury. Cast your vote for the winner:</p><div class="target-grid">';
+    for (const f of finalists) {
+      html += `<button class="btn target-btn" data-jury-vote="${f.id}">Vote for ${escapeHtml(f.name)}</button>`;
+    }
+    html += '</div>';
+    this.ui.showActionDetail(html);
+    this.ui.setActionPrompt('Finale — jury vote');
+    this.ui.renderActions([], () => {});
+
+    this.ui.elements.actionDetail.querySelectorAll('[data-jury-vote]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const pickId = btn.dataset.juryVote;
+        this.ui.hideActionDetail();
+        const { results } = this.finale.runJuryVote({ playerVoteForId: pickId });
+        this.logAndRender(results);
+        this.render();
+        setTimeout(() => this.endGame(), 1500);
+      });
+    });
   }
 
   _showFinalHOHPick(finalHOH, candidates) {
@@ -248,7 +308,7 @@ class Game {
 
   render() {
     const { state, ui } = this;
-    ui.updateWeekDay(state.week, state.day, state.phase);
+    ui.updateWeekDay(state.week, state.day, state.phase, state.finalePhase);
     ui.renderStoryLog(state.storyLog);
     ui.renderPlayer(state.getPlayer());
     ui.renderHouseguests(state.contestants, state.getPlayer());
@@ -280,12 +340,6 @@ class Game {
       return;
     }
 
-    const player = this.state.getPlayer();
-    if (player.evicted && !this.state.gameOver) {
-      this._spectateRemaining();
-      return;
-    }
-
     switch (this.state.phase) {
       case PHASES.SOCIAL:
         this.runSocialPhase();
@@ -311,6 +365,32 @@ class Game {
   }
 
   runSocialPhase() {
+    const player = this.state.getPlayer();
+    if (player?.evicted) {
+      this.ui.setActionPrompt('Spectator mode — follow the live feed or skip ahead.');
+      this.ui.renderActions(
+        [
+          {
+            id: 'end_day',
+            label: 'Watch Today',
+            description: 'See house events play out for the rest of the day.'
+          },
+          {
+            id: 'skip_to_hoh',
+            label: 'Skip to HOH Night',
+            description: 'Jump to this week’s Head of Household competition.'
+          },
+          {
+            id: 'simulate_rest',
+            label: 'Simulate Rest of Season',
+            description: 'Fast-forward to the winner (skips remaining weeks).'
+          }
+        ],
+        (action) => this.handleSpectatorAction(action)
+      );
+      return;
+    }
+
     this.ui.setActionPrompt(
       this.state.actionsRemaining > 0
         ? `What will you do? (${this.state.actionsRemaining} action${this.state.actionsRemaining > 1 ? 's' : ''} left today)`
@@ -319,6 +399,32 @@ class Game {
 
     const actions = this.playerActions.getAvailableActions();
     this.ui.renderActions(actions, (action) => this.handlePlayerAction(action));
+  }
+
+  handleSpectatorAction(action) {
+    if (action.id === 'simulate_rest') {
+      this.ui.hideActionDetail();
+      this._spectateRemaining();
+      return;
+    }
+
+    if (action.id === 'skip_to_hoh') {
+      this.ui.hideActionDetail();
+      this.state.phase = PHASES.COMPETITION;
+      this.state.day = 6;
+      this.logAndRender([
+        {
+          type: 'system',
+          text: 'You skip ahead to Head of Household night…'
+        }
+      ]);
+      setTimeout(() => this.runPhase(), 800);
+      return;
+    }
+
+    if (action.id === 'end_day') {
+      this.advanceDay();
+    }
   }
 
   handlePlayerAction(action) {
@@ -768,18 +874,16 @@ class Game {
       const jurorNote = this.state.getPlayer().isJuror
         ? ' You are on the jury.'
         : '';
-      if (remaining > 1) {
-        this.logAndRender([
-          {
-            type: 'system',
-            text: `You may continue watching the house feed as a spectator.${jurorNote}`
-          }
-        ]);
-        setTimeout(() => this._spectateRemaining(), 1500);
-      } else {
+      if (remaining <= 1) {
         this.endGame();
+        return;
       }
-      return;
+      this.logAndRender([
+        {
+          type: 'system',
+          text: `You may continue watching the house feed as a spectator.${jurorNote}`
+        }
+      ]);
     }
 
     this.state.phase = PHASES.WEEK_END;
@@ -843,7 +947,8 @@ class Game {
         this.state.storyLog.push(...this._tagEntries(r3.results, PHASES.COMPETITION));
         const finalHOH = this.state.getContestant(this.state.finaleR3WinnerId);
         const candidates = this.state.getActiveContestants().filter((c) => c.id !== finalHOH?.id);
-        const evict = this.finale.aiFinalPick(finalHOH, candidates);
+        const evict = this.finale.aiChooseEvictee(finalHOH, candidates);
+        if (!evict) break;
         const pick = this.finale.applyFinalPick(finalHOH, evict.id);
         this.state.storyLog.push(...this._tagEntries(pick.results, PHASES.EVICTION));
         const jury = this.finale.runJuryVote();

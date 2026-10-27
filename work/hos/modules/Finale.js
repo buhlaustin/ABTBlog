@@ -77,6 +77,12 @@ export class FinaleManager {
   }
 
   runPart3(r1Winner, r2Winner) {
+    if (!r1Winner || !r2Winner) {
+      return {
+        results: [{ type: 'system', text: 'Final HOH Part 3 could not run — missing round winners.' }],
+        finalHOH: null
+      };
+    }
     const { winner, results } = this._compWinner(
       [r1Winner, r2Winner],
       'Final Head of Household — Part 3 (Round 1 winner vs Round 2 winner)'
@@ -110,24 +116,28 @@ export class FinaleManager {
     return { results, finalist, evicted };
   }
 
-  aiFinalPick(finalHOH, candidates) {
-    let best = candidates[0];
+  /** Who Final HOH should evict (take the other houseguest to Final 2). */
+  aiChooseEvictee(finalHOH, candidates) {
+    if (!candidates?.length) return null;
+    if (candidates.length === 1) return candidates[0];
+
+    let evict = candidates[0];
     let bestScore = -Infinity;
     for (const c of candidates) {
       const score =
-        finalHOH.getRelationship(c.id) +
-        c.threat * 0.5 -
         c.competition * 2 +
-        randomInt(-5, 5);
+        c.threat * 0.4 -
+        finalHOH.getRelationship(c.id) * 0.5 +
+        randomInt(-4, 4);
       if (score > bestScore) {
         bestScore = score;
-        best = c;
+        evict = c;
       }
     }
-    return best;
+    return evict;
   }
 
-  runJuryVote() {
+  runJuryVote({ playerVoteForId = null } = {}) {
     const results = [];
     const finalists = this.state.getActiveContestants();
     if (finalists.length !== 2) {
@@ -140,14 +150,36 @@ export class FinaleManager {
     const jury = this.state.getJurors();
     results.push({
       type: 'drama',
-      text: `<strong>The jury speaks.</strong> ${jury.length} jurors cast their votes for the winner.`
+      text: `<strong>The jury speaks.</strong> ${jury.length} juror${jury.length === 1 ? '' : 's'} cast their votes for the winner.`
     });
 
     const votes = new Map();
     for (const f of finalists) votes.set(f.id, 0);
 
+    if (jury.length === 0) {
+      results.push({
+        type: 'warning',
+        text: 'No jurors were seated — the higher reputation finalist wins by default.'
+      });
+      const winner =
+        finalists[0].reputation >= finalists[1].reputation ? finalists[0] : finalists[1];
+      this.state.gameOver = true;
+      this.state.winner = winner;
+      this.state.finalePhase = 'complete';
+      results.push({
+        type: 'success',
+        text: `<strong>${winner.name} wins Big Brother!</strong>`
+      });
+      return { results, winner, voteCounts: votes };
+    }
+
     for (const juror of jury) {
-      const pick = this._jurorVote(juror, finalists);
+      let pick;
+      if (juror.isPlayer && playerVoteForId) {
+        pick = finalists.find((f) => f.id === playerVoteForId) || finalists[0];
+      } else {
+        pick = this._jurorVote(juror, finalists);
+      }
       votes.set(pick.id, (votes.get(pick.id) || 0) + 1);
       results.push({
         type: 'narrative',
