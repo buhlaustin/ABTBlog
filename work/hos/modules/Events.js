@@ -8,8 +8,17 @@ export class NarrativeEngine {
     this.state = gameState;
   }
 
+  /** House feed while evicted — no player intel side effects. */
+  generateSpectatorDailyEvent() {
+    return this._ambientEvent();
+  }
+
   /** Generate a random daily event. */
   generateDailyEvent() {
+    const player = this.state.getPlayer();
+    if (player?.evicted) {
+      return this.generateSpectatorDailyEvent();
+    }
     const roll = Math.random();
     if (roll < 0.25) return this._intelEvent();
     if (roll < 0.45) return this._dramaEvent();
@@ -20,6 +29,7 @@ export class NarrativeEngine {
 
   _intelEvent() {
     const player = this.state.getPlayer();
+    if (!player || player.evicted) return null;
     const active = this.state.getActiveContestants().filter((c) => !c.isPlayer);
     if (active.length < 2) return null;
 

@@ -148,7 +148,7 @@ export class GameState {
       .filter((c) => c && c.isJuror);
   }
 
-  /** First juror when 9 houseguests remain before this eviction. */
+  /** First juror when 10 houseguests remain before this eviction (9 after). */
   shouldJoinJury(activeCountBeforeEviction) {
     return activeCountBeforeEviction <= JURY_START_HOUSE_COUNT;
   }
@@ -367,8 +367,8 @@ export class GameState {
     resetIdCounter(1000);
     const state = Object.create(GameState.prototype);
     state.saveVersion = data.saveVersion ?? 1;
-    state.difficulty = data.difficulty;
-    state.config = DIFFICULTY_CONFIG[data.difficulty];
+    state.difficulty = data.difficulty in DIFFICULTY_CONFIG ? data.difficulty : 'normal';
+    state.config = DIFFICULTY_CONFIG[state.difficulty];
     state.castPreset = data.castPreset ?? 'legacy';
     state.startingCastSize = data.startingCastSize ?? data.contestants?.length ?? 11;
     state.doubleEvictionEnabled = data.doubleEvictionEnabled ?? false;
@@ -402,7 +402,7 @@ export class GameState {
     state.lastCompetitionType = data.lastCompetitionType;
     state.currentCompetition = data.currentCompetition || null;
     state.challengeData = data.challengeData || null;
-    state.playerIntel = data.playerIntel;
+    state.playerIntel = data.playerIntel ?? [];
     state.gameOver = data.gameOver;
     state.winner = data.winner ? state.contestants.find((c) => c.id === data.winner) : null;
     return state;
