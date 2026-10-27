@@ -293,15 +293,16 @@ export class EvictionSystem {
       results.push({ type: 'warning', text: 'It\'s a tie! A random draw decides the evictee.' });
     }
 
-    evicted.evicted = true;
-    evicted.evictedWeek = this.state.week;
-    evicted.isNominated = false;
-    this.state.evictedThisWeek = evicted.id;
+    const voteCount = evicted.votesReceived;
+    const runnerUp = nominees.find((n) => n.id !== evicted.id);
+    const runnerUpVotes = runnerUp?.votesReceived ?? 0;
 
     results.push({
       type: 'drama',
-      text: `<strong>${evicted.name} has been evicted from the house.</strong> (${evicted.votesReceived} votes)`
+      text: `By a vote of <strong>${voteCount} to ${runnerUpVotes}</strong>, ${evicted.name} is evicted from the Big Brother house.`
     });
+
+    this.state.processEviction(evicted, results);
 
     if (evicted.isPlayer) {
       results.push({ type: 'warning', text: 'Your journey in the house has come to an end.' });
@@ -316,10 +317,6 @@ export class EvictionSystem {
         c.modifyRelationship(evicted.id, 0); // cleanup
       }
     }
-
-    this.state.removeFromAlliance(evicted.id);
-    this.state.addHistory({ type: 'eviction', evicted: evicted.id, votes: voteLog });
-    this.state.updateThreatLevels();
 
     return { results, evicted, voteLog, needsPlayerVote: !player.isNominated && !player.isHOH && !playerVoteTarget };
   }

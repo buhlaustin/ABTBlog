@@ -26,6 +26,7 @@ export class Contestant {
     this.personality = personality || pickRandom(PERSONALITY_TYPES);
     this.evicted = false;
     this.evictedWeek = null;
+    this.isJuror = false;
 
     // Core stats (1-10)
     this.loyalty = stats.loyalty ?? this._rollStat(4, 8, difficultyBonus);
@@ -156,6 +157,7 @@ export class Contestant {
       personality: this.personality,
       evicted: this.evicted,
       evictedWeek: this.evictedWeek,
+      isJuror: this.isJuror,
       loyalty: this.loyalty,
       intelligence: this.intelligence,
       social: this.social,
@@ -195,6 +197,7 @@ export class Contestant {
     Object.assign(c, {
       evicted: data.evicted,
       evictedWeek: data.evictedWeek,
+      isJuror: data.isJuror ?? false,
       relationships: { ...data.relationships },
       trust: data.trust,
       threat: data.threat,

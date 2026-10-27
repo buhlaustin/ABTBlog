@@ -26,12 +26,24 @@
           <option value="hard">Hard — Ruthless strategists, slim margins</option>
         </select>
 
+        <label for="cast-size">Cast size</label>
+        <select id="cast-size">
+          <option value="standard" selected>Standard — 16 houseguests</option>
+          <option value="quick">Quick — 12 houseguests</option>
+          <option value="legacy">Legacy — 11 houseguests</option>
+        </select>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="double-eviction" checked>
+          Double eviction week (once per season, when 8 or fewer remain)
+        </label>
+
         <div class="setup-actions">
           <button id="btn-new-game" class="btn btn-primary">Start New Game</button>
           <button id="btn-load-game" class="btn btn-secondary" disabled>Continue Saved Game</button>
         </div>
       </div>
-      <p class="setup-hint">Survive weekly evictions, build alliances, win competitions, and become the last one standing.</p>
+      <p class="setup-hint">16 houseguests. Head of Household, Power of Veto, jury of 7, Final 3 — outwit, outplay, outlast.</p>
     </div>
 
     <!-- Main game screen -->

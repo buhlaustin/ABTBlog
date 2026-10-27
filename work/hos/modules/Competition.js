@@ -96,8 +96,26 @@ export class CompetitionManager {
   /** Generate challenge payload once — shared by UI and scoring. */
   createChallengeData(comp = this.currentCompetition) {
     switch (comp.id) {
-      case 'trivia':
-        return { type: 'trivia', data: pickRandom(TRIVIA_QUESTIONS) };
+      case 'trivia': {
+        const castSize =
+          this.state.startingCastSize ?? this.state.getActiveContestants().length;
+        const choices = [
+          String(Math.max(8, castSize - 4)),
+          String(Math.max(10, castSize - 2)),
+          String(castSize),
+          String(castSize + 2)
+        ];
+        const answer = choices.indexOf(String(castSize));
+        const pool = TRIVIA_QUESTIONS.filter(
+          (item) => item.q !== 'How many houseguests started this game?'
+        );
+        const dynamic = {
+          q: 'How many houseguests started this season?',
+          choices,
+          answer: answer >= 0 ? answer : 2
+        };
+        return { type: 'trivia', data: pickRandom([...pool, dynamic]) };
+      }
       case 'memory':
         return { type: 'memory', data: Array.from({ length: 5 }, () => randomInt(1, 4)).join('-') };
       case 'logic':

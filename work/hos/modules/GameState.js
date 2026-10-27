@@ -1,11 +1,15 @@
 import { Contestant } from './Contestant.js';
 import {
   DIFFICULTY_CONFIG,
+  SAVE_VERSION,
+  JURY_START_HOUSE_COUNT,
+  aiCountForCast,
   generateAINames,
   pickRandom,
   shuffle,
   uid,
-  resetIdCounter
+  resetIdCounter,
+  totalCastSize
 } from './utils.js';
 
 /** Game phases within a week. */
@@ -20,20 +24,43 @@ export const PHASES = {
 
 export const PHASE_LABELS = {
   [PHASES.SOCIAL]: 'Social Phase',
-  [PHASES.COMPETITION]: 'Competition',
+  [PHASES.COMPETITION]: 'Head of Household Competition',
   [PHASES.NOMINATION]: 'Nomination Ceremony',
-  [PHASES.VETO]: 'Veto / Power Event',
-  [PHASES.EVICTION]: 'Eviction Vote',
+  [PHASES.VETO]: 'Power of Veto',
+  [PHASES.EVICTION]: 'Live Eviction',
   [PHASES.WEEK_END]: 'Week Summary'
+};
+
+export const FINALE_PHASES = {
+  R1: 'r1',
+  R2: 'r2',
+  R3: 'r3',
+  FINAL_PICK: 'final_pick',
+  JURY_VOTE: 'jury_vote',
+  COMPLETE: 'complete'
 };
 
 /**
  * Central game state: contestants, week progression, alliances, and history.
  */
 export class GameState {
-  constructor({ playerName, difficulty = 'normal', aiCount = 10 } = {}) {
+  constructor({
+    playerName,
+    difficulty = 'normal',
+    aiCount = aiCountForCast('standard'),
+    castPreset = 'standard',
+    doubleEvictionEnabled = true
+  } = {}) {
+    this.saveVersion = SAVE_VERSION;
     this.difficulty = difficulty;
     this.config = DIFFICULTY_CONFIG[difficulty];
+    this.castPreset = castPreset;
+    this.startingCastSize = totalCastSize(aiCount);
+    this.doubleEvictionEnabled = doubleEvictionEnabled;
+    this.doubleEvictionUsed = false;
+    this.doubleEvictionWeek = false;
+    this.secondEvictionPending = false;
+
     this.week = 1;
     this.day = 1;
     this.phase = PHASES.SOCIAL;
@@ -41,6 +68,7 @@ export class GameState {
     this.maxDaysPerWeek = 5;
 
     this.contestants = [];
+    this.jury = [];
     this.alliances = [];
     this.history = [];
     this.storyLog = [];
@@ -54,9 +82,14 @@ export class GameState {
     this.lastCompetitionType = null;
     this.currentCompetition = null;
     this.challengeData = null;
-    this.playerIntel = []; // secrets player has learned
+    this.playerIntel = [];
     this.gameOver = false;
     this.winner = null;
+
+    this.finalePhase = null;
+    this.finaleR1WinnerId = null;
+    this.finaleR2WinnerId = null;
+    this.finaleR3WinnerId = null;
 
     this._initContestants(playerName, aiCount);
   }
@@ -99,6 +132,67 @@ export class GameState {
 
   getActiveContestants() {
     return this.contestants.filter((c) => !c.evicted);
+  }
+
+  getJurors() {
+    return this.jury
+      .map((id) => this.getContestant(id))
+      .filter((c) => c && c.isJuror);
+  }
+
+  /** First juror when 9 houseguests remain before this eviction. */
+  shouldJoinJury(activeCountBeforeEviction) {
+    return activeCountBeforeEviction <= JURY_START_HOUSE_COUNT;
+  }
+
+  processEviction(evicted, results) {
+    if (!evicted || evicted.evicted) return;
+
+    const activeBefore = this.getActiveContestants().length;
+    evicted.evicted = true;
+    evicted.evictedWeek = this.week;
+    evicted.isNominated = false;
+    evicted.isHOH = false;
+    evicted.hasVeto = false;
+    this.evictedThisWeek = evicted.id;
+
+    if (this.shouldJoinJury(activeBefore)) {
+      evicted.isJuror = true;
+      if (!this.jury.includes(evicted.id)) {
+        this.jury.push(evicted.id);
+      }
+      results.push({
+        type: 'success',
+        text: `${evicted.name} joins the jury.`
+      });
+    }
+
+    this.removeFromAlliance(evicted.id);
+    this.addHistory({ type: 'eviction', evicted: evicted.id, juror: evicted.isJuror });
+    this.updateThreatLevels();
+  }
+
+  shouldScheduleDoubleEvictionWeek() {
+    if (!this.doubleEvictionEnabled || this.doubleEvictionUsed) return false;
+    return this.getActiveContestants().length <= 8;
+  }
+
+  planDoubleEvictionForWeek() {
+    this.doubleEvictionWeek = this.shouldScheduleDoubleEvictionWeek();
+  }
+
+  enterFinale() {
+    this.finalePhase = FINALE_PHASES.R1;
+    this.phase = PHASES.COMPETITION;
+    this.day = 6;
+    for (const c of this.getActiveContestants()) {
+      c.isHOH = false;
+      c.isNominated = false;
+    }
+  }
+
+  isInFinale() {
+    return this.finalePhase != null && this.finalePhase !== FINALE_PHASES.COMPLETE;
   }
 
   getContestant(id) {
@@ -201,27 +295,42 @@ export class GameState {
     this.resetWeeklyFlags();
   }
 
-  checkWinCondition(allowFinalTwo = true) {
+  checkWinCondition() {
+    if (this.gameOver && this.winner) return true;
     const active = this.getActiveContestants();
     if (active.length === 1) {
       this.gameOver = true;
       this.winner = active[0];
       return true;
     }
-    if (allowFinalTwo && active.length === 2) {
-      const [a, b] = active;
-      const scoreA = a.competition * 2 + a.social + a.reputation / 10;
-      const scoreB = b.competition * 2 + b.social + b.reputation / 10;
-      this.gameOver = true;
-      this.winner = scoreA >= scoreB ? a : b;
-      return true;
+    if (active.length === 3 && !this.isInFinale()) {
+      return false;
+    }
+    if (active.length === 2 && this.finalePhase === FINALE_PHASES.JURY_VOTE) {
+      return false;
     }
     return false;
   }
 
+  needsFinaleStart() {
+    return this.getActiveContestants().length === 3 && !this.isInFinale() && !this.gameOver;
+  }
+
   toJSON() {
     return {
+      saveVersion: SAVE_VERSION,
       difficulty: this.difficulty,
+      castPreset: this.castPreset,
+      startingCastSize: this.startingCastSize,
+      doubleEvictionEnabled: this.doubleEvictionEnabled,
+      doubleEvictionUsed: this.doubleEvictionUsed,
+      doubleEvictionWeek: this.doubleEvictionWeek,
+      secondEvictionPending: this.secondEvictionPending,
+      jury: [...this.jury],
+      finalePhase: this.finalePhase,
+      finaleR1WinnerId: this.finaleR1WinnerId,
+      finaleR2WinnerId: this.finaleR2WinnerId,
+      finaleR3WinnerId: this.finaleR3WinnerId,
       week: this.week,
       day: this.day,
       phase: this.phase,
@@ -249,8 +358,20 @@ export class GameState {
   static fromJSON(data) {
     resetIdCounter(1000);
     const state = Object.create(GameState.prototype);
+    state.saveVersion = data.saveVersion ?? 1;
     state.difficulty = data.difficulty;
     state.config = DIFFICULTY_CONFIG[data.difficulty];
+    state.castPreset = data.castPreset ?? 'legacy';
+    state.startingCastSize = data.startingCastSize ?? data.contestants?.length ?? 11;
+    state.doubleEvictionEnabled = data.doubleEvictionEnabled ?? false;
+    state.doubleEvictionUsed = data.doubleEvictionUsed ?? false;
+    state.doubleEvictionWeek = data.doubleEvictionWeek ?? false;
+    state.secondEvictionPending = data.secondEvictionPending ?? false;
+    state.jury = data.jury ?? [];
+    state.finalePhase = data.finalePhase ?? null;
+    state.finaleR1WinnerId = data.finaleR1WinnerId ?? null;
+    state.finaleR2WinnerId = data.finaleR2WinnerId ?? null;
+    state.finaleR3WinnerId = data.finaleR3WinnerId ?? null;
     state.week = data.week;
     state.day = data.day;
     state.phase = data.phase;

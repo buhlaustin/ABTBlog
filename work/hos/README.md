@@ -24,7 +24,10 @@ Then visit `http://localhost:8080`.
 
 ## Features
 
-- 11 houseguests (you + 10 AI contestants) with unique personalities and stats
+- **16 houseguests** by default (you + 15 AI); optional 12 or 11 cast
+- Big Brother-style week: HOH → nominations → Power of Veto → live eviction
+- Jury of 7 (starts when 9 remain), Final 3 comp chain, jury vote for the win
+- Optional **double eviction** week (once per season, when ≤8 remain; default on)
 - Autonomous AI that forms alliances, betrays allies, and votes strategically
 - Five competition types: trivia, memory, logic, endurance, and chance
 - Full eviction system with vote breakdowns and reasoning

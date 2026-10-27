@@ -1,5 +1,16 @@
 /** Shared utilities for randomization, math, and text helpers. */
 
+export const SAVE_VERSION = 2;
+
+/** Jury begins on the eviction that brings the house from 10 → 9 (9 remain after). */
+export const JURY_START_HOUSE_COUNT = 9;
+
+export const CAST_PRESETS = {
+  legacy: { label: 'Legacy (11 HGs)', aiCount: 10 },
+  quick: { label: 'Quick (12 HGs)', aiCount: 11 },
+  standard: { label: 'Standard (16 HGs)', aiCount: 15, default: true }
+};
+
 export const FIRST_NAMES = [
   'Jordan', 'Alex', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Quinn', 'Avery',
   'Blake', 'Cameron', 'Dakota', 'Emery', 'Finley', 'Harper', 'Jamie', 'Kai',
@@ -146,4 +157,13 @@ export function escapeHtml(str) {
 /** Pick unique names for AI contestants. */
 export function generateAINames(count) {
   return pickN(FIRST_NAMES, count);
+}
+
+export function aiCountForCast(castPreset) {
+  const preset = CAST_PRESETS[castPreset] || CAST_PRESETS.standard;
+  return preset.aiCount;
+}
+
+export function totalCastSize(aiCount) {
+  return aiCount + 1;
 }

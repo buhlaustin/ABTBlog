@@ -12,6 +12,8 @@ export class UIManager {
       endScreen: document.getElementById('end-screen'),
       playerNameInput: document.getElementById('player-name'),
       difficultySelect: document.getElementById('difficulty'),
+      castSelect: document.getElementById('cast-size'),
+      doubleEvictionToggle: document.getElementById('double-eviction'),
       btnNewGame: document.getElementById('btn-new-game'),
       btnLoadGame: document.getElementById('btn-load-game'),
       btnSave: document.getElementById('btn-save'),
@@ -109,16 +111,21 @@ export class UIManager {
     const tags = [];
     if (player.isHOH) tags.push('<span class="tag hoh">HOH</span>');
     if (player.isNominated) tags.push('<span class="tag nominated">Nominated</span>');
-    if (player.hasVeto) tags.push('<span class="tag veto-holder">Veto</span>');
+    if (player.hasVeto) tags.push('<span class="tag veto-holder">POV</span>');
+    if (player.isJuror) tags.push('<span class="tag jury">Jury</span>');
     if (player.allianceId) tags.push('<span class="tag alliance">In Alliance</span>');
-    if (!player.isNominated && !player.isHOH) tags.push('<span class="tag safe">Safe</span>');
+    if (!player.evicted && !player.isNominated && !player.isHOH) {
+      tags.push('<span class="tag safe">Safe</span>');
+    }
 
     this.elements.playerStatus.innerHTML = tags.join('');
   }
 
   renderHouseguests(contestants, player) {
     const active = contestants.filter((c) => !c.evicted);
-    this.elements.guestCount.textContent = active.length;
+    const juryCount = contestants.filter((c) => c.isJuror).length;
+    this.elements.guestCount.textContent =
+      juryCount > 0 ? `${active.length} in · ${juryCount} jury` : String(active.length);
 
     this.elements.houseguestList.innerHTML = contestants.map((c) => {
       const rel = player ? player.getRelationship(c.id) : 0;
@@ -126,9 +133,10 @@ export class UIManager {
       const icons = [];
       if (c.isHOH) icons.push('👑');
       if (c.isNominated) icons.push('⚠️');
-      if (c.evicted) icons.push('❌');
+      if (c.isJuror) icons.push('⚖️');
+      if (c.evicted && !c.isJuror) icons.push('❌');
 
-      return `<li class="houseguest-item ${c.isPlayer ? 'is-player' : ''} ${c.evicted ? 'evicted' : ''}">
+      return `<li class="houseguest-item ${c.isPlayer ? 'is-player' : ''} ${c.evicted ? 'evicted' : ''} ${c.isJuror ? 'juror' : ''}">
         <div>
           <span class="name">${icons.join(' ')} ${escapeHtml(c.name)}</span>
           <div class="personality">${escapeHtml(c.personality.name)}</div>

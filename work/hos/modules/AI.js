@@ -32,7 +32,39 @@ export class AIController {
     }
 
     this.state.updateThreatLevels();
+
+    const maxShown = this.state.getActiveContestants().length > 12 ? 5 : 8;
+    if (events.length > maxShown) {
+      const hidden = events.length - maxShown;
+      return [
+        ...events.slice(0, maxShown),
+        {
+          type: 'social',
+          text: `…and ${hidden} other conversations around the house.`
+        }
+      ];
+    }
     return events;
+  }
+
+  decideJuryVote(juror, finalists) {
+    let best = finalists[0];
+    let bestScore = -Infinity;
+    for (const f of finalists) {
+      let score = juror.getRelationship(f.id) * 1.2;
+      const grudge = juror.grudges.find((g) => g.againstId === f.id);
+      if (grudge) score -= grudge.intensity;
+      const kept = juror.promises.filter((p) => p.targetId === f.id && p.kept === true);
+      score += kept.length * 8;
+      const broken = juror.promises.filter((p) => p.targetId === f.id && p.kept === false);
+      score -= broken.length * 12;
+      score += randomInt(-4, 4);
+      if (score > bestScore) {
+        bestScore = score;
+        best = f;
+      }
+    }
+    return best;
   }
 
   _chooseSocialAction(ai) {

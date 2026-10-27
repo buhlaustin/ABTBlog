@@ -19,7 +19,7 @@ export const workItems: WorkItem[] = [
     slug: "hos",
     title: "House of Strategy",
     summary:
-      "A single-player text-based social strategy game inspired by reality competition shows. Outwit, outplay, outlast.",
+      "Big Brother–style social strategy for 16 houseguests—HOH, Power of Veto, jury of 7, Final 3. Outwit, outplay, outlast.",
     kind: "hosted",
     status: "live",
     tags: ["game", "javascript"],
