@@ -17,16 +17,24 @@ export default function BlogIndexPage() {
       <ul className="mt-12 divide-y divide-border/80">
         {posts.map((post) => (
           <li key={post.slug} className="py-8 first:pt-0">
-            <time
-              dateTime={post.date}
-              className="font-mono text-xs uppercase tracking-wider text-muted"
-            >
-              {new Date(post.date).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </time>
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <time
+                dateTime={post.date}
+                className="font-mono text-xs uppercase tracking-wider text-muted"
+              >
+                {new Date(post.date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </time>
+              <span className="text-xs text-muted" aria-hidden>
+                ·
+              </span>
+              <span className="text-xs font-semibold text-foreground">
+                {post.author}
+              </span>
+            </div>
             <h2 className="font-display mt-2 text-xl font-bold">
               <Link
                 href={`/blog/${post.slug}/`}

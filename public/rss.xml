@@ -6,11 +6,44 @@
     <description>Personal site — writing and work at austinbuhltech.com</description>
     
     <item>
-      <title>Welcome to austinbuhltech.com</title>
-      <link>https://austinbuhltech.com/blog/welcome-to-austinbuhltech/</link>
-      <guid>https://austinbuhltech.com/blog/welcome-to-austinbuhltech/</guid>
-      <pubDate>Sun, 25 Oct 2026 00:00:00 GMT</pubDate>
-      <description>A home for my writing and side projects—including House of Strategy.</description>
+      <title>Rebuilding austinbuhltech.com as One Static Site</title>
+      <link>https://austinbuhltech.com/blog/personal-site-static-monolith/</link>
+      <guid>https://austinbuhltech.com/blog/personal-site-static-monolith/</guid>
+      <pubDate>Mon, 26 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Next.js, Tailwind, markdown blog, and playable work—all exported to S3 and CloudFront without a runtime server.</description>
+      <author>Austin Buhl</author>
+    </item>
+    <item>
+      <title>House of Strategy — Big Brother Rules in the Browser</title>
+      <link>https://austinbuhltech.com/blog/house-of-strategy-big-brother-browser/</link>
+      <guid>https://austinbuhltech.com/blog/house-of-strategy-big-brother-browser/</guid>
+      <pubDate>Thu, 22 Oct 2026 00:00:00 GMT</pubDate>
+      <description>A text-based social strategy game with HOH, veto, jury, and Final 3—built for fun and for testing narrative systems.</description>
+      <author>Austin Buhl</author>
+    </item>
+    <item>
+      <title>Open Source Side Quests — HVIT, Paxel, and Pong</title>
+      <link>https://austinbuhltech.com/blog/open-source-side-quests/</link>
+      <guid>https://austinbuhltech.com/blog/open-source-side-quests/</guid>
+      <pubDate>Tue, 20 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Physics simulations, Cursor Cloud tooling, and patriotic Pong—projects that keep my engineering instincts sharp.</description>
+      <author>Austin Buhl</author>
+    </item>
+    <item>
+      <title>Why I Built a WebRTC Stack for K–12 Chromebooks</title>
+      <link>https://austinbuhltech.com/blog/webrtc-for-k12-chromebooks/</link>
+      <guid>https://austinbuhltech.com/blog/webrtc-for-k12-chromebooks/</guid>
+      <pubDate>Sun, 18 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Seven years in edtech ops showed me where video platforms break—and what we built at ClassQuip instead.</description>
+      <author>Austin Buhl</author>
+    </item>
+    <item>
+      <title>From Edtech Operations to Founder</title>
+      <link>https://austinbuhltech.com/blog/stride-ops-to-founder/</link>
+      <guid>https://austinbuhltech.com/blog/stride-ops-to-founder/</guid>
+      <pubDate>Mon, 12 Oct 2026 00:00:00 GMT</pubDate>
+      <description>What seven years supporting teachers and admins taught me before starting ClassQuip.</description>
+      <author>Austin Buhl</author>
     </item>
   </channel>
 </rss>

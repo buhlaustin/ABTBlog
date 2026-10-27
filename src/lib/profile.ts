@@ -1,6 +1,13 @@
 import { siteConfig } from "@/lib/site";
 
 /** Public profile facts (aligned with https://github.com/buhlaustin). */
+/** Shown on blog posts and author cards. */
+export const authorCard = {
+  name: "Austin Buhl",
+  shortBio:
+    "Co-Founder & CEO of ClassQuip in Knoxville, TN. I build low-latency WebRTC for K–12, browser games like House of Strategy, and open-source tools when I’m not in the classroom stack.",
+} as const;
+
 export const profile = {
   role: "Co-Founder & CEO",
   company: "ClassQuip",

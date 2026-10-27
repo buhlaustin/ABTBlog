@@ -1,8 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { authorCard } from "@/lib/profile";
 
 const blogDirectory = path.join(process.cwd(), "content", "blog");
+
+export const defaultBlogAuthor = authorCard.name;
 
 export interface BlogPost {
   slug: string;
@@ -10,6 +13,7 @@ export interface BlogPost {
   date: string;
   description: string;
   tags: string[];
+  author: string;
   content: string;
 }
 
@@ -34,6 +38,7 @@ export function getAllPosts(): BlogPost[] {
         date: String(data.date ?? ""),
         description: String(data.description ?? ""),
         tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+        author: String(data.author ?? defaultBlogAuthor),
         content,
       };
     })
