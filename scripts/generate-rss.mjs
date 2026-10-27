@@ -18,6 +18,7 @@ const posts = files
       slug: data.slug ?? filename.replace(/\.md$/, ""),
       date: data.date,
       description: data.description ?? "",
+      author: data.author ?? "Austin Buhl",
     };
   })
   .filter((p) => p.title && p.date)
@@ -32,6 +33,7 @@ const items = posts
       <guid>${siteUrl}/blog/${post.slug}/</guid>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
       <description>${escapeXml(post.description)}</description>
+      <author>${escapeXml(post.author)}</author>
     </item>`,
   )
   .join("");
