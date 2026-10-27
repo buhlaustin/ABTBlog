@@ -427,6 +427,7 @@ body {
 .tag.alliance { background: var(--info); color: white; }
 .tag.safe { background: rgba(42, 157, 143, 0.3); color: var(--success); }
 .tag.jury { background: rgba(244, 162, 97, 0.35); color: var(--gold); }
+.tag.evicted-player { background: rgba(231, 111, 81, 0.25); color: var(--danger); }
 
 .checkbox-label {
   display: flex;
@@ -481,9 +482,14 @@ body {
 .rel-negative { color: var(--danger); }
 .rel-neutral { color: var(--text-muted); }
 
-.houseguest-item.evicted {
+.houseguest-item.evicted:not(.juror) {
   opacity: 0.35;
   text-decoration: line-through;
+}
+
+.houseguest-item.juror {
+  opacity: 0.9;
+  border-left: 3px solid var(--gold);
 }
 
 /* Alliance overview */

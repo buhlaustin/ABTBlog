@@ -40,6 +40,14 @@ export const FINALE_PHASES = {
   COMPLETE: 'complete'
 };
 
+export const FINALE_PHASE_LABELS = {
+  [FINALE_PHASES.R1]: 'Finale — HOH Part 1',
+  [FINALE_PHASES.R2]: 'Finale — HOH Part 2',
+  [FINALE_PHASES.R3]: 'Finale — HOH Part 3',
+  [FINALE_PHASES.FINAL_PICK]: 'Finale — Final eviction',
+  [FINALE_PHASES.JURY_VOTE]: 'Finale — Jury vote'
+};
+
 /**
  * Central game state: contestants, week progression, alliances, and history.
  */

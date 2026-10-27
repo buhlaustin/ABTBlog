@@ -1,4 +1,4 @@
-import { PHASE_LABELS, PHASES } from './GameState.js';
+import { FINALE_PHASE_LABELS, PHASE_LABELS } from './GameState.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 
 /**
@@ -45,7 +45,13 @@ export class UIManager {
 
   showSetup() {
     this.showScreen(this.elements.setupScreen);
-    this.elements.btnLoadGame.disabled = !StorageManagerRef.hasSave();
+    const hasSave = StorageManagerRef.hasSave();
+    this.elements.btnLoadGame.disabled = !hasSave;
+    if (this.elements.btnLoadGame) {
+      this.elements.btnLoadGame.title = hasSave
+        ? 'Continue your saved season'
+        : 'No save found in this browser';
+    }
   }
 
   showGame() {
@@ -57,9 +63,12 @@ export class UIManager {
     this.elements.endTitle.textContent = won ? 'You Won!' : 'Game Over';
   }
 
-  updateWeekDay(week, day, phase) {
+  updateWeekDay(week, day, phase, finalePhase = null) {
     this.elements.weekDay.textContent = `Week ${week} — Day ${day}`;
-    this.elements.phaseLabel.textContent = PHASE_LABELS[phase] || phase;
+    this.elements.phaseLabel.textContent =
+      (finalePhase && FINALE_PHASE_LABELS[finalePhase]) ||
+      PHASE_LABELS[phase] ||
+      phase;
   }
 
   /** Append entries to story log. */
@@ -109,11 +118,19 @@ export class UIManager {
     }).join('');
 
     const tags = [];
-    if (player.isHOH) tags.push('<span class="tag hoh">HOH</span>');
-    if (player.isNominated) tags.push('<span class="tag nominated">Nominated</span>');
-    if (player.hasVeto) tags.push('<span class="tag veto-holder">POV</span>');
-    if (player.isJuror) tags.push('<span class="tag jury">Jury</span>');
-    if (player.allianceId) tags.push('<span class="tag alliance">In Alliance</span>');
+    if (player.evicted && player.isJuror) {
+      tags.push('<span class="tag jury">Jury</span>');
+    } else if (player.evicted) {
+      tags.push('<span class="tag evicted-player">Out</span>');
+    }
+    if (!player.evicted && player.isHOH) tags.push('<span class="tag hoh">HOH</span>');
+    if (!player.evicted && player.isNominated) {
+      tags.push('<span class="tag nominated">Nominated</span>');
+    }
+    if (!player.evicted && player.hasVeto) tags.push('<span class="tag veto-holder">POV</span>');
+    if (!player.evicted && player.allianceId) {
+      tags.push('<span class="tag alliance">In Alliance</span>');
+    }
     if (!player.evicted && !player.isNominated && !player.isHOH) {
       tags.push('<span class="tag safe">Safe</span>');
     }
