@@ -6,6 +6,22 @@
     <description>Personal site — writing and work at austinbuhltech.com</description>
     
     <item>
+      <title>I Shipped Big Brother Rules in the Browser—What State Machines Taught Me About Real Products</title>
+      <link>https://austinbuhltech.com/blog/hos-state-machines-and-product-edge-cases/</link>
+      <guid>https://austinbuhltech.com/blog/hos-state-machines-and-product-edge-cases/</guid>
+      <pubDate>Wed, 28 Oct 2026 00:00:00 GMT</pubDate>
+      <description>House of Strategy’s finale chain, jury timing, and spectator mode are a case study in boring wiring—and why that wiring is the product.</description>
+      <author>Austin Buhl</author>
+    </item>
+    <item>
+      <title>OneRoster and LTI 1.3 in Plain English (For Engineers Who’ve Only Read the Spec)</title>
+      <link>https://austinbuhltech.com/blog/oneroster-lti-plain-english/</link>
+      <guid>https://austinbuhltech.com/blog/oneroster-lti-plain-english/</guid>
+      <pubDate>Wed, 28 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Roster drift, launch context, and token lifetimes—the failure modes I keep seeing when LMS tools meet district SIS reality.</description>
+      <author>Austin Buhl</author>
+    </item>
+    <item>
       <title>Hello World: Building Real-Time Systems, Tackling EdTech Friction, and Engineering in the Open</title>
       <link>https://austinbuhltech.com/blog/hello/</link>
       <guid>https://austinbuhltech.com/blog/hello/</guid>
