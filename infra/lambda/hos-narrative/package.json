@@ -1,0 +1,8 @@
+{
+  "name": "hos-narrative",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.750.0"
+  }
+}

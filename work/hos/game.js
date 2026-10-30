@@ -11,6 +11,7 @@ import { EvictionSystem } from './modules/Eviction.js';
 import { PlayerActions } from './modules/PlayerActions.js';
 import { UIManager, setStorageRef } from './modules/UI.js';
 import { StorageManager } from './modules/Storage.js';
+import { fetchNarrativeBeat, isNarrativeApiEnabled } from './modules/NarrativeApi.js';
 import { escapeHtml } from './modules/utils.js';
 
 class Game {
@@ -81,6 +82,12 @@ class Game {
       text: 'Calendar: <strong>Fri</strong> HOH · <strong>Sat</strong> Nominations · <strong>Sun</strong> POV comp · <strong>Mon</strong> Veto meeting · <strong>Tue–Wed</strong> Strategy · <strong>Thu</strong> Eviction.',
       type: 'system'
     });
+    if (isNarrativeApiEnabled()) {
+      this.state.addStory({
+        text: 'Enhanced host narration is <strong>on</strong> for this session.',
+        type: 'system'
+      });
+    }
 
     this.ui.showGame();
     this.render();
@@ -166,6 +173,18 @@ class Game {
     state.updateThreatLevels();
   }
 
+  async _appendAiNarrative(kind) {
+    const beat = await fetchNarrativeBeat(kind, this.state);
+    if (beat) this.logAndRender([beat]);
+  }
+
+  async _beginScheduledHouseDay() {
+    if (isNarrativeApiEnabled()) {
+      await this._appendAiNarrative('host_line');
+    }
+    this.runPhase();
+  }
+
   logAndRender(entries) {
     for (const entry of entries) {
       this.state.storyLog.push({
@@ -212,7 +231,7 @@ class Game {
         this.runEvictionPhase();
         break;
       case PHASES.WEEK_END:
-        this.runWeekEnd();
+        void this.runWeekEnd();
         break;
       default:
         break;
@@ -232,7 +251,7 @@ class Game {
 
   handlePlayerAction(action) {
     if (action.id === 'continue_day') {
-      this.runPhase();
+      void this._beginScheduledHouseDay();
       return;
     }
 
@@ -340,6 +359,7 @@ class Game {
     if (event) {
       this.logAndRender([event]);
     }
+    void this._appendAiNarrative('daily_beat');
 
     this.state.advanceWeekday();
     this.state.actionsRemaining = this.state.config.actionsPerDay;
@@ -700,13 +720,17 @@ class Game {
 
   // ─── Week end ──────────────────────────────────────────────────────
 
-  runWeekEnd() {
+  async runWeekEnd() {
     const active = this.state.getActiveContestants().length;
 
     this.logAndRender([{
       type: 'system',
       text: `Week ${this.state.week} is over. ${active} houseguests remain.`
     }]);
+
+    if (isNarrativeApiEnabled()) {
+      await this._appendAiNarrative('week_recap');
+    }
 
     if (this.state.checkWinCondition(true)) {
       this.endGame();

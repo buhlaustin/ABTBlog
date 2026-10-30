@@ -17,6 +17,8 @@
 /.next/
 /out/
 /public/work/
+/infra/lambda/hos-narrative/node_modules/
+/infra/lambda/hos-narrative.zip
 
 # production
 /build

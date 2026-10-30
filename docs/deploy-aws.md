@@ -30,6 +30,8 @@ aws cloudformation deploy \
 
 Alternatively use `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` on an IAM user with `s3:PutObject`, `cloudfront:CreateInvalidation`.
 
+Optional **HOS OpenAI narration**: deploy the Lambda + Secrets Manager stack and set GitHub secret `HOS_NARRATIVE_API_URL` — see [hos-openai-aws.md](hos-openai-aws.md).
+
 ## Manual deploy
 
 ```bash

@@ -26,6 +26,7 @@ Then visit `http://localhost:8080`.
 
 - 11 houseguests (you + 10 AI contestants) with unique personalities and stats
 - Autonomous AI that forms alliances, betrays allies, and votes strategically
+- Optional **OpenAI host narration** via AWS Lambda + Secrets Manager ([docs/hos-openai-aws.md](../../docs/hos-openai-aws.md))
 - Five competition types: trivia, memory, logic, endurance, and chance
 - Full eviction system with vote breakdowns and reasoning
 - Random drama events and intel gathering

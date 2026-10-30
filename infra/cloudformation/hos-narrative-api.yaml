@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: HOS narrative API — Lambda Function URL + Secrets Manager (OpenAI key)
+
+Parameters:
+  OpenAISecretName:
+    Type: String
+    Default: austinbuhltech/hos/openai-api-key
+    Description: Secrets Manager name for the OpenAI API key (plain string or JSON with OPENAI_API_KEY)
+  AllowedOrigins:
+    Type: String
+    Default: https://austinbuhltech.com,https://www.austinbuhltech.com
+    Description: Comma-separated browser origins allowed to call the Function URL
+  OpenAIModel:
+    Type: String
+    Default: gpt-4o-mini
+  LambdaMemoryMb:
+    Type: Number
+    Default: 256
+  LambdaTimeoutSec:
+    Type: Number
+    Default: 30
+
+Resources:
+  OpenAISecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Ref OpenAISecretName
+      Description: OpenAI API key for House of Strategy narrative generation
+      SecretString: REPLACE_ME
+
+  HosNarrativeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ReadOpenAISecret
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Ref OpenAISecret
+
+  HosNarrativeFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: austinbuhltech-hos-narrative
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt HosNarrativeRole.Arn
+      MemorySize: !Ref LambdaMemoryMb
+      Timeout: !Ref LambdaTimeoutSec
+      Code:
+        ZipFile: |
+          export async function handler() {
+            return {
+              statusCode: 503,
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ error: 'Run scripts/deploy-hos-narrative-api.sh to upload function code.' })
+            };
+          }
+      Environment:
+        Variables:
+          OPENAI_SECRET_ARN: !Ref OpenAISecret
+          ALLOWED_ORIGINS: !Ref AllowedOrigins
+          OPENAI_MODEL: !Ref OpenAIModel
+
+  HosNarrativeFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !GetAtt HosNarrativeFunction.Arn
+      AuthType: NONE
+      Cors:
+        AllowOrigins:
+          - https://austinbuhltech.com
+          - https://www.austinbuhltech.com
+        AllowMethods:
+          - POST
+        AllowHeaders:
+          - content-type
+        MaxAge: 86400
+
+  HosNarrativeUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref HosNarrativeFunction
+      Action: lambda:InvokeFunctionUrl
+      Principal: "*"
+      FunctionUrlAuthType: NONE
+
+Outputs:
+  OpenAISecretArn:
+    Description: Store your OpenAI API key here (plain sk-... or {"OPENAI_API_KEY":"sk-..."})
+    Value: !Ref OpenAISecret
+  OpenAISecretName:
+    Value: !Ref OpenAISecretName
+  NarrativeFunctionName:
+    Value: !Ref HosNarrativeFunction
+  NarrativeApiUrl:
+    Description: Set GitHub secret HOS_NARRATIVE_API_URL to this value (include trailing slash optional)
+    Value: !GetAtt HosNarrativeFunctionUrl.FunctionUrl
+  NarrativeApiUrlPost:
+    Description: POST JSON { kind, context } to this endpoint
+    Value: !GetAtt HosNarrativeFunctionUrl.FunctionUrl
