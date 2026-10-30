@@ -1,11 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: HOS narrative API — Lambda Function URL + Secrets Manager (OpenAI key)
+Description: HOS narrative API — Lambda Function URL (reads existing ClassQuip OpenAI secret)
 
 Parameters:
-  OpenAISecretName:
+  OpenAISecretArn:
     Type: String
-    Default: austinbuhltech/hos/openai-api-key
-    Description: Secrets Manager name for the OpenAI API key (plain string or JSON with OPENAI_API_KEY)
+    Default: arn:aws:secretsmanager:us-east-1:177914733797:secret:prod/ClassQuip-vRZIoS
+    Description: Existing Secrets Manager ARN (ClassQuip prod bundle with OPENAI_API_KEY). Do not create or modify the secret here.
   AllowedOrigins:
     Type: String
     Default: https://austinbuhltech.com,https://www.austinbuhltech.com
@@ -21,13 +21,6 @@ Parameters:
     Default: 30
 
 Resources:
-  OpenAISecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: !Ref OpenAISecretName
-      Description: OpenAI API key for House of Strategy narrative generation
-      SecretString: REPLACE_ME
-
   HosNarrativeRole:
     Type: AWS::IAM::Role
     Properties:
@@ -41,14 +34,14 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
-        - PolicyName: ReadOpenAISecret
+        - PolicyName: ReadClassQuipOpenAISecret
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
                   - secretsmanager:GetSecretValue
-                Resource: !Ref OpenAISecret
+                Resource: !Ref OpenAISecretArn
 
   HosNarrativeFunction:
     Type: AWS::Lambda::Function
@@ -70,7 +63,7 @@ Resources:
           }
       Environment:
         Variables:
-          OPENAI_SECRET_ARN: !Ref OpenAISecret
+          OPENAI_SECRET_ARN: !Ref OpenAISecretArn
           ALLOWED_ORIGINS: !Ref AllowedOrigins
           OPENAI_MODEL: !Ref OpenAIModel
 
@@ -99,15 +92,10 @@ Resources:
 
 Outputs:
   OpenAISecretArn:
-    Description: Store your OpenAI API key here (plain sk-... or {"OPENAI_API_KEY":"sk-..."})
-    Value: !Ref OpenAISecret
-  OpenAISecretName:
-    Value: !Ref OpenAISecretName
+    Description: Existing secret used for OPENAI_API_KEY (read-only from Lambda)
+    Value: !Ref OpenAISecretArn
   NarrativeFunctionName:
     Value: !Ref HosNarrativeFunction
   NarrativeApiUrl:
-    Description: Set GitHub secret HOS_NARRATIVE_API_URL to this value (include trailing slash optional)
-    Value: !GetAtt HosNarrativeFunctionUrl.FunctionUrl
-  NarrativeApiUrlPost:
-    Description: POST JSON { kind, context } to this endpoint
+    Description: Set GitHub secret HOS_NARRATIVE_API_URL to this value
     Value: !GetAtt HosNarrativeFunctionUrl.FunctionUrl

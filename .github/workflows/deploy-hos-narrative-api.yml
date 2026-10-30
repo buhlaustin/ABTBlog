@@ -24,8 +24,6 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy stack and Lambda code
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           chmod +x scripts/deploy-hos-narrative-api.sh
           ./scripts/deploy-hos-narrative-api.sh
