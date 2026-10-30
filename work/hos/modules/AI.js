@@ -12,27 +12,47 @@ export class AIController {
   runSocialPhase() {
     const events = [];
     const ais = this.state.getActiveContestants().filter((c) => !c.isPlayer);
+    const shuffled = [...ais].sort(() => Math.random() - 0.5);
+    const activeCount = Math.min(shuffled.length, Math.max(3, Math.ceil(ais.length * 0.45)));
 
-    for (const ai of ais) {
+    for (let i = 0; i < activeCount; i += 1) {
+      const ai = shuffled[i];
       const action = this._chooseSocialAction(ai);
       const result = this._executeSocialAction(ai, action);
       if (result) events.push(result);
     }
 
-    // Random alliance formation
-    if (Math.random() < 0.35) {
+    if (Math.random() < 0.5) {
       const formation = this._tryFormAlliance();
       if (formation) events.push(formation);
     }
 
-    // Random betrayal chance
-    if (Math.random() < 0.15 && this.state.week > 1) {
+    if (Math.random() < 0.22 && this.state.week > 1) {
       const betrayal = this._tryBetrayal();
       if (betrayal) events.push(betrayal);
     }
 
+    if (Math.random() < 0.35) {
+      const side = this._ambientHouseMoment();
+      if (side) events.push(side);
+    }
+
     this.state.updateThreatLevels();
     return events;
+  }
+
+  _ambientHouseMoment() {
+    const active = this.state.getActiveContestants().filter((c) => !c.isPlayer);
+    if (active.length < 2) return null;
+    const a = pickRandom(active);
+    const b = pickRandom(active.filter((c) => c.id !== a.id));
+    const lines = [
+      `${a.name} and ${b.name} argued about last week's vote in the kitchen.`,
+      `${a.name} was seen whispering with ${b.name} by the memory wall.`,
+      `Tension flared when ${a.name} called out ${b.name} for playing both sides.`,
+      `${a.name} comforted ${b.name} after a tough conversation with the HOH.`
+    ];
+    return { type: 'drama', text: pickRandom(lines) };
   }
 
   _chooseSocialAction(ai) {
@@ -177,9 +197,20 @@ export class AIController {
 
     if (leader.getRelationship(member.id) < 5 && Math.random() > 0.3) return null;
 
+    if (leader.allianceId || member.allianceId) return null;
+
     const alliance = this.state.createAlliance(leader.id, [member.id]);
+    if (!alliance) return null;
     leader.modifyRelationship(member.id, 15);
     member.modifyRelationship(leader.id, 12);
+
+    if (Math.random() < 0.12) {
+      alliance.exposed = true;
+      return {
+        type: 'drama',
+        text: `The house caught ${leader.name} and ${member.name} plotting — their alliance is exposed!`
+      };
+    }
 
     return {
       type: 'drama',

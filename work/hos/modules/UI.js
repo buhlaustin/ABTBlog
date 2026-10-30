@@ -1,4 +1,4 @@
-import { PHASE_LABELS, PHASES } from './GameState.js';
+import { PHASE_LABELS, PHASES, WEEKDAYS } from './GameState.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 
 /**
@@ -55,8 +55,9 @@ export class UIManager {
     this.elements.endTitle.textContent = won ? 'You Won!' : 'Game Over';
   }
 
-  updateWeekDay(week, day, phase) {
-    this.elements.weekDay.textContent = `Week ${week} — Day ${day}`;
+  updateWeekDay(week, weekdayIndex, phase) {
+    const weekday = WEEKDAYS[weekdayIndex] ?? `Day ${weekdayIndex + 1}`;
+    this.elements.weekDay.textContent = `Week ${week} — ${weekday}`;
     this.elements.phaseLabel.textContent = PHASE_LABELS[phase] || phase;
   }
 
@@ -139,23 +140,42 @@ export class UIManager {
   }
 
   renderAlliances(alliances, player) {
-    if (alliances.length === 0) {
-      this.elements.allianceOverview.innerHTML = '<p class="no-alliance">No known alliances yet.</p>';
+    const visible = alliances.filter(
+      (a) => a.exposed || (player?.id && a.members.includes(player.id))
+    );
+    const hiddenCount = alliances.length - visible.length;
+
+    if (visible.length === 0) {
+      const hint =
+        hiddenCount > 0
+          ? `<p class="no-alliance">Alliances are forming in the shadows. Spy or wait for drama to expose them.</p>`
+          : `<p class="no-alliance">No known alliances yet.</p>`;
+      this.elements.allianceOverview.innerHTML = hint;
       return;
     }
 
-    this.elements.allianceOverview.innerHTML = alliances.map((a) => {
-      const isPlayerAlliance = a.members.includes(player?.id);
-      const memberNames = a.members.map((id) => {
-        const c = window.__gameContestants?.get(id);
-        return c ? c.name : 'Unknown';
-      }).join(', ');
+    let html = visible
+      .map((a) => {
+        const isPlayerAlliance = a.members.includes(player?.id);
+        const memberNames = a.members
+          .map((id) => {
+            const c = window.__gameContestants?.get(id);
+            return c ? c.name : 'Unknown';
+          })
+          .join(', ');
 
-      return `<div class="alliance-group ${isPlayerAlliance ? 'player-alliance' : ''}">
-        <h3>${a.name}${a.exposed ? ' (EXPOSED)' : ''}</h3>
+        return `<div class="alliance-group ${isPlayerAlliance ? 'player-alliance' : ''}">
+        <h3>${a.name}${a.exposed && !isPlayerAlliance ? ' (exposed)' : ''}</h3>
         <div class="alliance-members">${memberNames}</div>
       </div>`;
-    }).join('');
+      })
+      .join('');
+
+    if (hiddenCount > 0) {
+      html += `<p class="alliance-rumor">${hiddenCount} other alliance${hiddenCount === 1 ? '' : 's'} may be active — not confirmed.</p>`;
+    }
+
+    this.elements.allianceOverview.innerHTML = html;
   }
 
   renderActions(actions, onAction) {

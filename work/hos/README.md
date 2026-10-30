@@ -17,9 +17,9 @@ Then visit `http://localhost:8080`.
 ## How to Play
 
 1. Enter your name and choose a difficulty level.
-2. Each week has five social days (Days 1–5) where you can talk, befriend, spy, campaign, and form alliances.
-3. Day 6 is the Head of Household competition — win to control nominations.
-4. Day 7 brings nominations, the Power of Veto, and the eviction vote.
+2. Weeks run **Friday → Thursday**: **Fri** HOH comp · **Sat** nominations · **Sun** POV comp · **Mon** veto ceremony · **Tue–Wed** social strategy · **Thu** live eviction.
+3. Use your actions on social days, then **End Day** — event days wait for **Start [Day]** so nothing auto-skips.
+4. Alliances are secret (max 3). You only see other alliances when they’re **exposed** or you’re a member.
 5. Survive until you're the last houseguest standing.
 
 ## Features

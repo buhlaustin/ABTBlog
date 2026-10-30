@@ -3,7 +3,7 @@
  * Orchestrates the weekly loop: social → competition → nominations → veto → eviction.
  */
 
-import { GameState, PHASES } from './modules/GameState.js';
+import { GameState, PHASES, PHASE_LABELS } from './modules/GameState.js';
 import { AIController } from './modules/AI.js';
 import { CompetitionManager } from './modules/Competition.js';
 import { NarrativeEngine } from './modules/Events.js';
@@ -74,7 +74,11 @@ class Game {
       type: 'success'
     });
     this.state.addStory({
-      text: 'Week 1 begins. Build relationships, win competitions, and avoid eviction.',
+      text: 'Week 1 begins Tuesday. The house is open for social time until Friday’s first Head of Household.',
+      type: 'system'
+    });
+    this.state.addStory({
+      text: 'Calendar: <strong>Fri</strong> HOH · <strong>Sat</strong> Nominations · <strong>Sun</strong> POV comp · <strong>Mon</strong> Veto meeting · <strong>Tue–Wed</strong> Strategy · <strong>Thu</strong> Eviction.',
       type: 'system'
     });
 
@@ -154,7 +158,7 @@ class Game {
 
   render() {
     const { state, ui } = this;
-    ui.updateWeekDay(state.week, state.day, state.phase);
+    ui.updateWeekDay(state.week, state.weekdayIndex, state.phase);
     ui.renderStoryLog(state.storyLog);
     ui.renderPlayer(state.getPlayer());
     ui.renderHouseguests(state.contestants, state.getPlayer());
@@ -197,8 +201,12 @@ class Game {
       case PHASES.NOMINATION:
         this.runNominationPhase();
         break;
+      case PHASES.VETO_COMP:
+        this.runVetoCompPhase();
+        break;
+      case PHASES.VETO_CEREMONY:
       case PHASES.VETO:
-        this.runVetoPhase();
+        this.runVetoCeremonyPhase();
         break;
       case PHASES.EVICTION:
         this.runEvictionPhase();
@@ -223,6 +231,11 @@ class Game {
   }
 
   handlePlayerAction(action) {
+    if (action.id === 'continue_day') {
+      this.runPhase();
+      return;
+    }
+
     if (action.id === 'end_day') {
       this.advanceDay();
       return;
@@ -311,6 +324,11 @@ class Game {
   }
 
   advanceDay() {
+    if (this.state.phase !== PHASES.SOCIAL) {
+      this.ui.showToast('Finish today’s event first, or use Start when prompted.');
+      return;
+    }
+
     this.ui.hideActionDetail();
 
     const aiEvents = this.ai.runSocialPhase();
@@ -323,26 +341,44 @@ class Game {
       this.logAndRender([event]);
     }
 
-    this.state.day += 1;
+    this.state.advanceWeekday();
     this.state.actionsRemaining = this.state.config.actionsPerDay;
 
-    if (this.state.day > this.state.maxDaysPerWeek) {
-      this.state.phase = PHASES.COMPETITION;
-      this.state.day = 6;
-      this.logAndRender([{
+    this.logAndRender([
+      {
         type: 'system',
-        text: 'Competition day has arrived!'
-      }]);
-      this.render();
-      setTimeout(() => this.runPhase(), 800);
-    } else {
-      this.logAndRender([{
-        type: 'system',
-        text: `— Day ${this.state.day} —`
-      }]);
-      this.render();
+        text: `— ${this.state.getWeekdayName()} — ${PHASE_LABELS[this.state.phase] || ''}`
+      }
+    ]);
+    this.render();
+
+    if (this.state.phase === PHASES.SOCIAL) {
       this.runSocialPhase();
+    } else {
+      this._offerContinueToCurrentDay();
     }
+  }
+
+  _offerContinueToCurrentDay() {
+    const dayName = this.state.getWeekdayName();
+    this.ui.setActionPrompt(`${dayName} — ${PHASE_LABELS[this.state.phase] || 'House event'}`);
+    this.ui.renderActions(
+      [
+        {
+          id: 'continue_day',
+          label: `Start ${dayName}`,
+          description: 'Begin today’s scheduled house event.'
+        }
+      ],
+      (a) => this.handlePlayerAction(a)
+    );
+  }
+
+  _afterHouseEvent() {
+    this.state.advanceWeekday();
+    this.state.actionsRemaining = this.state.config.actionsPerDay;
+    this.render();
+    this._offerContinueToCurrentDay();
   }
 
   // ─── Competition ─────────────────────────────────────────────────
@@ -419,11 +455,7 @@ class Game {
 
   _afterCompetition(winner) {
     if (this._maybeEndAtFinalTwo()) return;
-
-    this.state.phase = PHASES.NOMINATION;
-    this.state.day = 7;
-    this.render();
-    setTimeout(() => this.runPhase(), 1000);
+    this._afterHouseEvent();
   }
 
   // ─── Nominations ───────────────────────────────────────────────────
@@ -441,9 +473,7 @@ class Game {
 
     const { results } = this.eviction.runNominations();
     this.logAndRender(results);
-    this.state.phase = PHASES.VETO;
-    this.render();
-    setTimeout(() => this.runPhase(), 1200);
+    this._afterHouseEvent();
   }
 
   _showNominationPicker() {
@@ -482,9 +512,7 @@ class Game {
           const { results } = this.eviction.runNominations(picks);
           this.ui.hideActionDetail();
           this.logAndRender(results);
-          this.state.phase = PHASES.VETO;
-          this.render();
-          setTimeout(() => this.runPhase(), 1000);
+          this._afterHouseEvent();
         });
       }
     };
@@ -495,7 +523,7 @@ class Game {
 
   // ─── Veto ──────────────────────────────────────────────────────────
 
-  runVetoPhase() {
+  runVetoCompPhase() {
     const { playerInComp } = this.eviction.getVetoSetup();
 
     if (playerInComp && !this.state.getPlayer().evicted) {
@@ -503,7 +531,14 @@ class Game {
       return;
     }
 
-    this._finishVetoPhase(false);
+    this._finishVetoComp(false);
+  }
+
+  runVetoCeremonyPhase() {
+    const vetoWinner = this.state.vetoHolderId
+      ? this.state.getContestant(this.state.vetoHolderId)
+      : null;
+    this._finishVetoCeremony(vetoWinner);
   }
 
   _showVetoCompetition() {
@@ -521,13 +556,19 @@ class Game {
         const heldStrong = btn.dataset.value === 'true';
         const won = this.competition.resolveVetoCompetition(heldStrong);
         this.ui.hideActionDetail();
-        this._finishVetoPhase(won);
+        this._finishVetoComp(won);
       });
     });
   }
 
-  _finishVetoPhase(playerWonVeto) {
-    const result = this.eviction.runVetoEvent(playerWonVeto);
+  _finishVetoComp(playerWonVeto) {
+    const result = this.eviction.runVetoCompetition(playerWonVeto);
+    this.logAndRender(result.results);
+    this._afterHouseEvent();
+  }
+
+  _finishVetoCeremony(vetoWinner) {
+    const result = this.eviction.runVetoCeremony(vetoWinner);
     this.logAndRender(result.results);
 
     if (result.needsPlayerInput && result.vetoWinner?.isPlayer) {
@@ -540,9 +581,7 @@ class Game {
       return;
     }
 
-    this.state.phase = PHASES.EVICTION;
-    this.render();
-    setTimeout(() => this.runPhase(), 1200);
+    this._afterHouseEvent();
   }
 
   _showVetoChoice(vetoWinner) {
@@ -562,8 +601,7 @@ class Game {
         if (vetoResult.needsReplacementPick) {
           this._showReplacementPicker();
         } else {
-          this.state.phase = PHASES.EVICTION;
-          setTimeout(() => this.runPhase(), 1000);
+          this._afterHouseEvent();
         }
       });
     });
@@ -574,8 +612,7 @@ class Game {
         const vetoResult = this.eviction.playerUseVeto(vetoWinner, null, false);
         this.ui.hideActionDetail();
         this.logAndRender(vetoResult.results);
-        this.state.phase = PHASES.EVICTION;
-        setTimeout(() => this.runPhase(), 1000);
+        this._afterHouseEvent();
       });
     }
   }
@@ -597,8 +634,7 @@ class Game {
         const results = this.eviction.playerPickReplacement(btn.dataset.replacement);
         this.ui.hideActionDetail();
         this.logAndRender(results);
-        this.state.phase = PHASES.EVICTION;
-        setTimeout(() => this.runPhase(), 1000);
+        this._afterHouseEvent();
       });
     });
   }
@@ -659,7 +695,7 @@ class Game {
 
     this.state.phase = PHASES.WEEK_END;
     this.render();
-    setTimeout(() => this.runPhase(), 1500);
+    this.runPhase();
   }
 
   // ─── Week end ──────────────────────────────────────────────────────
@@ -685,7 +721,7 @@ class Game {
     }]);
 
     this.render();
-    this.runSocialPhase();
+    this._offerContinueToCurrentDay();
   }
 
   // ─── Spectator mode (player evicted) ───────────────────────────────
@@ -700,20 +736,56 @@ class Game {
 
       this.state.startNewWeek();
       this.competition.currentCompetition = null;
-      this.state.phase = PHASES.COMPETITION;
-      this.state.day = 6;
 
       const { results } = this.competition.runCompetition();
-      this.state.storyLog.push(...results.map((r) => ({ ...r, week: this.state.week, day: 6, phase: PHASES.COMPETITION })));
+      this.state.storyLog.push(
+        ...results.map((r) => ({
+          ...r,
+          week: this.state.week,
+          day: this.state.day,
+          phase: PHASES.COMPETITION
+        }))
+      );
 
       const nomResults = this.eviction.runNominations();
-      this.state.storyLog.push(...nomResults.results.map((r) => ({ ...r, week: this.state.week, day: 7, phase: PHASES.NOMINATION })));
+      this.state.storyLog.push(
+        ...nomResults.results.map((r) => ({
+          ...r,
+          week: this.state.week,
+          day: this.state.day,
+          phase: PHASES.NOMINATION
+        }))
+      );
 
-      const vetoResults = this.eviction.runVetoEvent(false);
-      this.state.storyLog.push(...vetoResults.results.map((r) => ({ ...r, week: this.state.week, day: 7, phase: PHASES.VETO })));
+      const vetoComp = this.eviction.runVetoCompetition(false);
+      this.state.storyLog.push(
+        ...vetoComp.results.map((r) => ({
+          ...r,
+          week: this.state.week,
+          day: this.state.day,
+          phase: PHASES.VETO_COMP
+        }))
+      );
+
+      const vetoMeet = this.eviction.runVetoCeremony(vetoComp.vetoWinner);
+      this.state.storyLog.push(
+        ...vetoMeet.results.map((r) => ({
+          ...r,
+          week: this.state.week,
+          day: this.state.day,
+          phase: PHASES.VETO_CEREMONY
+        }))
+      );
 
       const evictResults = this.eviction.runEvictionVote(null);
-      this.state.storyLog.push(...evictResults.results.map((r) => ({ ...r, week: this.state.week, day: 7, phase: PHASES.EVICTION })));
+      this.state.storyLog.push(
+        ...evictResults.results.map((r) => ({
+          ...r,
+          week: this.state.week,
+          day: this.state.day,
+          phase: PHASES.EVICTION
+        }))
+      );
 
       if (this.state.getActiveContestants().length <= 2) {
         this.state.checkWinCondition(true);

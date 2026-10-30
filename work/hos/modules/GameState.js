@@ -8,24 +8,42 @@ import {
   resetIdCounter
 } from './utils.js';
 
+/** Calendar: Friday → Thursday (Big Brother–style week). */
+export const WEEKDAYS = [
+  'Friday',
+  'Saturday',
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday'
+];
+
 /** Game phases within a week. */
 export const PHASES = {
   SOCIAL: 'social',
   COMPETITION: 'competition',
   NOMINATION: 'nomination',
+  VETO_COMP: 'veto_comp',
+  VETO_CEREMONY: 'veto_ceremony',
+  /** @deprecated saved games — mapped to VETO_CEREMONY on load */
   VETO: 'veto',
   EVICTION: 'eviction',
   WEEK_END: 'week_end'
 };
 
 export const PHASE_LABELS = {
-  [PHASES.SOCIAL]: 'Social Phase',
-  [PHASES.COMPETITION]: 'Competition',
-  [PHASES.NOMINATION]: 'Nomination Ceremony',
-  [PHASES.VETO]: 'Veto / Power Event',
-  [PHASES.EVICTION]: 'Eviction Vote',
-  [PHASES.WEEK_END]: 'Week Summary'
+  [PHASES.SOCIAL]: 'Social time in the house',
+  [PHASES.COMPETITION]: 'Head of Household — live',
+  [PHASES.NOMINATION]: 'Nomination ceremony',
+  [PHASES.VETO_COMP]: 'Power of Veto — competition',
+  [PHASES.VETO_CEREMONY]: 'Power of Veto — ceremony',
+  [PHASES.VETO]: 'Power of Veto — ceremony',
+  [PHASES.EVICTION]: 'Live eviction',
+  [PHASES.WEEK_END]: 'Week summary'
 };
+
+export const ALLIANCE_MAX_SIZE = 3;
 
 /**
  * Central game state: contestants, week progression, alliances, and history.
@@ -35,10 +53,13 @@ export class GameState {
     this.difficulty = difficulty;
     this.config = DIFFICULTY_CONFIG[difficulty];
     this.week = 1;
-    this.day = 1;
+    /** 0 = Friday … 6 = Thursday */
+    this.weekdayIndex = 4;
+    this.day = 5;
     this.phase = PHASES.SOCIAL;
     this.actionsRemaining = this.config.actionsPerDay;
-    this.maxDaysPerWeek = 5;
+    this.maxDaysPerWeek = 7;
+    this.vetoHolderId = null;
 
     this.contestants = [];
     this.alliances = [];
@@ -119,13 +140,66 @@ export class GameState {
     this.history.push({ ...event, week: this.week, day: this.day });
   }
 
-  /** Create a new alliance. */
+  getWeekdayName() {
+    return WEEKDAYS[this.weekdayIndex] ?? `Day ${this.weekdayIndex + 1}`;
+  }
+
+  syncPhaseForWeekday() {
+    const map = {
+      0: PHASES.COMPETITION,
+      1: PHASES.NOMINATION,
+      2: PHASES.VETO_COMP,
+      3: PHASES.VETO_CEREMONY,
+      4: PHASES.SOCIAL,
+      5: PHASES.SOCIAL,
+      6: PHASES.EVICTION
+    };
+    this.phase = map[this.weekdayIndex] ?? PHASES.SOCIAL;
+    this.day = this.weekdayIndex + 1;
+  }
+
+  /** Advance Fri → … → Thu; week 1 skips from Wed to Fri (move-in). */
+  advanceWeekday() {
+    if (this.week === 1 && this.weekdayIndex === 5) {
+      this.weekdayIndex = 0;
+      this.syncPhaseForWeekday();
+      return;
+    }
+    this.weekdayIndex += 1;
+    if (this.weekdayIndex > 6) {
+      this.weekdayIndex = 0;
+    }
+    this.syncPhaseForWeekday();
+  }
+
+  /** Alliances visible to the player (own alliance or exposed). */
+  getVisibleAlliances(forPlayerId) {
+    return this.alliances.filter(
+      (a) => a.exposed || (forPlayerId && a.members.includes(forPlayerId))
+    );
+  }
+
+  canJoinAlliance(allianceId, contestantId) {
+    const alliance = this.alliances.find((a) => a.id === allianceId);
+    if (!alliance) return { ok: false, reason: 'Alliance not found.' };
+    if (alliance.members.includes(contestantId)) return { ok: true };
+    if (alliance.members.length >= ALLIANCE_MAX_SIZE) {
+      return { ok: false, reason: 'That alliance is full.' };
+    }
+    return { ok: true };
+  }
+
+  /** Create a new alliance (max 3 members). */
   createAlliance(leaderId, memberIds, name = null) {
+    const members = [...new Set([leaderId, ...memberIds])];
+    if (members.length > ALLIANCE_MAX_SIZE) {
+      return null;
+    }
     const alliance = {
       id: uid('alliance'),
       name: name || `Alliance ${this.alliances.length + 1}`,
       leaderId,
-      members: [...new Set([leaderId, ...memberIds])],
+      members,
       trust: 70,
       exposed: false
     };
@@ -135,6 +209,20 @@ export class GameState {
       if (c) c.allianceId = alliance.id;
     }
     return alliance;
+  }
+
+  /** Add member to existing alliance if room. */
+  addAllianceMember(allianceId, contestantId) {
+    const check = this.canJoinAlliance(allianceId, contestantId);
+    if (!check.ok) return check;
+    const alliance = this.alliances.find((a) => a.id === allianceId);
+    const c = this.getContestant(contestantId);
+    if (!alliance || !c) return { ok: false, reason: 'Could not add member.' };
+    if (!alliance.members.includes(contestantId)) {
+      alliance.members.push(contestantId);
+    }
+    c.allianceId = alliance.id;
+    return { ok: true, alliance };
   }
 
   removeFromAlliance(contestantId) {
@@ -181,7 +269,8 @@ export class GameState {
       PHASES.SOCIAL,
       PHASES.COMPETITION,
       PHASES.NOMINATION,
-      PHASES.VETO,
+      PHASES.VETO_COMP,
+      PHASES.VETO_CEREMONY,
       PHASES.EVICTION,
       PHASES.WEEK_END
     ];
@@ -195,10 +284,11 @@ export class GameState {
 
   startNewWeek() {
     this.week += 1;
-    this.day = 1;
-    this.phase = PHASES.SOCIAL;
+    this.weekdayIndex = 0;
+    this.vetoHolderId = null;
     this.actionsRemaining = this.config.actionsPerDay;
     this.resetWeeklyFlags();
+    this.syncPhaseForWeekday();
   }
 
   checkWinCondition(allowFinalTwo = true) {
@@ -223,8 +313,10 @@ export class GameState {
     return {
       difficulty: this.difficulty,
       week: this.week,
+      weekdayIndex: this.weekdayIndex,
       day: this.day,
       phase: this.phase,
+      vetoHolderId: this.vetoHolderId,
       actionsRemaining: this.actionsRemaining,
       maxDaysPerWeek: this.maxDaysPerWeek,
       contestants: this.contestants.map((c) => c.toJSON()),
@@ -252,8 +344,13 @@ export class GameState {
     state.difficulty = data.difficulty;
     state.config = DIFFICULTY_CONFIG[data.difficulty];
     state.week = data.week;
-    state.day = data.day;
-    state.phase = data.phase;
+    state.weekdayIndex =
+      data.weekdayIndex ??
+      (typeof data.day === 'number' ? Math.max(0, Math.min(6, data.day - 1)) : 4);
+    state.day = data.day ?? state.weekdayIndex + 1;
+    state.phase =
+      data.phase === PHASES.VETO ? PHASES.VETO_CEREMONY : data.phase;
+    state.vetoHolderId = data.vetoHolderId ?? null;
     state.actionsRemaining = data.actionsRemaining;
     state.maxDaysPerWeek = data.maxDaysPerWeek;
     state.contestants = data.contestants.map((c) => Contestant.fromJSON(c));

@@ -1,4 +1,4 @@
-import { randomInt, clamp } from './utils.js';
+import { randomInt, clamp, pickRandom } from './utils.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -94,7 +94,90 @@ export class EvictionSystem {
     return { vetoPlayers, playerInComp: vetoPlayers.some((p) => p.id === player.id) };
   }
 
-  /** Veto competition / power event. */
+  /** Sunday — POV competition only. */
+  runVetoCompetition(playerWonVeto = false) {
+    const results = [];
+    const { vetoPlayers } = this.getVetoSetup();
+    const player = this.state.getPlayer();
+    const playerInComp = vetoPlayers.some((p) => p.id === player.id);
+
+    results.push({
+      type: 'competition',
+      text: '<strong>Power of Veto competition</strong> — players battle for the golden veto.'
+    });
+
+    for (const c of this.state.getActiveContestants()) {
+      c.hasVeto = false;
+    }
+
+    let vetoWinner;
+    if (playerInComp && playerWonVeto) {
+      vetoWinner = player;
+    } else if (playerInComp && !playerWonVeto) {
+      const aiPlayers = vetoPlayers.filter((p) => !p.isPlayer);
+      vetoWinner = aiPlayers.length
+        ? aiPlayers.reduce((best, c) => (c.competition > best.competition ? c : best), aiPlayers[0])
+        : pickRandom(vetoPlayers);
+    } else {
+      vetoWinner = vetoPlayers.reduce((best, c) => {
+        const score = c.competition + randomInt(-2, 3);
+        const bestScore = best.competition + randomInt(-2, 3);
+        return score > bestScore ? c : best;
+      }, vetoPlayers[0]);
+    }
+
+    if (!vetoWinner) {
+      results.push({ type: 'system', text: 'Veto competition could not run.' });
+      return { results, vetoWinner: null };
+    }
+
+    vetoWinner.hasVeto = true;
+    this.state.vetoHolderId = vetoWinner.id;
+    results.push({
+      type: 'success',
+      text: `<strong>${vetoWinner.name}</strong> wins the Power of Veto!`
+    });
+    return { results, vetoWinner };
+  }
+
+  /** Monday — veto meeting & replacement noms. */
+  runVetoCeremony(vetoWinner) {
+    const results = [];
+    const nominees = this.state.nominees.map((id) => this.state.getContestant(id)).filter(Boolean);
+
+    results.push({
+      type: 'drama',
+      text: '<strong>Veto ceremony</strong> — the veto holder decides whether to use the power.'
+    });
+
+    if (!vetoWinner) {
+      vetoWinner = this.state.vetoHolderId
+        ? this.state.getContestant(this.state.vetoHolderId)
+        : null;
+    }
+
+    if (!vetoWinner) {
+      results.push({ type: 'system', text: 'No veto holder was recorded.' });
+      return { results, vetoWinner: null, vetoUsed: false };
+    }
+
+    if (vetoWinner.isPlayer) {
+      return { results, vetoWinner, needsPlayerInput: true };
+    }
+
+    const decision = this.ai.decideVetoUse(vetoWinner, nominees);
+    if (decision.use && decision.target) {
+      return this._applyVeto(decision.target, results, vetoWinner);
+    }
+
+    results.push({
+      type: 'narrative',
+      text: `${vetoWinner.name} chose not to use the Power of Veto.`
+    });
+    return { results, vetoWinner, vetoUsed: false };
+  }
+
+  /** Legacy: full veto in one step (spectator sim). */
   runVetoEvent(playerWonVeto = false) {
     const results = [];
     const { vetoPlayers } = this.getVetoSetup();

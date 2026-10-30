@@ -1,4 +1,5 @@
 import { randomInt, clamp } from './utils.js';
+import { ALLIANCE_MAX_SIZE } from './GameState.js';
 
 /**
  * Player-initiated actions during the social phase.
@@ -123,20 +124,49 @@ export class PlayerActions {
     const accepted = Math.random() < acceptChance;
 
     if (accepted) {
+      if (target.allianceId && target.allianceId !== player.allianceId) {
+        this._consumeAction();
+        return {
+          success: false,
+          text: `${target.name} is already committed to another alliance. You can't merge groups.`,
+          type: 'warning'
+        };
+      }
+
       if (player.allianceId) {
-        const alliance = this.state.alliances.find((a) => a.id === player.allianceId);
-        if (alliance && !alliance.members.includes(target.id)) {
-          alliance.members.push(target.id);
-          target.allianceId = alliance.id;
+        const added = this.state.addAllianceMember(player.allianceId, target.id);
+        if (!added.ok) {
+          this._consumeAction();
+          return {
+            success: false,
+            text: `Your alliance is full (max ${ALLIANCE_MAX_SIZE} members).`,
+            type: 'warning'
+          };
         }
       } else if (target.allianceId) {
-        const alliance = this.state.alliances.find((a) => a.id === target.allianceId);
-        if (alliance) {
-          alliance.members.push(player.id);
-          player.allianceId = alliance.id;
+        const added = this.state.addAllianceMember(target.allianceId, player.id);
+        if (!added.ok) {
+          this._consumeAction();
+          return {
+            success: false,
+            text: `${target.name}'s alliance doesn't have room for another partner.`,
+            type: 'warning'
+          };
         }
       } else {
-        this.state.createAlliance(player.id, [target.id], `${player.name} & ${target.name}`);
+        const created = this.state.createAlliance(
+          player.id,
+          [target.id],
+          `${player.name} & ${target.name}`
+        );
+        if (!created) {
+          this._consumeAction();
+          return {
+            success: false,
+            text: 'That alliance could not be formed.',
+            type: 'warning'
+          };
+        }
       }
 
       player.modifyRelationship(target.id, 20);
@@ -173,6 +203,13 @@ export class PlayerActions {
     }
 
     const subject = target || this._pickSpySubject();
+    if (subject.allianceId) {
+      const alliance = this.state.alliances.find((a) => a.id === subject.allianceId);
+      if (alliance && !alliance.members.includes(player.id)) {
+        alliance.exposed = true;
+      }
+    }
+
     const intelTypes = [
       `${subject.name} was heard planning to target you next week.`,
       `${subject.name} is in a secret alliance with ${this._randomAllyName(subject)}.`,
