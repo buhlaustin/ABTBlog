@@ -20,7 +20,10 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+      - name: Build static site
+        env:
+          HOS_NARRATIVE_API_URL: ${{ secrets.HOS_NARRATIVE_API_URL }}
+        run: npm run build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4

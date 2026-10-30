@@ -1,82 +1,67 @@
 import { Contestant } from './Contestant.js';
 import {
   DIFFICULTY_CONFIG,
-  SAVE_VERSION,
-  JURY_START_HOUSE_COUNT,
-  aiCountForCast,
   generateAINames,
   pickRandom,
   shuffle,
   uid,
-  resetIdCounter,
-  totalCastSize
+  resetIdCounter
 } from './utils.js';
+
+/** Calendar: Friday → Thursday (Big Brother–style week). */
+export const WEEKDAYS = [
+  'Friday',
+  'Saturday',
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday'
+];
 
 /** Game phases within a week. */
 export const PHASES = {
   SOCIAL: 'social',
   COMPETITION: 'competition',
   NOMINATION: 'nomination',
+  VETO_COMP: 'veto_comp',
+  VETO_CEREMONY: 'veto_ceremony',
+  /** @deprecated saved games — mapped to VETO_CEREMONY on load */
   VETO: 'veto',
   EVICTION: 'eviction',
   WEEK_END: 'week_end'
 };
 
 export const PHASE_LABELS = {
-  [PHASES.SOCIAL]: 'Social Phase',
-  [PHASES.COMPETITION]: 'Head of Household Competition',
-  [PHASES.NOMINATION]: 'Nomination Ceremony',
-  [PHASES.VETO]: 'Power of Veto',
-  [PHASES.EVICTION]: 'Live Eviction',
-  [PHASES.WEEK_END]: 'Week Summary'
+  [PHASES.SOCIAL]: 'Social time in the house',
+  [PHASES.COMPETITION]: 'Head of Household — live',
+  [PHASES.NOMINATION]: 'Nomination ceremony',
+  [PHASES.VETO_COMP]: 'Power of Veto — competition',
+  [PHASES.VETO_CEREMONY]: 'Power of Veto — ceremony',
+  [PHASES.VETO]: 'Power of Veto — ceremony',
+  [PHASES.EVICTION]: 'Live eviction',
+  [PHASES.WEEK_END]: 'Week summary'
 };
 
-export const FINALE_PHASES = {
-  R1: 'r1',
-  R2: 'r2',
-  R3: 'r3',
-  FINAL_PICK: 'final_pick',
-  JURY_VOTE: 'jury_vote',
-  COMPLETE: 'complete'
-};
-
-export const FINALE_PHASE_LABELS = {
-  [FINALE_PHASES.R1]: 'Finale — HOH Part 1',
-  [FINALE_PHASES.R2]: 'Finale — HOH Part 2',
-  [FINALE_PHASES.R3]: 'Finale — HOH Part 3',
-  [FINALE_PHASES.FINAL_PICK]: 'Finale — Final eviction',
-  [FINALE_PHASES.JURY_VOTE]: 'Finale — Jury vote'
-};
+export const ALLIANCE_MAX_SIZE = 3;
 
 /**
  * Central game state: contestants, week progression, alliances, and history.
  */
 export class GameState {
-  constructor({
-    playerName,
-    difficulty = 'normal',
-    aiCount = aiCountForCast('standard'),
-    castPreset = 'standard',
-    doubleEvictionEnabled = true
-  } = {}) {
-    this.saveVersion = SAVE_VERSION;
+  constructor({ playerName, difficulty = 'normal', aiCount = 10 } = {}) {
     this.difficulty = difficulty;
     this.config = DIFFICULTY_CONFIG[difficulty];
-    this.castPreset = castPreset;
-    this.startingCastSize = totalCastSize(aiCount);
-    this.doubleEvictionEnabled = doubleEvictionEnabled;
-    this.doubleEvictionUsed = false;
-    this.doubleEvictionWeek = false;
-    this.secondEvictionPending = false;
-
     this.week = 1;
-    this.day = 1;
+    /** 0 = Friday … 6 = Thursday */
+    this.weekdayIndex = 4;
+    this.day = 5;
     this.phase = PHASES.SOCIAL;
     this.actionsRemaining = this.config.actionsPerDay;
-    this.maxDaysPerWeek = 5;
+    this.maxDaysPerWeek = 7;
+    this.vetoHolderId = null;
 
     this.contestants = [];
-    this.jury = [];
     this.alliances = [];
     this.history = [];
     this.storyLog = [];
@@ -90,14 +75,9 @@ export class GameState {
     this.lastCompetitionType = null;
     this.currentCompetition = null;
     this.challengeData = null;
-    this.playerIntel = [];
+    this.playerIntel = []; // secrets player has learned
     this.gameOver = false;
     this.winner = null;
-
-    this.finalePhase = null;
-    this.finaleR1WinnerId = null;
-    this.finaleR2WinnerId = null;
-    this.finaleR3WinnerId = null;
 
     this._initContestants(playerName, aiCount);
   }
@@ -142,67 +122,6 @@ export class GameState {
     return this.contestants.filter((c) => !c.evicted);
   }
 
-  getJurors() {
-    return this.jury
-      .map((id) => this.getContestant(id))
-      .filter((c) => c && c.isJuror);
-  }
-
-  /** First juror when 10 houseguests remain before this eviction (9 after). */
-  shouldJoinJury(activeCountBeforeEviction) {
-    return activeCountBeforeEviction <= JURY_START_HOUSE_COUNT;
-  }
-
-  processEviction(evicted, results) {
-    if (!evicted || evicted.evicted) return;
-
-    const activeBefore = this.getActiveContestants().length;
-    evicted.evicted = true;
-    evicted.evictedWeek = this.week;
-    evicted.isNominated = false;
-    evicted.isHOH = false;
-    evicted.hasVeto = false;
-    this.evictedThisWeek = evicted.id;
-
-    if (this.shouldJoinJury(activeBefore)) {
-      evicted.isJuror = true;
-      if (!this.jury.includes(evicted.id)) {
-        this.jury.push(evicted.id);
-      }
-      results.push({
-        type: 'success',
-        text: `${evicted.name} joins the jury.`
-      });
-    }
-
-    this.removeFromAlliance(evicted.id);
-    this.addHistory({ type: 'eviction', evicted: evicted.id, juror: evicted.isJuror });
-    this.updateThreatLevels();
-  }
-
-  shouldScheduleDoubleEvictionWeek() {
-    if (!this.doubleEvictionEnabled || this.doubleEvictionUsed) return false;
-    return this.getActiveContestants().length <= 8;
-  }
-
-  planDoubleEvictionForWeek() {
-    this.doubleEvictionWeek = this.shouldScheduleDoubleEvictionWeek();
-  }
-
-  enterFinale() {
-    this.finalePhase = FINALE_PHASES.R1;
-    this.phase = PHASES.COMPETITION;
-    this.day = 6;
-    for (const c of this.getActiveContestants()) {
-      c.isHOH = false;
-      c.isNominated = false;
-    }
-  }
-
-  isInFinale() {
-    return this.finalePhase != null && this.finalePhase !== FINALE_PHASES.COMPLETE;
-  }
-
   getContestant(id) {
     return this.contestants.find((c) => c.id === id);
   }
@@ -221,13 +140,66 @@ export class GameState {
     this.history.push({ ...event, week: this.week, day: this.day });
   }
 
-  /** Create a new alliance. */
+  getWeekdayName() {
+    return WEEKDAYS[this.weekdayIndex] ?? `Day ${this.weekdayIndex + 1}`;
+  }
+
+  syncPhaseForWeekday() {
+    const map = {
+      0: PHASES.COMPETITION,
+      1: PHASES.NOMINATION,
+      2: PHASES.VETO_COMP,
+      3: PHASES.VETO_CEREMONY,
+      4: PHASES.SOCIAL,
+      5: PHASES.SOCIAL,
+      6: PHASES.EVICTION
+    };
+    this.phase = map[this.weekdayIndex] ?? PHASES.SOCIAL;
+    this.day = this.weekdayIndex + 1;
+  }
+
+  /** Advance Fri → … → Thu; week 1 skips from Wed to Fri (move-in). */
+  advanceWeekday() {
+    if (this.week === 1 && this.weekdayIndex === 5) {
+      this.weekdayIndex = 0;
+      this.syncPhaseForWeekday();
+      return;
+    }
+    this.weekdayIndex += 1;
+    if (this.weekdayIndex > 6) {
+      this.weekdayIndex = 0;
+    }
+    this.syncPhaseForWeekday();
+  }
+
+  /** Alliances visible to the player (own alliance or exposed). */
+  getVisibleAlliances(forPlayerId) {
+    return this.alliances.filter(
+      (a) => a.exposed || (forPlayerId && a.members.includes(forPlayerId))
+    );
+  }
+
+  canJoinAlliance(allianceId, contestantId) {
+    const alliance = this.alliances.find((a) => a.id === allianceId);
+    if (!alliance) return { ok: false, reason: 'Alliance not found.' };
+    if (alliance.members.includes(contestantId)) return { ok: true };
+    if (alliance.members.length >= ALLIANCE_MAX_SIZE) {
+      return { ok: false, reason: 'That alliance is full.' };
+    }
+    return { ok: true };
+  }
+
+  /** Create a new alliance (max 3 members). */
   createAlliance(leaderId, memberIds, name = null) {
+    const members = [...new Set([leaderId, ...memberIds])];
+    if (members.length > ALLIANCE_MAX_SIZE) {
+      return null;
+    }
     const alliance = {
       id: uid('alliance'),
       name: name || `Alliance ${this.alliances.length + 1}`,
       leaderId,
-      members: [...new Set([leaderId, ...memberIds])],
+      members,
       trust: 70,
       exposed: false
     };
@@ -237,6 +209,20 @@ export class GameState {
       if (c) c.allianceId = alliance.id;
     }
     return alliance;
+  }
+
+  /** Add member to existing alliance if room. */
+  addAllianceMember(allianceId, contestantId) {
+    const check = this.canJoinAlliance(allianceId, contestantId);
+    if (!check.ok) return check;
+    const alliance = this.alliances.find((a) => a.id === allianceId);
+    const c = this.getContestant(contestantId);
+    if (!alliance || !c) return { ok: false, reason: 'Could not add member.' };
+    if (!alliance.members.includes(contestantId)) {
+      alliance.members.push(contestantId);
+    }
+    c.allianceId = alliance.id;
+    return { ok: true, alliance };
   }
 
   removeFromAlliance(contestantId) {
@@ -283,7 +269,8 @@ export class GameState {
       PHASES.SOCIAL,
       PHASES.COMPETITION,
       PHASES.NOMINATION,
-      PHASES.VETO,
+      PHASES.VETO_COMP,
+      PHASES.VETO_CEREMONY,
       PHASES.EVICTION,
       PHASES.WEEK_END
     ];
@@ -297,51 +284,39 @@ export class GameState {
 
   startNewWeek() {
     this.week += 1;
-    this.day = 1;
-    this.phase = PHASES.SOCIAL;
+    this.weekdayIndex = 0;
+    this.vetoHolderId = null;
     this.actionsRemaining = this.config.actionsPerDay;
     this.resetWeeklyFlags();
+    this.syncPhaseForWeekday();
   }
 
-  checkWinCondition() {
-    if (this.gameOver && this.winner) return true;
+  checkWinCondition(allowFinalTwo = true) {
     const active = this.getActiveContestants();
     if (active.length === 1) {
       this.gameOver = true;
       this.winner = active[0];
       return true;
     }
-    if (active.length === 3 && !this.isInFinale()) {
-      return false;
-    }
-    if (active.length === 2 && this.finalePhase === FINALE_PHASES.JURY_VOTE) {
-      return false;
+    if (allowFinalTwo && active.length === 2) {
+      const [a, b] = active;
+      const scoreA = a.competition * 2 + a.social + a.reputation / 10;
+      const scoreB = b.competition * 2 + b.social + b.reputation / 10;
+      this.gameOver = true;
+      this.winner = scoreA >= scoreB ? a : b;
+      return true;
     }
     return false;
   }
 
-  needsFinaleStart() {
-    return this.getActiveContestants().length === 3 && !this.isInFinale() && !this.gameOver;
-  }
-
   toJSON() {
     return {
-      saveVersion: SAVE_VERSION,
       difficulty: this.difficulty,
-      castPreset: this.castPreset,
-      startingCastSize: this.startingCastSize,
-      doubleEvictionEnabled: this.doubleEvictionEnabled,
-      doubleEvictionUsed: this.doubleEvictionUsed,
-      doubleEvictionWeek: this.doubleEvictionWeek,
-      secondEvictionPending: this.secondEvictionPending,
-      jury: [...this.jury],
-      finalePhase: this.finalePhase,
-      finaleR1WinnerId: this.finaleR1WinnerId,
-      finaleR2WinnerId: this.finaleR2WinnerId,
-      finaleR3WinnerId: this.finaleR3WinnerId,
       week: this.week,
+      weekdayIndex: this.weekdayIndex,
       day: this.day,
       phase: this.phase,
+      vetoHolderId: this.vetoHolderId,
       actionsRemaining: this.actionsRemaining,
       maxDaysPerWeek: this.maxDaysPerWeek,
       contestants: this.contestants.map((c) => c.toJSON()),
@@ -366,23 +341,16 @@ export class GameState {
   static fromJSON(data) {
     resetIdCounter(1000);
     const state = Object.create(GameState.prototype);
-    state.saveVersion = data.saveVersion ?? 1;
-    state.difficulty = data.difficulty in DIFFICULTY_CONFIG ? data.difficulty : 'normal';
-    state.config = DIFFICULTY_CONFIG[state.difficulty];
-    state.castPreset = data.castPreset ?? 'legacy';
-    state.startingCastSize = data.startingCastSize ?? data.contestants?.length ?? 11;
-    state.doubleEvictionEnabled = data.doubleEvictionEnabled ?? false;
-    state.doubleEvictionUsed = data.doubleEvictionUsed ?? false;
-    state.doubleEvictionWeek = data.doubleEvictionWeek ?? false;
-    state.secondEvictionPending = data.secondEvictionPending ?? false;
-    state.jury = data.jury ?? [];
-    state.finalePhase = data.finalePhase ?? null;
-    state.finaleR1WinnerId = data.finaleR1WinnerId ?? null;
-    state.finaleR2WinnerId = data.finaleR2WinnerId ?? null;
-    state.finaleR3WinnerId = data.finaleR3WinnerId ?? null;
+    state.difficulty = data.difficulty;
+    state.config = DIFFICULTY_CONFIG[data.difficulty];
     state.week = data.week;
-    state.day = data.day;
-    state.phase = data.phase;
+    state.weekdayIndex =
+      data.weekdayIndex ??
+      (typeof data.day === 'number' ? Math.max(0, Math.min(6, data.day - 1)) : 4);
+    state.day = data.day ?? state.weekdayIndex + 1;
+    state.phase =
+      data.phase === PHASES.VETO ? PHASES.VETO_CEREMONY : data.phase;
+    state.vetoHolderId = data.vetoHolderId ?? null;
     state.actionsRemaining = data.actionsRemaining;
     state.maxDaysPerWeek = data.maxDaysPerWeek;
     state.contestants = data.contestants.map((c) => Contestant.fromJSON(c));
@@ -402,7 +370,7 @@ export class GameState {
     state.lastCompetitionType = data.lastCompetitionType;
     state.currentCompetition = data.currentCompetition || null;
     state.challengeData = data.challengeData || null;
-    state.playerIntel = data.playerIntel ?? [];
+    state.playerIntel = data.playerIntel;
     state.gameOver = data.gameOver;
     state.winner = data.winner ? state.contestants.find((c) => c.id === data.winner) : null;
     return state;

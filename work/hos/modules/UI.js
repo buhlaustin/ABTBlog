@@ -1,4 +1,4 @@
-import { FINALE_PHASE_LABELS, PHASE_LABELS } from './GameState.js';
+import { PHASE_LABELS, PHASES, WEEKDAYS } from './GameState.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 
 /**
@@ -12,8 +12,6 @@ export class UIManager {
       endScreen: document.getElementById('end-screen'),
       playerNameInput: document.getElementById('player-name'),
       difficultySelect: document.getElementById('difficulty'),
-      castSelect: document.getElementById('cast-size'),
-      doubleEvictionToggle: document.getElementById('double-eviction'),
       btnNewGame: document.getElementById('btn-new-game'),
       btnLoadGame: document.getElementById('btn-load-game'),
       btnSave: document.getElementById('btn-save'),
@@ -45,13 +43,7 @@ export class UIManager {
 
   showSetup() {
     this.showScreen(this.elements.setupScreen);
-    const hasSave = StorageManagerRef.hasSave();
-    this.elements.btnLoadGame.disabled = !hasSave;
-    if (this.elements.btnLoadGame) {
-      this.elements.btnLoadGame.title = hasSave
-        ? 'Continue your saved season'
-        : 'No save found in this browser';
-    }
+    this.elements.btnLoadGame.disabled = !StorageManagerRef.hasSave();
   }
 
   showGame() {
@@ -63,12 +55,10 @@ export class UIManager {
     this.elements.endTitle.textContent = won ? 'You Won!' : 'Game Over';
   }
 
-  updateWeekDay(week, day, phase, finalePhase = null) {
-    this.elements.weekDay.textContent = `Week ${week} — Day ${day}`;
-    this.elements.phaseLabel.textContent =
-      (finalePhase && FINALE_PHASE_LABELS[finalePhase]) ||
-      PHASE_LABELS[phase] ||
-      phase;
+  updateWeekDay(week, weekdayIndex, phase) {
+    const weekday = WEEKDAYS[weekdayIndex] ?? `Day ${weekdayIndex + 1}`;
+    this.elements.weekDay.textContent = `Week ${week} — ${weekday}`;
+    this.elements.phaseLabel.textContent = PHASE_LABELS[phase] || phase;
   }
 
   /** Append entries to story log. */
@@ -91,21 +81,16 @@ export class UIManager {
     this.elements.storyLog.scrollTop = this.elements.storyLog.scrollHeight;
   }
 
-  _statBarWidth(value, scale = 10) {
-    const pct = scale === 10 ? value * 10 : value;
-    return Math.min(100, Math.max(0, pct));
-  }
-
   renderPlayer(player) {
     if (!player) return;
 
     this.elements.playerNameDisplay.textContent = player.name;
 
     const stats = [
-      { label: 'Social', value: player.social, cls: 'social', scale: 10 },
-      { label: 'Competition', value: player.competition, cls: 'competition', scale: 10 },
-      { label: 'Threat', value: player.threat, cls: 'threat', scale: 100 },
-      { label: 'Trust', value: player.trust, cls: 'trust', scale: 100 },
+      { label: 'Social', value: player.social, cls: 'social' },
+      { label: 'Competition', value: player.competition, cls: 'competition' },
+      { label: 'Threat', value: player.threat, cls: 'threat' },
+      { label: 'Trust', value: player.trust, cls: 'trust' },
       { label: 'Intelligence', value: player.intelligence },
       { label: 'Aggression', value: player.aggression },
       { label: 'Reputation', value: player.reputation },
@@ -114,41 +99,27 @@ export class UIManager {
 
     this.elements.playerStats.innerHTML = stats.map((s) => {
       if (s.cls) {
-        const width = this._statBarWidth(s.value, s.scale ?? 10);
         return `<div class="stat-bar-wrap">
           <div class="stat-row"><span class="stat-label">${s.label}</span><span>${s.value}</span></div>
-          <div class="stat-bar"><div class="stat-bar-fill ${s.cls}" style="width:${width}%"></div></div>
+          <div class="stat-bar"><div class="stat-bar-fill ${s.cls}" style="width:${s.value * 10}%"></div></div>
         </div>`;
       }
       return `<div class="stat-row"><span class="stat-label">${s.label}</span><span>${s.value}</span></div>`;
     }).join('');
 
     const tags = [];
-    if (player.evicted && player.isJuror) {
-      tags.push('<span class="tag jury">Jury</span>');
-    } else if (player.evicted) {
-      tags.push('<span class="tag evicted-player">Out</span>');
-    }
-    if (!player.evicted && player.isHOH) tags.push('<span class="tag hoh">HOH</span>');
-    if (!player.evicted && player.isNominated) {
-      tags.push('<span class="tag nominated">Nominated</span>');
-    }
-    if (!player.evicted && player.hasVeto) tags.push('<span class="tag veto-holder">POV</span>');
-    if (!player.evicted && player.allianceId) {
-      tags.push('<span class="tag alliance">In Alliance</span>');
-    }
-    if (!player.evicted && !player.isNominated && !player.isHOH) {
-      tags.push('<span class="tag safe">Safe</span>');
-    }
+    if (player.isHOH) tags.push('<span class="tag hoh">HOH</span>');
+    if (player.isNominated) tags.push('<span class="tag nominated">Nominated</span>');
+    if (player.hasVeto) tags.push('<span class="tag veto-holder">Veto</span>');
+    if (player.allianceId) tags.push('<span class="tag alliance">In Alliance</span>');
+    if (!player.isNominated && !player.isHOH) tags.push('<span class="tag safe">Safe</span>');
 
     this.elements.playerStatus.innerHTML = tags.join('');
   }
 
   renderHouseguests(contestants, player) {
     const active = contestants.filter((c) => !c.evicted);
-    const juryCount = contestants.filter((c) => c.isJuror).length;
-    this.elements.guestCount.textContent =
-      juryCount > 0 ? `${active.length} in · ${juryCount} jury` : String(active.length);
+    this.elements.guestCount.textContent = active.length;
 
     this.elements.houseguestList.innerHTML = contestants.map((c) => {
       const rel = player ? player.getRelationship(c.id) : 0;
@@ -156,10 +127,9 @@ export class UIManager {
       const icons = [];
       if (c.isHOH) icons.push('👑');
       if (c.isNominated) icons.push('⚠️');
-      if (c.isJuror) icons.push('⚖️');
-      if (c.evicted && !c.isJuror) icons.push('❌');
+      if (c.evicted) icons.push('❌');
 
-      return `<li class="houseguest-item ${c.isPlayer ? 'is-player' : ''} ${c.evicted ? 'evicted' : ''} ${c.isJuror ? 'juror' : ''}">
+      return `<li class="houseguest-item ${c.isPlayer ? 'is-player' : ''} ${c.evicted ? 'evicted' : ''}">
         <div>
           <span class="name">${icons.join(' ')} ${escapeHtml(c.name)}</span>
           <div class="personality">${escapeHtml(c.personality.name)}</div>
@@ -170,23 +140,42 @@ export class UIManager {
   }
 
   renderAlliances(alliances, player) {
-    if (alliances.length === 0) {
-      this.elements.allianceOverview.innerHTML = '<p class="no-alliance">No known alliances yet.</p>';
+    const visible = alliances.filter(
+      (a) => a.exposed || (player?.id && a.members.includes(player.id))
+    );
+    const hiddenCount = alliances.length - visible.length;
+
+    if (visible.length === 0) {
+      const hint =
+        hiddenCount > 0
+          ? `<p class="no-alliance">Alliances are forming in the shadows. Spy or wait for drama to expose them.</p>`
+          : `<p class="no-alliance">No known alliances yet.</p>`;
+      this.elements.allianceOverview.innerHTML = hint;
       return;
     }
 
-    this.elements.allianceOverview.innerHTML = alliances.map((a) => {
-      const isPlayerAlliance = a.members.includes(player?.id);
-      const memberNames = a.members.map((id) => {
-        const c = window.__gameContestants?.get(id);
-        return c ? c.name : 'Unknown';
-      }).join(', ');
+    let html = visible
+      .map((a) => {
+        const isPlayerAlliance = a.members.includes(player?.id);
+        const memberNames = a.members
+          .map((id) => {
+            const c = window.__gameContestants?.get(id);
+            return c ? c.name : 'Unknown';
+          })
+          .join(', ');
 
-      return `<div class="alliance-group ${isPlayerAlliance ? 'player-alliance' : ''}">
-        <h3>${a.name}${a.exposed ? ' (EXPOSED)' : ''}</h3>
+        return `<div class="alliance-group ${isPlayerAlliance ? 'player-alliance' : ''}">
+        <h3>${a.name}${a.exposed && !isPlayerAlliance ? ' (exposed)' : ''}</h3>
         <div class="alliance-members">${memberNames}</div>
       </div>`;
-    }).join('');
+      })
+      .join('');
+
+    if (hiddenCount > 0) {
+      html += `<p class="alliance-rumor">${hiddenCount} other alliance${hiddenCount === 1 ? '' : 's'} may be active — not confirmed.</p>`;
+    }
+
+    this.elements.allianceOverview.innerHTML = html;
   }
 
   renderActions(actions, onAction) {
