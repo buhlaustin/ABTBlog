@@ -8,7 +8,9 @@ House of Strategy is **static** (S3 + CloudFront). The OpenAI key stays in your 
 
 1. **Secrets Manager** — existing `prod/ClassQuip` JSON (same as ClassQuip production).
 2. **Lambda** — `infra/lambda/hos-narrative/` — `GetSecretValue` read-only, origin allowlist, rate limit.
-3. **Build** — GitHub secret `HOS_NARRATIVE_API_URL` → `scripts/inject-hos-config.mjs` → `work/hos/modules/hos-config.js`.
+3. **Build** — GitHub secret `HOS_NARRATIVE_API_URL` → `scripts/inject-hos-config.mjs` → `work/hos/modules/hos-config.js` and `work/eer/modules/eer-config.js` (same URL).
+
+**Executive Email Roulette** uses the same Lambda with `kind: "eer_daily_inbox"` (JSON inbox) and `kind: "eer_ouster_line"`. Redeploy the Lambda after pulling EER changes.
 
 ## Deploy Lambda (one-time or on code changes)
 
