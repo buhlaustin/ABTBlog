@@ -1,8 +1,47 @@
 import { HOS_NARRATIVE_API_URL } from './hos-config.js';
 import { PHASE_LABELS } from './GameState.js';
 
+/** Resolved at runtime from inline script, module, or narrative-api.json. */
+let resolvedUrl = null;
+
+export function getNarrativeApiUrl() {
+  if (resolvedUrl) return resolvedUrl;
+  if (typeof window !== 'undefined' && window.__HOS_NARRATIVE_API_URL) {
+    const w = String(window.__HOS_NARRATIVE_API_URL).trim();
+    if (w) {
+      resolvedUrl = w.replace(/\/$/, '');
+      return resolvedUrl;
+    }
+  }
+  if (typeof HOS_NARRATIVE_API_URL === 'string' && HOS_NARRATIVE_API_URL.length > 0) {
+    resolvedUrl = HOS_NARRATIVE_API_URL.replace(/\/$/, '');
+    return resolvedUrl;
+  }
+  return null;
+}
+
+/** Load URL from narrative-api.json when build inject missed the module bundle. */
+export async function initNarrativeApiUrl() {
+  if (getNarrativeApiUrl()) return getNarrativeApiUrl();
+  if (typeof document === 'undefined') return null;
+
+  try {
+    const script = document.querySelector('script[src*="game.js"]');
+    const base = script?.src ? script.src.replace(/game\.js(\?.*)?$/, '') : '/play/hos/';
+    const res = await fetch(`${base}narrative-api.json`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data?.url && typeof data.url === 'string') {
+      resolvedUrl = data.url.replace(/\/$/, '');
+    }
+  } catch {
+    /* offline or missing file */
+  }
+  return getNarrativeApiUrl();
+}
+
 export function isNarrativeApiEnabled() {
-  return typeof HOS_NARRATIVE_API_URL === 'string' && HOS_NARRATIVE_API_URL.length > 0;
+  return Boolean(getNarrativeApiUrl());
 }
 
 /** Safe snapshot for the server — no hidden alliance rosters, no full relationship matrix. */
@@ -45,13 +84,14 @@ export function buildNarrativeContext(state) {
  * @returns {Promise<{ text: string, type: string } | null>}
  */
 export async function fetchNarrativeBeat(kind, state) {
-  if (!isNarrativeApiEnabled()) return null;
+  const apiUrl = getNarrativeApiUrl();
+  if (!apiUrl) return null;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 18_000);
 
   try {
-    const res = await fetch(HOS_NARRATIVE_API_URL, {
+    const res = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({

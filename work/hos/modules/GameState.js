@@ -49,9 +49,17 @@ export const ALLIANCE_MAX_SIZE = 3;
  * Central game state: contestants, week progression, alliances, and history.
  */
 export class GameState {
-  constructor({ playerName, difficulty = 'normal', aiCount = 10 } = {}) {
+  constructor({
+    playerName,
+    difficulty = 'normal',
+    aiCount = 10,
+    castPreset = 'standard',
+    doubleEvictionEnabled = true
+  } = {}) {
     this.difficulty = difficulty;
     this.config = DIFFICULTY_CONFIG[difficulty];
+    this.castPreset = castPreset;
+    this.doubleEvictionEnabled = doubleEvictionEnabled;
     this.week = 1;
     /** 0 = Friday … 6 = Thursday */
     this.weekdayIndex = 4;
@@ -312,6 +320,8 @@ export class GameState {
   toJSON() {
     return {
       difficulty: this.difficulty,
+      castPreset: this.castPreset,
+      doubleEvictionEnabled: this.doubleEvictionEnabled,
       week: this.week,
       weekdayIndex: this.weekdayIndex,
       day: this.day,
@@ -343,6 +353,8 @@ export class GameState {
     const state = Object.create(GameState.prototype);
     state.difficulty = data.difficulty;
     state.config = DIFFICULTY_CONFIG[data.difficulty];
+    state.castPreset = data.castPreset ?? 'standard';
+    state.doubleEvictionEnabled = data.doubleEvictionEnabled ?? true;
     state.week = data.week;
     state.weekdayIndex =
       data.weekdayIndex ??

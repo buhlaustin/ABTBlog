@@ -11,8 +11,12 @@ import { EvictionSystem } from './modules/Eviction.js';
 import { PlayerActions } from './modules/PlayerActions.js';
 import { UIManager, setStorageRef } from './modules/UI.js';
 import { StorageManager } from './modules/Storage.js';
-import { fetchNarrativeBeat, isNarrativeApiEnabled } from './modules/NarrativeApi.js';
-import { escapeHtml } from './modules/utils.js';
+import {
+  fetchNarrativeBeat,
+  initNarrativeApiUrl,
+  isNarrativeApiEnabled
+} from './modules/NarrativeApi.js';
+import { aiCountForCast, escapeHtml, totalCastSize } from './modules/utils.js';
 
 class Game {
   constructor() {
@@ -36,7 +40,9 @@ class Game {
     ui.elements.btnNewGame.addEventListener('click', () => {
       const name = ui.elements.playerNameInput.value.trim() || 'You';
       const difficulty = ui.elements.difficultySelect.value;
-      this.startNewGame(name, difficulty);
+      const castPreset = ui.elements.castSelect?.value || 'standard';
+      const doubleEvictionEnabled = ui.elements.doubleEvictionToggle?.checked ?? true;
+      void this.startNewGame(name, difficulty, castPreset, doubleEvictionEnabled);
     });
 
     ui.elements.btnLoadGame.addEventListener('click', () => this.loadGame());
@@ -63,15 +69,25 @@ class Game {
     window.__gamePlayer = null;
   }
 
-  startNewGame(playerName, difficulty) {
+  async startNewGame(playerName, difficulty, castPreset = 'standard', doubleEvictionEnabled = true) {
     this._resetGame();
-    this.state = new GameState({ playerName, difficulty, aiCount: 10 });
+    await initNarrativeApiUrl();
+
+    const aiCount = aiCountForCast(castPreset);
+    this.state = new GameState({
+      playerName,
+      difficulty,
+      aiCount,
+      castPreset,
+      doubleEvictionEnabled
+    });
     this._initSystems();
     this._exposeGlobals();
 
     const safeName = escapeHtml(playerName);
+    const castSize = totalCastSize(aiCount);
     this.state.addStory({
-      text: `Welcome to the House, <strong>${safeName}</strong>! ${this.state.getActiveContestants().length} houseguests are competing. Only one will win.`,
+      text: `Welcome to the House, <strong>${safeName}</strong>! ${castSize} houseguests are competing. Only one will win.`,
       type: 'success'
     });
     this.state.addStory({
@@ -87,6 +103,7 @@ class Game {
         text: 'Enhanced host narration is <strong>on</strong> for this session.',
         type: 'system'
       });
+      void this._appendAiNarrative('host_line');
     }
 
     this.ui.showGame();

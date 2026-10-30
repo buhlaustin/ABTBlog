@@ -12,6 +12,8 @@ export class UIManager {
       endScreen: document.getElementById('end-screen'),
       playerNameInput: document.getElementById('player-name'),
       difficultySelect: document.getElementById('difficulty'),
+      castSelect: document.getElementById('cast-size'),
+      doubleEvictionToggle: document.getElementById('double-eviction'),
       btnNewGame: document.getElementById('btn-new-game'),
       btnLoadGame: document.getElementById('btn-load-game'),
       btnSave: document.getElementById('btn-save'),
