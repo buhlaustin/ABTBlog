@@ -9,10 +9,10 @@ export function resolveNarrativeApiUrl() {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname || '';
     if (host === 'austinbuhltech.com' || host.endsWith('.austinbuhltech.com')) {
-      return `${window.location.origin}/api/hos/narrative`;
+      return `${window.location.origin}/play/hos/narrate`;
     }
     if (window.location.pathname.startsWith('/play/hos')) {
-      return `${window.location.origin}/api/hos/narrative`;
+      return `${window.location.origin}/play/hos/narrate`;
     }
   }
   return getNarrativeApiUrl();
@@ -97,6 +97,23 @@ export function buildNarrativeContext(state) {
  * @param {'daily_beat' | 'host_line' | 'week_recap'} kind
  * @returns {Promise<{ text: string, type: string } | null>}
  */
+async function fetchNarrativeBeatDirect(kind, state, apiUrl) {
+  try {
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ kind, context: buildNarrativeContext(state) }),
+      credentials: 'omit'
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data?.text) return null;
+    return { text: data.text, type: data.type || 'narrative' };
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchNarrativeBeat(kind, state) {
   const apiUrl = resolveNarrativeApiUrl() || getNarrativeApiUrl();
   if (!apiUrl) return null;
@@ -116,11 +133,21 @@ export async function fetchNarrativeBeat(kind, state) {
       credentials: 'omit'
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const direct = getNarrativeApiUrl();
+      if (direct && direct.includes('lambda-url') && apiUrl !== direct) {
+        return fetchNarrativeBeatDirect(kind, state, direct);
+      }
+      return null;
+    }
     const data = await res.json();
     if (!data?.text) return null;
     return { text: data.text, type: data.type || 'narrative' };
   } catch {
+    const direct = getNarrativeApiUrl();
+    if (direct && direct.includes('lambda-url')) {
+      return fetchNarrativeBeatDirect(kind, state, direct);
+    }
     return null;
   } finally {
     clearTimeout(timeout);
