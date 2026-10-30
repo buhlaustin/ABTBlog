@@ -23,11 +23,11 @@ function corsOrigin(event) {
 }
 
 function json(statusCode, body, event, extraHeaders = {}) {
+  // CORS is handled by Lambda Function URL Cors config — do not duplicate ACAO here.
   return {
     statusCode,
     headers: {
       'content-type': 'application/json',
-      'access-control-allow-origin': corsOrigin(event),
       ...extraHeaders
     },
     body: JSON.stringify(body)

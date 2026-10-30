@@ -128,43 +128,51 @@ function isSiteProductionHost() {
   return host === 'austinbuhltech.com' || host.endsWith('.austinbuhltech.com');
 }
 
-export function getClientNarrativeApiUrl() {
-  const sameOrigin = resolveNarrativeApiUrl();
-  if (sameOrigin) return sameOrigin;
+export function getDirectNarrativeApiUrl() {
   const configured = getNarrativeApiUrl();
-  if (!configured) return null;
-  if (isSiteProductionHost() && configured.includes('lambda-url')) {
-    return `${window.location.origin}/play/hos/narrate`;
-  }
-  return configured;
+  if (configured?.includes('lambda-url')) return configured.replace(/\/$/, '');
+  return null;
 }
 
-export async function fetchNarrativeBeat(kind, state) {
-  const apiUrl = getClientNarrativeApiUrl();
-  if (!apiUrl) return null;
+export function getClientNarrativeApiUrl() {
+  const direct = getDirectNarrativeApiUrl();
+  if (direct) return direct;
+  if (isSiteProductionHost()) {
+    return `${window.location.origin}/play/hos/narrate`;
+  }
+  return resolveNarrativeApiUrl() || getNarrativeApiUrl();
+}
 
+async function postNarrative(apiUrl, body) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 18_000);
-
+  const timeout = setTimeout(() => controller.abort(), 45_000);
   try {
     const res = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        kind,
-        context: buildNarrativeContext(state)
-      }),
+      body: JSON.stringify(body),
       signal: controller.signal,
       credentials: 'omit'
     });
-
     if (!res.ok) return null;
-    const data = await res.json();
-    if (!data?.text) return null;
-    return { text: data.text, type: data.type || 'narrative' };
+    return await res.json();
   } catch {
     return null;
   } finally {
     clearTimeout(timeout);
   }
+}
+
+export async function fetchNarrativeBeat(kind, state) {
+  const body = { kind, context: buildNarrativeContext(state) };
+  const primary = getClientNarrativeApiUrl();
+  const proxy =
+    isSiteProductionHost() ? `${window.location.origin}/play/hos/narrate` : null;
+  const unique = [...new Set([primary, proxy, getDirectNarrativeApiUrl()].filter(Boolean))];
+
+  for (const apiUrl of unique) {
+    const data = await postNarrative(apiUrl, body);
+    if (data?.text) return { text: data.text, type: data.type || 'narrative' };
+  }
+  return null;
 }

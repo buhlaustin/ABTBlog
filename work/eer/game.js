@@ -95,15 +95,19 @@ class ExecutiveEmailRoulette {
     try {
       let emails = null;
       if (this.state.aiEnabled) {
-        emails = await fetchAiDailyInbox(this.state);
-      }
-      if (!emails?.length) {
-        emails = pickLocalInbox(this.state.day, this.state.recentSubjects);
-        if (this.state.aiEnabled) {
-          this.ui.appendFeed('Using local inbox (AI unavailable).', 'warning');
+        const { emails: aiEmails, error } = await fetchAiDailyInbox(this.state);
+        if (aiEmails?.length) {
+          emails = aiEmails;
+          this.ui.appendFeed(`Day ${this.state.day}: AI inbox loaded (${emails.length} emails).`, 'ai');
+        } else {
+          this.ui.appendFeed(
+            `AI inbox failed: ${escapeHtml(error || 'unknown')}. Retrying with curated scenarios…`,
+            'warning'
+          );
+          emails = pickLocalInbox(this.state.day, this.state.recentSubjects);
         }
       } else {
-        this.ui.appendFeed(`Day ${this.state.day} inbox generated.`, 'ai');
+        emails = pickLocalInbox(this.state.day, this.state.recentSubjects);
       }
 
       this.state.setInbox(emails);
@@ -112,7 +116,7 @@ class ExecutiveEmailRoulette {
     } catch (err) {
       console.error('loadDayInbox failed', err);
       this.state.setInbox(pickLocalInbox(this.state.day, this.state.recentSubjects));
-      this.ui.appendFeed('Inbox failed to load — showing offline scenarios.', 'warning');
+      this.ui.appendFeed('Inbox error — loaded backup scenarios.', 'warning');
       this.render();
       this.showCurrentEmail();
     } finally {

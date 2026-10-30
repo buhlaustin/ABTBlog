@@ -2,6 +2,11 @@ name: Deploy HOS narrative API
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "infra/lambda/hos-narrative/**"
+      - "infra/cloudformation/hos-narrative-api.yaml"
 
 permissions:
   contents: read

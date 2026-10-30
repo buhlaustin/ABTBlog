@@ -72,22 +72,26 @@ function isSiteProductionHost() {
   return host === 'austinbuhltech.com' || host.endsWith('.austinbuhltech.com');
 }
 
-/** URL used for browser fetch — never cross-origin lambda on production (duplicate CORS). */
+/** Primary: configured Lambda URL (Function URL CORS). Fallback: same-origin CloudFront proxy. */
 export function getClientNarrativeApiUrl() {
-  const sameOrigin = resolveNarrativeApiUrl();
-  if (sameOrigin) return sameOrigin;
-  const configured = getNarrativeApiUrl();
-  if (!configured) return null;
-  if (isSiteProductionHost() && configured.includes('lambda-url')) {
+  const direct = getDirectNarrativeApiUrl();
+  if (direct) return direct;
+  if (isSiteProductionHost()) {
     return `${window.location.origin}/play/hos/narrate`;
   }
-  return configured;
+  return resolveNarrativeApiUrl() || getNarrativeApiUrl();
+}
+
+export function getDirectNarrativeApiUrl() {
+  const configured = getNarrativeApiUrl();
+  if (configured?.includes('lambda-url')) return configured.replace(/\/$/, '');
+  return null;
 }
 
 async function postJson(apiUrl, body) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 45_000);
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25_000);
     const res = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -95,26 +99,43 @@ async function postJson(apiUrl, body) {
       credentials: 'omit',
       signal: controller.signal
     });
-    clearTimeout(timeout);
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      return { error: `HTTP ${res.status}`, detail: errText.slice(0, 200) };
+    }
     return await res.json();
-  } catch {
-    return null;
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'fetch failed' };
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
 export async function fetchAiDailyInbox(state) {
   const apiUrl = getClientNarrativeApiUrl();
-  if (!apiUrl) return null;
+  if (!apiUrl) return { emails: null, error: 'Narrative API URL not configured' };
 
   const payload = {
     kind: 'eer_daily_inbox',
     context: buildInboxContext(state)
   };
 
-  const data = await postJson(apiUrl, payload);
-  if (!data?.emails?.length) return null;
-  return data.emails.slice(0, 5);
+  const proxy =
+    isSiteProductionHost() ? `${window.location.origin}/play/hos/narrate` : null;
+  const urls = [...new Set([apiUrl, proxy].filter(Boolean))];
+
+  let lastError = 'AI inbox unavailable';
+  for (const url of urls) {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const data = await postJson(url, payload);
+      if (data?.emails?.length) {
+        return { emails: data.emails.slice(0, 5), error: null };
+      }
+      lastError = data?.error || data?.detail || 'Empty inbox response';
+      if (attempt === 0) await new Promise((r) => setTimeout(r, 600));
+    }
+  }
+  return { emails: null, error: lastError };
 }
 
 export async function fetchOusterLine(state) {
@@ -132,5 +153,6 @@ export async function fetchOusterLine(state) {
       reason: state.ousterReason
     }
   });
-  return data?.text?.trim() || null;
+  if (data?.text) return data.text.trim();
+  return null;
 }
