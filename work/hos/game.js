@@ -214,7 +214,31 @@ class Game {
     if (isNarrativeApiEnabled()) {
       await this._appendAiNarrative('host_line');
     }
-    this.runPhase();
+    this._runScheduledHouseEvent();
+  }
+
+  _runScheduledHouseEvent() {
+    switch (this.state.phase) {
+      case PHASES.COMPETITION:
+        this.runCompetitionPhase();
+        break;
+      case PHASES.NOMINATION:
+        this.runNominationPhase();
+        break;
+      case PHASES.VETO_COMP:
+        this.runVetoCompPhase();
+        break;
+      case PHASES.VETO_CEREMONY:
+      case PHASES.VETO:
+        this.runVetoCeremonyPhase();
+        break;
+      case PHASES.EVICTION:
+        this.runEvictionPhase();
+        break;
+      default:
+        this.runPhase();
+        break;
+    }
   }
 
   logAndRender(entries) {
@@ -239,6 +263,19 @@ class Game {
     const player = this.state.getPlayer();
     if (player.evicted && !this.state.gameOver) {
       this._spectateRemaining();
+      return;
+    }
+
+    if (this.state.isScheduledHouseEventDay() && !this.state.houseEventComplete) {
+      this.runEventDaySocialPhase();
+      return;
+    }
+
+    if (
+      this.state.phase === PHASES.SOCIAL
+      || (this.state.isScheduledHouseEventDay() && this.state.houseEventComplete)
+    ) {
+      this.runSocialPhase();
       return;
     }
 
@@ -271,9 +308,13 @@ class Game {
   }
 
   runSocialPhase() {
+    const dayName = this.state.getWeekdayName();
+    const phaseHint = this.state.isScheduledHouseEventDay() && this.state.houseEventComplete
+      ? ` After ${dayName}'s ceremony, the house is still awake.`
+      : '';
     this.ui.setActionPrompt(
       this.state.actionsRemaining > 0
-        ? `What will you do? (${this.state.actionsRemaining} action${this.state.actionsRemaining > 1 ? 's' : ''} left today)`
+        ? `What will you do? (${this.state.actionsRemaining} action${this.state.actionsRemaining > 1 ? 's' : ''} left today)${phaseHint}`
         : 'End the day to continue.'
     );
 
@@ -281,8 +322,25 @@ class Game {
     this.ui.renderActions(actions, (action) => this.handlePlayerAction(action));
   }
 
+  runEventDaySocialPhase() {
+    const dayName = this.state.getWeekdayName();
+    const eventLabel = PHASE_LABELS[this.state.phase] || 'House event';
+    this.ui.setActionPrompt(
+      `${dayName} — ${eventLabel}. Mingle in the house, then begin the live event when you're ready.`
+    );
+    const actions = [
+      {
+        id: 'begin_house_event',
+        label: `Begin ${dayName} live event`,
+        description: eventLabel
+      },
+      ...this.playerActions.getAvailableActions()
+    ];
+    this.ui.renderActions(actions, (action) => this.handlePlayerAction(action));
+  }
+
   handlePlayerAction(action) {
-    if (action.id === 'continue_day') {
+    if (action.id === 'continue_day' || action.id === 'begin_house_event') {
       void this._beginScheduledHouseDay();
       return;
     }
@@ -292,7 +350,20 @@ class Game {
       return;
     }
 
-    const needsTarget = ['talk', 'befriend', 'alliance', 'spy', 'promise', 'break_promise', 'campaign', 'influence'].includes(action.id);
+    const needsTarget = [
+      'talk',
+      'befriend',
+      'alliance',
+      'expand_alliance',
+      'spy',
+      'promise',
+      'break_promise',
+      'campaign',
+      'influence',
+      'scheme_nom',
+      'pregame',
+      'comfort_nominee'
+    ].includes(action.id);
 
     if (needsTarget) {
       this.pendingAction = action;
@@ -308,6 +379,44 @@ class Game {
           html += `<button class="btn target-btn" data-target="${t.id}">${escapeHtml(t.name)}</button>`;
         }
         html += '</div>';
+      } else if (action.id === 'expand_alliance') {
+        const player = this.state.getPlayer();
+        const mine = this.state.alliances.filter((a) => a.members.includes(player.id));
+        html = '<p>Which alliance?</p><div class="target-grid">';
+        for (const a of mine) {
+          html += `<button class="btn target-btn" data-alliance="${a.id}">${escapeHtml(a.name)} (${a.members.length})</button>`;
+        }
+        html += '</div><button class="btn btn-ghost" data-cancel>Cancel</button>';
+        this.ui.showActionDetail(html, null);
+        this.ui.elements.actionDetail.querySelectorAll('[data-alliance]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            this.pendingAction = { ...action, allianceId: btn.dataset.alliance };
+            const picker = this.ui.buildTargetPicker(
+              this.state.contestants,
+              `Invite someone into ${btn.textContent}`
+            );
+            this.ui.showActionDetail(
+              picker.html + '<button class="btn btn-ghost" data-cancel>Cancel</button>',
+              null
+            );
+            this.ui.elements.actionDetail.querySelectorAll('[data-target]').forEach((tbtn) => {
+              tbtn.addEventListener('click', () => {
+                this.pendingAction = null;
+                this.executePlayerAction(action.id, tbtn.dataset.target, {
+                  allianceId: btn.dataset.alliance
+                });
+              });
+            });
+          });
+        });
+        const cancel = this.ui.elements.actionDetail.querySelector('[data-cancel]');
+        if (cancel) {
+          cancel.addEventListener('click', () => {
+            this.pendingAction = null;
+            this.ui.hideActionDetail();
+          });
+        }
+        return;
       } else {
         const picker = this.ui.buildTargetPicker(
           this.state.contestants,
@@ -342,7 +451,10 @@ class Game {
   }
 
   executePlayerAction(actionId, targetId = null, extra = {}) {
-    const result = this.playerActions.execute(actionId, targetId, extra);
+    const result = this.playerActions.execute(actionId, targetId, {
+      promiseType: extra.promiseType,
+      allianceId: extra.allianceId
+    });
 
     if (!result.success && result.text) {
       this.logAndRender([{ text: result.text, type: result.type || 'warning' }]);
@@ -375,8 +487,9 @@ class Game {
   }
 
   advanceDay() {
-    if (this.state.phase !== PHASES.SOCIAL) {
-      this.ui.showToast('Finish today’s event first, or use Start when prompted.');
+    if (this.state.isScheduledHouseEventDay() && !this.state.houseEventComplete) {
+      this.ui.showToast('Begin today’s live house event before ending the day.');
+      this.runEventDaySocialPhase();
       return;
     }
 
@@ -403,34 +516,20 @@ class Game {
       }
     ]);
     this.render();
-
-    if (this.state.phase === PHASES.SOCIAL) {
-      this.runSocialPhase();
-    } else {
-      this._offerContinueToCurrentDay();
-    }
+    this.runPhase();
   }
 
-  _offerContinueToCurrentDay() {
-    const dayName = this.state.getWeekdayName();
-    this.ui.setActionPrompt(`${dayName} — ${PHASE_LABELS[this.state.phase] || 'House event'}`);
-    this.ui.renderActions(
-      [
-        {
-          id: 'continue_day',
-          label: `Start ${dayName}`,
-          description: 'Begin today’s scheduled house event.'
-        }
-      ],
-      (a) => this.handlePlayerAction(a)
-    );
-  }
-
-  _afterHouseEvent() {
-    this.state.advanceWeekday();
+  _onHouseEventComplete() {
+    this.state.houseEventComplete = true;
     this.state.actionsRemaining = this.state.config.actionsPerDay;
+    this.logAndRender([
+      {
+        type: 'system',
+        text: 'The live event is over — the house is still buzzing. Use your actions before the day ends.'
+      }
+    ]);
     this.render();
-    this._offerContinueToCurrentDay();
+    this.runSocialPhase();
   }
 
   // ─── Competition ─────────────────────────────────────────────────
@@ -507,7 +606,7 @@ class Game {
 
   _afterCompetition(winner) {
     if (this._maybeEndAtFinalTwo()) return;
-    this._afterHouseEvent();
+    this._onHouseEventComplete();
   }
 
   // ─── Nominations ───────────────────────────────────────────────────
@@ -525,7 +624,7 @@ class Game {
 
     const { results } = this.eviction.runNominations();
     this.logAndRender(results);
-    this._afterHouseEvent();
+    this._onHouseEventComplete();
   }
 
   _showNominationPicker() {
@@ -564,7 +663,7 @@ class Game {
           const { results } = this.eviction.runNominations(picks);
           this.ui.hideActionDetail();
           this.logAndRender(results);
-          this._afterHouseEvent();
+          this._onHouseEventComplete();
         });
       }
     };
@@ -616,7 +715,7 @@ class Game {
   _finishVetoComp(playerWonVeto) {
     const result = this.eviction.runVetoCompetition(playerWonVeto);
     this.logAndRender(result.results);
-    this._afterHouseEvent();
+    this._onHouseEventComplete();
   }
 
   _finishVetoCeremony(vetoWinner) {
@@ -633,7 +732,7 @@ class Game {
       return;
     }
 
-    this._afterHouseEvent();
+    this._onHouseEventComplete();
   }
 
   _showVetoChoice(vetoWinner) {
@@ -653,7 +752,7 @@ class Game {
         if (vetoResult.needsReplacementPick) {
           this._showReplacementPicker();
         } else {
-          this._afterHouseEvent();
+          this._onHouseEventComplete();
         }
       });
     });
@@ -664,7 +763,7 @@ class Game {
         const vetoResult = this.eviction.playerUseVeto(vetoWinner, null, false);
         this.ui.hideActionDetail();
         this.logAndRender(vetoResult.results);
-        this._afterHouseEvent();
+        this._onHouseEventComplete();
       });
     }
   }
@@ -686,7 +785,7 @@ class Game {
         const results = this.eviction.playerPickReplacement(btn.dataset.replacement);
         this.ui.hideActionDetail();
         this.logAndRender(results);
-        this._afterHouseEvent();
+        this._onHouseEventComplete();
       });
     });
   }
@@ -777,7 +876,7 @@ class Game {
     }]);
 
     this.render();
-    this._offerContinueToCurrentDay();
+    this.runPhase();
   }
 
   // ─── Spectator mode (player evicted) ───────────────────────────────

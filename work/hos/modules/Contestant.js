@@ -44,6 +44,9 @@ export class Contestant {
     this.trust = 50; // house-wide trust in this person
     this.threat = 10;
     this.reputation = 50; // how the house perceives them
+    /** @type {string[]} Secret alliance memberships (multiple pairwise / group deals). */
+    this.allianceIds = [];
+    /** @deprecated First alliance id — kept for older saves; use allianceIds. */
     this.allianceId = null;
     this.promises = []; // { targetId, type, week, kept }
     this.secretsKnown = []; // narrative intel
@@ -101,8 +104,15 @@ export class Contestant {
     threat += Math.max(0, (this.reputation - 50) / 5);
     threat += this.aggression;
 
-    const alliance = house.alliances.find((a) => a.id === this.allianceId);
-    if (alliance && alliance.members.length >= 3) threat += 8;
+    const ids = this.allianceIds?.length
+      ? this.allianceIds
+      : this.allianceId
+        ? [this.allianceId]
+        : [];
+    for (const aid of ids) {
+      const alliance = house.alliances.find((a) => a.id === aid);
+      if (alliance && alliance.members.length >= 3) threat += 6;
+    }
 
     const avgRel = this._averageRelationship(house);
     if (avgRel > 30) threat += 10;
@@ -167,6 +177,7 @@ export class Contestant {
       trust: this.trust,
       threat: this.threat,
       reputation: this.reputation,
+      allianceIds: [...(this.allianceIds || [])],
       allianceId: this.allianceId,
       promises: [...this.promises],
       secretsKnown: [...this.secretsKnown],
@@ -202,7 +213,12 @@ export class Contestant {
       trust: data.trust,
       threat: data.threat,
       reputation: data.reputation,
-      allianceId: data.allianceId,
+      allianceIds: data.allianceIds?.length
+        ? [...data.allianceIds]
+        : data.allianceId
+          ? [data.allianceId]
+          : [],
+      allianceId: data.allianceId ?? data.allianceIds?.[0] ?? null,
       promises: [...data.promises],
       secretsKnown: [...data.secretsKnown],
       isHOH: data.isHOH,

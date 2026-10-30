@@ -1,5 +1,11 @@
 import { Contestant } from './Contestant.js';
 import {
+  addContestantToAlliance,
+  getAllianceIds,
+  removeContestantFromAlliance,
+  sharesAllianceWith
+} from './allianceUtils.js';
+import {
   DIFFICULTY_CONFIG,
   generateAINames,
   pickRandom,
@@ -43,7 +49,7 @@ export const PHASE_LABELS = {
   [PHASES.WEEK_END]: 'Week summary'
 };
 
-export const ALLIANCE_MAX_SIZE = 3;
+export { sharesAllianceWith, getAllianceIds, getContestantAlliances } from './allianceUtils.js';
 
 /**
  * Central game state: contestants, week progression, alliances, and history.
@@ -86,6 +92,8 @@ export class GameState {
     this.playerIntel = []; // secrets player has learned
     this.gameOver = false;
     this.winner = null;
+    /** True after HOH / noms / veto / eviction finishes for the current calendar day. */
+    this.houseEventComplete = false;
 
     this._initContestants(playerName, aiCount);
   }
@@ -166,18 +174,18 @@ export class GameState {
     this.day = this.weekdayIndex + 1;
   }
 
-  /** Advance Fri → … → Thu; week 1 skips from Wed to Fri (move-in). */
+  /** Advance Fri → … → Thu (always includes eviction night). */
   advanceWeekday() {
-    if (this.week === 1 && this.weekdayIndex === 5) {
-      this.weekdayIndex = 0;
-      this.syncPhaseForWeekday();
-      return;
-    }
     this.weekdayIndex += 1;
     if (this.weekdayIndex > 6) {
       this.weekdayIndex = 0;
     }
+    this.houseEventComplete = false;
     this.syncPhaseForWeekday();
+  }
+
+  isScheduledHouseEventDay() {
+    return this.phase !== PHASES.SOCIAL && this.phase !== PHASES.WEEK_END;
   }
 
   /** Alliances visible to the player (own alliance or exposed). */
@@ -191,18 +199,13 @@ export class GameState {
     const alliance = this.alliances.find((a) => a.id === allianceId);
     if (!alliance) return { ok: false, reason: 'Alliance not found.' };
     if (alliance.members.includes(contestantId)) return { ok: true };
-    if (alliance.members.length >= ALLIANCE_MAX_SIZE) {
-      return { ok: false, reason: 'That alliance is full.' };
-    }
     return { ok: true };
   }
 
-  /** Create a new alliance (max 3 members). */
+  /** Create a new distinct alliance (players can belong to several). */
   createAlliance(leaderId, memberIds, name = null) {
     const members = [...new Set([leaderId, ...memberIds])];
-    if (members.length > ALLIANCE_MAX_SIZE) {
-      return null;
-    }
+    if (members.length < 2) return null;
     const alliance = {
       id: uid('alliance'),
       name: name || `Alliance ${this.alliances.length + 1}`,
@@ -214,12 +217,12 @@ export class GameState {
     this.alliances.push(alliance);
     for (const id of alliance.members) {
       const c = this.getContestant(id);
-      if (c) c.allianceId = alliance.id;
+      if (c) addContestantToAlliance(c, alliance.id);
     }
     return alliance;
   }
 
-  /** Add member to existing alliance if room. */
+  /** Add member to an existing alliance. */
   addAllianceMember(allianceId, contestantId) {
     const check = this.canJoinAlliance(allianceId, contestantId);
     if (!check.ok) return check;
@@ -229,22 +232,25 @@ export class GameState {
     if (!alliance.members.includes(contestantId)) {
       alliance.members.push(contestantId);
     }
-    c.allianceId = alliance.id;
+    addContestantToAlliance(c, alliance.id);
     return { ok: true, alliance };
   }
 
-  removeFromAlliance(contestantId) {
+  removeFromAlliance(contestantId, allianceId = null) {
     const c = this.getContestant(contestantId);
-    if (!c || !c.allianceId) return;
-    const alliance = this.alliances.find((a) => a.id === c.allianceId);
-    c.allianceId = null;
-    if (alliance) {
-      alliance.members = alliance.members.filter((id) => id !== contestantId);
-      if (alliance.members.length < 2) {
-        this.alliances = this.alliances.filter((a) => a.id !== alliance.id);
-        for (const id of alliance.members) {
-          const member = this.getContestant(id);
-          if (member) member.allianceId = null;
+    if (!c) return;
+    const ids = allianceId ? [allianceId] : getAllianceIds(c);
+    for (const aid of ids) {
+      const alliance = this.alliances.find((a) => a.id === aid);
+      removeContestantFromAlliance(c, aid);
+      if (alliance) {
+        alliance.members = alliance.members.filter((id) => id !== contestantId);
+        if (alliance.members.length < 2) {
+          this.alliances = this.alliances.filter((a) => a.id !== alliance.id);
+          for (const id of alliance.members) {
+            const member = this.getContestant(id);
+            if (member) removeContestantFromAlliance(member, alliance.id);
+          }
         }
       }
     }
@@ -294,6 +300,7 @@ export class GameState {
     this.week += 1;
     this.weekdayIndex = 0;
     this.vetoHolderId = null;
+    this.houseEventComplete = false;
     this.actionsRemaining = this.config.actionsPerDay;
     this.resetWeeklyFlags();
     this.syncPhaseForWeekday();
@@ -344,7 +351,8 @@ export class GameState {
       challengeData: this.challengeData,
       playerIntel: this.playerIntel,
       gameOver: this.gameOver,
-      winner: this.winner ? this.winner.id : null
+      winner: this.winner ? this.winner.id : null,
+      houseEventComplete: this.houseEventComplete
     };
   }
 
@@ -385,6 +393,7 @@ export class GameState {
     state.playerIntel = data.playerIntel;
     state.gameOver = data.gameOver;
     state.winner = data.winner ? state.contestants.find((c) => c.id === data.winner) : null;
+    state.houseEventComplete = data.houseEventComplete ?? false;
     return state;
   }
 }

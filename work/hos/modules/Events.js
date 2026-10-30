@@ -106,7 +106,12 @@ export class NarrativeEngine {
     }
 
     const player = this.state.getPlayer();
-    if (player.allianceId === alliance.id) {
+    const playerAllianceIds = player.allianceIds?.length
+      ? player.allianceIds
+      : player.allianceId
+        ? [player.allianceId]
+        : [];
+    if (playerAllianceIds.includes(alliance.id)) {
       return { type: 'drama', text: conflict };
     }
     return { type: 'narrative', text: 'Alliances are shifting behind the scenes.' };

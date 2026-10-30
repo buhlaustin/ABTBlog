@@ -1,4 +1,9 @@
 import { statCheck, weightedPick, pickRandom, randomInt, clamp } from './utils.js';
+import {
+  getAllianceIds,
+  getContestantAlliances,
+  sharesAllianceWith
+} from './allianceUtils.js';
 
 /**
  * Autonomous AI decision-making for alliances, social moves, nominations, and votes.
@@ -115,23 +120,22 @@ export class AIController {
         };
       }
       case 'strengthen_alliance': {
-        if (ai.allianceId) {
-          const alliance = this.state.alliances.find((a) => a.id === ai.allianceId);
-          if (alliance) {
-            for (const memberId of alliance.members) {
-              if (memberId !== ai.id) {
-                const member = this.state.getContestant(memberId);
-                if (member) {
-                  ai.modifyRelationship(memberId, randomInt(2, 6));
-                  member.modifyRelationship(ai.id, randomInt(2, 5));
-                }
+        const mine = getContestantAlliances(this.state, ai.id);
+        const alliance = mine.length > 0 ? pickRandom(mine) : null;
+        if (alliance) {
+          for (const memberId of alliance.members) {
+            if (memberId !== ai.id) {
+              const member = this.state.getContestant(memberId);
+              if (member) {
+                ai.modifyRelationship(memberId, randomInt(2, 6));
+                member.modifyRelationship(ai.id, randomInt(2, 5));
               }
             }
-            return {
-              type: 'narrative',
-              text: `${ai.name} reinforced their alliance commitments in a late-night meeting.`
-            };
           }
+          return {
+            type: 'narrative',
+            text: `${ai.name} reinforced "${alliance.name}" in a late-night meeting.`
+          };
         }
         return null;
       }
@@ -170,7 +174,7 @@ export class AIController {
     return weightedPick(others, (o) => {
       let weight = 10 - o.threat / 10;
       weight += ai.getRelationship(o.id) / 10;
-      if (o.allianceId === ai.allianceId && ai.allianceId) weight += 15;
+      if (sharesAllianceWith(ai, o)) weight += 15;
       return Math.max(1, weight);
     });
   }
@@ -180,7 +184,7 @@ export class AIController {
   }
 
   _tryFormAlliance() {
-    const ais = this.state.getActiveContestants().filter((c) => !c.isPlayer && !c.allianceId);
+    const ais = this.state.getActiveContestants().filter((c) => !c.isPlayer);
     if (ais.length < 2) return null;
 
     const strategists = ais.filter((a) => ['strategist', 'loyalist', 'social'].includes(a.personality.id));
@@ -188,7 +192,9 @@ export class AIController {
     const leader = pickRandom(leaderPool);
     if (!leader) return null;
 
-    const candidates = this.state.getOthers(leader).filter((c) => !c.allianceId && !c.isPlayer);
+    const candidates = this.state.getOthers(leader).filter(
+      (c) => !c.isPlayer && !sharesAllianceWith(leader, c)
+    );
     if (candidates.length === 0) return null;
 
     const member = weightedPick(candidates, (c) => {
@@ -196,8 +202,6 @@ export class AIController {
     });
 
     if (leader.getRelationship(member.id) < 5 && Math.random() > 0.3) return null;
-
-    if (leader.allianceId || member.allianceId) return null;
 
     const alliance = this.state.createAlliance(leader.id, [member.id]);
     if (!alliance) return null;
@@ -242,7 +246,7 @@ export class AIController {
     const victim = this.state.getContestant(victimId);
     if (!victim) return null;
 
-    this.state.removeFromAlliance(betrayer.id);
+    this.state.removeFromAlliance(betrayer.id, alliance.id);
     victim.recordBetrayal(betrayer.id, this.state.week);
     betrayer.reputation = clamp(betrayer.reputation - 10, 0, 100);
 
@@ -274,10 +278,10 @@ export class AIController {
     score += Math.max(0, -hoh.getRelationship(target.id) / 3);
     score += target.aggression;
 
-    if (target.allianceId && target.allianceId !== hoh.allianceId) {
+    if (getAllianceIds(target).length > 0 && !sharesAllianceWith(hoh, target)) {
       score += 10;
     }
-    if (hoh.allianceId && target.allianceId === hoh.allianceId) {
+    if (sharesAllianceWith(hoh, target)) {
       score -= 25;
     }
 
@@ -305,12 +309,10 @@ export class AIController {
         reasons.push(`grudge against ${nominee.name}`);
       }
 
-      if (voter.allianceId && nominee.allianceId === voter.allianceId) {
+      if (sharesAllianceWith(voter, nominee)) {
         score -= 30;
         reasons.push(`alliance member ${nominee.name} is protected`);
-      }
-
-      if (voter.allianceId && nominee.allianceId && nominee.allianceId !== voter.allianceId) {
+      } else if (getAllianceIds(nominee).length > 0 && getAllianceIds(voter).length > 0) {
         score += 15;
         reasons.push(`rival alliance target`);
       }
@@ -365,7 +367,7 @@ export class AIController {
 
   /** AI uses veto decision. */
   decideVetoUse(holder, nominees) {
-    const ally = nominees.find((n) => n.allianceId && n.allianceId === holder.allianceId);
+    const ally = nominees.find((n) => sharesAllianceWith(holder, n));
     if (ally && holder.getRelationship(ally.id) > 10) {
       return { use: true, target: ally };
     }

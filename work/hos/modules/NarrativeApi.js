@@ -73,9 +73,14 @@ export function buildNarrativeContext(state) {
     .map((e) => (typeof e.text === 'string' ? e.text.replace(/<[^>]+>/g, '') : ''))
     .filter(Boolean);
 
-  const playerAlliance = player?.allianceId
-    ? state.alliances.find((a) => a.id === player.allianceId)
-    : null;
+  const playerAllianceIds = player?.allianceIds?.length
+    ? player.allianceIds
+    : player?.allianceId
+      ? [player.allianceId]
+      : [];
+  const playerAlliances = playerAllianceIds
+    .map((id) => state.alliances.find((a) => a.id === id))
+    .filter(Boolean);
 
   return {
     week: state.week,
@@ -87,7 +92,10 @@ export function buildNarrativeContext(state) {
     nominees,
     playerIsNominated: Boolean(player?.isNominated),
     playerIsHOH: Boolean(player?.isHOH),
-    playerAllianceSize: playerAlliance?.members?.length || 0,
+    playerAllianceCount: playerAlliances.length,
+    playerAllianceNames: playerAlliances.map((a) => a.name),
+    playerAllianceSize: playerAlliances.reduce((n, a) => Math.max(n, a.members.length), 0),
+    houseEventComplete: Boolean(state.houseEventComplete),
     exposedAllianceCount: state.alliances.filter((a) => a.exposed).length,
     recentEvents
   };

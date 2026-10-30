@@ -113,7 +113,9 @@ export class UIManager {
     if (player.isHOH) tags.push('<span class="tag hoh">HOH</span>');
     if (player.isNominated) tags.push('<span class="tag nominated">Nominated</span>');
     if (player.hasVeto) tags.push('<span class="tag veto-holder">Veto</span>');
-    if (player.allianceId) tags.push('<span class="tag alliance">In Alliance</span>');
+    const allianceCount = player.allianceIds?.length || (player.allianceId ? 1 : 0);
+    if (allianceCount === 1) tags.push('<span class="tag alliance">In Alliance</span>');
+    if (allianceCount > 1) tags.push(`<span class="tag alliance">${allianceCount} Alliances</span>`);
     if (!player.isNominated && !player.isHOH) tags.push('<span class="tag safe">Safe</span>');
 
     this.elements.playerStatus.innerHTML = tags.join('');

@@ -1,5 +1,10 @@
 import { randomInt, clamp } from './utils.js';
-import { ALLIANCE_MAX_SIZE } from './GameState.js';
+import { PHASES } from './GameState.js';
+import {
+  getAllianceIds,
+  getContestantAlliances,
+  sharesAllianceWith
+} from './allianceUtils.js';
 
 /**
  * Player-initiated actions during the social phase.
@@ -14,21 +19,72 @@ export class PlayerActions {
     const player = this.state.getPlayer();
     if (!player || player.evicted) return [];
 
+    const phase = this.state.phase;
+    const nominees = this.state.nominees
+      .map((id) => this.state.getContestant(id))
+      .filter(Boolean);
+
     const actions = [
       { id: 'talk', label: 'Talk to Houseguest', description: 'Have a conversation to build rapport.' },
       { id: 'befriend', label: 'Build Friendship', description: 'Invest time strengthening a bond.' },
-      { id: 'alliance', label: 'Propose Alliance', description: 'Invite someone into a secret alliance.' },
+      { id: 'alliance', label: 'Propose New Alliance', description: 'Start a separate secret deal with someone.' },
       { id: 'spy', label: 'Spy / Gather Intel', description: 'Eavesdrop and learn house secrets.' },
       { id: 'promise', label: 'Make a Promise', description: 'Pledge your vote or loyalty.' },
       { id: 'campaign', label: 'Campaign Against Target', description: 'Turn the house against someone.' },
-      { id: 'influence', label: 'Influence Votes', description: 'Lobby houseguests before eviction.' },
       { id: 'reputation', label: 'Improve Reputation', description: 'Do something to look good to the house.' },
       { id: 'rest', label: 'Rest & Observe', description: 'Skip action, lower threat slightly.' }
     ];
 
+    const playerAlliances = getContestantAlliances(this.state, player.id);
+    if (playerAlliances.length > 0) {
+      actions.splice(3, 0, {
+        id: 'expand_alliance',
+        label: 'Invite to Existing Alliance',
+        description: 'Add someone to one of your current alliances.'
+      });
+    }
+
+    if (phase === PHASES.EVICTION || this.state.isScheduledHouseEventDay()) {
+      actions.splice(6, 0, {
+        id: 'influence',
+        label: 'Lobby Before the Vote',
+        description: 'Push houseguests while tension is high.'
+      });
+    } else {
+      actions.splice(6, 0, {
+        id: 'influence',
+        label: 'Influence Votes',
+        description: 'Lobby houseguests before eviction night.'
+      });
+    }
+
+    if (phase === PHASES.NOMINATION || phase === PHASES.VETO_CEREMONY || phase === PHASES.VETO) {
+      actions.unshift({
+        id: 'scheme_nom',
+        label: 'Scheme About Nominees',
+        description: 'Float names and test reactions before the ceremony.'
+      });
+    }
+
+    if (phase === PHASES.COMPETITION) {
+      actions.unshift({
+        id: 'pregame',
+        label: 'Pre-Competition Pep Talk',
+        description: 'Rally allies before the HOH competition.'
+      });
+    }
+
+    if (nominees.length > 0 && (phase === PHASES.VETO_COMP || phase === PHASES.EVICTION)) {
+      actions.unshift({
+        id: 'comfort_nominee',
+        label: 'Comfort a Nominee',
+        description: 'Show support (or fake it) on the block.'
+      });
+    }
+
     const hasActivePromises = player.promises.some((p) => p.kept === null);
     if (hasActivePromises) {
-      actions.splice(5, 0, {
+      actions.splice(8, 0, {
         id: 'break_promise',
         label: 'Break a Promise',
         description: 'Go back on your word (risky).'
@@ -54,6 +110,8 @@ export class PlayerActions {
         return this._befriend(player, target);
       case 'alliance':
         return this._proposeAlliance(player, target);
+      case 'expand_alliance':
+        return this._expandAlliance(player, target, extra.allianceId);
       case 'spy':
         return this._spy(player, target);
       case 'promise':
@@ -68,11 +126,26 @@ export class PlayerActions {
         return this._improveReputation(player);
       case 'rest':
         return this._rest(player);
+      case 'scheme_nom':
+        return this._schemeNominees(player, target);
+      case 'pregame':
+        return this._pregameComp(player, target);
+      case 'comfort_nominee':
+        return this._comfortNominee(player, target);
       case 'end_day':
         return { success: true, text: 'You chose to end the day.', type: 'system', endDay: true };
       default:
         return { success: false, text: 'Unknown action.', type: 'system' };
     }
+  }
+
+  _phaseFlavor() {
+    const phase = this.state.phase;
+    if (phase === PHASES.EVICTION) return 'with eviction looming';
+    if (phase === PHASES.NOMINATION) return 'as nomination talk swirls';
+    if (phase === PHASES.VETO_COMP || phase === PHASES.VETO_CEREMONY) return 'with veto drama in the air';
+    if (phase === PHASES.COMPETITION) return 'before the HOH comp';
+    return 'around the house';
   }
 
   _talk(player, target) {
@@ -82,11 +155,13 @@ export class PlayerActions {
     player.modifyRelationship(target.id, delta);
     target.modifyRelationship(player.id, delta - randomInt(0, 2));
 
+    const flavor = this._phaseFlavor();
     const dialogues = [
-      `You had a heartfelt conversation with ${target.name} about life outside the house.`,
-      `You and ${target.name} bonded over shared interests in the backyard.`,
-      `A late-night chat with ${target.name} revealed you have more in common than you thought.`,
-      `${target.name} opened up to you about feeling isolated in the house.`
+      `You had a raw conversation with ${target.name} ${flavor} about who is really running the house.`,
+      `You and ${target.name} traded strategy ${flavor} — both of you lied a little, both of you listened.`,
+      `A tense sidebar with ${target.name} ${flavor} ended with a handshake that might actually mean something.`,
+      `${target.name} vented to you ${flavor}; you filed every word away for later.`,
+      `You and ${target.name} laughed too loud on purpose ${flavor}, just so the house would wonder what you said.`
     ];
 
     this._consumeAction();
@@ -111,8 +186,8 @@ export class PlayerActions {
     return {
       success: true,
       text: success
-        ? `Your friendship with ${target.name} grew significantly. They seem to genuinely trust you.`
-        : `You spent time with ${target.name}, but they're still keeping their guard up.`,
+        ? `Your bond with ${target.name} deepened ${this._phaseFlavor()}. They might actually ride for you.`
+        : `${target.name} smiled ${this._phaseFlavor()}, but their eyes stayed on the exits.`,
       type: success ? 'success' : 'narrative'
     };
   }
@@ -120,53 +195,31 @@ export class PlayerActions {
   _proposeAlliance(player, target) {
     if (!target) return { success: false, text: 'Choose an alliance partner.', type: 'system' };
 
+    if (sharesAllianceWith(player, target)) {
+      this._consumeAction();
+      return {
+        success: true,
+        text: `You and ${target.name} already share a secret deal. You tighten the pact instead of starting over.`,
+        type: 'narrative'
+      };
+    }
+
     const acceptChance = (player.getRelationship(target.id) + player.social * 5 + target.loyalty * 3) / 100;
     const accepted = Math.random() < acceptChance;
 
     if (accepted) {
-      if (target.allianceId && target.allianceId !== player.allianceId) {
+      const created = this.state.createAlliance(
+        player.id,
+        [target.id],
+        `${player.name} ↔ ${target.name}`
+      );
+      if (!created) {
         this._consumeAction();
         return {
           success: false,
-          text: `${target.name} is already committed to another alliance. You can't merge groups.`,
+          text: 'That alliance could not be formed.',
           type: 'warning'
         };
-      }
-
-      if (player.allianceId) {
-        const added = this.state.addAllianceMember(player.allianceId, target.id);
-        if (!added.ok) {
-          this._consumeAction();
-          return {
-            success: false,
-            text: `Your alliance is full (max ${ALLIANCE_MAX_SIZE} members).`,
-            type: 'warning'
-          };
-        }
-      } else if (target.allianceId) {
-        const added = this.state.addAllianceMember(target.allianceId, player.id);
-        if (!added.ok) {
-          this._consumeAction();
-          return {
-            success: false,
-            text: `${target.name}'s alliance doesn't have room for another partner.`,
-            type: 'warning'
-          };
-        }
-      } else {
-        const created = this.state.createAlliance(
-          player.id,
-          [target.id],
-          `${player.name} & ${target.name}`
-        );
-        if (!created) {
-          this._consumeAction();
-          return {
-            success: false,
-            text: 'That alliance could not be formed.',
-            type: 'warning'
-          };
-        }
       }
 
       player.modifyRelationship(target.id, 20);
@@ -176,7 +229,7 @@ export class PlayerActions {
       this._consumeAction();
       return {
         success: true,
-        text: `${target.name} accepted your alliance proposal! You now have a secret partnership.`,
+        text: `${target.name} shook on a new secret alliance with you — separate from any other deals in the house.`,
         type: 'success'
       };
     }
@@ -185,8 +238,50 @@ export class PlayerActions {
     this._consumeAction();
     return {
       success: false,
-      text: `${target.name} politely declined your alliance offer. Awkward.`,
+      text: `${target.name} dodged your offer ${this._phaseFlavor()}. The room got quiet fast.`,
       type: 'warning'
+    };
+  }
+
+  _expandAlliance(player, target, allianceId) {
+    if (!allianceId) {
+      return { success: false, text: 'Pick which alliance to expand.', type: 'system', needsAlliancePick: true };
+    }
+    if (!target) return { success: false, text: 'Choose who to invite.', type: 'system' };
+
+    const alliance = this.state.alliances.find((a) => a.id === allianceId);
+    if (!alliance || !alliance.members.includes(player.id)) {
+      return { success: false, text: 'That alliance is not yours.', type: 'system' };
+    }
+    if (alliance.members.includes(target.id)) {
+      this._consumeAction();
+      return { success: true, text: `${target.name} is already in that alliance.`, type: 'narrative' };
+    }
+
+    const acceptChance = (player.getRelationship(target.id) + target.loyalty * 4) / 120;
+    if (Math.random() >= acceptChance) {
+      target.modifyRelationship(player.id, -4);
+      this._consumeAction();
+      return {
+        success: false,
+        text: `${target.name} refused to join "${alliance.name}".`,
+        type: 'warning'
+      };
+    }
+
+    const added = this.state.addAllianceMember(alliance.id, target.id);
+    if (!added.ok) {
+      this._consumeAction();
+      return { success: false, text: added.reason || 'Could not add member.', type: 'warning' };
+    }
+
+    player.modifyRelationship(target.id, 10);
+    target.modifyRelationship(player.id, 8);
+    this._consumeAction();
+    return {
+      success: true,
+      text: `${target.name} joined your alliance "${alliance.name}".`,
+      type: 'success'
     };
   }
 
@@ -197,24 +292,26 @@ export class PlayerActions {
     if (!success) {
       return {
         success: false,
-        text: 'You tried to eavesdrop but got caught lingering. The house is suspicious.',
+        text: 'You lingered too long by the door. Someone definitely noticed.',
         type: 'warning'
       };
     }
 
     const subject = target || this._pickSpySubject();
-    if (subject.allianceId) {
-      const alliance = this.state.alliances.find((a) => a.id === subject.allianceId);
-      if (alliance && !alliance.members.includes(player.id)) {
-        alliance.exposed = true;
-      }
+    const subjectAlliances = getContestantAlliances(this.state, subject.id).filter(
+      (a) => !a.members.includes(player.id)
+    );
+    for (const alliance of subjectAlliances) {
+      if (Math.random() < 0.35) alliance.exposed = true;
     }
 
+    const allyName = this._randomAllyName(subject);
     const intelTypes = [
       `${subject.name} was heard planning to target you next week.`,
-      `${subject.name} is in a secret alliance with ${this._randomAllyName(subject)}.`,
+      `${subject.name} is running a side deal with ${allyName} — not their only alliance.`,
       `${subject.name} lied about their vote last week.`,
-      `${subject.name} has been spreading rumors about you.`
+      `${subject.name} has been spreading rumors about you ${this._phaseFlavor()}.`,
+      `You caught ${subject.name} rehearsing what to say if they win HOH.`
     ];
 
     const intel = intelTypes[randomInt(0, intelTypes.length - 1)];
@@ -245,8 +342,8 @@ export class PlayerActions {
     player.trust = clamp(player.trust + 3, 0, 100);
 
     const promises = {
-      vote: `You promised ${target.name} your vote this week.`,
-      safety: `You promised ${target.name} you would keep them safe.`,
+      vote: `You promised ${target.name} your vote this week — the house will hold you to it.`,
+      safety: `You promised ${target.name} safety ${this._phaseFlavor()}.`,
       loyalty: `You swore loyalty to ${target.name} for the rest of the game.`
     };
 
@@ -302,8 +399,8 @@ export class PlayerActions {
     return {
       success: true,
       text: influenced > 0
-        ? `Your campaign against ${target.name} swayed ${influenced} houseguest(s).`
-        : `Your campaign against ${target.name} didn't gain much traction.`,
+        ? `Your whisper campaign against ${target.name} landed with ${influenced} houseguest(s) ${this._phaseFlavor()}.`
+        : `Your shots at ${target.name} bounced off — for now.`,
       type: 'drama'
     };
   }
@@ -315,7 +412,8 @@ export class PlayerActions {
     let influenced = 0;
 
     for (const other of others) {
-      const chance = (player.social + player.getRelationship(other.id)) / 150;
+      const bonus = sharesAllianceWith(player, other) ? 0.15 : 0;
+      const chance = (player.social + player.getRelationship(other.id)) / 150 + bonus;
       if (Math.random() < chance) {
         other.modifyRelationship(target.id, -randomInt(3, 8));
         influenced += 1;
@@ -326,8 +424,8 @@ export class PlayerActions {
     return {
       success: true,
       text: influenced > 0
-        ? `You influenced ${influenced} houseguest(s) to vote against ${target.name}.`
-        : `Your lobbying efforts fell flat this time.`,
+        ? `You moved ${influenced} vote(s) against ${target.name} ${this._phaseFlavor()}.`
+        : `Nobody budged — the block might stay predictable.`,
       type: 'narrative'
     };
   }
@@ -344,7 +442,7 @@ export class PlayerActions {
     this._consumeAction();
     return {
       success: true,
-      text: 'You did something genuinely kind for the house. Your reputation improved.',
+      text: `You pulled a gracious house move ${this._phaseFlavor()}. Even rivals nodded.`,
       type: 'success'
     };
   }
@@ -354,8 +452,63 @@ export class PlayerActions {
     this._consumeAction();
     return {
       success: true,
-      text: 'You kept a low profile today, watching and waiting.',
+      text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first.`,
       type: 'system'
+    };
+  }
+
+  _schemeNominees(player, target) {
+    if (!target) return { success: false, text: 'Choose who to test as a nominee name.', type: 'system' };
+    const reactions = this.state.getOthers(player).filter((c) => c.id !== target.id);
+    let stirred = 0;
+    for (const c of reactions) {
+      if (Math.random() < (player.social + 5) / 25) {
+        c.modifyRelationship(target.id, -randomInt(2, 6));
+        stirred += 1;
+      }
+    }
+    target.threat = clamp(target.threat + randomInt(2, 5), 0, 100);
+    this._consumeAction();
+    return {
+      success: true,
+      text: stirred
+        ? `You floated ${target.name}'s name ${this._phaseFlavor()}; ${stirred} people visibly flinched.`
+        : `You casually dropped ${target.name}'s name — the house played poker faces.`,
+      type: 'drama'
+    };
+  }
+
+  _pregameComp(player, target) {
+    if (!target) return { success: false, text: 'Choose who to rally.', type: 'system' };
+    const boost = randomInt(3, 8);
+    player.modifyRelationship(target.id, boost);
+    target.modifyRelationship(player.id, boost - 1);
+    if (sharesAllianceWith(player, target)) {
+      target.competition = clamp(target.competition + 1, 1, 10);
+    }
+    this._consumeAction();
+    return {
+      success: true,
+      text: `You hyped ${target.name} before the comp — whether they win or not, they remember.`,
+      type: 'narrative'
+    };
+  }
+
+  _comfortNominee(player, target) {
+    if (!target) return { success: false, text: 'Choose a nominee to approach.', type: 'system' };
+    if (!this.state.nominees.includes(target.id)) {
+      return { success: false, text: `${target.name} is not on the block right now.`, type: 'system' };
+    }
+    const genuine = Math.random() < (player.loyalty + player.getRelationship(target.id)) / 120;
+    player.modifyRelationship(target.id, genuine ? randomInt(6, 12) : randomInt(2, 5));
+    target.modifyRelationship(player.id, genuine ? randomInt(5, 10) : randomInt(1, 4));
+    this._consumeAction();
+    return {
+      success: true,
+      text: genuine
+        ? `You sat with ${target.name} on the block — real comfort in a cruel week.`
+        : `You performed sympathy for ${target.name}. The cameras might buy it; they might not.`,
+      type: genuine ? 'success' : 'narrative'
     };
   }
 
