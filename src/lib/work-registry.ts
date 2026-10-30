@@ -16,6 +16,17 @@ export interface WorkItem {
 
 export const workItems: WorkItem[] = [
   {
+    slug: "eer",
+    title: "Executive Email Roulette",
+    summary:
+      "Reigns-style corporate inbox triage: five urgent emails a day, two replies each. Balance stock, board, morale, and cash—or get ousted.",
+    kind: "hosted",
+    status: "live",
+    tags: ["game", "javascript", "satire"],
+    featured: true,
+    hostedEntry: "/play/eer/index.html",
+  },
+  {
     slug: "hos",
     title: "House of Strategy",
     summary:

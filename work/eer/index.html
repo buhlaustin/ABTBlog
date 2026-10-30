@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Executive Email Roulette</title>
+  <link rel="stylesheet" href="/play/eer/style.css">
+</head>
+<body>
+  <div id="app">
+    <section id="screen-setup" class="screen">
+      <header class="hero">
+        <p class="eyebrow">High-stakes decision micro-game</p>
+        <h1>Executive Email Roulette</h1>
+        <p class="lede">You are the stressed interim CEO. Every day, five urgent emails land. Two reply buttons each. Keep four meters out of the danger zone — hit <strong>0%</strong> or <strong>100%</strong> on any meter and the board will oust you.</p>
+      </header>
+      <div class="setup-form">
+        <label for="ceo-name">Your title on the door</label>
+        <input id="ceo-name" type="text" maxlength="40" placeholder="Interim CEO" autocomplete="name">
+        <div class="setup-actions">
+          <button id="btn-start" class="btn btn-primary">Open the inbox</button>
+          <button id="btn-load" class="btn btn-ghost">Continue save</button>
+        </div>
+      </div>
+      <ul class="meter-legend">
+        <li><span>Stock Price</span> — too low or meme-high kills you</li>
+        <li><span>Board Approval</span> — lose them or become their puppet</li>
+        <li><span>Employee Morale</span> — mutiny or cult vibes</li>
+        <li><span>Cash Runway</span> — bankrupt or reckless burn</li>
+      </ul>
+    </section>
+
+    <section id="screen-game" class="screen" hidden>
+      <header class="game-header">
+        <div>
+          <p id="day-label" class="day-label">Day 1</p>
+          <p id="email-progress" class="progress-label">Email 1 of 5</p>
+        </div>
+        <button id="btn-save" class="btn btn-small btn-ghost" type="button">Save</button>
+      </header>
+
+      <div class="meters">
+        <div id="meter-stock" class="meter" data-meter="stock">
+          <div class="meter-head"><span>Stock</span><span class="meter-value">50%</span></div>
+          <div class="meter-track"><div class="meter-fill"></div></div>
+        </div>
+        <div id="meter-board" class="meter" data-meter="board">
+          <div class="meter-head"><span>Board</span><span class="meter-value">50%</span></div>
+          <div class="meter-track"><div class="meter-fill"></div></div>
+        </div>
+        <div id="meter-morale" class="meter" data-meter="morale">
+          <div class="meter-head"><span>Morale</span><span class="meter-value">50%</span></div>
+          <div class="meter-track"><div class="meter-fill"></div></div>
+        </div>
+        <div id="meter-cash" class="meter" data-meter="cash">
+          <div class="meter-head"><span>Cash</span><span class="meter-value">50%</span></div>
+          <div class="meter-track"><div class="meter-fill"></div></div>
+        </div>
+      </div>
+
+      <article id="email-card" class="email-card" aria-live="polite"></article>
+
+      <div class="choices">
+        <button id="choice-a" class="btn btn-choice" type="button">…</button>
+        <button id="choice-b" class="btn btn-choice" type="button">…</button>
+      </div>
+
+      <div id="story-feed" class="story-feed" aria-live="polite"></div>
+    </section>
+
+    <section id="screen-end" class="screen" hidden>
+      <h2 id="end-title">You've been ousted</h2>
+      <div id="end-summary" class="end-summary"></div>
+      <button id="btn-restart" class="btn btn-primary" type="button">Try another quarter</button>
+    </section>
+
+    <div id="toast" class="toast" role="status"></div>
+  </div>
+  <script>window.__EER_NARRATIVE_API_URL="https://austinbuhltech.com/play/hos/narrate";</script>
+  <script type="module" src="/play/eer/game.js"></script>
+</body>
+</html>

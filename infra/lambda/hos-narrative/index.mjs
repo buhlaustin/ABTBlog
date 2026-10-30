@@ -80,11 +80,26 @@ async function loadOpenAiKey() {
 }
 
 function buildPrompt(kind, context) {
+  const ctx = JSON.stringify(context, null, 0);
+
+  if (kind === 'eer_daily_inbox') {
+    return `You write satirical corporate crisis emails for "Executive Email Roulette".
+The player is interim CEO. Return ONLY valid JSON (no markdown fences) with this shape:
+{"emails":[{"subject":"...","from":"Name · Title","body":"2-4 sentences","choices":[{"label":"short button text","effects":{"stock":0,"board":0,"morale":0,"cash":0}},{"label":"...","effects":{...}}]}]}
+Rules: exactly 5 emails, exactly 2 choices each. effects are integers from -18 to +18 (at least one non-zero per choice).
+Themes: HR disasters, activist investors, leaks, eccentric founder, regulators, viral tweets, AI hype, layoffs.
+Match difficulty to day number in context. Do not repeat subjects from recentSubjects in context.
+Context: ${ctx}`;
+  }
+
+  if (kind === 'eer_ouster_line') {
+    return `Write ONE darkly funny boardroom ouster headline (under 200 chars) for "Executive Email Roulette".
+No markdown. Context: ${ctx}`;
+  }
+
   const base = `You are the unseen narrator of "House of Strategy", a Big Brother-style social strategy game.
 Write ONE short feed line (1-3 sentences, under 280 characters). No markdown. No spoilers beyond the context.
 Do not invent evictions or wins that are not in context. Stay dramatic but plausible.`;
-
-  const ctx = JSON.stringify(context, null, 0);
 
   if (kind === 'host_line') {
     return `${base}\nKind: Julie Chen-style host line before a live event.\nContext: ${ctx}`;
@@ -95,9 +110,51 @@ Do not invent evictions or wins that are not in context. Stay dramatic but plaus
   return `${base}\nKind: Daily house drama or strategy beat during social time.\nContext: ${ctx}`;
 }
 
+function parseEerInbox(text) {
+  const trimmed = text.trim();
+  const start = trimmed.indexOf('{');
+  const end = trimmed.lastIndexOf('}');
+  if (start < 0 || end <= start) throw new Error('No JSON object in EER response');
+  const parsed = JSON.parse(trimmed.slice(start, end + 1));
+  if (!Array.isArray(parsed.emails) || parsed.emails.length < 1) {
+    throw new Error('Invalid EER inbox shape');
+  }
+  return parsed.emails.slice(0, 5).map(normalizeEerEmail);
+}
+
+function normalizeEerEmail(raw) {
+  const choices = (raw.choices || []).slice(0, 2).map((c) => ({
+    label: String(c.label || 'Reply').slice(0, 80),
+    effects: normalizeEffects(c.effects)
+  }));
+  while (choices.length < 2) {
+    choices.push({
+      label: choices.length === 0 ? 'Ignore' : 'Forward to legal',
+      effects: { stock: 0, board: -2, morale: 0, cash: 0 }
+    });
+  }
+  return {
+    subject: String(raw.subject || 'Urgent: Need your call').slice(0, 120),
+    from: String(raw.from || 'Unknown Sender').slice(0, 80),
+    body: String(raw.body || 'We need a decision before the market opens.').slice(0, 600),
+    choices
+  };
+}
+
+function normalizeEffects(effects) {
+  const keys = ['stock', 'board', 'morale', 'cash'];
+  const out = {};
+  for (const k of keys) {
+    const n = Number(effects?.[k] ?? 0);
+    out[k] = Number.isFinite(n) ? Math.max(-18, Math.min(18, Math.round(n))) : 0;
+  }
+  return out;
+}
+
 async function callOpenAI(apiKey, kind, context) {
   const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
   const prompt = buildPrompt(kind, context);
+  const isEerInbox = kind === 'eer_daily_inbox';
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -107,10 +164,17 @@ async function callOpenAI(apiKey, kind, context) {
     },
     body: JSON.stringify({
       model,
-      temperature: 0.85,
-      max_tokens: 120,
+      temperature: isEerInbox ? 0.9 : 0.85,
+      max_tokens: isEerInbox ? 2200 : 120,
       messages: [
-        { role: 'system', content: 'You write punchy reality-TV narration.' },
+        {
+          role: 'system',
+          content: isEerInbox
+            ? 'You write sharp corporate satire as strict JSON only.'
+            : kind.startsWith('eer_')
+              ? 'You write sharp corporate satire.'
+              : 'You write punchy reality-TV narration.'
+        },
         { role: 'user', content: prompt }
       ]
     })
@@ -124,6 +188,9 @@ async function callOpenAI(apiKey, kind, context) {
   const data = await res.json();
   const text = data.choices?.[0]?.message?.content?.trim();
   if (!text) throw new Error('Empty OpenAI response');
+  if (kind === 'eer_daily_inbox') {
+    return parseEerInbox(text);
+  }
   return text.replace(/^["']|["']$/g, '');
 }
 
@@ -161,8 +228,11 @@ export async function handler(event) {
 
   try {
     const apiKey = await loadOpenAiKey();
-    const text = await callOpenAI(apiKey, kind, context);
-    return json(200, { text, type: 'narrative' }, event);
+    const result = await callOpenAI(apiKey, kind, context);
+    if (kind === 'eer_daily_inbox') {
+      return json(200, { emails: result, type: 'eer_inbox' }, event);
+    }
+    return json(200, { text: result, type: 'narrative' }, event);
   } catch (err) {
     console.error(err);
     const message = err instanceof Error ? err.message : 'Narrative generation failed';

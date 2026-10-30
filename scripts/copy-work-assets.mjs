@@ -8,7 +8,10 @@ const publicPlay = join(root, "public", "play");
 mkdirSync(publicPlay, { recursive: true });
 
 /** slug → source folder under work/ */
-const projects = [{ slug: "hos", dir: "hos" }];
+const projects = [
+  { slug: "hos", dir: "hos" },
+  { slug: "eer", dir: "eer" },
+];
 
 for (const { slug, dir } of projects) {
   const src = join(root, "work", dir);
