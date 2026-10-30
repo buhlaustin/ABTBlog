@@ -1,7 +1,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const url = (process.env.HOS_NARRATIVE_API_URL || '').trim().replace(/\/$/, '');
+const defaultProd = 'https://austinbuhltech.com/api/hos/narrative';
+const url = (process.env.HOS_NARRATIVE_API_URL || defaultProd).trim().replace(/\/$/, '');
 const root = process.cwd();
 const hosDir = join(root, 'work/hos');
 const modulePath = join(hosDir, 'modules/hos-config.js');

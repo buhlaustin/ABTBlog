@@ -4,11 +4,14 @@ import { PHASE_LABELS } from './GameState.js';
 /** Resolved at runtime from inline script, module, or narrative-api.json. */
 let resolvedUrl = null;
 
-/** Same-origin proxy avoids ad blockers on *.lambda-url.* domains. */
+/** Same-origin proxy (/api/hos/narrative) avoids ad blockers on *.lambda-url.* */
 export function resolveNarrativeApiUrl() {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname || '';
     if (host === 'austinbuhltech.com' || host.endsWith('.austinbuhltech.com')) {
+      return `${window.location.origin}/api/hos/narrative`;
+    }
+    if (window.location.pathname.startsWith('/play/hos')) {
       return `${window.location.origin}/api/hos/narrative`;
     }
   }
