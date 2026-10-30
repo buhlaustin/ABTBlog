@@ -13,6 +13,10 @@ Parameters:
     Type: String
     Default: ""
     Description: Optional Route 53 hosted zone ID to create A/AAAA alias records
+  HosNarrativeOriginDomain:
+    Type: String
+    Default: g5xsf5u2bayw2cubunix6hiopq0esijh.lambda-url.us-east-1.on.aws
+    Description: Lambda Function URL host (no scheme) for HOS OpenAI proxy
 
 Conditions:
   CreateDnsRecords: !Not [!Equals [!Ref HostedZoneId, ""]]
@@ -69,11 +73,29 @@ Resources:
         function handler(event) {
           var request = event.request;
           var uri = request.uri;
+          if (uri.startsWith('/api/hos/narrative')) {
+            return request;
+          }
           if (uri.endsWith('/')) {
             request.uri += 'index.html';
           } else if (!uri.includes('.')) {
             request.uri += '/index.html';
           }
+          return request;
+        }
+
+  HosNarrativeUriRewriteFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: austinbuhltech-hos-narrative-proxy
+      AutoPublish: true
+      FunctionConfig:
+        Comment: Rewrite /api/hos/narrative to Lambda Function URL root
+        Runtime: cloudfront-js-2.0
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          request.uri = '/';
           return request;
         }
 
@@ -100,6 +122,18 @@ Resources:
               FunctionARN: !GetAtt UriRewriteFunction.FunctionARN
           ForwardedValues:
             QueryString: false
+        CacheBehaviors:
+          - PathPattern: /api/hos/narrative*
+            TargetOriginId: HosNarrativeOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE]
+            CachedMethods: [GET, HEAD]
+            Compress: true
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
+            FunctionAssociations:
+              - EventType: viewer-request
+                FunctionARN: !GetAtt HosNarrativeUriRewriteFunction.FunctionARN
         CustomErrorResponses:
           - ErrorCode: 404
             ResponseCode: 404
@@ -113,6 +147,12 @@ Resources:
             OriginAccessControlId: !Ref SiteOAC
             S3OriginConfig:
               OriginAccessIdentity: ""
+          - Id: HosNarrativeOrigin
+            DomainName: !Ref HosNarrativeOriginDomain
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: [TLSv1.2]
 
   DnsARecord:
     Type: AWS::Route53::RecordSet

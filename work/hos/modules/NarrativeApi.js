@@ -4,6 +4,17 @@ import { PHASE_LABELS } from './GameState.js';
 /** Resolved at runtime from inline script, module, or narrative-api.json. */
 let resolvedUrl = null;
 
+/** Same-origin proxy avoids ad blockers on *.lambda-url.* domains. */
+export function resolveNarrativeApiUrl() {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname || '';
+    if (host === 'austinbuhltech.com' || host.endsWith('.austinbuhltech.com')) {
+      return `${window.location.origin}/api/hos/narrative`;
+    }
+  }
+  return getNarrativeApiUrl();
+}
+
 export function getNarrativeApiUrl() {
   if (resolvedUrl) return resolvedUrl;
   if (typeof window !== 'undefined' && window.__HOS_NARRATIVE_API_URL) {
@@ -41,7 +52,7 @@ export async function initNarrativeApiUrl() {
 }
 
 export function isNarrativeApiEnabled() {
-  return Boolean(getNarrativeApiUrl());
+  return Boolean(resolveNarrativeApiUrl() || getNarrativeApiUrl());
 }
 
 /** Safe snapshot for the server — no hidden alliance rosters, no full relationship matrix. */
@@ -84,7 +95,7 @@ export function buildNarrativeContext(state) {
  * @returns {Promise<{ text: string, type: string } | null>}
  */
 export async function fetchNarrativeBeat(kind, state) {
-  const apiUrl = getNarrativeApiUrl();
+  const apiUrl = resolveNarrativeApiUrl() || getNarrativeApiUrl();
   if (!apiUrl) return null;
 
   const controller = new AbortController();

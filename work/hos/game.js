@@ -29,6 +29,7 @@ class Game {
     this.playerActions = null;
     this.pendingAction = null;
     this.pendingChallenge = null;
+    this._narrativeWarned = false;
 
     setStorageRef(StorageManager);
     this._bindSetupEvents();
@@ -192,7 +193,21 @@ class Game {
 
   async _appendAiNarrative(kind) {
     const beat = await fetchNarrativeBeat(kind, this.state);
-    if (beat) this.logAndRender([beat]);
+    if (beat) {
+      this.logAndRender([{
+        ...beat,
+        type: 'ai-host',
+        text: `<strong>Host:</strong> ${beat.text}`
+      }]);
+      return;
+    }
+    if (isNarrativeApiEnabled() && !this._narrativeWarned) {
+      this._narrativeWarned = true;
+      this.logAndRender([{
+        type: 'warning',
+        text: 'Host narration could not load (network or blocker). Local story continues.'
+      }]);
+    }
   }
 
   async _beginScheduledHouseDay() {
