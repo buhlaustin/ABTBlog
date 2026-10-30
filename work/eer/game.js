@@ -84,26 +84,40 @@ class ExecutiveEmailRoulette {
   async loadDayInbox() {
     if (!this.state || this.loadingInbox) return;
     this.loadingInbox = true;
-    this.ui.setChoices(['…', '…'], false);
+    this.ui.setChoices(['Loading…', 'Loading…'], false);
     this.ui.setDay(this.state.day, 0, 5);
+    this.ui.renderEmail({
+      subject: 'Syncing inbox…',
+      from: 'Executive Assistant · Auto',
+      body: 'Pulling today’s crises onto your desk.'
+    });
 
-    let emails = null;
-    if (this.state.aiEnabled) {
-      emails = await fetchAiDailyInbox(this.state);
-    }
-    if (!emails?.length) {
-      emails = pickLocalInbox(this.state.day, this.state.recentSubjects);
+    try {
+      let emails = null;
       if (this.state.aiEnabled) {
-        this.ui.appendFeed('Using local inbox (AI unavailable).', 'warning');
+        emails = await fetchAiDailyInbox(this.state);
       }
-    } else {
-      this.ui.appendFeed(`Day ${this.state.day} inbox generated.`, 'ai');
-    }
+      if (!emails?.length) {
+        emails = pickLocalInbox(this.state.day, this.state.recentSubjects);
+        if (this.state.aiEnabled) {
+          this.ui.appendFeed('Using local inbox (AI unavailable).', 'warning');
+        }
+      } else {
+        this.ui.appendFeed(`Day ${this.state.day} inbox generated.`, 'ai');
+      }
 
-    this.state.setInbox(emails);
-    this.loadingInbox = false;
-    this.render();
-    this.showCurrentEmail();
+      this.state.setInbox(emails);
+      this.render();
+      this.showCurrentEmail();
+    } catch (err) {
+      console.error('loadDayInbox failed', err);
+      this.state.setInbox(pickLocalInbox(this.state.day, this.state.recentSubjects));
+      this.ui.appendFeed('Inbox failed to load — showing offline scenarios.', 'warning');
+      this.render();
+      this.showCurrentEmail();
+    } finally {
+      this.loadingInbox = false;
+    }
   }
 
   showCurrentEmail() {

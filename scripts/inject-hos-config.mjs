@@ -2,7 +2,10 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const defaultProd = 'https://austinbuhltech.com/play/hos/narrate';
-const url = (process.env.HOS_NARRATIVE_API_URL || defaultProd).trim().replace(/\/$/, '');
+const rawUrl = (process.env.HOS_NARRATIVE_API_URL || defaultProd).trim().replace(/\/$/, '');
+/** Browser bundles must not call lambda-url directly on prod (CloudFront + Lambda duplicate CORS). */
+const url =
+  rawUrl && rawUrl.includes('lambda-url') ? defaultProd : rawUrl || defaultProd;
 const root = process.cwd();
 const hosDir = join(root, 'work/hos');
 const eerDir = join(root, 'work/eer');

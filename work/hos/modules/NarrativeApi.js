@@ -122,8 +122,25 @@ async function fetchNarrativeBeatDirect(kind, state, apiUrl) {
   }
 }
 
+function isSiteProductionHost() {
+  if (typeof window === 'undefined') return false;
+  const host = window.location.hostname || '';
+  return host === 'austinbuhltech.com' || host.endsWith('.austinbuhltech.com');
+}
+
+export function getClientNarrativeApiUrl() {
+  const sameOrigin = resolveNarrativeApiUrl();
+  if (sameOrigin) return sameOrigin;
+  const configured = getNarrativeApiUrl();
+  if (!configured) return null;
+  if (isSiteProductionHost() && configured.includes('lambda-url')) {
+    return `${window.location.origin}/play/hos/narrate`;
+  }
+  return configured;
+}
+
 export async function fetchNarrativeBeat(kind, state) {
-  const apiUrl = resolveNarrativeApiUrl() || getNarrativeApiUrl();
+  const apiUrl = getClientNarrativeApiUrl();
   if (!apiUrl) return null;
 
   const controller = new AbortController();
@@ -141,21 +158,11 @@ export async function fetchNarrativeBeat(kind, state) {
       credentials: 'omit'
     });
 
-    if (!res.ok) {
-      const direct = getNarrativeApiUrl();
-      if (direct && direct.includes('lambda-url') && apiUrl !== direct) {
-        return fetchNarrativeBeatDirect(kind, state, direct);
-      }
-      return null;
-    }
+    if (!res.ok) return null;
     const data = await res.json();
     if (!data?.text) return null;
     return { text: data.text, type: data.type || 'narrative' };
   } catch {
-    const direct = getNarrativeApiUrl();
-    if (direct && direct.includes('lambda-url')) {
-      return fetchNarrativeBeatDirect(kind, state, direct);
-    }
     return null;
   } finally {
     clearTimeout(timeout);

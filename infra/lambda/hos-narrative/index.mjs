@@ -10,11 +10,13 @@ const rateByIp = new Map();
 const MAX_BODY_BYTES = 12_000;
 const MAX_REQUESTS_PER_MINUTE = 20;
 
+function allowedOriginsList() {
+  const raw = process.env.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || '';
+  return [...new Set(raw.split(',').map((s) => s.trim()).filter(Boolean))];
+}
+
 function corsOrigin(event) {
-  const allowed = (process.env.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const allowed = allowedOriginsList();
   const origin = event.headers?.origin || event.headers?.Origin || '';
   if (allowed.includes(origin)) return origin;
   return allowed[0] || '*';
@@ -33,10 +35,7 @@ function json(statusCode, body, event, extraHeaders = {}) {
 }
 
 function isAllowedOrigin(event) {
-  const allowed = (process.env.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const allowed = allowedOriginsList();
   if (allowed.length === 0) return true;
 
   const origin = event.headers?.origin || event.headers?.Origin || '';
