@@ -1,7 +1,16 @@
-import { formatMoney, MODE_CONFIG, fixedCostsForStage } from './GameState.js';
+import { formatMoney, MODE_CONFIG, fixedCostsForStage } from './constants.js';
 import { computePayroll, staffRevenueMultiplier } from './Staff.js';
 import { satelliteRent } from './Offices.js';
-import { scalingRevenueMult } from './IPO.js';
+
+/** Post-seed scaling so late-game tasks can reach the $1B gate in a reasonable run. */
+export function scalingRevenueMult(state) {
+  if (!state.flags?.seedRoundClosed) return 1;
+  const r = state.finance?.lifetimeRevenue ?? 0;
+  if (r < 500_000) return 1;
+  const base = 1 + Math.min(140, (r / 4_000_000) ** 0.62);
+  const sandbox = state.mode === 'sandbox' ? 1.2 : 1;
+  return Math.round(base * sandbox * 100) / 100;
+}
 
 export function hubRevenueMult(state) {
   return state?.offices?.modifiers?.revenueMult ?? 1;

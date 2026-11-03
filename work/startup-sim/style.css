@@ -135,6 +135,11 @@ h1 {
   color: var(--muted);
 }
 
+.fine-print.error,
+#start-api-status.error {
+  color: #ff8a8a;
+}
+
 .panel-head {
   display: flex;
   align-items: center;

@@ -1,4 +1,4 @@
-import { STAGES, formatMoney, createInitialPublicMarket } from './GameState.js';
+import { STAGES, REVENUE_GATES, formatMoney, createInitialPublicMarket } from './constants.js';
 import { getFounderRow } from './CapTable.js';
 import { requestNarrative } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
@@ -14,16 +14,6 @@ function deriveTicker(companyName) {
     .replace(/[^A-Z]/g, '');
   if (letters.length >= 4) return letters.slice(0, 4);
   return (letters + 'ACME').slice(0, 4);
-}
-
-/** Post-seed scaling so late-game tasks can reach the $1B gate in a reasonable run. */
-export function scalingRevenueMult(state) {
-  if (!state.flags?.seedRoundClosed) return 1;
-  const r = state.finance?.lifetimeRevenue ?? 0;
-  if (r < 500_000) return 1;
-  const base = 1 + Math.min(140, (r / 4_000_000) ** 0.62);
-  const sandbox = state.mode === 'sandbox' ? 1.2 : 1;
-  return Math.round(base * sandbox * 100) / 100;
 }
 
 export function canFileIpo(state) {
@@ -48,8 +38,23 @@ function computeIpoValuation(state) {
 }
 
 export function fileIpo(state) {
+  if (state.flags?.ipoFiled) {
+    return { ok: false, reason: 'IPO already filed.' };
+  }
+  if (!state.flags?.seedRoundClosed) {
+    return { ok: false, reason: 'Close your seed round on Finance before filing an IPO.' };
+  }
+  if (!state.flags?.ipoUnlocked) {
+    return {
+      ok: false,
+      reason: `Reach ${formatMoney(REVENUE_GATES.IPO)} lifetime revenue to unlock the IPO window.`
+    };
+  }
+  if (state.flags?.gameOver) {
+    return { ok: false, reason: 'This run has ended.' };
+  }
   if (!canFileIpo(state)) {
-    return { ok: false, reason: 'IPO not available yet (need $1B lifetime revenue and a closed seed round).' };
+    return { ok: false, reason: 'IPO is not available yet.' };
   }
 
   const valuation = computeIpoValuation(state);
@@ -133,7 +138,7 @@ function readNewsSentiment(state) {
   const headlines = (state.news?.currentMonthArticles ?? [])
     .concat(state.news?.archive ?? [])
     .slice(0, 6)
-    .map((a) => `${a.headline} ${a.dek}`.toLowerCase());
+    .map((a) => `${a.headline ?? ''} ${a.dek ?? ''}`.toLowerCase());
   const text = headlines.join(' ');
   if (!text) return 0;
   let score = 0;

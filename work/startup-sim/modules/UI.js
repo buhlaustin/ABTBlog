@@ -1,4 +1,4 @@
-import { formatMoney, stageLabel } from './GameState.js';
+import { formatMoney, stageLabel } from './constants.js';
 import { getMonthlyTaskSlots } from './Calendar.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
@@ -37,6 +37,9 @@ export function populateCategorySelect(selectEl, categories) {
     opt.textContent = cat.label;
     selectEl.appendChild(opt);
   }
+  if (categories.length > 0) {
+    selectEl.value = categories[0].id;
+  }
 }
 
 export function bindSandboxCashToggle(form) {
@@ -72,7 +75,7 @@ export function renderGameHud(state) {
   const stageArt = document.getElementById('hud-stage-art');
   if (stageArt) {
     stageArt.src = stageIconUrl(state.stage);
-    stageArt.alt = '';
+    stageArt.alt = stageLabel(state.stage);
   }
   if (company) company.textContent = state.company.name;
   if (stage) stage.textContent = stageLabel(state.stage);
@@ -138,6 +141,7 @@ export function renderDeskPanel(state) {
     })
     .join('');
 
+  const catalogError = state.calendar?.taskCatalogError;
   const endDisabled = !canEndMonth(state);
   const monthRev = state.calendar.monthRevenue ?? 0;
   const monthSpend = state.calendar.monthSpend ?? 0;
@@ -146,6 +150,11 @@ export function renderDeskPanel(state) {
 
   desk.innerHTML = `
     ${tutorial}
+    ${
+      catalogError
+        ? '<p class="desk-feedback error" role="alert">Task data failed to load — refresh the page. You cannot close the month until tasks are available.</p>'
+        : ''
+    }
     <p class="panel-lede">Complete all counted tasks, then close the month. Staff/finance changes do not use task slots.</p>
     <div class="summary-grid">
       <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slots}</span></div>

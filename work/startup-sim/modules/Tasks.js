@@ -1,5 +1,5 @@
 import { assetBaseUrl } from './utils.js';
-import { STAGES } from './GameState.js';
+import { STAGES } from './constants.js';
 import { getMonthlyTaskSlots } from './Calendar.js';
 
 let taskCatalog = null;
@@ -37,13 +37,11 @@ function stageAllowed(task, stage) {
   if (stage === STAGES.XC) {
     return stages.includes('xc') || stages.includes('office');
   }
-  if (stage === STAGES.POST_XC || stage === STAGES.PUBLIC) {
-    return (
-      stages.includes('post_xc') ||
-      stages.includes('public') ||
-      stages.includes('office') ||
-      stages.includes('xc')
-    );
+  if (stage === STAGES.POST_XC) {
+    return stages.includes('post_xc') || stages.includes('xc');
+  }
+  if (stage === STAGES.PUBLIC) {
+    return stages.includes('public') || stages.includes('post_xc');
   }
   return stages.includes(stage);
 }
@@ -52,6 +50,15 @@ function stageAllowed(task, stage) {
 export function dealMonthlyTasks(state) {
   const slots = getMonthlyTaskSlots(state.stage);
   const pool = getTaskDefinitions().filter((t) => stageAllowed(t, state.stage));
+  if (!pool.length) {
+    state.calendar.taskCatalogError = true;
+    state.calendar.monthTasks = [];
+    state.calendar.tasksCompleted = 0;
+    state.calendar.monthRevenue = 0;
+    state.calendar.monthSpend = 0;
+    return state;
+  }
+  state.calendar.taskCatalogError = false;
   const picked = shuffle(pool).slice(0, slots);
   state.calendar.monthTasks = picked.map((def, index) => ({
     instanceId: `${state.calendar.year}-${state.calendar.monthIndex}-${def.id}-${index}`,
@@ -78,5 +85,6 @@ export function allTasksComplete(state) {
 
 export function canEndMonth(state) {
   if (state.flags?.gameOver) return false;
+  if (state.calendar?.taskCatalogError) return false;
   return allTasksComplete(state);
 }

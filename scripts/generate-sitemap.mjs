@@ -18,7 +18,13 @@ const blogSlugs = readdirSync(blogDir)
     return data.slug ?? filename.replace(/\.md$/, "");
   });
 
-const workSlugs = ["hos", "hvit-engine", "cursor-cloud-to-paxel-converter"];
+const workSlugs = [
+  "eer",
+  "startup-sim",
+  "hos",
+  "hvit-engine",
+  "cursor-cloud-to-paxel-converter",
+];
 
 const urls = [
   ...staticPaths,

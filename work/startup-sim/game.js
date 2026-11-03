@@ -1,7 +1,7 @@
 import { loadCategories } from './modules/Categories.js';
 import { createInitialState, normalizeSave } from './modules/GameState.js';
 import { StorageManager } from './modules/Storage.js';
-import { loadTaskCatalog, getTaskDef } from './modules/Tasks.js';
+import { loadTaskCatalog, getTaskDef, dealMonthlyTasks } from './modules/Tasks.js';
 import { initNarrativeApiUrl, isNarrativeApiEnabled } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
@@ -191,6 +191,7 @@ async function handleFileIpo() {
     return;
   }
   await fetchIpoPress(sessionState);
+  dealMonthlyTasks(sessionState);
   appendLog(
     sessionState,
     `${result.ticker} listed at ${formatMoney(result.openPrice)}/share — welcome to the public markets.`
@@ -379,9 +380,10 @@ function bindGameInteractions() {
     if (e.target.id === 'advisor-form') {
       e.preventDefault();
       if (!sessionState) return;
-      const text = document.getElementById('advisor-input')?.value;
-      refresh();
+      const input = document.getElementById('advisor-input');
+      const text = input?.value;
       const result = await sendAdvisorMessage(sessionState, text);
+      if (input) input.value = '';
       if (!result.ok) {
         refresh();
         return;
@@ -417,12 +419,20 @@ async function init() {
 
   setLoadButtonEnabled(StorageManager.hasSave());
 
+  function flashLoadError(message) {
+    const el = document.getElementById('start-api-status');
+    if (!el) return;
+    el.hidden = false;
+    el.textContent = message;
+    el.classList.add('error');
+  }
+
   const apiStatus = document.getElementById('start-api-status');
   if (apiStatus) {
     apiStatus.hidden = false;
     apiStatus.textContent = isNarrativeApiEnabled()
-      ? 'AI narrative endpoint ready (XC, news, social, advisor, IPO press).'
-      : 'AI offline — XC uses lenient local scoring.';
+      ? 'AI narrative optional (XC, news, social, advisor, IPO press). Offline fallbacks always work.'
+      : 'AI offline — lenient local fallbacks for XC, news, social, and advisor.';
   }
 
   document.getElementById('btn-new')?.addEventListener('click', () => {
@@ -431,8 +441,13 @@ async function init() {
 
   document.getElementById('btn-load')?.addEventListener('click', () => {
     const raw = StorageManager.load();
+    if (!raw) {
+      flashLoadError('No save found or save could not be read.');
+      return;
+    }
     const state = normalizeSave(raw);
     if (state) enterGame(state);
+    else flashLoadError('Save file is invalid or from an unsupported version.');
   });
 
   document.getElementById('btn-setup-back')?.addEventListener('click', () => {

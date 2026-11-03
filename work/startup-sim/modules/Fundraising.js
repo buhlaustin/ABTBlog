@@ -1,6 +1,6 @@
 import { applySeedRound, seedRoundPreview, renderCapTableRows } from './CapTable.js';
 import { renderFinanceSummary } from './Finance.js';
-import { formatMoney } from './GameState.js';
+import { formatMoney } from './constants.js';
 import { canStartInterview, isInResidency } from './XC.js';
 import { renderOfficesPanel } from './Offices.js';
 import { renderIpoPanel } from './IPO.js';

@@ -1,4 +1,4 @@
-import { STAGES } from './GameState.js';
+import { STAGES } from './constants.js';
 import { assetBaseUrl } from './utils.js';
 
 let manifest = null;

@@ -1,6 +1,5 @@
-import { STAGES } from './GameState.js';
 import { assetBaseUrl } from './utils.js';
-import { formatMoney } from './GameState.js';
+import { formatMoney } from './constants.js';
 
 let hubsCache = null;
 

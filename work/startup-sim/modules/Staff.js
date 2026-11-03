@@ -1,4 +1,4 @@
-import { STAGES, formatMoney, fixedCostsForStage } from './GameState.js';
+import { STAGES, formatMoney, fixedCostsForStage } from './constants.js';
 import { totalHeadcountCap } from './Offices.js';
 
 export const DEPARTMENTS = [

@@ -1,4 +1,4 @@
-import { STAGES } from './GameState.js';
+import { STAGES } from './constants.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';

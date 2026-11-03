@@ -1,4 +1,4 @@
-import { STAGES } from './GameState.js';
+import { STAGES } from './constants.js';
 
 const FOUNDER_AUTHORIZED = 10_000_000;
 
@@ -132,11 +132,18 @@ export function seedRoundPreview(state) {
   };
 }
 
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 export function renderCapTableRows(state) {
   return (state.capTable ?? [])
     .map(
       (r) =>
-        `<tr><td>${r.name}</td><td class="num">${(r.shares ?? 0).toLocaleString()}</td><td class="num">${r.pct ?? 0}%</td><td>${r.class ?? '—'}</td></tr>`
+        `<tr><td>${escapeHtml(r.name)}</td><td class="num">${(r.shares ?? 0).toLocaleString()}</td><td class="num">${r.pct ?? 0}%</td><td>${escapeHtml(r.class ?? '—')}</td></tr>`
     )
     .join('');
 }

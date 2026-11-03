@@ -1,4 +1,4 @@
-import { formatMoney, stageLabel } from './GameState.js';
+import { formatMoney, stageLabel } from './constants.js';
 import { totalHeadcount } from './Staff.js';
 import { projectMonthlyBurn } from './Finance.js';
 

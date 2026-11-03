@@ -1,4 +1,4 @@
-import { STAGES } from './GameState.js';
+import { STAGES } from './constants.js';
 
 const STORAGE_KEY = 'startup-sim-tutorial-dismissed';
 

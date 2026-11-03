@@ -1,5 +1,4 @@
-import { REVENUE_GATES, STAGES } from './GameState.js';
-import { fixedCostsForStage } from './GameState.js';
+import { REVENUE_GATES, STAGES, fixedCostsForStage } from './constants.js';
 
 /** Apply stage upgrades from revenue gates. */
 const STAGE_RANK = {

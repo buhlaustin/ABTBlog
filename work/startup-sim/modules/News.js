@@ -1,7 +1,7 @@
 import { assetBaseUrl } from './utils.js';
 import { requestNarrative, isNarrativeApiEnabled } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
-import { stageLabel } from './GameState.js';
+import { stageLabel } from './constants.js';
 
 let timelineSeed = null;
 
