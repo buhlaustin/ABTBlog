@@ -8,6 +8,14 @@ import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js
 import { formatMoney } from './modules/GameState.js';
 import { syncStageFromProgress, onStageChange } from './modules/Progression.js';
 import {
+  adjustDraftHeadcount,
+  setDraftHeadcount,
+  finalizeStaffing,
+  showPeopleFeedback
+} from './modules/Staff.js';
+import { acceptXC, closeSeedRound, showFinanceFeedback } from './modules/Fundraising.js';
+import { recordLayoffEvent } from './modules/News.js';
+import {
   bindSandboxCashToggle,
   bindTabNavigation,
   flashSaveStatus,
@@ -75,7 +83,60 @@ function handleEndMonth() {
     showDeskFeedback(result.reason || 'Cannot close month yet.', true);
     return;
   }
-  showDeskFeedback('Month closed. New tasks dealt.');
+  if (result.gameOver) {
+    showDeskFeedback('Out of cash.');
+  } else {
+    showDeskFeedback('Month closed. New tasks dealt.');
+  }
+  refresh();
+}
+
+function handleFinalizeStaff() {
+  if (!sessionState) return;
+  const result = finalizeStaffing(sessionState);
+  if (!result.ok) {
+    showPeopleFeedback(result.reason || 'Could not finalize.', true);
+    refresh();
+    return;
+  }
+  if (result.significantLayoff) {
+    recordLayoffEvent(sessionState, result.layoffPct);
+    appendLog(
+      sessionState,
+      `Layoffs (${Math.round(result.layoffPct * 100)}% of headcount) — press will notice in Phase 4.`
+    );
+  }
+  appendLog(sessionState, 'Staffing plan finalized for payroll.');
+  showPeopleFeedback('Staffing finalized — month-end payroll uses these counts.');
+  refresh();
+}
+
+function handleAcceptXC() {
+  if (!sessionState) return;
+  const result = acceptXC(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'XC not available.', true);
+    refresh();
+    return;
+  }
+  appendLog(sessionState, 'Accepted X Combinator — $500k SAFE, ~6% on conversion.');
+  showFinanceFeedback('XC accepted — cash updated, cap table diluted.');
+  refresh();
+}
+
+function handleCloseSeed() {
+  if (!sessionState) return;
+  const result = closeSeedRound(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Cannot close seed.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Closed seed round — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post-money.`
+  );
+  showFinanceFeedback('Seed round closed.');
   refresh();
 }
 
@@ -87,9 +148,43 @@ function bindGameInteractions() {
       handleCompleteTask(completeBtn.getAttribute('data-complete-task'));
       return;
     }
+
+    const staffDelta = e.target.closest('[data-staff-delta]');
+    if (staffDelta) {
+      if (!sessionState) return;
+      const dept = staffDelta.getAttribute('data-staff-delta');
+      const delta = Number(staffDelta.getAttribute('data-delta'));
+      const result = adjustDraftHeadcount(sessionState, dept, delta);
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else showPeopleFeedback('');
+      refresh();
+      return;
+    }
+
+    if (e.target.id === 'btn-finalize-staff') {
+      handleFinalizeStaff();
+      return;
+    }
+    if (e.target.id === 'btn-accept-xc') {
+      handleAcceptXC();
+      return;
+    }
+    if (e.target.id === 'btn-close-seed') {
+      handleCloseSeed();
+      return;
+    }
     if (e.target.id === 'btn-end-month') {
       handleEndMonth();
     }
+  });
+
+  app?.addEventListener('change', (e) => {
+    const input = e.target.closest('[data-staff-input]');
+    if (!input || !sessionState) return;
+    const dept = input.getAttribute('data-staff-input');
+    const result = setDraftHeadcount(sessionState, dept, input.value);
+    if (!result.ok) showPeopleFeedback(result.reason, true);
+    refresh();
   });
 
   document.getElementById('btn-gameover-menu')?.addEventListener('click', () => {

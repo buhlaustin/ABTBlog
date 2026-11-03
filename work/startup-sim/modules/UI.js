@@ -1,7 +1,7 @@
 import { formatMoney, stageLabel } from './GameState.js';
 import { getMonthlyTaskSlots } from './Calendar.js';
 import { nextRevenueMilestone } from './Progression.js';
-import { renderFinanceSummary } from './Finance.js';
+import { renderFinancePanel } from './Fundraising.js';
 import { renderPeoplePanel } from './Staff.js';
 import { renderSocialPlaceholder } from './Social.js';
 import { renderNewsPlaceholder } from './News.js';
@@ -199,23 +199,10 @@ export function renderAllPanels(state) {
 
   renderPeoplePanel(document.getElementById('panel-people'), state);
 
-  const finance = document.getElementById('panel-finance');
-  if (finance) {
-    const sum = renderFinanceSummary(state);
-    finance.innerHTML = `
-      <p class="panel-lede">Cash flow from tasks (immediate) + overhead at month close.</p>
-      <div class="summary-grid">
-        <div><span class="stat-label">Cash</span><span class="stat-value">${sum.cashLabel}</span></div>
-        <div><span class="stat-label">Last month rev.</span><span class="stat-value">${sum.mrrLabel}</span></div>
-        <div><span class="stat-label">Overhead/mo</span><span class="stat-value">${sum.burnLabel}</span></div>
-        <div><span class="stat-label">Runway</span><span class="stat-value">${sum.runway}</span></div>
-        <div><span class="stat-label">Founder equity</span><span class="stat-value">${state.capTable[0]?.pct ?? 100}%</span></div>
-      </div>
-    `;
-  }
+  renderFinancePanel(document.getElementById('panel-finance'), state);
 
   renderSocialPlaceholder(document.getElementById('panel-social'));
-  renderNewsPlaceholder(document.getElementById('panel-news'));
+  renderNewsPlaceholder(document.getElementById('panel-news'), state);
   renderAdvisorPlaceholder(document.getElementById('panel-advisor'));
 }
 

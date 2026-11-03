@@ -3,8 +3,9 @@ import { createInitialStaff } from './Staff.js';
 import { createInitialSocial } from './Social.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
+import { recalculateCapTablePercentages } from './CapTable.js';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 export const STAGES = {
   GARAGE: 'garage',
@@ -65,7 +66,9 @@ export function createInitialState(options) {
       monthlyBurn: 0,
       mrr: 0,
       valuation: null,
-      fixedCostsMonthly: fixedCostsForStage(STAGES.GARAGE)
+      fixedCostsMonthly: fixedCostsForStage(STAGES.GARAGE),
+      instruments: [],
+      lastRound: null
     },
     staff: createInitialStaff(),
     product: { level: 0, buzz: 0, featureQueue: [] },
@@ -76,12 +79,14 @@ export function createInitialState(options) {
         id: 'founder',
         name: 'You (Founder)',
         shares: 10_000_000,
-        pct: 100
+        pct: 100,
+        class: 'founder'
       }
     ],
     flags: {
       xcUnlocked: false,
       xcAccepted: false,
+      seedRoundClosed: false,
       ipoUnlocked: false,
       xcUnlockedLogged: false,
       gameOver: false,
@@ -118,8 +123,14 @@ export function normalizeSave(raw) {
     state.finance.fixedCostsMonthly = fixedCostsForStage(state.stage ?? STAGES.GARAGE);
   }
   if (state.finance.mrr === undefined) state.finance.mrr = state.finance.monthlyRevenue ?? 0;
+  if (!state.finance.instruments) state.finance.instruments = [];
+  if (state.finance.lastRound === undefined) state.finance.lastRound = null;
   if (!state.flags) state.flags = {};
   if (state.flags.gameOver === undefined) state.flags.gameOver = false;
+  if (state.flags.seedRoundClosed === undefined) state.flags.seedRoundClosed = false;
+  if (state.capTable?.length) {
+    recalculateCapTablePercentages(state.capTable);
+  }
 
   if (!state.calendar.monthTasks.length && !state.flags.gameOver) {
     startMonth(state);

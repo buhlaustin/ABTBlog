@@ -13,6 +13,6 @@ Open `http://localhost:8080/play/startup-sim/index.html` (after copy) or serve t
 
 ## Status
 
-**Phase 1 complete:** monthly counted tasks on Desk, close month (overhead + progression), category economics, $50k office gate, game over on bankruptcy.
+**Phase 2 complete:** editable department headcount + finalize staffing, cap table, XC SAFE, seed round, staff revenue boost.
 
-**Phase 2 next:** editable headcount + finalize staffing, cap table / XC funding.
+**Phase 3 next:** XC residency arc, hub cities, satellite offices.

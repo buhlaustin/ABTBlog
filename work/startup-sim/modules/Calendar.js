@@ -2,6 +2,7 @@ import { STAGES } from './GameState.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { syncStageFromProgress, onStageChange } from './Progression.js';
+import { syncDraftFromFinalized } from './Staff.js';
 
 /** Counted task slots per month (staff/finance actions excluded). */
 export function getMonthlyTaskSlots(stage) {
@@ -56,6 +57,7 @@ export function advanceCalendarMonth(state) {
 }
 
 export function startMonth(state) {
+  syncDraftFromFinalized(state);
   dealMonthlyTasks(state);
   return state;
 }

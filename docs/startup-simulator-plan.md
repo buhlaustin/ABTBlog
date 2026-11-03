@@ -359,9 +359,11 @@ work/startup-sim/
 
 ### Phase 2 — Staff & finance depth
 
-- Department headcount table, draft vs finalize, surplus/deficit preview
-- Cap table + XC SAFE + first raise wizard (dilution table above)
-- Office → XC gate at $500k
+- [x] Department headcount table with steppers, draft vs finalize, surplus/deficit vs last month revenue
+- [x] Month-end payroll uses finalized headcount; staff boosts task revenue
+- [x] Cap table UI + XC SAFE ($500k, ~6%) + seed close ($3M @ $15M post, ESOP 10%)
+- [x] $500k lifetime revenue unlocks XC (Finance tab)
+- [x] Layoffs ≥15% queued for Phase 4 news
 
 ### Phase 3 — Progression & cities
 

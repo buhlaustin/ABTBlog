@@ -28,7 +28,7 @@ export function onStageChange(state, fromStage, toStage) {
     lines.push('Unlocked small office — higher fixed costs, more task slots next month.');
   }
   if (state.flags.xcUnlocked && !state.flags.xcUnlockedLogged) {
-    lines.push('X Combinator application is available (Phase 3).');
+    lines.push('X Combinator unlocked — accept the SAFE on the Finance tab.');
     state.flags.xcUnlockedLogged = true;
   }
   return lines;

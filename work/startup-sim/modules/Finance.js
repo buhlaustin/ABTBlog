@@ -1,5 +1,5 @@
 import { formatMoney, MODE_CONFIG, fixedCostsForStage } from './GameState.js';
-import { computePayroll } from './Staff.js';
+import { computePayroll, staffRevenueMultiplier } from './Staff.js';
 
 export function projectMonthlyBurn(state) {
   const headcount = state.staff?.headcountByDept ?? {};
@@ -40,7 +40,7 @@ export function rollTaskOutcome(taskDef, state) {
   const buzz = taskDef.buzz ?? 0;
   const buzzBonus = Math.min(0.15, (state.product.buzz ?? 0) * 0.02);
   const levelBonus = Math.min(0.2, (state.product.level ?? 0) * 0.03);
-  const mult = 1 + buzzBonus + levelBonus;
+  const mult = (1 + buzzBonus + levelBonus) * staffRevenueMultiplier(state);
   const revenue = Math.round((rMin + Math.random() * (rMax - rMin)) * mult);
   return { revenue, product, buzz };
 }
