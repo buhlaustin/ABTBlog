@@ -187,6 +187,39 @@
       "revenue": [1500, 6500],
       "product": 1,
       "buzz": 2
+    },
+    {
+      "id": "national-campaign",
+      "title": "National brand campaign",
+      "description": "Billboards, podcasts, and awkward celebrity endorsements.",
+      "types": ["marketing"],
+      "stages": ["post_xc", "public"],
+      "cost": 8000,
+      "revenue": [12000, 85000],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "platform-partnerships",
+      "title": "Platform partnership blitz",
+      "description": "Integrate everywhere; hope nobody reads the SLA.",
+      "types": ["sales"],
+      "stages": ["post_xc", "public"],
+      "cost": 12000,
+      "revenue": [35000, 220000],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "mega-deal-close",
+      "title": "Close the mega-deal",
+      "description": "Legal redlines, procurement gauntlet, champagne that tastes like stress.",
+      "types": ["sales"],
+      "stages": ["post_xc", "public"],
+      "cost": 18000,
+      "revenue": [80000, 450000],
+      "product": 0,
+      "buzz": 2
     }
   ]
 }

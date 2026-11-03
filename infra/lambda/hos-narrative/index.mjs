@@ -123,6 +123,13 @@ Rules: Suggest in-game actions (Desk tasks, staffing, fundraising, runway). NOT 
 Context: ${ctx}`;
   }
 
+  if (kind === 'startup_ipo_press') {
+    return `You write a fictional IPO day story for "Startup Simulator". Return ONLY valid JSON:
+{"headline":"under 120 chars","dek":"one sentence under 200 chars"}
+Rules: Parody outlets only; no real companies or living public figures. Celebratory but lightly satirical tone.
+Context: ${ctx}`;
+  }
+
   const base = `You are the unseen narrator of "House of Strategy", a Big Brother-style social strategy game.
 Write ONE short feed line (1-3 sentences, under 280 characters). No markdown. No spoilers beyond the context.
 Do not invent evictions or wins that are not in context. Stay dramatic but plausible.`;
@@ -236,6 +243,9 @@ async function callOpenAI(apiKey, kind, context) {
   if (kind === 'startup_advisor_chat') {
     return parseStartupAdvisor(text);
   }
+  if (kind === 'startup_ipo_press') {
+    return parseStartupIpoPress(text);
+  }
   return text.replace(/^["']|["']$/g, '');
 }
 
@@ -276,6 +286,14 @@ function parseStartupSocial(text) {
 function parseStartupAdvisor(text) {
   const parsed = parseJsonObject(text);
   return { reply: String(parsed.reply ?? parsed.text ?? 'Focus on runway and counted tasks.').slice(0, 600) };
+}
+
+function parseStartupIpoPress(text) {
+  const parsed = parseJsonObject(text);
+  return {
+    headline: String(parsed.headline ?? 'Shares begin trading').slice(0, 140),
+    dek: String(parsed.dek ?? '').slice(0, 280)
+  };
 }
 
 function parseStartupXcScore(text) {
@@ -340,6 +358,9 @@ export async function handler(event) {
     }
     if (kind === 'startup_advisor_chat') {
       return json(200, { ...result, type: 'startup_advisor' }, event);
+    }
+    if (kind === 'startup_ipo_press') {
+      return json(200, { ...result, type: 'startup_ipo_press' }, event);
     }
     return json(200, { text: result, type: 'narrative' }, event);
   } catch (err) {

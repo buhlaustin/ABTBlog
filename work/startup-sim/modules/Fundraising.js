@@ -3,6 +3,7 @@ import { renderFinanceSummary } from './Finance.js';
 import { formatMoney } from './GameState.js';
 import { canStartInterview, isInResidency } from './XC.js';
 import { renderOfficesPanel } from './Offices.js';
+import { renderIpoPanel } from './IPO.js';
 
 export function canCloseSeed(state) {
   return Boolean(
@@ -74,6 +75,7 @@ export function renderFinancePanel(container, state) {
     </div>
     ${xcBlock}
     ${seedBlock}
+    <div id="ipo-panel-mount"></div>
     <div id="offices-panel-mount"></div>
     <h3 class="log-head">Cap table</h3>
     <table class="data-table">
@@ -88,6 +90,7 @@ export function renderFinancePanel(container, state) {
     <p id="finance-feedback" class="desk-feedback" hidden></p>
   `;
 
+  renderIpoPanel(container, state);
   renderOfficesPanel(document.getElementById('offices-panel-mount'), state);
 }
 

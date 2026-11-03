@@ -24,6 +24,9 @@ export function syncStageFromProgress(state) {
   if (r >= REVENUE_GATES.IPO) {
     state.flags.ipoUnlocked = true;
   }
+  if (state.flags?.ipoFiled) {
+    stage = STAGES.PUBLIC;
+  }
 
   if ((STAGE_RANK[stage] ?? 0) < STAGE_RANK[STAGES.XC] && state.flags?.xcAccepted) {
     stage = STAGES.XC;
@@ -47,6 +50,18 @@ export function onStageChange(state, fromStage, toStage) {
     lines.push('X Combinator unlocked — apply on the Finance tab.');
     state.flags.xcUnlockedLogged = true;
   }
+  if (toStage === STAGES.PUBLIC && fromStage !== STAGES.PUBLIC) {
+    lines.push('You are now a public company — watch the stock price each month on Finance.');
+  }
+  return lines;
+}
+
+export function onIpoUnlocked(state) {
+  const lines = [];
+  if (state.flags?.ipoUnlocked && !state.flags?.ipoUnlockedLogged) {
+    lines.push('IPO window unlocked — file on the Finance tab when ready.');
+    state.flags.ipoUnlockedLogged = true;
+  }
   return lines;
 }
 
@@ -55,5 +70,6 @@ export function nextRevenueMilestone(state) {
   if (r < REVENUE_GATES.OFFICE) return { label: 'Small office', amount: REVENUE_GATES.OFFICE };
   if (r < REVENUE_GATES.XC) return { label: 'X Combinator', amount: REVENUE_GATES.XC };
   if (r < REVENUE_GATES.IPO) return { label: 'IPO eligibility', amount: REVENUE_GATES.IPO };
-  return null;
+  if (!state.flags?.ipoFiled) return { label: 'File IPO', amount: REVENUE_GATES.IPO };
+  return { label: 'Grow stock / cash out', amount: null };
 }

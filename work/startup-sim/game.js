@@ -6,7 +6,8 @@ import { initNarrativeApiUrl, isNarrativeApiEnabled } from './modules/NarrativeA
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
 import { formatMoney } from './modules/GameState.js';
-import { syncStageFromProgress, onStageChange } from './modules/Progression.js';
+import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './modules/Progression.js';
+import { fileIpo, fetchIpoPress, cashOut } from './modules/IPO.js';
 import {
   adjustDraftHeadcount,
   setDraftHeadcount,
@@ -127,6 +128,9 @@ function handleCompleteTask(instanceId) {
       appendLog(sessionState, line);
     }
   }
+  for (const line of onIpoUnlocked(sessionState)) {
+    appendLog(sessionState, line);
+  }
 
   showDeskFeedback(`Task complete: +${formatMoney(revenue)} revenue`);
   refresh();
@@ -172,6 +176,39 @@ function handleFinalizeStaff() {
   }
   appendLog(sessionState, 'Staffing plan finalized for payroll.');
   showPeopleFeedback('Staffing finalized — month-end payroll uses these counts.');
+  refresh();
+}
+
+async function handleFileIpo() {
+  if (!sessionState) return;
+  showFinanceFeedback('Filing S-1 (fictionally)…');
+  const result = fileIpo(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Cannot file IPO.', true);
+    refresh();
+    return;
+  }
+  await fetchIpoPress(sessionState);
+  appendLog(
+    sessionState,
+    `${result.ticker} listed at ${formatMoney(result.openPrice)}/share — welcome to the public markets.`
+  );
+  showFinanceFeedback(`${result.ticker} is live.`);
+  refresh();
+}
+
+function handleCashOut() {
+  if (!sessionState) return;
+  if (!window.confirm('Step down as CEO and cash out your founder stake at the current share price?')) {
+    return;
+  }
+  const result = cashOut(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Cannot cash out.', true);
+    refresh();
+    return;
+  }
+  appendLog(sessionState, `Cashed out founder stake for ${formatMoney(result.payout)}.`);
   refresh();
 }
 
@@ -273,6 +310,14 @@ function bindGameInteractions() {
       handleCloseSeed();
       return;
     }
+    if (e.target.id === 'btn-file-ipo') {
+      handleFileIpo();
+      return;
+    }
+    if (e.target.id === 'btn-cash-out') {
+      handleCashOut();
+      return;
+    }
     if (e.target.id === 'btn-select-hub') {
       handleSelectHub();
       return;
@@ -367,7 +412,7 @@ async function init() {
   if (apiStatus) {
     apiStatus.hidden = false;
     apiStatus.textContent = isNarrativeApiEnabled()
-      ? 'AI narrative endpoint ready (XC interview + Phase 4).'
+      ? 'AI narrative endpoint ready (XC, news, social, advisor, IPO press).'
       : 'AI offline — XC uses lenient local scoring.';
   }
 

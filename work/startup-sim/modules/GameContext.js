@@ -27,8 +27,16 @@ export function buildGameSnapshot(state) {
     flags: {
       xcAccepted: state.flags?.xcAccepted,
       seedClosed: state.flags?.seedRoundClosed,
-      ipoUnlocked: state.flags?.ipoUnlocked
+      ipoUnlocked: state.flags?.ipoUnlocked,
+      ipoFiled: state.flags?.ipoFiled
     },
+    public: state.publicMarket?.ticker
+      ? {
+          ticker: state.publicMarket.ticker,
+          sharePrice: state.publicMarket.sharePrice,
+          monthsPublic: state.publicMarket.monthsPublic
+        }
+      : null,
     recentLog: (state.calendar?.log ?? []).slice(0, 5).map((e) => e.message),
     recentHeadlines: (state.news?.currentMonthArticles ?? []).map((a) => a.headline)
   };

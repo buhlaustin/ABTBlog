@@ -1,7 +1,8 @@
 import { STAGES } from './GameState.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { resolveMonthEndBurn } from './Finance.js';
-import { syncStageFromProgress, onStageChange } from './Progression.js';
+import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
+import { tickPublicMarket, isPublicCompany } from './IPO.js';
 import { syncDraftFromFinalized } from './Staff.js';
 import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
@@ -80,6 +81,15 @@ export function endMonth(state) {
   syncStageFromProgress(state);
   if (state.stage !== priorStage) {
     for (const line of onStageChange(state, priorStage, state.stage)) {
+      appendLog(state, line);
+    }
+  }
+  for (const line of onIpoUnlocked(state)) {
+    appendLog(state, line);
+  }
+
+  if (isPublicCompany(state)) {
+    for (const line of tickPublicMarket(state).lines ?? []) {
       appendLog(state, line);
     }
   }

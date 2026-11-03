@@ -15,4 +15,6 @@ Open `http://localhost:8080/play/startup-sim/index.html` (after copy) or serve t
 
 **Phase 4 complete:** AI/offline news, ProNet/Chirp + reactions, chief-of-staff advisor.
 
-**Phase 5 next:** IPO, $1B gate, monthly stock sim, cash-out ending.
+**Phase 5 complete:** $1B IPO gate, monthly stock sim, cash-out ending, `startup_ipo_press`.
+
+**Phase 6 next:** Commons assets, polish, go live on work index.

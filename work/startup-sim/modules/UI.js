@@ -7,6 +7,7 @@ import { renderSocialPanel } from './Social.js';
 import { renderNewsPanel } from './News.js';
 import { renderAdvisorPanel } from './Advisor.js';
 import { getTaskDef, pendingTasks, canEndMonth } from './Tasks.js';
+import { isPublicCompany, founderStakeValue } from './IPO.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -64,6 +65,7 @@ export function renderGameHud(state) {
   const month = document.getElementById('hud-month');
   const mode = document.getElementById('hud-mode');
   const mrr = document.getElementById('hud-mrr');
+  const stock = document.getElementById('hud-stock');
 
   if (company) company.textContent = state.company.name;
   if (stage) stage.textContent = stageLabel(state.stage);
@@ -78,6 +80,15 @@ export function renderGameHud(state) {
     mode.textContent = `${state.mode === 'sandbox' ? 'Sandbox' : 'Career'}${mult}`;
   }
   if (mrr) mrr.textContent = formatMoney(state.finance.mrr ?? 0);
+  if (stock) {
+    if (isPublicCompany(state)) {
+      const pm = state.publicMarket ?? {};
+      stock.hidden = false;
+      stock.textContent = `${pm.ticker ?? '—'} ${formatMoney(pm.sharePrice ?? 0)}`;
+    } else {
+      stock.hidden = true;
+    }
+  }
 }
 
 function escapeHtml(s) {
@@ -97,7 +108,9 @@ export function renderDeskPanel(state) {
   const done = state.calendar.tasksCompleted ?? 0;
   const milestone = nextRevenueMilestone(state);
   const ms = milestone
-    ? `${milestone.label} at ${formatMoney(milestone.amount)}`
+    ? milestone.amount != null
+      ? `${milestone.label} at ${formatMoney(milestone.amount)}`
+      : milestone.label
     : 'All major gates cleared';
 
   const taskCards = (state.calendar.monthTasks ?? [])
@@ -210,13 +223,43 @@ export function renderAllPanels(state) {
 export function renderGameOver(state) {
   const title = document.getElementById('gameover-title');
   const body = document.getElementById('gameover-body');
+  const eyebrow = document.querySelector('#screen-gameover .eyebrow');
+  const victory = state.ending?.type === 'cash_out';
+
+  if (eyebrow) eyebrow.textContent = victory ? 'CEO step-down' : 'Run ended';
   if (title) title.textContent = state.company.name;
   if (body) {
-    body.innerHTML = `
-      <p>${escapeHtml(state.flags.gameOverReason || 'Your run ended.')}</p>
-      <p>Lifetime revenue: <strong>${formatMoney(state.finance.lifetimeRevenue)}</strong></p>
-      <p>Months played: <strong>${(state.calendar.year - 1) * 12 + state.calendar.monthIndex - 1}</strong></p>
-    `;
+    const months = (state.calendar.year - 1) * 12 + state.calendar.monthIndex - 1;
+    if (victory) {
+      const e = state.ending;
+      body.innerHTML = `
+        <p>${escapeHtml(state.flags.gameOverReason || '')}</p>
+        ${
+          e.pressHeadline
+            ? `<blockquote class="ipo-press"><strong>${escapeHtml(e.pressHeadline)}</strong><br>${escapeHtml(e.pressDek || '')}</blockquote>`
+            : ''
+        }
+        <div class="summary-grid gameover-stats">
+          <div><span class="stat-label">Cash-out</span><span class="stat-value">${formatMoney(e.payout)}</span></div>
+          <div><span class="stat-label">Share price</span><span class="stat-value">${formatMoney(e.sharePrice)}</span></div>
+          <div><span class="stat-label">Founder stake</span><span class="stat-value">${e.founderPct}%</span></div>
+          <div><span class="stat-label">Months public</span><span class="stat-value">${e.monthsPublic}</span></div>
+          <div><span class="stat-label">Lifetime revenue</span><span class="stat-value">${formatMoney(e.lifetimeRevenue)}</span></div>
+          <div><span class="stat-label">Months played</span><span class="stat-value">${months}</span></div>
+        </div>
+      `;
+    } else {
+      body.innerHTML = `
+        <p>${escapeHtml(state.flags.gameOverReason || 'Your run ended.')}</p>
+        <p>Lifetime revenue: <strong>${formatMoney(state.finance.lifetimeRevenue)}</strong></p>
+        <p>Months played: <strong>${months}</strong></p>
+        ${
+          isPublicCompany(state)
+            ? `<p>Founder stake at exit price: <strong>${formatMoney(founderStakeValue(state))}</strong></p>`
+            : ''
+        }
+      `;
+    }
   }
 }
 

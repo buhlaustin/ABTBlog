@@ -382,9 +382,12 @@ work/startup-sim/
 
 ### Phase 5 — IPO & endgame
 
-- $1B gate, IPO timing, **monthly** stock sim ticks
-- Cash-out ending + archive stats
-- Balance pass + sandbox tuning
+- [x] $1B lifetime revenue gate → **File IPO** on Finance (requires closed seed)
+- [x] Post-listing **monthly stock ticks** (MRR growth, runway, news sentiment, noise)
+- [x] **Step down & cash out** ending + stats screen (founder stake × share price)
+- [x] Lambda **`startup_ipo_press`** + offline headline fallback
+- [x] Late-game tasks + post-seed **scaling revenue mult** (sandbox +20%)
+- [x] Save **v6** (`publicMarket`, `ending`, IPO flags)
 
 ### Phase 6 — Polish
 

@@ -8,7 +8,22 @@ import { createInitialOffices } from './Offices.js';
 import { createInitialXcState } from './XC.js';
 import { createInitialAdvisor } from './Advisor.js';
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
+
+export function createInitialPublicMarket() {
+  return {
+    ticker: null,
+    sharePrice: null,
+    ipoPrice: null,
+    ipoMonthIndex: null,
+    ipoYear: null,
+    priorMonthMrr: 0,
+    priceHistory: [],
+    pressHeadline: null,
+    pressDek: null,
+    monthsPublic: 0
+  };
+}
 
 export const STAGES = {
   GARAGE: 'garage',
@@ -32,6 +47,7 @@ export const MODE_CONFIG = {
 export function fixedCostsForStage(stage) {
   if (stage === STAGES.GARAGE) return 500;
   if (stage === STAGES.OFFICE) return 2_500;
+  if (stage === STAGES.PUBLIC) return 6_500;
   return 4_000;
 }
 
@@ -80,6 +96,8 @@ export function createInitialState(options) {
     offices: createInitialOffices(),
     xc: createInitialXcState(),
     advisor: createInitialAdvisor(),
+    publicMarket: createInitialPublicMarket(),
+    ending: null,
     capTable: [
       {
         id: 'founder',
@@ -95,6 +113,9 @@ export function createInitialState(options) {
       xcResidencyComplete: false,
       seedRoundClosed: false,
       ipoUnlocked: false,
+      ipoUnlockedLogged: false,
+      ipoFiled: false,
+      cashedOut: false,
       xcUnlockedLogged: false,
       gameOver: false,
       gameOverReason: null
@@ -141,6 +162,12 @@ export function normalizeSave(raw) {
   if (!state.offices) state.offices = createInitialOffices();
   if (!state.xc) state.xc = createInitialXcState();
   if (!state.advisor) state.advisor = createInitialAdvisor();
+  if (!state.publicMarket) state.publicMarket = createInitialPublicMarket();
+  if (state.ending === undefined) state.ending = null;
+  if (state.flags.ipoUnlockedLogged === undefined) state.flags.ipoUnlockedLogged = false;
+  if (state.flags.ipoFiled === undefined) state.flags.ipoFiled = false;
+  if (state.flags.cashedOut === undefined) state.flags.cashedOut = false;
+  if (state.flags.ipoUnlocked === undefined) state.flags.ipoUnlocked = false;
   if (state.news && state.news.showArchive === undefined) state.news.showArchive = false;
   if (state.flags.xcAccepted && state.flags.xcResidencyComplete === false && !state.xc.residencyMonthsRemaining) {
     state.flags.xcResidencyComplete = true;

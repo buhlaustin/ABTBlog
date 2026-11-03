@@ -40,6 +40,7 @@ function stageAllowed(task, stage) {
   if (stage === STAGES.POST_XC || stage === STAGES.PUBLIC) {
     return (
       stages.includes('post_xc') ||
+      stages.includes('public') ||
       stages.includes('office') ||
       stages.includes('xc')
     );

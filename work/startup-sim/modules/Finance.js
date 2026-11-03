@@ -1,6 +1,7 @@
 import { formatMoney, MODE_CONFIG, fixedCostsForStage } from './GameState.js';
 import { computePayroll, staffRevenueMultiplier } from './Staff.js';
 import { satelliteRent } from './Offices.js';
+import { scalingRevenueMult } from './IPO.js';
 
 export function hubRevenueMult(state) {
   return state?.offices?.modifiers?.revenueMult ?? 1;
@@ -30,7 +31,9 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
   const sand = sandboxMult(state);
   const cost = Math.round((taskDef.cost ?? 0) * econ.costMult * sand * hubCostMult(state));
-  const revenue = Math.round(rolled.revenue * econ.revenueMult * (2 - sand) * hubRevenueMult(state));
+  const revenue = Math.round(
+    rolled.revenue * econ.revenueMult * (2 - sand) * hubRevenueMult(state) * scalingRevenueMult(state)
+  );
 
   state.finance.cash -= cost;
   state.finance.cash += revenue;
