@@ -13,6 +13,6 @@ Open `http://localhost:8080/play/startup-sim/index.html` (after copy) or serve t
 
 ## Status
 
-**Phase 0 complete:** start/setup flow, full tab shell, department headcount preview (read-only), save/load, data + module stubs.
+**Phase 1 complete:** monthly counted tasks on Desk, close month (overhead + progression), category economics, $50k office gate, game over on bankruptcy.
 
-**Phase 1 next:** monthly task loop, revenue/burn, garage → office gate.
+**Phase 2 next:** editable headcount + finalize staffing, cap table / XC funding.

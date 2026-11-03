@@ -1,9 +1,10 @@
-import { getCategoryById } from './Categories.js';
+import { getCategoryById, categoryEconomics } from './Categories.js';
 import { createInitialStaff } from './Staff.js';
 import { createInitialSocial } from './Social.js';
 import { createInitialNews } from './News.js';
+import { createInitialCalendar, startMonth } from './Calendar.js';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 
 export const STAGES = {
   GARAGE: 'garage',
@@ -24,6 +25,12 @@ export const MODE_CONFIG = {
   sandbox: { startingCash: 500_000, difficulty: 0.75 }
 };
 
+export function fixedCostsForStage(stage) {
+  if (stage === STAGES.GARAGE) return 500;
+  if (stage === STAGES.OFFICE) return 2_500;
+  return 4_000;
+}
+
 export function createInitialState(options) {
   const mode = options.mode === 'sandbox' ? 'sandbox' : 'career';
   const modeCfg = MODE_CONFIG[mode];
@@ -37,26 +44,31 @@ export function createInitialState(options) {
     throw new Error('Invalid startup category');
   }
 
-  return {
+  const economics = categoryEconomics(category);
+
+  const state = {
     version: SAVE_VERSION,
     mode,
     sandboxStartingCash: mode === 'sandbox' ? startingCash : null,
     company: {
       name: String(options.companyName || 'Untitled Co.').trim(),
       categoryId: category.id,
-      categoryLabel: category.label
+      categoryLabel: category.label,
+      economics
     },
     stage: STAGES.GARAGE,
-    calendar: { monthIndex: 1, year: 1 },
+    calendar: createInitialCalendar(),
     finance: {
       cash: startingCash,
       lifetimeRevenue: 0,
       monthlyRevenue: 0,
+      monthlyBurn: 0,
+      mrr: 0,
       valuation: null,
-      fixedCostsMonthly: 500
+      fixedCostsMonthly: fixedCostsForStage(STAGES.GARAGE)
     },
     staff: createInitialStaff(),
-    product: { researchLevel: 0, featureQueue: [] },
+    product: { level: 0, buzz: 0, featureQueue: [] },
     social: createInitialSocial(),
     news: createInitialNews(),
     capTable: [
@@ -70,21 +82,49 @@ export function createInitialState(options) {
     flags: {
       xcUnlocked: false,
       xcAccepted: false,
-      ipoUnlocked: false
+      ipoUnlocked: false,
+      xcUnlockedLogged: false,
+      gameOver: false,
+      gameOverReason: null
     }
   };
+
+  startMonth(state);
+  return state;
 }
 
 export function normalizeSave(raw) {
   if (!raw || typeof raw !== 'object') return null;
   const state = { ...raw };
+
   if (!state.staff?.headcountByDept) {
     state.staff = createInitialStaff();
   }
+  if (!state.draftHeadcountByDept && state.staff.draftHeadcountByDept) {
+    /* ok */
+  }
   if (!state.social) state.social = createInitialSocial();
   if (!state.news) state.news = createInitialNews();
-  if (!state.product) state.product = { researchLevel: 0, featureQueue: [] };
-  if (!state.finance.fixedCostsMonthly) state.finance.fixedCostsMonthly = 500;
+  if (!state.product) state.product = { level: 0, buzz: 0, featureQueue: [] };
+  if (!state.product.buzz && state.product.buzz !== 0) state.product.buzz = 0;
+  if (!state.calendar) state.calendar = createInitialCalendar();
+  if (!state.calendar.monthTasks) state.calendar.monthTasks = [];
+  if (!state.calendar.log) state.calendar.log = [];
+  if (!state.company.economics) {
+    const cat = getCategoryById(state.company?.categoryId);
+    state.company.economics = categoryEconomics(cat);
+  }
+  if (!state.finance.fixedCostsMonthly) {
+    state.finance.fixedCostsMonthly = fixedCostsForStage(state.stage ?? STAGES.GARAGE);
+  }
+  if (state.finance.mrr === undefined) state.finance.mrr = state.finance.monthlyRevenue ?? 0;
+  if (!state.flags) state.flags = {};
+  if (state.flags.gameOver === undefined) state.flags.gameOver = false;
+
+  if (!state.calendar.monthTasks.length && !state.flags.gameOver) {
+    startMonth(state);
+  }
+
   state.version = SAVE_VERSION;
   return state;
 }

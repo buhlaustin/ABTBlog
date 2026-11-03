@@ -11,7 +11,7 @@
   <div id="app">
     <section id="screen-start" class="screen screen-start">
       <header class="hero">
-        <p class="eyebrow">Phase 0 · scaffold</p>
+        <p class="eyebrow">Phase 1 · core sim</p>
         <h1>Startup Simulator</h1>
         <p class="lede">
           Build from a garage to IPO. Career mode starts at $120k; Sandbox adds starting cash but the same revenue milestones.
@@ -75,6 +75,7 @@
         <div class="hud-stats">
           <div><span class="stat-label">Cash</span><span id="hud-cash" class="stat-value">—</span></div>
           <div><span class="stat-label">Revenue (life)</span><span id="hud-revenue" class="stat-value">—</span></div>
+          <div><span class="stat-label">Last mo.</span><span id="hud-mrr" class="stat-value">—</span></div>
           <div><span class="stat-label">Month</span><span id="hud-month" class="stat-value">—</span></div>
         </div>
       </header>
@@ -106,6 +107,15 @@
         <span id="save-status" class="save-status" hidden>Saved</span>
         <button id="btn-back-start" class="btn btn-ghost btn-small" type="button">Main menu</button>
       </footer>
+    </section>
+
+    <section id="screen-gameover" class="screen" hidden>
+      <header class="hero">
+        <p class="eyebrow">Run ended</p>
+        <h1 id="gameover-title">Company</h1>
+        <div id="gameover-body" class="lede"></div>
+      </header>
+      <button id="btn-gameover-menu" class="btn btn-primary" type="button">Main menu</button>
     </section>
   </div>
   <script>window.__STARTUP_NARRATIVE_API_URL="https://austinbuhltech.com/play/hos/narrate";</script>

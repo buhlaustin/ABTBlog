@@ -1,4 +1,137 @@
 {
   "version": 1,
-  "tasks": []
+  "tasks": [
+    {
+      "id": "customer-interviews",
+      "title": "Run 10 customer interviews",
+      "description": "Validate pain points before you build the wrong thing.",
+      "types": ["research"],
+      "stages": ["garage", "office"],
+      "cost": 150,
+      "revenue": [0, 400],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "mvp-sprint",
+      "title": "Ship MVP sprint",
+      "description": "Close the loop on a thin vertical slice customers can touch.",
+      "types": ["product"],
+      "stages": ["garage", "office"],
+      "cost": 800,
+      "revenue": [200, 1200],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "landing-page",
+      "title": "Launch landing page + waitlist",
+      "description": "Explain the vision and capture emails.",
+      "types": ["marketing"],
+      "stages": ["garage", "office"],
+      "cost": 350,
+      "revenue": [100, 900],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "local-outreach",
+      "title": "Local founder outreach",
+      "description": "Coffee chats, co-working boards, and awkward intros.",
+      "types": ["sales"],
+      "stages": ["garage", "office"],
+      "cost": 120,
+      "revenue": [300, 1500],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "content-blitz",
+      "title": "Content marketing blitz",
+      "description": "Posts, threads, and a newsletter no one asked for yet.",
+      "types": ["marketing"],
+      "stages": ["garage", "office"],
+      "cost": 250,
+      "revenue": [150, 1100],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cold-email",
+      "title": "Cold email campaign",
+      "description": "100 personalized emails. 3 replies. 1 maybe.",
+      "types": ["sales"],
+      "stages": ["garage", "office"],
+      "cost": 100,
+      "revenue": [400, 2200],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "bug-bash",
+      "title": "Bug bash week",
+      "description": "Stability over sparkle — keep early users from churning.",
+      "types": ["product"],
+      "stages": ["garage", "office"],
+      "cost": 400,
+      "revenue": [100, 800],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "partnership-pilot",
+      "title": "Pilot with a friendly partner",
+      "description": "Borrow someone else's logo for credibility.",
+      "types": ["sales"],
+      "stages": ["garage", "office"],
+      "cost": 500,
+      "revenue": [800, 3500],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "pricing-test",
+      "title": "Pricing experiment",
+      "description": "Try three price points; pick the least embarrassing.",
+      "types": ["research"],
+      "stages": ["garage", "office"],
+      "cost": 200,
+      "revenue": [200, 1400],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "community-beta",
+      "title": "Community beta launch",
+      "description": "Invite power users into a noisy Slack you'll regret.",
+      "types": ["marketing"],
+      "stages": ["garage", "office"],
+      "cost": 300,
+      "revenue": [250, 1800],
+      "product": 1,
+      "buzz": 4
+    },
+    {
+      "id": "feature-polish",
+      "title": "Polish core feature",
+      "description": "Make the demo path actually work in meetings.",
+      "types": ["product"],
+      "stages": ["office"],
+      "cost": 1200,
+      "revenue": [500, 2800],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "paid-ads-test",
+      "title": "Paid ads test budget",
+      "description": "Small spend to learn CAC before you scale.",
+      "types": ["marketing"],
+      "stages": ["office"],
+      "cost": 2000,
+      "revenue": [400, 4500],
+      "product": 0,
+      "buzz": 2
+    }
+  ]
 }

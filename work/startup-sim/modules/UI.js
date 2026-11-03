@@ -6,11 +6,13 @@ import { renderPeoplePanel } from './Staff.js';
 import { renderSocialPlaceholder } from './Social.js';
 import { renderNewsPlaceholder } from './News.js';
 import { renderAdvisorPlaceholder } from './Advisor.js';
+import { getTaskDef, pendingTasks, canEndMonth } from './Tasks.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
   setup: () => document.getElementById('screen-setup'),
-  game: () => document.getElementById('screen-game')
+  game: () => document.getElementById('screen-game'),
+  gameover: () => document.getElementById('screen-gameover')
 };
 
 export function showScreen(name) {
@@ -60,6 +62,7 @@ export function renderGameHud(state) {
   const revenue = document.getElementById('hud-revenue');
   const month = document.getElementById('hud-month');
   const mode = document.getElementById('hud-mode');
+  const mrr = document.getElementById('hud-mrr');
 
   if (company) company.textContent = state.company.name;
   if (stage) stage.textContent = stageLabel(state.stage);
@@ -69,8 +72,87 @@ export function renderGameHud(state) {
     month.textContent = `M${state.calendar.monthIndex}, Y${state.calendar.year}`;
   }
   if (mode) {
-    mode.textContent = state.mode === 'sandbox' ? 'Sandbox' : 'Career';
+    const econ = state.company.economics;
+    const mult = econ ? ` · rev×${econ.revenueMult.toFixed(2)}` : '';
+    mode.textContent = `${state.mode === 'sandbox' ? 'Sandbox' : 'Career'}${mult}`;
   }
+  if (mrr) mrr.textContent = formatMoney(state.finance.mrr ?? 0);
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+export function renderDeskPanel(state) {
+  const desk = document.getElementById('panel-desk');
+  if (!desk) return;
+
+  const slots = getMonthlyTaskSlots(state.stage);
+  const pending = pendingTasks(state);
+  const done = state.calendar.tasksCompleted ?? 0;
+  const milestone = nextRevenueMilestone(state);
+  const ms = milestone
+    ? `${milestone.label} at ${formatMoney(milestone.amount)}`
+    : 'All major gates cleared';
+
+  const taskCards = (state.calendar.monthTasks ?? [])
+    .map((inst) => {
+      const def = getTaskDef(inst.taskId);
+      if (!def) return '';
+      const doneClass = inst.status === 'done' ? 'task-card done' : 'task-card';
+      const btn =
+        inst.status === 'pending'
+          ? `<button type="button" class="btn btn-primary btn-small" data-complete-task="${escapeHtml(inst.instanceId)}">Complete</button>`
+          : '<span class="task-done-label">Done</span>';
+      return `<article class="${doneClass}">
+        <h3>${escapeHtml(def.title)}</h3>
+        <p>${escapeHtml(def.description)}</p>
+        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Revenue band ${formatMoney(def.revenue?.[0] ?? 0)}–${formatMoney(def.revenue?.[1] ?? 0)}</p>
+        ${btn}
+      </article>`;
+    })
+    .join('');
+
+  const endDisabled = !canEndMonth(state);
+  const monthRev = state.calendar.monthRevenue ?? 0;
+  const monthSpend = state.calendar.monthSpend ?? 0;
+
+  desk.innerHTML = `
+    <p class="panel-lede">Complete all counted tasks, then close the month. Staff/finance changes do not use task slots.</p>
+    <div class="summary-grid">
+      <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slots}</span></div>
+      <div><span class="stat-label">This month</span><span class="stat-value">+${formatMoney(monthRev)} / -${formatMoney(monthSpend)}</span></div>
+      <div><span class="stat-label">Next gate</span><span class="stat-value">${escapeHtml(ms)}</span></div>
+      <div><span class="stat-label">Pending</span><span class="stat-value">${pending.length}</span></div>
+    </div>
+    <div class="task-list">${taskCards || '<div class="tab-placeholder">No tasks dealt.</div>'}</div>
+    <div class="desk-actions">
+      <button type="button" id="btn-end-month" class="btn btn-primary" ${endDisabled ? 'disabled' : ''} title="${endDisabled ? 'Finish remaining tasks first' : 'Apply overhead and start next month'}">Close month</button>
+      <p id="desk-feedback" class="desk-feedback" hidden></p>
+    </div>
+    <section class="month-log">
+      <h3 class="log-head">Recent log</h3>
+      <ul>${(state.calendar.log ?? [])
+        .slice(0, 6)
+        .map(
+          (e) =>
+            `<li><span class="log-when">Y${e.year} M${e.month}</span> ${escapeHtml(e.message)}</li>`
+        )
+        .join('') || '<li class="muted">No events yet.</li>'}</ul>
+    </section>
+  `;
+}
+
+export function showDeskFeedback(message, isError = false) {
+  const el = document.getElementById('desk-feedback');
+  if (!el) return;
+  el.textContent = message;
+  el.hidden = !message;
+  el.classList.toggle('error', isError);
 }
 
 export function bindTabNavigation() {
@@ -93,37 +175,25 @@ export function bindTabNavigation() {
 
 export function renderAllPanels(state) {
   renderGameHud(state);
-
-  const milestone = nextRevenueMilestone(state);
-  const desk = document.getElementById('panel-desk');
-  if (desk) {
-    const slots = getMonthlyTaskSlots(state.stage);
-    const ms = milestone
-      ? `${milestone.label} at ${formatMoney(milestone.amount)} revenue`
-      : 'All major gates cleared';
-    desk.innerHTML = `
-      <p class="panel-lede">Monthly counted tasks — Phase 1.</p>
-      <div class="summary-grid">
-        <div><span class="stat-label">Task slots</span><span class="stat-value">${slots} / month</span></div>
-        <div><span class="stat-label">Next gate</span><span class="stat-value">${ms}</span></div>
-      </div>
-      <div class="tab-placeholder">No tasks queued yet.</div>
-    `;
-  }
+  renderDeskPanel(state);
 
   const product = document.getElementById('panel-product');
   if (product) {
     product.innerHTML = `
-      <p class="panel-lede">Research &amp; development queue — Phase 1.</p>
-      <div class="tab-placeholder">Product level: ${state.product.researchLevel}</div>
+      <p class="panel-lede">Product strength feeds task outcomes (revenue multiplier).</p>
+      <div class="summary-grid">
+        <div><span class="stat-label">Product level</span><span class="stat-value">${state.product.level ?? 0}</span></div>
+        <div><span class="stat-label">Buzz</span><span class="stat-value">${state.product.buzz ?? 0}</span></div>
+        <div><span class="stat-label">Category</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
+      </div>
     `;
   }
 
   const growth = document.getElementById('panel-growth');
   if (growth) {
     growth.innerHTML = `
-      <p class="panel-lede">Marketing &amp; sales campaigns — Phase 1.</p>
-      <div class="tab-placeholder">${state.company.categoryLabel} playbooks not wired yet.</div>
+      <p class="panel-lede">Marketing and sales tasks appear on the Desk each month.</p>
+      <div class="tab-placeholder">${escapeHtml(state.company.categoryLabel)} — use Desk tasks to grow this month.</div>
     `;
   }
 
@@ -133,10 +203,11 @@ export function renderAllPanels(state) {
   if (finance) {
     const sum = renderFinanceSummary(state);
     finance.innerHTML = `
-      <p class="panel-lede">Burn, runway, cap table — Phase 2 raises.</p>
+      <p class="panel-lede">Cash flow from tasks (immediate) + overhead at month close.</p>
       <div class="summary-grid">
         <div><span class="stat-label">Cash</span><span class="stat-value">${sum.cashLabel}</span></div>
-        <div><span class="stat-label">Burn/mo</span><span class="stat-value">${sum.burnLabel}</span></div>
+        <div><span class="stat-label">Last month rev.</span><span class="stat-value">${sum.mrrLabel}</span></div>
+        <div><span class="stat-label">Overhead/mo</span><span class="stat-value">${sum.burnLabel}</span></div>
         <div><span class="stat-label">Runway</span><span class="stat-value">${sum.runway}</span></div>
         <div><span class="stat-label">Founder equity</span><span class="stat-value">${state.capTable[0]?.pct ?? 100}%</span></div>
       </div>
@@ -146,6 +217,19 @@ export function renderAllPanels(state) {
   renderSocialPlaceholder(document.getElementById('panel-social'));
   renderNewsPlaceholder(document.getElementById('panel-news'));
   renderAdvisorPlaceholder(document.getElementById('panel-advisor'));
+}
+
+export function renderGameOver(state) {
+  const title = document.getElementById('gameover-title');
+  const body = document.getElementById('gameover-body');
+  if (title) title.textContent = state.company.name;
+  if (body) {
+    body.innerHTML = `
+      <p>${escapeHtml(state.flags.gameOverReason || 'Your run ended.')}</p>
+      <p>Lifetime revenue: <strong>${formatMoney(state.finance.lifetimeRevenue)}</strong></p>
+      <p>Months played: <strong>${(state.calendar.year - 1) * 12 + state.calendar.monthIndex - 1}</strong></p>
+    `;
+  }
 }
 
 export function flashSaveStatus(ok) {

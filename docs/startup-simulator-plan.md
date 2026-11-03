@@ -351,10 +351,11 @@ work/startup-sim/
 
 ### Phase 1 — Core sim (no AI)
 
-- GameState, calendar, 4 garage tasks, basic revenue/burn
-- Garage → office gate at $50k
-- Save/load
-- Category picker affects constants
+- [x] GameState v2, calendar, 4 garage tasks (6 in office), basic revenue/burn
+- [x] Garage → office gate at $50k (fixed costs + task slots)
+- [x] Save/load (includes month tasks + log)
+- [x] Category picker affects revenue/cost multipliers
+- [x] Game over on negative cash after month close
 
 ### Phase 2 — Staff & finance depth
 

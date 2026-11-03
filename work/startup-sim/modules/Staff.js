@@ -58,7 +58,10 @@ export function projectStaffEconomics(state) {
   const payroll = computePayroll(draft, state.stage);
   const fixed = state.finance?.fixedCostsMonthly ?? 500;
   const burn = payroll + fixed;
-  const revenue = state.finance?.monthlyRevenue ?? 0;
+  const revenue =
+    (state.calendar?.monthRevenue ?? 0) > 0
+      ? state.calendar.monthRevenue
+      : state.finance?.monthlyRevenue ?? 0;
   const surplus = revenue - burn;
   return { payroll, burn, revenue, surplus, fixed };
 }

@@ -337,3 +337,96 @@ h1 {
   font-size: 0.8rem;
   color: var(--success);
 }
+
+.task-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.task-card {
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  padding: 0.85rem 1rem;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.task-card.done {
+  opacity: 0.65;
+}
+
+.task-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.task-card p {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.task-meta {
+  font-size: 0.78rem !important;
+}
+
+.task-done-label {
+  font-size: 0.8rem;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.desk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.desk-feedback {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--success);
+}
+
+.desk-feedback.error {
+  color: #f87171;
+}
+
+.month-log {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.log-head {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.month-log ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.month-log li {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(42, 51, 68, 0.5);
+}
+
+.month-log li.muted {
+  font-style: italic;
+}
+
+.log-when {
+  color: var(--text);
+  font-weight: 600;
+  margin-right: 0.35rem;
+}

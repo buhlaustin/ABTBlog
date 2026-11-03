@@ -1,24 +1,70 @@
-import { formatMoney } from './GameState.js';
+import { formatMoney, MODE_CONFIG, fixedCostsForStage } from './GameState.js';
 import { computePayroll } from './Staff.js';
 
-/** Phase 1: monthly burn/revenue resolution. */
 export function projectMonthlyBurn(state) {
-  const draft = state.staff?.draftHeadcountByDept ?? {};
-  const payroll = computePayroll(draft, state.stage);
-  const fixed = state.finance?.fixedCostsMonthly ?? 0;
+  const headcount = state.staff?.headcountByDept ?? {};
+  const payroll = computePayroll(headcount, state.stage);
+  const fixed =
+    typeof state.finance?.fixedCostsMonthly === 'number'
+      ? state.finance.fixedCostsMonthly
+      : fixedCostsForStage(state.stage);
   return payroll + fixed;
+}
+
+function sandboxMult(state) {
+  return state.mode === 'sandbox' ? MODE_CONFIG.sandbox.difficulty : MODE_CONFIG.career.difficulty;
+}
+
+/** Apply one task's cash flow immediately when completed. */
+export function applyTaskOutcome(state, taskDef, rolled) {
+  const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
+  const sand = sandboxMult(state);
+  const cost = Math.round((taskDef.cost ?? 0) * econ.costMult * sand);
+  const revenue = Math.round(rolled.revenue * econ.revenueMult * (2 - sand));
+
+  state.finance.cash -= cost;
+  state.finance.cash += revenue;
+  state.finance.lifetimeRevenue += revenue;
+  state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + revenue;
+  state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
+
+  state.product.level = (state.product.level ?? 0) + (rolled.product ?? 0);
+  state.product.buzz = (state.product.buzz ?? 0) + (rolled.buzz ?? 0);
+
+  return { cost, revenue };
+}
+
+export function rollTaskOutcome(taskDef, state) {
+  const [rMin, rMax] = taskDef.revenue ?? [0, 0];
+  const product = taskDef.product ?? 0;
+  const buzz = taskDef.buzz ?? 0;
+  const buzzBonus = Math.min(0.15, (state.product.buzz ?? 0) * 0.02);
+  const levelBonus = Math.min(0.2, (state.product.level ?? 0) * 0.03);
+  const mult = 1 + buzzBonus + levelBonus;
+  const revenue = Math.round((rMin + Math.random() * (rMax - rMin)) * mult);
+  return { revenue, product, buzz };
+}
+
+/** Month-end: payroll + fixed burn, update MRR snapshot. */
+export function resolveMonthEndBurn(state) {
+  const burn = projectMonthlyBurn(state);
+  state.finance.cash -= burn;
+  state.finance.monthlyBurn = burn;
+  state.finance.monthlyRevenue = state.calendar.monthRevenue ?? 0;
+  state.finance.mrr = Math.round(state.finance.monthlyRevenue);
+  return burn;
 }
 
 export function renderFinanceSummary(state) {
   const burn = projectMonthlyBurn(state);
   const cash = state.finance?.cash ?? 0;
-  const runway =
-    burn > 0 ? `${(cash / burn).toFixed(1)} mo` : '∞';
+  const runway = burn > 0 ? `${(cash / burn).toFixed(1)} mo` : '∞';
 
   return {
     burn,
     runway,
     burnLabel: formatMoney(burn),
-    cashLabel: formatMoney(cash)
+    cashLabel: formatMoney(cash),
+    mrrLabel: formatMoney(state.finance?.mrr ?? 0)
   };
 }

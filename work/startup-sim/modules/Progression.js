@@ -1,12 +1,7 @@
 import { REVENUE_GATES, STAGES } from './GameState.js';
+import { fixedCostsForStage } from './GameState.js';
 
-export function stageFromRevenue(lifetimeRevenue) {
-  const r = Number(lifetimeRevenue) || 0;
-  if (r >= REVENUE_GATES.IPO) return STAGES.PUBLIC;
-  return null;
-}
-
-/** Apply stage upgrades from revenue gates (Phase 1+). */
+/** Apply stage upgrades from revenue gates. */
 export function syncStageFromProgress(state) {
   const r = state.finance?.lifetimeRevenue ?? 0;
   let stage = state.stage;
@@ -23,6 +18,20 @@ export function syncStageFromProgress(state) {
 
   state.stage = stage;
   return state;
+}
+
+/** @returns {string[]} log lines for the month feed */
+export function onStageChange(state, fromStage, toStage) {
+  const lines = [];
+  if (fromStage === STAGES.GARAGE && toStage === STAGES.OFFICE) {
+    state.finance.fixedCostsMonthly = fixedCostsForStage(STAGES.OFFICE);
+    lines.push('Unlocked small office — higher fixed costs, more task slots next month.');
+  }
+  if (state.flags.xcUnlocked && !state.flags.xcUnlockedLogged) {
+    lines.push('X Combinator application is available (Phase 3).');
+    state.flags.xcUnlockedLogged = true;
+  }
+  return lines;
 }
 
 export function nextRevenueMilestone(state) {
