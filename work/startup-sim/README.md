@@ -13,4 +13,6 @@ Open `http://localhost:8080/play/startup-sim/index.html` (after copy) or serve t
 
 ## Status
 
-Phase 0: start screen and module scaffold only.
+**Phase 0 complete:** start/setup flow, full tab shell, department headcount preview (read-only), save/load, data + module stubs.
+
+**Phase 1 next:** monthly task loop, revenue/burn, garage → office gate.

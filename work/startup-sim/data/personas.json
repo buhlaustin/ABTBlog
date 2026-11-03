@@ -1,0 +1,6 @@
+{
+  "personas": [
+    { "id": "vc-parrot", "name": "Patty Fundsworth", "handle": "@fundsworth", "network": "chirp", "role": "VC" },
+    { "id": "tech-journo", "name": "Sam Scoop", "handle": "sam-scoop", "network": "pronet", "role": "journalist" }
+  ]
+}

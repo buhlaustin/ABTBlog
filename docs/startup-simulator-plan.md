@@ -342,9 +342,12 @@ work/startup-sim/
 ### Phase 0 — Scaffold (this PR)
 
 - [x] Plan document
-- [ ] WIP registry + play route + copy-work
-- [ ] Start screen shell + empty module graph
-- [ ] ASSETS.md + empty manifest
+- [x] WIP registry + play route + copy-work
+- [x] Start screen shell + module graph (Calendar, Progression, Finance, Staff, Tasks, Social, News, Advisor, Storage, utils)
+- [x] Data stubs (`categories.json`, `tasks.json`, `news-timeline-seed.json`, `personas.json`)
+- [x] Main shell tabs (Desk → Advisor) with Phase placeholders + save/load
+- [x] ASSETS.md + empty manifest
+- [x] Shared narrative URL inject (same Lambda as HOS/EER)
 
 ### Phase 1 — Core sim (no AI)
 

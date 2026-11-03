@@ -3,8 +3,22 @@
  * Phase 4: same URL as HOS (hos-narrative Lambda) with startup-specific `kind`s.
  */
 import { STARTUP_NARRATIVE_API_URL } from './startup-config.js';
+import { assetBaseUrl } from './utils.js';
 
 let resolvedUrl = null;
+
+export function resolveNarrativeApiUrl() {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname || '';
+    if (host === 'austinbuhltech.com' || host.endsWith('.austinbuhltech.com')) {
+      return `${window.location.origin}/play/hos/narrate`;
+    }
+    if (window.location.pathname.startsWith('/play/startup-sim')) {
+      return `${window.location.origin}/play/hos/narrate`;
+    }
+  }
+  return getNarrativeApiUrl();
+}
 
 export function getNarrativeApiUrl() {
   if (resolvedUrl) return resolvedUrl;
@@ -22,8 +36,23 @@ export function getNarrativeApiUrl() {
   return null;
 }
 
+export async function initNarrativeApiUrl() {
+  if (getNarrativeApiUrl()) return getNarrativeApiUrl();
+  try {
+    const res = await fetch(`${assetBaseUrl()}narrative-api.json`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data?.url && typeof data.url === 'string') {
+      resolvedUrl = data.url.replace(/\/$/, '');
+    }
+  } catch {
+    /* offline */
+  }
+  return getNarrativeApiUrl();
+}
+
 export function isNarrativeApiEnabled() {
-  return Boolean(getNarrativeApiUrl());
+  return Boolean(resolveNarrativeApiUrl() || getNarrativeApiUrl());
 }
 
 export async function requestNarrative(kind, context) {

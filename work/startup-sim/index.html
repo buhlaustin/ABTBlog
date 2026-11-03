@@ -11,18 +11,17 @@
   <div id="app">
     <section id="screen-start" class="screen screen-start">
       <header class="hero">
-        <p class="eyebrow">Work in progress</p>
+        <p class="eyebrow">Phase 0 · scaffold</p>
         <h1>Startup Simulator</h1>
         <p class="lede">
-          Build from a garage to IPO. Career mode starts lean; Sandbox gives you more runway with the same revenue milestones.
-          AI news, social feeds, and a chief-of-staff advisor arrive in later phases.
+          Build from a garage to IPO. Career mode starts at $120k; Sandbox adds starting cash but the same revenue milestones.
         </p>
       </header>
       <div class="start-actions">
         <button id="btn-new" class="btn btn-primary" type="button">New game</button>
-        <button id="btn-load" class="btn btn-ghost" type="button" disabled title="Coming in Phase 1">Load save</button>
+        <button id="btn-load" class="btn btn-ghost" type="button" disabled>Load save</button>
       </div>
-      <p class="fine-print">Planning doc lives in-repo only — implementation tracked on GitHub.</p>
+      <p id="start-api-status" class="fine-print" hidden></p>
     </section>
 
     <section id="screen-setup" class="screen" hidden>
@@ -66,11 +65,12 @@
       </form>
     </section>
 
-    <section id="screen-garage" class="screen" hidden>
+    <section id="screen-game" class="screen" hidden>
       <header class="hud">
         <div>
           <p class="hud-eyebrow" id="hud-stage">Garage</p>
           <h2 id="hud-company">Company</h2>
+          <p class="hud-mode" id="hud-mode">Career</p>
         </div>
         <div class="hud-stats">
           <div><span class="stat-label">Cash</span><span id="hud-cash" class="stat-value">—</span></div>
@@ -78,12 +78,37 @@
           <div><span class="stat-label">Month</span><span id="hud-month" class="stat-value">—</span></div>
         </div>
       </header>
-      <div class="wip-banner">
-        <p>Phase 0 shell — month loop, tasks, and AI tabs land in Phase 1+.</p>
-        <button id="btn-back-start" class="btn btn-ghost btn-small" type="button">Back to menu</button>
+
+      <nav id="game-tabs" class="game-tabs" role="tablist" aria-label="Company sections">
+        <button type="button" role="tab" class="active" data-tab="desk" aria-selected="true">Desk</button>
+        <button type="button" role="tab" data-tab="product" aria-selected="false">Product</button>
+        <button type="button" role="tab" data-tab="growth" aria-selected="false">Growth</button>
+        <button type="button" role="tab" data-tab="people" aria-selected="false">People</button>
+        <button type="button" role="tab" data-tab="finance" aria-selected="false">Finance</button>
+        <button type="button" role="tab" data-tab="social" aria-selected="false">Social</button>
+        <button type="button" role="tab" data-tab="news" aria-selected="false">News</button>
+        <button type="button" role="tab" data-tab="advisor" aria-selected="false">Advisor</button>
+      </nav>
+
+      <div class="game-panels">
+        <div id="panel-desk" class="game-panel" data-panel="desk" role="tabpanel"></div>
+        <div id="panel-product" class="game-panel" data-panel="product" role="tabpanel" hidden></div>
+        <div id="panel-growth" class="game-panel" data-panel="growth" role="tabpanel" hidden></div>
+        <div id="panel-people" class="game-panel" data-panel="people" role="tabpanel" hidden></div>
+        <div id="panel-finance" class="game-panel" data-panel="finance" role="tabpanel" hidden></div>
+        <div id="panel-social" class="game-panel" data-panel="social" role="tabpanel" hidden></div>
+        <div id="panel-news" class="game-panel" data-panel="news" role="tabpanel" hidden></div>
+        <div id="panel-advisor" class="game-panel" data-panel="advisor" role="tabpanel" hidden></div>
       </div>
+
+      <footer class="game-footer">
+        <button id="btn-save" class="btn btn-ghost btn-small" type="button">Save</button>
+        <span id="save-status" class="save-status" hidden>Saved</span>
+        <button id="btn-back-start" class="btn btn-ghost btn-small" type="button">Main menu</button>
+      </footer>
     </section>
   </div>
+  <script>window.__STARTUP_NARRATIVE_API_URL="https://austinbuhltech.com/play/hos/narrate";</script>
   <script type="module" src="/play/startup-sim/game.js"></script>
 </body>
 </html>

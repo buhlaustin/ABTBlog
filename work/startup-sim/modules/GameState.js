@@ -1,4 +1,9 @@
 import { getCategoryById } from './Categories.js';
+import { createInitialStaff } from './Staff.js';
+import { createInitialSocial } from './Social.js';
+import { createInitialNews } from './News.js';
+
+export const SAVE_VERSION = 1;
 
 export const STAGES = {
   GARAGE: 'garage',
@@ -33,8 +38,9 @@ export function createInitialState(options) {
   }
 
   return {
-    version: 1,
+    version: SAVE_VERSION,
     mode,
+    sandboxStartingCash: mode === 'sandbox' ? startingCash : null,
     company: {
       name: String(options.companyName || 'Untitled Co.').trim(),
       categoryId: category.id,
@@ -46,8 +52,13 @@ export function createInitialState(options) {
       cash: startingCash,
       lifetimeRevenue: 0,
       monthlyRevenue: 0,
-      valuation: null
+      valuation: null,
+      fixedCostsMonthly: 500
     },
+    staff: createInitialStaff(),
+    product: { researchLevel: 0, featureQueue: [] },
+    social: createInitialSocial(),
+    news: createInitialNews(),
     capTable: [
       {
         id: 'founder',
@@ -62,6 +73,20 @@ export function createInitialState(options) {
       ipoUnlocked: false
     }
   };
+}
+
+export function normalizeSave(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const state = { ...raw };
+  if (!state.staff?.headcountByDept) {
+    state.staff = createInitialStaff();
+  }
+  if (!state.social) state.social = createInitialSocial();
+  if (!state.news) state.news = createInitialNews();
+  if (!state.product) state.product = { researchLevel: 0, featureQueue: [] };
+  if (!state.finance.fixedCostsMonthly) state.finance.fixedCostsMonthly = 500;
+  state.version = SAVE_VERSION;
+  return state;
 }
 
 export function formatMoney(n) {
