@@ -391,9 +391,10 @@ work/startup-sim/
 
 ### Phase 6 — Polish
 
-- Commons assets wired per manifest
-- Accessibility, mobile layout, tutorials
-- Status **live** on work index
+- [x] CC0 stage icons in `assets/icons/` + `manifest.json`; `validate-startup-sim-assets.mjs` on prebuild
+- [x] `Assets.js` stage art in HUD; contextual **tutorial** tips (localStorage dismiss)
+- [x] Skip link, tab keyboard nav, focus rings, mobile tab scroll + touch targets
+- [x] Work registry **live** + featured; `/work/startup-sim/` indexable when live
 
 ---
 

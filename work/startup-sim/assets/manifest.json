@@ -1,4 +1,33 @@
 {
   "version": 1,
-  "assets": []
+  "assets": [
+    {
+      "id": "icon-garage",
+      "path": "assets/icons/garage.svg",
+      "license": "CC0-1.0",
+      "author": "Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/garage.svg"
+    },
+    {
+      "id": "icon-office",
+      "path": "assets/icons/office.svg",
+      "license": "CC0-1.0",
+      "author": "Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/office.svg"
+    },
+    {
+      "id": "icon-skyline",
+      "path": "assets/icons/skyline.svg",
+      "license": "CC0-1.0",
+      "author": "Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/skyline.svg"
+    },
+    {
+      "id": "icon-public",
+      "path": "assets/icons/public.svg",
+      "license": "CC0-1.0",
+      "author": "Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/public.svg"
+    }
+  ]
 }

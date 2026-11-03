@@ -32,8 +32,9 @@ export const workItems: WorkItem[] = [
     summary:
       "Garage-to-IPO startup tycoon: revenue gates, fundraising, cap table, AI news and social feeds, and a chief-of-staff advisor. Career and Sandbox modes.",
     kind: "hosted",
-    status: "wip",
+    status: "live",
     tags: ["game", "javascript", "simulation"],
+    featured: true,
     hostedEntry: "/play/startup-sim/index.html",
   },
   {

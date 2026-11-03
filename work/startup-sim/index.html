@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="robots" content="noindex">
   <title>Startup Simulator</title>
+  <meta name="description" content="Garage-to-IPO startup tycoon with fundraising, AI news, and monthly stock simulation.">
   <link rel="stylesheet" href="/play/startup-sim/style.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <div id="app">
-    <section id="screen-start" class="screen screen-start">
-      <header class="hero">
-        <p class="eyebrow">Phase 5 · IPO &amp; endgame</p>
-        <h1>Startup Simulator</h1>
+    <section id="screen-start" class="screen screen-start" aria-labelledby="start-title">
+      <header class="hero" id="main-content">
+        <p class="eyebrow">Startup tycoon</p>
+        <h1 id="start-title">Startup Simulator</h1>
         <p class="lede">
           Build from a garage to IPO. Career mode starts at $120k; Sandbox adds starting cash but the same revenue milestones.
         </p>
@@ -67,10 +68,13 @@
 
     <section id="screen-game" class="screen" hidden>
       <header class="hud">
-        <div>
+        <div class="hud-brand">
+          <img id="hud-stage-art" class="hud-stage-art" width="48" height="48" alt="" decoding="async">
+          <div>
           <p class="hud-eyebrow" id="hud-stage">Garage</p>
           <h2 id="hud-company">Company</h2>
           <p class="hud-mode" id="hud-mode">Career</p>
+          </div>
         </div>
         <div class="hud-stats">
           <div><span class="stat-label">Cash</span><span id="hud-cash" class="stat-value">—</span></div>
@@ -82,25 +86,25 @@
       </header>
 
       <nav id="game-tabs" class="game-tabs" role="tablist" aria-label="Company sections">
-        <button type="button" role="tab" class="active" data-tab="desk" aria-selected="true">Desk</button>
-        <button type="button" role="tab" data-tab="product" aria-selected="false">Product</button>
-        <button type="button" role="tab" data-tab="growth" aria-selected="false">Growth</button>
-        <button type="button" role="tab" data-tab="people" aria-selected="false">People</button>
-        <button type="button" role="tab" data-tab="finance" aria-selected="false">Finance</button>
-        <button type="button" role="tab" data-tab="social" aria-selected="false">Social</button>
-        <button type="button" role="tab" data-tab="news" aria-selected="false">News</button>
-        <button type="button" role="tab" data-tab="advisor" aria-selected="false">Advisor</button>
+        <button type="button" role="tab" class="active" data-tab="desk" id="tab-desk" aria-selected="true" aria-controls="panel-desk">Desk</button>
+        <button type="button" role="tab" data-tab="product" id="tab-product" aria-selected="false" aria-controls="panel-product">Product</button>
+        <button type="button" role="tab" data-tab="growth" id="tab-growth" aria-selected="false" aria-controls="panel-growth">Growth</button>
+        <button type="button" role="tab" data-tab="people" id="tab-people" aria-selected="false" aria-controls="panel-people">People</button>
+        <button type="button" role="tab" data-tab="finance" id="tab-finance" aria-selected="false" aria-controls="panel-finance">Finance</button>
+        <button type="button" role="tab" data-tab="social" id="tab-social" aria-selected="false" aria-controls="panel-social">Social</button>
+        <button type="button" role="tab" data-tab="news" id="tab-news" aria-selected="false" aria-controls="panel-news">News</button>
+        <button type="button" role="tab" data-tab="advisor" id="tab-advisor" aria-selected="false" aria-controls="panel-advisor">Advisor</button>
       </nav>
 
       <div class="game-panels">
-        <div id="panel-desk" class="game-panel" data-panel="desk" role="tabpanel"></div>
-        <div id="panel-product" class="game-panel" data-panel="product" role="tabpanel" hidden></div>
-        <div id="panel-growth" class="game-panel" data-panel="growth" role="tabpanel" hidden></div>
-        <div id="panel-people" class="game-panel" data-panel="people" role="tabpanel" hidden></div>
-        <div id="panel-finance" class="game-panel" data-panel="finance" role="tabpanel" hidden></div>
-        <div id="panel-social" class="game-panel" data-panel="social" role="tabpanel" hidden></div>
-        <div id="panel-news" class="game-panel" data-panel="news" role="tabpanel" hidden></div>
-        <div id="panel-advisor" class="game-panel" data-panel="advisor" role="tabpanel" hidden></div>
+        <div id="panel-desk" class="game-panel" data-panel="desk" role="tabpanel" aria-labelledby="tab-desk"></div>
+        <div id="panel-product" class="game-panel" data-panel="product" role="tabpanel" aria-labelledby="tab-product" hidden></div>
+        <div id="panel-growth" class="game-panel" data-panel="growth" role="tabpanel" aria-labelledby="tab-growth" hidden></div>
+        <div id="panel-people" class="game-panel" data-panel="people" role="tabpanel" aria-labelledby="tab-people" hidden></div>
+        <div id="panel-finance" class="game-panel" data-panel="finance" role="tabpanel" aria-labelledby="tab-finance" hidden></div>
+        <div id="panel-social" class="game-panel" data-panel="social" role="tabpanel" aria-labelledby="tab-social" hidden></div>
+        <div id="panel-news" class="game-panel" data-panel="news" role="tabpanel" aria-labelledby="tab-news" hidden></div>
+        <div id="panel-advisor" class="game-panel" data-panel="advisor" role="tabpanel" aria-labelledby="tab-advisor" hidden></div>
       </div>
 
       <footer class="game-footer">

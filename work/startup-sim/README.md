@@ -1,6 +1,6 @@
 # Startup Simulator
 
-WIP startup tycoon game (Career + Sandbox modes). See the full design plan in the repo at [`docs/startup-simulator-plan.md`](../../docs/startup-simulator-plan.md) (internal — not published on the marketing site).
+Hosted startup tycoon game (Career + Sandbox modes). Play on the site at `/work/startup-sim/`. Design plan: [`docs/startup-simulator-plan.md`](../../docs/startup-simulator-plan.md) (internal).
 
 ## Local play
 
@@ -13,8 +13,6 @@ Open `http://localhost:8080/play/startup-sim/index.html` (after copy) or serve t
 
 ## Status
 
-**Phase 4 complete:** AI/offline news, ProNet/Chirp + reactions, chief-of-staff advisor.
+**Shipped (Phases 0–6):** core loop, staff/fundraising, XC/hubs, AI news/social/advisor, IPO endgame, CC0 stage icons, tutorials, a11y/mobile polish.
 
-**Phase 5 complete:** $1B IPO gate, monthly stock sim, cash-out ending, `startup_ipo_press`.
-
-**Phase 6 next:** Commons assets, polish, go live on work index.
+**Build:** `npm run prebuild` validates `assets/manifest.json` paths before copy to `public/play/`.

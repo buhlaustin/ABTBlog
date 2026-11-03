@@ -24,6 +24,8 @@ import {
   completeXcAcceptance
 } from './modules/XC.js';
 import { loadHubData, selectHub, addSatellite, removeSatellite, showOfficesFeedback } from './modules/Offices.js';
+import { loadAssetManifest } from './modules/Assets.js';
+import { dismissTutorialStep } from './modules/Tutorial.js';
 import {
   bindSandboxCashToggle,
   bindTabNavigation,
@@ -335,6 +337,12 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    if (e.target.id === 'btn-dismiss-tutorial') {
+      const stepId = e.target.getAttribute('data-tutorial-id');
+      if (stepId) dismissTutorialStep(stepId);
+      refresh();
+      return;
+    }
     const socialTab = e.target.closest('[data-social-tab]');
     if (socialTab && sessionState) {
       setSocialNetwork(sessionState, socialTab.getAttribute('data-social-tab'));
@@ -394,6 +402,7 @@ async function init() {
     loadCategories(),
     loadTaskCatalog(),
     loadHubData(),
+    loadAssetManifest(),
     initNarrativeApiUrl()
   ]);
 

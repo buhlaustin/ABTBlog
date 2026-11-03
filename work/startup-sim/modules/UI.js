@@ -8,6 +8,8 @@ import { renderNewsPanel } from './News.js';
 import { renderAdvisorPanel } from './Advisor.js';
 import { getTaskDef, pendingTasks, canEndMonth } from './Tasks.js';
 import { isPublicCompany, founderStakeValue } from './IPO.js';
+import { stageIconUrl } from './Assets.js';
+import { activeTutorialStep, renderTutorialBanner } from './Tutorial.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -67,6 +69,11 @@ export function renderGameHud(state) {
   const mrr = document.getElementById('hud-mrr');
   const stock = document.getElementById('hud-stock');
 
+  const stageArt = document.getElementById('hud-stage-art');
+  if (stageArt) {
+    stageArt.src = stageIconUrl(state.stage);
+    stageArt.alt = '';
+  }
   if (company) company.textContent = state.company.name;
   if (stage) stage.textContent = stageLabel(state.stage);
   if (cash) cash.textContent = formatMoney(state.finance.cash);
@@ -135,7 +142,10 @@ export function renderDeskPanel(state) {
   const monthRev = state.calendar.monthRevenue ?? 0;
   const monthSpend = state.calendar.monthSpend ?? 0;
 
+  const tutorial = renderTutorialBanner(activeTutorialStep(state));
+
   desk.innerHTML = `
+    ${tutorial}
     <p class="panel-lede">Complete all counted tasks, then close the month. Staff/finance changes do not use task slots.</p>
     <div class="summary-grid">
       <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slots}</span></div>
@@ -178,12 +188,31 @@ export function bindTabNavigation() {
     if (!btn) return;
     const tab = btn.dataset.tab;
     nav.querySelectorAll('[data-tab]').forEach((b) => {
-      b.classList.toggle('active', b.dataset.tab === tab);
-      b.setAttribute('aria-selected', b.dataset.tab === tab ? 'true' : 'false');
+      const active = b.dataset.tab === tab;
+      b.classList.toggle('active', active);
+      b.setAttribute('aria-selected', active ? 'true' : 'false');
+      b.tabIndex = active ? 0 : -1;
     });
     document.querySelectorAll('[data-panel]').forEach((panel) => {
-      panel.hidden = panel.dataset.panel !== tab;
+      const active = panel.dataset.panel === tab;
+      panel.hidden = !active;
+      panel.tabIndex = active ? 0 : -1;
     });
+  });
+
+  nav.addEventListener('keydown', (e) => {
+    const tabs = [...nav.querySelectorAll('[data-tab]')];
+    const current = tabs.findIndex((b) => b.getAttribute('aria-selected') === 'true');
+    if (current < 0) return;
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      tabs[(current + 1) % tabs.length].click();
+      tabs[(current + 1) % tabs.length].focus();
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      tabs[(current - 1 + tabs.length) % tabs.length].click();
+      tabs[(current - 1 + tabs.length) % tabs.length].focus();
+    }
   });
 }
 
