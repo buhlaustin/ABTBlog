@@ -11,6 +11,7 @@ mkdirSync(publicPlay, { recursive: true });
 const projects = [
   { slug: "hos", dir: "hos" },
   { slug: "eer", dir: "eer" },
+  { slug: "startup-sim", dir: "startup-sim" },
 ];
 
 for (const { slug, dir } of projects) {

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>Startup Simulator</title>
+  <link rel="stylesheet" href="/play/startup-sim/style.css">
+</head>
+<body>
+  <div id="app">
+    <section id="screen-start" class="screen screen-start">
+      <header class="hero">
+        <p class="eyebrow">Work in progress</p>
+        <h1>Startup Simulator</h1>
+        <p class="lede">
+          Build from a garage to IPO. Career mode starts lean; Sandbox gives you more runway with the same revenue milestones.
+          AI news, social feeds, and a chief-of-staff advisor arrive in later phases.
+        </p>
+      </header>
+      <div class="start-actions">
+        <button id="btn-new" class="btn btn-primary" type="button">New game</button>
+        <button id="btn-load" class="btn btn-ghost" type="button" disabled title="Coming in Phase 1">Load save</button>
+      </div>
+      <p class="fine-print">Planning doc lives in-repo only — implementation tracked on GitHub.</p>
+    </section>
+
+    <section id="screen-setup" class="screen" hidden>
+      <header class="panel-head">
+        <button id="btn-setup-back" class="btn btn-ghost btn-small" type="button">← Back</button>
+        <h2>Found your company</h2>
+      </header>
+      <form id="setup-form" class="setup-form">
+        <label for="company-name">Company name</label>
+        <input id="company-name" name="companyName" type="text" maxlength="48" required placeholder="Acme Labs">
+
+        <label for="startup-category">Startup type</label>
+        <select id="startup-category" name="category" required>
+          <option value="">Choose a category…</option>
+        </select>
+
+        <fieldset class="mode-fieldset">
+          <legend>Game mode</legend>
+          <label class="radio-row">
+            <input type="radio" name="mode" value="career" checked>
+            <span><strong>Career</strong> — $120k starting cash, standard difficulty</span>
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="mode" value="sandbox">
+            <span><strong>Sandbox</strong> — extra starting cash, softer penalties</span>
+          </label>
+        </fieldset>
+
+        <div id="sandbox-cash-wrap" class="sandbox-cash" hidden>
+          <label for="sandbox-cash">Sandbox starting cash</label>
+          <select id="sandbox-cash" name="sandboxCash">
+            <option value="500000">$500,000</option>
+            <option value="1000000">$1,000,000</option>
+            <option value="10000000">$10,000,000</option>
+            <option value="100000000">$100,000,000</option>
+            <option value="1000000000">$1,000,000,000</option>
+          </select>
+        </div>
+
+        <button id="btn-start-game" class="btn btn-primary" type="submit">Enter the garage</button>
+      </form>
+    </section>
+
+    <section id="screen-garage" class="screen" hidden>
+      <header class="hud">
+        <div>
+          <p class="hud-eyebrow" id="hud-stage">Garage</p>
+          <h2 id="hud-company">Company</h2>
+        </div>
+        <div class="hud-stats">
+          <div><span class="stat-label">Cash</span><span id="hud-cash" class="stat-value">—</span></div>
+          <div><span class="stat-label">Revenue (life)</span><span id="hud-revenue" class="stat-value">—</span></div>
+          <div><span class="stat-label">Month</span><span id="hud-month" class="stat-value">—</span></div>
+        </div>
+      </header>
+      <div class="wip-banner">
+        <p>Phase 0 shell — month loop, tasks, and AI tabs land in Phase 1+.</p>
+        <button id="btn-back-start" class="btn btn-ghost btn-small" type="button">Back to menu</button>
+      </div>
+    </section>
+  </div>
+  <script type="module" src="/play/startup-sim/game.js"></script>
+</body>
+</html>
