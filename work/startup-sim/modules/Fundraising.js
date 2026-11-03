@@ -1,17 +1,16 @@
-import { applyXCSafe, applySeedRound, seedRoundPreview, renderCapTableRows } from './CapTable.js';
+import { applySeedRound, seedRoundPreview, renderCapTableRows } from './CapTable.js';
 import { renderFinanceSummary } from './Finance.js';
 import { formatMoney } from './GameState.js';
-
-export function canApplyXC(state) {
-  return Boolean(state.flags?.xcUnlocked && !state.flags?.xcAccepted);
-}
+import { canStartInterview, isInResidency } from './XC.js';
+import { renderOfficesPanel } from './Offices.js';
 
 export function canCloseSeed(state) {
-  return Boolean(state.flags?.xcAccepted && !state.flags?.seedRoundClosed);
-}
-
-export function acceptXC(state) {
-  return applyXCSafe(state);
+  return Boolean(
+    state.flags?.xcAccepted &&
+      state.flags?.xcResidencyComplete &&
+      state.offices?.hubId &&
+      !state.flags?.seedRoundClosed
+  );
 }
 
 export function closeSeedRound(state) {
@@ -37,14 +36,19 @@ export function renderFinancePanel(container, state) {
     )
     .join('');
 
-  const xcBlock = canApplyXC(state)
-    ? `<div class="finance-action">
-        <p><strong>X Combinator</strong> is open ($500k SAFE, ~6% on conversion).</p>
-        <button type="button" class="btn btn-primary btn-small" id="btn-accept-xc">Accept XC offer</button>
-      </div>`
-    : state.flags?.xcAccepted
-      ? `<p class="fine-print">X Combinator SAFE closed — ${formatMoney(500_000)} added to cash.</p>`
-      : `<p class="fine-print">Reach ${formatMoney(500_000)} lifetime revenue to unlock XC.</p>`;
+  let xcBlock = '';
+  if (canStartInterview(state)) {
+    xcBlock = `<div class="finance-action">
+        <p><strong>X Combinator</strong> — apply with a short interview ($500k SAFE, ~6%).</p>
+        <button type="button" class="btn btn-primary btn-small" id="btn-xc-apply">Apply to XC</button>
+      </div>`;
+  } else if (isInResidency(state)) {
+    xcBlock = `<p class="fine-print">In SF batch — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) remaining before hub selection.</p>`;
+  } else if (state.flags?.xcAccepted) {
+    xcBlock = `<p class="fine-print">XC SAFE closed — ${formatMoney(500_000)} on the balance sheet.</p>`;
+  } else {
+    xcBlock = `<p class="fine-print">Reach ${formatMoney(500_000)} lifetime revenue to unlock XC.</p>`;
+  }
 
   const seedBlock = canCloseSeed(state) && preview
     ? `<div class="finance-action">
@@ -54,7 +58,9 @@ export function renderFinancePanel(container, state) {
       </div>`
     : state.flags?.seedRoundClosed
       ? `<p class="fine-print">Seed round closed${state.finance.lastRound ? ` — ${formatMoney(state.finance.lastRound.raised)} at ${formatMoney(state.finance.lastRound.postMoney)} post.` : '.'}</p>`
-      : '';
+      : state.flags?.xcAccepted
+        ? `<p class="fine-print">Complete XC batch + hub selection to close seed.</p>`
+        : '';
 
   container.innerHTML = `
     <p class="panel-lede">Task cash flow is immediate; payroll + fixed costs hit on month close. Fundraising does not use task slots.</p>
@@ -64,9 +70,11 @@ export function renderFinancePanel(container, state) {
       <div><span class="stat-label">Overhead/mo</span><span class="stat-value">${sum.burnLabel}</span></div>
       <div><span class="stat-label">Runway</span><span class="stat-value">${sum.runway}</span></div>
       <div><span class="stat-label">Valuation</span><span class="stat-value">${state.finance.valuation ? formatMoney(state.finance.valuation) : '—'}</span></div>
+      <div><span class="stat-label">Location</span><span class="stat-value">${escapeHtml(state.company.location || '—')}</span></div>
     </div>
     ${xcBlock}
     ${seedBlock}
+    <div id="offices-panel-mount"></div>
     <h3 class="log-head">Cap table</h3>
     <table class="data-table">
       <thead><tr><th>Holder</th><th>Shares</th><th>%</th><th>Class</th></tr></thead>
@@ -79,6 +87,8 @@ export function renderFinancePanel(container, state) {
     }
     <p id="finance-feedback" class="desk-feedback" hidden></p>
   `;
+
+  renderOfficesPanel(document.getElementById('offices-panel-mount'), state);
 }
 
 export function showFinanceFeedback(message, isError = false) {

@@ -1,14 +1,24 @@
 import { formatMoney, MODE_CONFIG, fixedCostsForStage } from './GameState.js';
 import { computePayroll, staffRevenueMultiplier } from './Staff.js';
+import { satelliteRent } from './Offices.js';
+
+export function hubRevenueMult(state) {
+  return state?.offices?.modifiers?.revenueMult ?? 1;
+}
+
+export function hubCostMult(state) {
+  return state?.offices?.modifiers?.costMult ?? 1;
+}
 
 export function projectMonthlyBurn(state) {
   const headcount = state.staff?.headcountByDept ?? {};
-  const payroll = computePayroll(headcount, state.stage);
-  const fixed =
+  const payroll = computePayroll(headcount, state.stage, state);
+  let fixed =
     typeof state.finance?.fixedCostsMonthly === 'number'
       ? state.finance.fixedCostsMonthly
       : fixedCostsForStage(state.stage);
-  return payroll + fixed;
+  fixed = Math.round(fixed * hubCostMult(state));
+  return payroll + fixed + satelliteRent(state);
 }
 
 function sandboxMult(state) {
@@ -19,8 +29,8 @@ function sandboxMult(state) {
 export function applyTaskOutcome(state, taskDef, rolled) {
   const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
   const sand = sandboxMult(state);
-  const cost = Math.round((taskDef.cost ?? 0) * econ.costMult * sand);
-  const revenue = Math.round(rolled.revenue * econ.revenueMult * (2 - sand));
+  const cost = Math.round((taskDef.cost ?? 0) * econ.costMult * sand * hubCostMult(state));
+  const revenue = Math.round(rolled.revenue * econ.revenueMult * (2 - sand) * hubRevenueMult(state));
 
   state.finance.cash -= cost;
   state.finance.cash += revenue;

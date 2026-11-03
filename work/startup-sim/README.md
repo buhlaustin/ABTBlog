@@ -13,6 +13,6 @@ Open `http://localhost:8080/play/startup-sim/index.html` (after copy) or serve t
 
 ## Status
 
-**Phase 2 complete:** editable department headcount + finalize staffing, cap table, XC SAFE, seed round, staff revenue boost.
+**Phase 3 complete:** XC interview, 3-month batch, hub HQ + satellites, gated seed close.
 
-**Phase 3 next:** XC residency arc, hub cities, satellite offices.
+**Phase 4 next:** AI news, social, advisor (Lambda kinds).

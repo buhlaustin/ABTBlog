@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "questions": [
+    {
+      "id": "problem",
+      "prompt": "What problem are you solving, and why now?",
+      "hint": "One paragraph — be concrete."
+    },
+    {
+      "id": "traction",
+      "prompt": "What traction do you have so far?",
+      "hint": "Revenue, users, pilots — honest numbers help."
+    },
+    {
+      "id": "why-xc",
+      "prompt": "Why X Combinator, and what will you achieve in the batch?",
+      "hint": "What you will ship in 3 months."
+    }
+  ]
+}

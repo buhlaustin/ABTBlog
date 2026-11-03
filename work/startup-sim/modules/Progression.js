@@ -2,18 +2,34 @@ import { REVENUE_GATES, STAGES } from './GameState.js';
 import { fixedCostsForStage } from './GameState.js';
 
 /** Apply stage upgrades from revenue gates. */
+const STAGE_RANK = {
+  [STAGES.GARAGE]: 0,
+  [STAGES.OFFICE]: 1,
+  [STAGES.XC]: 2,
+  [STAGES.POST_XC]: 3,
+  [STAGES.PUBLIC]: 4
+};
+
 export function syncStageFromProgress(state) {
   const r = state.finance?.lifetimeRevenue ?? 0;
   let stage = state.stage;
+  const rank = STAGE_RANK[stage] ?? 0;
 
-  if (stage === STAGES.GARAGE && r >= REVENUE_GATES.OFFICE) {
+  if (rank <= STAGE_RANK[STAGES.GARAGE] && r >= REVENUE_GATES.OFFICE) {
     stage = STAGES.OFFICE;
   }
-  if ((stage === STAGES.GARAGE || stage === STAGES.OFFICE) && r >= REVENUE_GATES.XC) {
+  if (r >= REVENUE_GATES.XC) {
     state.flags.xcUnlocked = true;
   }
   if (r >= REVENUE_GATES.IPO) {
     state.flags.ipoUnlocked = true;
+  }
+
+  if ((STAGE_RANK[stage] ?? 0) < STAGE_RANK[STAGES.XC] && state.flags?.xcAccepted) {
+    stage = STAGES.XC;
+  }
+  if (state.offices?.hubId && (STAGE_RANK[stage] ?? 0) < STAGE_RANK[STAGES.POST_XC]) {
+    stage = STAGES.POST_XC;
   }
 
   state.stage = stage;
@@ -28,7 +44,7 @@ export function onStageChange(state, fromStage, toStage) {
     lines.push('Unlocked small office — higher fixed costs, more task slots next month.');
   }
   if (state.flags.xcUnlocked && !state.flags.xcUnlockedLogged) {
-    lines.push('X Combinator unlocked — accept the SAFE on the Finance tab.');
+    lines.push('X Combinator unlocked — apply on the Finance tab.');
     state.flags.xcUnlockedLogged = true;
   }
   return lines;

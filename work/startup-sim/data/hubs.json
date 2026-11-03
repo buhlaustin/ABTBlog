@@ -1,0 +1,50 @@
+{
+  "hubs": [
+    {
+      "id": "bay",
+      "label": "Bay Area",
+      "costMult": 1.15,
+      "revenueMult": 1.12,
+      "salaryMult": 1.12,
+      "fixedBase": 8500
+    },
+    {
+      "id": "nyc",
+      "label": "New York City",
+      "costMult": 1.1,
+      "revenueMult": 1.08,
+      "salaryMult": 1.08,
+      "fixedBase": 8000
+    },
+    {
+      "id": "miami",
+      "label": "Miami",
+      "costMult": 0.95,
+      "revenueMult": 1.02,
+      "salaryMult": 0.95,
+      "fixedBase": 5500
+    },
+    {
+      "id": "dallas",
+      "label": "Dallas",
+      "costMult": 0.88,
+      "revenueMult": 0.98,
+      "salaryMult": 0.9,
+      "fixedBase": 4800
+    },
+    {
+      "id": "atlanta",
+      "label": "Atlanta",
+      "costMult": 0.9,
+      "revenueMult": 1.0,
+      "salaryMult": 0.92,
+      "fixedBase": 5000
+    }
+  ],
+  "satelliteTemplates": [
+    { "id": "sat-denver", "label": "Denver satellite", "seats": 6, "rentMonthly": 9000 },
+    { "id": "sat-austin", "label": "Austin satellite", "seats": 8, "rentMonthly": 11000 },
+    { "id": "sat-chicago", "label": "Chicago satellite", "seats": 10, "rentMonthly": 14000 },
+    { "id": "sat-seattle", "label": "Seattle satellite", "seats": 8, "rentMonthly": 13000 }
+  ]
+}

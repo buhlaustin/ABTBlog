@@ -12,6 +12,7 @@ const screens = {
   start: () => document.getElementById('screen-start'),
   setup: () => document.getElementById('screen-setup'),
   game: () => document.getElementById('screen-game'),
+  xcInterview: () => document.getElementById('screen-xc-interview'),
   gameover: () => document.getElementById('screen-gameover')
 };
 

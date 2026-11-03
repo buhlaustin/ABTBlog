@@ -13,8 +13,14 @@ import {
   finalizeStaffing,
   showPeopleFeedback
 } from './modules/Staff.js';
-import { acceptXC, closeSeedRound, showFinanceFeedback } from './modules/Fundraising.js';
+import { closeSeedRound, showFinanceFeedback } from './modules/Fundraising.js';
 import { recordLayoffEvent } from './modules/News.js';
+import {
+  renderInterviewForm,
+  scoreInterview,
+  completeXcAcceptance
+} from './modules/XC.js';
+import { loadHubData, selectHub, addSatellite, removeSatellite, showOfficesFeedback } from './modules/Offices.js';
 import {
   bindSandboxCashToggle,
   bindTabNavigation,
@@ -44,6 +50,54 @@ function enterGame(state) {
   if (!sessionState.flags?.gameOver) {
     showScreen('game');
   }
+}
+
+async function openXcInterview() {
+  if (!sessionState) return;
+  const mount = document.getElementById('xc-interview-mount');
+  await renderInterviewForm(mount);
+  showScreen('xcInterview');
+}
+
+async function submitXcInterview(e) {
+  e.preventDefault();
+  if (!sessionState) return;
+  const form = e.target;
+  const fd = new FormData(form);
+  const answers = {};
+  for (const [key, val] of fd.entries()) {
+    answers[key] = val;
+  }
+
+  const feedback = document.getElementById('xc-interview-feedback');
+  if (feedback) {
+    feedback.textContent = 'Scoring application…';
+    feedback.hidden = false;
+  }
+
+  const score = await scoreInterview(sessionState, answers);
+  if (!score.accepted) {
+    if (feedback) {
+      feedback.textContent = score.feedback;
+      feedback.classList.add('error');
+    }
+    return;
+  }
+
+  const result = completeXcAcceptance(sessionState);
+  if (!result.ok) {
+    if (feedback) {
+      feedback.textContent = result.reason || 'Could not accept.';
+      feedback.classList.add('error');
+    }
+    return;
+  }
+
+  appendLog(sessionState, `XC accepted (score ${score.score}) — $500k SAFE, 3-month SF batch starts.`);
+  syncStageFromProgress(sessionState);
+  showScreen('game');
+  showFinanceFeedback(score.feedback);
+  refresh();
 }
 
 function handleCompleteTask(instanceId) {
@@ -111,19 +165,6 @@ function handleFinalizeStaff() {
   refresh();
 }
 
-function handleAcceptXC() {
-  if (!sessionState) return;
-  const result = acceptXC(sessionState);
-  if (!result.ok) {
-    showFinanceFeedback(result.reason || 'XC not available.', true);
-    refresh();
-    return;
-  }
-  appendLog(sessionState, 'Accepted X Combinator — $500k SAFE, ~6% on conversion.');
-  showFinanceFeedback('XC accepted — cash updated, cap table diluted.');
-  refresh();
-}
-
 function handleCloseSeed() {
   if (!sessionState) return;
   const result = closeSeedRound(sessionState);
@@ -137,6 +178,40 @@ function handleCloseSeed() {
     `Closed seed round — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post-money.`
   );
   showFinanceFeedback('Seed round closed.');
+  refresh();
+}
+
+function handleSelectHub() {
+  if (!sessionState) return;
+  const select = document.getElementById('hub-select');
+  const hubId = select?.value;
+  if (!hubId) {
+    showOfficesFeedback('Pick a hub city.', true);
+    return;
+  }
+  const result = selectHub(sessionState, hubId);
+  if (!result.ok) {
+    showOfficesFeedback(result.reason, true);
+    refresh();
+    return;
+  }
+  appendLog(sessionState, `HQ set in ${result.hub.label} — seed fundraising unlocked.`);
+  syncStageFromProgress(sessionState);
+  showOfficesFeedback(`Hub: ${result.hub.label}`);
+  refresh();
+}
+
+function handleAddSatellite() {
+  if (!sessionState) return;
+  const select = document.getElementById('satellite-template');
+  const result = addSatellite(sessionState, select?.value);
+  if (!result.ok) {
+    showOfficesFeedback(result.reason, true);
+    refresh();
+    return;
+  }
+  appendLog(sessionState, `Opened ${result.entry.label} (+${result.entry.seats} seats).`);
+  showOfficesFeedback('Satellite added.');
   refresh();
 }
 
@@ -161,16 +236,39 @@ function bindGameInteractions() {
       return;
     }
 
+    const removeSat = e.target.closest('[data-remove-satellite]');
+    if (removeSat) {
+      if (!sessionState) return;
+      const id = removeSat.getAttribute('data-remove-satellite');
+      const result = removeSatellite(sessionState, id);
+      if (!result.ok) showOfficesFeedback(result.reason, true);
+      else showOfficesFeedback('Satellite removed.');
+      refresh();
+      return;
+    }
+
     if (e.target.id === 'btn-finalize-staff') {
       handleFinalizeStaff();
       return;
     }
-    if (e.target.id === 'btn-accept-xc') {
-      handleAcceptXC();
+    if (e.target.id === 'btn-xc-apply') {
+      openXcInterview();
+      return;
+    }
+    if (e.target.id === 'btn-xc-interview-cancel') {
+      showScreen('game');
       return;
     }
     if (e.target.id === 'btn-close-seed') {
       handleCloseSeed();
+      return;
+    }
+    if (e.target.id === 'btn-select-hub') {
+      handleSelectHub();
+      return;
+    }
+    if (e.target.id === 'btn-add-satellite') {
+      handleAddSatellite();
       return;
     }
     if (e.target.id === 'btn-end-month') {
@@ -187,6 +285,12 @@ function bindGameInteractions() {
     refresh();
   });
 
+  app?.addEventListener('submit', (e) => {
+    if (e.target.id === 'xc-interview-form') {
+      submitXcInterview(e);
+    }
+  });
+
   document.getElementById('btn-gameover-menu')?.addEventListener('click', () => {
     sessionState = null;
     setLoadButtonEnabled(StorageManager.hasSave());
@@ -195,7 +299,12 @@ function bindGameInteractions() {
 }
 
 async function init() {
-  await Promise.all([loadCategories(), loadTaskCatalog(), initNarrativeApiUrl()]);
+  await Promise.all([
+    loadCategories(),
+    loadTaskCatalog(),
+    loadHubData(),
+    initNarrativeApiUrl()
+  ]);
 
   const categories = await loadCategories();
   const categorySelect = document.getElementById('startup-category');
@@ -212,8 +321,8 @@ async function init() {
   if (apiStatus) {
     apiStatus.hidden = false;
     apiStatus.textContent = isNarrativeApiEnabled()
-      ? 'AI narrative endpoint ready (Phase 4).'
-      : 'AI narrative offline — core sim works without it.';
+      ? 'AI narrative endpoint ready (XC interview + Phase 4).'
+      : 'AI offline — XC uses lenient local scoring.';
   }
 
   document.getElementById('btn-new')?.addEventListener('click', () => {

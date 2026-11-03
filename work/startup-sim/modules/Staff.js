@@ -1,4 +1,5 @@
 import { STAGES, formatMoney, fixedCostsForStage } from './GameState.js';
+import { totalHeadcountCap } from './Offices.js';
 
 export const DEPARTMENTS = [
   { id: 'engineering', label: 'Engineering' },
@@ -38,24 +39,27 @@ export function syncDraftFromFinalized(state) {
   state.staff.draftHeadcountByDept = { ...finalized };
 }
 
-export function maxHeadcountForStage(stage) {
+export function maxHeadcountForStage(stage, state = null) {
+  if (state) return totalHeadcountCap(state);
   if (stage === STAGES.GARAGE) return 2;
   if (stage === STAGES.OFFICE) return 12;
   if (stage === STAGES.XC || stage === STAGES.POST_XC) return 24;
   return 48;
 }
 
-export function salaryForDept(deptId, stage) {
+export function salaryForDept(deptId, stage, state = null) {
   const base = DEFAULT_SALARY[deptId] ?? 6000;
-  if (stage === STAGES.GARAGE) return Math.round(base * 0.85);
-  return base;
+  let salary = stage === STAGES.GARAGE ? Math.round(base * 0.85) : base;
+  const salMult = state?.offices?.modifiers?.salaryMult ?? 1;
+  if (state?.offices?.hubId) salary = Math.round(salary * salMult);
+  return salary;
 }
 
-export function computePayroll(headcount, stage) {
+export function computePayroll(headcount, stage, state = null) {
   let total = 0;
   for (const dept of DEPARTMENTS) {
     const n = headcount[dept.id] ?? 0;
-    total += n * salaryForDept(dept.id, stage);
+    total += n * salaryForDept(dept.id, stage, state);
   }
   return total;
 }
@@ -73,7 +77,7 @@ export function adjustDraftHeadcount(state, deptId, delta) {
   const draft = state.staff.draftHeadcountByDept;
   const current = draft[deptId] ?? 0;
   const next = Math.max(0, current + delta);
-  const max = maxHeadcountForStage(state.stage);
+  const max = maxHeadcountForStage(state.stage, state);
 
   const otherTotal = totalHeadcount(draft) - current;
   if (otherTotal + next > max) {
@@ -87,7 +91,7 @@ export function adjustDraftHeadcount(state, deptId, delta) {
 export function setDraftHeadcount(state, deptId, value) {
   const n = Math.max(0, Math.floor(Number(value) || 0));
   const draft = { ...state.staff.draftHeadcountByDept, [deptId]: 0 };
-  const max = maxHeadcountForStage(state.stage);
+  const max = maxHeadcountForStage(state.stage, state);
   const otherTotal = totalHeadcount(draft) - (draft[deptId] ?? 0);
   if (otherTotal + n > max) {
     return { ok: false, reason: `Headcount cap for this stage is ${max}.` };
@@ -105,7 +109,7 @@ export function staffRevenueMultiplier(state) {
 
 export function projectStaffEconomics(state) {
   const draft = state.staff?.draftHeadcountByDept ?? emptyHeadcount();
-  const payroll = computePayroll(draft, state.stage);
+  const payroll = computePayroll(draft, state.stage, state);
   const fixed =
     typeof state.finance?.fixedCostsMonthly === 'number'
       ? state.finance.fixedCostsMonthly
@@ -122,14 +126,14 @@ export function projectStaffEconomics(state) {
 export function finalizeStaffing(state) {
   const prior = { ...state.staff.headcountByDept };
   const draft = state.staff.draftHeadcountByDept ?? emptyHeadcount();
-  const max = maxHeadcountForStage(state.stage);
+  const max = maxHeadcountForStage(state.stage, state);
   const total = totalHeadcount(draft);
   if (total > max) {
     return { ok: false, reason: `Headcount cap is ${max}.` };
   }
 
   state.staff.headcountByDept = { ...draft };
-  state.staff.payrollMonthly = computePayroll(state.staff.headcountByDept, state.stage);
+  state.staff.payrollMonthly = computePayroll(state.staff.headcountByDept, state.stage, state);
   state.staff.lastFinalizedMonth = state.calendar.monthIndex;
   state.staff.lastFinalizedYear = state.calendar.year;
 
@@ -156,7 +160,7 @@ function escapeHtml(s) {
 export function renderPeoplePanel(container, state) {
   if (!container) return;
   const econ = projectStaffEconomics(state);
-  const maxHc = maxHeadcountForStage(state.stage);
+  const maxHc = maxHeadcountForStage(state.stage, state);
   const totalDraft = totalHeadcount(state.staff.draftHeadcountByDept);
   const totalFinal = totalHeadcount(state.staff.headcountByDept);
   const finalizedLabel =
@@ -167,7 +171,7 @@ export function renderPeoplePanel(container, state) {
   const rows = visibleDepartments(state.stage)
     .map((dept) => {
       const n = state.staff.draftHeadcountByDept[dept.id] ?? 0;
-      const sub = n * salaryForDept(dept.id, state.stage);
+      const sub = n * salaryForDept(dept.id, state.stage, state);
       return `<tr>
         <td>${escapeHtml(dept.label)}</td>
         <td class="num headcount-cell">
@@ -175,7 +179,7 @@ export function renderPeoplePanel(container, state) {
           <input type="number" min="0" class="headcount-input" data-staff-input="${dept.id}" value="${n}">
           <button type="button" class="btn-step" data-staff-delta="${dept.id}" data-delta="1" aria-label="Increase">+</button>
         </td>
-        <td class="num">${formatMoney(salaryForDept(dept.id, state.stage))}</td>
+        <td class="num">${formatMoney(salaryForDept(dept.id, state.stage, state))}</td>
         <td class="num">${formatMoney(sub)}</td>
       </tr>`;
     })

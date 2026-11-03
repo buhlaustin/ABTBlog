@@ -34,7 +34,17 @@ function stageAllowed(task, stage) {
   if (stage === STAGES.GARAGE || stage === STAGES.OFFICE) {
     return stages.includes(stage);
   }
-  return stages.includes('office') || stages.includes(stage);
+  if (stage === STAGES.XC) {
+    return stages.includes('xc') || stages.includes('office');
+  }
+  if (stage === STAGES.POST_XC || stage === STAGES.PUBLIC) {
+    return (
+      stages.includes('post_xc') ||
+      stages.includes('office') ||
+      stages.includes('xc')
+    );
+  }
+  return stages.includes(stage);
 }
 
 /** Deal counted tasks for the current month. */

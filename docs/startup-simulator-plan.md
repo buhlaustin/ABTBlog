@@ -367,9 +367,10 @@ work/startup-sim/
 
 ### Phase 3 — Progression & cities
 
-- XC 3-month arc; **scripted questions** + Lambda **`startup_xc_interview_score`** when API available
-- Hub selection + satellite offices
-- Task count scaling by stage
+- [x] XC apply flow: scripted interview (`data/xc-interview.json`) + Lambda **`startup_xc_interview_score`** (lenient offline fallback)
+- [x] 3-month SF residency counter; hub pick (Bay, NYC, Miami, Dallas, Atlanta) with econ modifiers
+- [x] Satellite offices (free-buy seats + rent); seed requires batch + hub
+- [x] XC / post-XC task deck + stage task slots (6 / 7)
 
 ### Phase 4 — AI layer
 

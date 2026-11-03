@@ -63,6 +63,12 @@ export function applySeedRound(state) {
   if (!state.flags?.xcAccepted) {
     return { ok: false, reason: 'Complete X Combinator acceptance first.' };
   }
+  if (!state.flags?.xcResidencyComplete) {
+    return { ok: false, reason: 'Finish the 3-month XC batch first.' };
+  }
+  if (!state.offices?.hubId) {
+    return { ok: false, reason: 'Choose a permanent hub office first.' };
+  }
   if (state.flags?.seedRoundClosed) {
     return { ok: false, reason: 'Seed round already closed.' };
   }
@@ -106,7 +112,14 @@ export function applySeedRound(state) {
 }
 
 export function seedRoundPreview(state) {
-  if (!state.flags?.xcAccepted || state.flags?.seedRoundClosed) return null;
+  if (
+    !state.flags?.xcAccepted ||
+    !state.flags?.xcResidencyComplete ||
+    !state.offices?.hubId ||
+    state.flags?.seedRoundClosed
+  ) {
+    return null;
+  }
   const founder = getFounderRow(state);
   const founderPct = founder?.pct ?? 100;
   return {

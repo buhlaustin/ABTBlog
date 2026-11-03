@@ -96,6 +96,13 @@ Context: ${ctx}`;
 No markdown. Context: ${ctx}`;
   }
 
+  if (kind === 'startup_xc_interview_score') {
+    return `You are a fictional X Combinator partner in the game "Startup Simulator". Score the founder's batch application.
+Return ONLY valid JSON (no markdown): {"accepted":true|false,"score":0-100,"feedback":"one short encouraging sentence"}
+Rules: Be LENIENT — this is a game, not real YC. Accept if answers show any real effort (≥2 substantive answers). Reject only if answers are empty or nonsense. score 65-95 on accept, 40-55 on reject.
+Context: ${ctx}`;
+  }
+
   const base = `You are the unseen narrator of "House of Strategy", a Big Brother-style social strategy game.
 Write ONE short feed line (1-3 sentences, under 280 characters). No markdown. No spoilers beyond the context.
 Do not invent evictions or wins that are not in context. Stay dramatic but plausible.`;
@@ -154,6 +161,7 @@ async function callOpenAI(apiKey, kind, context) {
   const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
   const prompt = buildPrompt(kind, context);
   const isEerInbox = kind === 'eer_daily_inbox';
+  const isStartupJson = kind === 'startup_xc_interview_score';
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -164,11 +172,11 @@ async function callOpenAI(apiKey, kind, context) {
     body: JSON.stringify({
       model,
       temperature: isEerInbox ? 0.9 : 0.85,
-      max_tokens: isEerInbox ? 2200 : 120,
+      max_tokens: isEerInbox ? 2200 : isStartupJson ? 200 : 120,
       messages: [
         {
           role: 'system',
-          content: isEerInbox
+          content: isEerInbox || isStartupJson
             ? 'You write sharp corporate satire as strict JSON only.'
             : kind.startsWith('eer_')
               ? 'You write sharp corporate satire.'
@@ -190,7 +198,23 @@ async function callOpenAI(apiKey, kind, context) {
   if (kind === 'eer_daily_inbox') {
     return parseEerInbox(text);
   }
+  if (kind === 'startup_xc_interview_score') {
+    return parseStartupXcScore(text);
+  }
   return text.replace(/^["']|["']$/g, '');
+}
+
+function parseStartupXcScore(text) {
+  const trimmed = text.trim();
+  const start = trimmed.indexOf('{');
+  const end = trimmed.lastIndexOf('}');
+  if (start < 0 || end <= start) throw new Error('No JSON in XC score response');
+  const parsed = JSON.parse(trimmed.slice(start, end + 1));
+  return {
+    accepted: Boolean(parsed.accepted),
+    score: Math.max(0, Math.min(100, Math.round(Number(parsed.score) || 70))),
+    feedback: String(parsed.feedback || 'Thanks for applying.').slice(0, 280)
+  };
 }
 
 export async function handler(event) {
@@ -230,6 +254,9 @@ export async function handler(event) {
     const result = await callOpenAI(apiKey, kind, context);
     if (kind === 'eer_daily_inbox') {
       return json(200, { emails: result, type: 'eer_inbox' }, event);
+    }
+    if (kind === 'startup_xc_interview_score') {
+      return json(200, { ...result, type: 'startup_xc_score' }, event);
     }
     return json(200, { text: result, type: 'narrative' }, event);
   } catch (err) {

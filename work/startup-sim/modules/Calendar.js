@@ -3,6 +3,7 @@ import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { syncStageFromProgress, onStageChange } from './Progression.js';
 import { syncDraftFromFinalized } from './Staff.js';
+import { tickXcResidency } from './XC.js';
 
 /** Counted task slots per month (staff/finance actions excluded). */
 export function getMonthlyTaskSlots(stage) {
@@ -80,6 +81,10 @@ export function endMonth(state) {
     for (const line of onStageChange(state, priorStage, state.stage)) {
       appendLog(state, line);
     }
+  }
+
+  for (const line of tickXcResidency(state)) {
+    appendLog(state, line);
   }
 
   if (state.finance.cash < 0) {

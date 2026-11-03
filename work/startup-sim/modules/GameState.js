@@ -4,8 +4,10 @@ import { createInitialSocial } from './Social.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { recalculateCapTablePercentages } from './CapTable.js';
+import { createInitialOffices } from './Offices.js';
+import { createInitialXcState } from './XC.js';
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 export const STAGES = {
   GARAGE: 'garage',
@@ -74,6 +76,8 @@ export function createInitialState(options) {
     product: { level: 0, buzz: 0, featureQueue: [] },
     social: createInitialSocial(),
     news: createInitialNews(),
+    offices: createInitialOffices(),
+    xc: createInitialXcState(),
     capTable: [
       {
         id: 'founder',
@@ -86,6 +90,7 @@ export function createInitialState(options) {
     flags: {
       xcUnlocked: false,
       xcAccepted: false,
+      xcResidencyComplete: false,
       seedRoundClosed: false,
       ipoUnlocked: false,
       xcUnlockedLogged: false,
@@ -128,6 +133,14 @@ export function normalizeSave(raw) {
   if (!state.flags) state.flags = {};
   if (state.flags.gameOver === undefined) state.flags.gameOver = false;
   if (state.flags.seedRoundClosed === undefined) state.flags.seedRoundClosed = false;
+  if (state.flags.xcResidencyComplete === undefined) {
+    state.flags.xcResidencyComplete = Boolean(state.flags.xcAccepted && !state.xc);
+  }
+  if (!state.offices) state.offices = createInitialOffices();
+  if (!state.xc) state.xc = createInitialXcState();
+  if (state.flags.xcAccepted && state.flags.xcResidencyComplete === false && !state.xc.residencyMonthsRemaining) {
+    state.flags.xcResidencyComplete = true;
+  }
   if (state.capTable?.length) {
     recalculateCapTablePercentages(state.capTable);
   }
