@@ -13,7 +13,7 @@
 
 ## Vision
 
-A single-player startup tycoon with a **12-month calendar loop**, **revenue-driven progression**, **fundraising & cap table**, **staff as spreadsheet inventory**, **AI-generated news & social feeds**, and a **context-aware chief-of-staff chatbot**. Tone: aspirational but grounded; satire optional in news/social, not in core finance math.
+A single-player startup tycoon with a **12-month calendar loop**, **revenue-driven progression**, **fundraising & cap table**, **department headcount planning** (not a deep HR directory), **AI-generated news & social feeds**, and a **context-aware chief-of-staff chatbot**. Tone: aspirational but grounded; satire optional in news/social, not in core finance math.
 
 **Win condition:** Reach **$1B cumulative revenue** to unlock IPO; optionally continue post-IPO to grow stock price or **cash out** (CEO steps down, final payout = shares × price).
 
@@ -52,7 +52,7 @@ flowchart TD
 
 - Visual: small garage (CC0 / Commons art — see Assets)
 - **Monthly action budget:** 4 counted tasks (see Calendar)
-- **Staff:** Solo founder; after revenue/hiring unlock, max **2 remote** employees until office stage
+- **Staff:** Solo founder; after unlock, department headcount capped at **2 total** (any mix of remote roles) until office stage
 - Activities: research product, develop MVP/features, marketing, sales/support tasks tuned to category (SaaS, marketplace, consumer app, etc.)
 
 ### Stage: Small office ($50k revenue)
@@ -65,8 +65,8 @@ flowchart TD
 
 - Fictional **X Combinator (XC)** — YC-like accelerator, not using YC trademarks in UI copy where avoidable
 - Relocate to SF for **3 in-game months** (calendar continues; tasks may be XC-themed)
-- **Application:** mix of deterministic checks + optional **AI interview** (later phase)
-- On acceptance: **+$500,000** funding (instrument: SAFE or convertible — cap table impact defined in Finance)
+- **Application:** **scripted interview questions** (fixed prompts in data); player types short answers; **AI scores** responses for accept/reject/waitlist — scoring is **lenient** (this is a game, not real YC). Fallback: pass if API offline.
+- On acceptance: **+$500,000** on a **SAFE** (see Finance for dilution)
 - Unlocks **fundraising flow** (term sheet, valuation, dilution)
 
 ### Stage: Post-XC hub + raise
@@ -78,7 +78,7 @@ flowchart TD
 ### Stage: IPO ($1B revenue)
 
 - IPO window opens; timing matters (market sentiment from news layer, metrics thresholds)
-- Post-IPO: tradable **stock price** simulation, secondary raises, founder stake value
+- Post-IPO: **stock price** simulation on **monthly ticks only** (no day-level sim anywhere in the game), secondary raises, founder stake value
 - **End game:** Cash out → AI news article + summary screen (shares × price, rank, equity retained)
 
 ---
@@ -112,7 +112,7 @@ Each category defines: `defaultACV`, `salesCycleWeeks`, `viralityCoeff`, `regula
 - Each month:
   1. Player receives **4–8 counted tasks** (capacity by stage; garage = 4)
   2. Player completes tasks (marketing campaign, product sprint, partnership, etc.)
-  3. **Staff/finance/admin** actions do **not** consume task slots (hiring, firing, budget sliders, cap table view)
+  3. **Staff/finance/admin** actions do **not** consume task slots (adjusting draft headcount, finalize staffing, cap table view, raises)
   4. End month → resolve: revenue, burn, payroll, random events, **AI news batch**, social feed tick, chief-of-staff digest optional
 - Years roll indefinitely until win/exit; difficulty and story beats can reference real-world **fictional timeline** (see News)
 
@@ -124,25 +124,42 @@ State fields (minimum):
 - `valuation`, `lastRound`, `instruments[]`
 - **Cap table:** `{ holderId, name, shares, class, dilutedPct }` — founder starts 100% on 10M authorized (numbers tunable)
 
-**Funding:**
+**Funding & dilution (locked defaults — industry-average, tuned for fun):**
 
-- XC grant: +$500k, defined dilution or SAFE cap (design choice: recommend **7% post-money on SAFE** or fixed **5–10%** on priced seed at raise finalize — tune in balancing)
-- **Raises after first close:** optional any time; bad timing hurts valuation / news sentiment
-- **Dilution:** each round issues new shares; show pro-forma cap table before confirm
+| Event | Cash in | Instrument | Founder dilution (typical) |
+|-------|---------|------------|----------------------------|
+| **XC acceptance** | +$500k | SAFE, **$8M cap**, **20% discount** | **~6%** when SAFE converts (game shows “~6% on conversion”) |
+| **First priced round** (post-XC) | Player-driven | **Seed** at **$12M pre** / **$15M post** on **$3M** raised | **~20%** new pool to investors |
+| **Series A** (optional later) | Player-driven | **$40M pre** / **$50M post** on **$10M** raised | **~20%** |
+| **Series B** (optional later) | Player-driven | **$120M pre** / **$150M post** on **$30M** raised | **~20%** |
+
+- **Option pool:** seed round adds **10%** ESOP (dilutes everyone pro-rata on cap table UI).
+- **Raises after first close:** optional any time; bad timing (low revenue growth, negative news) applies **10–25% valuation haircut** on the template above.
+- **Dilution:** each round issues new shares; **pro-forma cap table** before confirm; founder starts **10M shares / 100%**.
 
 **Revenue:**
 
-- Task outcomes + headcount + product level + marketing spend → monthly revenue delta
+- Task outcomes + **finalized** department headcount + product level + marketing spend → monthly revenue delta
 - Sandbox: multiply positive outcomes / reduce failure severity (config flags)
 
-### 3. Staff management (spreadsheet UX)
+### 3. Staff management (department headcount table)
 
-- Table columns: Name (generated or player-edited), Role, Department, Location (remote / hub / satellite), Salary, Start month, Productivity modifier
-- Add row / remove row; bulk adjust by department budget caps
-- **Garage:** max 2 remote until office stage
-- Layoffs: instant burn reduction; may trigger **negative AI news** if size > threshold
+**Not** an in-depth staff directory — no per-person roster, names, or HR profiles.
 
-Departments (budget roll-ups): Engineering, Product, Sales, Marketing, G&A, Support.
+**UX:**
+
+- Single table: one row per **department** with columns such as **Department**, **Headcount** (stepper or numeric input), **$/head/mo** (read-only avg from stage + hub), **Subtotal/mo**.
+- Departments: **Engineering**, **Product**, **Sales**, **Marketing**, **Finance/G&A**, **Support** (Support unlocks after office stage).
+- Player adjusts counts in a **draft** state; a live summary panel shows:
+  - **Total payroll/mo** (sum of subtotals)
+  - **Projected burn** (payroll + fixed office/infra costs)
+  - **Projected surplus/deficit** vs expected revenue (use last month revenue or simple forecast — label clearly)
+- **Finalize staffing** commits draft → `staff.headcountByDept` for the month; until finalized, month-end payroll uses **last finalized** counts.
+- **Garage:** max **2** total headcount across all departments (founder not counted).
+- **Office+:** caps rise by stage and satellite offices (seat limits, not named employees).
+- **Layoffs:** reducing headcount on finalize with a net decrease vs prior month may trigger **negative AI news** if drop ≥ **15%** of total headcount.
+
+**Simulation:** Revenue and task effectiveness use department counts (e.g. marketing → campaign yield, engineering → feature velocity) — no individual productivity rolls.
 
 ### 4. Counted monthly tasks
 
@@ -189,6 +206,7 @@ Two tabs inside **Social** panel — visually distinct but structurally shared:
   - **Industry react** to player (funding, layoffs, launches, scandals)
   - **Global fictional timeline** (e.g. *Artemis IV lands June 2028*) — seeded timeline JSON + AI fill-in
   - **Macro** (rates, AI regulation) affecting modifiers lightly
+- **Names:** Prefer **fictional and parody** outlets/companies/people (e.g. “Macrohard”, “Blue Origin of the Bay”, “The Financier Times”) — avoid real trademarks and real exec names where possible; AI prompts enforce this.
 
 **API kind:** `startup_news_month` → returns `{ articles: [{ headline, dek, body, source, date }] }`
 
@@ -198,7 +216,7 @@ Two tabs inside **Social** panel — visually distinct but structurally shared:
 
 - Docked panel or modal: chat UI
 - System context bundle each request:
-  - Stage, cash, burn, runway, revenue, cap table summary, active tasks, recent news headlines, staff count
+  - Stage, cash, burn, runway, revenue, cap table summary, active tasks, recent news headlines, **department headcounts**
 - **kind:** `startup_advisor_chat` (multi-turn: client sends last N turns + snapshot)
 - Guardrails: no real financial advice disclaimer in footer; suggest in-game actions only
 - Fallback: scripted tips if API offline
@@ -207,21 +225,28 @@ Two tabs inside **Social** panel — visually distinct but structurally shared:
 
 ## AI infrastructure
 
-Reuse **HOS narrative Lambda** pattern (`infra/lambda/hos-narrative` or rename to shared `game-narrative`):
+**Use the existing HOS narrative Lambda — no new stack for Phase 4.**
+
+The deployed endpoint behind `HOS_NARRATIVE_API_URL` / `infra/lambda/hos-narrative` already accepts `{ kind, context }` and calls OpenAI. Startup Simulator adds **new `kind` branches** in `buildPrompt()` / response parsing in that same Lambda (alongside HOS and EER kinds). Same Secrets Manager key, same `OPENAI_MODEL`, same CORS/rate limits.
 
 | kind | Purpose |
 |------|---------|
-| `startup_news_month` | Monthly articles |
+| `startup_news_month` | Monthly articles (JSON array) |
 | `startup_social_reactions` | Comments on player posts |
-| `startup_xc_interview` | XC Q&A lines |
-| `startup_advisor_chat` | Chief of staff |
+| `startup_xc_interview_score` | Score scripted XC answers → `{ accepted, feedback, score }` — **permissive rubric** |
+| `startup_advisor_chat` | Chief of staff (multi-turn in client, single completion per message) |
 | `startup_ipo_press` | IPO / step-down story |
 
-**Model:** Same secret + env as other games; target **`gpt-5-mini`** (or project default when `OPENAI_MODEL` is set — align deploy with “5.4 mini” user naming).
+**When to wire:**
 
-**Client:** `modules/NarrativeApi.js` mirroring HOS — resolve URL from config inject + optional `/play/startup-sim/narrate` proxy on production domain.
+- **Phase 1–3:** No Lambda required (offline fallbacks for XC: auto-accept or simple keyword pass).
+- **Phase 4:** Extend **`hos-narrative` Lambda** + point Startup Sim client at the **same URL** as HOS (inject via shared config or duplicate `narrative-api.json` URL at build). Optional: add `/play/startup-sim/narrate` rewrite on the static host if we mirror HOS’s same-origin proxy — not a second Lambda.
 
-**Rate limits:** reuse IP bucket; stricter for chat (e.g. 10/min).
+**Model:** Same as other games (`OPENAI_MODEL`, default **`gpt-5-mini`** / project “5.4 mini” naming).
+
+**Client:** `modules/NarrativeApi.js` — same POST shape as HOS `NarrativeApi.js`.
+
+**Rate limits:** existing IP bucket; advisor chat capped ~**10/min** per client IP in Lambda if needed.
 
 ---
 
@@ -261,7 +286,7 @@ No placeholder “slop” art in production builds. Track provenance in `work/st
    - **Desk** (tasks + quick actions)
    - **Product** (research / dev queue)
    - **Growth** (marketing & sales)
-   - **People** (staff spreadsheet)
+   - **People** (department headcount + finalize staffing)
    - **Finance** (burn, cap table, raise flow)
    - **Social** (ProNet + Chirp)
    - **News**
@@ -285,7 +310,7 @@ work/startup-sim/
     Calendar.js             # month advance, task slots
     Progression.js          # stage gates
     Finance.js              # cash, revenue, cap table, rounds
-    Staff.js                # roster CRUD
+    Staff.js                # headcount draft, finalize, payroll projection
     Tasks.js                # task deck + resolution
     Categories.js           # startup type data
     Social.js               # feeds + post composer
@@ -307,7 +332,7 @@ work/startup-sim/
 
 ## Save format
 
-- `version`, `mode`, `sandboxStartingCash`, `company`, `calendar`, `finance`, `staff[]`, `product`, `social`, `newsArchive`, `flags` (xcAccepted, ipoCompleted, etc.)
+- `version`, `mode`, `sandboxStartingCash`, `company`, `calendar`, `finance`, `staff: { headcountByDept, draftHeadcountByDept, lastFinalizedMonth }`, `product`, `social`, `newsArchive`, `flags` (xcAccepted, ipoCompleted, etc.)
 - Migrate on version bump
 
 ---
@@ -330,26 +355,26 @@ work/startup-sim/
 
 ### Phase 2 — Staff & finance depth
 
-- Spreadsheet staff, departments, layoffs
-- Cap table + XC funding + first raise wizard
+- Department headcount table, draft vs finalize, surplus/deficit preview
+- Cap table + XC SAFE + first raise wizard (dilution table above)
 - Office → XC gate at $500k
 
 ### Phase 3 — Progression & cities
 
-- XC 3-month arc (scripted if no AI)
+- XC 3-month arc; **scripted questions** + Lambda **`startup_xc_interview_score`** when API available
 - Hub selection + satellite offices
 - Task count scaling by stage
 
 ### Phase 4 — AI layer
 
-- Lambda kinds + client NarrativeApi
+- Add startup `kind`s to **existing** `hos-narrative` Lambda; client uses same API URL
 - News tab + monthly generation
 - Social reactions
 - Advisor chat
 
 ### Phase 5 — IPO & endgame
 
-- $1B gate, IPO timing, stock sim
+- $1B gate, IPO timing, **monthly** stock sim ticks
 - Cash-out ending + archive stats
 - Balance pass + sandbox tuning
 
@@ -361,13 +386,13 @@ work/startup-sim/
 
 ---
 
-## Open decisions (for later discussion)
+## Decisions (locked)
 
-1. **XC interview:** fully AI vs hybrid scripted questions?
-2. **Exact dilution defaults** per round (seed / A / B templates)
-3. **Stock sim granularity** post-IPO (daily vs monthly ticks)
-4. **Real company names** in news parody — avoid; use fictional analogs
-5. **Multiplayer / leaderboards** — out of scope unless requested
+1. **XC interview:** **Scripted questions** in game data; **AI scores** free-text answers. Rubric is **forgiving** (clear pass band, flavor feedback) — entertainment first, not YC simulation.
+2. **Dilution defaults:** See **Funding & dilution** table above (XC SAFE ~6%, seed/A/B ~20% with stated pre/post templates + 10% ESOP at seed).
+3. **Stock sim:** **Monthly ticks only** — aligned with calendar; no day progression anywhere.
+4. **News & social names:** **Parody/fictional** by default; prompt guardrails + seeded persona names — no real companies or living public figures.
+5. **Multiplayer / leaderboards:** **Out of scope.**
 
 ---
 
