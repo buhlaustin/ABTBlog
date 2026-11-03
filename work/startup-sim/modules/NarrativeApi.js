@@ -1,6 +1,6 @@
 /**
  * AI narrative client — mirrors HOS/EER pattern.
- * Endpoint wiring lands in Phase 4 (shared Lambda kinds for news, social, advisor).
+ * Phase 4: same URL as HOS (hos-narrative Lambda) with startup-specific `kind`s.
  */
 import { STARTUP_NARRATIVE_API_URL } from './startup-config.js';
 
