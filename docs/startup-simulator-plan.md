@@ -374,10 +374,11 @@ work/startup-sim/
 
 ### Phase 4 — AI layer
 
-- Add startup `kind`s to **existing** `hos-narrative` Lambda; client uses same API URL
-- News tab + monthly generation
-- Social reactions
-- Advisor chat
+- [x] Lambda kinds: `startup_news_month`, `startup_social_reactions`, `startup_advisor_chat` (+ XC score)
+- [x] News tab: 3–4 articles on month close, archive toggle, offline parody fallback
+- [x] Social: ProNet + Chirp compose, AI/offline reactions, persona seeds
+- [x] Advisor: context-aware chat with offline tips fallback
+- [x] Save v5 (`advisor`, social archive, news archive)
 
 ### Phase 5 — IPO & endgame
 

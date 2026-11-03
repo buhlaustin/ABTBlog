@@ -509,3 +509,127 @@ h1 {
   font-family: inherit;
   resize: vertical;
 }
+
+.news-article {
+  border-bottom: 1px solid var(--border);
+  padding: 0.85rem 0;
+}
+
+.news-source {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.news-article h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.news-dek {
+  margin: 0 0 0.35rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.news-body {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.news-archive-block {
+  margin: 0.75rem 0;
+  padding: 0.65rem 0;
+  border-top: 1px dashed var(--border);
+}
+
+.social-subtabs {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.social-subtabs button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.social-subtabs button.active {
+  color: var(--text);
+  border-color: var(--accent-dim);
+}
+
+.social-feed.theme-pronet .social-post {
+  border-left: 3px solid #4a6fa5;
+}
+
+.social-feed.theme-chirp .social-post {
+  border-left: 3px solid #1d9bf0;
+}
+
+.social-post {
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  padding: 0.75rem 0.85rem;
+  margin-bottom: 0.65rem;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.social-post header {
+  margin-bottom: 0.35rem;
+  font-size: 0.88rem;
+}
+
+.social-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.social-comments {
+  margin: 0.5rem 0 0;
+  padding-left: 1rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.advisor-log {
+  max-height: 280px;
+  overflow-y: auto;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  padding: 0.65rem 0.75rem;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.advisor-msg {
+  margin-bottom: 0.65rem;
+}
+
+.advisor-msg p {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.advisor-role {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.advisor-assistant {
+  border-left: 2px solid var(--accent-dim);
+  padding-left: 0.5rem;
+}

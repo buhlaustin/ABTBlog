@@ -56,7 +56,7 @@ export function isNarrativeApiEnabled() {
 }
 
 export async function requestNarrative(kind, context) {
-  const url = getNarrativeApiUrl();
+  const url = resolveNarrativeApiUrl() || getNarrativeApiUrl();
   if (!url) return null;
 
   const res = await fetch(url, {

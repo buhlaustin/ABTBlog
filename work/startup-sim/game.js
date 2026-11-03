@@ -14,7 +14,9 @@ import {
   showPeopleFeedback
 } from './modules/Staff.js';
 import { closeSeedRound, showFinanceFeedback } from './modules/Fundraising.js';
-import { recordLayoffEvent } from './modules/News.js';
+import { recordLayoffEvent, generateMonthlyNews, toggleNewsArchive } from './modules/News.js';
+import { publishPlayerPost, setSocialNetwork, showSocialFeedback } from './modules/Social.js';
+import { sendAdvisorMessage } from './modules/Advisor.js';
 import {
   renderInterviewForm,
   scoreInterview,
@@ -130,7 +132,7 @@ function handleCompleteTask(instanceId) {
   refresh();
 }
 
-function handleEndMonth() {
+async function handleEndMonth() {
   if (!sessionState || sessionState.flags?.gameOver) return;
   const result = endMonth(sessionState);
   if (!result.ok) {
@@ -139,9 +141,17 @@ function handleEndMonth() {
   }
   if (result.gameOver) {
     showDeskFeedback('Out of cash.');
-  } else {
-    showDeskFeedback('Month closed. New tasks dealt.');
+    refresh();
+    return;
   }
+
+  showDeskFeedback('Generating headlines…');
+  const news = await generateMonthlyNews(sessionState);
+  appendLog(
+    sessionState,
+    news.source === 'ai' ? 'Fresh headlines landed (AI).' : 'Headlines updated (offline).'
+  );
+  showDeskFeedback('Month closed. New tasks dealt.');
   refresh();
 }
 
@@ -157,7 +167,7 @@ function handleFinalizeStaff() {
     recordLayoffEvent(sessionState, result.layoffPct);
     appendLog(
       sessionState,
-      `Layoffs (${Math.round(result.layoffPct * 100)}% of headcount) — press will notice in Phase 4.`
+      `Layoffs (${Math.round(result.layoffPct * 100)}% of headcount) — watch the News tab next month close.`
     );
   }
   appendLog(sessionState, 'Staffing plan finalized for payroll.');
@@ -273,6 +283,17 @@ function bindGameInteractions() {
     }
     if (e.target.id === 'btn-end-month') {
       handleEndMonth();
+      return;
+    }
+    if (e.target.id === 'btn-toggle-news-archive') {
+      toggleNewsArchive(sessionState);
+      refresh();
+      return;
+    }
+    const socialTab = e.target.closest('[data-social-tab]');
+    if (socialTab && sessionState) {
+      setSocialNetwork(sessionState, socialTab.getAttribute('data-social-tab'));
+      refresh();
     }
   });
 
@@ -285,9 +306,34 @@ function bindGameInteractions() {
     refresh();
   });
 
-  app?.addEventListener('submit', (e) => {
+  app?.addEventListener('submit', async (e) => {
     if (e.target.id === 'xc-interview-form') {
       submitXcInterview(e);
+      return;
+    }
+    if (e.target.id === 'social-post-form') {
+      e.preventDefault();
+      if (!sessionState) return;
+      const text = document.getElementById('social-post-text')?.value;
+      const network = sessionState.social?.activeNetwork ?? 'pronet';
+      showSocialFeedback('Posting…');
+      const result = await publishPlayerPost(sessionState, network, text);
+      if (!result.ok) showSocialFeedback(result.reason, true);
+      else showSocialFeedback('Posted.');
+      refresh();
+      return;
+    }
+    if (e.target.id === 'advisor-form') {
+      e.preventDefault();
+      if (!sessionState) return;
+      const text = document.getElementById('advisor-input')?.value;
+      refresh();
+      const result = await sendAdvisorMessage(sessionState, text);
+      if (!result.ok) {
+        refresh();
+        return;
+      }
+      refresh();
     }
   });
 

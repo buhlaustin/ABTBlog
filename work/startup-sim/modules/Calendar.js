@@ -4,6 +4,7 @@ import { resolveMonthEndBurn } from './Finance.js';
 import { syncStageFromProgress, onStageChange } from './Progression.js';
 import { syncDraftFromFinalized } from './Staff.js';
 import { tickXcResidency } from './XC.js';
+import { archiveCurrentNews } from './News.js';
 
 /** Counted task slots per month (staff/finance actions excluded). */
 export function getMonthlyTaskSlots(stage) {
@@ -94,6 +95,7 @@ export function endMonth(state) {
     return { ok: true, gameOver: true };
   }
 
+  archiveCurrentNews(state);
   advanceCalendarMonth(state);
   startMonth(state);
   return { ok: true, gameOver: false };

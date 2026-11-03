@@ -13,6 +13,6 @@ Open `http://localhost:8080/play/startup-sim/index.html` (after copy) or serve t
 
 ## Status
 
-**Phase 3 complete:** XC interview, 3-month batch, hub HQ + satellites, gated seed close.
+**Phase 4 complete:** AI/offline news, ProNet/Chirp + reactions, chief-of-staff advisor.
 
-**Phase 4 next:** AI news, social, advisor (Lambda kinds).
+**Phase 5 next:** IPO, $1B gate, monthly stock sim, cash-out ending.

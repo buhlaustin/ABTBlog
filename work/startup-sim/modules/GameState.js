@@ -6,8 +6,9 @@ import { createInitialCalendar, startMonth } from './Calendar.js';
 import { recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
 import { createInitialXcState } from './XC.js';
+import { createInitialAdvisor } from './Advisor.js';
 
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 
 export const STAGES = {
   GARAGE: 'garage',
@@ -78,6 +79,7 @@ export function createInitialState(options) {
     news: createInitialNews(),
     offices: createInitialOffices(),
     xc: createInitialXcState(),
+    advisor: createInitialAdvisor(),
     capTable: [
       {
         id: 'founder',
@@ -138,6 +140,8 @@ export function normalizeSave(raw) {
   }
   if (!state.offices) state.offices = createInitialOffices();
   if (!state.xc) state.xc = createInitialXcState();
+  if (!state.advisor) state.advisor = createInitialAdvisor();
+  if (state.news && state.news.showArchive === undefined) state.news.showArchive = false;
   if (state.flags.xcAccepted && state.flags.xcResidencyComplete === false && !state.xc.residencyMonthsRemaining) {
     state.flags.xcResidencyComplete = true;
   }

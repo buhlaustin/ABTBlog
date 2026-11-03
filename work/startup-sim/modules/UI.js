@@ -3,9 +3,9 @@ import { getMonthlyTaskSlots } from './Calendar.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
 import { renderPeoplePanel } from './Staff.js';
-import { renderSocialPlaceholder } from './Social.js';
-import { renderNewsPlaceholder } from './News.js';
-import { renderAdvisorPlaceholder } from './Advisor.js';
+import { renderSocialPanel } from './Social.js';
+import { renderNewsPanel } from './News.js';
+import { renderAdvisorPanel } from './Advisor.js';
 import { getTaskDef, pendingTasks, canEndMonth } from './Tasks.js';
 
 const screens = {
@@ -202,9 +202,9 @@ export function renderAllPanels(state) {
 
   renderFinancePanel(document.getElementById('panel-finance'), state);
 
-  renderSocialPlaceholder(document.getElementById('panel-social'));
-  renderNewsPlaceholder(document.getElementById('panel-news'), state);
-  renderAdvisorPlaceholder(document.getElementById('panel-advisor'));
+  renderSocialPanel(document.getElementById('panel-social'), state);
+  renderNewsPanel(document.getElementById('panel-news'), state);
+  renderAdvisorPanel(document.getElementById('panel-advisor'), state);
 }
 
 export function renderGameOver(state) {
