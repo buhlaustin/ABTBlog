@@ -26,7 +26,11 @@ import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
 import { renderProductActionsPanel } from './ProductActions.js';
 import { sentimentLabel } from './Sentiment.js';
 import { competitorRevenueMult } from './Competitor.js';
-import { getTaskRevenueMultiplierPreview } from './Finance.js';
+import {
+  getTaskRevenueMultiplierPreview,
+  getCoreTaskRevenueMult,
+  getSandboxTuningMult
+} from './Finance.js';
 import { renderGrowthCampaignsBlock } from './GrowthCampaigns.js';
 
 const screens = {
@@ -446,8 +450,17 @@ export function renderGrowthPanel(container, state) {
   const lastReason = state.sentiment?.lastReason;
   const pendingDesk = (state.calendar?.monthTasks ?? []).filter((t) => t.status === 'pending').length;
 
+  const coreMult = getCoreTaskRevenueMult(state);
+  const tuneMult = getSandboxTuningMult(state);
+  const totalMult = getTaskRevenueMultiplierPreview(state);
+  const multNote =
+    state.mode === 'sandbox' && tuneMult !== 1
+      ? `<p class="fine-print">Desk &amp; Growth revenue: <strong>${coreMult.toFixed(2)}×</strong> progression stack × <strong>${tuneMult.toFixed(2)}×</strong> sandbox overlay = <strong>${totalMult.toFixed(2)}×</strong>.</p>`
+      : `<p class="fine-print">Desk &amp; Growth effective revenue multiplier: <strong>${totalMult.toFixed(2)}×</strong> (rounds, HQ, staff, buzz).</p>`;
+
   container.innerHTML = `
-    <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks drive revenue; rivals and board mood nudge outcomes.</p>
+    <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks and paid campaigns below share the same multiplier math.</p>
+    ${multNote}
     <div class="summary-grid">
       <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>
       <div><span class="stat-label">Heat</span><span class="stat-value">${pressure}/5</span></div>

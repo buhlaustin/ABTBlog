@@ -131,7 +131,7 @@ if (totalHeadcountCap(state) !== 0) {
 if (normalizeSave(null) !== null) failed = true;
 if (normalizeSave({ company: {}, finance: {} }) !== null) failed = true;
 
-const { getTaskRevenueMultiplierPreview } = await import(
+const { getTaskRevenueMultiplierPreview, getCoreTaskRevenueMult } = await import(
   `file://${join(sim, 'modules/Finance.js')}`
 );
 const careerMult = getTaskRevenueMultiplierPreview(state);
@@ -163,11 +163,40 @@ const sandboxState = createInitialState({
   sandboxTuning: { revenueMult: 2, costMult: 1, ipoGateArr: 1_000_000_000 }
 });
 const sandboxMult = getTaskRevenueMultiplierPreview(sandboxState);
+const sandboxCore = getCoreTaskRevenueMult(sandboxState);
 if (sandboxMult < 1.5) {
   console.error(`FAIL: sandbox 2x tuning should raise effective mult, got ${sandboxMult}`);
   failed = true;
 } else {
   console.log(`OK: sandbox tuned revenue mult ${sandboxMult}`);
+}
+const overlayState = createInitialState({
+  companyName: 'Overlay',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxTuning: { revenueMult: 2, startingStage: 'garage', ipoGateArr: 1_000_000_000 }
+});
+overlayState.flags.seedRoundClosed = true;
+overlayState.flags.seriesAClosed = true;
+const coreCareer = getCoreTaskRevenueMult({
+  ...overlayState,
+  mode: 'career',
+  sandboxTuning: null
+});
+const coreSand = getCoreTaskRevenueMult(overlayState);
+const totalSand = getTaskRevenueMultiplierPreview(overlayState);
+const expected = Math.round(coreSand * 2 * 100) / 100;
+if (Math.abs(totalSand - expected) > 0.05) {
+  console.error(
+    `FAIL: sandbox overlay expected ~${expected} (core ${coreSand} × 2), got ${totalSand}`
+  );
+  failed = true;
+} else {
+  console.log(`OK: sandbox overlay stacks (${coreSand} × 2 = ${totalSand})`);
+}
+if (Math.abs(coreSand - coreCareer) > 0.05) {
+  console.error(`FAIL: core mult should match career vs sandbox core ${coreSand} vs ${coreCareer}`);
+  failed = true;
 }
 
 const { completeXcAcceptance, maybeStartScheduledXcBatch, isInResidency } = await import(

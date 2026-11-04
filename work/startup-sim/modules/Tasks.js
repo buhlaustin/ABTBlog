@@ -45,7 +45,7 @@ function shuffle(arr) {
 }
 
 /** Months of dealt task ids to deprioritize when building the next desk lineup. */
-const RECENT_TASK_COOLDOWN_MONTHS = 5;
+const RECENT_TASK_COOLDOWN_MONTHS = 8;
 
 /**
  * Pick up to `slots` tasks from `pool` with unique ids per month.

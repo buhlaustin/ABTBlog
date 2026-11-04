@@ -36,22 +36,44 @@ export function productBuzzRevenueMult(state) {
   return 1 + buzzBonus + levelBonus;
 }
 
-/** Approximate desk-task revenue multiplier shown in HUD (not category ACV alone). */
-export function getTaskRevenueMultiplierPreview(state) {
+/** Revenue uses career baseline so sandbox tuning overlay is explicit (e.g. 20× × 2× = 40×). */
+function modeDifficultyMult(_state) {
+  return 2 - MODE_CONFIG.career.difficulty;
+}
+
+/**
+ * Progression + category + hub + staff + buzz (career-equivalent).
+ * Sandbox tuning from setup is applied on top — see applySandboxRevenueTuning().
+ */
+export function getCoreTaskRevenueMult(state) {
   const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
-  const sand = state.mode === 'sandbox' ? MODE_CONFIG.sandbox.difficulty : MODE_CONFIG.career.difficulty;
   const m =
     econ.revenueMult *
-    (2 - sand) *
+    modeDifficultyMult(state) *
     hubRevenueMult(state) *
     scalingRevenueMult(state) *
     competitorRevenueMult(state) *
-    getSandboxExtraRevenueMult(state) *
     xcProgramRevenueMult(state) *
     acceleratorRevenueMult(state) *
     productBuzzRevenueMult(state) *
     staffRevenueMultiplier(state);
   return Math.round(m * 100) / 100;
+}
+
+/** Sandbox setup multiplier stacks on core (e.g. 20× core × 2× tuning = 40×). */
+export function applySandboxRevenueTuning(state, coreMult) {
+  if (state.mode !== 'sandbox') return coreMult;
+  const tune = getSandboxExtraRevenueMult(state);
+  return Math.round(coreMult * tune * 100) / 100;
+}
+
+export function getSandboxTuningMult(state) {
+  return state.mode === 'sandbox' ? getSandboxExtraRevenueMult(state) : 1;
+}
+
+/** HUD rev× — full desk payout multiplier including sandbox tuning overlay. */
+export function getTaskRevenueMultiplierPreview(state) {
+  return applySandboxRevenueTuning(state, getCoreTaskRevenueMult(state));
 }
 
 export function projectMonthlyBurn(state) {
@@ -73,18 +95,9 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   const cost = Math.round(
     (taskDef.cost ?? 0) * econ.costMult * sand * hubCostMult(state) * staffCostMultiplier(state)
   );
+  const core = getCoreTaskRevenueMult(state);
   const revenue = Math.round(
-    rolled.revenue *
-      econ.revenueMult *
-      (2 - sand) *
-      hubRevenueMult(state) *
-      scalingRevenueMult(state) *
-      competitorRevenueMult(state) *
-      getSandboxExtraRevenueMult(state) *
-      xcProgramRevenueMult(state) *
-      acceleratorRevenueMult(state) *
-      staffRevenueMultiplier(state) *
-      staffRetentionBonus(state, taskDef)
+    rolled.revenue * applySandboxRevenueTuning(state, core) * staffRetentionBonus(state, taskDef)
   );
 
   state.finance.cash -= cost;

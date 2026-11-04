@@ -114,6 +114,7 @@ export function applySeedRound(state) {
     closedYear: state.calendar.year
   };
   state.flags.seedRoundClosed = true;
+  applyFundraiseMomentum(state, 'Seed');
   return { ok: true, raised, postMoney };
 }
 
@@ -219,7 +220,23 @@ function applyPricedRound(state, config) {
   };
   state.flags[setFlag] = true;
   if (downRound) state.flags.lastDownRound = true;
+  applyFundraiseMomentum(state, roundName);
   return { ok: true, raised, postMoney, downRound, roundName };
+}
+
+function applyFundraiseMomentum(state, roundName) {
+  const bumps = {
+    Seed: { product: 2, buzz: 2 },
+    'Series A': { product: 3, buzz: 4 },
+    'Series B': { product: 3, buzz: 5 },
+    'Series C': { product: 2, buzz: 4 },
+    'Series D': { product: 2, buzz: 3 },
+    'Series E': { product: 1, buzz: 3 },
+    'Series F': { product: 1, buzz: 2 }
+  };
+  const b = bumps[roundName] ?? { product: 1, buzz: 1 };
+  state.product.level = (state.product.level ?? 0) + b.product;
+  state.product.buzz = (state.product.buzz ?? 0) + b.buzz;
 }
 
 export function applySeriesA(state) {

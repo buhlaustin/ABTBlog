@@ -61,7 +61,7 @@ const titles = {
 let added = 0;
 for (const tpl of templates) {
   for (const type of tpl.types) {
-    for (let i = 0; i < 4; i += 1) {
+    for (let i = 0; i < 6; i += 1) {
       const titlePool = titles[type] ?? titles.sales;
       const title = titlePool[(added + i) % titlePool.length];
       const id = `gen-${type}-t${tpl.tierMin}-${added}-${i}`;

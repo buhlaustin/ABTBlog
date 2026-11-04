@@ -42,7 +42,6 @@ export function progressionRevenueMult(state) {
   if (arr >= 50_000_000) {
     m *= 1 + Math.min(8, (arr / 120_000_000) ** 0.45);
   }
-  if (state.mode === 'sandbox') m *= 1.15;
 
   return Math.round(m * 100) / 100;
 }

@@ -182,7 +182,12 @@ export function purchaseWorkspaceTier(state, tier) {
   if (tier === WORKSPACE_TIER.SMALL) state.workspace.smallOfficeOwned = true;
   if (tier === WORKSPACE_TIER.MEDIUM) state.workspace.mediumOfficeOwned = true;
   if (tier === WORKSPACE_TIER.LARGE) state.workspace.largeOfficeOwned = true;
-  if (tier === WORKSPACE_TIER.CAMPUS) state.workspace.campusOwned = true;
+  if (tier === WORKSPACE_TIER.CAMPUS) {
+    state.workspace.campusOwned = true;
+    state.product.level = (state.product.level ?? 0) + 3;
+    state.product.buzz = (state.product.buzz ?? 0) + 4;
+    state.company.location = state.company.location || 'Company HQ';
+  }
   applyWorkspaceBurn(state);
 
   if (tier !== WORKSPACE_TIER.GARAGE && tier !== WORKSPACE_TIER.HUB) {

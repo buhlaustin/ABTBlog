@@ -2,15 +2,7 @@ import bundled from '../data/growth-campaigns.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { formatMoney } from './constants.js';
 import { progressionTier } from './ProgressionEconomy.js';
-import { progressionRevenueMult } from './ProgressionEconomy.js';
-import { recordCashOutflow } from './Finance.js';
-import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
-import { MODE_CONFIG } from './constants.js';
-import { hubRevenueMult } from './Finance.js';
-import { competitorRevenueMult } from './Competitor.js';
-import { xcProgramRevenueMult } from './XC.js';
-import { acceleratorRevenueMult } from './Accelerators.js';
-import { staffRevenueMultiplier } from './Staff.js';
+import { recordCashOutflow, getCoreTaskRevenueMult, applySandboxRevenueTuning } from './Finance.js';
 
 let catalog = bundled;
 
@@ -29,20 +21,7 @@ export function getGrowthCampaigns() {
 }
 
 function campaignRevenueMult(state) {
-  const sand =
-    state.mode === 'sandbox' ? MODE_CONFIG.sandbox.difficulty : MODE_CONFIG.career.difficulty;
-  const econ = state.company.economics ?? { revenueMult: 1 };
-  return (
-    econ.revenueMult *
-    (2 - sand) *
-    hubRevenueMult(state) *
-    progressionRevenueMult(state) *
-    competitorRevenueMult(state) *
-    getSandboxExtraRevenueMult(state) *
-    xcProgramRevenueMult(state) *
-    acceleratorRevenueMult(state) *
-    staffRevenueMultiplier(state)
-  );
+  return applySandboxRevenueTuning(state, getCoreTaskRevenueMult(state));
 }
 
 export function availableCampaigns(state) {

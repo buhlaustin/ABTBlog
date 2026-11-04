@@ -2113,6 +2113,1318 @@
       ],
       "product": 0,
       "buzz": 1
+    },
+    {
+      "id": "gen-sales-t1-0-1",
+      "title": "Seven-figure renewal push (1+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 1797,
+      "revenue": [
+        8000,
+        45000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t1-1-2",
+      "title": "Government RFP sprint (1+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 2090,
+      "revenue": [
+        8000,
+        45000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t1-2-3",
+      "title": "Multi-year platform deal (1+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 2383,
+      "revenue": [
+        8000,
+        45000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t1-3-4",
+      "title": "Strategic alliance signing (1+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 975,
+      "revenue": [
+        8000,
+        45000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t1-4-5",
+      "title": "Enterprise security review win (1+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 1268,
+      "revenue": [
+        8000,
+        45000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t2-5-0",
+      "title": "Multi-year platform deal (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 3,
+      "cost": 8985,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t2-6-1",
+      "title": "Strategic alliance signing (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 3,
+      "cost": 10979,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t2-7-2",
+      "title": "Enterprise security review win (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 3,
+      "cost": 4972,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t2-8-3",
+      "title": "Seven-figure renewal push (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 3,
+      "cost": 6966,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t2-9-4",
+      "title": "Government RFP sprint (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 3,
+      "cost": 8960,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t2-10-5",
+      "title": "Multi-year platform deal (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 3,
+      "cost": 10954,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t3-11-0",
+      "title": "Seven-figure renewal push (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 4,
+      "cost": 25967,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t3-12-1",
+      "title": "Government RFP sprint (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 4,
+      "cost": 27961,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t3-13-2",
+      "title": "Multi-year platform deal (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 4,
+      "cost": 29955,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t3-14-3",
+      "title": "Strategic alliance signing (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 4,
+      "cost": 31949,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t3-15-4",
+      "title": "Enterprise security review win (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 4,
+      "cost": 33943,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t3-16-5",
+      "title": "Seven-figure renewal push (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 4,
+      "cost": 35937,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t4-17-0",
+      "title": "Strategic alliance signing (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 5,
+      "cost": 56949,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t4-18-1",
+      "title": "Enterprise security review win (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 5,
+      "cost": 58943,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t4-19-2",
+      "title": "Seven-figure renewal push (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 5,
+      "cost": 60937,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t4-20-3",
+      "title": "Government RFP sprint (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 5,
+      "cost": 62931,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t4-21-4",
+      "title": "Multi-year platform deal (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 5,
+      "cost": 64925,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t4-22-5",
+      "title": "Strategic alliance signing (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 5,
+      "cost": 66919,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t5-23-0",
+      "title": "Government RFP sprint (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 5,
+      "tierMax": 6,
+      "cost": 102931,
+      "revenue": [
+        1200000,
+        6500000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t5-24-1",
+      "title": "Multi-year platform deal (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 5,
+      "tierMax": 6,
+      "cost": 104925,
+      "revenue": [
+        1200000,
+        6500000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t5-25-2",
+      "title": "Strategic alliance signing (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 5,
+      "tierMax": 6,
+      "cost": 106919,
+      "revenue": [
+        1200000,
+        6500000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t5-26-3",
+      "title": "Enterprise security review win (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 5,
+      "tierMax": 6,
+      "cost": 108913,
+      "revenue": [
+        1200000,
+        6500000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t5-27-4",
+      "title": "Seven-figure renewal push (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 5,
+      "tierMax": 6,
+      "cost": 110907,
+      "revenue": [
+        1200000,
+        6500000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t5-28-5",
+      "title": "Government RFP sprint (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 5,
+      "tierMax": 6,
+      "cost": 112901,
+      "revenue": [
+        1200000,
+        6500000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t6-29-0",
+      "title": "Enterprise security review win (6+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 228913,
+      "revenue": [
+        4000000,
+        22000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t6-30-1",
+      "title": "Seven-figure renewal push (6+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 230907,
+      "revenue": [
+        4000000,
+        22000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t6-31-2",
+      "title": "Government RFP sprint (6+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 232901,
+      "revenue": [
+        4000000,
+        22000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t6-32-3",
+      "title": "Multi-year platform deal (6+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 234895,
+      "revenue": [
+        4000000,
+        22000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t6-33-4",
+      "title": "Strategic alliance signing (6+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 236889,
+      "revenue": [
+        4000000,
+        22000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t6-34-5",
+      "title": "Enterprise security review win (6+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 238883,
+      "revenue": [
+        4000000,
+        22000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-marketing-t3-35-0",
+      "title": "Category creation push (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 22894,
+      "revenue": [
+        60000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t3-36-1",
+      "title": "Partner co-marketing fund (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 24888,
+      "revenue": [
+        60000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t3-37-2",
+      "title": "Vertical landing page fleet (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 26882,
+      "revenue": [
+        60000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t3-38-3",
+      "title": "Analyst briefing tour (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 8875,
+      "revenue": [
+        60000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t3-39-4",
+      "title": "Category creation push (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10869,
+      "revenue": [
+        60000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t3-40-5",
+      "title": "Partner co-marketing fund (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 12863,
+      "revenue": [
+        60000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t5-41-0",
+      "title": "Analyst briefing tour (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 90877,
+      "revenue": [
+        800000,
+        4800000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t5-42-1",
+      "title": "Category creation push (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 92871,
+      "revenue": [
+        800000,
+        4800000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t5-43-2",
+      "title": "Partner co-marketing fund (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 94865,
+      "revenue": [
+        800000,
+        4800000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t5-44-3",
+      "title": "Vertical landing page fleet (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 96859,
+      "revenue": [
+        800000,
+        4800000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t5-45-4",
+      "title": "Analyst briefing tour (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 98853,
+      "revenue": [
+        800000,
+        4800000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t5-46-5",
+      "title": "Category creation push (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 100847,
+      "revenue": [
+        800000,
+        4800000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-product-t2-47-0",
+      "title": "Integration marketplace launch (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 13856,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t2-48-1",
+      "title": "Platform API vNext (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 3849,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t2-49-2",
+      "title": "AI copilot GA (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 5843,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t2-50-3",
+      "title": "Integration marketplace launch (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 7837,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t2-51-4",
+      "title": "Platform API vNext (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 9831,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t2-52-5",
+      "title": "AI copilot GA (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 11825,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t4-53-0",
+      "title": "Integration marketplace launch (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 77841,
+      "revenue": [
+        200000,
+        1100000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t4-54-1",
+      "title": "Platform API vNext (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 79835,
+      "revenue": [
+        200000,
+        1100000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t4-55-2",
+      "title": "AI copilot GA (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 81829,
+      "revenue": [
+        200000,
+        1100000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t4-56-3",
+      "title": "Integration marketplace launch (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 83823,
+      "revenue": [
+        200000,
+        1100000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t4-57-4",
+      "title": "Platform API vNext (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 85817,
+      "revenue": [
+        200000,
+        1100000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t4-58-5",
+      "title": "AI copilot GA (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 87811,
+      "revenue": [
+        200000,
+        1100000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t7-59-0",
+      "title": "Enterprise security review win (7+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 158823,
+      "revenue": [
+        5000000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t7-60-1",
+      "title": "Seven-figure renewal push (7+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 160817,
+      "revenue": [
+        5000000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t7-61-2",
+      "title": "Government RFP sprint (7+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 162811,
+      "revenue": [
+        5000000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t7-62-3",
+      "title": "Multi-year platform deal (7+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 164805,
+      "revenue": [
+        5000000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t7-63-4",
+      "title": "Strategic alliance signing (7+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 166799,
+      "revenue": [
+        5000000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t7-64-5",
+      "title": "Enterprise security review win (7+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 168793,
+      "revenue": [
+        5000000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 1
     }
   ]
 }
