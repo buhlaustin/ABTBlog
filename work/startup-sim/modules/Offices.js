@@ -159,7 +159,7 @@ export function renderOfficesPanel(container, state) {
     state.offices?.hubId
       ? `
     <h3 class="log-head">Satellite offices</h3>
-    <p class="panel-lede">Free-buy expansion — adds seats to headcount cap and monthly rent.</p>
+    <p class="panel-lede">Buy another office — more seats for hiring and another line on the rent bill.</p>
     <table class="data-table">
       <thead><tr><th>Office</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
       <tbody>${satRows || '<tr><td colspan="4">No satellites yet.</td></tr>'}</tbody>

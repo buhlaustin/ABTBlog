@@ -140,7 +140,7 @@ export function renderHallOfFameBlock(container) {
 
   container.innerHTML = `
     <h2 class="hof-title">Hall of fame</h2>
-    <p class="fine-print">${hof.runsRecorded} run(s) recorded on this device.</p>
+    <p class="fine-print">${hof.runsRecorded} completed run${hof.runsRecorded === 1 ? '' : 's'} in the hall.</p>
     ${bestLines.length ? `<ul class="hof-bests">${bestLines.map((l) => `<li>${l}</li>`).join('')}</ul>` : ''}
     ${recent ? `<ul class="hof-recent">${recent}</ul>` : ''}
   `;
@@ -149,9 +149,9 @@ export function renderHallOfFameBlock(container) {
 export function formatHallHighlights(highlights) {
   if (!highlights?.length) return '';
   const labels = {
-    bestFounderPayout: 'Best founder cash-out on this device',
-    bestValuation: 'Highest valuation on this device',
-    fastestIpoMonths: 'Fastest path to IPO on this device'
+    bestFounderPayout: 'Best founder cash-out',
+    bestValuation: 'Highest valuation',
+    fastestIpoMonths: 'Fastest path to IPO'
   };
   return highlights.map((k) => labels[k] ?? k).join(' · ');
 }

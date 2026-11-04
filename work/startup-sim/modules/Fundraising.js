@@ -119,7 +119,7 @@ export function renderFinancePanel(container, state) {
         : '';
 
   container.innerHTML = `
-    <p class="panel-lede">Task cash flow is immediate; payroll + fixed costs hit on month close. Fundraising does not use task slots.</p>
+    <p class="panel-lede">Cash from desk tasks lands right away. Payroll and rent bill when you close the month. Fundraising lives here, not on the desk.</p>
     <div class="summary-grid">
       <div><span class="stat-label">Cash</span><span class="stat-value">${sum.cashLabel}</span></div>
       <div><span class="stat-label">Last month rev.</span><span class="stat-value">${sum.mrrLabel}</span></div>

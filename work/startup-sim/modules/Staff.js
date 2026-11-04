@@ -73,7 +73,7 @@ export function visibleDepartments(stage) {
 }
 
 export function adjustDraftHeadcount(state, deptId, delta) {
-  if (!state.staff?.draftHeadcountByDept) return { ok: false, reason: 'Invalid staff state.' };
+  if (!state.staff?.draftHeadcountByDept) return { ok: false, reason: 'People tab is out of sync — switch tabs and try again.' };
   const draft = state.staff.draftHeadcountByDept;
   const current = draft[deptId] ?? 0;
   const next = Math.max(0, current + delta);

@@ -166,7 +166,7 @@ export function renderSocialPanel(container, state) {
   const chirpPosts = state.social?.chirp?.posts ?? [];
 
   container.innerHTML = `
-    <p class="panel-lede">ProNet (professional) and Chirp (short-form). Posts get AI reactions when online.</p>
+    <p class="panel-lede">ProNet for polished updates; Chirp for hot takes. Post and watch the replies roll in.</p>
     <nav class="social-subtabs">
       <button type="button" class="${active === 'pronet' ? 'active' : ''}" data-social-tab="pronet">ProNet</button>
       <button type="button" class="${active === 'chirp' ? 'active' : ''}" data-social-tab="chirp">Chirp</button>

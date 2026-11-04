@@ -22,7 +22,7 @@ export function buildRunExportText(state) {
     if (e.pressHeadline) lines.push(`Press: ${e.pressHeadline}`);
   } else if (state.flags?.gameOver) {
     lines.push('');
-    lines.push(`Outcome: ${state.flags.gameOverReason ?? 'Game over'}`);
+    lines.push(`Outcome: ${state.flags.gameOverReason ?? 'Run ended'}`);
   }
 
   if (state.meta?.hofHighlights?.length) {

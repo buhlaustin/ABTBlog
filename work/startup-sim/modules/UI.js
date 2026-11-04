@@ -73,7 +73,7 @@ export function setLoadButtonEnabled(enabled) {
   const btn = document.getElementById('btn-load');
   if (!btn) return;
   btn.disabled = !enabled;
-  btn.title = enabled ? 'Continue your saved company' : 'No save found';
+  btn.title = enabled ? 'Continue your saved company' : 'Start a new game first';
 }
 
 /** Emphasize Continue when a local save exists. */
@@ -84,7 +84,7 @@ export function syncStartScreen() {
   const enabled = loadBtn && !loadBtn.disabled;
 
   if (loadBtn) {
-    loadBtn.textContent = enabled ? 'Continue saved game' : 'Load save';
+    loadBtn.textContent = enabled ? 'Continue saved game' : 'No saved game yet';
   }
   if (newBtn && loadBtn) {
     if (enabled) {
@@ -195,7 +195,7 @@ export function renderDeskPanel(state) {
     ${tutorial}
     ${
       catalogError
-        ? '<p class="desk-feedback error" role="alert">Task data failed to load — refresh the page. You cannot close the month until tasks are available.</p>'
+        ? '<p class="desk-feedback error" role="alert">Tasks did not load — reload the page. You cannot close the month until the desk is full.</p>'
         : ''
     }
     ${
@@ -203,7 +203,7 @@ export function renderDeskPanel(state) {
         ? '<p class="desk-feedback error" role="alert">Crisis on the desk — resolve it before closing the month.</p>'
         : ''
     }
-    <p class="panel-lede">Complete all counted tasks, then close the month. Staff/finance changes do not use task slots. <span class="fine-print">Keys: 1–8 tabs, M close month.</span></p>
+    <p class="panel-lede">Finish every task on the desk, then close the month. Hiring and fundraising happen on their own tabs. <span class="fine-print">Shortcuts: 1–8 switch tabs, M close month.</span></p>
     <div class="summary-grid">
       <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slotTarget}</span></div>
       <div><span class="stat-label">This month</span><span class="stat-value">+${formatMoney(monthRev)} / -${formatMoney(monthSpend)}</span></div>
@@ -339,7 +339,7 @@ export function renderAllPanels(state) {
   if (saveHint && !saveHint.classList.contains('error')) {
     saveHint.hidden = false;
     if (saveHint.textContent !== 'Saved locally' && saveHint.textContent !== 'Save failed') {
-      saveHint.textContent = 'Auto-saved on this device';
+      saveHint.textContent = 'Progress saved';
     }
   }
   renderGameHud(state);
@@ -392,7 +392,7 @@ export function renderProductPanel(container, state) {
       : '';
 
   container.innerHTML = `
-    <p class="panel-lede">Product strength feeds task outcomes (revenue multiplier).</p>
+    <p class="panel-lede">A stronger product makes desk tasks pay better — level up by shipping product work on the desk.</p>
     <div class="summary-grid">
       <div><span class="stat-label">Product level</span><span class="stat-value">${state.product.level ?? 0}</span></div>
       <div><span class="stat-label">Buzz</span><span class="stat-value">${state.product.buzz ?? 0}</span></div>
@@ -460,13 +460,13 @@ export function renderGameOver(state) {
 export function flashSaveStatus(ok) {
   const el = document.getElementById('save-status');
   if (!el) return;
-  el.textContent = ok ? 'Saved locally' : 'Save failed';
+  el.textContent = ok ? 'Saved' : 'Save failed';
   el.classList.toggle('error', !ok);
   el.hidden = false;
   if (ok) {
     setTimeout(() => {
-      if (el.textContent === 'Saved locally') {
-        el.textContent = 'Auto-saved on this device';
+      if (el.textContent === 'Saved') {
+        el.textContent = 'Progress saved';
       }
     }, 2500);
   }

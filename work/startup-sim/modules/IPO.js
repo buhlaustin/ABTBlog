@@ -282,7 +282,7 @@ export function renderIpoPanel(container, state) {
       }
     </div>`;
   } else if (state.flags?.cashedOut) {
-    block = `<p class="fine-print">You already cashed out — load a new run from the main menu.</p>`;
+    block = `<p class="fine-print">You already cashed out — start a new company from the main menu.</p>`;
   } else if (state.flags?.seedRoundClosed && !state.flags?.ipoUnlocked) {
     block = `<p class="fine-print">Reach ${formatMoney(getEffectiveIpoGate(state))} lifetime revenue to unlock the IPO window.</p>`;
   }

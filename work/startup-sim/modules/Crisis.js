@@ -93,6 +93,6 @@ export function renderCrisisPanel(container, state) {
     <h2>${escapeHtml(active.title)}</h2>
     <p class="lede">${escapeHtml(active.description)}</p>
     <div class="crisis-actions">${buttons}</div>
-    <p class="fine-print">Resolve before closing the month. Does not consume a task slot.</p>
+    <p class="fine-print">Pick a path before you close the month — this does not replace a desk task.</p>
   `;
 }

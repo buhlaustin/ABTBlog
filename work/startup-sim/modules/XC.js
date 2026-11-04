@@ -177,7 +177,7 @@ export async function renderInterviewForm(container, state) {
     .join('');
 
   container.innerHTML = `
-    <p class="panel-lede">X Combinator partner office — short answers. Scoring is forgiving; this is a game.</p>
+    <p class="panel-lede">Partner office hours — short answers, real effort. They reward clarity, not buzzwords.</p>
     <form id="xc-interview-form" class="setup-form">${fields}
       <button type="submit" class="btn btn-primary">Submit application</button>
       <button type="button" class="btn btn-ghost" id="btn-xc-interview-cancel">Cancel</button>

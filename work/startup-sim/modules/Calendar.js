@@ -52,10 +52,10 @@ export function startMonth(state) {
 
 export function endMonth(state) {
   if (state.calendar?.taskCatalogError) {
-    return { ok: false, reason: 'Task data is unavailable — refresh the page and try again.' };
+    return { ok: false, reason: 'Tasks are not ready yet — reload and try closing the month again.' };
   }
   if (!allTasksComplete(state)) {
-    return { ok: false, reason: 'Complete all counted tasks before closing the month.' };
+    return { ok: false, reason: 'Finish every desk task before closing the month.' };
   }
 
   const priorStage = state.stage;
@@ -101,7 +101,7 @@ export function endMonth(state) {
   if (state.finance.cash < 0) {
     state.flags.gameOver = true;
     state.flags.gameOverReason = 'Ran out of cash.';
-    appendLog(state, 'You ran out of cash. Game over.');
+    appendLog(state, 'You ran out of cash. The run is over.');
     return {
       ok: true,
       gameOver: true,

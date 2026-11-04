@@ -10,7 +10,7 @@ const FALLBACK_CATALOG = {
     {
       id: 'fallback-mvp',
       title: 'Ship MVP sprint',
-      description: 'Keep building while task data reloads.',
+      description: 'Ship something customers can touch this month.',
       stages: ['garage', 'office', 'xc', 'post_xc', 'public'],
       cost: 800,
       revenue: [200, 1200],

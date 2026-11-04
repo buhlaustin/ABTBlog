@@ -44,7 +44,7 @@ export function onStageChange(state, fromStage, toStage) {
   const lines = [];
   if (fromStage === STAGES.GARAGE && toStage === STAGES.OFFICE) {
     state.finance.fixedCostsMonthly = fixedCostsForStage(STAGES.OFFICE);
-    lines.push('Unlocked small office — higher fixed costs, more task slots next month.');
+    lines.push('Unlocked small office — higher fixed costs, more desk work next month.');
   }
   if (state.flags.xcUnlocked && !state.flags.xcUnlockedLogged) {
     lines.push('X Combinator unlocked — apply on the Finance tab.');

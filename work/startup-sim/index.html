@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Startup Simulator</title>
-  <meta name="description" content="Garage-to-IPO startup tycoon with fundraising, AI news, and monthly stock simulation.">
+  <meta name="description" content="Garage-to-IPO startup tycoon with fundraising, headlines, social buzz, and monthly stock simulation.">
   <link rel="stylesheet" href="/play/startup-sim/style.css">
 </head>
 <body>
@@ -15,11 +15,11 @@
         <p class="eyebrow">Startup tycoon</p>
         <h1 id="start-title">Startup Simulator</h1>
         <p class="lede">
-          Build from a garage to IPO. Career mode starts at $120k; Sandbox adds starting cash but the same revenue milestones.
+          Build from a garage to IPO. Career is the standard climb with $120k in the bank. Sandbox lets you stack extra cash and tune the rules for a wilder run.
         </p>
       </header>
       <div id="start-continue-offer" class="start-continue-offer" hidden>
-        <p class="lede">You have a saved run on this device.</p>
+        <p class="lede">Welcome back — your company is waiting.</p>
         <button id="btn-continue-open" class="btn btn-primary" type="button">Continue where you left off</button>
         <button id="btn-dismiss-continue-offer" class="btn btn-ghost btn-small" type="button">Stay on menu</button>
       </div>
@@ -27,7 +27,7 @@
         <button id="btn-load" class="btn btn-ghost" type="button" disabled>Continue saved game</button>
         <button id="btn-new" class="btn btn-primary" type="button">New game</button>
       </div>
-      <p id="start-save-hint" class="fine-print" hidden>Progress is saved automatically on your device. Use Continue to pick up where you left off.</p>
+      <p id="start-save-hint" class="fine-print" hidden>Your progress saves as you play. Hit Continue to pick up where you left off.</p>
       <p id="start-api-status" class="fine-print" hidden></p>
       <div id="hall-of-fame" class="hall-of-fame" hidden aria-label="Hall of fame"></div>
     </section>
@@ -70,7 +70,7 @@
         </div>
 
         <div id="sandbox-tuning-wrap" class="sandbox-cash" hidden>
-          <p class="fine-print">Sandbox tuning does not affect Career rules on other saves.</p>
+          <p class="fine-print">Sandbox knobs apply only to this new Sandbox company.</p>
           <label for="sandbox-revenue-mult">Task revenue multiplier</label>
           <select id="sandbox-revenue-mult" name="sandboxRevenueMult">
             <option value="1">1× (default)</option>
@@ -138,13 +138,13 @@
       </div>
 
       <footer class="game-footer">
-        <span id="save-status" class="save-status fine-print" aria-live="polite" hidden>Auto-saved on this device</span>
+        <span id="save-status" class="save-status fine-print" aria-live="polite" hidden>Progress saved</span>
         <label class="audio-toggle fine-print">
           <input type="checkbox" id="toggle-audio" aria-describedby="audio-toggle-hint">
           Sound effects
         </label>
         <span id="audio-toggle-hint" class="visually-hidden">Optional UI clicks and month-close chime</span>
-        <button id="btn-save" class="btn btn-ghost btn-small" type="button" title="Save now (progress also auto-saves)">Save</button>
+        <button id="btn-save" class="btn btn-ghost btn-small" type="button" title="Save now — the game also saves as you go">Save</button>
         <button id="btn-back-start" class="btn btn-ghost btn-small" type="button">Main menu</button>
       </footer>
     </section>

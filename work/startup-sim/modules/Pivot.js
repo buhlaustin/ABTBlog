@@ -17,7 +17,7 @@ export function applyPivot(state, newCategoryId) {
   }
 
   const cat = getCategoryById(newCategoryId, getCategoriesSync());
-  if (!cat) return { ok: false, reason: 'Invalid category.' };
+  if (!cat) return { ok: false, reason: 'Pick a category from the list.' };
   if (cat.id === state.company.categoryId) {
     return { ok: false, reason: 'Pick a different category than your current positioning.' };
   }

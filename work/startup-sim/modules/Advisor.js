@@ -1,4 +1,4 @@
-import { requestNarrative, shouldUseNarrativeAi, isNarrativeApiLive } from './NarrativeApi.js';
+import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 
 const MAX_HISTORY = 12;
@@ -79,13 +79,6 @@ function escapeHtml(s) {
 export function renderAdvisorPanel(container, state) {
   if (!container) return;
   if (!state.advisor) state.advisor = createInitialAdvisor();
-  let api = 'Offline tips mode';
-  if (shouldUseNarrativeAi() && isNarrativeApiLive()) {
-    api = 'AI chief of staff (connected)';
-  } else if (shouldUseNarrativeAi()) {
-    api = 'AI chief of staff';
-  }
-
   const msgs = (state.advisor.messages ?? [])
     .map(
       (m) =>
@@ -94,12 +87,12 @@ export function renderAdvisorPanel(container, state) {
     .join('');
 
   container.innerHTML = `
-    <p class="panel-lede">${api} — knows your cash, stage, tasks, and headlines.</p>
+    <p class="panel-lede">Your chief of staff reads cash, runway, stage, and the latest headlines — then tells you what to do next.</p>
     <div class="advisor-log">${msgs || '<p class="fine-print">Ask what to focus on this month.</p>'}</div>
     <form id="advisor-form" class="setup-form">
       <textarea id="advisor-input" rows="2" maxlength="400" placeholder="What should we prioritize?"></textarea>
       <button type="submit" class="btn btn-primary btn-small" ${state.advisor.pending ? 'disabled' : ''}>Ask</button>
     </form>
-    <p class="fine-print">Game guidance only — not real investment or legal advice.</p>
+    <p class="fine-print">In-world coaching only — your lawyer still gets paid separately.</p>
   `;
 }

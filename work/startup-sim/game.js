@@ -167,7 +167,7 @@ async function submitXcInterview(e) {
   const result = completeXcAcceptance(sessionState);
   if (!result.ok) {
     if (feedback) {
-      feedback.textContent = result.reason || 'Could not accept.';
+      feedback.textContent = result.reason || 'Not accepted yet — try again next month.';
       feedback.classList.add('error');
     }
     return;
@@ -245,7 +245,7 @@ async function handleEndMonth() {
   }
   appendLog(
     sessionState,
-    news.source === 'ai' ? 'Fresh headlines landed (AI).' : 'Headlines updated (offline).'
+    news.source === 'ai' ? 'Fresh headlines hit the wire.' : 'Headlines updated.'
   );
   const headline = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
   if (result.monthSummary) {
@@ -258,9 +258,9 @@ async function handleEndMonth() {
 
 function loadSavedGame() {
   const raw = StorageManager.load();
-  if (!raw) return { ok: false, reason: 'No save found or save could not be read.' };
+  if (!raw) return { ok: false, reason: 'No saved company found.' };
   const state = normalizeSave(raw);
-  if (!state) return { ok: false, reason: 'Save file is invalid or from an unsupported version.' };
+  if (!state) return { ok: false, reason: 'That save could not be opened — try starting a new company.' };
   enterGame(state);
   return { ok: true };
 }
@@ -572,7 +572,7 @@ function bindGameInteractions() {
       if (fb) {
         fb.hidden = false;
         fb.textContent = result.ok
-          ? `Pivoted to ${result.newLabel}. Desk tasks refreshed; check News.`
+          ? `Pivoted to ${result.newLabel}. Fresh desk lineup — the News tab will notice.`
           : result.reason || 'Could not pivot.';
         fb.classList.toggle('error', !result.ok);
       }
@@ -646,14 +646,13 @@ async function init() {
     apiStatus.classList.remove('error');
     if (isNarrativeApiLive()) {
       apiStatus.textContent =
-        'AI narrative connected — XC scoring, news, social, advisor, and IPO press use live generation.';
+        'The wire is live — batch interviews, headlines, social chatter, advisor notes, and IPO press are freshly written.';
     } else if (isNarrativeApiEnabled()) {
       apiStatus.textContent =
-        'Narrative API unreachable — deploy hos-narrative with Startup kinds (see docs). Using offline fallbacks until then.';
+        'Headlines and chatter are on backup scripts for now. Same game — a little less surprise on the News and Social tabs.';
       apiStatus.classList.add('error');
     } else {
-      apiStatus.textContent = 'No narrative URL configured — offline fallbacks only.';
-      apiStatus.classList.add('error');
+      apiStatus.hidden = true;
     }
   }
 
@@ -721,7 +720,7 @@ async function init() {
       }
       if (err) {
         err.textContent =
-          'Could not load task data. Check your connection and refresh, then try again.';
+          'The task list did not load. Check your connection, reload the page, and try again.';
       }
       return;
     }

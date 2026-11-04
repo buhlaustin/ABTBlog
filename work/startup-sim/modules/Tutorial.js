@@ -25,7 +25,7 @@ const STEPS = [
     id: 'scale',
     stages: [STAGES.POST_XC],
     title: 'Scale',
-    body: 'Higher-revenue tasks unlock after seed. Watch runway on Finance and optional AI headlines after each month.'
+    body: 'Higher-revenue tasks unlock after seed. Watch runway on Finance and skim the News tab after each month close.'
   },
   {
     id: 'ipo',

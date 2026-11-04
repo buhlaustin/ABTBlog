@@ -27,7 +27,7 @@ Open `/work/startup-sim/` (Next) or, after `npm run copy-work`, `/play/startup-s
 
 ## Saves
 
-Progress is stored in **`localStorage`** on this device (`startup_sim_save_v1`). The game **auto-saves** after tasks, month close, and most actions; use **Continue saved game** on the title screen to resume. **New game** replaces the save when you start a new company.
+Progress saves automatically in your browser as you play. Use **Continue saved game** on the title screen to resume. **New game** replaces the save when you found a new company.
 
 ## Production AI
 

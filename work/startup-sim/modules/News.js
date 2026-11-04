@@ -201,7 +201,7 @@ export function renderNewsPanel(container, state) {
     : '';
 
   container.innerHTML = `
-    <p class="panel-lede">Headlines refresh when you close each month (3–4 articles). Parody outlets only.</p>
+    <p class="panel-lede">Three or four fresh stories land each time you close the month — all from fictional outlets.</p>
     <button type="button" class="btn btn-ghost btn-small" id="btn-toggle-news-archive">
       ${showArchive ? 'Hide archive' : 'Show archive'}
     </button>
