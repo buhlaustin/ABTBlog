@@ -27,7 +27,8 @@ export function createInitialNews() {
     currentMonthArticles: [],
     archive: [],
     layoffQueue: [],
-    showArchive: false
+    showArchive: false,
+    seedCelebrationShown: false
   };
 }
 
@@ -101,9 +102,10 @@ function offlineNewsArticles(state) {
     state.flags.lastDownRound = false;
   }
 
-  if (state.flags?.seedRoundClosed) {
+  if (state.flags?.seedRoundClosed && !state.news?.seedCelebrationShown) {
+    state.news.seedCelebrationShown = true;
     articles.push({
-      headline: `VC Twitter celebrates ${company} seed rumors`,
+      headline: `VC Twitter celebrates ${company}'s seed close`,
       dek: 'Term sheets or it did not happen.',
       body: 'Patty Fundsworth posted six threads and zero confirmations. Chirp remains undefeated as a source of truth.',
       source: 'Chirp Business',

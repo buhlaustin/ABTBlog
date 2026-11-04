@@ -15,6 +15,9 @@ import { activeTutorialStep, renderTutorialBanner } from './Tutorial.js';
 import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
+import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
+import { sentimentLabel } from './Sentiment.js';
+import { competitorRevenueMult } from './Competitor.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -229,11 +232,7 @@ export function renderDeskPanel(state) {
 }
 
 export function showDeskFeedback(message, isError = false) {
-  const el = document.getElementById('desk-feedback');
-  if (!el) return;
-  el.textContent = message;
-  el.hidden = !message;
-  el.classList.toggle('error', isError);
+  setGameFeedback(message, isError);
 }
 
 export const TAB_ORDER = [
@@ -346,14 +345,8 @@ export function renderAllPanels(state) {
   renderDeskPanel(state);
 
   renderProductPanel(document.getElementById('panel-product'), state);
-
-  const growth = document.getElementById('panel-growth');
-  if (growth) {
-    growth.innerHTML = `
-      <p class="panel-lede">Marketing and sales tasks appear on the Desk each month.</p>
-      <div class="tab-placeholder">${escapeHtml(state.company.categoryLabel)} — use Desk tasks to grow this month.</div>
-    `;
-  }
+  renderGrowthPanel(document.getElementById('panel-growth'), state);
+  paintGameFeedback();
 
   renderPeoplePanel(document.getElementById('panel-people'), state);
 
@@ -362,6 +355,39 @@ export function renderAllPanels(state) {
   renderSocialPanel(document.getElementById('panel-social'), state);
   renderNewsPanel(document.getElementById('panel-news'), state);
   renderAdvisorPanel(document.getElementById('panel-advisor'), state);
+}
+
+export function renderGrowthPanel(container, state) {
+  if (!container) return;
+  const rival = state.world?.competitor;
+  const pressure = rival?.pressure ?? 0;
+  const revMult = competitorRevenueMult(state);
+  const buzz = state.product?.buzz ?? 0;
+  const sentiment = state.sentiment?.score ?? 68;
+  const lastReason = state.sentiment?.lastReason;
+  const pendingDesk = (state.calendar?.monthTasks ?? []).filter((t) => t.status === 'pending').length;
+
+  container.innerHTML = `
+    <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks drive revenue; rivals and board mood nudge outcomes.</p>
+    <div class="summary-grid">
+      <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>
+      <div><span class="stat-label">Heat</span><span class="stat-value">${pressure}/5</span></div>
+      <div><span class="stat-label">Rev. modifier</span><span class="stat-value">${(revMult * 100).toFixed(0)}%</span></div>
+      <div><span class="stat-label">Buzz</span><span class="stat-value">${buzz}</span></div>
+      <div><span class="stat-label">Board</span><span class="stat-value">${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}</span></div>
+      <div><span class="stat-label">Desk tasks left</span><span class="stat-value">${pendingDesk}</span></div>
+    </div>
+    ${
+      rival
+        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Win months on the Desk and close strong revenue to cool rival heat.</p>`
+        : ''
+    }
+    ${
+      lastReason
+        ? `<p class="fine-print">Latest board note: ${escapeHtml(lastReason)}</p>`
+        : '<p class="fine-print">Ship desk tasks that match your category — growth and product level feed task payouts on Product.</p>'
+    }
+  `;
 }
 
 export function renderProductPanel(container, state) {

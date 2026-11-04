@@ -118,6 +118,45 @@ export function applySeedRound(state) {
   return { ok: true, raised, postMoney };
 }
 
+/** Cap table + instruments shape after seed — no cash or flag checks (sandbox bootstrap). */
+export function applySeedCapTableSnapshot(state) {
+  if (!state.capTable?.length) {
+    state.capTable = [
+      {
+        id: 'founder',
+        name: 'You (Founder)',
+        shares: 10_000_000,
+        pct: 100,
+        class: 'founder'
+      }
+    ];
+  }
+  let rows = state.capTable.map((r) => ({ ...r }));
+  const totalBefore = rows.reduce((s, r) => s + r.shares, 0);
+  const raised = 3_000_000;
+  const postMoney = 15_000_000;
+  const seedShares = Math.round(totalBefore * (raised / (postMoney - raised)));
+  if (!rows.some((r) => r.id === 'seed')) {
+    rows.push({
+      id: 'seed',
+      name: 'Seed investors',
+      shares: seedShares,
+      class: 'investor'
+    });
+  }
+  let total = rows.reduce((s, r) => s + r.shares, 0);
+  if (!rows.some((r) => r.id === 'esop')) {
+    const esopShares = Math.round(total * (0.1 / 0.9));
+    rows.push({
+      id: 'esop',
+      name: 'Employee option pool',
+      shares: esopShares,
+      class: 'option'
+    });
+  }
+  state.capTable = recalculateCapTablePercentages(rows);
+}
+
 function applyPricedRound(state, config) {
   const {
     roundKey,

@@ -75,6 +75,7 @@ import {
   showDeskFeedback,
   showScreen
 } from './modules/UI.js';
+import { setGameFeedback } from './modules/GameFeedback.js';
 
 let sessionState = null;
 
@@ -238,17 +239,9 @@ async function handleEndMonth() {
   }
 
   await rollMonthStartCrisis(sessionState);
-  if (hasActiveCrisis(sessionState)) {
-    appendLog(sessionState, `Crisis: ${sessionState.crisis.active.title}`);
-  }
 
   showDeskFeedback('Generating headlines…');
   const news = await generateMonthlyNews(sessionState);
-  if (hasActiveCrisis(sessionState)) {
-    showDeskFeedback('Crisis hit — resolve it before your next month close.');
-    refresh();
-    return;
-  }
   appendLog(
     sessionState,
     news.source === 'ai' ? 'Fresh headlines hit the wire.' : 'Headlines updated.'
@@ -257,6 +250,12 @@ async function handleEndMonth() {
   if (result.monthSummary) {
     await openMonthSummaryDialog(sessionState, result.monthSummary, headline);
     playMonthCloseChime();
+  }
+  if (hasActiveCrisis(sessionState)) {
+    appendLog(sessionState, `Crisis: ${sessionState.crisis.active.title}`);
+    showDeskFeedback('Month closed — resolve the crisis before you close again.');
+    refresh();
+    return;
   }
   showDeskFeedback('Month closed. New tasks dealt.');
   refresh();
@@ -563,9 +562,11 @@ function bindGameInteractions() {
       const result = await sendAdvisorMessage(sessionState, text);
       if (input) input.value = '';
       if (!result.ok) {
+        setGameFeedback(result.reason || 'Could not send that message.', true);
         refresh();
         return;
       }
+      setGameFeedback('Chief of staff replied.');
       refresh();
       return;
     }
@@ -574,16 +575,11 @@ function bindGameInteractions() {
       if (!sessionState) return;
       const cat = document.getElementById('pivot-category')?.value;
       const result = applyPivot(sessionState, cat);
-      const fb = document.getElementById('pivot-feedback');
-      if (fb) {
-        fb.hidden = false;
-        fb.textContent = result.ok
-          ? `Pivoted to ${result.newLabel}. Fresh desk lineup — the News tab will notice.`
-          : result.reason || 'Could not pivot.';
-        fb.classList.toggle('error', !result.ok);
-      }
       if (result.ok) {
         appendLog(sessionState, `Pivoted from ${result.oldLabel} to ${result.newLabel}.`);
+        setGameFeedback(`Pivoted to ${result.newLabel}. Fresh desk lineup — check News.`);
+      } else {
+        setGameFeedback(result.reason || 'Could not pivot.', true);
       }
       refresh();
     }
@@ -645,7 +641,7 @@ async function init() {
     return;
   }
 
-  const categories = await loadCategories();
+  const categories = getCategoriesSync();
   const categorySelect = document.getElementById('startup-category');
   populateCategorySelect(categorySelect, categories);
 
@@ -675,8 +671,8 @@ async function init() {
         'The wire is live — batch interviews, headlines, social chatter, advisor notes, and IPO press are freshly written.';
     } else if (isNarrativeApiEnabled()) {
       apiStatus.textContent =
-        'Story server did not respond — reload the page. Interviews, headlines, and social need that connection.';
-      apiStatus.classList.add('error');
+        'Live story server is quiet — headlines and social still update each month. Reload if interviews stay stuck.';
+      apiStatus.classList.remove('error');
     } else {
       apiStatus.hidden = true;
     }

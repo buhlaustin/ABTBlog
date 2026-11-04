@@ -260,7 +260,7 @@ export function renderIpoPanel(container, state) {
   let block = '';
   if (canFileIpo(state)) {
     block = `<div class="finance-action ipo-action">
-      <p><strong>IPO window open</strong> — You crossed $1B lifetime revenue. File to list on the fictional exchange.</p>
+      <p><strong>IPO window open</strong> — You crossed ${formatMoney(getEffectiveIpoGate(state))} lifetime revenue. File to list on the fictional exchange.</p>
       <p class="fine-print">Market sentiment from recent news can nudge the opening pop. After listing, the stock updates each month.</p>
       <button type="button" class="btn btn-primary btn-small" id="btn-file-ipo">File IPO</button>
     </div>`;

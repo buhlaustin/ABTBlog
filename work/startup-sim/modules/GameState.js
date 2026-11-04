@@ -12,6 +12,7 @@ import { createCompetitorForCategory } from './Competitor.js';
 import { createInitialCrisisState } from './Crisis.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { calendarTurn } from './XC.js';
+import { syncStageFromProgress } from './Progression.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -166,6 +167,7 @@ export function normalizeSave(raw) {
     if (state.xc.retryAvailableTurn === undefined) state.xc.retryAvailableTurn = null;
     if (state.xc.needsFollowUpQuestion === undefined) state.xc.needsFollowUpQuestion = false;
     if (!state.advisor) state.advisor = createInitialAdvisor();
+    if (state.advisor.pending) state.advisor.pending = false;
     if (!state.sentiment) state.sentiment = createInitialSentiment();
     if (!state.world?.competitor) {
       state.world = {
@@ -195,7 +197,13 @@ export function normalizeSave(raw) {
     if (state.flags.ipoFiled === undefined) state.flags.ipoFiled = false;
     if (state.flags.cashedOut === undefined) state.flags.cashedOut = false;
     if (state.flags.ipoUnlocked === undefined) state.flags.ipoUnlocked = false;
+    if (state.flags.xcUnlocked === undefined) state.flags.xcUnlocked = false;
+    if (state.flags.xcAccepted === undefined) state.flags.xcAccepted = false;
+    if (state.flags.xcUnlockedLogged === undefined) state.flags.xcUnlockedLogged = false;
     if (state.news && state.news.showArchive === undefined) state.news.showArchive = false;
+    if (state.news && state.news.seedCelebrationShown === undefined) {
+      state.news.seedCelebrationShown = false;
+    }
 
     if (state.flags.xcResidencyComplete === undefined) {
       state.flags.xcResidencyComplete = false;
@@ -213,13 +221,25 @@ export function normalizeSave(raw) {
       }
     }
 
-    if (state.capTable?.length) {
+    if (!state.capTable?.length) {
+      state.capTable = [
+        {
+          id: 'founder',
+          name: 'You (Founder)',
+          shares: 10_000_000,
+          pct: 100,
+          class: 'founder'
+        }
+      ];
+    } else {
       recalculateCapTablePercentages(state.capTable);
     }
 
     if (!state.calendar.monthTasks.length && !state.flags.gameOver) {
       startMonth(state);
     }
+
+    syncStageFromProgress(state);
 
     state.version = SAVE_VERSION;
     return state;

@@ -1,5 +1,6 @@
 import { assetBaseUrl } from './utils.js';
 import { STAGES, formatMoney } from './constants.js';
+import { setGameFeedback } from './GameFeedback.js';
 import bundledHubs from '../data/hubs.json' with { type: 'json' };
 
 let hubsCache = bundledHubs;
@@ -185,9 +186,5 @@ export function renderOfficesPanel(container, state) {
 }
 
 export function showOfficesFeedback(message, isError = false) {
-  const el = document.getElementById('offices-feedback');
-  if (!el) return;
-  el.textContent = message;
-  el.hidden = !message;
-  el.classList.toggle('error', isError);
+  setGameFeedback(message, isError);
 }

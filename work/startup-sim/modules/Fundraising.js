@@ -9,7 +9,8 @@ import {
 } from './CapTable.js';
 import { renderFinanceSummary } from './Finance.js';
 import { formatMoney } from './constants.js';
-import { sentimentLabel } from './Sentiment.js';
+import { sentimentLabel, seriesAGateSentiment, seriesBGateSentiment } from './Sentiment.js';
+import { setGameFeedback } from './GameFeedback.js';
 import { canStartInterview, isInResidency, xcWaitingForRetry } from './XC.js';
 import { renderOfficesPanel } from './Offices.js';
 import { renderIpoPanel } from './IPO.js';
@@ -84,12 +85,19 @@ export function renderFinancePanel(container, state) {
       ${rival ? `<p class="fine-print">Rival in the news: <strong>${escapeHtml(rival)}</strong></p>` : ''}
     </div>`;
 
+  const seriesAScore = seriesAGateSentiment(state);
+  const seriesBScore = seriesBGateSentiment(state);
   const seriesABlock =
     seriesA && !state.flags?.seriesAClosed
       ? `<div class="finance-action">
         <p><strong>Series A</strong> — raise ${formatMoney(seriesA.raised)} at ${formatMoney(seriesA.postMoney)} post-money.</p>
         <p class="fine-print">${escapeHtml(seriesA.note)} Founder ~${seriesA.founderPctNow}% → ~${seriesA.founderPctAfterApprox}%.</p>
-        <button type="button" class="btn btn-primary btn-small" id="btn-close-series-a">Close Series A</button>
+        ${
+          seriesAScore < 30
+            ? `<p class="fine-print error">Board sentiment ${seriesAScore}/100 — need at least 30 before Series A (see Growth tab).</p>`
+            : ''
+        }
+        <button type="button" class="btn btn-primary btn-small" id="btn-close-series-a" ${seriesAScore < 30 ? 'disabled title="Raise board sentiment to 30+"' : ''}>Close Series A</button>
       </div>`
       : state.flags?.seriesAClosed
         ? `<p class="fine-print">Series A closed.</p>`
@@ -100,7 +108,12 @@ export function renderFinancePanel(container, state) {
       ? `<div class="finance-action">
         <p><strong>Series B</strong> — raise ${formatMoney(seriesB.raised)} at ${formatMoney(seriesB.postMoney)} post-money.</p>
         <p class="fine-print">${escapeHtml(seriesB.note)} Founder ~${seriesB.founderPctNow}% → ~${seriesB.founderPctAfterApprox}%.</p>
-        <button type="button" class="btn btn-primary btn-small" id="btn-close-series-b">Close Series B</button>
+        ${
+          seriesBScore < 25
+            ? `<p class="fine-print error">Board sentiment ${seriesBScore}/100 — need at least 25 before Series B.</p>`
+            : ''
+        }
+        <button type="button" class="btn btn-primary btn-small" id="btn-close-series-b" ${seriesBScore < 25 ? 'disabled title="Raise board sentiment to 25+"' : ''}>Close Series B</button>
       </div>`
       : state.flags?.seriesBClosed
         ? `<p class="fine-print">Series B closed.</p>`
@@ -153,9 +166,5 @@ export function renderFinancePanel(container, state) {
 }
 
 export function showFinanceFeedback(message, isError = false) {
-  const el = document.getElementById('finance-feedback');
-  if (!el) return;
-  el.textContent = message;
-  el.hidden = !message;
-  el.classList.toggle('error', isError);
+  setGameFeedback(message, isError);
 }

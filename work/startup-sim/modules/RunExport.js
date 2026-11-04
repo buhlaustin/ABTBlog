@@ -31,7 +31,11 @@ export function buildRunExportText(state) {
   }
 
   lines.push('');
-  lines.push('https://austinbuhltech.com/work/startup-sim/');
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    lines.push(`${window.location.origin}/play/startup-sim/`);
+  } else {
+    lines.push('https://austinbuhltech.com/play/startup-sim/');
+  }
   return lines.join('\n');
 }
 

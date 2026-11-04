@@ -426,6 +426,12 @@ h1 {
   text-align: right;
 }
 
+.game-flash {
+  flex: 1 1 100%;
+  margin: 0 0 0.35rem;
+  max-width: 100%;
+}
+
 .game-footer {
   display: flex;
   align-items: center;

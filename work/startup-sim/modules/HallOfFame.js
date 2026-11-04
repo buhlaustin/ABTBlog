@@ -2,6 +2,12 @@ import { formatMoney } from './constants.js';
 
 const HOF_KEY = 'startup_sim_hall_of_fame_v1';
 
+function formatOutcome(outcome) {
+  if (outcome === 'cash_out') return 'CEO cash-out';
+  if (outcome === 'game_over') return 'Run ended';
+  return 'Completed';
+}
+
 function emptyRecord() {
   return {
     version: 1,
@@ -134,7 +140,7 @@ export function renderHallOfFameBlock(container) {
     .slice(0, 4)
     .map(
       (r) =>
-        `<li>${escapeHtml(r.company)} — ${escapeHtml(r.outcome)} · ${formatMoney(r.lifetimeRevenue)} lifetime · ${r.months} mo</li>`
+        `<li>${escapeHtml(r.company)} — ${escapeHtml(formatOutcome(r.outcome))} · ${formatMoney(r.lifetimeRevenue)} lifetime · ${r.months} mo</li>`
     )
     .join('');
 

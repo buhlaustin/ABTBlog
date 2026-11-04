@@ -1,5 +1,6 @@
 import { STAGES, formatMoney, fixedCostsForStage } from './constants.js';
 import { totalHeadcountCap } from './Offices.js';
+import { setGameFeedback } from './GameFeedback.js';
 
 export const DEPARTMENTS = [
   { id: 'engineering', label: 'Engineering' },
@@ -205,9 +206,5 @@ export function renderPeoplePanel(container, state) {
 }
 
 export function showPeopleFeedback(message, isError = false) {
-  const el = document.getElementById('people-feedback');
-  if (!el) return;
-  el.textContent = message;
-  el.hidden = !message;
-  el.classList.toggle('error', isError);
+  setGameFeedback(message, isError);
 }

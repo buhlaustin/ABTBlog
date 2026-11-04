@@ -85,12 +85,23 @@ export function dealMonthlyTasks(state) {
   state.calendar.taskCatalogError = false;
   const shuffled = shuffle(pool);
   const picked = [];
+  const usedIds = new Set();
   while (picked.length < slots) {
+    let added = false;
     for (const def of shuffled) {
       if (picked.length >= slots) break;
+      if (usedIds.has(def.id)) continue;
+      usedIds.add(def.id);
       picked.push(def);
+      added = true;
     }
-    if (!shuffled.length) break;
+    if (!added) {
+      for (const def of shuffled) {
+        if (picked.length >= slots) break;
+        picked.push(def);
+      }
+      break;
+    }
   }
   state.calendar.monthTaskSlotTarget = slots;
   state.calendar.monthTasks = picked.map((def, index) => ({

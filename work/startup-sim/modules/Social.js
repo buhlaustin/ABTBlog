@@ -1,6 +1,7 @@
 import { assetBaseUrl } from './utils.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
+import { setGameFeedback } from './GameFeedback.js';
 import bundledPersonas from '../data/personas.json' with { type: 'json' };
 
 let personasCache = bundledPersonas.personas ?? [];
@@ -207,9 +208,5 @@ export function updateChirpCharCount(text) {
 }
 
 export function showSocialFeedback(message, isError = false) {
-  const el = document.getElementById('social-feedback');
-  if (!el) return;
-  el.textContent = message;
-  el.hidden = !message;
-  el.classList.toggle('error', isError);
+  setGameFeedback(message, isError);
 }

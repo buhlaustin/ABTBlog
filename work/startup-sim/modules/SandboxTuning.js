@@ -1,4 +1,5 @@
 import { STAGES, REVENUE_GATES, fixedCostsForStage } from './constants.js';
+import { applySeedCapTableSnapshot } from './CapTable.js';
 
 const ATLANTA_HUB = {
   id: 'atlanta',
@@ -69,5 +70,6 @@ export function applySandboxStartingStage(state) {
     };
     state.finance.fixedCostsMonthly = hub.fixedBase;
     state.company.location = hub.label;
+    applySeedCapTableSnapshot(state);
   }
 }
