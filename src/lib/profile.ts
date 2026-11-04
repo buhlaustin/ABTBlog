@@ -9,7 +9,7 @@ export const authorCard = {
 } as const;
 
 export const profile = {
-  role: "Co-Founder & CEO",
+  role: "Software Engineer and Indie Game Designer",
   company: "ClassQuip",
   companyUrl: "https://www.classquip.com",
   previousEmployer: "Stride / K12",
