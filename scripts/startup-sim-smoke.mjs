@@ -142,6 +142,20 @@ if (careerMult < 0.9 || careerMult > 2.5) {
   console.log(`OK: career effective revenue mult ${careerMult}`);
 }
 
+const lowCashSandbox = createInitialState({
+  companyName: 'SandboxScrappy',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 25_000,
+  sandboxTuning: { revenueMult: 2, startingStage: 'garage', ipoGateArr: 50_000_000 }
+});
+if (lowCashSandbox.finance.cash !== 25_000) {
+  console.error(`FAIL: sandbox low cash expected 25000 got ${lowCashSandbox.finance.cash}`);
+  failed = true;
+} else {
+  console.log('OK: sandbox can start at $25k with tuning');
+}
+
 const sandboxState = createInitialState({
   companyName: 'SandboxMult',
   categoryId: 'b2b-saas',
