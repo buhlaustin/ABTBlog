@@ -1,4 +1,4 @@
-import { loadCategories } from './modules/Categories.js';
+import { loadCategories, getCategoriesSync } from './modules/Categories.js';
 import { createInitialState, normalizeSave } from './modules/GameState.js';
 import { StorageManager } from './modules/Storage.js';
 import {
@@ -613,6 +613,7 @@ async function init() {
     el.classList.add('error');
     document.getElementById('btn-new')?.setAttribute('disabled', 'disabled');
     document.getElementById('btn-load')?.setAttribute('disabled', 'disabled');
+    document.body.dataset.startupSimReady = 'error';
   }
 
   function flashLoadError(message) {

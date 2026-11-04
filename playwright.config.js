@@ -4,7 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
 /** Playwright smoke for Startup Simulator (served from public/ after copy-work). */
 export default defineConfig({
   testDir: 'e2e',
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,

@@ -5,10 +5,11 @@ const SAVE_KEY = 'startup_sim_save_v1';
 
 test.describe('Startup Simulator', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/play/startup-sim/index.html');
+    await page.goto('/play/startup-sim/index.html', { waitUntil: 'load' });
     await page.evaluate((key) => localStorage.removeItem(key), SAVE_KEY);
-    await page.reload();
-    await expect(page.locator('body[data-startup-sim-ready="true"]')).toBeVisible({ timeout: 15_000 });
+    // Full navigation — reload() can interrupt ES module init on slow CI runners.
+    await page.goto('/play/startup-sim/index.html', { waitUntil: 'load' });
+    await expect(page.locator('body[data-startup-sim-ready="true"]')).toBeVisible({ timeout: 45_000 });
     await expect(page.getByRole('button', { name: 'New game' })).toBeVisible();
   });
 
