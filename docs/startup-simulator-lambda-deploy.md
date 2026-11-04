@@ -1,6 +1,8 @@
 # Startup Simulator narrative kinds (deploy separately)
 
-The static **Startup Simulator** client can call these `kind` values on the shared narrative API:
+**Phase 7 ship goal:** live AI for Startup Simulator (see [startup-simulator-plan.md](./startup-simulator-plan.md) — Phase 7). Until this deploy lands, the game uses offline fallbacks only.
+
+The static **Startup Simulator** client calls these `kind` values on the shared narrative API:
 
 - `startup_xc_interview_score`
 - `startup_news_month`
@@ -15,7 +17,7 @@ The game works **without** them (offline fallbacks). Enable live AI by deploying
 1. Replace `index.mjs` with the prepared bundle:
 
    ```bash
-   cp infra/lambda/hos-narrative/index.mjs.with-startup-sim infra/lambda/hos-narrative/index.mjs
+   cp docs/startup-simulator-hos-narrative-index.mjs infra/lambda/hos-narrative/index.mjs
    ```
 
 2. Merge to `main` **or** run the **Deploy HOS narrative API** workflow manually (`workflow_dispatch`).
@@ -24,4 +26,4 @@ Pushing only `infra/lambda/hos-narrative/**` changes to `main` triggers [`.githu
 
 ## Game-only merge
 
-Merging Startup Simulator under `work/startup-sim/` does **not** deploy Lambda unless `infra/lambda/hos-narrative/` changes on `main`.
+Merging Startup Simulator under `work/startup-sim/` does **not** deploy Lambda. Only changes to `infra/lambda/hos-narrative/index.mjs` (or the CloudFormation template) on `main` trigger deploy — not docs-only bundles.

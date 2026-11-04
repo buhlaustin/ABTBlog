@@ -396,6 +396,54 @@ work/startup-sim/
 - [x] Skip link, tab keyboard nav, focus rings, mobile tab scroll + touch targets
 - [x] Work registry **live** + featured; `/work/startup-sim/` indexable when live
 
+### Phase 7 — Depth, live AI, retention
+
+Ship criteria: **live narrative AI is required** for this phase (all five `kind`s on production `hos-narrative`). Offline fallbacks remain for resilience only — not the primary experience. No client feature flag to force offline mode.
+
+#### Live AI (required)
+
+- [ ] Promote staged handler: `docs/startup-simulator-hos-narrative-index.mjs` → `infra/lambda/hos-narrative/index.mjs` and deploy per [`startup-simulator-lambda-deploy.md`](./startup-simulator-lambda-deploy.md)
+- [ ] Verify in production: `startup_xc_interview_score`, `startup_news_month`, `startup_social_reactions`, `startup_advisor_chat`, `startup_ipo_press`
+- [ ] Start screen / settings: show **API connected** when narrative URL responds; surface clear error if Lambda is down (player still gets fallbacks, but status is honest)
+- [ ] **Advisor memory:** server-side or client bundle includes last N turns + snapshot so advice references recent decisions
+- [ ] **Social NPC threads:** reactions/comments reference last month’s headlines or the player’s last post (same `startup_social_reactions` flow, richer context)
+- [ ] **XC waitlist path:** lenient reject → retry next month with one new question (reuse scoring infra)
+- [ ] **IPO day beat:** extra `startup_ipo_press` moment + optional one-month **lockup** before cash-out is allowed
+
+#### Gameplay depth
+
+- [ ] **Series A / B** fundraising templates (higher gates, ~20% dilution per locked table); optional **down round** beat if runway is tight
+- [ ] **Board / investor sentiment** meter (layoffs, missed months, stock) gates or worsens follow-on terms
+- [ ] **Competitor NPC** in news/social (one fictional rival; light buzz/market modifiers)
+- [ ] **Category-specific task decks** — 2–3 exclusive Desk tasks per startup category (data-driven)
+- [ ] **Crisis cards** — rare month-start events (outage, lawsuit parody, poached hire) with two choices and cash/buzz/stock effects
+
+#### Progression & meta
+
+- [ ] **Run summary / hall of fame** — local persistence of best valuation, fastest to IPO, founder payout across runs
+- [ ] **Sandbox tuning panel** — optional revenue mult, starting stage, IPO gate (sandbox only; does not affect career gates)
+- [ ] **One-time pivot** — change category/positioning once per run with buzz hit + news cycle
+
+#### UX & retention
+
+- [ ] **Continue on open** — if save exists, optional one-tap “Continue where you left off?” on entry (auto-save already in place)
+- [ ] **Month-end summary modal** — cash, burn, runway, stock tick, headline teaser before new month
+- [ ] **Keyboard shortcuts** — 1–8 for tabs, `M` to close month when valid
+- [ ] **Run export** — copy/share text summary from cash-out / game-over screen
+
+#### Content & polish
+
+- [ ] **Commons art pass** — stage backgrounds, hub skylines from manifest (beyond Phase 6 icons)
+- [ ] **Audio** — CC0 UI clicks + optional month-close chime (off by default)
+- [ ] **Chirp character counter** — live count toward 240 while typing
+- [ ] **Public-era task variety** — expand pool beyond minimum slot count to reduce repetition
+
+#### Ops & quality
+
+- [ ] **Playwright smoke** — new game → task → save → reload → continue in CI (complements `smoke:startup-sim`)
+- [ ] **Save migration v7** — explicit version steps when Phase 7 fields land
+- [ ] **AI integration smoke** — scripted or manual checklist hitting each `kind` against staging/production URL before release
+
 ---
 
 ## Decisions (locked)
