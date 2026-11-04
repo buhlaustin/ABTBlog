@@ -82,6 +82,12 @@ function shuffle(arr) {
   return a;
 }
 
+function categoryAllowed(task, categoryId) {
+  const cats = task.categories;
+  if (!cats?.length) return true;
+  return cats.includes(categoryId);
+}
+
 function stageAllowed(task, stage) {
   const stages = task.stages ?? ['garage'];
   if (stage === STAGES.GARAGE || stage === STAGES.OFFICE) {
@@ -102,7 +108,10 @@ function stageAllowed(task, stage) {
 /** Deal counted tasks for the current month. */
 export function dealMonthlyTasks(state) {
   const slots = getMonthlyTaskSlots(state.stage);
-  const pool = getTaskDefinitions().filter((t) => stageAllowed(t, state.stage));
+  const categoryId = state.company?.categoryId;
+  const pool = getTaskDefinitions().filter(
+    (t) => stageAllowed(t, state.stage) && categoryAllowed(t, categoryId)
+  );
   if (!pool.length) {
     state.calendar.taskCatalogError = true;
     state.calendar.monthTasks = [];
@@ -148,5 +157,6 @@ export function allTasksComplete(state) {
 export function canEndMonth(state) {
   if (state.flags?.gameOver) return false;
   if (state.calendar?.taskCatalogError) return false;
+  if (state.crisis?.active) return false;
   return allTasksComplete(state);
 }

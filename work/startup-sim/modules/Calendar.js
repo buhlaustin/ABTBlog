@@ -3,6 +3,7 @@ import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
 import { tickPublicMarket, tickIpoLockup, isPublicCompany } from './IPO.js';
+import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
 import { syncDraftFromFinalized } from './Staff.js';
 import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
@@ -58,7 +59,9 @@ export function endMonth(state) {
   }
 
   const priorStage = state.stage;
+  const priorMonthRevenue = state.finance?.monthlyRevenue ?? 0;
   const burn = resolveMonthEndBurn(state);
+  onMonthEndSentiment(state, priorMonthRevenue, state.finance?.monthlyRevenue ?? 0);
 
   appendLog(
     state,
@@ -76,7 +79,9 @@ export function endMonth(state) {
   }
 
   if (isPublicCompany(state)) {
-    for (const line of tickPublicMarket(state).lines ?? []) {
+    const tick = tickPublicMarket(state);
+    onStockSentiment(state, tick.deltaPct ?? 0);
+    for (const line of tick.lines ?? []) {
       appendLog(state, line);
     }
     for (const line of tickIpoLockup(state)) {

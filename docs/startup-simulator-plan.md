@@ -412,11 +412,11 @@ Ship criteria: **live narrative AI is required** for this phase (all five `kind`
 
 #### Gameplay depth
 
-- [ ] **Series A / B** fundraising templates (higher gates, ~20% dilution per locked table); optional **down round** beat if runway is tight
-- [ ] **Board / investor sentiment** meter (layoffs, missed months, stock) gates or worsens follow-on terms
-- [ ] **Competitor NPC** in news/social (one fictional rival; light buzz/market modifiers)
-- [ ] **Category-specific task decks** — 2–3 exclusive Desk tasks per startup category (data-driven)
-- [ ] **Crisis cards** — rare month-start events (outage, lawsuit parody, poached hire) with two choices and cash/buzz/stock effects
+- [x] **Series A / B** fundraising templates (higher gates, ~20% dilution per locked table); optional **down round** beat if runway is tight
+- [x] **Board / investor sentiment** meter (layoffs, missed months, stock) gates or worsens follow-on terms
+- [x] **Competitor NPC** in news/social (one fictional rival; light buzz/market modifiers)
+- [x] **Category-specific task decks** — 2 exclusive Desk tasks per startup category (data-driven)
+- [x] **Crisis cards** — rare month-start events (outage, lawsuit parody, poached hire) with two choices and cash/buzz/stock effects
 
 #### Progression & meta
 

@@ -1,6 +1,7 @@
 import { formatMoney, MODE_CONFIG, fixedCostsForStage } from './constants.js';
 import { computePayroll, staffRevenueMultiplier } from './Staff.js';
 import { satelliteRent } from './Offices.js';
+import { competitorRevenueMult } from './Competitor.js';
 
 /** Post-seed scaling so late-game tasks can reach the $1B gate in a reasonable run. */
 export function scalingRevenueMult(state) {
@@ -41,7 +42,12 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   const sand = sandboxMult(state);
   const cost = Math.round((taskDef.cost ?? 0) * econ.costMult * sand * hubCostMult(state));
   const revenue = Math.round(
-    rolled.revenue * econ.revenueMult * (2 - sand) * hubRevenueMult(state) * scalingRevenueMult(state)
+    rolled.revenue *
+      econ.revenueMult *
+      (2 - sand) *
+      hubRevenueMult(state) *
+      scalingRevenueMult(state) *
+      competitorRevenueMult(state)
   );
 
   state.finance.cash -= cost;

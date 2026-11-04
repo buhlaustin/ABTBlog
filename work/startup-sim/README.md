@@ -16,7 +16,7 @@ Open `/work/startup-sim/` (Next) or, after `npm run copy-work`, `/play/startup-s
 
 **Shipped (Phases 0–6):** core loop, staff/fundraising, XC/hubs, AI news/social/advisor, IPO endgame, CC0 stage icons, tutorials, a11y/mobile polish.
 
-**Phase 7 (in progress):** live AI via deployed `hos-narrative` (health probe on title screen), XC waitlist + follow-up question, IPO lockup month, richer social context.
+**Phase 7 (in progress):** live AI, XC waitlist, IPO lockup; **gameplay depth** — Series A/B, board sentiment, rival NPC, category tasks, crisis cards (save v8).
 
 ## Build & QA
 

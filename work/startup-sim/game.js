@@ -19,7 +19,19 @@ import {
   finalizeStaffing,
   showPeopleFeedback
 } from './modules/Staff.js';
-import { closeSeedRound, showFinanceFeedback } from './modules/Fundraising.js';
+import {
+  closeSeedRound,
+  closeSeriesA,
+  closeSeriesB,
+  showFinanceFeedback
+} from './modules/Fundraising.js';
+import { onLayoffSentiment } from './modules/Sentiment.js';
+import {
+  rollMonthStartCrisis,
+  hasActiveCrisis,
+  applyCrisisChoice,
+  renderCrisisPanel
+} from './modules/Crisis.js';
 import { recordLayoffEvent, generateMonthlyNews, toggleNewsArchive } from './modules/News.js';
 import { publishPlayerPost, setSocialNetwork, showSocialFeedback } from './modules/Social.js';
 import { sendAdvisorMessage } from './modules/Advisor.js';
@@ -60,6 +72,12 @@ function persistProgress(silent = true) {
 
 function refresh() {
   if (!sessionState) return;
+  if (hasActiveCrisis(sessionState) && !sessionState.flags?.gameOver) {
+    renderCrisisPanel(document.getElementById('crisis-mount'), sessionState);
+    showScreen('crisis');
+    persistProgress(true);
+    return;
+  }
   renderAllPanels(sessionState);
   persistProgress(true);
   if (sessionState.flags?.gameOver) {
@@ -71,7 +89,8 @@ function refresh() {
 function enterGame(state) {
   sessionState = state;
   refresh();
-  if (!sessionState.flags?.gameOver) {
+  if (sessionState.flags?.gameOver) return;
+  if (!hasActiveCrisis(sessionState)) {
     showScreen('game');
   }
 }
@@ -185,8 +204,18 @@ async function handleEndMonth() {
     return;
   }
 
+  await rollMonthStartCrisis(sessionState);
+  if (hasActiveCrisis(sessionState)) {
+    appendLog(sessionState, `Crisis: ${sessionState.crisis.active.title}`);
+  }
+
   showDeskFeedback('Generating headlines…');
   const news = await generateMonthlyNews(sessionState);
+  if (hasActiveCrisis(sessionState)) {
+    showDeskFeedback('Crisis hit — resolve it before your next month close.');
+    refresh();
+    return;
+  }
   appendLog(
     sessionState,
     news.source === 'ai' ? 'Fresh headlines landed (AI).' : 'Headlines updated (offline).'
@@ -202,6 +231,9 @@ function handleFinalizeStaff() {
     showPeopleFeedback(result.reason || 'Could not finalize.', true);
     refresh();
     return;
+  }
+  if (result.layoffPct > 0) {
+    onLayoffSentiment(sessionState, result.layoffPct);
   }
   if (result.significantLayoff) {
     recordLayoffEvent(sessionState, result.layoffPct);
@@ -262,6 +294,52 @@ function handleCloseSeed() {
     `Closed seed round — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post-money.`
   );
   showFinanceFeedback('Seed round closed.');
+  refresh();
+}
+
+function handleCloseSeriesA() {
+  if (!sessionState) return;
+  const result = closeSeriesA(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Cannot close Series A.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Series A — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post${result.downRound ? ' (down round)' : ''}.`
+  );
+  showFinanceFeedback(result.downRound ? 'Series A closed on down-round terms.' : 'Series A closed.');
+  refresh();
+}
+
+function handleCloseSeriesB() {
+  if (!sessionState) return;
+  const result = closeSeriesB(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Cannot close Series B.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Series B — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post${result.downRound ? ' (down round)' : ''}.`
+  );
+  showFinanceFeedback(result.downRound ? 'Series B closed on down-round terms.' : 'Series B closed.');
+  refresh();
+}
+
+function handleCrisisChoice(index) {
+  if (!sessionState) return;
+  const result = applyCrisisChoice(sessionState, index);
+  if (!result.ok) {
+    showDeskFeedback(result.reason || 'Could not resolve crisis.', true);
+    refresh();
+    return;
+  }
+  appendLog(sessionState, `Crisis resolved: ${result.summary}`);
+  showDeskFeedback('Crisis handled — back to the desk.');
+  showScreen('game');
   refresh();
 }
 
@@ -345,6 +423,19 @@ function bindGameInteractions() {
     }
     if (e.target.id === 'btn-close-seed') {
       handleCloseSeed();
+      return;
+    }
+    if (e.target.id === 'btn-close-series-a') {
+      handleCloseSeriesA();
+      return;
+    }
+    if (e.target.id === 'btn-close-series-b') {
+      handleCloseSeriesB();
+      return;
+    }
+    const crisisBtn = e.target.closest('[data-crisis-choice]');
+    if (crisisBtn) {
+      handleCrisisChoice(Number(crisisBtn.getAttribute('data-crisis-choice')));
       return;
     }
     if (e.target.id === 'btn-file-ipo') {

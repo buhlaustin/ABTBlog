@@ -38,7 +38,9 @@ export function buildGameSnapshot(state) {
         }
       : null,
     recentLog: (state.calendar?.log ?? []).slice(0, 5).map((e) => e.message),
-    recentHeadlines: (state.news?.currentMonthArticles ?? []).map((a) => a.headline)
+    recentHeadlines: (state.news?.currentMonthArticles ?? []).map((a) => a.headline),
+    boardSentiment: state.sentiment?.score ?? null,
+    competitor: state.world?.competitor?.name ?? null
   };
 }
 

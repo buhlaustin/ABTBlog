@@ -1,4 +1,11 @@
 import { STAGES } from './constants.js';
+import {
+  canRaiseSeriesA,
+  canRaiseSeriesB,
+  isDownRoundLikely,
+  seriesAGateSentiment,
+  seriesBGateSentiment
+} from './Sentiment.js';
 
 const FOUNDER_AUTHORIZED = 10_000_000;
 
@@ -109,6 +116,148 @@ export function applySeedRound(state) {
   };
   state.flags.seedRoundClosed = true;
   return { ok: true, raised, postMoney };
+}
+
+function applyPricedRound(state, config) {
+  const {
+    roundKey,
+    roundName,
+    preMoney,
+    raised,
+    investorId,
+    investorLabel,
+    requireFlag,
+    requireFlagValue = true,
+    setFlag,
+    minSentiment,
+    sentimentBlockMessage
+  } = config;
+
+  if (requireFlag && state.flags?.[requireFlag] !== requireFlagValue) {
+    return { ok: false, reason: `Complete ${roundName} prerequisites first.` };
+  }
+  if (state.flags?.[setFlag]) {
+    return { ok: false, reason: `${roundName} already closed.` };
+  }
+  if (state.flags?.ipoFiled) {
+    return { ok: false, reason: 'Already public — no new primary rounds.' };
+  }
+  const sentiment = state.sentiment?.score ?? 50;
+  if (minSentiment != null && sentiment < minSentiment) {
+    return {
+      ok: false,
+      reason: sentimentBlockMessage ?? `Board sentiment too low (${sentiment}/100) for ${roundName}.`
+    };
+  }
+
+  let effectivePre = preMoney;
+  let downRound = false;
+  if (isDownRoundLikely(state)) {
+    effectivePre = Math.round(preMoney * 0.85);
+    downRound = true;
+  }
+  const postMoney = effectivePre + raised;
+  const rows = state.capTable.map((r) => ({ ...r }));
+  const totalBefore = rows.reduce((s, r) => s + r.shares, 0);
+  const newShares = Math.round(totalBefore * (raised / (postMoney - raised)));
+  rows.push({
+    id: investorId,
+    name: investorLabel,
+    shares: newShares,
+    class: 'investor'
+  });
+
+  state.capTable = recalculateCapTablePercentages(rows);
+  state.finance.cash = (state.finance.cash ?? 0) + raised;
+  state.finance.valuation = postMoney;
+  state.finance.lastRound = {
+    name: roundName,
+    raised,
+    preMoney: effectivePre,
+    postMoney,
+    downRound,
+    closedMonth: state.calendar.monthIndex,
+    closedYear: state.calendar.year
+  };
+  state.flags[setFlag] = true;
+  if (downRound) state.flags.lastDownRound = true;
+  return { ok: true, raised, postMoney, downRound, roundName };
+}
+
+export function applySeriesA(state) {
+  if (!canRaiseSeriesA(state)) {
+    return { ok: false, reason: 'Series A unlocks after seed and $2M lifetime revenue.' };
+  }
+  return applyPricedRound(state, {
+    roundKey: 'seriesA',
+    roundName: 'Series A',
+    preMoney: 40_000_000,
+    raised: 10_000_000,
+    investorId: 'series-a',
+    investorLabel: 'Series A investors',
+    requireFlag: 'seedRoundClosed',
+    setFlag: 'seriesAClosed',
+    minSentiment: 30,
+    sentimentBlockMessage: 'Board wants stronger momentum before Series A (sentiment below 30).'
+  });
+}
+
+export function applySeriesB(state) {
+  if (!canRaiseSeriesB(state)) {
+    return { ok: false, reason: 'Series B unlocks after Series A and $12M lifetime revenue.' };
+  }
+  return applyPricedRound(state, {
+    roundKey: 'seriesB',
+    roundName: 'Series B',
+    preMoney: 120_000_000,
+    raised: 30_000_000,
+    investorId: 'series-b',
+    investorLabel: 'Series B investors',
+    requireFlag: 'seriesAClosed',
+    setFlag: 'seriesBClosed',
+    minSentiment: 25,
+    sentimentBlockMessage: 'Investors are skittish — improve board sentiment before Series B.'
+  });
+}
+
+export function seriesAPreview(state) {
+  if (!canRaiseSeriesA(state)) return null;
+  const founder = getFounderRow(state);
+  const down = isDownRoundLikely(state);
+  const pre = down ? 34_000_000 : 40_000_000;
+  const post = pre + 10_000_000;
+  return {
+    raised: 10_000_000,
+    preMoney: pre,
+    postMoney: post,
+    founderPctNow: founder?.pct ?? 0,
+    founderPctAfterApprox: Math.round((founder?.pct ?? 0) * 0.8 * 10) / 10,
+    downRound: down,
+    sentiment: seriesAGateSentiment(state),
+    note: down
+      ? 'Down-round likely (~15% valuation haircut) — runway is tight and sentiment is soft.'
+      : '~20% to new Series A investors (pro-forma).'
+  };
+}
+
+export function seriesBPreview(state) {
+  if (!canRaiseSeriesB(state)) return null;
+  const founder = getFounderRow(state);
+  const down = isDownRoundLikely(state);
+  const pre = down ? 102_000_000 : 120_000_000;
+  const post = pre + 30_000_000;
+  return {
+    raised: 30_000_000,
+    preMoney: pre,
+    postMoney: post,
+    founderPctNow: founder?.pct ?? 0,
+    founderPctAfterApprox: Math.round((founder?.pct ?? 0) * 0.8 * 10) / 10,
+    downRound: down,
+    sentiment: seriesBGateSentiment(state),
+    note: down
+      ? 'Down-round terms on the table — board is nervous.'
+      : '~20% to new Series B investors (pro-forma).'
+  };
 }
 
 export function seedRoundPreview(state) {

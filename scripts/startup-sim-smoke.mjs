@@ -21,6 +21,12 @@ const { hydrateTaskCatalog, dealMonthlyTasks } = await import(
 );
 hydrateTaskCatalog(tasksJson);
 
+function categoryAllowed(task, categoryId) {
+  const cats = task.categories;
+  if (!cats?.length) return true;
+  return cats.includes(categoryId);
+}
+
 function stageAllowed(task, stage) {
   const stages = task.stages ?? ['garage'];
   if (stage === STAGES.GARAGE || stage === STAGES.OFFICE) return stages.includes(stage);
@@ -31,8 +37,11 @@ function stageAllowed(task, stage) {
 }
 
 let failed = false;
+const smokeCategory = 'b2b-saas';
 for (const stage of Object.values(STAGES)) {
-  const pool = tasksJson.tasks.filter((t) => stageAllowed(t, stage));
+  const pool = tasksJson.tasks.filter(
+    (t) => stageAllowed(t, stage) && categoryAllowed(t, smokeCategory)
+  );
   const slots = getMonthlyTaskSlots(stage);
   if (pool.length === 0) {
     console.error(`FAIL: no tasks for stage ${stage}`);

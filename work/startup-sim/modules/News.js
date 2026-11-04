@@ -1,6 +1,7 @@
 import { assetBaseUrl } from './utils.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
+import { maybeCompetitorNewsArticle, bumpCompetitorPressure } from './Competitor.js';
 import { stageLabel } from './constants.js';
 
 let timelineSeed = null;
@@ -76,6 +77,23 @@ function offlineNewsArticles(state) {
       source: 'Macrohard Newsdesk',
       date: monthLabel(state)
     });
+  }
+
+  const rivalArticle = maybeCompetitorNewsArticle(state);
+  if (rivalArticle) {
+    articles.push(rivalArticle);
+    bumpCompetitorPressure(state, 1);
+  }
+
+  if (state.flags?.lastDownRound) {
+    articles.push({
+      headline: `${company} closes a down round — board calls it "discipline"`,
+      dek: 'Valuation haircut, morale optional.',
+      body: 'The Financier Times notes terms were "creative." Your cap table spreadsheet weeps quietly.',
+      source: 'The Financier Times',
+      date: monthLabel(state)
+    });
+    state.flags.lastDownRound = false;
   }
 
   if (state.flags?.seedRoundClosed) {

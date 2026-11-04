@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "crises": [
+    {
+      "id": "outage",
+      "title": "Production outage",
+      "description": "Status page red. Enterprise customers are refreshing aggressively.",
+      "choices": [
+        {
+          "label": "All-hands war room (expensive)",
+          "effects": { "cash": -12000, "buzz": 2, "sentiment": 2 }
+        },
+        {
+          "label": "Quiet fix + apology blog",
+          "effects": { "cash": -3000, "buzz": -2, "sentiment": -3 }
+        }
+      ]
+    },
+    {
+      "id": "lawsuit-parody",
+      "title": "Patent troll letter",
+      "description": "A firm you've never heard of claims you invented their invention.",
+      "choices": [
+        {
+          "label": "Settle quickly",
+          "effects": { "cash": -25000, "buzz": 0, "sentiment": 1 }
+        },
+        {
+          "label": "Fight in fictional court",
+          "effects": { "cash": -8000, "buzz": 1, "sentiment": -4 }
+        }
+      ]
+    },
+    {
+      "id": "poached-hire",
+      "title": "Key hire poached",
+      "description": "Your rival dangled equity and a title with the word “Chief”.",
+      "choices": [
+        {
+          "label": "Counter-offer package",
+          "effects": { "cash": -15000, "buzz": 0, "sentiment": 0, "competitor": -1 }
+        },
+        {
+          "label": "Wish them well on ProNet",
+          "effects": { "cash": 0, "buzz": -1, "sentiment": -2, "competitor": 1 }
+        }
+      ]
+    },
+    {
+      "id": "data-scare",
+      "title": "Near-miss data incident",
+      "description": "An engineer almost pasted prod credentials into a public gist.",
+      "choices": [
+        {
+          "label": "Hire security audit",
+          "effects": { "cash": -18000, "buzz": 0, "sentiment": 4 }
+        },
+        {
+          "label": "Internal memo only",
+          "effects": { "cash": -2000, "buzz": -1, "sentiment": -5 }
+        }
+      ]
+    }
+  ]
+}

@@ -7,6 +7,9 @@ import { recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
 import { createInitialXcState } from './XC.js';
 import { createInitialAdvisor } from './Advisor.js';
+import { createInitialSentiment } from './Sentiment.js';
+import { createCompetitorForCategory } from './Competitor.js';
+import { createInitialCrisisState } from './Crisis.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -17,7 +20,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 
 export {
   STAGES,
@@ -74,6 +77,9 @@ export function createInitialState(options) {
     offices: createInitialOffices(),
     xc: createInitialXcState(),
     advisor: createInitialAdvisor(),
+    sentiment: createInitialSentiment(),
+    world: { competitor: createCompetitorForCategory(category.id) },
+    crisis: createInitialCrisisState(),
     publicMarket: createInitialPublicMarket(),
     ending: null,
     capTable: [
@@ -90,6 +96,9 @@ export function createInitialState(options) {
       xcAccepted: false,
       xcResidencyComplete: false,
       seedRoundClosed: false,
+      seriesAClosed: false,
+      seriesBClosed: false,
+      lastDownRound: false,
       ipoUnlocked: false,
       ipoUnlockedLogged: false,
       ipoFiled: false,
@@ -142,6 +151,16 @@ export function normalizeSave(raw) {
     if (state.xc.retryAvailableTurn === undefined) state.xc.retryAvailableTurn = null;
     if (state.xc.needsFollowUpQuestion === undefined) state.xc.needsFollowUpQuestion = false;
     if (!state.advisor) state.advisor = createInitialAdvisor();
+    if (!state.sentiment) state.sentiment = createInitialSentiment();
+    if (!state.world?.competitor) {
+      state.world = {
+        competitor: createCompetitorForCategory(state.company?.categoryId ?? 'b2b-saas')
+      };
+    }
+    if (!state.crisis) state.crisis = createInitialCrisisState();
+    if (state.flags.seriesAClosed === undefined) state.flags.seriesAClosed = false;
+    if (state.flags.seriesBClosed === undefined) state.flags.seriesBClosed = false;
+    if (state.flags.lastDownRound === undefined) state.flags.lastDownRound = false;
     if (!state.publicMarket) state.publicMarket = createInitialPublicMarket();
     if (state.publicMarket.lockupMonthsRemaining === undefined) {
       state.publicMarket.lockupMonthsRemaining = state.flags?.ipoFiled ? 0 : 0;

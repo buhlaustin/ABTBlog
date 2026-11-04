@@ -7,6 +7,7 @@ import { renderSocialPanel } from './Social.js';
 import { renderNewsPanel } from './News.js';
 import { renderAdvisorPanel } from './Advisor.js';
 import { getTaskDef, pendingTasks, canEndMonth } from './Tasks.js';
+import { hasActiveCrisis } from './Crisis.js';
 import { isPublicCompany, founderStakeValue } from './IPO.js';
 import { stageIconUrl } from './Assets.js';
 import { activeTutorialStep, renderTutorialBanner } from './Tutorial.js';
@@ -16,6 +17,7 @@ const screens = {
   setup: () => document.getElementById('screen-setup'),
   game: () => document.getElementById('screen-game'),
   xcInterview: () => document.getElementById('screen-xc-interview'),
+  crisis: () => document.getElementById('screen-crisis'),
   gameover: () => document.getElementById('screen-gameover')
 };
 
@@ -186,6 +188,11 @@ export function renderDeskPanel(state) {
     ${
       catalogError
         ? '<p class="desk-feedback error" role="alert">Task data failed to load — refresh the page. You cannot close the month until tasks are available.</p>'
+        : ''
+    }
+    ${
+      hasActiveCrisis(state)
+        ? '<p class="desk-feedback error" role="alert">Crisis on the desk — resolve it before closing the month.</p>'
         : ''
     }
     <p class="panel-lede">Complete all counted tasks, then close the month. Staff/finance changes do not use task slots.</p>

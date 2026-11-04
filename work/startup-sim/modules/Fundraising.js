@@ -1,6 +1,15 @@
-import { applySeedRound, seedRoundPreview, renderCapTableRows } from './CapTable.js';
+import {
+  applySeedRound,
+  applySeriesA,
+  applySeriesB,
+  seedRoundPreview,
+  seriesAPreview,
+  seriesBPreview,
+  renderCapTableRows
+} from './CapTable.js';
 import { renderFinanceSummary } from './Finance.js';
 import { formatMoney } from './constants.js';
+import { sentimentLabel } from './Sentiment.js';
 import { canStartInterview, isInResidency, xcWaitingForRetry } from './XC.js';
 import { renderOfficesPanel } from './Offices.js';
 import { renderIpoPanel } from './IPO.js';
@@ -18,6 +27,14 @@ export function closeSeedRound(state) {
   return applySeedRound(state);
 }
 
+export function closeSeriesA(state) {
+  return applySeriesA(state);
+}
+
+export function closeSeriesB(state) {
+  return applySeriesB(state);
+}
+
 function escapeHtml(s) {
   return String(s)
     .replace(/&/g, '&amp;')
@@ -30,6 +47,10 @@ export function renderFinancePanel(container, state) {
 
   const sum = renderFinanceSummary(state);
   const preview = seedRoundPreview(state);
+  const seriesA = seriesAPreview(state);
+  const seriesB = seriesBPreview(state);
+  const sentimentScore = state.sentiment?.score ?? 68;
+  const rival = state.world?.competitor?.name;
   const instruments = (state.finance.instruments ?? [])
     .map(
       (i) =>
@@ -56,6 +77,35 @@ export function renderFinancePanel(container, state) {
     xcBlock = `<p class="fine-print">Reach ${formatMoney(500_000)} lifetime revenue to unlock XC.</p>`;
   }
 
+  const sentimentBlock = `<div class="sentiment-meter" role="meter" aria-valuenow="${sentimentScore}" aria-valuemin="0" aria-valuemax="100">
+      <span class="stat-label">Board sentiment</span>
+      <div class="sentiment-bar"><div class="sentiment-fill" style="width:${sentimentScore}%"></div></div>
+      <span class="stat-value">${sentimentScore} — ${escapeHtml(sentimentLabel(sentimentScore))}</span>
+      ${rival ? `<p class="fine-print">Rival in the news: <strong>${escapeHtml(rival)}</strong></p>` : ''}
+    </div>`;
+
+  const seriesABlock =
+    seriesA && !state.flags?.seriesAClosed
+      ? `<div class="finance-action">
+        <p><strong>Series A</strong> — raise ${formatMoney(seriesA.raised)} at ${formatMoney(seriesA.postMoney)} post-money.</p>
+        <p class="fine-print">${escapeHtml(seriesA.note)} Founder ~${seriesA.founderPctNow}% → ~${seriesA.founderPctAfterApprox}%.</p>
+        <button type="button" class="btn btn-primary btn-small" id="btn-close-series-a">Close Series A</button>
+      </div>`
+      : state.flags?.seriesAClosed
+        ? `<p class="fine-print">Series A closed.</p>`
+        : '';
+
+  const seriesBBlock =
+    seriesB && !state.flags?.seriesBClosed
+      ? `<div class="finance-action">
+        <p><strong>Series B</strong> — raise ${formatMoney(seriesB.raised)} at ${formatMoney(seriesB.postMoney)} post-money.</p>
+        <p class="fine-print">${escapeHtml(seriesB.note)} Founder ~${seriesB.founderPctNow}% → ~${seriesB.founderPctAfterApprox}%.</p>
+        <button type="button" class="btn btn-primary btn-small" id="btn-close-series-b">Close Series B</button>
+      </div>`
+      : state.flags?.seriesBClosed
+        ? `<p class="fine-print">Series B closed.</p>`
+        : '';
+
   const seedBlock = canCloseSeed(state) && preview
     ? `<div class="finance-action">
         <p><strong>Seed round</strong> — raise ${formatMoney(preview.raised)} at ${formatMoney(preview.postMoney)} post-money.</p>
@@ -78,8 +128,11 @@ export function renderFinancePanel(container, state) {
       <div><span class="stat-label">Valuation</span><span class="stat-value">${state.finance.valuation ? formatMoney(state.finance.valuation) : '—'}</span></div>
       <div><span class="stat-label">Location</span><span class="stat-value">${escapeHtml(state.company.location || '—')}</span></div>
     </div>
+    ${sentimentBlock}
     ${xcBlock}
     ${seedBlock}
+    ${seriesABlock}
+    ${seriesBBlock}
     <div id="ipo-panel-mount"></div>
     <div id="offices-panel-mount"></div>
     <h3 class="log-head">Cap table</h3>
