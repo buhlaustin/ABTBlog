@@ -313,23 +313,6 @@ h1 {
   font-weight: 600;
 }
 
-.wip-banner {
-  border: 1px dashed var(--border);
-  border-radius: 0.75rem;
-  padding: 1rem 1.25rem;
-  color: var(--muted);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.wip-banner p {
-  margin: 0;
-  flex: 1 1 200px;
-}
-
 .hud-mode {
   margin: 0.25rem 0 0;
   font-size: 0.8rem;

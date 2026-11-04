@@ -66,7 +66,7 @@ Goal: ship a **complete** garage→IPO tycoon — no stub tabs, no silent failur
 | Growth: market/competitor/sentiment | Yes |
 | People: draft HC, finalize | Yes |
 | Finance: XC, seed, A/B, cap table, IPO mount, offices mount | Yes |
-| Social: tabs, post, Chirp counter | Yes |
+| Social: tabs, post, Chirp counter, archive | Yes |
 | News: feed, archive toggle | Yes |
 | Advisor: ask | Yes |
 | Crisis screen | Yes |
@@ -93,11 +93,21 @@ When the narrative API is unreachable, the game still runs using **authored temp
 
 ---
 
+## Follow-up pass (same branch)
+
+| Item | Resolution |
+|------|------------|
+| Player task title “Ship MVP sprint” | Renamed to **Ship launch sprint** (id unchanged for saves) |
+| `product.featureQueue` unused | Removed from new state shape; legacy saves ignore extra field |
+| `social.archive` invisible | **Archive** sub-tab on Social with count + scrollback |
+| Dead `.wip-banner` CSS | Removed (never mounted in HTML) |
+| Regression guard | `npm run audit:startup-sim-wiring` in CI — every `btn-*` / form / data hook must bind in `game.js` |
+| E2E | Second spec: Growth / Social archive / News / Finance panels |
+
 ## Remaining low-priority notes
 
-- `product.featureQueue` is initialized but unused (future feature hook; no player impact).
-- `social.archive` trimmed but not shown in UI (posts stay in-network feeds).
 - Very small task pools at post_xc (9 tasks, 7 slots) may repeat after de-dupe exhausts — acceptable for v1.
+- Full career → IPO path not covered by Playwright (manual / future long e2e).
 
 ---
 
@@ -105,6 +115,7 @@ When the narrative API is unreachable, the game still runs using **authored temp
 
 ```bash
 npm run smoke:startup-sim
+npm run audit:startup-sim-wiring
 npm run e2e:startup-sim
 node scripts/validate-startup-sim-assets.mjs
 ```

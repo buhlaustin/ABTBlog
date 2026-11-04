@@ -43,4 +43,28 @@ test.describe('Startup Simulator', () => {
     await expect(page.locator('#screen-game')).toBeVisible();
     await expect(page.locator('#hud-company')).toHaveText('Playwright Test Co');
   });
+
+  test('all company tabs render live panels', async ({ page }) => {
+    page.on('dialog', (dialog) => dialog.accept());
+
+    await page.getByRole('button', { name: 'New game' }).click();
+    await page.locator('#company-name').fill('Tab Audit Co');
+    await page.locator('#startup-category').selectOption('b2b-saas');
+    await page.locator('#btn-start-game').click();
+    await expect(page.locator('#screen-game')).toBeVisible();
+
+    await page.locator('#tab-growth').click();
+    await expect(page.locator('#panel-growth')).toContainText('Rival');
+    await expect(page.locator('#panel-growth')).toContainText('Board');
+
+    await page.locator('#tab-social').click();
+    await expect(page.locator('[data-social-tab="archive"]')).toBeVisible();
+
+    await page.locator('#tab-news').click();
+    await expect(page.locator('#btn-toggle-news-archive')).toBeVisible();
+
+    await page.locator('#tab-finance').click();
+    await expect(page.locator('#panel-finance')).toContainText('Cap table');
+    await expect(page.locator('#panel-finance')).toContainText('Board sentiment');
+  });
 });

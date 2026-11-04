@@ -75,7 +75,7 @@ export function createInitialState(options) {
       lastRound: null
     },
     staff: createInitialStaff(),
-    product: { level: 0, buzz: 0, featureQueue: [] },
+    product: { level: 0, buzz: 0 },
     social: createInitialSocial(),
     news: createInitialNews(),
     offices: createInitialOffices(),
@@ -143,7 +143,7 @@ export function normalizeSave(raw) {
     }
     if (!state.social) state.social = createInitialSocial();
     if (!state.news) state.news = createInitialNews();
-    if (!state.product) state.product = { level: 0, buzz: 0, featureQueue: [] };
+    if (!state.product) state.product = { level: 0, buzz: 0 };
     if (!state.product.buzz && state.product.buzz !== 0) state.product.buzz = 0;
     if (!state.calendar) state.calendar = createInitialCalendar();
     if (!state.calendar.monthTasks) state.calendar.monthTasks = [];

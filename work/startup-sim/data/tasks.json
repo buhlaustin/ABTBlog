@@ -22,7 +22,7 @@
     },
     {
       "id": "mvp-sprint",
-      "title": "Ship MVP sprint",
+      "title": "Ship launch sprint",
       "description": "Close the loop on a thin vertical slice customers can touch.",
       "types": [
         "product"

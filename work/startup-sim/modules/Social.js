@@ -146,6 +146,26 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
+function renderArchivePosts(posts) {
+  if (!posts.length) {
+    return '<div class="tab-placeholder">Older posts appear here after your feeds roll forward.</div>';
+  }
+  const sorted = [...posts].sort((a, b) => {
+    const ta = (a.year ?? 0) * 12 + (a.month ?? 0);
+    const tb = (b.year ?? 0) * 12 + (b.month ?? 0);
+    return tb - ta;
+  });
+  return sorted
+    .map((p) => {
+      const net = p.network === 'chirp' ? 'Chirp' : 'ProNet';
+      return `<article class="social-post archived">
+        <header><strong>${escapeHtml(p.authorName)}</strong> <span class="fine-print">${escapeHtml(net)} · Y${p.year} M${p.month}</span></header>
+        <p>${escapeHtml(p.text)}</p>
+      </article>`;
+    })
+    .join('');
+}
+
 function renderPosts(posts, networkClass) {
   if (!posts.length) {
     return `<div class="tab-placeholder">No ${networkClass} posts yet.</div>`;
@@ -170,14 +190,12 @@ export function renderSocialPanel(container, state) {
   const active = state.social?.activeNetwork ?? 'pronet';
   const pronetPosts = state.social?.pronet?.posts ?? [];
   const chirpPosts = state.social?.chirp?.posts ?? [];
+  const archivePosts = state.social?.archive ?? [];
+  const onArchive = active === 'archive';
 
-  container.innerHTML = `
-    <p class="panel-lede">ProNet for polished updates; Chirp for hot takes. Post and watch the replies roll in.</p>
-    <nav class="social-subtabs">
-      <button type="button" class="${active === 'pronet' ? 'active' : ''}" data-social-tab="pronet">ProNet</button>
-      <button type="button" class="${active === 'chirp' ? 'active' : ''}" data-social-tab="chirp">Chirp</button>
-    </nav>
-    <form id="social-post-form" class="setup-form">
+  const composer = onArchive
+    ? ''
+    : `<form id="social-post-form" class="setup-form">
       <textarea id="social-post-text" rows="2" maxlength="${active === 'chirp' ? CHIRP_LIMIT : 600}" placeholder="${active === 'chirp' ? 'What is happening?' : 'Share an update with your network…'}"></textarea>
       ${
         active === 'chirp'
@@ -185,17 +203,31 @@ export function renderSocialPanel(container, state) {
           : ''
       }
       <button type="submit" class="btn btn-primary btn-small">Post</button>
-    </form>
-    <div class="social-feed ${active === 'chirp' ? 'theme-chirp' : 'theme-pronet'}">
+    </form>`;
+
+  const feed = onArchive
+    ? `<div class="social-feed theme-archive">${renderArchivePosts(archivePosts)}</div>`
+    : `<div class="social-feed ${active === 'chirp' ? 'theme-chirp' : 'theme-pronet'}">
       ${active === 'chirp' ? renderPosts(chirpPosts, 'theme-chirp') : renderPosts(pronetPosts, 'theme-pronet')}
-    </div>
+    </div>`;
+
+  container.innerHTML = `
+    <p class="panel-lede">ProNet for polished updates; Chirp for hot takes. Post and watch the replies roll in.</p>
+    <nav class="social-subtabs">
+      <button type="button" class="${active === 'pronet' ? 'active' : ''}" data-social-tab="pronet">ProNet</button>
+      <button type="button" class="${active === 'chirp' ? 'active' : ''}" data-social-tab="chirp">Chirp</button>
+      <button type="button" class="${active === 'archive' ? 'active' : ''}" data-social-tab="archive">Archive (${archivePosts.length})</button>
+    </nav>
+    ${composer}
+    ${feed}
     <p id="social-feedback" class="desk-feedback" hidden></p>
   `;
 }
 
 export function setSocialNetwork(state, network) {
   if (!state.social) state.social = createInitialSocial();
-  state.social.activeNetwork = network === 'chirp' ? 'chirp' : 'pronet';
+  if (network === 'archive') state.social.activeNetwork = 'archive';
+  else state.social.activeNetwork = network === 'chirp' ? 'chirp' : 'pronet';
 }
 
 export function updateChirpCharCount(text) {
