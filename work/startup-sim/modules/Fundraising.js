@@ -2,16 +2,33 @@ import {
   applySeedRound,
   applySeriesA,
   applySeriesB,
+  applySeriesC,
+  applySeriesD,
+  applySeriesE,
+  applySeriesF,
   seedRoundPreview,
   seriesAPreview,
   seriesBPreview,
+  seriesCPreview,
+  seriesDPreview,
+  seriesEPreview,
+  seriesFPreview,
   renderCapTableRows
 } from './CapTable.js';
 import { renderFinanceSummary } from './Finance.js';
 import { formatMoney } from './constants.js';
 import { sentimentLabel, seriesAGateSentiment, seriesBGateSentiment } from './Sentiment.js';
 import { setGameFeedback } from './GameFeedback.js';
-import { canStartInterview, isInResidency, xcWaitingForRetry } from './XC.js';
+import {
+  canStartInterview,
+  isInResidency,
+  isXcAcceptedPendingBatch,
+  xcBatchStartLabel,
+  xcWaitingForRetry
+} from './XC.js';
+import { renderAcceleratorsBlock, joinAccelerator } from './Accelerators.js';
+
+export { joinAccelerator };
 import { renderOfficesPanel } from './Offices.js';
 import { renderIpoPanel } from './IPO.js';
 
@@ -34,6 +51,31 @@ export function closeSeriesA(state) {
 
 export function closeSeriesB(state) {
   return applySeriesB(state);
+}
+
+export function closeSeriesC(state) {
+  return applySeriesC(state);
+}
+
+export function closeSeriesD(state) {
+  return applySeriesD(state);
+}
+
+export function closeSeriesE(state) {
+  return applySeriesE(state);
+}
+
+export function closeSeriesF(state) {
+  return applySeriesF(state);
+}
+
+function renderPricedRoundBlock(state, preview, flagName, buttonId, label) {
+  if (!preview || state.flags?.[flagName]) return '';
+  return `<div class="finance-action">
+    <p><strong>${label}</strong> — raise ${formatMoney(preview.raised)} at ${formatMoney(preview.postMoney)} post-money.</p>
+    <p class="fine-print">Founder ~${preview.founderPctNow}% → ~${preview.founderPctAfterApprox}%.</p>
+    <button type="button" class="btn btn-primary btn-small" id="${buttonId}">Close ${label}</button>
+  </div>`;
 }
 
 function escapeHtml(s) {
@@ -71,9 +113,12 @@ export function renderFinancePanel(container, state) {
   } else if (xcWaitingForRetry(state)) {
     xcBlock = `<p class="fine-print">XC waitlist — finish this month and reapply next month with sharper metrics.</p>`;
   } else if (isInResidency(state)) {
-    xcBlock = `<p class="fine-print">In SF batch — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) remaining. Desk tasks are XC-only.</p>`;
+    xcBlock = `<p class="fine-print"><strong>In SF batch</strong> — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) left. +35% task revenue, +batch product momentum. Desk tasks are XC-only.</p>`;
+  } else if (isXcAcceptedPendingBatch(state)) {
+    const start = xcBatchStartLabel(state);
+    xcBlock = `<p class="fine-print"><strong>Accepted into XC</strong> — batch starts Month ${start?.monthIndex ?? '?'}, Year ${start?.year ?? '?'}. $500k SAFE already on the cap table.</p>`;
   } else if (state.flags?.xcAccepted) {
-    xcBlock = `<p class="fine-print">XC SAFE closed — ${formatMoney(500_000)} on the balance sheet.</p>`;
+    xcBlock = `<p class="fine-print">XC alumni — ${formatMoney(500_000)} SAFE closed. ${(state.xc?.graduateBoostMonths ?? 0) > 0 ? `${state.xc.graduateBoostMonths} mo alumni revenue boost left.` : 'Batch complete.'}</p>`;
   } else {
     xcBlock = `<p class="fine-print">Reach ${formatMoney(100_000)} ARR to unlock XC.</p>`;
   }
@@ -127,9 +172,11 @@ export function renderFinancePanel(container, state) {
       </div>`
     : state.flags?.seedRoundClosed
       ? `<p class="fine-print">Seed round closed${state.finance.lastRound ? ` — ${formatMoney(state.finance.lastRound.raised)} at ${formatMoney(state.finance.lastRound.postMoney)} post.` : '.'}</p>`
-      : state.flags?.xcAccepted
-        ? `<p class="fine-print">Complete XC batch + hub selection to close seed.</p>`
-        : '';
+      : state.flags?.xcAccepted && !state.flags?.xcResidencyComplete
+        ? `<p class="fine-print">Finish the 3-month XC batch, then close seed (small office required).</p>`
+        : state.flags?.xcAccepted
+          ? `<p class="fine-print">Lease a small office to close seed.</p>`
+          : '';
 
   container.innerHTML = `
     <p class="panel-lede">Cash from desk tasks lands right away. Payroll and rent bill when you close the month. Fundraising lives here, not on the desk.</p>
@@ -151,6 +198,11 @@ export function renderFinancePanel(container, state) {
     ${seedBlock}
     ${seriesABlock}
     ${seriesBBlock}
+    ${renderPricedRoundBlock(state, seriesCPreview(state), 'seriesCClosed', 'btn-close-series-c', 'Series C')}
+    ${renderPricedRoundBlock(state, seriesDPreview(state), 'seriesDClosed', 'btn-close-series-d', 'Series D')}
+    ${renderPricedRoundBlock(state, seriesEPreview(state), 'seriesEClosed', 'btn-close-series-e', 'Series E')}
+    ${renderPricedRoundBlock(state, seriesFPreview(state), 'seriesFClosed', 'btn-close-series-f', 'Series F')}
+    ${renderAcceleratorsBlock(state)}
     <div id="ipo-panel-mount"></div>
     <div id="offices-panel-mount"></div>
     <h3 class="log-head">Cap table</h3>

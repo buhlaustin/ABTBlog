@@ -44,7 +44,7 @@ function shuffle(arr) {
 }
 
 /** Months of dealt task ids to deprioritize when building the next desk lineup. */
-const RECENT_TASK_COOLDOWN_MONTHS = 2;
+const RECENT_TASK_COOLDOWN_MONTHS = 5;
 
 /**
  * Pick up to `slots` tasks from `pool` with unique ids per month.
@@ -112,7 +112,7 @@ function stageAllowed(task, stage) {
     return stages.includes('xc');
   }
   if (stage === STAGES.POST_XC) {
-    return stages.includes('post_xc') || stages.includes('xc');
+    return stages.includes('post_xc');
   }
   if (stage === STAGES.PUBLIC) {
     return stages.includes('public') || stages.includes('post_xc');
@@ -191,7 +191,7 @@ export function confirmTaskLineup(state) {
   }
   const recent = state.calendar.recentTaskIds ?? [];
   const dealtIds = selected.map((o) => o.taskId);
-  state.calendar.recentTaskIds = [...recent, ...dealtIds].slice(-slots * 3);
+  state.calendar.recentTaskIds = [...recent, ...dealtIds].slice(-slots * 6);
   state.calendar.monthTasks = selected.map((o, index) => ({
     instanceId: `${state.calendar.year}-${state.calendar.monthIndex}-${o.taskId}-${index}`,
     taskId: o.taskId,

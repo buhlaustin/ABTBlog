@@ -1,4 +1,5 @@
-import { assetBaseUrl } from './utils.js';
+import { fetchGameJson } from './utils.js';
+import { STAGES } from './constants.js';
 import { applyXCSafe } from './CapTable.js';
 import { restorePostXcWorkspace } from './Workspace.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
@@ -8,12 +9,9 @@ let interviewCache = bundledInterview;
 
 export async function loadInterviewQuestions() {
   try {
-    const res = await fetch(`${assetBaseUrl()}data/xc-interview.json`, { cache: 'no-store' });
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data.questions) && data.questions.length > 0) {
-        interviewCache = data;
-      }
+    const data = await fetchGameJson('data/xc-interview.json');
+    if (data && Array.isArray(data.questions) && data.questions.length > 0) {
+      interviewCache = data;
     }
   } catch {
     /* keep bundled questions */
@@ -26,7 +24,9 @@ export function createInitialXcState() {
     residencyMonthsRemaining: 0,
     batchLabel: null,
     retryAvailableTurn: null,
-    needsFollowUpQuestion: false
+    needsFollowUpQuestion: false,
+    batchStartsTurn: null,
+    graduateBoostMonths: 0
   };
 }
 
@@ -48,8 +48,36 @@ export function canStartInterview(state) {
   return true;
 }
 
+/** True during the 3-month SF batch (desk tasks are XC-only). */
 export function isInResidency(state) {
-  return Boolean(state.flags?.xcAccepted && !state.flags?.xcResidencyComplete);
+  return Boolean(state.flags?.xcBatchActive && !state.flags?.xcResidencyComplete);
+}
+
+export function isXcAcceptedPendingBatch(state) {
+  return Boolean(
+    state.flags?.xcAccepted && !state.flags?.xcBatchActive && !state.flags?.xcResidencyComplete
+  );
+}
+
+export function xcBatchStartLabel(state) {
+  const turn = state.xc?.batchStartsTurn;
+  if (turn == null) return null;
+  const year = Math.floor((turn - 1) / 12) + 1;
+  const month = ((turn - 1) % 12) + 1;
+  return { year, monthIndex: month };
+}
+
+export function xcProgramRevenueMult(state) {
+  if (isInResidency(state)) return 1.35;
+  const grad = state.xc?.graduateBoostMonths ?? 0;
+  if (grad > 0 && state.flags?.xcResidencyComplete) return 1.15;
+  return 1;
+}
+
+export function xcProgramProductBonus(state) {
+  if (isInResidency(state)) return 1.25;
+  if ((state.xc?.graduateBoostMonths ?? 0) > 0) return 1.1;
+  return 1;
 }
 
 /** Lenient offline pass — any non-empty answers with minimal length. */
@@ -136,13 +164,33 @@ export function beginResidency(state) {
   state.company.location = 'San Francisco (XC batch)';
   state.finance.fixedCostsMonthly = 6_000;
   state.flags.xcResidencyComplete = false;
+  state.flags.xcBatchActive = true;
+  state.stage = STAGES.XC;
+  state.product.buzz = (state.product.buzz ?? 0) + 4;
+  state.product.level = (state.product.level ?? 0) + 2;
 }
 
+/** Schedule batch for next calendar month (acceptance is immediate; batch starts then). */
 export function completeXcAcceptance(state) {
   const result = applyXCSafe(state);
   if (!result.ok) return result;
+  state.xc = state.xc ?? createInitialXcState();
+  state.xc.batchStartsTurn = calendarTurn(state) + 1;
+  state.flags.xcBatchActive = false;
+  const start = xcBatchStartLabel(state);
+  return { ok: true, xcShares: result.xcShares, batchStarts: start };
+}
+
+/** Call at the start of each month before dealing tasks. */
+export function maybeStartScheduledXcBatch(state) {
+  if (!state.flags?.xcAccepted || state.flags?.xcBatchActive || state.flags?.xcResidencyComplete) {
+    return null;
+  }
+  const start = state.xc?.batchStartsTurn;
+  if (start == null) return null;
+  if (calendarTurn(state) < start) return null;
   beginResidency(state);
-  return result;
+  return state.xc.batchLabel;
 }
 
 /** Call at month end while in residency. */
@@ -153,10 +201,19 @@ export function tickXcResidency(state) {
   lines.push(`XC batch month complete — ${state.xc.residencyMonthsRemaining} left in San Francisco.`);
   if (state.xc.residencyMonthsRemaining <= 0) {
     state.flags.xcResidencyComplete = true;
+    state.flags.xcBatchActive = false;
+    state.xc.graduateBoostMonths = 8;
+    state.product.buzz = (state.product.buzz ?? 0) + 3;
+    state.product.level = (state.product.level ?? 0) + 2;
     restorePostXcWorkspace(state);
-    lines.push('Batch finished — back in your small office. Upgrade space or chase hub HQ at $500M ARR on Finance.');
+    lines.push('Batch finished — alumni boost active for 8 months. Close seed when you have a small office.');
   }
   return lines;
+}
+
+export function tickXcGraduateBoost(state) {
+  if ((state.xc?.graduateBoostMonths ?? 0) <= 0) return;
+  state.xc.graduateBoostMonths -= 1;
 }
 
 function escapeHtml(s) {
@@ -184,7 +241,7 @@ export async function renderInterviewForm(container, state) {
     .join('');
 
   container.innerHTML = `
-    <p class="panel-lede">Partner office hours — short answers, real effort. They reward clarity, not buzzwords.</p>
+    <p class="panel-lede">Partner office hours — short answers, real effort. If accepted, you join the batch <strong>next month</strong> (3-month program).</p>
     <form id="xc-interview-form" class="setup-form">${fields}
       <button type="submit" class="btn btn-primary">Submit application</button>
       <button type="button" class="btn btn-ghost" id="btn-xc-interview-cancel">Cancel</button>

@@ -8,6 +8,8 @@ import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
 import { syncDraftFromFinalized } from './Staff.js';
 import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
+import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
+import { tickAcceleratorBoost } from './Accelerators.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -47,6 +49,7 @@ export function advanceCalendarMonth(state) {
 }
 
 export function startMonth(state) {
+  maybeStartScheduledXcBatch(state);
   syncDraftFromFinalized(state);
   dealMonthlyTasks(state);
   dealBoardTasks(state);
@@ -100,6 +103,8 @@ export function endMonth(state) {
   for (const line of tickXcResidency(state)) {
     appendLog(state, line);
   }
+  tickXcGraduateBoost(state);
+  tickAcceleratorBoost(state);
 
   if (state.finance.cash < 0) {
     state.flags.gameOver = true;

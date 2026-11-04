@@ -115,13 +115,19 @@ export function createInitialState(options) {
         class: 'founder'
       }
     ],
+    accelerators: { joined: [], activeBoost: null },
     flags: {
       xcUnlocked: false,
       xcAccepted: false,
+      xcBatchActive: false,
       xcResidencyComplete: false,
       seedRoundClosed: false,
       seriesAClosed: false,
       seriesBClosed: false,
+      seriesCClosed: false,
+      seriesDClosed: false,
+      seriesEClosed: false,
+      seriesFClosed: false,
       lastDownRound: false,
       ipoUnlocked: false,
       ipoUnlockedLogged: false,
@@ -252,17 +258,30 @@ export function normalizeSave(raw) {
     if (state.flags.xcResidencyComplete === undefined) {
       state.flags.xcResidencyComplete = false;
     }
+    if (state.flags.xcBatchActive === undefined) {
+      state.flags.xcBatchActive = Boolean(
+        state.flags.xcAccepted &&
+          !state.flags.xcResidencyComplete &&
+          (state.xc?.residencyMonthsRemaining ?? 0) > 0
+      );
+    }
     if (state.flags.xcAccepted && !state.flags.xcResidencyComplete) {
       const remaining = Number(state.xc?.residencyMonthsRemaining) || 0;
       if (remaining > 0) {
         state.flags.xcResidencyComplete = false;
+        state.flags.xcBatchActive = true;
       } else if (state.xc?.batchLabel) {
         state.flags.xcResidencyComplete = true;
-      } else {
-        state.xc.residencyMonthsRemaining = 3;
-        state.xc.batchLabel = 'SF batch (restored save)';
-        state.flags.xcResidencyComplete = false;
+        state.flags.xcBatchActive = false;
+      } else if (!state.xc?.batchStartsTurn) {
+        state.xc = state.xc ?? createInitialXcState();
+        state.xc.batchStartsTurn = calendarTurn(state);
+        state.flags.xcBatchActive = false;
       }
+    }
+    if (!state.accelerators) state.accelerators = { joined: [], activeBoost: null };
+    for (const f of ['seriesCClosed', 'seriesDClosed', 'seriesEClosed', 'seriesFClosed']) {
+      if (state.flags[f] === undefined) state.flags[f] = false;
     }
 
     if (!state.capTable?.length) {

@@ -10,11 +10,13 @@ import {
   confirmTaskLineup
 } from './modules/Tasks.js';
 import { completeBoardTask } from './modules/Board.js';
+import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
 import {
   openExecutiveHireFlow,
   hireExecutiveCandidate,
-  cancelExecutiveHire
+  cancelExecutiveHire,
+  fireExecutive
 } from './modules/Executives.js';
 import { runProductAction, showProductActionFeedback } from './modules/ProductActions.js';
 import {
@@ -39,8 +41,14 @@ import {
   closeSeedRound,
   closeSeriesA,
   closeSeriesB,
+  closeSeriesC,
+  closeSeriesD,
+  closeSeriesE,
+  closeSeriesF,
+  joinAccelerator,
   showFinanceFeedback
 } from './modules/Fundraising.js';
+import { loadAccelerators } from './modules/Accelerators.js';
 import { onLayoffSentiment } from './modules/Sentiment.js';
 import {
   rollMonthStartCrisis,
@@ -208,10 +216,16 @@ async function submitXcInterview(e) {
     return;
   }
 
-  appendLog(sessionState, `XC accepted (score ${score.score}) — $500k SAFE, 3-month SF batch starts.`);
+  const start = result.batchStarts;
+  appendLog(
+    sessionState,
+    `XC accepted (score ${score.score}) — $500k SAFE. Batch starts Month ${start?.monthIndex ?? '?'}, Year ${start?.year ?? '?'} (3 months).`
+  );
   syncStageFromProgress(sessionState);
   showScreen('game');
-  showFinanceFeedback(score.feedback);
+  showFinanceFeedback(
+    `${score.feedback} You join the batch next month — expect a revenue and buzz step-change once SF starts.`
+  );
   refresh();
 }
 
@@ -441,6 +455,70 @@ function handleCloseSeriesB() {
   refresh();
 }
 
+function handleCloseSeriesC() {
+  if (!sessionState) return;
+  const result = closeSeriesC(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Cannot close Series C.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Series C — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post${result.downRound ? ' (down round)' : ''}.`
+  );
+  showFinanceFeedback(result.downRound ? 'Series C closed on down-round terms.' : 'Series C closed.');
+  refresh();
+}
+
+function handleCloseSeriesD() {
+  if (!sessionState) return;
+  const result = closeSeriesD(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Cannot close Series D.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Series D — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post${result.downRound ? ' (down round)' : ''}.`
+  );
+  showFinanceFeedback(result.downRound ? 'Series D closed on down-round terms.' : 'Series D closed.');
+  refresh();
+}
+
+function handleCloseSeriesE() {
+  if (!sessionState) return;
+  const result = closeSeriesE(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Cannot close Series E.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Series E — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post${result.downRound ? ' (down round)' : ''}.`
+  );
+  showFinanceFeedback(result.downRound ? 'Series E closed on down-round terms.' : 'Series E closed.');
+  refresh();
+}
+
+function handleCloseSeriesF() {
+  if (!sessionState) return;
+  const result = closeSeriesF(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Cannot close Series F.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Series F — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post${result.downRound ? ' (down round)' : ''}.`
+  );
+  showFinanceFeedback(result.downRound ? 'Series F closed on down-round terms.' : 'Series F closed.');
+  refresh();
+}
+
 function handleCrisisChoice(index) {
   if (!sessionState) return;
   const result = applyCrisisChoice(sessionState, index);
@@ -494,13 +572,24 @@ function bindGameInteractions() {
   app?.addEventListener('click', (e) => {
     const boardBtn = e.target.closest('[data-complete-board-task]');
     if (boardBtn && sessionState) {
-      const result = completeBoardTask(sessionState, boardBtn.getAttribute('data-complete-board-task'));
-      if (!result.ok) setGameFeedback(result.reason || 'Could not complete board task.', true);
-      else {
+      void (async () => {
+        const result = completeBoardTask(sessionState, boardBtn.getAttribute('data-complete-board-task'));
+        if (!result.ok) {
+          setGameFeedback(result.reason || 'Could not complete board task.', true);
+          refresh();
+          return;
+        }
         appendLog(sessionState, `Board: “${result.def.title}”.`);
+        refresh();
+        await openBoardTaskOutcomeDialog({
+          title: result.def.title,
+          sentimentDelta: result.sentimentDelta ?? 0,
+          sentimentAfter: result.sentimentAfter ?? 0,
+          buzzDelta: result.buzzDelta ?? 0
+        });
         setGameFeedback('Board task done.');
-      }
-      refresh();
+        refresh();
+      })();
       return;
     }
 
@@ -551,6 +640,20 @@ function bindGameInteractions() {
     if (e.target.id === 'btn-cancel-exec-hire' && sessionState) {
       cancelExecutiveHire(sessionState);
       showPeopleFeedback('');
+      refresh();
+      return;
+    }
+
+    const fireExecBtn = e.target.closest('[data-fire-exec]');
+    if (fireExecBtn && sessionState) {
+      const id = fireExecBtn.getAttribute('data-fire-exec');
+      if (!window.confirm('Release this executive? Payroll drops next month.')) return;
+      const result = fireExecutive(sessionState, id);
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else {
+        appendLog(sessionState, `Released ${result.removed.name} (${result.removed.roleTitle}).`);
+        showPeopleFeedback(`${result.removed.name} left the company.`);
+      }
       refresh();
       return;
     }
@@ -632,6 +735,34 @@ function bindGameInteractions() {
     }
     if (e.target.id === 'btn-close-series-b') {
       handleCloseSeriesB();
+      return;
+    }
+    if (e.target.id === 'btn-close-series-c') {
+      handleCloseSeriesC();
+      return;
+    }
+    if (e.target.id === 'btn-close-series-d') {
+      handleCloseSeriesD();
+      return;
+    }
+    if (e.target.id === 'btn-close-series-e') {
+      handleCloseSeriesE();
+      return;
+    }
+    if (e.target.id === 'btn-close-series-f') {
+      handleCloseSeriesF();
+      return;
+    }
+    const accelBtn = e.target.closest('[data-join-accelerator]');
+    if (accelBtn && sessionState) {
+      const id = accelBtn.getAttribute('data-join-accelerator');
+      const result = joinAccelerator(sessionState, id);
+      if (!result.ok) showFinanceFeedback(result.reason, true);
+      else {
+        appendLog(sessionState, `Joined ${result.program.name} — ${formatMoney(result.program.safeAmount)} SAFE.`);
+        showFinanceFeedback(`${result.program.name} SAFE closed. Revenue boost active.`);
+      }
+      refresh();
       return;
     }
     const crisisBtn = e.target.closest('[data-crisis-choice]');
@@ -915,6 +1046,7 @@ async function init() {
         loadCategories(),
         loadTaskCatalog(),
         loadHubData(),
+        loadAccelerators(),
         loadAssetManifest(),
         initNarrativeApiUrl(),
         preloadCrisisCatalog(),

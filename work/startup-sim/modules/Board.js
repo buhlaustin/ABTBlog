@@ -9,7 +9,8 @@ let boardCatalog = bundledBoard;
 export function createInitialBoard() {
   return {
     monthTasks: [],
-    completedThisMonth: 0
+    completedThisMonth: 0,
+    recentTaskIds: []
   };
 }
 
@@ -26,10 +27,18 @@ function shuffle(arr) {
   return a;
 }
 
+const BOARD_TASK_COOLDOWN = 4;
+
 export function dealBoardTasks(state) {
   if (!state.board) state.board = createInitialBoard();
   const pool = getBoardTaskDefs();
-  const picked = shuffle(pool).slice(0, 3);
+  const recent = new Set((state.board.recentTaskIds ?? []).slice(-BOARD_TASK_COOLDOWN * 3));
+  const fresh = pool.filter((t) => !recent.has(t.id));
+  const source = fresh.length >= 3 ? fresh : pool;
+  const picked = shuffle(source).slice(0, 3);
+  state.board.recentTaskIds = [...(state.board.recentTaskIds ?? []), ...picked.map((p) => p.id)].slice(
+    -BOARD_TASK_COOLDOWN * 3
+  );
   state.board.monthTasks = picked.map((def, index) => ({
     instanceId: `board-${state.calendar.year}-${state.calendar.monthIndex}-${def.id}-${index}`,
     taskId: def.id,
@@ -49,15 +58,25 @@ export function completeBoardTask(state, instanceId) {
   if (!def) return { ok: false, reason: 'Unknown board task.' };
 
   const cost = def.cost ?? 0;
+  const sentimentBefore = state.sentiment?.score ?? 68;
   state.finance.cash -= cost;
   if (cost > 0) recordCashOutflow(state, cost, 'board');
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
-  if (def.sentiment) onBoardSentiment(state, def.sentiment);
-  if (def.buzz) state.product.buzz = (state.product.buzz ?? 0) + def.buzz;
+  const sentimentDelta = def.sentiment ?? 0;
+  if (sentimentDelta) onBoardSentiment(state, sentimentDelta);
+  const buzzDelta = def.buzz ?? 0;
+  if (buzzDelta) state.product.buzz = (state.product.buzz ?? 0) + buzzDelta;
 
   inst.status = 'done';
   state.board.completedThisMonth = (state.board.completedThisMonth ?? 0) + 1;
-  return { ok: true, def };
+  return {
+    ok: true,
+    def,
+    sentimentDelta,
+    sentimentBefore,
+    sentimentAfter: state.sentiment?.score ?? sentimentBefore,
+    buzzDelta
+  };
 }
 
 function escapeHtml(s) {

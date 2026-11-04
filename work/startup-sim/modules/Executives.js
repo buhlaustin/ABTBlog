@@ -64,10 +64,45 @@ function pick(pool, rng, usedSet) {
   return list[Math.floor(rng() * list.length)];
 }
 
+const ROLE_BIO_LEADS = {
+  COO: 'Operator who scales teams without breaking culture.',
+  CFO: 'Finance leader obsessed with runway and clean audits.',
+  CTO: 'Technical exec who still reads diffs on Friday nights.',
+  CMO: 'Brand builder who turns buzz into pipeline.',
+  CRO: 'Revenue leader who lives in the CRM.',
+  CPO: 'Product exec who talks to customers every week.',
+  CHRO: 'People leader who hires fast and fires fair.',
+  CIO: 'Systems exec who untangles enterprise messes.',
+  CSO: 'Security-minded exec for when the board asks hard questions.',
+  'General Counsel': 'Startup lawyer who has seen every term sheet trick.',
+  'VP Engineering': 'Engineering leader who ships predictable quarters.',
+  'VP Sales': 'Sales leader who builds repeatable outbound.',
+  'VP Marketing': 'Marketing leader who measures everything.',
+  'VP Product': 'Product leader who connects roadmap to revenue.',
+  'VP Operations': 'Ops leader who makes chaos boring.',
+  'VP Finance': 'Finance leader who models scenarios in spreadsheets.'
+};
+
+function roleBio(roleTitle, snippet, former, rng) {
+  const lead = ROLE_BIO_LEADS[roleTitle] ?? `Seasoned ${roleTitle} for high-growth startups.`;
+  const extra = pick(
+    [
+      'Known for crisp board updates.',
+      'Brings a network of operators and angels.',
+      'Has zero patience for vanity metrics.',
+      'Turned around a messy cap table once already.'
+    ],
+    rng,
+    new Set()
+  );
+  return `${lead} ${snippet} Previously at ${former}. ${extra}`;
+}
+
 export async function generateExecutiveCandidates(state, roleTitle, count = 4) {
   const data = await loadExecNames();
   const rng = mulberry32(runSeed(state) + roleTitle.length * 997 + (state.executives?.roster?.length ?? 0) * 131);
   const usedNames = new Set((state.executives?.roster ?? []).map((e) => e.name));
+  const usedSnippets = new Set();
   const candidates = [];
 
   for (let i = 0; i < count; i++) {
@@ -76,7 +111,8 @@ export async function generateExecutiveCandidates(state, roleTitle, count = 4) {
     const name = `${first} ${last}`;
     usedNames.add(name);
     const former = pick(data.formerCompanies, rng, new Set());
-    const snippet = pick(data.bioSnippets, rng, new Set());
+    const snippet = pick(data.bioSnippets, rng, usedSnippets);
+    usedSnippets.add(snippet);
     const tier = getWorkspaceTier(state);
     const salary =
       SALARY_BY_TIER[tier] ??
@@ -85,7 +121,7 @@ export async function generateExecutiveCandidates(state, roleTitle, count = 4) {
       id: `exec-cand-${Date.now()}-${i}-${Math.floor(rng() * 1e6)}`,
       roleTitle: roleTitle.trim() || 'COO',
       name,
-      bio: `${snippet} Previously at ${former}.`,
+      bio: roleBio(roleTitle, snippet, former, rng),
       salaryMonthly: salary,
       formerCompany: former
     });
@@ -141,6 +177,24 @@ export function hireExecutiveCandidate(state, candidateId) {
 
 export function cancelExecutiveHire(state) {
   if (state.executives) state.executives.pendingHire = null;
+}
+
+export function fireExecutive(state, executiveId) {
+  const roster = state.executives?.roster ?? [];
+  const idx = roster.findIndex((e) => e.id === executiveId);
+  if (idx < 0) return { ok: false, reason: 'Executive not found.' };
+  const removed = roster[idx];
+  state.executives.roster = roster.filter((e) => e.id !== executiveId);
+  return { ok: true, removed };
+}
+
+export function filledExecutiveTitles(state) {
+  return new Set((state.executives?.roster ?? []).map((e) => e.roleTitle));
+}
+
+export function availableExecutiveTitles(state, data = execNamesCache) {
+  const filled = filledExecutiveTitles(state);
+  return (data.suggestedTitles ?? ['COO', 'CFO', 'CTO', 'CMO', 'CRO']).filter((t) => !filled.has(t));
 }
 
 export function migrateLegacyCoo(state) {
@@ -200,22 +254,26 @@ export function renderOrgChart(container, state) {
   const execNodes = roster
     .map(
       (e) =>
-        `<div class="org-node org-node-exec"><span class="org-role">${escapeHtml(e.roleTitle)}</span><strong>${escapeHtml(e.name)}</strong><span class="fine-print">${formatMoney(e.salaryMonthly)}/mo · not in headcount cap</span></div>`
+        `<div class="org-node org-node-exec"><span class="org-role">${escapeHtml(e.roleTitle)}</span><strong>${escapeHtml(e.name)}</strong><span class="fine-print">${formatMoney(e.salaryMonthly)}/mo · not in headcount cap</span>
+        <button type="button" class="btn btn-ghost btn-small" data-fire-exec="${escapeHtml(e.id)}">Release</button></div>`
     )
     .join('');
 
-  const titleOptions = suggestedTitles(data)
+  const openTitles = availableExecutiveTitles(state, data);
+  const titleOptions = openTitles
     .map((t) => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`)
     .join('');
 
   const hireBlock =
-    open > 0 && !state.executives?.pendingHire
+    open > 0 && openTitles.length > 0 && !state.executives?.pendingHire
       ? `<div class="org-node org-node-open">
           <span class="org-role">Open seat (${open} left)</span>
           <label class="fine-print" for="exec-role-title">Title</label>
           <select id="exec-role-title" class="exec-role-select">${titleOptions}</select>
           <button type="button" class="btn btn-primary btn-small" id="btn-start-exec-hire">Review candidates</button>
         </div>`
+    : open > 0 && !openTitles.length && !state.executives?.pendingHire
+      ? `<div class="org-node org-node-muted"><span class="org-role">C-suite</span><p class="fine-print">All listed titles are filled — release someone to hire a different role.</p></div>`
       : slots === 0
         ? `<div class="org-node org-node-muted"><span class="org-role">C-suite</span><p class="fine-print">Unlocks when you lease a small office.</p></div>`
         : open === 0
