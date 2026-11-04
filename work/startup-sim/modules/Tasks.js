@@ -68,6 +68,11 @@ export function getTaskDefinitions() {
   return taskCatalog?.tasks ?? [];
 }
 
+/** Used by headless smoke tests only (loads tasks.json without fetch). */
+export function hydrateTaskCatalog(data) {
+  if (data?.tasks?.length) taskCatalog = data;
+}
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i -= 1) {

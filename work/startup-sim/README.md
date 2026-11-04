@@ -4,15 +4,23 @@ Hosted startup tycoon game (Career + Sandbox modes). Play on the site at `/work/
 
 ## Local play
 
+From repo root:
+
 ```bash
-npm run copy-work
-python3 -m http.server 8080
+npm run dev
 ```
 
-Open `http://localhost:8080/play/startup-sim/index.html` (after copy) or serve this folder directly.
+Open `/work/startup-sim/` (Next) or, after `npm run copy-work`, `/play/startup-sim/index.html` from `public/`.
 
 ## Status
 
 **Shipped (Phases 0–6):** core loop, staff/fundraising, XC/hubs, AI news/social/advisor, IPO endgame, CC0 stage icons, tutorials, a11y/mobile polish.
 
-**Build:** `npm run prebuild` validates `assets/manifest.json` paths before copy to `public/play/`.
+## Build & QA
+
+- `npm run smoke:startup-sim` — headless task-pool and module checks (also runs in `prebuild`)
+- `npm run prebuild` — validates assets, smoke, copies to `public/play/`
+
+## Production AI (optional)
+
+Redeploy the shared **`hos-narrative`** Lambda after prompt changes; the game uses offline fallbacks when the narrative URL is unavailable.

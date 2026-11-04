@@ -16,6 +16,10 @@ const { STAGES, getMonthlyTaskSlots } = await import(
 const { createInitialState, normalizeSave } = await import(
   `file://${join(sim, 'modules/GameState.js')}`
 );
+const { hydrateTaskCatalog, dealMonthlyTasks } = await import(
+  `file://${join(sim, 'modules/Tasks.js')}`
+);
+hydrateTaskCatalog(tasksJson);
 
 function stageAllowed(task, stage) {
   const stages = task.stages ?? ['garage'];
@@ -48,7 +52,11 @@ const state = createInitialState({
 });
 
 if (!state.calendar.monthTasks?.length) {
-  console.warn('WARN: createInitialState dealt 0 tasks in Node (tasks.json loads via fetch in browser)');
+  dealMonthlyTasks(state);
+}
+if (!state.calendar.monthTasks?.length) {
+  console.error('FAIL: could not deal tasks after hydrating catalog');
+  failed = true;
 } else {
   console.log(`OK: initial deal ${state.calendar.monthTasks.length} tasks`);
 }

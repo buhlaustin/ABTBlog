@@ -1,6 +1,6 @@
 # Startup Simulator — Game Design & Engineering Plan
 
-> **Internal planning document.** Not linked from the public site, RSS, or sitemap. Source of truth for implementation phases until the game ships.
+> **Internal planning document.** Not linked from the marketing site or RSS. Source of truth for design and phases. **Shipped** on the work index as **Live** (`/work/startup-sim/`).
 
 ## Working title & slug
 
