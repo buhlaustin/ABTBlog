@@ -54,6 +54,7 @@ jobs:
         run: npm run e2e:startup-sim
 
       - name: Narrative API health (optional)
+        continue-on-error: true
         run: npm run smoke:startup-sim-ai
         env:
           HOS_NARRATIVE_API_URL: ${{ secrets.HOS_NARRATIVE_API_URL }}
