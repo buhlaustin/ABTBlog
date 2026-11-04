@@ -30,10 +30,10 @@ const focusPillars = [
   },
 ] as const;
 
-function PlayHosBanner() {
+function PlayStartupSimBanner() {
   return (
     <Link
-      href="/work/hos/"
+      href="/work/startup-sim/"
       className="group relative block overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-6 py-8 text-white shadow-lg transition hover:border-zinc-600 sm:px-8 sm:py-10"
     >
       <div
@@ -41,23 +41,23 @@ function PlayHosBanner() {
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 100% 0%, rgba(37, 99, 235, 0.45), transparent 55%), radial-gradient(ellipse 60% 50% at 0% 100%, rgba(59, 130, 246, 0.2), transparent 50%)",
+            "radial-gradient(ellipse 80% 60% at 100% 0%, rgba(52, 211, 153, 0.35), transparent 55%), radial-gradient(ellipse 60% 50% at 0% 100%, rgba(37, 99, 235, 0.35), transparent 50%)",
         }}
       />
       <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-xl">
-          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.25em] text-blue-300/90">
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.25em] text-emerald-300/90">
             Playable in the browser
           </p>
           <h2 className="font-display mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            House of Strategy
+            Startup Simulator
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-zinc-400 sm:text-base">
-            Outwit ten AI houseguests—alliances, competitions, and evictions in a
-            text-based social strategy game.
+            Garage-to-IPO tycoon: fundraising, cap table, AI headlines and social
+            feeds, and a chief-of-staff advisor. Career or Sandbox.
           </p>
         </div>
-        <span className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition group-hover:bg-blue-50 sm:w-auto">
+        <span className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition group-hover:bg-emerald-50 sm:w-auto">
           Play now
           <span aria-hidden className="transition group-hover:translate-x-0.5">
             →
@@ -70,7 +70,7 @@ function PlayHosBanner() {
 
 export default function HomePage() {
   const featuredWork = workItems.filter((item) => item.featured);
-  const otherFeatured = featuredWork.filter((item) => item.slug !== "hos");
+  const otherFeatured = featuredWork.filter((item) => item.slug !== "startup-sim");
   const latestPost = getAllPosts()[0];
   const bioLead = profile.bioParagraphs[0];
   const bioSide = profile.bioParagraphs[3];
@@ -136,10 +136,10 @@ export default function HomePage() {
               </div>
             </div>
             <Link
-              href="/work/hos/"
+              href="/work/startup-sim/"
               className="flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
             >
-              Play House of Strategy →
+              Play Startup Simulator →
             </Link>
             <a
               href={siteConfig.github}
@@ -156,7 +156,7 @@ export default function HomePage() {
 
       <div className="mx-auto max-w-5xl px-safe pb-20 pt-12 sm:pb-24 sm:pt-16">
         <section className="mb-16">
-          <PlayHosBanner />
+          <PlayStartupSimBanner />
         </section>
 
         <section className="mb-16">

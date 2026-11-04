@@ -215,10 +215,12 @@ export function renderPeoplePanel(container, state) {
     ${orgMount}
     <div id="org-chart-mount"></div>
     <p class="panel-lede">Adjust draft headcount, preview burn vs last month revenue, then <strong>Finalize staffing</strong>. C-suite hires sit outside the headcount cap.</p>
-    <table class="data-table">
-      <thead><tr><th>Department</th><th>Headcount</th><th>$/head/mo</th><th>Subtotal</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead><tr><th>Department</th><th>Headcount</th><th>$/head/mo</th><th>Subtotal</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
     <div class="summary-grid">
       <div><span class="stat-label">Draft / cap</span><span class="stat-value">${totalDraft} / ${maxHc}</span></div>
       <div><span class="stat-label">Finalized (active)</span><span class="stat-value">${totalFinal}</span></div>

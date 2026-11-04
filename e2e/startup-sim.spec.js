@@ -86,4 +86,47 @@ test.describe('Startup Simulator', () => {
     await expect(page.locator('#panel-finance')).toContainText('Cap table');
     await expect(page.locator('#panel-finance')).toContainText('Board sentiment');
   });
+
+  test('mobile viewport: tabs and people table scroll without horizontal page overflow', async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true,
+    });
+    const page = await context.newPage();
+    page.on('dialog', (dialog) => dialog.accept());
+
+    await page.goto('/play/startup-sim/index.html', { waitUntil: 'load' });
+    await page.evaluate((key) => localStorage.removeItem(key), SAVE_KEY);
+    await page.goto('/play/startup-sim/index.html', { waitUntil: 'load' });
+    await expect(page.locator('body[data-startup-sim-ready="true"]')).toBeVisible({
+      timeout: 45_000,
+    });
+
+    await page.getByRole('button', { name: 'New game' }).click();
+    await page.locator('#company-name').fill('Mobile Co');
+    await page.locator('#ceo-first-name').fill('Mo');
+    await page.locator('#ceo-last-name').fill('Bile');
+    await page.locator('#startup-category').selectOption('b2b-saas');
+    await page.locator('#btn-start-game').click();
+    await expect(page.locator('#screen-game')).toBeVisible();
+
+    const offers = page.locator('[data-toggle-task-offer]');
+    for (let i = 0; i < Math.min(4, await offers.count()); i += 1) {
+      await offers.nth(i).click();
+    }
+    await page.locator('#btn-confirm-task-lineup').click();
+
+    await page.locator('#tab-finance').click();
+    await expect(page.locator('#panel-finance .table-scroll')).toBeVisible();
+    await expect(page.locator('#tab-desk')).toHaveCSS('min-height', '44px');
+
+    const docWidth = await page.evaluate(() => document.documentElement.clientWidth);
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(scrollWidth).toBeLessThanOrEqual(docWidth + 2);
+
+    await context.close();
+  });
 });

@@ -212,10 +212,12 @@ export function renderOfficesPanel(container, state) {
     state.offices?.hubId
       ? `
     <h3 class="log-head">Satellite offices</h3>
-    <table class="data-table">
-      <thead><tr><th>Office</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
-      <tbody>${satRows || '<tr><td colspan="4">No satellites yet.</td></tr>'}</tbody>
-    </table>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead><tr><th>Office</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
+        <tbody>${satRows || '<tr><td colspan="4">No satellites yet.</td></tr>'}</tbody>
+      </table>
+    </div>
     <div class="satellite-add">
       <select id="satellite-template">${satOptions}</select>
       <button type="button" class="btn btn-ghost btn-small" id="btn-add-satellite">Add satellite</button>

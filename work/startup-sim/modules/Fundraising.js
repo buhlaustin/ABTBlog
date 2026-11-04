@@ -154,10 +154,12 @@ export function renderFinancePanel(container, state) {
     <div id="ipo-panel-mount"></div>
     <div id="offices-panel-mount"></div>
     <h3 class="log-head">Cap table</h3>
-    <table class="data-table">
-      <thead><tr><th>Holder</th><th>Shares</th><th>%</th><th>Class</th></tr></thead>
-      <tbody>${renderCapTableRows(state) || '<tr><td colspan="4">Empty</td></tr>'}</tbody>
-    </table>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead><tr><th>Holder</th><th>Shares</th><th>%</th><th>Class</th></tr></thead>
+        <tbody>${renderCapTableRows(state) || '<tr><td colspan="4">Empty</td></tr>'}</tbody>
+      </table>
+    </div>
     ${
       instruments
         ? `<h3 class="log-head">Instruments</h3><ul class="instrument-list">${instruments}</ul>`

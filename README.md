@@ -32,3 +32,9 @@ Game source is in `work/hos/`. Play at `/work/hos/`. Upstream history lives in [
 ## Blog
 
 Posts are Markdown files in `content/blog/` with frontmatter (`title`, `date`, `description`, optional `slug`, `tags`).
+
+## SEO
+
+- Site-wide defaults live in `src/lib/site.ts`; per-page metadata uses `pageMetadata()` in `src/lib/seo.ts`.
+- `npm run audit:seo` fails the build if the bare domain appears in marketing titles/descriptions.
+- `robots.txt` and `sitemap.xml` are emitted by Next at build time (`src/app/robots.ts`, `src/app/sitemap.ts`).
