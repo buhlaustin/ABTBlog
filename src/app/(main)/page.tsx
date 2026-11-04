@@ -130,9 +130,10 @@ export default function HomePage() {
                 height={48}
                 className="h-12 w-12 rounded-xl border border-border object-cover"
               />
-              <div className="min-w-0 text-sm">
+              <div className="min-w-0 text-sm leading-snug">
                 <p className="font-semibold text-foreground">{siteConfig.name}</p>
-                <p className="truncate text-muted">{profile.role}</p>
+                <p className="text-muted">{profile.role}</p>
+                <p className="text-muted">{profile.tagline}</p>
               </div>
             </div>
             <Link

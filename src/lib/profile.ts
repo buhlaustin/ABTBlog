@@ -9,7 +9,8 @@ export const authorCard = {
 } as const;
 
 export const profile = {
-  role: "Software Engineer and Indie Game Designer",
+  role: "Software Engineer",
+  tagline: "Indie game designer",
   company: "ClassQuip",
   companyUrl: "https://www.classquip.com",
   previousEmployer: "Stride / K12",

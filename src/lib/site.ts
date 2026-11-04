@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Austin Buhl",
   /** Default `<title>` and Open Graph title for the homepage (no domain name). */
-  defaultTitle: "Austin Buhl — Knoxville, TN Software Engineer",
+  defaultTitle: "Austin Buhl — Software Engineer",
   /** Appended by root layout for inner pages: `%s · Austin Buhl`. */
   description:
     "Software engineer and indie game designer in Knoxville, TN. Real-time edtech, browser games, simulations, and open source.",
