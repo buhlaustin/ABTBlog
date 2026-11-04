@@ -1,5 +1,6 @@
 import { assetBaseUrl } from './utils.js';
 import { applyXCSafe } from './CapTable.js';
+import { restorePostXcWorkspace } from './Workspace.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import bundledInterview from '../data/xc-interview.json' with { type: 'json' };
 
@@ -152,7 +153,8 @@ export function tickXcResidency(state) {
   lines.push(`XC batch month complete — ${state.xc.residencyMonthsRemaining} left in San Francisco.`);
   if (state.xc.residencyMonthsRemaining <= 0) {
     state.flags.xcResidencyComplete = true;
-    lines.push('Batch finished — choose your permanent hub on the Finance tab.');
+    restorePostXcWorkspace(state);
+    lines.push('Batch finished — back in your small office. Upgrade space or chase hub HQ at $500M ARR on Finance.');
   }
   return lines;
 }

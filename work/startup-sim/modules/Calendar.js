@@ -1,5 +1,6 @@
 import { STAGES } from './constants.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
+import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
 import { tickPublicMarket, tickIpoLockup, isPublicCompany } from './IPO.js';
@@ -48,6 +49,7 @@ export function advanceCalendarMonth(state) {
 export function startMonth(state) {
   syncDraftFromFinalized(state);
   dealMonthlyTasks(state);
+  dealBoardTasks(state);
   return state;
 }
 

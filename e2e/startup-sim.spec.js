@@ -20,10 +20,18 @@ test.describe('Startup Simulator', () => {
     await expect(page.locator('#screen-setup')).toBeVisible();
 
     await page.locator('#company-name').fill('Playwright Test Co');
+    await page.locator('#ceo-first-name').fill('Alex');
+    await page.locator('#ceo-last-name').fill('Founder');
     await page.locator('#startup-category').selectOption('b2b-saas');
     await page.locator('#btn-start-game').click();
-
     await expect(page.locator('#screen-game')).toBeVisible();
+    const offers = page.locator('[data-toggle-task-offer]');
+    await expect(offers.first()).toBeVisible();
+    const offerCount = await offers.count();
+    for (let i = 0; i < Math.min(4, offerCount); i += 1) {
+      await offers.nth(i).click();
+    }
+    await page.locator('#btn-confirm-task-lineup').click();
     await expect(page.locator('#hud-company')).toHaveText('Playwright Test Co');
 
     const complete = page.locator('[data-complete-task]').first();
@@ -50,9 +58,19 @@ test.describe('Startup Simulator', () => {
 
     await page.getByRole('button', { name: 'New game' }).click();
     await page.locator('#company-name').fill('Tab Audit Co');
+    await page.locator('#ceo-first-name').fill('Sam');
+    await page.locator('#ceo-last-name').fill('Tabler');
     await page.locator('#startup-category').selectOption('b2b-saas');
     await page.locator('#btn-start-game').click();
     await expect(page.locator('#screen-game')).toBeVisible();
+    const offers = page.locator('[data-toggle-task-offer]');
+    for (let i = 0; i < Math.min(4, await offers.count()); i += 1) {
+      await offers.nth(i).click();
+    }
+    await page.locator('#btn-confirm-task-lineup').click();
+
+    await page.locator('#tab-board').click();
+    await expect(page.locator('#panel-board')).toContainText('optional');
 
     await page.locator('#tab-growth').click();
     await expect(page.locator('#panel-growth')).toContainText('Rival');

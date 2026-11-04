@@ -1,7 +1,8 @@
-import { REVENUE_GATES, STAGES, fixedCostsForStage } from './constants.js';
+import { STAGES } from './constants.js';
 import { getEffectiveIpoGate } from './SandboxTuning.js';
+import { ARR_GATES, getArr, syncProgressFlagsFromArr, getTaskStage } from './Workspace.js';
 
-/** Apply stage upgrades from revenue gates. */
+/** Apply narrative stage flags from ARR — no auto office upgrades. */
 const STAGE_RANK = {
   [STAGES.GARAGE]: 0,
   [STAGES.OFFICE]: 1,
@@ -11,28 +12,16 @@ const STAGE_RANK = {
 };
 
 export function syncStageFromProgress(state) {
-  const r = state.finance?.lifetimeRevenue ?? 0;
-  let stage = state.stage;
-  const rank = STAGE_RANK[stage] ?? 0;
+  syncProgressFlagsFromArr(state);
+  const arr = getArr(state);
 
-  if (rank <= STAGE_RANK[STAGES.GARAGE] && r >= REVENUE_GATES.OFFICE) {
-    stage = STAGES.OFFICE;
-  }
-  if (r >= REVENUE_GATES.XC) {
-    state.flags.xcUnlocked = true;
-  }
-  if (r >= getEffectiveIpoGate(state)) {
+  if (arr >= getEffectiveIpoGate(state)) {
     state.flags.ipoUnlocked = true;
   }
+
+  let stage = getTaskStage(state);
   if (state.flags?.ipoFiled) {
     stage = STAGES.PUBLIC;
-  }
-
-  if ((STAGE_RANK[stage] ?? 0) < STAGE_RANK[STAGES.XC] && state.flags?.xcAccepted) {
-    stage = STAGES.XC;
-  }
-  if (state.offices?.hubId && (STAGE_RANK[stage] ?? 0) < STAGE_RANK[STAGES.POST_XC]) {
-    stage = STAGES.POST_XC;
   }
 
   state.stage = stage;
@@ -42,16 +31,15 @@ export function syncStageFromProgress(state) {
 /** @returns {string[]} log lines for the month feed */
 export function onStageChange(state, fromStage, toStage) {
   const lines = [];
-  if (fromStage === STAGES.GARAGE && toStage === STAGES.OFFICE) {
-    state.finance.fixedCostsMonthly = fixedCostsForStage(STAGES.OFFICE);
-    lines.push('Unlocked small office — higher fixed costs, more desk work next month.');
-  }
   if (state.flags.xcUnlocked && !state.flags.xcUnlockedLogged) {
-    lines.push('X Combinator unlocked — apply on the Finance tab.');
+    lines.push('X Combinator unlocked — apply on the Finance tab at $100k ARR.');
     state.flags.xcUnlockedLogged = true;
   }
   if (toStage === STAGES.PUBLIC && fromStage !== STAGES.PUBLIC) {
     lines.push('You are now a public company — watch the stock price each month on Finance.');
+  }
+  if (fromStage === STAGES.XC && toStage === STAGES.POST_XC) {
+    lines.push('Back from the batch — small office lease restored. Upgrade space on Finance when ARR allows.');
   }
   return lines;
 }
@@ -66,11 +54,19 @@ export function onIpoUnlocked(state) {
 }
 
 export function nextRevenueMilestone(state) {
-  const r = state.finance?.lifetimeRevenue ?? 0;
-  if (r < REVENUE_GATES.OFFICE) return { label: 'Small office', amount: REVENUE_GATES.OFFICE };
-  if (r < REVENUE_GATES.XC) return { label: 'X Combinator', amount: REVENUE_GATES.XC };
+  const arr = getArr(state);
+  const tier = state.workspace?.tier ?? 'garage';
+  if (tier === 'garage' && arr < ARR_GATES.SMALL_OFFICE) {
+    return { label: 'Small office lease', amount: ARR_GATES.SMALL_OFFICE, metric: 'ARR' };
+  }
+  if (!state.flags?.xcUnlocked && arr < ARR_GATES.XC) {
+    return { label: 'X Combinator', amount: ARR_GATES.XC, metric: 'ARR' };
+  }
+  if (tier !== 'medium' && arr < ARR_GATES.MEDIUM_OFFICE) {
+    return { label: 'Medium office', amount: ARR_GATES.MEDIUM_OFFICE, metric: 'ARR' };
+  }
   const ipoGate = getEffectiveIpoGate(state);
-  if (r < ipoGate) return { label: 'IPO eligibility', amount: ipoGate };
-  if (!state.flags?.ipoFiled) return { label: 'File IPO', amount: ipoGate };
-  return { label: 'Grow stock / cash out', amount: null };
+  if (arr < ipoGate) return { label: 'IPO eligibility', amount: ipoGate, metric: 'ARR' };
+  if (!state.flags?.ipoFiled) return { label: 'File IPO', amount: ipoGate, metric: 'ARR' };
+  return { label: 'Grow stock / cash out', amount: null, metric: 'ARR' };
 }

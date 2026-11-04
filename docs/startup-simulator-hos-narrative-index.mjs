@@ -104,9 +104,16 @@ Context: ${ctx}`;
   }
 
   if (kind === 'startup_news_month') {
-    return `You write in-world news for the game "Startup Simulator". Return ONLY valid JSON:
-{"articles":[{"headline":"...","dek":"...","body":"2-4 sentences","source":"parody outlet name","date":"Y# M#"}]}
-Rules: exactly 3 or 4 articles. Use fictional/parody names (Macrohard, Financier Times, Chirp Business). NO real companies or living public figures. Mix world events from context.timelineEvents with reactions to the player's company snapshot. If layoffsPending>0 include one layoff story.
+    return `You write in-world news for the fictional tech economy in "Startup Simulator". Return ONLY valid JSON:
+{"articles":[{"headline":"...","dek":"...","body":"2-4 sentences","source":"parody outlet name","date":"Year Y, month M"}]}
+Rules: exactly 3 or 4 articles. Use parody names (Macrohard, Financier Times, Chirp Business). NO real companies or living public figures. Use context.narrative for company facts (headcount, revenue, workspace). Mix context.timelineEvents when present. Include at most ONE layoff article and ONLY if context.narrative.recentLayoffEvents is non-empty; use exact headcount numbers from that array. NEVER mention sandbox, game levels, desk tasks, ARR gates, or other game UI/meta.
+Context: ${ctx}`;
+  }
+
+  if (kind === 'startup_social_month') {
+    return `You write in-world social posts for Startup Simulator (ProNet = professional, Chirp = short hot takes). Return ONLY valid JSON:
+{"posts":[{"network":"pronet"|"chirp","author":"display name","text":"post body"}]}
+Rules: 3-5 posts split across networks. Reference context.headlines or context.narrative when natural. No game meta (sandbox, levels, desk tasks). Use persona names from context.personas when fitting.
 Context: ${ctx}`;
   }
 
@@ -201,7 +208,7 @@ async function callOpenAI(apiKey, kind, context) {
       temperature: isEerInbox ? 0.9 : 0.85,
       max_tokens: isEerInbox
         ? 2200
-        : kind === 'startup_news_month'
+        : kind === 'startup_news_month' || kind === 'startup_social_month'
           ? 1800
           : isStartupJson
             ? 400

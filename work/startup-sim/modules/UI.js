@@ -1,12 +1,19 @@
-import { formatMoney, stageLabel } from './constants.js';
-import { getMonthlyTaskSlots } from './constants.js';
+import { formatMoney, stageLabel, getMonthlyTaskSlots } from './constants.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
 import { renderPeoplePanel } from './Staff.js';
 import { renderSocialPanel } from './Social.js';
 import { renderNewsPanel } from './News.js';
 import { renderAdvisorPanel } from './Advisor.js';
-import { getTaskDef, pendingTasks, canEndMonth } from './Tasks.js';
+import {
+  getTaskDef,
+  pendingTasks,
+  canEndMonth,
+  needsTaskLineup,
+  selectedOfferCount
+} from './Tasks.js';
+import { getTaskStage, workspaceLabel, getWorkspaceTier, getArr } from './Workspace.js';
+import { renderBoardPanel } from './Board.js';
 import { hasActiveCrisis } from './Crisis.js';
 import { isPublicCompany, founderStakeValue } from './IPO.js';
 import { stageIconUrl, applyGameBackdrop } from './Assets.js';
@@ -16,6 +23,7 @@ import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
+import { renderProductActionsPanel } from './ProductActions.js';
 import { sentimentLabel } from './Sentiment.js';
 import { competitorRevenueMult } from './Competitor.js';
 
@@ -124,9 +132,9 @@ export function renderGameHud(state) {
   }
   applyGameBackdrop(state);
   if (company) company.textContent = state.company.name;
-  if (stage) stage.textContent = stageLabel(state.stage);
+  if (stage) stage.textContent = workspaceLabel(getWorkspaceTier(state));
   if (cash) cash.textContent = formatMoney(state.finance.cash);
-  if (revenue) revenue.textContent = formatMoney(state.finance.lifetimeRevenue);
+  if (revenue) revenue.textContent = formatMoney(getArr(state));
   if (month) {
     month.textContent = `M${state.calendar.monthIndex}, Y${state.calendar.year}`;
   }
@@ -159,15 +167,32 @@ export function renderDeskPanel(state) {
   const desk = document.getElementById('panel-desk');
   if (!desk) return;
 
-  const slotTarget = state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlots(state.stage);
+  const taskStage = getTaskStage(state);
+  const slotTarget = state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlots(taskStage);
   const pending = pendingTasks(state);
   const done = state.calendar.tasksCompleted ?? 0;
   const milestone = nextRevenueMilestone(state);
   const ms = milestone
     ? milestone.amount != null
-      ? `${milestone.label} at ${formatMoney(milestone.amount)}`
+      ? `${milestone.label} at ${formatMoney(milestone.amount)} ARR`
       : milestone.label
     : 'All major gates cleared';
+
+  const lineupOpen = needsTaskLineup(state);
+  const offerCards = lineupOpen
+    ? (state.calendar.monthTaskOffers ?? [])
+        .map((offer) => {
+          const def = getTaskDef(offer.taskId);
+          if (!def) return '';
+          const sel = offer.selected ? 'task-offer selected' : 'task-offer';
+          return `<article class="${sel}">
+            <h3>${escapeHtml(def.title)}</h3>
+            <p>${escapeHtml(def.description)}</p>
+            <button type="button" class="btn btn-ghost btn-small" data-toggle-task-offer="${escapeHtml(offer.offerId)}">${offer.selected ? 'Selected' : 'Select'}</button>
+          </article>`;
+        })
+        .join('')
+    : '';
 
   const taskCards = (state.calendar.monthTasks ?? [])
     .map((inst) => {
@@ -206,14 +231,20 @@ export function renderDeskPanel(state) {
         ? '<p class="desk-feedback error" role="alert">Crisis on the desk — resolve it before closing the month.</p>'
         : ''
     }
-    <p class="panel-lede">Finish every task on the desk, then close the month. Hiring and fundraising happen on their own tabs. <span class="fine-print">Shortcuts: 1–8 switch tabs, M close month.</span></p>
+    <p class="panel-lede">Pick ${slotTarget} tasks from this month’s offers, complete them, then close the month. <span class="fine-print">Shortcuts: 1–9 switch tabs, M close month.</span></p>
     <div class="summary-grid">
       <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slotTarget}</span></div>
       <div><span class="stat-label">This month</span><span class="stat-value">+${formatMoney(monthRev)} / -${formatMoney(monthSpend)}</span></div>
       <div><span class="stat-label">Next gate</span><span class="stat-value">${escapeHtml(ms)}</span></div>
       <div><span class="stat-label">Pending</span><span class="stat-value">${pending.length}</span></div>
     </div>
-    <div class="task-list">${taskCards || '<div class="tab-placeholder">No tasks dealt.</div>'}</div>
+    ${
+      lineupOpen
+        ? `<section class="task-offers"><h3 class="log-head">This month’s offers (${selectedOfferCount(state)} / ${slotTarget} selected)</h3><div class="task-list">${offerCards}</div>
+        <button type="button" id="btn-confirm-task-lineup" class="btn btn-primary btn-small" ${selectedOfferCount(state) === slotTarget ? '' : 'disabled'}>Lock desk lineup</button></section>`
+        : ''
+    }
+    <div class="task-list">${taskCards || (lineupOpen ? '<div class="tab-placeholder">Lock your lineup to start working tasks.</div>' : '<div class="tab-placeholder">No tasks dealt.</div>')}</div>
     <div class="desk-actions">
       <button type="button" id="btn-end-month" class="btn btn-primary" ${endDisabled ? 'disabled' : ''} title="${endDisabled ? 'Finish remaining tasks first' : 'Apply overhead and start next month'}">Close month</button>
       <p id="desk-feedback" class="desk-feedback" hidden></p>
@@ -241,6 +272,7 @@ export const TAB_ORDER = [
   'growth',
   'people',
   'finance',
+  'board',
   'social',
   'news',
   'advisor'
@@ -308,7 +340,7 @@ export function bindGameKeyboardShortcuts(getSession, onCloseMonth) {
     if (document.getElementById('month-summary-dialog')?.open) return;
 
     const num = Number(e.key);
-    if (num >= 1 && num <= 8 && !e.altKey && !e.ctrlKey && !e.metaKey) {
+    if (num >= 1 && num <= 9 && !e.altKey && !e.ctrlKey && !e.metaKey) {
       const tab = TAB_ORDER[num - 1];
       if (tab) {
         e.preventDefault();
@@ -355,6 +387,7 @@ export function renderAllPanels(state) {
   renderSocialPanel(document.getElementById('panel-social'), state);
   renderNewsPanel(document.getElementById('panel-news'), state);
   renderAdvisorPanel(document.getElementById('panel-advisor'), state);
+  renderBoardPanel(document.getElementById('panel-board'), state);
 }
 
 export function renderGrowthPanel(container, state) {
@@ -425,7 +458,9 @@ export function renderProductPanel(container, state) {
       <div><span class="stat-label">Category</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
     </div>
     ${pivotBlock}
+    <div id="product-actions-mount"></div>
   `;
+  renderProductActionsPanel(document.getElementById('product-actions-mount'), state);
 }
 
 export function renderGameOver(state) {

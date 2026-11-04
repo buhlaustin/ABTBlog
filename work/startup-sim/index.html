@@ -42,6 +42,12 @@
         <label for="company-name">Company name</label>
         <input id="company-name" name="companyName" type="text" maxlength="48" required placeholder="Acme Labs">
 
+        <label for="ceo-first-name">Your name (CEO)</label>
+        <div class="name-row">
+          <input id="ceo-first-name" name="ceoFirstName" type="text" maxlength="24" required placeholder="First">
+          <input id="ceo-last-name" name="ceoLastName" type="text" maxlength="32" required placeholder="Last">
+        </div>
+
         <label for="startup-category">Startup type</label>
         <select id="startup-category" name="category" required>
           <option value="" disabled hidden>Choose a category…</option>
@@ -109,7 +115,7 @@
         </div>
         <div class="hud-stats">
           <div><span class="stat-label">Cash</span><span id="hud-cash" class="stat-value">—</span></div>
-          <div><span class="stat-label">Revenue (life)</span><span id="hud-revenue" class="stat-value">—</span></div>
+          <div><span class="stat-label">ARR</span><span id="hud-revenue" class="stat-value">—</span></div>
           <div><span class="stat-label">Last mo.</span><span id="hud-mrr" class="stat-value">—</span></div>
           <div><span class="stat-label">Month</span><span id="hud-month" class="stat-value">—</span></div>
           <div id="hud-stock-wrap"><span class="stat-label">Stock</span><span id="hud-stock" class="stat-value" hidden>—</span></div>
@@ -122,6 +128,7 @@
         <button type="button" role="tab" data-tab="growth" id="tab-growth" aria-selected="false" aria-controls="panel-growth">Growth</button>
         <button type="button" role="tab" data-tab="people" id="tab-people" aria-selected="false" aria-controls="panel-people">People</button>
         <button type="button" role="tab" data-tab="finance" id="tab-finance" aria-selected="false" aria-controls="panel-finance">Finance</button>
+        <button type="button" role="tab" data-tab="board" id="tab-board" aria-selected="false" aria-controls="panel-board">Board</button>
         <button type="button" role="tab" data-tab="social" id="tab-social" aria-selected="false" aria-controls="panel-social">Social</button>
         <button type="button" role="tab" data-tab="news" id="tab-news" aria-selected="false" aria-controls="panel-news">News</button>
         <button type="button" role="tab" data-tab="advisor" id="tab-advisor" aria-selected="false" aria-controls="panel-advisor">Advisor</button>
@@ -133,6 +140,7 @@
         <div id="panel-growth" class="game-panel" data-panel="growth" role="tabpanel" aria-labelledby="tab-growth" hidden></div>
         <div id="panel-people" class="game-panel" data-panel="people" role="tabpanel" aria-labelledby="tab-people" hidden></div>
         <div id="panel-finance" class="game-panel" data-panel="finance" role="tabpanel" aria-labelledby="tab-finance" hidden></div>
+        <div id="panel-board" class="game-panel" data-panel="board" role="tabpanel" aria-labelledby="tab-board" hidden></div>
         <div id="panel-social" class="game-panel" data-panel="social" role="tabpanel" aria-labelledby="tab-social" hidden></div>
         <div id="panel-news" class="game-panel" data-panel="news" role="tabpanel" aria-labelledby="tab-news" hidden></div>
         <div id="panel-advisor" class="game-panel" data-panel="advisor" role="tabpanel" aria-labelledby="tab-advisor" hidden></div>

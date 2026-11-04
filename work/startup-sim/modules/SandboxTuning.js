@@ -1,5 +1,6 @@
 import { STAGES, REVENUE_GATES, fixedCostsForStage } from './constants.js';
 import { applySeedCapTableSnapshot } from './CapTable.js';
+import { WORKSPACE_TIER, purchaseWorkspaceTier } from './Workspace.js';
 
 const ATLANTA_HUB = {
   id: 'atlanta',
@@ -41,7 +42,8 @@ export function applySandboxStartingStage(state) {
   const key = state.sandboxTuning.startingStage;
   if (key === 'office') {
     state.stage = STAGES.OFFICE;
-    state.finance.fixedCostsMonthly = fixedCostsForStage(STAGES.OFFICE);
+    if (!state.workspace) state.workspace = { tier: WORKSPACE_TIER.GARAGE };
+    purchaseWorkspaceTier(state, WORKSPACE_TIER.SMALL);
     return;
   }
   if (key === 'post_xc') {

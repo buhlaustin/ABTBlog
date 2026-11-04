@@ -19,7 +19,7 @@ export function canCloseSeed(state) {
   return Boolean(
     state.flags?.xcAccepted &&
       state.flags?.xcResidencyComplete &&
-      state.offices?.hubId &&
+      state.workspace?.smallOfficeOwned &&
       !state.flags?.seedRoundClosed
   );
 }
@@ -71,11 +71,11 @@ export function renderFinancePanel(container, state) {
   } else if (xcWaitingForRetry(state)) {
     xcBlock = `<p class="fine-print">XC waitlist — finish this month and reapply next month with sharper metrics.</p>`;
   } else if (isInResidency(state)) {
-    xcBlock = `<p class="fine-print">In SF batch — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) remaining before hub selection.</p>`;
+    xcBlock = `<p class="fine-print">In SF batch — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) remaining. Desk tasks are XC-only.</p>`;
   } else if (state.flags?.xcAccepted) {
     xcBlock = `<p class="fine-print">XC SAFE closed — ${formatMoney(500_000)} on the balance sheet.</p>`;
   } else {
-    xcBlock = `<p class="fine-print">Reach ${formatMoney(500_000)} lifetime revenue to unlock XC.</p>`;
+    xcBlock = `<p class="fine-print">Reach ${formatMoney(100_000)} ARR to unlock XC.</p>`;
   }
 
   const sentimentBlock = `<div class="sentiment-meter" role="meter" aria-valuenow="${sentimentScore}" aria-valuemin="0" aria-valuemax="100">
@@ -140,6 +140,11 @@ export function renderFinancePanel(container, state) {
       <div><span class="stat-label">Runway</span><span class="stat-value">${sum.runway}</span></div>
       <div><span class="stat-label">Valuation</span><span class="stat-value">${state.finance.valuation ? formatMoney(state.finance.valuation) : '—'}</span></div>
       <div><span class="stat-label">Location</span><span class="stat-value">${escapeHtml(state.company.location || '—')}</span></div>
+      <div><span class="stat-label">Lifetime revenue</span><span class="stat-value">${sum.lifetimeRevenueLabel}</span></div>
+      <div><span class="stat-label">Lifetime expenses</span><span class="stat-value">${sum.lifetimeExpensesLabel}</span></div>
+      <div><span class="stat-label">Lifetime profit</span><span class="stat-value">${sum.lifetimeProfitLabel}</span></div>
+      <div><span class="stat-label">Starting cash (investment)</span><span class="stat-value">${sum.initialInvestmentLabel}</span></div>
+      <div><span class="stat-label">Founder stake @ valuation</span><span class="stat-value">${sum.founderStakeLabel}</span></div>
     </div>
     ${sentimentBlock}
     ${xcBlock}

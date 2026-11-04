@@ -313,6 +313,55 @@ h1 {
   font-weight: 600;
 }
 
+.name-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.name-row input {
+  flex: 1 1 0;
+}
+
+.task-offer {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.task-offer.selected {
+  border-color: var(--accent, #3b82f6);
+  box-shadow: 0 0 0 1px var(--accent, #3b82f6);
+}
+
+.org-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.org-node {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  min-width: 12rem;
+  text-align: center;
+}
+
+.org-connector {
+  width: 2px;
+  height: 1rem;
+  background: var(--border);
+}
+
+.workspace-purchase-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
 .hud-mode {
   margin: 0.25rem 0 0;
   font-size: 0.8rem;

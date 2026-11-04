@@ -1,5 +1,6 @@
 import { assetBaseUrl } from './utils.js';
-import { STAGES, getMonthlyTaskSlots } from './constants.js';
+import { STAGES, getMonthlyTaskSlots, getMonthlyTaskOfferCount } from './constants.js';
+import { getTaskStage } from './Workspace.js';
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 
 /** Shipped catalog — always available with the game bundle. */
@@ -110,7 +111,7 @@ function stageAllowed(task, stage) {
     return stages.includes(stage);
   }
   if (stage === STAGES.XC) {
-    return stages.includes('xc') || stages.includes('office');
+    return stages.includes('xc');
   }
   if (stage === STAGES.POST_XC) {
     return stages.includes('post_xc') || stages.includes('xc');
@@ -121,36 +122,90 @@ function stageAllowed(task, stage) {
   return stages.includes(stage);
 }
 
-/** Deal counted tasks for the current month. */
-export function dealMonthlyTasks(state) {
-  const slots = getMonthlyTaskSlots(state.stage);
+function buildTaskPool(state) {
+  const taskStage = getTaskStage(state);
   const categoryId = state.company?.categoryId;
-  const pool = getTaskDefinitions().filter(
-    (t) => stageAllowed(t, state.stage) && categoryAllowed(t, categoryId)
+  return getTaskDefinitions().filter(
+    (t) => stageAllowed(t, taskStage) && categoryAllowed(t, categoryId)
   );
+}
+
+/** Offer extra tasks; player confirms lineup before work counts. */
+export function dealMonthlyTasks(state) {
+  const taskStage = getTaskStage(state);
+  const slots = getMonthlyTaskSlots(taskStage);
+  const offerCount = getMonthlyTaskOfferCount(taskStage);
+  const pool = buildTaskPool(state);
   if (!pool.length) {
     state.calendar.taskCatalogError = true;
+    state.calendar.monthTaskOffers = [];
     state.calendar.monthTasks = [];
     state.calendar.tasksCompleted = 0;
     state.calendar.monthRevenue = 0;
     state.calendar.monthSpend = 0;
+    state.calendar.taskLineupConfirmed = false;
     return state;
   }
   state.calendar.taskCatalogError = false;
   const recent = state.calendar.recentTaskIds ?? [];
-  const picked = pickMonthlyTaskDefs(pool, slots, recent);
-  const dealtIds = picked.map((d) => d.id);
-  state.calendar.recentTaskIds = [...recent, ...dealtIds].slice(-slots * 3);
+  const offered = pickMonthlyTaskDefs(pool, offerCount, recent);
   state.calendar.monthTaskSlotTarget = slots;
-  state.calendar.monthTasks = picked.map((def, index) => ({
-    instanceId: `${state.calendar.year}-${state.calendar.monthIndex}-${def.id}-${index}`,
+  state.calendar.monthTaskOffers = offered.map((def, index) => ({
+    offerId: `${state.calendar.year}-${state.calendar.monthIndex}-offer-${def.id}-${index}`,
     taskId: def.id,
-    status: 'pending'
+    selected: false
   }));
+  state.calendar.monthTasks = [];
+  state.calendar.taskLineupConfirmed = false;
   state.calendar.tasksCompleted = 0;
   state.calendar.monthRevenue = 0;
   state.calendar.monthSpend = 0;
   return state;
+}
+
+export function selectedOfferCount(state) {
+  return (state.calendar.monthTaskOffers ?? []).filter((o) => o.selected).length;
+}
+
+export function toggleTaskOffer(state, offerId) {
+  const slots = state.calendar.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+  if (state.calendar.taskLineupConfirmed) {
+    return { ok: false, reason: 'Lineup locked — complete tasks or finish the month.' };
+  }
+  const offer = state.calendar.monthTaskOffers?.find((o) => o.offerId === offerId);
+  if (!offer) return { ok: false, reason: 'Task not on this month’s board.' };
+  if (offer.selected) {
+    offer.selected = false;
+    return { ok: true };
+  }
+  if (selectedOfferCount(state) >= slots) {
+    return { ok: false, reason: `Pick ${slots} tasks only.` };
+  }
+  offer.selected = true;
+  return { ok: true };
+}
+
+export function confirmTaskLineup(state) {
+  const slots = state.calendar.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+  const selected = (state.calendar.monthTaskOffers ?? []).filter((o) => o.selected);
+  if (selected.length !== slots) {
+    return { ok: false, reason: `Select exactly ${slots} tasks for this month.` };
+  }
+  const recent = state.calendar.recentTaskIds ?? [];
+  const dealtIds = selected.map((o) => o.taskId);
+  state.calendar.recentTaskIds = [...recent, ...dealtIds].slice(-slots * 3);
+  state.calendar.monthTasks = selected.map((o, index) => ({
+    instanceId: `${state.calendar.year}-${state.calendar.monthIndex}-${o.taskId}-${index}`,
+    taskId: o.taskId,
+    status: 'pending'
+  }));
+  state.calendar.taskLineupConfirmed = true;
+  return { ok: true };
+}
+
+export function needsTaskLineup(state) {
+  if (state.calendar?.taskCatalogError) return false;
+  return !state.calendar?.taskLineupConfirmed;
 }
 
 export function getTaskDef(taskId) {
@@ -169,5 +224,6 @@ export function canEndMonth(state) {
   if (state.flags?.gameOver) return false;
   if (state.calendar?.taskCatalogError) return false;
   if (state.crisis?.active) return false;
+  if (needsTaskLineup(state)) return false;
   return allTasksComplete(state);
 }

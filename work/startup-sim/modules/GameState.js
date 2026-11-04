@@ -5,6 +5,9 @@ import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
+import { createInitialWorkspace, applyWorkspaceBurn } from './Workspace.js';
+import { createInitialExecutives, migrateLegacyCoo } from './Executives.js';
+import { createInitialBoard } from './Board.js';
 import { createInitialXcState } from './XC.js';
 import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
@@ -13,6 +16,7 @@ import { createInitialCrisisState } from './Crisis.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { calendarTurn } from './XC.js';
 import { syncStageFromProgress } from './Progression.js';
+import { syncLifetimeProfit } from './Finance.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -23,7 +27,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 9;
+export const SAVE_VERSION = 11;
 
 export {
   STAGES,
@@ -57,18 +61,26 @@ export function createInitialState(options) {
     sandboxTuning: mode === 'sandbox' ? options.sandboxTuning ?? null : null,
     company: {
       name: String(options.companyName || 'Untitled Co.').trim(),
+      ceoFirstName: String(options.ceoFirstName || 'Founder').trim(),
+      ceoLastName: String(options.ceoLastName || '').trim(),
       categoryId: category.id,
       categoryLabel: category.label,
       economics
     },
+    workspace: createInitialWorkspace(),
+    executives: createInitialExecutives(),
+    board: createInitialBoard(),
     stage: STAGES.GARAGE,
     calendar: createInitialCalendar(),
     finance: {
       cash: startingCash,
       lifetimeRevenue: 0,
+      lifetimeExpenses: 0,
+      lifetimeProfit: 0,
       monthlyRevenue: 0,
       monthlyBurn: 0,
       mrr: 0,
+      arr: 0,
       valuation: null,
       fixedCostsMonthly: fixedCostsForStage(STAGES.GARAGE),
       instruments: [],
@@ -86,6 +98,8 @@ export function createInitialState(options) {
     crisis: createInitialCrisisState(),
     meta: {
       runStartedTurn: 1,
+      runSeed: Math.floor(Math.random() * 2_147_483_647),
+      initialInvestmentCash: startingCash,
       monthsAtIpo: null,
       hofRecorded: false,
       hofHighlights: []
@@ -124,6 +138,7 @@ export function createInitialState(options) {
     applySandboxStartingStage(state);
   }
 
+  applyWorkspaceBurn(state);
   state.meta.runStartedTurn = calendarTurn(state);
   startMonth(state);
   return state;
@@ -149,6 +164,31 @@ export function normalizeSave(raw) {
     if (!state.calendar.monthTasks) state.calendar.monthTasks = [];
     if (!state.calendar.log) state.calendar.log = [];
     if (!state.calendar.recentTaskIds) state.calendar.recentTaskIds = [];
+    if (!state.calendar.monthTaskOffers) state.calendar.monthTaskOffers = [];
+    if (state.calendar.taskLineupConfirmed === undefined) {
+      state.calendar.taskLineupConfirmed = (state.calendar.monthTasks?.length ?? 0) > 0;
+    }
+    if (!state.workspace) state.workspace = createInitialWorkspace();
+    if (!state.executives) state.executives = createInitialExecutives();
+    migrateLegacyCoo(state);
+    if (state.finance.lifetimeExpenses === undefined) state.finance.lifetimeExpenses = 0;
+    if (state.finance.lifetimeProfit === undefined) {
+      state.finance.lifetimeProfit =
+        (state.finance.lifetimeRevenue ?? 0) - (state.finance.lifetimeExpenses ?? 0);
+    }
+    if (state.meta.initialInvestmentCash === undefined) {
+      state.meta.initialInvestmentCash =
+        state.sandboxStartingCash ?? MODE_CONFIG[state.mode === 'sandbox' ? 'sandbox' : 'career'].startingCash;
+    }
+    if (state.meta.runSeed === undefined) {
+      state.meta.runSeed = Math.floor(Math.random() * 2_147_483_647);
+    }
+    if (!state.board) state.board = createInitialBoard();
+    if (state.finance.arr === undefined) {
+      state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);
+    }
+    if (!state.company.ceoFirstName) state.company.ceoFirstName = 'Founder';
+    if (state.company.ceoLastName === undefined) state.company.ceoLastName = '';
     if (!state.company.economics) {
       const cat = getCategoryById(state.company?.categoryId);
       if (!cat) return null;
@@ -236,11 +276,19 @@ export function normalizeSave(raw) {
       recalculateCapTablePercentages(state.capTable);
     }
 
+    if (state.stage === STAGES.OFFICE && state.workspace?.tier === 'garage') {
+      state.workspace.tier = 'small';
+      state.workspace.smallOfficeOwned = true;
+      applyWorkspaceBurn(state);
+    }
+
     if (!state.calendar.monthTasks.length && !state.flags.gameOver) {
       startMonth(state);
     }
 
     syncStageFromProgress(state);
+    applyWorkspaceBurn(state);
+    syncLifetimeProfit(state);
 
     state.version = SAVE_VERSION;
     return state;
