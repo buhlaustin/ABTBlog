@@ -189,7 +189,7 @@ export function workspaceLabel(tier) {
 /** Stage used for task pools (XC batch = xc-only tasks). */
 export function getTaskStage(state) {
   if (state.flags?.ipoFiled) return STAGES.PUBLIC;
-  if (state.flags?.xcAccepted && !state.flags?.xcResidencyComplete) return STAGES.XC;
+  if (state.flags?.xcBatchActive && !state.flags?.xcResidencyComplete) return STAGES.XC;
   if (state.flags?.xcResidencyComplete || state.offices?.hubId) {
     return state.flags?.ipoFiled ? STAGES.PUBLIC : STAGES.POST_XC;
   }

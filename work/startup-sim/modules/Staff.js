@@ -117,11 +117,56 @@ export function setDraftHeadcount(state, deptId, value) {
   return { ok: true };
 }
 
-/** Revenue boost from finalized headcount (not draft). */
+function finalizedHeadcount(state) {
+  return state.staff?.headcountByDept ?? emptyHeadcount();
+}
+
+/** Legacy aggregate — prefer taskOutcomeMultipliers for desk tasks. */
 export function staffRevenueMultiplier(state) {
-  const hc = state.staff?.headcountByDept ?? emptyHeadcount();
-  const m = (hc.marketing ?? 0) * 0.03 + (hc.sales ?? 0) * 0.04 + (hc.engineering ?? 0) * 0.02;
-  return 1 + Math.min(0.35, m);
+  const hc = finalizedHeadcount(state);
+  const m =
+    (hc.marketing ?? 0) * 0.028 +
+    (hc.sales ?? 0) * 0.038 +
+    (hc.engineering ?? 0) * 0.022 +
+    (hc.product ?? 0) * 0.018;
+  return 1 + Math.min(0.45, m);
+}
+
+/** How much headcount capacity affects a deal-sized task (prevents solo $400k mega deals). */
+export function headcountExecutionScale(state, taskDef) {
+  const total = totalHeadcount(finalizedHeadcount(state));
+  const types = taskDef?.types ?? [];
+  const isDeal = types.includes('sales') || (taskDef?.revenue?.[1] ?? 0) >= 50_000;
+  const target = isDeal ? 10 : 6;
+  const scale = 0.22 + 0.78 * Math.min(1, Math.sqrt(total / target));
+  return Math.max(0.2, Math.round(scale * 1000) / 1000);
+}
+
+/** Department mix for a task roll. */
+export function departmentTaskMultiplier(state, taskDef) {
+  const hc = finalizedHeadcount(state);
+  const types = new Set(taskDef?.types ?? []);
+  let bonus = 0;
+  if (types.has('sales')) bonus += (hc.sales ?? 0) * 0.05;
+  if (types.has('marketing') || types.has('growth')) bonus += (hc.marketing ?? 0) * 0.04;
+  if (types.has('product')) bonus += (hc.product ?? 0) * 0.035 + (hc.engineering ?? 0) * 0.025;
+  if (types.has('research')) bonus += (hc.product ?? 0) * 0.02;
+  bonus += (hc.engineering ?? 0) * 0.015;
+  return 1 + Math.min(0.55, bonus);
+}
+
+/** Finance team trims task spend; support stabilizes MRR tasks slightly. */
+export function staffCostMultiplier(state) {
+  const hc = finalizedHeadcount(state);
+  const financeCut = Math.min(0.12, (hc.finance ?? 0) * 0.015);
+  return Math.max(0.82, 1 - financeCut);
+}
+
+export function staffRetentionBonus(state, taskDef) {
+  const hc = finalizedHeadcount(state);
+  const types = taskDef?.types ?? [];
+  if (!types.includes('support') && !types.includes('success')) return 1;
+  return 1 + Math.min(0.2, (hc.support ?? 0) * 0.025);
 }
 
 export function projectStaffEconomics(state) {

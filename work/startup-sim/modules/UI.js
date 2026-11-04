@@ -26,6 +26,7 @@ import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
 import { renderProductActionsPanel } from './ProductActions.js';
 import { sentimentLabel } from './Sentiment.js';
 import { competitorRevenueMult } from './Competitor.js';
+import { getTaskRevenueMultiplierPreview } from './Finance.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -139,9 +140,8 @@ export function renderGameHud(state) {
     month.textContent = `M${state.calendar.monthIndex}, Y${state.calendar.year}`;
   }
   if (mode) {
-    const econ = state.company.economics;
-    const mult = econ ? ` · rev×${econ.revenueMult.toFixed(2)}` : '';
-    mode.textContent = `${state.mode === 'sandbox' ? 'Sandbox' : 'Career'}${mult}`;
+    const revMult = getTaskRevenueMultiplierPreview(state);
+    mode.textContent = `${state.mode === 'sandbox' ? 'Sandbox' : 'Career'} · rev×${revMult.toFixed(2)}`;
   }
   if (mrr) mrr.textContent = formatMoney(state.finance.mrr ?? 0);
   if (stock) {

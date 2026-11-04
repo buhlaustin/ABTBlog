@@ -57,7 +57,6 @@ export function applyXCSafe(state) {
   state.capTable = recalculateCapTablePercentages(table);
 
   state.flags.xcAccepted = true;
-  state.stage = STAGES.XC;
   state.finance.valuation = 8_000_000;
   return { ok: true, xcShares };
 }
@@ -259,6 +258,150 @@ export function applySeriesB(state) {
   });
 }
 
+export function canRaiseSeriesC(state) {
+  return Boolean(state.flags?.seriesBClosed && (state.finance?.lifetimeRevenue ?? 0) >= 30_000_000);
+}
+
+export function applySeriesC(state) {
+  if (!canRaiseSeriesC(state)) {
+    return { ok: false, reason: 'Series C unlocks after Series B and $30M lifetime revenue.' };
+  }
+  return applyPricedRound(state, {
+    roundKey: 'seriesC',
+    roundName: 'Series C',
+    preMoney: 200_000_000,
+    raised: 50_000_000,
+    investorId: 'series-c',
+    investorLabel: 'Series C investors',
+    requireFlag: 'seriesBClosed',
+    setFlag: 'seriesCClosed',
+    minSentiment: 22
+  });
+}
+
+export function applySeriesD(state) {
+  if (!state.flags?.seriesCClosed) {
+    return { ok: false, reason: 'Close Series C first.' };
+  }
+  if ((state.finance?.lifetimeRevenue ?? 0) < 80_000_000) {
+    return { ok: false, reason: 'Series D unlocks after $80M lifetime revenue.' };
+  }
+  return applyPricedRound(state, {
+    roundKey: 'seriesD',
+    roundName: 'Series D',
+    preMoney: 500_000_000,
+    raised: 100_000_000,
+    investorId: 'series-d',
+    investorLabel: 'Series D investors',
+    requireFlag: 'seriesCClosed',
+    setFlag: 'seriesDClosed',
+    minSentiment: 20
+  });
+}
+
+export function applySeriesE(state) {
+  if (!state.flags?.seriesDClosed) {
+    return { ok: false, reason: 'Close Series D first.' };
+  }
+  if ((state.finance?.lifetimeRevenue ?? 0) < 200_000_000) {
+    return { ok: false, reason: 'Series E unlocks after $200M lifetime revenue.' };
+  }
+  return applyPricedRound(state, {
+    roundKey: 'seriesE',
+    roundName: 'Series E',
+    preMoney: 1_000_000_000,
+    raised: 150_000_000,
+    investorId: 'series-e',
+    investorLabel: 'Series E investors',
+    requireFlag: 'seriesDClosed',
+    setFlag: 'seriesEClosed',
+    minSentiment: 18
+  });
+}
+
+export function applySeriesF(state) {
+  if (!state.flags?.seriesEClosed) {
+    return { ok: false, reason: 'Close Series E first.' };
+  }
+  if ((state.finance?.lifetimeRevenue ?? 0) < 400_000_000) {
+    return { ok: false, reason: 'Series F unlocks after $400M lifetime revenue.' };
+  }
+  return applyPricedRound(state, {
+    roundKey: 'seriesF',
+    roundName: 'Series F',
+    preMoney: 2_000_000_000,
+    raised: 200_000_000,
+    investorId: 'series-f',
+    investorLabel: 'Series F investors',
+    requireFlag: 'seriesEClosed',
+    setFlag: 'seriesFClosed',
+    minSentiment: 15
+  });
+}
+
+function pricedRoundPreview(state, config) {
+  if (config.requireFlag && !state.flags?.[config.requireFlag]) return null;
+  if (state.flags?.[config.setFlag]) return null;
+  if (config.minLifetime && (state.finance?.lifetimeRevenue ?? 0) < config.minLifetime) return null;
+  const founder = getFounderRow(state);
+  const down = isDownRoundLikely(state);
+  const pre = down ? Math.round(config.preMoney * 0.85) : config.preMoney;
+  const post = pre + config.raised;
+  return {
+    raised: config.raised,
+    preMoney: pre,
+    postMoney: post,
+    founderPctNow: founder?.pct ?? 0,
+    founderPctAfterApprox: Math.round((founder?.pct ?? 0) * 0.8 * 10) / 10,
+    downRound: down,
+    roundName: config.roundName
+  };
+}
+
+export function seriesCPreview(state) {
+  return pricedRoundPreview(state, {
+    requireFlag: 'seriesBClosed',
+    setFlag: 'seriesCClosed',
+    preMoney: 200_000_000,
+    raised: 50_000_000,
+    roundName: 'Series C',
+    minLifetime: 30_000_000
+  });
+}
+
+export function seriesDPreview(state) {
+  return pricedRoundPreview(state, {
+    requireFlag: 'seriesCClosed',
+    setFlag: 'seriesDClosed',
+    preMoney: 500_000_000,
+    raised: 100_000_000,
+    roundName: 'Series D',
+    minLifetime: 80_000_000
+  });
+}
+
+export function seriesEPreview(state) {
+  return pricedRoundPreview(state, {
+    requireFlag: 'seriesDClosed',
+    setFlag: 'seriesEClosed',
+    preMoney: 1_000_000_000,
+    raised: 150_000_000,
+    roundName: 'Series E',
+    minLifetime: 200_000_000
+  });
+}
+
+export function seriesFPreview(state) {
+  return pricedRoundPreview(state, {
+    requireFlag: 'seriesEClosed',
+    setFlag: 'seriesFClosed',
+    preMoney: 2_000_000_000,
+    raised: 200_000_000,
+    roundName: 'Series F',
+    minLifetime: 400_000_000
+  });
+}
+
 export function seriesAPreview(state) {
   if (!canRaiseSeriesA(state)) return null;
   const founder = getFounderRow(state);
@@ -303,7 +446,7 @@ export function seedRoundPreview(state) {
   if (
     !state.flags?.xcAccepted ||
     !state.flags?.xcResidencyComplete ||
-    !state.offices?.hubId ||
+    !state.workspace?.smallOfficeOwned ||
     state.flags?.seedRoundClosed
   ) {
     return null;

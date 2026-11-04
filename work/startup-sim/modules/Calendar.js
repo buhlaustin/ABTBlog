@@ -8,6 +8,8 @@ import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
 import { syncDraftFromFinalized } from './Staff.js';
 import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
+import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
+import { tickAcceleratorBoost } from './Accelerators.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -47,6 +49,14 @@ export function advanceCalendarMonth(state) {
 }
 
 export function startMonth(state) {
+  const stageBeforeBatch = state.stage;
+  maybeStartScheduledXcBatch(state);
+  syncStageFromProgress(state);
+  if (state.stage !== stageBeforeBatch) {
+    for (const line of onStageChange(state, stageBeforeBatch, state.stage)) {
+      appendLog(state, line);
+    }
+  }
   syncDraftFromFinalized(state);
   dealMonthlyTasks(state);
   dealBoardTasks(state);
@@ -99,6 +109,16 @@ export function endMonth(state) {
 
   for (const line of tickXcResidency(state)) {
     appendLog(state, line);
+  }
+  tickXcGraduateBoost(state);
+  tickAcceleratorBoost(state);
+
+  const stageBeforeResidencySync = state.stage;
+  syncStageFromProgress(state);
+  if (state.stage !== stageBeforeResidencySync) {
+    for (const line of onStageChange(state, stageBeforeResidencySync, state.stage)) {
+      appendLog(state, line);
+    }
   }
 
   if (state.finance.cash < 0) {

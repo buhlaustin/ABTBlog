@@ -1,9 +1,18 @@
 import { formatMoney, MODE_CONFIG } from './constants.js';
-import { computePayroll, staffRevenueMultiplier } from './Staff.js';
+import {
+  computePayroll,
+  staffRevenueMultiplier,
+  headcountExecutionScale,
+  departmentTaskMultiplier,
+  staffCostMultiplier,
+  staffRetentionBonus
+} from './Staff.js';
 import { satelliteRent } from './Offices.js';
 import { workspaceRentMonthly, getArr } from './Workspace.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
+import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
+import { acceleratorRevenueMult } from './Accelerators.js';
 
 /** Post-seed scaling so late-game tasks can reach the $1B gate in a reasonable run. */
 export function scalingRevenueMult(state) {
@@ -23,6 +32,32 @@ export function hubCostMult(state) {
   return state?.offices?.modifiers?.costMult ?? 1;
 }
 
+export function productBuzzRevenueMult(state) {
+  const buzz = state.product?.buzz ?? 0;
+  const level = state.product?.level ?? 0;
+  const buzzBonus = Math.min(0.18, buzz * 0.022);
+  const levelBonus = Math.min(0.22, level * 0.032);
+  return 1 + buzzBonus + levelBonus;
+}
+
+/** Approximate desk-task revenue multiplier shown in HUD (not category ACV alone). */
+export function getTaskRevenueMultiplierPreview(state) {
+  const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
+  const sand = state.mode === 'sandbox' ? MODE_CONFIG.sandbox.difficulty : MODE_CONFIG.career.difficulty;
+  const m =
+    econ.revenueMult *
+    (2 - sand) *
+    hubRevenueMult(state) *
+    scalingRevenueMult(state) *
+    competitorRevenueMult(state) *
+    getSandboxExtraRevenueMult(state) *
+    xcProgramRevenueMult(state) *
+    acceleratorRevenueMult(state) *
+    productBuzzRevenueMult(state) *
+    staffRevenueMultiplier(state);
+  return Math.round(m * 100) / 100;
+}
+
 export function projectMonthlyBurn(state) {
   const headcount = state.staff?.headcountByDept ?? {};
   const payroll = computePayroll(headcount, state.stage, state);
@@ -39,7 +74,9 @@ function sandboxMult(state) {
 export function applyTaskOutcome(state, taskDef, rolled) {
   const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
   const sand = sandboxMult(state);
-  const cost = Math.round((taskDef.cost ?? 0) * econ.costMult * sand * hubCostMult(state));
+  const cost = Math.round(
+    (taskDef.cost ?? 0) * econ.costMult * sand * hubCostMult(state) * staffCostMultiplier(state)
+  );
   const revenue = Math.round(
     rolled.revenue *
       econ.revenueMult *
@@ -47,7 +84,11 @@ export function applyTaskOutcome(state, taskDef, rolled) {
       hubRevenueMult(state) *
       scalingRevenueMult(state) *
       competitorRevenueMult(state) *
-      getSandboxExtraRevenueMult(state)
+      getSandboxExtraRevenueMult(state) *
+      xcProgramRevenueMult(state) *
+      acceleratorRevenueMult(state) *
+      staffRevenueMultiplier(state) *
+      staffRetentionBonus(state, taskDef)
   );
 
   state.finance.cash -= cost;
@@ -57,8 +98,10 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + revenue;
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
 
-  state.product.level = (state.product.level ?? 0) + (rolled.product ?? 0);
-  state.product.buzz = (state.product.buzz ?? 0) + (rolled.buzz ?? 0);
+  const productGain = Math.round((rolled.product ?? 0) * xcProgramProductBonus(state));
+  state.product.level = (state.product.level ?? 0) + productGain;
+  const buzzGain = rolled.buzz ?? 0;
+  state.product.buzz = (state.product.buzz ?? 0) + buzzGain;
 
   return { cost, revenue };
 }
@@ -67,10 +110,12 @@ export function rollTaskOutcome(taskDef, state) {
   const [rMin, rMax] = taskDef.revenue ?? [0, 0];
   const product = taskDef.product ?? 0;
   const buzz = taskDef.buzz ?? 0;
-  const buzzBonus = Math.min(0.15, (state.product.buzz ?? 0) * 0.02);
-  const levelBonus = Math.min(0.2, (state.product.level ?? 0) * 0.03);
-  const mult = (1 + buzzBonus + levelBonus) * staffRevenueMultiplier(state);
-  const revenue = Math.round((rMin + Math.random() * (rMax - rMin)) * mult);
+  const base = rMin + Math.random() * Math.max(0, rMax - rMin);
+  const mult =
+    headcountExecutionScale(state, taskDef) *
+    departmentTaskMultiplier(state, taskDef) *
+    productBuzzRevenueMult(state);
+  const revenue = Math.round(base * mult);
   return { revenue, product, buzz };
 }
 

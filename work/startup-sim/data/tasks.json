@@ -289,13 +289,264 @@
         "sales"
       ],
       "stages": [
-        "xc",
-        "post_xc"
+        "xc"
       ],
       "cost": 350,
       "revenue": [
         800,
         4000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "xc-batch-kickoff",
+      "title": "Batch kickoff week",
+      "description": "Meet forty founders who all claim they're default alive.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 150,
+      "revenue": [
+        600,
+        2800
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "xc-group-partner-review",
+      "title": "Group partner review",
+      "description": "Thirty minutes of questions that feel like three hours.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 80,
+      "revenue": [
+        400,
+        2400
+      ],
+      "product": 3,
+      "buzz": 1
+    },
+    {
+      "id": "xc-pivot-or-persevere",
+      "title": "Pivot-or-persevere memo",
+      "description": "Write the essay that decides next month's roadmap.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 120,
+      "revenue": [
+        500,
+        2600
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "xc-batch-sales-blitz",
+      "title": "Batch sales blitz",
+      "description": "Warm intros from cohort mates turn into paid pilots.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 300,
+      "revenue": [
+        1200,
+        8500
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "xc-alumni-panel",
+      "title": "Alumni panel Q&A",
+      "description": "Legends admit what they'd do differently — you take notes.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 100,
+      "revenue": [
+        350,
+        1900
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "xc-legal-clinic",
+      "title": "SAFE & cap table clinic",
+      "description": "Lawyers explain dilution without making you cry.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 200,
+      "revenue": [
+        450,
+        2100
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "xc-growth-hackathon",
+      "title": "Growth hackathon weekend",
+      "description": "Ship experiments; pray one chart hockey-sticks.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 450,
+      "revenue": [
+        900,
+        5200
+      ],
+      "product": 1,
+      "buzz": 4
+    },
+    {
+      "id": "xc-enterprise-intro-day",
+      "title": "Enterprise intro day",
+      "description": "Partners line up Fortune 500 meetings you couldn't get solo.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 500,
+      "revenue": [
+        2500,
+        14000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "xc-product-sprint",
+      "title": "Batch product sprint",
+      "description": "Ship the feature investors asked for on Tuesday.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 600,
+      "revenue": [
+        700,
+        3800
+      ],
+      "product": 3,
+      "buzz": 1
+    },
+    {
+      "id": "xc-press-training",
+      "title": "Media training session",
+      "description": "Learn to say 'we're excited' without sounding robotic.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 180,
+      "revenue": [
+        550,
+        2900
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "xc-mid-batch-checkin",
+      "title": "Mid-batch metrics review",
+      "description": "Partners compare your MRR curve to the room's average.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 90,
+      "revenue": [
+        650,
+        3200
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "xc-demo-rehearsal",
+      "title": "Demo Day rehearsal",
+      "description": "Run the pitch until the clicker works and the joke lands.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 220,
+      "revenue": [
+        800,
+        4500
+      ],
+      "product": 1,
+      "buzz": 4
+    },
+    {
+      "id": "xc-late-batch-deals",
+      "title": "Late-batch deal push",
+      "description": "Close logos before Demo Day slides go final.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 400,
+      "revenue": [
+        1800,
+        11000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "xc-founder-therapy",
+      "title": "Founder sanity circle",
+      "description": "Vent about runway; leave with three actionable intros.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 60,
+      "revenue": [
+        300,
+        1600
       ],
       "product": 0,
       "buzz": 2

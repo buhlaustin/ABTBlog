@@ -1,0 +1,43 @@
+{
+  "programs": [
+    {
+      "id": "techlot",
+      "name": "TechLot",
+      "tagline": "12-week remote accelerator — operator mentors, demo day in Austin.",
+      "arrGate": 75000,
+      "safeAmount": 175000,
+      "valuationCap": 6000000,
+      "estPct": 4,
+      "productBoost": 2,
+      "buzzBoost": 3,
+      "revenueMultMonths": 4,
+      "revenueMult": 1.12
+    },
+    {
+      "id": "foundry-nine",
+      "name": "Foundry Nine",
+      "tagline": "NYC studio program — design partners and enterprise intros.",
+      "arrGate": 120000,
+      "safeAmount": 250000,
+      "valuationCap": 9000000,
+      "estPct": 5,
+      "productBoost": 3,
+      "buzzBoost": 2,
+      "revenueMultMonths": 6,
+      "revenueMult": 1.18
+    },
+    {
+      "id": "angel-rail",
+      "name": "Angel Rail",
+      "tagline": "Rolling SAFE syndicate — no batch, just a wire and a Slack channel.",
+      "arrGate": 40000,
+      "safeAmount": 100000,
+      "valuationCap": 4500000,
+      "estPct": 3,
+      "productBoost": 1,
+      "buzzBoost": 1,
+      "revenueMultMonths": 3,
+      "revenueMult": 1.08
+    }
+  ]
+}
