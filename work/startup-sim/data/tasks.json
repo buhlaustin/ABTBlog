@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "tasks": [
     {
       "id": "customer-interviews",
@@ -1225,6 +1225,894 @@
       ],
       "product": 0,
       "buzz": 0
+    },
+    {
+      "id": "gen-sales-t1-0-0",
+      "title": "Global account pursuit (1+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 800,
+      "revenue": [
+        8000,
+        45000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t1-1-1",
+      "title": "Channel partner summit (1+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 1093,
+      "revenue": [
+        8000,
+        45000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t1-2-2",
+      "title": "Fortune 500 pilot close (1+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 1386,
+      "revenue": [
+        8000,
+        45000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t1-3-3",
+      "title": "International reseller launch (1+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 1679,
+      "revenue": [
+        8000,
+        45000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t2-4-0",
+      "title": "Fortune 500 pilot close (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 3,
+      "cost": 7988,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t2-5-1",
+      "title": "International reseller launch (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 3,
+      "cost": 9982,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t2-6-2",
+      "title": "Usage-based upsell wave (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 3,
+      "cost": 11976,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t2-7-3",
+      "title": "Global account pursuit (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 3,
+      "cost": 5969,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t3-8-0",
+      "title": "Usage-based upsell wave (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 4,
+      "cost": 22976,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t3-9-1",
+      "title": "Global account pursuit (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 4,
+      "cost": 24970,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t3-10-2",
+      "title": "Channel partner summit (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 4,
+      "cost": 26964,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t3-11-3",
+      "title": "Fortune 500 pilot close (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 4,
+      "cost": 28958,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t4-12-0",
+      "title": "Channel partner summit (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 5,
+      "cost": 51964,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t4-13-1",
+      "title": "Fortune 500 pilot close (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 5,
+      "cost": 53958,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t4-14-2",
+      "title": "International reseller launch (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 5,
+      "cost": 55952,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t4-15-3",
+      "title": "Usage-based upsell wave (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 5,
+      "cost": 57946,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t5-16-0",
+      "title": "International reseller launch (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 5,
+      "tierMax": 6,
+      "cost": 95952,
+      "revenue": [
+        1200000,
+        6500000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t5-17-1",
+      "title": "Usage-based upsell wave (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 5,
+      "tierMax": 6,
+      "cost": 97946,
+      "revenue": [
+        1200000,
+        6500000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t5-18-2",
+      "title": "Global account pursuit (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 5,
+      "tierMax": 6,
+      "cost": 99940,
+      "revenue": [
+        1200000,
+        6500000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t5-19-3",
+      "title": "Channel partner summit (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 5,
+      "tierMax": 6,
+      "cost": 101934,
+      "revenue": [
+        1200000,
+        6500000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t6-20-0",
+      "title": "Global account pursuit (6+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 219940,
+      "revenue": [
+        4000000,
+        22000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t6-21-1",
+      "title": "Channel partner summit (6+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 221934,
+      "revenue": [
+        4000000,
+        22000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t6-22-2",
+      "title": "Fortune 500 pilot close (6+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 223928,
+      "revenue": [
+        4000000,
+        22000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t6-23-3",
+      "title": "International reseller launch (6+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 225922,
+      "revenue": [
+        4000000,
+        22000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-marketing-t3-24-0",
+      "title": "Brand refresh campaign (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11927,
+      "revenue": [
+        60000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t3-25-1",
+      "title": "Customer conference keynote (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 13921,
+      "revenue": [
+        60000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t3-26-2",
+      "title": "Demand gen quarter blitz (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 15915,
+      "revenue": [
+        60000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t3-27-3",
+      "title": "Executive LinkedIn takeover (3+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 17909,
+      "revenue": [
+        60000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t5-28-0",
+      "title": "Demand gen quarter blitz (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 77916,
+      "revenue": [
+        800000,
+        4800000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t5-29-1",
+      "title": "Executive LinkedIn takeover (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 79910,
+      "revenue": [
+        800000,
+        4800000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t5-30-2",
+      "title": "Brand refresh campaign (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 81904,
+      "revenue": [
+        800000,
+        4800000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-marketing-t5-31-3",
+      "title": "Customer conference keynote (5+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 83898,
+      "revenue": [
+        800000,
+        4800000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "gen-product-t2-32-0",
+      "title": "Reliability quarter push (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 10902,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t2-33-1",
+      "title": "Mobile parity release (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 12896,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t2-34-2",
+      "title": "Enterprise feature gate (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 14890,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t2-35-3",
+      "title": "Reliability quarter push (2+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 4883,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t4-36-0",
+      "title": "Enterprise feature gate (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 60892,
+      "revenue": [
+        200000,
+        1100000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t4-37-1",
+      "title": "Reliability quarter push (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 62886,
+      "revenue": [
+        200000,
+        1100000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t4-38-2",
+      "title": "Mobile parity release (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 64880,
+      "revenue": [
+        200000,
+        1100000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-product-t4-39-3",
+      "title": "Enterprise feature gate (4+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 66874,
+      "revenue": [
+        200000,
+        1100000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t7-40-0",
+      "title": "Global account pursuit (7+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 139880,
+      "revenue": [
+        5000000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t7-41-1",
+      "title": "Channel partner summit (7+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 141874,
+      "revenue": [
+        5000000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t7-42-2",
+      "title": "Fortune 500 pilot close (7+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 143868,
+      "revenue": [
+        5000000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "gen-sales-t7-43-3",
+      "title": "International reseller launch (7+)",
+      "description": "Scale-era work sized for your funding stage and HQ footprint.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 145862,
+      "revenue": [
+        5000000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 1
     }
   ]
 }

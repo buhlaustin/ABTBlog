@@ -6,7 +6,6 @@ import {
   workspaceRentMonthly,
   salaryTierMult
 } from './Workspace.js';
-import { executivePayrollMonthly, renderOrgChart } from './Executives.js';
 import { setGameFeedback } from './GameFeedback.js';
 
 export const DEPARTMENTS = [
@@ -66,7 +65,6 @@ export function computePayroll(headcount, stage, state = null) {
     const n = headcount[dept.id] ?? 0;
     total += n * salaryForDept(dept.id, stage, state);
   }
-  if (state) total += executivePayrollMonthly(state);
   return total;
 }
 
@@ -259,7 +257,7 @@ export function renderPeoplePanel(container, state) {
   container.innerHTML = `
     ${orgMount}
     <div id="org-chart-mount"></div>
-    <p class="panel-lede">Adjust draft headcount, preview burn vs last month revenue, then <strong>Finalize staffing</strong>. C-suite hires sit outside the headcount cap.</p>
+    <p class="panel-lede">Adjust draft headcount, preview burn vs last month revenue, then <strong>Finalize staffing</strong>. You stay CEO — no separate exec hires.</p>
     <div class="table-scroll">
       <table class="data-table">
         <thead><tr><th>Department</th><th>Headcount</th><th>$/head/mo</th><th>Subtotal</th></tr></thead>
@@ -277,7 +275,22 @@ export function renderPeoplePanel(container, state) {
     <button type="button" class="btn btn-primary" id="btn-finalize-staff" ${hiringAllowed(state) ? '' : 'disabled'}>Finalize staffing</button>
     <p id="people-feedback" class="desk-feedback" hidden></p>
   `;
-  renderOrgChart(document.getElementById('org-chart-mount'), state);
+  renderCeoOnlyChart(document.getElementById('org-chart-mount'), state);
+}
+
+function renderCeoOnlyChart(container, state) {
+  if (!container) return;
+  const ceoName = [state.company?.ceoFirstName, state.company?.ceoLastName]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+  const ceoLabel = ceoName || state.company?.name || 'CEO';
+  container.innerHTML = `
+    <h3 class="log-head">Leadership</h3>
+    <div class="org-chart">
+      <div class="org-node org-node-ceo"><span class="org-role">CEO</span><strong>${escapeHtml(ceoLabel)}</strong></div>
+    </div>
+  `;
 }
 
 export function showPeopleFeedback(message, isError = false) {

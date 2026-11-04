@@ -1,6 +1,7 @@
 import { fetchGameJson } from './utils.js';
 import { STAGES, getMonthlyTaskSlots, getMonthlyTaskOfferCount } from './constants.js';
 import { getTaskStage } from './Workspace.js';
+import { progressionTier } from './ProgressionEconomy.js';
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 
 /** Shipped catalog — always available with the game bundle. */
@@ -120,11 +121,42 @@ function stageAllowed(task, stage) {
   return stages.includes(stage);
 }
 
+function inferredTierBand(task) {
+  if (task.tierMin != null || task.tierMax != null) {
+    return { min: task.tierMin ?? 0, max: task.tierMax ?? 99 };
+  }
+  const stages = task.stages ?? [];
+  const rMax = task.revenue?.[1] ?? 0;
+  if (stages.includes('garage') || stages.includes('office')) {
+    return { min: 0, max: 1 };
+  }
+  if (stages.includes('xc')) {
+    return { min: 0, max: 2 };
+  }
+  if (stages.includes('public')) {
+    return { min: 5, max: 99 };
+  }
+  if (rMax >= 500_000) return { min: 5, max: 99 };
+  if (rMax >= 120_000) return { min: 4, max: 99 };
+  if (rMax >= 40_000) return { min: 3, max: 5 };
+  if (rMax >= 12_000) return { min: 2, max: 4 };
+  return { min: 1, max: 2 };
+}
+
+function taskTierAllowed(task, state) {
+  const tier = progressionTier(state);
+  const { min, max } = inferredTierBand(task);
+  return tier >= min && tier <= max;
+}
+
 function buildTaskPool(state) {
   const taskStage = getTaskStage(state);
   const categoryId = state.company?.categoryId;
   return getTaskDefinitions().filter(
-    (t) => stageAllowed(t, taskStage) && categoryAllowed(t, categoryId)
+    (t) =>
+      stageAllowed(t, taskStage) &&
+      categoryAllowed(t, categoryId) &&
+      taskTierAllowed(t, state)
   );
 }
 

@@ -82,7 +82,10 @@ export function selectHub(state, hubId) {
   }
   const arr = getArr(state);
   if (arr < ARR_GATES.HUB_HQ) {
-    return { ok: false, reason: `Reach ${formatMoney(ARR_GATES.HUB_HQ)} ARR before a city hub HQ.` };
+    return { ok: false, reason: `Reach ${formatMoney(ARR_GATES.HUB_HQ)} ARR before a worldwide hub city.` };
+  }
+  if (!state.flags?.seriesAClosed && !state.flags?.seriesBClosed) {
+    return { ok: false, reason: 'Close Series A or B before opening a hub city.' };
   }
   if (getWorkspaceTier(state) !== WORKSPACE_TIER.HUB && !state.workspace?.hubOwned) {
     const buy = purchaseWorkspaceTier(state, WORKSPACE_TIER.HUB);
@@ -146,7 +149,14 @@ function workspacePurchaseBlock(state) {
   const tiers = [
     { id: WORKSPACE_TIER.SMALL, label: 'Small office', rent: '$2k/mo', gate: ARR_GATES.SMALL_OFFICE, cap: 4 },
     { id: WORKSPACE_TIER.MEDIUM, label: 'Medium office', rent: '$5k/mo', gate: ARR_GATES.MEDIUM_OFFICE, cap: 12 },
-    { id: WORKSPACE_TIER.LARGE, label: 'Large office', rent: '$12k/mo', gate: ARR_GATES.LARGE_OFFICE, cap: 24 }
+    { id: WORKSPACE_TIER.LARGE, label: 'Large office', rent: '$12k/mo', gate: ARR_GATES.LARGE_OFFICE, cap: 24 },
+    {
+      id: WORKSPACE_TIER.CAMPUS,
+      label: 'Company HQ',
+      rent: '$28k/mo',
+      gate: ARR_GATES.CAMPUS_HQ,
+      cap: 100
+    }
   ];
   const buttons = tiers
     .map((t) => {
@@ -174,7 +184,11 @@ export function renderOfficesPanel(container, state) {
   const inResidency = state.flags?.xcAccepted && !state.flags?.xcResidencyComplete;
 
   let hubSection = '';
-  if (state.flags?.xcResidencyComplete && !state.offices?.hubId && getArr(state) >= ARR_GATES.HUB_HQ) {
+  const hubUnlocked =
+    state.flags?.xcResidencyComplete &&
+    (state.flags?.seriesAClosed || state.flags?.seriesBClosed) &&
+    getArr(state) >= ARR_GATES.HUB_HQ;
+  if (hubUnlocked && !state.offices?.hubId) {
     const options = getHubs()
       .map(
         (h) =>
@@ -183,7 +197,7 @@ export function renderOfficesPanel(container, state) {
       .join('');
     hubSection = `
       <div class="finance-action">
-        <p><strong>City hub HQ</strong> — unlocked at ${formatMoney(ARR_GATES.HUB_HQ)} ARR. Unlimited staffing.</p>
+        <p><strong>Worldwide hub city</strong> — Series A/B + ${formatMoney(ARR_GATES.HUB_HQ)} ARR. Massive task revenue; sprint to IPO.</p>
         <select id="hub-select" class="hub-select">
           <option value="">Select hub…</option>
           ${options}

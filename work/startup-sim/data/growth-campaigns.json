@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "campaigns": [
+    {
+      "id": "growth-flyers",
+      "title": "Neighborhood flyer drop",
+      "description": "Cheap ink, questionable targeting — still beats silence.",
+      "cost": 800,
+      "revenue": [400, 2200],
+      "buzz": 1,
+      "tierMin": 1,
+      "tierMax": 3
+    },
+    {
+      "id": "growth-podcast-sponsor",
+      "title": "Podcast host-read ads",
+      "description": "Founders love founder podcasts. So do your CAC spreadsheets.",
+      "cost": 3500,
+      "revenue": [2500, 12000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-billboard",
+      "title": "Highway billboard",
+      "description": "One sentence value prop at 65 mph.",
+      "cost": 18000,
+      "revenue": [12000, 55000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-conference-booth",
+      "title": "Industry conference booth",
+      "description": "Badge scans, demo laptops, and swag nobody keeps.",
+      "cost": 45000,
+      "revenue": [35000, 180000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-tv-spot-local",
+      "title": "Regional TV spot",
+      "description": "30 seconds between weather and car ads.",
+      "cost": 120000,
+      "revenue": [90000, 420000],
+      "buzz": 4,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-national-commercial",
+      "title": "National TV commercial",
+      "description": "Prime-time brand story — finance will ask for ROI tomorrow.",
+      "cost": 450000,
+      "revenue": [380000, 1800000],
+      "buzz": 5,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-stadium-naming",
+      "title": "Stadium naming rights (pilot)",
+      "description": "Your logo on a scoreboard. Investors either cheer or faint.",
+      "cost": 1200000,
+      "revenue": [950000, 4500000],
+      "buzz": 6,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-superbowl-teaser",
+      "title": "Big-game teaser spot",
+      "description": "Eight seconds, eight million impressions, one nervous board call.",
+      "cost": 3500000,
+      "revenue": [2800000, 12000000],
+      "buzz": 8,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-ipo-roadshow-ad",
+      "title": "IPO roadshow ad blitz",
+      "description": "Wall-to-wall financial media while the S-1 is hot.",
+      "cost": 800000,
+      "revenue": [650000, 3200000],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7
+    }
+  ]
+}

@@ -10,6 +10,7 @@ import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
 import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
 import { tickAcceleratorBoost } from './Accelerators.js';
+import { resetGrowthCampaignsMonth } from './GrowthCampaigns.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -58,6 +59,7 @@ export function startMonth(state) {
     }
   }
   syncDraftFromFinalized(state);
+  resetGrowthCampaignsMonth(state);
   dealMonthlyTasks(state);
   dealBoardTasks(state);
   return state;

@@ -5,8 +5,7 @@ import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
-import { createInitialWorkspace, applyWorkspaceBurn } from './Workspace.js';
-import { createInitialExecutives, migrateLegacyCoo } from './Executives.js';
+import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
 import { createInitialBoard } from './Board.js';
 import { createInitialXcState, calendarTurn } from './XC.js';
 import { createInitialAdvisor } from './Advisor.js';
@@ -26,7 +25,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 11;
+export const SAVE_VERSION = 12;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -76,7 +75,7 @@ export function createInitialState(options) {
       economics
     },
     workspace: createInitialWorkspace(),
-    executives: createInitialExecutives(),
+    growth: { campaignsThisMonth: [] },
     board: createInitialBoard(),
     stage: STAGES.GARAGE,
     calendar: createInitialCalendar(),
@@ -183,8 +182,12 @@ export function normalizeSave(raw) {
       state.calendar.taskLineupConfirmed = (state.calendar.monthTasks?.length ?? 0) > 0;
     }
     if (!state.workspace) state.workspace = createInitialWorkspace();
-    if (!state.executives) state.executives = createInitialExecutives();
-    migrateLegacyCoo(state);
+    if (state.executives) delete state.executives;
+    if (!state.growth) state.growth = { campaignsThisMonth: [] };
+    if (!state.growth.campaignsThisMonth) state.growth.campaignsThisMonth = [];
+    if (state.workspace && state.workspace.campusOwned === undefined) {
+      state.workspace.campusOwned = getWorkspaceTier(state) === 'campus';
+    }
     if (state.finance.lifetimeExpenses === undefined) state.finance.lifetimeExpenses = 0;
     if (state.finance.lifetimeProfit === undefined) {
       state.finance.lifetimeProfit =

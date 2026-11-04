@@ -198,6 +198,27 @@ if (!accept.ok || !xcState.xc?.batchStartsTurn) {
   }
 }
 
+const { progressionRevenueMult } = await import(
+  `file://${join(sim, 'modules/ProgressionEconomy.js')}`
+);
+const scaled = createInitialState({
+  companyName: 'Scaled',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+scaled.flags.seedRoundClosed = true;
+scaled.flags.seriesAClosed = true;
+scaled.flags.seriesBClosed = true;
+scaled.finance.mrr = 2_000_000;
+scaled.finance.arr = 24_000_000;
+const progMult = progressionRevenueMult(scaled);
+if (progMult < 20) {
+  console.error(`FAIL: post-Series-B progression mult too low: ${progMult}`);
+  failed = true;
+} else {
+  console.log(`OK: progression revenue mult after A/B ${progMult}`);
+}
+
 const { completeBoardTask, dealBoardTasks } = await import(
   `file://${join(sim, 'modules/Board.js')}`
 );

@@ -13,15 +13,11 @@ import { competitorRevenueMult } from './Competitor.js';
 import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
 import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
+import { progressionRevenueMult } from './ProgressionEconomy.js';
 
-/** Post-seed scaling so late-game tasks can reach the $1B gate in a reasonable run. */
+/** Legacy alias — progression stack replaces seed-only scaling. */
 export function scalingRevenueMult(state) {
-  if (!state.flags?.seedRoundClosed) return 1;
-  const r = getArr(state);
-  if (r < 500_000) return 1;
-  const base = 1 + Math.min(140, (r / 4_000_000) ** 0.62);
-  const sandbox = state.mode === 'sandbox' ? 1.2 : 1;
-  return Math.round(base * sandbox * 100) / 100;
+  return progressionRevenueMult(state);
 }
 
 export function hubRevenueMult(state) {

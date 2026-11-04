@@ -12,12 +12,7 @@ import {
 import { completeBoardTask } from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
-import {
-  openExecutiveHireFlow,
-  hireExecutiveCandidate,
-  cancelExecutiveHire,
-  fireExecutive
-} from './modules/Executives.js';
+import { runGrowthCampaign, loadGrowthCampaigns } from './modules/GrowthCampaigns.js';
 import { runProductAction, showProductActionFeedback } from './modules/ProductActions.js';
 import {
   initNarrativeApiUrl,
@@ -626,46 +621,18 @@ function bindGameInteractions() {
       return;
     }
 
-    if (e.target.id === 'btn-start-exec-hire' && sessionState) {
-      const titleEl = document.getElementById('exec-role-title');
-      const title = titleEl?.value ?? 'COO';
-      openExecutiveHireFlow(sessionState, title).then((result) => {
-        if (!result.ok) showPeopleFeedback(result.reason, true);
-        else showPeopleFeedback('Pick a candidate below.');
-        refresh();
-      });
-      return;
-    }
-
-    if (e.target.id === 'btn-cancel-exec-hire' && sessionState) {
-      cancelExecutiveHire(sessionState);
-      showPeopleFeedback('');
-      refresh();
-      return;
-    }
-
-    const fireExecBtn = e.target.closest('[data-fire-exec]');
-    if (fireExecBtn && sessionState) {
-      const id = fireExecBtn.getAttribute('data-fire-exec');
-      if (!window.confirm('Release this executive? Payroll drops next month.')) return;
-      const result = fireExecutive(sessionState, id);
-      if (!result.ok) showPeopleFeedback(result.reason, true);
-      else {
-        appendLog(sessionState, `Released ${result.removed.name} (${result.removed.roleTitle}).`);
-        showPeopleFeedback(`${result.removed.name} left the company.`);
-      }
-      refresh();
-      return;
-    }
-
-    const hireExecBtn = e.target.closest('[data-hire-exec]');
-    if (hireExecBtn && sessionState) {
-      const id = hireExecBtn.getAttribute('data-hire-exec');
-      const result = hireExecutiveCandidate(sessionState, id);
-      if (!result.ok) showPeopleFeedback(result.reason, true);
-      else {
-        appendLog(sessionState, `Hired ${result.executive.name} as ${result.executive.roleTitle}.`);
-        showPeopleFeedback(`${result.executive.name} joined as ${result.executive.roleTitle}.`);
+    const growthBtn = e.target.closest('[data-run-growth]');
+    if (growthBtn && sessionState) {
+      const id = growthBtn.getAttribute('data-run-growth');
+      const result = runGrowthCampaign(sessionState, id);
+      if (!result.ok) {
+        setGameFeedback(result.reason || 'Could not launch campaign.', true);
+      } else {
+        appendLog(
+          sessionState,
+          `Growth: ${result.def.title} — spent ${formatMoney(result.cost)}, booked ${formatMoney(result.revenue)}.`
+        );
+        setGameFeedback(`${result.def.title} launched.`);
       }
       refresh();
       return;
@@ -1047,6 +1014,7 @@ async function init() {
         loadTaskCatalog(),
         loadHubData(),
         loadAccelerators(),
+        loadGrowthCampaigns(),
         loadAssetManifest(),
         initNarrativeApiUrl(),
         preloadCrisisCatalog(),

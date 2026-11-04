@@ -27,6 +27,7 @@ import { renderProductActionsPanel } from './ProductActions.js';
 import { sentimentLabel } from './Sentiment.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { getTaskRevenueMultiplierPreview } from './Finance.js';
+import { renderGrowthCampaignsBlock } from './GrowthCampaigns.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -463,8 +464,9 @@ export function renderGrowthPanel(container, state) {
     ${
       lastReason
         ? `<p class="fine-print">Latest board note: ${escapeHtml(lastReason)}</p>`
-        : '<p class="fine-print">Ship desk tasks that match your category — growth and product level feed task payouts on Product.</p>'
+        : '<p class="fine-print">Desk tasks scale with funding rounds and HQ tier. Paid campaigns below do not use desk slots.</p>'
     }
+    ${renderGrowthCampaignsBlock(state)}
   `;
 }
 
