@@ -201,7 +201,7 @@ export function renderDeskPanel(state) {
         ? '<p class="desk-feedback error" role="alert">Crisis on the desk — resolve it before closing the month.</p>'
         : ''
     }
-    <p class="panel-lede">Complete all counted tasks, then close the month. Staff/finance changes do not use task slots.</p>
+    <p class="panel-lede">Complete all counted tasks, then close the month. Staff/finance changes do not use task slots. <span class="fine-print">Keys: 1–8 tabs, M close month.</span></p>
     <div class="summary-grid">
       <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slotTarget}</span></div>
       <div><span class="stat-label">This month</span><span class="stat-value">+${formatMoney(monthRev)} / -${formatMoney(monthSpend)}</span></div>
@@ -234,6 +234,38 @@ export function showDeskFeedback(message, isError = false) {
   el.classList.toggle('error', isError);
 }
 
+export const TAB_ORDER = [
+  'desk',
+  'product',
+  'growth',
+  'people',
+  'finance',
+  'social',
+  'news',
+  'advisor'
+];
+
+export function selectTab(tabId) {
+  const nav = document.getElementById('game-tabs');
+  if (!nav) return;
+  const btn = nav.querySelector(`[data-tab="${tabId}"]`);
+  btn?.click();
+}
+
+function activateTab(nav, tab) {
+  nav.querySelectorAll('[data-tab]').forEach((b) => {
+    const active = b.dataset.tab === tab;
+    b.classList.toggle('active', active);
+    b.setAttribute('aria-selected', active ? 'true' : 'false');
+    b.tabIndex = active ? 0 : -1;
+  });
+  document.querySelectorAll('[data-panel]').forEach((panel) => {
+    const active = panel.dataset.panel === tab;
+    panel.hidden = !active;
+    panel.tabIndex = active ? 0 : -1;
+  });
+}
+
 export function bindTabNavigation() {
   const nav = document.getElementById('game-tabs');
   if (!nav) return;
@@ -241,18 +273,7 @@ export function bindTabNavigation() {
   nav.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-tab]');
     if (!btn) return;
-    const tab = btn.dataset.tab;
-    nav.querySelectorAll('[data-tab]').forEach((b) => {
-      const active = b.dataset.tab === tab;
-      b.classList.toggle('active', active);
-      b.setAttribute('aria-selected', active ? 'true' : 'false');
-      b.tabIndex = active ? 0 : -1;
-    });
-    document.querySelectorAll('[data-panel]').forEach((panel) => {
-      const active = panel.dataset.panel === tab;
-      panel.hidden = !active;
-      panel.tabIndex = active ? 0 : -1;
-    });
+    activateTab(nav, btn.dataset.tab);
   });
 
   nav.addEventListener('keydown', (e) => {
@@ -269,6 +290,44 @@ export function bindTabNavigation() {
       tabs[(current - 1 + tabs.length) % tabs.length].focus();
     }
   });
+}
+
+export function bindGameKeyboardShortcuts(getSession, onCloseMonth) {
+  document.addEventListener('keydown', (e) => {
+    const state = getSession?.();
+    const gameScreen = document.getElementById('screen-game');
+    if (!state || gameScreen?.hidden) return;
+
+    const tag = e.target?.tagName?.toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target?.isContentEditable) {
+      return;
+    }
+    if (document.getElementById('month-summary-dialog')?.open) return;
+
+    const num = Number(e.key);
+    if (num >= 1 && num <= 8 && !e.altKey && !e.ctrlKey && !e.metaKey) {
+      const tab = TAB_ORDER[num - 1];
+      if (tab) {
+        e.preventDefault();
+        selectTab(tab);
+      }
+      return;
+    }
+
+    if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (canEndMonth(state)) {
+        e.preventDefault();
+        onCloseMonth?.();
+      }
+    }
+  });
+}
+
+export function syncContinueOnOpenOffer(hasSave) {
+  const offer = document.getElementById('start-continue-offer');
+  if (!offer) return;
+  const dismissed = sessionStorage.getItem('startup_sim_resume_dismissed') === '1';
+  offer.hidden = !hasSave || dismissed;
 }
 
 export function renderAllPanels(state) {
@@ -342,8 +401,10 @@ export function renderProductPanel(container, state) {
 export function renderGameOver(state) {
   const title = document.getElementById('gameover-title');
   const body = document.getElementById('gameover-body');
+  const exportBtn = document.getElementById('btn-export-run');
   const eyebrow = document.querySelector('#screen-gameover .eyebrow');
   const victory = state.ending?.type === 'cash_out';
+  if (exportBtn) exportBtn.hidden = false;
 
   if (eyebrow) eyebrow.textContent = victory ? 'CEO step-down' : 'Run ended';
   if (title) title.textContent = state.company.name;

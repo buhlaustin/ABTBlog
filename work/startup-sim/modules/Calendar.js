@@ -60,8 +60,12 @@ export function endMonth(state) {
 
   const priorStage = state.stage;
   const priorMonthRevenue = state.finance?.monthlyRevenue ?? 0;
+  const closedYear = state.calendar.year;
+  const closedMonthIndex = state.calendar.monthIndex;
+  const monthRevenue = state.calendar.monthRevenue ?? 0;
   const burn = resolveMonthEndBurn(state);
   onMonthEndSentiment(state, priorMonthRevenue, state.finance?.monthlyRevenue ?? 0);
+  let stockDeltaPct = null;
 
   appendLog(
     state,
@@ -80,7 +84,8 @@ export function endMonth(state) {
 
   if (isPublicCompany(state)) {
     const tick = tickPublicMarket(state);
-    onStockSentiment(state, tick.deltaPct ?? 0);
+    stockDeltaPct = tick.deltaPct ?? 0;
+    onStockSentiment(state, stockDeltaPct);
     for (const line of tick.lines ?? []) {
       appendLog(state, line);
     }
@@ -97,13 +102,36 @@ export function endMonth(state) {
     state.flags.gameOver = true;
     state.flags.gameOverReason = 'Ran out of cash.';
     appendLog(state, 'You ran out of cash. Game over.');
-    return { ok: true, gameOver: true };
+    return {
+      ok: true,
+      gameOver: true,
+      monthSummary: {
+        closedYear,
+        closedMonthIndex,
+        monthRevenue,
+        burn,
+        cashAfter: state.finance.cash,
+        stockDeltaPct
+      }
+    };
   }
 
+  const cashAfter = state.finance.cash;
   archiveCurrentNews(state);
   advanceCalendarMonth(state);
   startMonth(state);
-  return { ok: true, gameOver: false };
+  return {
+    ok: true,
+    gameOver: false,
+    monthSummary: {
+      closedYear,
+      closedMonthIndex,
+      monthRevenue,
+      burn,
+      cashAfter,
+      stockDeltaPct
+    }
+  };
 }
 
 function formatLogMoney(n) {

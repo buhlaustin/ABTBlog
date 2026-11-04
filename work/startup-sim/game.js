@@ -46,9 +46,13 @@ import { dismissTutorialStep } from './modules/Tutorial.js';
 import { recordRunInHallOfFame, renderHallOfFameBlock } from './modules/HallOfFame.js';
 import { parseSandboxTuning } from './modules/SandboxTuning.js';
 import { applyPivot } from './modules/Pivot.js';
+import { openMonthSummaryDialog } from './modules/MonthSummary.js';
+import { copyRunExportToClipboard } from './modules/RunExport.js';
 import {
   bindSandboxCashToggle,
   bindTabNavigation,
+  bindGameKeyboardShortcuts,
+  syncContinueOnOpenOffer,
   flashSaveStatus,
   populateCategorySelect,
   renderAllPanels,
@@ -212,6 +216,10 @@ async function handleEndMonth() {
   if (result.gameOver) {
     showDeskFeedback('Out of cash.');
     refresh();
+    if (result.monthSummary) {
+      const headline = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
+      await openMonthSummaryDialog(sessionState, result.monthSummary, headline);
+    }
     return;
   }
 
@@ -231,8 +239,21 @@ async function handleEndMonth() {
     sessionState,
     news.source === 'ai' ? 'Fresh headlines landed (AI).' : 'Headlines updated (offline).'
   );
+  const headline = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
+  if (result.monthSummary) {
+    await openMonthSummaryDialog(sessionState, result.monthSummary, headline);
+  }
   showDeskFeedback('Month closed. New tasks dealt.');
   refresh();
+}
+
+function loadSavedGame() {
+  const raw = StorageManager.load();
+  if (!raw) return { ok: false, reason: 'No save found or save could not be read.' };
+  const state = normalizeSave(raw);
+  if (!state) return { ok: false, reason: 'Save file is invalid or from an unsupported version.' };
+  enterGame(state);
+  return { ok: true };
 }
 
 function handleFinalizeStaff() {
@@ -550,8 +571,19 @@ function bindGameInteractions() {
   document.getElementById('btn-gameover-menu')?.addEventListener('click', () => {
     sessionState = null;
     syncStartScreen();
+    syncContinueOnOpenOffer(StorageManager.hasSave());
     renderHallOfFameBlock(document.getElementById('hall-of-fame'));
     showScreen('start');
+  });
+
+  document.getElementById('btn-export-run')?.addEventListener('click', async () => {
+    if (!sessionState) return;
+    const fb = document.getElementById('export-run-feedback');
+    const result = await copyRunExportToClipboard(sessionState);
+    if (fb) {
+      fb.hidden = false;
+      fb.textContent = result.ok ? 'Run summary copied to clipboard.' : result.reason ?? 'Copy failed.';
+    }
   });
 }
 
@@ -572,10 +604,13 @@ async function init() {
   const setupForm = document.getElementById('setup-form');
   bindSandboxCashToggle(setupForm);
   bindTabNavigation();
+  bindGameKeyboardShortcuts(() => sessionState, () => handleEndMonth());
   bindGameInteractions();
 
-  setLoadButtonEnabled(StorageManager.hasSave());
+  const hasSave = StorageManager.hasSave();
+  setLoadButtonEnabled(hasSave);
   syncStartScreen();
+  syncContinueOnOpenOffer(hasSave);
   renderHallOfFameBlock(document.getElementById('hall-of-fame'));
 
   function flashLoadError(message) {
@@ -614,14 +649,18 @@ async function init() {
   });
 
   document.getElementById('btn-load')?.addEventListener('click', () => {
-    const raw = StorageManager.load();
-    if (!raw) {
-      flashLoadError('No save found or save could not be read.');
-      return;
-    }
-    const state = normalizeSave(raw);
-    if (state) enterGame(state);
-    else flashLoadError('Save file is invalid or from an unsupported version.');
+    const result = loadSavedGame();
+    if (!result.ok) flashLoadError(result.reason);
+  });
+
+  document.getElementById('btn-continue-open')?.addEventListener('click', () => {
+    const result = loadSavedGame();
+    if (!result.ok) flashLoadError(result.reason);
+  });
+
+  document.getElementById('btn-dismiss-continue-offer')?.addEventListener('click', () => {
+    sessionStorage.setItem('startup_sim_resume_dismissed', '1');
+    syncContinueOnOpenOffer(StorageManager.hasSave());
   });
 
   document.getElementById('btn-setup-back')?.addEventListener('click', () => {
@@ -632,6 +671,7 @@ async function init() {
     persistProgress(true);
     sessionState = null;
     syncStartScreen();
+    syncContinueOnOpenOffer(StorageManager.hasSave());
     showScreen('start');
   });
 

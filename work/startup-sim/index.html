@@ -18,6 +18,11 @@
           Build from a garage to IPO. Career mode starts at $120k; Sandbox adds starting cash but the same revenue milestones.
         </p>
       </header>
+      <div id="start-continue-offer" class="start-continue-offer" hidden>
+        <p class="lede">You have a saved run on this device.</p>
+        <button id="btn-continue-open" class="btn btn-primary" type="button">Continue where you left off</button>
+        <button id="btn-dismiss-continue-offer" class="btn btn-ghost btn-small" type="button">Stay on menu</button>
+      </div>
       <div class="start-actions">
         <button id="btn-load" class="btn btn-ghost" type="button" disabled>Continue saved game</button>
         <button id="btn-new" class="btn btn-primary" type="button">New game</button>
@@ -159,8 +164,19 @@
         <h1 id="gameover-title" tabindex="-1">Company</h1>
         <div id="gameover-body" class="lede"></div>
       </header>
-      <button id="btn-gameover-menu" class="btn btn-primary" type="button">Main menu</button>
+      <div class="gameover-actions">
+        <button id="btn-export-run" class="btn btn-ghost" type="button">Copy run summary</button>
+        <button id="btn-gameover-menu" class="btn btn-primary" type="button">Main menu</button>
+      </div>
+      <p id="export-run-feedback" class="fine-print" hidden aria-live="polite"></p>
     </section>
+
+    <dialog id="month-summary-dialog" class="month-summary-dialog" aria-labelledby="month-summary-title">
+      <div id="month-summary-body"></div>
+      <form method="dialog" class="month-summary-actions">
+        <button id="btn-month-summary-close" class="btn btn-primary" type="submit">Start next month</button>
+      </form>
+    </dialog>
   </div>
   <script>window.__STARTUP_NARRATIVE_API_URL="https://austinbuhltech.com/play/hos/narrate";</script>
   <script type="module" src="/play/startup-sim/game.js"></script>

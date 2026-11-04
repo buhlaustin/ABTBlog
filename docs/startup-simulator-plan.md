@@ -426,10 +426,10 @@ Ship criteria: **live narrative AI is required** for this phase (all five `kind`
 
 #### UX & retention
 
-- [ ] **Continue on open** — if save exists, optional one-tap “Continue where you left off?” on entry (auto-save already in place)
-- [ ] **Month-end summary modal** — cash, burn, runway, stock tick, headline teaser before new month
-- [ ] **Keyboard shortcuts** — 1–8 for tabs, `M` to close month when valid
-- [ ] **Run export** — copy/share text summary from cash-out / game-over screen
+- [x] **Continue on open** — if save exists, optional one-tap “Continue where you left off?” on entry (auto-save already in place)
+- [x] **Month-end summary modal** — cash, burn, runway, stock tick, headline teaser before new month
+- [x] **Keyboard shortcuts** — 1–8 for tabs, `M` to close month when valid
+- [x] **Run export** — copy/share text summary from cash-out / game-over screen
 
 #### Content & polish
 
