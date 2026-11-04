@@ -80,16 +80,20 @@ export async function scoreInterview(state, answers) {
 }
 
 function parseScoreJson(text) {
-  const trimmed = text.trim();
-  const start = trimmed.indexOf('{');
-  const end = trimmed.lastIndexOf('}');
-  if (start >= 0 && end > start) {
-    const parsed = JSON.parse(trimmed.slice(start, end + 1));
-    return {
-      accepted: Boolean(parsed.accepted),
-      score: Number(parsed.score) || 70,
-      feedback: String(parsed.feedback || 'Decision rendered.')
-    };
+  try {
+    const trimmed = text.trim();
+    const start = trimmed.indexOf('{');
+    const end = trimmed.lastIndexOf('}');
+    if (start >= 0 && end > start) {
+      const parsed = JSON.parse(trimmed.slice(start, end + 1));
+      return {
+        accepted: Boolean(parsed.accepted),
+        score: Number(parsed.score) || 70,
+        feedback: String(parsed.feedback || 'Decision rendered.')
+      };
+    }
+  } catch {
+    /* fall through */
   }
   return scoreInterviewOffline({});
 }

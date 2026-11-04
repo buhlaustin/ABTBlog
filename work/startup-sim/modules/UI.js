@@ -113,7 +113,8 @@ export function renderDeskPanel(state) {
   const desk = document.getElementById('panel-desk');
   if (!desk) return;
 
-  const slots = getMonthlyTaskSlots(state.stage);
+  const slots = state.calendar?.monthTasks?.length ?? getMonthlyTaskSlots(state.stage);
+  const slotTarget = state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlots(state.stage);
   const pending = pendingTasks(state);
   const done = state.calendar.tasksCompleted ?? 0;
   const milestone = nextRevenueMilestone(state);
@@ -157,7 +158,7 @@ export function renderDeskPanel(state) {
     }
     <p class="panel-lede">Complete all counted tasks, then close the month. Staff/finance changes do not use task slots.</p>
     <div class="summary-grid">
-      <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slots}</span></div>
+      <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slotTarget}</span></div>
       <div><span class="stat-label">This month</span><span class="stat-value">+${formatMoney(monthRev)} / -${formatMoney(monthSpend)}</span></div>
       <div><span class="stat-label">Next gate</span><span class="stat-value">${escapeHtml(ms)}</span></div>
       <div><span class="stat-label">Pending</span><span class="stat-value">${pending.length}</span></div>

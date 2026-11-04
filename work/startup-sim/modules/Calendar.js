@@ -7,23 +7,7 @@ import { syncDraftFromFinalized } from './Staff.js';
 import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
 
-/** Counted task slots per month (staff/finance actions excluded). */
-export function getMonthlyTaskSlots(stage) {
-  switch (stage) {
-    case STAGES.GARAGE:
-      return 4;
-    case STAGES.OFFICE:
-      return 6;
-    case STAGES.XC:
-      return 6;
-    case STAGES.POST_XC:
-      return 7;
-    case STAGES.PUBLIC:
-      return 8;
-    default:
-      return 4;
-  }
-}
+export { getMonthlyTaskSlots } from './constants.js';
 
 export function createInitialCalendar() {
   return {

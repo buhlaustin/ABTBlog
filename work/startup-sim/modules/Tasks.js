@@ -1,6 +1,5 @@
 import { assetBaseUrl } from './utils.js';
-import { STAGES } from './constants.js';
-import { getMonthlyTaskSlots } from './Calendar.js';
+import { STAGES, getMonthlyTaskSlots } from './constants.js';
 
 let taskCatalog = null;
 
@@ -59,7 +58,16 @@ export function dealMonthlyTasks(state) {
     return state;
   }
   state.calendar.taskCatalogError = false;
-  const picked = shuffle(pool).slice(0, slots);
+  const shuffled = shuffle(pool);
+  const picked = [];
+  while (picked.length < slots) {
+    for (const def of shuffled) {
+      if (picked.length >= slots) break;
+      picked.push(def);
+    }
+    if (!shuffled.length) break;
+  }
+  state.calendar.monthTaskSlotTarget = slots;
   state.calendar.monthTasks = picked.map((def, index) => ({
     instanceId: `${state.calendar.year}-${state.calendar.monthIndex}-${def.id}-${index}`,
     taskId: def.id,
