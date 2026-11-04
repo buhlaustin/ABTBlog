@@ -18,13 +18,12 @@ const blogSlugs = readdirSync(blogDir)
     return data.slug ?? filename.replace(/\.md$/, "");
   });
 
-const workSlugs = [
-  "eer",
-  "startup-sim",
-  "hos",
-  "hvit-engine",
-  "cursor-cloud-to-paxel-converter",
-];
+/** Keep in sync with `slug` entries in src/lib/work-registry.ts */
+const registrySrc = readFileSync(join(root, "src/lib/work-registry.ts"), "utf8");
+const workSlugs = [...registrySrc.matchAll(/^\s*slug:\s*"([^"]+)"/gm)].map((m) => m[1]);
+if (workSlugs.length < 3) {
+  throw new Error("Could not parse work slugs from work-registry.ts for sitemap");
+}
 
 const urls = [
   ...staticPaths,

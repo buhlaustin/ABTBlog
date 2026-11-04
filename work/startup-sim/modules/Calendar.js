@@ -50,6 +50,9 @@ export function startMonth(state) {
 }
 
 export function endMonth(state) {
+  if (state.calendar?.taskCatalogError) {
+    return { ok: false, reason: 'Task data is unavailable — refresh the page and try again.' };
+  }
   if (!allTasksComplete(state)) {
     return { ok: false, reason: 'Complete all counted tasks before closing the month.' };
   }

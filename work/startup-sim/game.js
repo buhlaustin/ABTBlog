@@ -1,7 +1,7 @@
 import { loadCategories } from './modules/Categories.js';
 import { createInitialState, normalizeSave } from './modules/GameState.js';
 import { StorageManager } from './modules/Storage.js';
-import { loadTaskCatalog, getTaskDef, dealMonthlyTasks } from './modules/Tasks.js';
+import { loadTaskCatalog, getTaskDef, getTaskDefinitions, dealMonthlyTasks } from './modules/Tasks.js';
 import { initNarrativeApiUrl, isNarrativeApiEnabled } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
@@ -480,6 +480,23 @@ async function init() {
     const sandboxCash = fd.get('sandboxCash');
 
     if (!companyName || !categoryId) return;
+
+    if (!getTaskDefinitions().length) {
+      const el = document.getElementById('setup-form');
+      let err = document.getElementById('setup-task-error');
+      if (!err && el) {
+        err = document.createElement('p');
+        err.id = 'setup-task-error';
+        err.className = 'desk-feedback error';
+        err.setAttribute('role', 'alert');
+        el.appendChild(err);
+      }
+      if (err) {
+        err.textContent =
+          'Could not load task data. Check your connection and refresh, then try again.';
+      }
+      return;
+    }
 
     enterGame(
       createInitialState({

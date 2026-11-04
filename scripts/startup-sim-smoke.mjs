@@ -37,9 +37,8 @@ for (const stage of Object.values(STAGES)) {
   }
   if (pool.length < slots) {
     console.warn(`WARN: stage ${stage} pool ${pool.length} < slots ${slots} (will repeat tasks)`);
-  } else {
-    console.log(`OK: stage ${stage} pool ${pool.length}, slots ${slots}`);
   }
+  console.log(`OK: stage ${stage} pool ${pool.length}, slots ${slots}`);
 }
 
 const state = createInitialState({

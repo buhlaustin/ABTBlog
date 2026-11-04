@@ -3,14 +3,63 @@ import { STAGES, getMonthlyTaskSlots } from './constants.js';
 
 let taskCatalog = null;
 
+/** Minimal offline deck if tasks.json cannot load (avoids soft-lock). */
+const FALLBACK_CATALOG = {
+  version: 1,
+  tasks: [
+    {
+      id: 'fallback-mvp',
+      title: 'Ship MVP sprint',
+      description: 'Keep building while task data reloads.',
+      stages: ['garage', 'office', 'xc', 'post_xc', 'public'],
+      cost: 800,
+      revenue: [200, 1200],
+      product: 2,
+      buzz: 1
+    },
+    {
+      id: 'fallback-outreach',
+      title: 'Customer outreach',
+      description: 'Talk to users; adjust the pitch.',
+      stages: ['garage', 'office', 'xc', 'post_xc', 'public'],
+      cost: 200,
+      revenue: [100, 900],
+      product: 1,
+      buzz: 1
+    },
+    {
+      id: 'fallback-pricing',
+      title: 'Pricing experiment',
+      description: 'Find a number customers tolerate.',
+      stages: ['garage', 'office', 'xc', 'post_xc', 'public'],
+      cost: 200,
+      revenue: [150, 800],
+      product: 0,
+      buzz: 0
+    },
+    {
+      id: 'fallback-ads',
+      title: 'Lightweight marketing test',
+      description: 'Spend a little; learn a lot.',
+      stages: ['garage', 'office', 'xc', 'post_xc', 'public'],
+      cost: 350,
+      revenue: [100, 700],
+      product: 0,
+      buzz: 2
+    }
+  ]
+};
+
 export async function loadTaskCatalog() {
   if (taskCatalog) return taskCatalog;
   try {
     const res = await fetch(`${assetBaseUrl()}data/tasks.json`, { cache: 'no-store' });
-    if (!res.ok) return { version: 1, tasks: [] };
-    taskCatalog = await res.json();
+    if (!res.ok) throw new Error('tasks fetch failed');
+    const data = await res.json();
+    if (!Array.isArray(data.tasks) || data.tasks.length === 0) throw new Error('empty tasks');
+    taskCatalog = data;
   } catch {
-    taskCatalog = { version: 1, tasks: [] };
+    taskCatalog = FALLBACK_CATALOG;
   }
   return taskCatalog;
 }

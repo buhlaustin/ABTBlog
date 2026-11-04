@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "npm run copy-work && next dev",
-    "prebuild": "node scripts/inject-hos-config.mjs && node scripts/validate-startup-sim-assets.mjs && node scripts/copy-work-assets.mjs && node scripts/generate-rss.mjs && node scripts/generate-sitemap.mjs",
+    "prebuild": "node scripts/inject-hos-config.mjs && node scripts/validate-startup-sim-assets.mjs && node scripts/startup-sim-smoke.mjs && node scripts/copy-work-assets.mjs && node scripts/generate-rss.mjs && node scripts/generate-sitemap.mjs",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "copy-work": "node scripts/copy-work-assets.mjs"
+    "copy-work": "node scripts/copy-work-assets.mjs",
+    "smoke:startup-sim": "node scripts/startup-sim-smoke.mjs"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",

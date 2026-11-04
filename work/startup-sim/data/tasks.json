@@ -220,6 +220,39 @@
       "revenue": [80000, 450000],
       "product": 0,
       "buzz": 2
+    },
+    {
+      "id": "earnings-call-tour",
+      "title": "Earnings call roadshow",
+      "description": "Explain the same chart to analysts who will forget it immediately.",
+      "types": ["marketing"],
+      "stages": ["public"],
+      "cost": 15000,
+      "revenue": [50000, 180000],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "global-expansion-blitz",
+      "title": "Global expansion sprint",
+      "description": "Open three countries before legal finishes reading page one.",
+      "types": ["sales"],
+      "stages": ["public"],
+      "cost": 22000,
+      "revenue": [90000, 320000],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "platform-ecosystem-summit",
+      "title": "Platform ecosystem summit",
+      "description": "Keynotes, partner badges, and one demo that actually works.",
+      "types": ["marketing"],
+      "stages": ["public"],
+      "cost": 18000,
+      "revenue": [70000, 260000],
+      "product": 2,
+      "buzz": 4
     }
   ]
 }

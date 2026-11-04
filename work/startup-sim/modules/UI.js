@@ -1,5 +1,5 @@
 import { formatMoney, stageLabel } from './constants.js';
-import { getMonthlyTaskSlots } from './Calendar.js';
+import { getMonthlyTaskSlots } from './constants.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
 import { renderPeoplePanel } from './Staff.js';
@@ -23,6 +23,11 @@ export function showScreen(name) {
   for (const key of Object.keys(screens)) {
     const el = screens[key]();
     if (el) el.hidden = key !== name;
+  }
+  if (name === 'gameover') {
+    requestAnimationFrame(() => {
+      document.getElementById('gameover-title')?.focus();
+    });
   }
 }
 
@@ -113,7 +118,6 @@ export function renderDeskPanel(state) {
   const desk = document.getElementById('panel-desk');
   if (!desk) return;
 
-  const slots = state.calendar?.monthTasks?.length ?? getMonthlyTaskSlots(state.stage);
   const slotTarget = state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlots(state.stage);
   const pending = pendingTasks(state);
   const done = state.calendar.tasksCompleted ?? 0;
