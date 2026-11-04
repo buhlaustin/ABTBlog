@@ -286,6 +286,54 @@ export function selectTab(tabId) {
   playUiClick();
 }
 
+let panelStateProvider = null;
+
+export function setPanelStateProvider(fn) {
+  panelStateProvider = fn;
+}
+
+function getActiveTabId() {
+  return document.querySelector('#game-tabs [data-tab][aria-selected="true"]')?.dataset?.tab ?? 'desk';
+}
+
+function renderPanelForTab(tab, state) {
+  switch (tab) {
+    case 'desk':
+      renderDeskPanel(state);
+      break;
+    case 'product':
+      renderProductPanel(document.getElementById('panel-product'), state);
+      break;
+    case 'growth':
+      renderGrowthPanel(document.getElementById('panel-growth'), state);
+      break;
+    case 'people':
+      renderPeoplePanel(document.getElementById('panel-people'), state);
+      break;
+    case 'finance':
+      renderFinancePanel(document.getElementById('panel-finance'), state);
+      break;
+    case 'board':
+      renderBoardPanel(document.getElementById('panel-board'), state);
+      break;
+    case 'social':
+      renderSocialPanel(document.getElementById('panel-social'), state);
+      break;
+    case 'news':
+      renderNewsPanel(document.getElementById('panel-news'), state);
+      break;
+    case 'advisor':
+      renderAdvisorPanel(document.getElementById('panel-advisor'), state);
+      break;
+    default:
+      break;
+  }
+}
+
+export function markAllPanelsStale() {
+  /* Panels re-render when their tab is selected; desk + HUD refresh every tick. */
+}
+
 function activateTab(nav, tab) {
   let activeBtn = null;
   nav.querySelectorAll('[data-tab]').forEach((b) => {
@@ -301,6 +349,8 @@ function activateTab(nav, tab) {
     panel.tabIndex = active ? 0 : -1;
   });
   activeBtn?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' });
+  const state = panelStateProvider?.();
+  if (state) renderPanelForTab(tab, state);
 }
 
 export function bindTabNavigation() {
@@ -378,19 +428,11 @@ export function renderAllPanels(state) {
   }
   renderGameHud(state);
   renderDeskPanel(state);
-
-  renderProductPanel(document.getElementById('panel-product'), state);
-  renderGrowthPanel(document.getElementById('panel-growth'), state);
+  const active = getActiveTabId();
+  if (active !== 'desk') {
+    renderPanelForTab(active, state);
+  }
   paintGameFeedback();
-
-  renderPeoplePanel(document.getElementById('panel-people'), state);
-
-  renderFinancePanel(document.getElementById('panel-finance'), state);
-
-  renderSocialPanel(document.getElementById('panel-social'), state);
-  renderNewsPanel(document.getElementById('panel-news'), state);
-  renderAdvisorPanel(document.getElementById('panel-advisor'), state);
-  renderBoardPanel(document.getElementById('panel-board'), state);
 }
 
 export function renderGrowthPanel(container, state) {

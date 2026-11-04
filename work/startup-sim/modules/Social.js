@@ -1,10 +1,11 @@
-import { assetBaseUrl } from './utils.js';
+import { fetchGameJson } from './utils.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot, buildNarrativeContext } from './GameContext.js';
 import { setGameFeedback } from './GameFeedback.js';
 import bundledPersonas from '../data/personas.json' with { type: 'json' };
 
 let personasCache = bundledPersonas.personas ?? [];
+let personasHydrated = false;
 export const CHIRP_LIMIT = 240;
 
 export function createInitialSocial() {
@@ -17,18 +18,33 @@ export function createInitialSocial() {
 }
 
 async function loadPersonas() {
+  if (personasHydrated) return personasCache;
   try {
-    const res = await fetch(`${assetBaseUrl()}data/personas.json`, { cache: 'no-store' });
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data.personas) && data.personas.length > 0) {
-        personasCache = data.personas;
-      }
+    const data = await fetchGameJson('data/personas.json');
+    if (Array.isArray(data?.personas) && data.personas.length > 0) {
+      personasCache = data.personas;
     }
   } catch {
     /* keep bundled personas */
   }
+  personasHydrated = true;
   return personasCache;
+}
+
+export function preloadSocialPersonas() {
+  return loadPersonas();
+}
+
+function clearNpcPostsForMonth(state) {
+  const m = state.calendar.monthIndex;
+  const y = state.calendar.year;
+  for (const net of ['pronet', 'chirp']) {
+    const list = state.social?.[net]?.posts;
+    if (!list) continue;
+    state.social[net].posts = list.filter(
+      (p) => !(p.authorId === 'npc' && p.month === m && p.year === y)
+    );
+  }
 }
 
 function postList(state, network) {
@@ -186,8 +202,16 @@ function offlineMonthlyPosts(state, personas) {
   trimSocial(state);
 }
 
-export async function generateMonthlySocial(state) {
+export function applyOfflineMonthlySocial(state) {
   if (!state.social) state.social = createInitialSocial();
+  offlineMonthlyPosts(state, personasCache);
+}
+
+/** @returns {Promise<boolean>} true when AI posts replaced offline NPC posts for this month */
+export async function enrichMonthlySocialWithAi(state) {
+  if (!state.social) state.social = createInitialSocial();
+  if (!shouldUseNarrativeAi()) return false;
+
   const personas = await loadPersonas();
   const headlines = headlineList(state);
   const context = {
@@ -197,24 +221,29 @@ export async function generateMonthlySocial(state) {
     rules: 'Generate in-world posts. No sandbox, levels, or game UI terms.'
   };
 
-  if (shouldUseNarrativeAi()) {
-    try {
-      const res = await requestNarrative('startup_social_month', context);
-      const posts = res?.posts ?? res?.result?.posts;
-      if (Array.isArray(posts) && posts.length) {
-        for (const p of posts.slice(0, 6)) {
-          const network = p.network === 'chirp' ? 'chirp' : 'pronet';
-          pushFeedPost(state, network, String(p.author ?? p.authorName ?? 'Anon').slice(0, 60), p.text);
-        }
-        trimSocial(state);
-        return { ok: true, source: 'ai' };
+  try {
+    const res = await requestNarrative('startup_social_month', context);
+    const posts = res?.posts ?? res?.result?.posts;
+    if (Array.isArray(posts) && posts.length) {
+      clearNpcPostsForMonth(state);
+      for (const p of posts.slice(0, 6)) {
+        const network = p.network === 'chirp' ? 'chirp' : 'pronet';
+        pushFeedPost(state, network, String(p.author ?? p.authorName ?? 'Anon').slice(0, 60), p.text);
       }
-    } catch {
-      /* offline */
+      trimSocial(state);
+      return true;
     }
+  } catch {
+    /* keep offline */
   }
+  return false;
+}
 
-  offlineMonthlyPosts(state, personas);
+export async function generateMonthlySocial(state) {
+  applyOfflineMonthlySocial(state);
+  if (await enrichMonthlySocialWithAi(state)) {
+    return { ok: true, source: 'ai' };
+  }
   return { ok: true, source: 'offline' };
 }
 

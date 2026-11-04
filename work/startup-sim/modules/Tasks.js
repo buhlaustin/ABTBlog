@@ -1,4 +1,4 @@
-import { assetBaseUrl } from './utils.js';
+import { fetchGameJson } from './utils.js';
 import { STAGES, getMonthlyTaskSlots, getMonthlyTaskOfferCount } from './constants.js';
 import { getTaskStage } from './Workspace.js';
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
@@ -11,10 +11,8 @@ export async function loadTaskCatalog() {
     throw new Error('startup-sim: bundled tasks.json is empty');
   }
   try {
-    const res = await fetch(`${assetBaseUrl()}data/tasks.json`, { cache: 'no-store' });
-    if (!res.ok) return taskCatalog;
-    const data = await res.json();
-    if (Array.isArray(data.tasks) && data.tasks.length > 0) {
+    const data = await fetchGameJson('data/tasks.json');
+    if (Array.isArray(data?.tasks) && data.tasks.length > 0) {
       taskCatalog = data;
     }
   } catch {

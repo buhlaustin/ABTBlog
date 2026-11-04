@@ -14,3 +14,12 @@ export function assetBaseUrl() {
   }
   return '/play/startup-sim/';
 }
+
+/** Static game JSON — prefer cache after first load. */
+export async function fetchGameJson(relativePath) {
+  const res = await fetch(`${assetBaseUrl()}${relativePath.replace(/^\//, '')}`, {
+    cache: 'force-cache'
+  });
+  if (!res.ok) return null;
+  return res.json();
+}

@@ -101,20 +101,28 @@ export async function probeNarrativeApi({ retries = 3 } = {}) {
   return false;
 }
 
-export async function requestNarrative(kind, context) {
+const NARRATIVE_REQUEST_MS = 12_000;
+
+export async function requestNarrative(kind, context, { timeoutMs = NARRATIVE_REQUEST_MS } = {}) {
   const url = resolveNarrativeApiUrl() || getNarrativeApiUrl();
   if (!url) return null;
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ kind, context })
+      body: JSON.stringify({ kind, context }),
+      signal: controller.signal
     });
 
     if (!res.ok) return null;
     return await res.json();
   } catch {
     return null;
+  } finally {
+    clearTimeout(timer);
   }
 }

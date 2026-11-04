@@ -1,28 +1,32 @@
-import { assetBaseUrl } from './utils.js';
+import { fetchGameJson } from './utils.js';
 import { adjustSentiment } from './Sentiment.js';
 import { bumpCompetitorPressure, easeCompetitorPressure } from './Competitor.js';
 import { isPublicCompany } from './IPO.js';
 import bundledCrises from '../data/crises.json' with { type: 'json' };
 
 let crisisCatalog = bundledCrises;
+let crisesHydrated = false;
 
 export function createInitialCrisisState() {
   return { active: null };
 }
 
 async function loadCrises() {
+  if (crisesHydrated) return crisisCatalog;
   try {
-    const res = await fetch(`${assetBaseUrl()}data/crises.json`, { cache: 'no-store' });
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data.crises) && data.crises.length > 0) {
-        crisisCatalog = data;
-      }
+    const data = await fetchGameJson('data/crises.json');
+    if (data && Array.isArray(data.crises) && data.crises.length > 0) {
+      crisisCatalog = data;
     }
   } catch {
     /* keep bundled crises */
   }
+  crisesHydrated = true;
   return crisisCatalog;
+}
+
+export function preloadCrisisCatalog() {
+  return loadCrises();
 }
 
 export async function rollMonthStartCrisis(state) {
@@ -31,7 +35,7 @@ export async function rollMonthStartCrisis(state) {
   if (!state.crisis) state.crisis = createInitialCrisisState();
   if (Math.random() > 0.14) return null;
 
-  const { crises } = await loadCrises();
+  const { crises } = crisesHydrated ? crisisCatalog : await loadCrises();
   if (!crises?.length) return null;
   const def = crises[Math.floor(Math.random() * crises.length)];
   state.crisis.active = {

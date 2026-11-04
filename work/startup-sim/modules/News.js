@@ -1,24 +1,28 @@
-import { assetBaseUrl } from './utils.js';
+import { fetchGameJson } from './utils.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildNarrativeContext } from './GameContext.js';
 import { maybeCompetitorNewsArticle, bumpCompetitorPressure } from './Competitor.js';
 import bundledTimeline from '../data/news-timeline-seed.json' with { type: 'json' };
 
 let timelineSeed = bundledTimeline;
+let timelineHydrated = false;
 
 async function loadTimelineSeed() {
+  if (timelineHydrated) return timelineSeed;
   try {
-    const res = await fetch(`${assetBaseUrl()}data/news-timeline-seed.json`, { cache: 'no-store' });
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data.events)) {
-        timelineSeed = data;
-      }
+    const data = await fetchGameJson('data/news-timeline-seed.json');
+    if (data && Array.isArray(data.events)) {
+      timelineSeed = data;
     }
   } catch {
     /* keep bundled timeline */
   }
+  timelineHydrated = true;
   return timelineSeed;
+}
+
+export function preloadNewsTimeline() {
+  return loadTimelineSeed();
 }
 
 export function createInitialNews() {
@@ -165,11 +169,18 @@ function sanitizeArticles(raw, state) {
   }));
 }
 
-export async function generateMonthlyNews(state) {
+export function applyOfflineMonthlyNews(state) {
   if (!state.news) state.news = createInitialNews();
+  state.news.currentMonthArticles = offlineNewsArticles(state);
+}
+
+/** @returns {Promise<boolean>} true when AI articles replaced offline feed */
+export async function enrichMonthlyNewsWithAi(state) {
+  if (!state.news) state.news = createInitialNews();
+  if (!shouldUseNarrativeAi()) return false;
+
   const seed = await loadTimelineSeed();
   const timeline = matchingTimelineEvents(state, seed.events ?? []);
-
   const context = {
     narrative: buildNarrativeContext(state),
     timelineEvents: timeline,
@@ -177,23 +188,27 @@ export async function generateMonthlyNews(state) {
       'In-world journalism only. Use narrative.recentLayoffEvents for layoff stories (at most one). Never reference game mechanics listed in narrative.narrativeRules.'
   };
 
-  if (shouldUseNarrativeAi()) {
-    try {
-      const res = await requestNarrative('startup_news_month', context);
-      const articles = res?.articles ?? res?.result?.articles;
-      if (Array.isArray(articles) && articles.length) {
-        state.news.currentMonthArticles = sanitizeArticles(articles, state);
-        if ((state.news.layoffQueue ?? []).some((e) => !e.consumed)) {
-          consumeNextLayoff(state);
-        }
-        return { ok: true, source: 'ai' };
+  try {
+    const res = await requestNarrative('startup_news_month', context);
+    const articles = res?.articles ?? res?.result?.articles;
+    if (Array.isArray(articles) && articles.length) {
+      state.news.currentMonthArticles = sanitizeArticles(articles, state);
+      if ((state.news.layoffQueue ?? []).some((e) => !e.consumed)) {
+        consumeNextLayoff(state);
       }
-    } catch {
-      /* fallback */
+      return true;
     }
+  } catch {
+    /* keep offline */
   }
+  return false;
+}
 
-  state.news.currentMonthArticles = offlineNewsArticles(state);
+export async function generateMonthlyNews(state) {
+  applyOfflineMonthlyNews(state);
+  if (await enrichMonthlyNewsWithAi(state)) {
+    return { ok: true, source: 'ai' };
+  }
   return { ok: true, source: 'offline' };
 }
 

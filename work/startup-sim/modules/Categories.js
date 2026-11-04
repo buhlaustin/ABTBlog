@@ -1,5 +1,4 @@
-import { assetBaseUrl } from './utils.js';
-import { clamp } from './utils.js';
+import { clamp, fetchGameJson } from './utils.js';
 import bundledCategories from '../data/categories.json' with { type: 'json' };
 
 let categoriesCache = bundledCategories;
@@ -9,9 +8,7 @@ export async function loadCategories() {
     throw new Error('startup-sim: bundled categories.json is empty');
   }
   try {
-    const res = await fetch(`${assetBaseUrl()}data/categories.json`, { cache: 'no-store' });
-    if (!res.ok) return categoriesCache;
-    const data = await res.json();
+    const data = await fetchGameJson('data/categories.json');
     if (Array.isArray(data) && data.length > 0) {
       categoriesCache = data;
     }

@@ -45,6 +45,24 @@ export function renderMonthSummaryContent(container, state, summary, headlineTea
   `;
 }
 
+export function updateMonthSummaryHeadline(headlineTeaser) {
+  const dialog = document.getElementById('month-summary-dialog');
+  if (!dialog?.open) return;
+  const body = document.getElementById('month-summary-body');
+  if (!body) return;
+  let el = body.querySelector('.month-summary-headline');
+  if (!headlineTeaser) return;
+  const html = `<strong>Headlines:</strong> ${escapeHtml(headlineTeaser)}`;
+  if (el) {
+    el.innerHTML = html;
+  } else {
+    el = document.createElement('p');
+    el.className = 'month-summary-headline';
+    el.innerHTML = html;
+    body.appendChild(el);
+  }
+}
+
 export function openMonthSummaryDialog(state, summary, headlineTeaser) {
   const dialog = document.getElementById('month-summary-dialog');
   const body = document.getElementById('month-summary-body');

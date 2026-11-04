@@ -21,7 +21,8 @@ import {
   initNarrativeApiUrl,
   isNarrativeApiEnabled,
   isNarrativeApiLive,
-  probeNarrativeApi
+  probeNarrativeApi,
+  shouldUseNarrativeAi
 } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
@@ -45,10 +46,27 @@ import {
   rollMonthStartCrisis,
   hasActiveCrisis,
   applyCrisisChoice,
-  renderCrisisPanel
+  renderCrisisPanel,
+  preloadCrisisCatalog
 } from './modules/Crisis.js';
-import { recordLayoffEvent, generateMonthlyNews, toggleNewsArchive } from './modules/News.js';
-import { publishPlayerPost, setSocialNetwork, showSocialFeedback, generateMonthlySocial } from './modules/Social.js';
+import {
+  recordLayoffEvent,
+  applyOfflineMonthlyNews,
+  enrichMonthlyNewsWithAi,
+  renderNewsPanel,
+  toggleNewsArchive,
+  preloadNewsTimeline
+} from './modules/News.js';
+import {
+  publishPlayerPost,
+  setSocialNetwork,
+  showSocialFeedback,
+  applyOfflineMonthlySocial,
+  enrichMonthlySocialWithAi,
+  renderSocialPanel,
+  preloadSocialPersonas,
+  updateChirpCharCount
+} from './modules/Social.js';
 import { sendAdvisorMessage } from './modules/Advisor.js';
 import {
   renderInterviewForm,
@@ -61,7 +79,7 @@ import { dismissTutorialStep } from './modules/Tutorial.js';
 import { recordRunInHallOfFame, renderHallOfFameBlock } from './modules/HallOfFame.js';
 import { parseSandboxTuning } from './modules/SandboxTuning.js';
 import { applyPivot } from './modules/Pivot.js';
-import { openMonthSummaryDialog } from './modules/MonthSummary.js';
+import { openMonthSummaryDialog, updateMonthSummaryHeadline } from './modules/MonthSummary.js';
 import { copyRunExportToClipboard } from './modules/RunExport.js';
 import {
   setAudioEnabled,
@@ -69,7 +87,6 @@ import {
   playMonthCloseChime,
   playUiClick
 } from './modules/Audio.js';
-import { updateChirpCharCount } from './modules/Social.js';
 import {
   bindSandboxCashToggle,
   bindTabNavigation,
@@ -80,6 +97,7 @@ import {
   renderAllPanels,
   renderGameOver,
   setLoadButtonEnabled,
+  setPanelStateProvider,
   syncStartScreen,
   showDeskFeedback,
   showScreen
@@ -87,6 +105,7 @@ import {
 import { setGameFeedback } from './modules/GameFeedback.js';
 
 let sessionState = null;
+let monthCloseInFlight = false;
 
 /** Persist run to localStorage so Continue works after refresh or leaving the page. */
 function persistProgress(silent = true) {
@@ -231,48 +250,77 @@ function handleCompleteTask(instanceId) {
 }
 
 async function handleEndMonth() {
-  if (!sessionState || sessionState.flags?.gameOver) return;
-  const result = endMonth(sessionState);
-  if (!result.ok) {
-    showDeskFeedback(result.reason || 'Cannot close month yet.', true);
-    return;
-  }
-  if (result.gameOver) {
-    showDeskFeedback('Out of cash.');
-    refresh();
-    if (result.monthSummary) {
-      const headline = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
-      await openMonthSummaryDialog(sessionState, result.monthSummary, headline);
+  if (!sessionState || sessionState.flags?.gameOver || monthCloseInFlight) return;
+
+  const endBtn = document.getElementById('btn-end-month');
+  monthCloseInFlight = true;
+  endBtn?.setAttribute('disabled', 'disabled');
+  endBtn?.setAttribute('aria-busy', 'true');
+
+  try {
+    const result = endMonth(sessionState);
+    if (!result.ok) {
+      showDeskFeedback(result.reason || 'Cannot close month yet.', true);
+      return;
     }
-    return;
-  }
+    if (result.gameOver) {
+      showDeskFeedback('Out of cash.');
+      refresh();
+      if (result.monthSummary) {
+        const headline = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
+        await openMonthSummaryDialog(sessionState, result.monthSummary, headline);
+      }
+      return;
+    }
 
-  await rollMonthStartCrisis(sessionState);
+    await rollMonthStartCrisis(sessionState);
 
-  showDeskFeedback('Generating headlines…');
-  const news = await generateMonthlyNews(sessionState);
-  appendLog(
-    sessionState,
-    news.source === 'ai' ? 'Fresh headlines hit the wire.' : 'Headlines updated.'
-  );
-  const social = await generateMonthlySocial(sessionState);
-  appendLog(
-    sessionState,
-    social.source === 'ai' ? 'ProNet and Chirp are buzzing.' : 'Social feeds updated.'
-  );
-  const headline = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
-  if (result.monthSummary) {
-    await openMonthSummaryDialog(sessionState, result.monthSummary, headline);
-    playMonthCloseChime();
-  }
-  if (hasActiveCrisis(sessionState)) {
-    appendLog(sessionState, `Crisis: ${sessionState.crisis.active.title}`);
-    showDeskFeedback('Month closed — resolve the crisis before you close again.');
+    applyOfflineMonthlyNews(sessionState);
+    applyOfflineMonthlySocial(sessionState);
     refresh();
-    return;
+
+    const headlineNow = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
+    if (result.monthSummary) {
+      await openMonthSummaryDialog(sessionState, result.monthSummary, headlineNow);
+      playMonthCloseChime();
+    }
+
+    if (shouldUseNarrativeAi()) {
+      void Promise.all([
+        enrichMonthlyNewsWithAi(sessionState),
+        enrichMonthlySocialWithAi(sessionState)
+      ]).then(([newsAi, socialAi]) => {
+        if (newsAi) {
+          appendLog(sessionState, 'Fresh headlines hit the wire.');
+          updateMonthSummaryHeadline(sessionState.news?.currentMonthArticles?.[0]?.headline ?? null);
+        }
+        if (socialAi) {
+          appendLog(sessionState, 'ProNet and Chirp are buzzing.');
+        }
+        if (newsAi || socialAi) {
+          renderNewsPanel(document.getElementById('panel-news'), sessionState);
+          renderSocialPanel(document.getElementById('panel-social'), sessionState);
+          persistProgress(true);
+        }
+      });
+    } else {
+      appendLog(sessionState, 'Headlines updated.');
+      appendLog(sessionState, 'Social feeds updated.');
+    }
+
+    if (hasActiveCrisis(sessionState)) {
+      appendLog(sessionState, `Crisis: ${sessionState.crisis.active.title}`);
+      showDeskFeedback('Month closed — resolve the crisis before you close again.');
+      refresh();
+      return;
+    }
+    showDeskFeedback('Month closed. New tasks dealt.');
+    refresh();
+  } finally {
+    monthCloseInFlight = false;
+    endBtn?.removeAttribute('disabled');
+    endBtn?.removeAttribute('aria-busy');
   }
-  showDeskFeedback('Month closed. New tasks dealt.');
-  refresh();
 }
 
 function loadSavedGame() {
@@ -731,19 +779,6 @@ async function init() {
     el.classList.add('error');
   }
 
-  try {
-    await Promise.all([
-      loadCategories(),
-      loadTaskCatalog(),
-      loadHubData(),
-      loadAssetManifest(),
-      initNarrativeApiUrl()
-    ]);
-  } catch {
-    showBootstrapError('Game data did not load. Reload the page and try again.');
-    return;
-  }
-
   if (!isTaskCatalogReady()) {
     showBootstrapError('Task list missing — reload the page.');
     return;
@@ -756,6 +791,7 @@ async function init() {
   const setupForm = document.getElementById('setup-form');
   bindSandboxCashToggle(setupForm);
   bindTabNavigation();
+  setPanelStateProvider(() => sessionState);
   bindGameKeyboardShortcuts(() => sessionState, () => handleEndMonth());
   bindGameInteractions();
 
@@ -873,7 +909,25 @@ async function init() {
   showScreen('start');
   document.body.dataset.startupSimReady = 'true';
 
-  void probeNarrativeApi({ retries: 3 }).then(() => syncNarrativeStatus());
+  void (async () => {
+    try {
+      await Promise.all([
+        loadCategories(),
+        loadTaskCatalog(),
+        loadHubData(),
+        loadAssetManifest(),
+        initNarrativeApiUrl(),
+        preloadCrisisCatalog(),
+        preloadNewsTimeline(),
+        preloadSocialPersonas()
+      ]);
+      populateCategorySelect(categorySelect, getCategoriesSync());
+    } catch {
+      /* bundled data already playable */
+    }
+    await probeNarrativeApi({ retries: 2 });
+    syncNarrativeStatus();
+  })();
 }
 
 init();
