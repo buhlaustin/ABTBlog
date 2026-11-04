@@ -18,7 +18,8 @@ export function createInitialCalendar() {
     tasksCompleted: 0,
     monthRevenue: 0,
     monthSpend: 0,
-    log: []
+    log: [],
+    recentTaskIds: []
   };
 }
 

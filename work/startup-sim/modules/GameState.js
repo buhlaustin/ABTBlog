@@ -148,6 +148,7 @@ export function normalizeSave(raw) {
     if (!state.calendar) state.calendar = createInitialCalendar();
     if (!state.calendar.monthTasks) state.calendar.monthTasks = [];
     if (!state.calendar.log) state.calendar.log = [];
+    if (!state.calendar.recentTaskIds) state.calendar.recentTaskIds = [];
     if (!state.company.economics) {
       const cat = getCategoryById(state.company?.categoryId);
       if (!cat) return null;

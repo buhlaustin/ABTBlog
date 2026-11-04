@@ -104,9 +104,14 @@ When the narrative API is unreachable, the game still runs using **authored temp
 | Regression guard | `npm run audit:startup-sim-wiring` in CI — every `btn-*` / form / data hook must bind in `game.js` |
 | E2E | Second spec: Growth / Social archive / News / Finance panels |
 
+## Task variety (post_xc)
+
+- **Catalog:** four new universal post-XC desk tasks (KPI review, manager layer, security review, churn war room) — every category now has **13+** eligible tasks vs **7** monthly slots.
+- **Dealing:** `pickMonthlyTaskDefs()` — unique task ids per month when `pool ≥ slots`; **2-month cooldown** on `calendar.recentTaskIds` so the same work rarely back-to-back.
+- **CI:** smoke fails if any category/stage has `pool < slots` or duplicates within a simulated month (40 deals).
+
 ## Remaining low-priority notes
 
-- Very small task pools at post_xc (9 tasks, 7 slots) may repeat after de-dupe exhausts — acceptable for v1.
 - Full career → IPO path not covered by Playwright (manual / future long e2e).
 
 ---

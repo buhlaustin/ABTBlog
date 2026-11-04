@@ -319,6 +319,82 @@
       "buzz": 2
     },
     {
+      "id": "post-xc-kpi-review",
+      "title": "Company KPI review",
+      "description": "Board deck, metric owners, and one chart that actually trends up.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 1800,
+      "revenue": [
+        1200,
+        7500
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "post-xc-manager-layer",
+      "title": "Build the manager layer",
+      "description": "Team leads, 1:1 templates, and fewer Slack fires.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 3200,
+      "revenue": [
+        2500,
+        11000
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "post-xc-security-review",
+      "title": "Enterprise security review",
+      "description": "Questionnaires, pen tests, and polite answers about encryption.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 4500,
+      "revenue": [
+        4000,
+        18000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "post-xc-churn-war-room",
+      "title": "Churn war room",
+      "description": "Cohort charts, save offers, and a blameless postmortem.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 2800,
+      "revenue": [
+        3500,
+        16000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
       "id": "national-campaign",
       "title": "National brand campaign",
       "description": "Billboards, podcasts, and awkward celebrity endorsements.",

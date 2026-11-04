@@ -44,6 +44,60 @@ function shuffle(arr) {
   return a;
 }
 
+/** Months of dealt task ids to deprioritize when building the next desk lineup. */
+const RECENT_TASK_COOLDOWN_MONTHS = 2;
+
+/**
+ * Pick up to `slots` tasks from `pool` with unique ids per month.
+ * Prefers tasks not seen in `recentTaskIds` (cross-month variety).
+ * Duplicates in one month only when pool.length < slots (should not happen in shipped catalog).
+ */
+export function pickMonthlyTaskDefs(pool, slots, recentTaskIds = []) {
+  if (!pool.length || slots <= 0) return [];
+
+  const cooldownLen = slots * RECENT_TASK_COOLDOWN_MONTHS;
+  const recent = new Set((recentTaskIds ?? []).slice(-cooldownLen));
+  const fresh = pool.filter((t) => !recent.has(t.id));
+  const stale = pool.filter((t) => recent.has(t.id));
+
+  const picked = [];
+  const used = new Set();
+
+  function takeUnique(source) {
+    for (const def of shuffle(source)) {
+      if (picked.length >= slots) break;
+      if (used.has(def.id)) continue;
+      used.add(def.id);
+      picked.push(def);
+    }
+  }
+
+  takeUnique(fresh.length ? fresh : pool);
+  if (picked.length < slots) takeUnique(stale);
+  if (picked.length < slots) takeUnique(pool);
+
+  if (picked.length < slots && pool.length > 0) {
+    const extras = shuffle(pool);
+    let guard = 0;
+    while (picked.length < slots && guard < slots * 4) {
+      const def = extras[picked.length % extras.length];
+      picked.push(def);
+      guard += 1;
+    }
+  }
+
+  return picked.slice(0, slots);
+}
+
+export function monthDealHasDuplicateTaskIds(picked) {
+  const seen = new Set();
+  for (const def of picked) {
+    if (seen.has(def.id)) return true;
+    seen.add(def.id);
+  }
+  return false;
+}
+
 function categoryAllowed(task, categoryId) {
   const cats = task.categories;
   if (!cats?.length) return true;
@@ -83,26 +137,10 @@ export function dealMonthlyTasks(state) {
     return state;
   }
   state.calendar.taskCatalogError = false;
-  const shuffled = shuffle(pool);
-  const picked = [];
-  const usedIds = new Set();
-  while (picked.length < slots) {
-    let added = false;
-    for (const def of shuffled) {
-      if (picked.length >= slots) break;
-      if (usedIds.has(def.id)) continue;
-      usedIds.add(def.id);
-      picked.push(def);
-      added = true;
-    }
-    if (!added) {
-      for (const def of shuffled) {
-        if (picked.length >= slots) break;
-        picked.push(def);
-      }
-      break;
-    }
-  }
+  const recent = state.calendar.recentTaskIds ?? [];
+  const picked = pickMonthlyTaskDefs(pool, slots, recent);
+  const dealtIds = picked.map((d) => d.id);
+  state.calendar.recentTaskIds = [...recent, ...dealtIds].slice(-slots * 3);
   state.calendar.monthTaskSlotTarget = slots;
   state.calendar.monthTasks = picked.map((def, index) => ({
     instanceId: `${state.calendar.year}-${state.calendar.monthIndex}-${def.id}-${index}`,
