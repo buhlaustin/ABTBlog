@@ -16,11 +16,13 @@ Open `/work/startup-sim/` (Next) or, after `npm run copy-work`, `/play/startup-s
 
 **Shipped (Phases 0–6):** core loop, staff/fundraising, XC/hubs, AI news/social/advisor, IPO endgame, CC0 stage icons, tutorials, a11y/mobile polish.
 
-**Phase 7 (in progress):** live AI, depth, meta, UX, **polish** — stage/hub backdrops, optional audio, Chirp counter, expanded public tasks (save v9).
+**Phase 7:** live AI, gameplay depth, meta, UX, polish, and ops (Playwright + AI smoke).
 
 ## Build & QA
 
 - `npm run smoke:startup-sim` — headless task-pool and module checks (also runs in `prebuild`)
+- `npm run e2e:startup-sim` — Playwright: new game → task → reload → continue (after `npm ci` + `npx playwright install chromium`)
+- `npm run smoke:startup-sim-ai` — narrative `startup_health` when `HOS_NARRATIVE_API_URL` is set; see `docs/startup-simulator-ai-smoke.md`
 - `npm run prebuild` — validates assets, smoke, copies to `public/play/`
 
 ## Saves

@@ -20,6 +20,8 @@ Merging that file to **`main`** triggers [`.github/workflows/deploy-hos-narrativ
 
 After deploy, the game probes `startup_health` on load; the title screen shows **AI narrative connected** when the live Lambda responds.
 
+Verify with `npm run smoke:startup-sim-ai` (health) or `node scripts/startup-sim-ai-smoke.mjs --full` before release — see [startup-simulator-ai-smoke.md](./startup-simulator-ai-smoke.md).
+
 ## Client-only changes
 
 Merging only `work/startup-sim/**` does **not** deploy Lambda. Production AI stays offline until `index.mjs` reaches `main`.

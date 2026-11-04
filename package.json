@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "eslint",
     "copy-work": "node scripts/copy-work-assets.mjs",
-    "smoke:startup-sim": "node scripts/startup-sim-smoke.mjs"
+    "smoke:startup-sim": "node scripts/startup-sim-smoke.mjs",
+    "smoke:startup-sim-ai": "node scripts/startup-sim-ai-smoke.mjs",
+    "e2e:startup-sim": "playwright test e2e/startup-sim.spec.js"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",
@@ -22,6 +24,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

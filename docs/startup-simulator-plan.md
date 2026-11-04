@@ -440,9 +440,9 @@ Ship criteria: **live narrative AI is required** for this phase (all five `kind`
 
 #### Ops & quality
 
-- [ ] **Playwright smoke** — new game → task → save → reload → continue in CI (complements `smoke:startup-sim`)
+- [x] **Playwright smoke** — `e2e/startup-sim.spec.js` + [startup-sim-ci.yml](../.github/workflows/startup-sim-ci.yml) (new game → task → reload → continue)
 - [x] **Save migration v7+** — explicit version steps through save **v9** (meta, sandbox tuning, pivot)
-- [ ] **AI integration smoke** — scripted or manual checklist hitting each `kind` against staging/production URL before release
+- [x] **AI integration smoke** — `scripts/startup-sim-ai-smoke.mjs` + [startup-simulator-ai-smoke.md](./startup-simulator-ai-smoke.md) (`--full` for all kinds)
 
 ---
 
