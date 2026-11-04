@@ -19,9 +19,10 @@
         </p>
       </header>
       <div class="start-actions">
+        <button id="btn-load" class="btn btn-ghost" type="button" disabled>Continue saved game</button>
         <button id="btn-new" class="btn btn-primary" type="button">New game</button>
-        <button id="btn-load" class="btn btn-ghost" type="button" disabled>Load save</button>
       </div>
+      <p id="start-save-hint" class="fine-print" hidden>Progress is saved automatically on your device. Use Continue to pick up where you left off.</p>
       <p id="start-api-status" class="fine-print" hidden></p>
     </section>
 
@@ -108,8 +109,8 @@
       </div>
 
       <footer class="game-footer">
-        <button id="btn-save" class="btn btn-ghost btn-small" type="button">Save</button>
-        <span id="save-status" class="save-status" hidden>Saved</span>
+        <span id="save-status" class="save-status fine-print" aria-live="polite" hidden>Auto-saved on this device</span>
+        <button id="btn-save" class="btn btn-ghost btn-small" type="button" title="Save now (progress also auto-saves)">Save</button>
         <button id="btn-back-start" class="btn btn-ghost btn-small" type="button">Main menu</button>
       </footer>
     </section>

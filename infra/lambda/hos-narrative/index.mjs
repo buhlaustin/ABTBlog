@@ -96,40 +96,6 @@ Context: ${ctx}`;
 No markdown. Context: ${ctx}`;
   }
 
-  if (kind === 'startup_xc_interview_score') {
-    return `You are a fictional X Combinator partner in the game "Startup Simulator". Score the founder's batch application.
-Return ONLY valid JSON (no markdown): {"accepted":true|false,"score":0-100,"feedback":"one short encouraging sentence"}
-Rules: Be LENIENT — this is a game, not real YC. Accept if answers show any real effort (≥2 substantive answers). Reject only if answers are empty or nonsense. score 65-95 on accept, 40-55 on reject.
-Context: ${ctx}`;
-  }
-
-  if (kind === 'startup_news_month') {
-    return `You write in-world news for the game "Startup Simulator". Return ONLY valid JSON:
-{"articles":[{"headline":"...","dek":"...","body":"2-4 sentences","source":"parody outlet name","date":"Y# M#"}]}
-Rules: exactly 3 or 4 articles. Use fictional/parody names (Macrohard, Financier Times, Chirp Business). NO real companies or living public figures. Mix world events from context.timelineEvents with reactions to the player's company snapshot. If layoffsPending>0 include one layoff story.
-Context: ${ctx}`;
-  }
-
-  if (kind === 'startup_social_reactions') {
-    return `You generate social reactions for Startup Simulator (ProNet/LinkedIn-like or Chirp/Twitter-like).
-Return ONLY valid JSON: {"likes":number,"reposts":number,"comments":[{"author":"name","text":"under 200 chars"}]}
-Rules: 1-3 comments, playful professional tone for pronet, punchy for chirp. Use persona names from context when fitting.
-Context: ${ctx}`;
-  }
-
-  if (kind === 'startup_advisor_chat') {
-    return `You are the founder's chief of staff in "Startup Simulator". Return ONLY valid JSON: {"reply":"under 120 words"}
-Rules: Suggest in-game actions (Desk tasks, staffing, fundraising, runway). NOT real financial/legal advice. Use context.snapshot and recent messages.
-Context: ${ctx}`;
-  }
-
-  if (kind === 'startup_ipo_press') {
-    return `You write a fictional IPO day story for "Startup Simulator". Return ONLY valid JSON:
-{"headline":"under 120 chars","dek":"one sentence under 200 chars"}
-Rules: Parody outlets only; no real companies or living public figures. Celebratory but lightly satirical tone.
-Context: ${ctx}`;
-  }
-
   const base = `You are the unseen narrator of "House of Strategy", a Big Brother-style social strategy game.
 Write ONE short feed line (1-3 sentences, under 280 characters). No markdown. No spoilers beyond the context.
 Do not invent evictions or wins that are not in context. Stay dramatic but plausible.`;
@@ -188,7 +154,6 @@ async function callOpenAI(apiKey, kind, context) {
   const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
   const prompt = buildPrompt(kind, context);
   const isEerInbox = kind === 'eer_daily_inbox';
-  const isStartupJson = kind.startsWith('startup_');
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -199,18 +164,12 @@ async function callOpenAI(apiKey, kind, context) {
     body: JSON.stringify({
       model,
       temperature: isEerInbox ? 0.9 : 0.85,
-      max_tokens: isEerInbox
-        ? 2200
-        : kind === 'startup_news_month'
-          ? 1800
-          : isStartupJson
-            ? 400
-            : 120,
+      max_tokens: isEerInbox ? 2200 : 120,
       messages: [
         {
           role: 'system',
-          content: isEerInbox || isStartupJson
-            ? 'You output strict JSON only for Startup Simulator and EER.'
+          content: isEerInbox
+            ? 'You write sharp corporate satire as strict JSON only.'
             : kind.startsWith('eer_')
               ? 'You write sharp corporate satire.'
               : 'You write punchy reality-TV narration.'
@@ -231,82 +190,7 @@ async function callOpenAI(apiKey, kind, context) {
   if (kind === 'eer_daily_inbox') {
     return parseEerInbox(text);
   }
-  if (kind === 'startup_xc_interview_score') {
-    return parseStartupXcScore(text);
-  }
-  if (kind === 'startup_news_month') {
-    return parseStartupNews(text);
-  }
-  if (kind === 'startup_social_reactions') {
-    return parseStartupSocial(text);
-  }
-  if (kind === 'startup_advisor_chat') {
-    return parseStartupAdvisor(text);
-  }
-  if (kind === 'startup_ipo_press') {
-    return parseStartupIpoPress(text);
-  }
   return text.replace(/^["']|["']$/g, '');
-}
-
-function parseJsonObject(text) {
-  const trimmed = text.trim();
-  const start = trimmed.indexOf('{');
-  const end = trimmed.lastIndexOf('}');
-  if (start < 0 || end <= start) throw new Error('No JSON object in response');
-  return JSON.parse(trimmed.slice(start, end + 1));
-}
-
-function parseStartupNews(text) {
-  const parsed = parseJsonObject(text);
-  const articles = Array.isArray(parsed.articles) ? parsed.articles : [];
-  return {
-    articles: articles.slice(0, 4).map((a) => ({
-      headline: String(a.headline ?? '').slice(0, 120),
-      dek: String(a.dek ?? '').slice(0, 200),
-      body: String(a.body ?? '').slice(0, 1200),
-      source: String(a.source ?? 'Parody Wire').slice(0, 80),
-      date: String(a.date ?? '').slice(0, 40)
-    }))
-  };
-}
-
-function parseStartupSocial(text) {
-  const parsed = parseJsonObject(text);
-  return {
-    likes: Math.max(0, Math.min(999, Math.round(Number(parsed.likes) || 0))),
-    reposts: Math.max(0, Math.min(999, Math.round(Number(parsed.reposts) || 0))),
-    comments: (parsed.comments ?? []).slice(0, 5).map((c) => ({
-      author: String(c.author ?? 'Anon').slice(0, 60),
-      text: String(c.text ?? '').slice(0, 280)
-    }))
-  };
-}
-
-function parseStartupAdvisor(text) {
-  const parsed = parseJsonObject(text);
-  return { reply: String(parsed.reply ?? parsed.text ?? 'Focus on runway and counted tasks.').slice(0, 600) };
-}
-
-function parseStartupIpoPress(text) {
-  const parsed = parseJsonObject(text);
-  return {
-    headline: String(parsed.headline ?? 'Shares begin trading').slice(0, 140),
-    dek: String(parsed.dek ?? '').slice(0, 280)
-  };
-}
-
-function parseStartupXcScore(text) {
-  const trimmed = text.trim();
-  const start = trimmed.indexOf('{');
-  const end = trimmed.lastIndexOf('}');
-  if (start < 0 || end <= start) throw new Error('No JSON in XC score response');
-  const parsed = JSON.parse(trimmed.slice(start, end + 1));
-  return {
-    accepted: Boolean(parsed.accepted),
-    score: Math.max(0, Math.min(100, Math.round(Number(parsed.score) || 70))),
-    feedback: String(parsed.feedback || 'Thanks for applying.').slice(0, 280)
-  };
 }
 
 export async function handler(event) {
@@ -346,21 +230,6 @@ export async function handler(event) {
     const result = await callOpenAI(apiKey, kind, context);
     if (kind === 'eer_daily_inbox') {
       return json(200, { emails: result, type: 'eer_inbox' }, event);
-    }
-    if (kind === 'startup_xc_interview_score') {
-      return json(200, { ...result, type: 'startup_xc_score' }, event);
-    }
-    if (kind === 'startup_news_month') {
-      return json(200, { ...result, type: 'startup_news' }, event);
-    }
-    if (kind === 'startup_social_reactions') {
-      return json(200, { ...result, type: 'startup_social' }, event);
-    }
-    if (kind === 'startup_advisor_chat') {
-      return json(200, { ...result, type: 'startup_advisor' }, event);
-    }
-    if (kind === 'startup_ipo_press') {
-      return json(200, { ...result, type: 'startup_ipo_press' }, event);
     }
     return json(200, { text: result, type: 'narrative' }, event);
   } catch (err) {

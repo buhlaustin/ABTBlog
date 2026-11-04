@@ -34,15 +34,29 @@ import {
   renderAllPanels,
   renderGameOver,
   setLoadButtonEnabled,
+  syncStartScreen,
   showDeskFeedback,
   showScreen
 } from './modules/UI.js';
 
 let sessionState = null;
 
+/** Persist run to localStorage so Continue works after refresh or leaving the page. */
+function persistProgress(silent = true) {
+  if (!sessionState) return false;
+  const ok = StorageManager.save(sessionState);
+  if (ok) {
+    setLoadButtonEnabled(true);
+    syncStartScreen();
+    if (!silent) flashSaveStatus(true);
+  }
+  return ok;
+}
+
 function refresh() {
   if (!sessionState) return;
   renderAllPanels(sessionState);
+  persistProgress(true);
   if (sessionState.flags?.gameOver) {
     renderGameOver(sessionState);
     showScreen('gameover');
@@ -394,7 +408,7 @@ function bindGameInteractions() {
 
   document.getElementById('btn-gameover-menu')?.addEventListener('click', () => {
     sessionState = null;
-    setLoadButtonEnabled(StorageManager.hasSave());
+    syncStartScreen();
     showScreen('start');
   });
 }
@@ -418,6 +432,7 @@ async function init() {
   bindGameInteractions();
 
   setLoadButtonEnabled(StorageManager.hasSave());
+  syncStartScreen();
 
   function flashLoadError(message) {
     const el = document.getElementById('start-api-status');
@@ -436,6 +451,12 @@ async function init() {
   }
 
   document.getElementById('btn-new')?.addEventListener('click', () => {
+    if (StorageManager.hasSave()) {
+      const ok = window.confirm(
+        'Start a new company? Your current saved run will be replaced when you enter the garage.'
+      );
+      if (!ok) return;
+    }
     showScreen('setup');
   });
 
@@ -455,20 +476,15 @@ async function init() {
   });
 
   document.getElementById('btn-back-start')?.addEventListener('click', () => {
-    if (sessionState && !sessionState.flags?.gameOver) {
-      StorageManager.save(sessionState);
-      setLoadButtonEnabled(true);
-    }
+    persistProgress(true);
     sessionState = null;
-    setLoadButtonEnabled(StorageManager.hasSave());
+    syncStartScreen();
     showScreen('start');
   });
 
   document.getElementById('btn-save')?.addEventListener('click', () => {
     if (!sessionState) return;
-    const ok = StorageManager.save(sessionState);
-    flashSaveStatus(ok);
-    setLoadButtonEnabled(StorageManager.hasSave());
+    persistProgress(false);
   });
 
   setupForm?.addEventListener('submit', (e) => {

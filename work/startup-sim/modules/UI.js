@@ -67,6 +67,34 @@ export function setLoadButtonEnabled(enabled) {
   btn.title = enabled ? 'Continue your saved company' : 'No save found';
 }
 
+/** Emphasize Continue when a local save exists. */
+export function syncStartScreen() {
+  const loadBtn = document.getElementById('btn-load');
+  const newBtn = document.getElementById('btn-new');
+  const hint = document.getElementById('start-save-hint');
+  const enabled = loadBtn && !loadBtn.disabled;
+
+  if (loadBtn) {
+    loadBtn.textContent = enabled ? 'Continue saved game' : 'Load save';
+  }
+  if (newBtn && loadBtn) {
+    if (enabled) {
+      loadBtn.classList.add('btn-primary');
+      loadBtn.classList.remove('btn-ghost');
+      newBtn.classList.remove('btn-primary');
+      newBtn.classList.add('btn-ghost');
+    } else {
+      loadBtn.classList.remove('btn-primary');
+      loadBtn.classList.add('btn-ghost');
+      newBtn.classList.add('btn-primary');
+      newBtn.classList.remove('btn-ghost');
+    }
+  }
+  if (hint) {
+    hint.hidden = !enabled;
+  }
+}
+
 export function renderGameHud(state) {
   const company = document.getElementById('hud-company');
   const stage = document.getElementById('hud-stage');
@@ -231,6 +259,13 @@ export function bindTabNavigation() {
 }
 
 export function renderAllPanels(state) {
+  const saveHint = document.getElementById('save-status');
+  if (saveHint && !saveHint.classList.contains('error')) {
+    saveHint.hidden = false;
+    if (saveHint.textContent !== 'Saved locally' && saveHint.textContent !== 'Save failed') {
+      saveHint.textContent = 'Auto-saved on this device';
+    }
+  }
   renderGameHud(state);
   renderDeskPanel(state);
 
@@ -309,9 +344,14 @@ export function renderGameOver(state) {
 export function flashSaveStatus(ok) {
   const el = document.getElementById('save-status');
   if (!el) return;
-  el.textContent = ok ? 'Saved' : 'Save failed';
+  el.textContent = ok ? 'Saved locally' : 'Save failed';
+  el.classList.toggle('error', !ok);
   el.hidden = false;
-  setTimeout(() => {
-    el.hidden = true;
-  }, 2000);
+  if (ok) {
+    setTimeout(() => {
+      if (el.textContent === 'Saved locally') {
+        el.textContent = 'Auto-saved on this device';
+      }
+    }, 2500);
+  }
 }

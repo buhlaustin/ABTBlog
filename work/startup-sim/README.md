@@ -21,6 +21,12 @@ Open `/work/startup-sim/` (Next) or, after `npm run copy-work`, `/play/startup-s
 - `npm run smoke:startup-sim` — headless task-pool and module checks (also runs in `prebuild`)
 - `npm run prebuild` — validates assets, smoke, copies to `public/play/`
 
-## Production AI (optional)
+## Saves
 
-Redeploy the shared **`hos-narrative`** Lambda after prompt changes; the game uses offline fallbacks when the narrative URL is unavailable.
+Progress is stored in **`localStorage`** on this device (`startup_sim_save_v1`). The game **auto-saves** after tasks, month close, and most actions; use **Continue saved game** on the title screen to resume. **New game** replaces the save when you start a new company.
+
+## Production AI (optional, deploy when ready)
+
+Live AI needs Startup kinds on the shared **`hos-narrative`** Lambda. A ready-to-copy handler lives at `docs/startup-simulator-hos-narrative-index.mjs` — see `docs/startup-simulator-lambda-deploy.md`. Until that is deployed, offline fallbacks work for all AI features.
+
+Merging the game without changing `infra/lambda/hos-narrative/index.mjs` does **not** update production Lambda. Pushing a change to **`index.mjs`** on **`main`** triggers the **Deploy HOS narrative API** workflow.
