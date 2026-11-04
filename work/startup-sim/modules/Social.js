@@ -3,7 +3,7 @@ import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 
 let personasCache = null;
-const CHIRP_LIMIT = 240;
+export const CHIRP_LIMIT = 240;
 
 export function createInitialSocial() {
   return {
@@ -173,6 +173,11 @@ export function renderSocialPanel(container, state) {
     </nav>
     <form id="social-post-form" class="setup-form">
       <textarea id="social-post-text" rows="2" maxlength="${active === 'chirp' ? CHIRP_LIMIT : 600}" placeholder="${active === 'chirp' ? 'What is happening?' : 'Share an update with your network…'}"></textarea>
+      ${
+        active === 'chirp'
+          ? `<p id="chirp-char-count" class="chirp-char-count" aria-live="polite">0 / ${CHIRP_LIMIT}</p>`
+          : ''
+      }
       <button type="submit" class="btn btn-primary btn-small">Post</button>
     </form>
     <div class="social-feed ${active === 'chirp' ? 'theme-chirp' : 'theme-pronet'}">
@@ -185,6 +190,15 @@ export function renderSocialPanel(container, state) {
 export function setSocialNetwork(state, network) {
   if (!state.social) state.social = createInitialSocial();
   state.social.activeNetwork = network === 'chirp' ? 'chirp' : 'pronet';
+}
+
+export function updateChirpCharCount(text) {
+  const el = document.getElementById('chirp-char-count');
+  if (!el) return;
+  const len = String(text ?? '').length;
+  el.textContent = `${len} / ${CHIRP_LIMIT}`;
+  el.classList.toggle('chirp-char-warn', len > CHIRP_LIMIT - 25);
+  el.classList.toggle('chirp-char-over', len >= CHIRP_LIMIT);
 }
 
 export function showSocialFeedback(message, isError = false) {

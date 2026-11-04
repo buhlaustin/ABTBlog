@@ -56,6 +56,62 @@ textarea:focus-visible {
   padding: 1.5rem 1rem 3rem;
 }
 
+#screen-game {
+  --stage-backdrop: none;
+  background-color: var(--bg, #0a0e14);
+  background-image: linear-gradient(
+      180deg,
+      rgba(10, 14, 20, 0.94) 0%,
+      rgba(10, 14, 20, 0.9) 50%,
+      rgba(10, 14, 20, 0.82) 100%
+    ),
+    var(--stage-backdrop);
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
+.game-panels,
+.game-tabs,
+.hud {
+  position: relative;
+  z-index: 1;
+}
+
+.audio-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.chirp-char-count {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.chirp-char-count.chirp-char-warn {
+  color: #fbbf24;
+}
+
+.chirp-char-count.chirp-char-over {
+  color: #f87171;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .screen[hidden] {
   display: none !important;
 }

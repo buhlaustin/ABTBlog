@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="p" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a1628"/>
+      <stop offset="100%" stop-color="#1a2840"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="120" fill="url(#p)"/>
+  <rect x="60" y="30" width="680" height="8" fill="#3dd68c" opacity="0.35"/>
+  <text x="400" y="75" text-anchor="middle" fill="#5b9cff" font-family="system-ui,sans-serif" font-size="28" font-weight="700" opacity="0.25">NYSE-ish</text>
+  <rect x="100" y="50" width="600" height="55" fill="#101820" stroke="#3dd68c" stroke-width="2" opacity="0.6"/>
+</svg>

@@ -9,7 +9,8 @@ import { renderAdvisorPanel } from './Advisor.js';
 import { getTaskDef, pendingTasks, canEndMonth } from './Tasks.js';
 import { hasActiveCrisis } from './Crisis.js';
 import { isPublicCompany, founderStakeValue } from './IPO.js';
-import { stageIconUrl } from './Assets.js';
+import { stageIconUrl, applyGameBackdrop } from './Assets.js';
+import { playUiClick } from './Audio.js';
 import { activeTutorialStep, renderTutorialBanner } from './Tutorial.js';
 import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
@@ -118,6 +119,7 @@ export function renderGameHud(state) {
     stageArt.src = stageIconUrl(state.stage);
     stageArt.alt = stageLabel(state.stage);
   }
+  applyGameBackdrop(state);
   if (company) company.textContent = state.company.name;
   if (stage) stage.textContent = stageLabel(state.stage);
   if (cash) cash.textContent = formatMoney(state.finance.cash);
@@ -248,8 +250,9 @@ export const TAB_ORDER = [
 export function selectTab(tabId) {
   const nav = document.getElementById('game-tabs');
   if (!nav) return;
-  const btn = nav.querySelector(`[data-tab="${tabId}"]`);
-  btn?.click();
+  if (!nav.querySelector(`[data-tab="${tabId}"]`)) return;
+  activateTab(nav, tabId);
+  playUiClick();
 }
 
 function activateTab(nav, tab) {
@@ -274,6 +277,7 @@ export function bindTabNavigation() {
     const btn = e.target.closest('[data-tab]');
     if (!btn) return;
     activateTab(nav, btn.dataset.tab);
+    playUiClick();
   });
 
   nav.addEventListener('keydown', (e) => {

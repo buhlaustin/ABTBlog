@@ -433,10 +433,10 @@ Ship criteria: **live narrative AI is required** for this phase (all five `kind`
 
 #### Content & polish
 
-- [ ] **Commons art pass** — stage backgrounds, hub skylines from manifest (beyond Phase 6 icons)
-- [ ] **Audio** — CC0 UI clicks + optional month-close chime (off by default)
-- [ ] **Chirp character counter** — live count toward 240 while typing
-- [ ] **Public-era task variety** — expand pool beyond minimum slot count to reduce repetition
+- [x] **Commons art pass** — stage backgrounds, hub skylines from manifest (beyond Phase 6 icons)
+- [x] **Audio** — CC0 UI clicks + optional month-close chime (off by default)
+- [x] **Chirp character counter** — live count toward 240 while typing
+- [x] **Public-era task variety** — expand pool beyond minimum slot count to reduce repetition
 
 #### Ops & quality
 

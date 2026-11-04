@@ -49,6 +49,13 @@ import { applyPivot } from './modules/Pivot.js';
 import { openMonthSummaryDialog } from './modules/MonthSummary.js';
 import { copyRunExportToClipboard } from './modules/RunExport.js';
 import {
+  setAudioEnabled,
+  syncAudioToggleCheckbox,
+  playMonthCloseChime,
+  playUiClick
+} from './modules/Audio.js';
+import { updateChirpCharCount } from './modules/Social.js';
+import {
   bindSandboxCashToggle,
   bindTabNavigation,
   bindGameKeyboardShortcuts,
@@ -203,6 +210,7 @@ function handleCompleteTask(instanceId) {
   }
 
   showDeskFeedback(`Task complete: +${formatMoney(revenue)} revenue`);
+  playUiClick();
   refresh();
 }
 
@@ -242,6 +250,7 @@ async function handleEndMonth() {
   const headline = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
   if (result.monthSummary) {
     await openMonthSummaryDialog(sessionState, result.monthSummary, headline);
+    playMonthCloseChime();
   }
   showDeskFeedback('Month closed. New tasks dealt.');
   refresh();
@@ -508,6 +517,12 @@ function bindGameInteractions() {
     }
   });
 
+  app?.addEventListener('input', (e) => {
+    if (e.target.id === 'social-post-text') {
+      updateChirpCharCount(e.target.value);
+    }
+  });
+
   app?.addEventListener('change', (e) => {
     const input = e.target.closest('[data-staff-input]');
     if (!input || !sessionState) return;
@@ -612,6 +627,10 @@ async function init() {
   syncStartScreen();
   syncContinueOnOpenOffer(hasSave);
   renderHallOfFameBlock(document.getElementById('hall-of-fame'));
+  syncAudioToggleCheckbox();
+  document.getElementById('toggle-audio')?.addEventListener('change', (e) => {
+    setAudioEnabled(e.target.checked);
+  });
 
   function flashLoadError(message) {
     const el = document.getElementById('start-api-status');

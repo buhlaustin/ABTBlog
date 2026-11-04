@@ -16,7 +16,7 @@ Open `/work/startup-sim/` (Next) or, after `npm run copy-work`, `/play/startup-s
 
 **Shipped (Phases 0–6):** core loop, staff/fundraising, XC/hubs, AI news/social/advisor, IPO endgame, CC0 stage icons, tutorials, a11y/mobile polish.
 
-**Phase 7 (in progress):** live AI, gameplay depth, meta, **UX** — continue on open, month-end summary, keyboard shortcuts, run export (save v9).
+**Phase 7 (in progress):** live AI, depth, meta, UX, **polish** — stage/hub backdrops, optional audio, Chirp counter, expanded public tasks (save v9).
 
 ## Build & QA
 

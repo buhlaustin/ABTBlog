@@ -35,3 +35,41 @@ export function stageIconPath(stage) {
 export function stageIconUrl(stage) {
   return assetUrl(stageIconPath(stage));
 }
+
+const STAGE_BACKDROP = {
+  [STAGES.GARAGE]: 'assets/backgrounds/garage-bg.svg',
+  [STAGES.OFFICE]: 'assets/backgrounds/office-bg.svg',
+  [STAGES.XC]: 'assets/backgrounds/skyline-bg.svg',
+  [STAGES.POST_XC]: 'assets/backgrounds/skyline-bg.svg',
+  [STAGES.PUBLIC]: 'assets/backgrounds/public-bg.svg'
+};
+
+const HUB_BACKDROP = {
+  bay: 'assets/backgrounds/hub-bay.svg',
+  nyc: 'assets/backgrounds/hub-nyc.svg',
+  miami: 'assets/backgrounds/hub-miami.svg',
+  dallas: 'assets/backgrounds/hub-dallas.svg',
+  atlanta: 'assets/backgrounds/hub-atlanta.svg'
+};
+
+/** Wide stage / hub backdrop for the main game shell. */
+export function gameBackdropUrl(state) {
+  const hubId = state?.offices?.hubId;
+  const stage = state?.stage ?? STAGES.GARAGE;
+  if (
+    hubId &&
+    HUB_BACKDROP[hubId] &&
+    (stage === STAGES.POST_XC || stage === STAGES.PUBLIC)
+  ) {
+    return assetUrl(HUB_BACKDROP[hubId]);
+  }
+  const rel = STAGE_BACKDROP[stage] ?? STAGE_BACKDROP[STAGES.GARAGE];
+  return assetUrl(rel);
+}
+
+export function applyGameBackdrop(state) {
+  const screen = document.getElementById('screen-game');
+  if (!screen) return;
+  const url = gameBackdropUrl(state);
+  screen.style.setProperty('--stage-backdrop', `url("${url}")`);
+}

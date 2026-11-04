@@ -808,6 +808,96 @@
       ],
       "product": 1,
       "buzz": 4
+    },
+    {
+      "id": "public-investor-day",
+      "title": "Investor day webcast",
+      "description": "Analysts pretend to understand your TAM.",
+      "stages": [
+        "public"
+      ],
+      "cost": 12000,
+      "revenue": [
+        45000,
+        165000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "public-stock-buyback",
+      "title": "Announce buyback theater",
+      "description": "Board approves returning cash you do not have yet.",
+      "stages": [
+        "public"
+      ],
+      "cost": 25000,
+      "revenue": [
+        20000,
+        95000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "public-activist-response",
+      "title": "Activist investor response",
+      "description": "Open letter, closed door, public tweetstorm.",
+      "stages": [
+        "public"
+      ],
+      "cost": 8000,
+      "revenue": [
+        35000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "public-ma-rumor",
+      "title": "M&A rumor management",
+      "description": "Deny the merger talks you started.",
+      "stages": [
+        "public"
+      ],
+      "cost": 5000,
+      "revenue": [
+        60000,
+        220000
+      ],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "public-product-keynote",
+      "title": "Product keynote livestream",
+      "description": "Demo gods must be appeased.",
+      "stages": [
+        "public"
+      ],
+      "cost": 14000,
+      "revenue": [
+        55000,
+        190000
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "public-regulatory-filing",
+      "title": "Regulatory filing sprint",
+      "description": "Lawyers bill, stock ticks.",
+      "stages": [
+        "public"
+      ],
+      "cost": 18000,
+      "revenue": [
+        40000,
+        155000
+      ],
+      "product": 0,
+      "buzz": 0
     }
   ]
 }
