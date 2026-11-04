@@ -32,7 +32,13 @@ export function renderMonthSummaryContent(container, state, summary, headlineTea
     <div class="summary-grid">
       <div><span class="stat-label">Cash</span><span class="stat-value">${formatMoney(summary.cashAfter)}</span></div>
       <div><span class="stat-label">Month revenue</span><span class="stat-value">${formatMoney(summary.monthRevenue)}</span></div>
+      <div><span class="stat-label">ARR (after close)</span><span class="stat-value">${formatMoney(summary.arrAfter ?? 0)}</span></div>
       <div><span class="stat-label">Overhead</span><span class="stat-value">${formatMoney(summary.burn)}</span></div>
+      ${
+        summary.growthCampaignsClosed
+          ? `<div><span class="stat-label">Growth campaigns</span><span class="stat-value">${summary.growthCampaignsClosed}</span></div>`
+          : ''
+      }
       <div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(runwayLabel(state))}</span></div>
       ${stockBlock}
     </div>

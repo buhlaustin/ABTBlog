@@ -29,8 +29,10 @@ import { competitorRevenueMult } from './Competitor.js';
 import {
   getTaskRevenueMultiplierPreview,
   getCoreTaskRevenueMult,
-  getSandboxTuningMult
+  getSandboxTuningMult,
+  estimateTaskPayoutBand
 } from './Finance.js';
+import { progressionTierLabel } from './ProgressionEconomy.js';
 import { renderGrowthCampaignsBlock } from './GrowthCampaigns.js';
 
 const screens = {
@@ -208,10 +210,11 @@ export function renderDeskPanel(state) {
         inst.status === 'pending'
           ? `<button type="button" class="btn btn-primary btn-small" data-complete-task="${escapeHtml(inst.instanceId)}">Complete</button>`
           : '<span class="task-done-label">Done</span>';
+      const band = estimateTaskPayoutBand(def, state);
       return `<article class="${doneClass}">
         <h3>${escapeHtml(def.title)}</h3>
         <p>${escapeHtml(def.description)}</p>
-        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Revenue band ${formatMoney(def.revenue?.[0] ?? 0)}–${formatMoney(def.revenue?.[1] ?? 0)}</p>
+        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×</p>
         ${btn}
       </article>`;
     })
@@ -242,6 +245,8 @@ export function renderDeskPanel(state) {
       <div><span class="stat-label">This month</span><span class="stat-value">+${formatMoney(monthRev)} / -${formatMoney(monthSpend)}</span></div>
       <div><span class="stat-label">Next gate</span><span class="stat-value">${escapeHtml(ms)}</span></div>
       <div><span class="stat-label">Pending</span><span class="stat-value">${pending.length}</span></div>
+      <div><span class="stat-label">Scale era</span><span class="stat-value">${escapeHtml(progressionTierLabel(state))}</span></div>
+      <div><span class="stat-label">Rev. mult</span><span class="stat-value">${getTaskRevenueMultiplierPreview(state).toFixed(2)}×</span></div>
     </div>
     ${
       lineupOpen
@@ -453,10 +458,12 @@ export function renderGrowthPanel(container, state) {
   const coreMult = getCoreTaskRevenueMult(state);
   const tuneMult = getSandboxTuningMult(state);
   const totalMult = getTaskRevenueMultiplierPreview(state);
+  const era = progressionTierLabel(state);
+  const growthRuns = (state.growth?.campaignsThisMonth ?? []).length;
   const multNote =
     state.mode === 'sandbox' && tuneMult !== 1
-      ? `<p class="fine-print">Desk &amp; Growth revenue: <strong>${coreMult.toFixed(2)}×</strong> progression stack × <strong>${tuneMult.toFixed(2)}×</strong> sandbox overlay = <strong>${totalMult.toFixed(2)}×</strong>.</p>`
-      : `<p class="fine-print">Desk &amp; Growth effective revenue multiplier: <strong>${totalMult.toFixed(2)}×</strong> (rounds, HQ, staff, buzz).</p>`;
+      ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong>${growthRuns ? ` · ${growthRuns} campaign(s) launched this month` : ''}.</p>`
+      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — effective multiplier <strong>${totalMult.toFixed(2)}×</strong>${growthRuns ? ` · ${growthRuns} campaign(s) this month` : ''}.</p>`;
 
   container.innerHTML = `
     <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks and paid campaigns below share the same multiplier math.</p>

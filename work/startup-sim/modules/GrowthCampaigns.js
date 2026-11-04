@@ -1,8 +1,13 @@
 import bundled from '../data/growth-campaigns.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
-import { formatMoney } from './constants.js';
 import { progressionTier } from './ProgressionEconomy.js';
-import { recordCashOutflow, getCoreTaskRevenueMult, applySandboxRevenueTuning } from './Finance.js';
+import {
+  recordCashOutflow,
+  getCoreTaskRevenueMult,
+  applySandboxRevenueTuning,
+  getTaskRevenueMultiplierPreview
+} from './Finance.js';
+import { formatMoney } from './constants.js';
 
 let catalog = bundled;
 
@@ -83,14 +88,17 @@ export function renderGrowthCampaignsBlock(state) {
   if (!campaigns.length) {
     return '<p class="fine-print">No paid growth plays unlocked yet — close seed and scale ARR for billboards and beyond.</p>';
   }
+  const mult = getTaskRevenueMultiplierPreview(state);
   const cards = campaigns
-    .map(
-      (c) => `<div class="finance-action">
+    .map((c) => {
+      const r0 = Math.round((c.revenue?.[0] ?? 0) * mult * 0.5);
+      const r1 = Math.round((c.revenue?.[1] ?? 0) * mult);
+      return `<div class="finance-action">
         <p><strong>${escapeHtml(c.title)}</strong> — ${escapeHtml(c.description)}</p>
-        <p class="fine-print">Cost ${formatMoney(c.cost)} · optional · does not use desk slots · buzz +${c.buzz ?? 0}</p>
+        <p class="fine-print">Cost ${formatMoney(c.cost)} · typical book ${formatMoney(r0)}–${formatMoney(r1)} at ${mult.toFixed(2)}× · buzz +${c.buzz ?? 0} · no desk slot</p>
         <button type="button" class="btn btn-ghost btn-small" data-run-growth="${escapeHtml(c.id)}">Launch</button>
-      </div>`
-    )
+      </div>`;
+    })
     .join('');
   return `<h3 class="log-head">Paid growth (Growth tab)</h3>${cards}`;
 }

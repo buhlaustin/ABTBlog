@@ -76,6 +76,16 @@ export function getTaskRevenueMultiplierPreview(state) {
   return applySandboxRevenueTuning(state, getCoreTaskRevenueMult(state));
 }
 
+/** Rough desk payout range at current mult (before per-task headcount roll variance). */
+export function estimateTaskPayoutBand(taskDef, state) {
+  const [rMin, rMax] = taskDef?.revenue ?? [0, 0];
+  const eff = getTaskRevenueMultiplierPreview(state);
+  return {
+    min: Math.round(rMin * eff * 0.45),
+    max: Math.round(rMax * eff * 1.05)
+  };
+}
+
 export function projectMonthlyBurn(state) {
   const headcount = state.staff?.headcountByDept ?? {};
   const payroll = computePayroll(headcount, state.stage, state);

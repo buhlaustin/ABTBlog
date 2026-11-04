@@ -13,6 +13,12 @@ import { completeBoardTask } from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
 import { runGrowthCampaign, loadGrowthCampaigns } from './modules/GrowthCampaigns.js';
+import { openGrowthCampaignOutcomeDialog } from './modules/GrowthOutcome.js';
+import {
+  getCoreTaskRevenueMult,
+  getSandboxTuningMult,
+  getTaskRevenueMultiplierPreview
+} from './modules/Finance.js';
 import { runProductAction, showProductActionFeedback } from './modules/ProductActions.js';
 import {
   initNarrativeApiUrl,
@@ -623,18 +629,36 @@ function bindGameInteractions() {
 
     const growthBtn = e.target.closest('[data-run-growth]');
     if (growthBtn && sessionState) {
-      const id = growthBtn.getAttribute('data-run-growth');
-      const result = runGrowthCampaign(sessionState, id);
-      if (!result.ok) {
-        setGameFeedback(result.reason || 'Could not launch campaign.', true);
-      } else {
+      void (async () => {
+        const id = growthBtn.getAttribute('data-run-growth');
+        const result = runGrowthCampaign(sessionState, id);
+        if (!result.ok) {
+          setGameFeedback(result.reason || 'Could not launch campaign.', true);
+          refresh();
+          return;
+        }
         appendLog(
           sessionState,
           `Growth: ${result.def.title} — spent ${formatMoney(result.cost)}, booked ${formatMoney(result.revenue)}.`
         );
+        refresh();
+        const core = getCoreTaskRevenueMult(sessionState);
+        const tune = getSandboxTuningMult(sessionState);
+        const total = getTaskRevenueMultiplierPreview(sessionState);
+        const multLine =
+          sessionState.mode === 'sandbox' && tune !== 1
+            ? `${core.toFixed(2)}× progression × ${tune.toFixed(2)}× sandbox = ${total.toFixed(2)}× on this payout.`
+            : `${total.toFixed(2)}× effective multiplier on this payout.`;
+        await openGrowthCampaignOutcomeDialog({
+          title: result.def.title,
+          cost: result.cost,
+          revenue: result.revenue,
+          buzzDelta: result.def.buzz ?? 0,
+          multLine
+        });
         setGameFeedback(`${result.def.title} launched.`);
-      }
-      refresh();
+        refresh();
+      })();
       return;
     }
 

@@ -78,6 +78,7 @@ export function endMonth(state) {
   const closedYear = state.calendar.year;
   const closedMonthIndex = state.calendar.monthIndex;
   const monthRevenue = state.calendar.monthRevenue ?? 0;
+  const growthCampaignsClosed = state.growth?.campaignsThisMonth?.length ?? 0;
   const burn = resolveMonthEndBurn(state);
   onMonthEndSentiment(state, priorMonthRevenue, state.finance?.monthlyRevenue ?? 0);
   let stockDeltaPct = null;
@@ -136,7 +137,9 @@ export function endMonth(state) {
         monthRevenue,
         burn,
         cashAfter: state.finance.cash,
-        stockDeltaPct
+        stockDeltaPct,
+        growthCampaignsClosed,
+        arrAfter: state.finance.arr ?? 0
       }
     };
   }
@@ -154,7 +157,9 @@ export function endMonth(state) {
       monthRevenue,
       burn,
       cashAfter,
-      stockDeltaPct
+      stockDeltaPct,
+      growthCampaignsClosed,
+      arrAfter: state.finance.arr ?? 0
     }
   };
 }

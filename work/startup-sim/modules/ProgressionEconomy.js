@@ -17,6 +17,21 @@ export function progressionTier(state) {
   return 0;
 }
 
+const TIER_LABELS = [
+  'Early startup',
+  'Post-batch scaling',
+  'Seed stage',
+  'Series A scale',
+  'Series B growth',
+  'Company HQ era',
+  'Global hub sprint',
+  'Public company'
+];
+
+export function progressionTierLabel(state) {
+  return TIER_LABELS[progressionTier(state)] ?? 'Scaling';
+}
+
 /** Multiplier stack for desk tasks + growth campaigns — path to $1B ARR. */
 export function progressionRevenueMult(state) {
   let m = 1;
