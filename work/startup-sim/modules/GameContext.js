@@ -16,6 +16,7 @@ export function buildGameSnapshot(state) {
     burn,
     runwayMonths: burn > 0 ? Math.round((cash / burn) * 10) / 10 : null,
     lifetimeRevenue: state.finance?.lifetimeRevenue ?? 0,
+    arr: state.finance?.arr ?? (state.finance?.mrr ?? 0) * 12,
     lastMonthRevenue: state.finance?.monthlyRevenue ?? 0,
     mrr: state.finance?.mrr ?? 0,
     valuation: state.finance?.valuation ?? null,

@@ -1,0 +1,40 @@
+{
+  "tasks": [
+    {
+      "id": "board-governance-pack",
+      "title": "Refresh board deck",
+      "description": "Send ARR, burn, and hiring plan before the next check-in.",
+      "cost": 400,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 2
+    },
+    {
+      "id": "board-comp-plan",
+      "title": "Comp committee prep",
+      "description": "Benchmark exec salaries so the board stops side-eyeing your option pool.",
+      "cost": 800,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3
+    },
+    {
+      "id": "board-audit-committee",
+      "title": "Audit committee call",
+      "description": "Walk through controls before someone asks about SOC2 again.",
+      "cost": 1200,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 2
+    },
+    {
+      "id": "board-strategy-offsite",
+      "title": "Board strategy offsite",
+      "description": "Two days of sticky notes and one actionable decision.",
+      "cost": 3500,
+      "revenue": [0, 0],
+      "buzz": 2,
+      "sentiment": 4
+    }
+  ]
+}

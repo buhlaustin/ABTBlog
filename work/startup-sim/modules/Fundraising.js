@@ -19,7 +19,7 @@ export function canCloseSeed(state) {
   return Boolean(
     state.flags?.xcAccepted &&
       state.flags?.xcResidencyComplete &&
-      state.offices?.hubId &&
+      state.workspace?.smallOfficeOwned &&
       !state.flags?.seedRoundClosed
   );
 }
@@ -71,11 +71,11 @@ export function renderFinancePanel(container, state) {
   } else if (xcWaitingForRetry(state)) {
     xcBlock = `<p class="fine-print">XC waitlist — finish this month and reapply next month with sharper metrics.</p>`;
   } else if (isInResidency(state)) {
-    xcBlock = `<p class="fine-print">In SF batch — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) remaining before hub selection.</p>`;
+    xcBlock = `<p class="fine-print">In SF batch — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) remaining. Desk tasks are XC-only.</p>`;
   } else if (state.flags?.xcAccepted) {
     xcBlock = `<p class="fine-print">XC SAFE closed — ${formatMoney(500_000)} on the balance sheet.</p>`;
   } else {
-    xcBlock = `<p class="fine-print">Reach ${formatMoney(500_000)} lifetime revenue to unlock XC.</p>`;
+    xcBlock = `<p class="fine-print">Reach ${formatMoney(100_000)} ARR to unlock XC.</p>`;
   }
 
   const sentimentBlock = `<div class="sentiment-meter" role="meter" aria-valuenow="${sentimentScore}" aria-valuemin="0" aria-valuemax="100">

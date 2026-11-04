@@ -1,13 +1,14 @@
-import { formatMoney, MODE_CONFIG, fixedCostsForStage } from './constants.js';
+import { formatMoney, MODE_CONFIG } from './constants.js';
 import { computePayroll, staffRevenueMultiplier } from './Staff.js';
 import { satelliteRent } from './Offices.js';
+import { workspaceRentMonthly, getArr } from './Workspace.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
 
 /** Post-seed scaling so late-game tasks can reach the $1B gate in a reasonable run. */
 export function scalingRevenueMult(state) {
   if (!state.flags?.seedRoundClosed) return 1;
-  const r = state.finance?.lifetimeRevenue ?? 0;
+  const r = getArr(state);
   if (r < 500_000) return 1;
   const base = 1 + Math.min(140, (r / 4_000_000) ** 0.62);
   const sandbox = state.mode === 'sandbox' ? 1.2 : 1;
@@ -25,10 +26,7 @@ export function hubCostMult(state) {
 export function projectMonthlyBurn(state) {
   const headcount = state.staff?.headcountByDept ?? {};
   const payroll = computePayroll(headcount, state.stage, state);
-  let fixed =
-    typeof state.finance?.fixedCostsMonthly === 'number'
-      ? state.finance.fixedCostsMonthly
-      : fixedCostsForStage(state.stage);
+  let fixed = workspaceRentMonthly(state);
   fixed = Math.round(fixed * hubCostMult(state));
   return payroll + fixed + satelliteRent(state);
 }
@@ -82,6 +80,7 @@ export function resolveMonthEndBurn(state) {
   state.finance.monthlyBurn = burn;
   state.finance.monthlyRevenue = state.calendar.monthRevenue ?? 0;
   state.finance.mrr = Math.round(state.finance.monthlyRevenue);
+  state.finance.arr = Math.round(state.finance.mrr * 12);
   return burn;
 }
 

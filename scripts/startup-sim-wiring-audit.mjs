@@ -23,7 +23,7 @@ const dataAttrs = new Set();
 for (const { text } of sources) {
   for (const m of text.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) btnIds.add(m[1]);
   for (const m of text.matchAll(/\bid='(btn-[a-z0-9-]+)'/g)) btnIds.add(m[1]);
-  for (const m of text.matchAll(/data-(complete-task|staff-delta|remove-satellite|crisis-choice|social-tab|staff-input|tutorial-id)/g)) {
+  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace)/g)) {
     dataAttrs.add(m[1]);
   }
 }
@@ -40,7 +40,9 @@ const externalBtnHandlers = new Set([
   'btn-gameover-menu',
   'btn-export-run',
   'btn-start-game',
-  'btn-month-summary-close'
+  'btn-month-summary-close',
+  'btn-confirm-task-lineup',
+  'btn-hire-coo'
 ]);
 
 const unhandled = [];
@@ -63,7 +65,10 @@ const dataPatterns = {
   'crisis-choice': "closest('[data-crisis-choice]')",
   'social-tab': "closest('[data-social-tab]')",
   'staff-input': "closest('[data-staff-input]')",
-  'tutorial-id': 'btn-dismiss-tutorial'
+  'tutorial-id': 'btn-dismiss-tutorial',
+  'toggle-task-offer': "closest('[data-toggle-task-offer]')",
+  'purchase-workspace': "closest('[data-purchase-workspace]')",
+  'complete-board-task': "closest('[data-complete-board-task]')"
 };
 
 for (const attr of dataAttrs) {

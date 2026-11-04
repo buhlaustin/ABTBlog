@@ -8,9 +8,10 @@ export const STAGES = {
   PUBLIC: 'public'
 };
 
+/** @deprecated Use ARR_GATES in Workspace.js — kept for sandbox IPO default. */
 export const REVENUE_GATES = {
-  OFFICE: 50_000,
-  XC: 500_000,
+  OFFICE: 10_000,
+  XC: 100_000,
   IPO: 1_000_000_000
 };
 
@@ -56,7 +57,7 @@ export function formatMoney(n) {
   return `$${Math.round(v).toLocaleString()}`;
 }
 
-/** Counted task slots per month (staff/finance actions excluded). */
+/** Active desk slots to complete each month. */
 export function getMonthlyTaskSlots(stage) {
   switch (stage) {
     case STAGES.GARAGE:
@@ -72,6 +73,12 @@ export function getMonthlyTaskSlots(stage) {
     default:
       return 4;
   }
+}
+
+/** How many tasks are offered on the desk before the player picks their lineup. */
+export function getMonthlyTaskOfferCount(stage) {
+  const slots = getMonthlyTaskSlots(stage);
+  return slots + 2;
 }
 
 export function stageLabel(stage) {

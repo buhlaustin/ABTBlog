@@ -53,21 +53,27 @@ export function onStockSentiment(state, deltaPct) {
   else if (deltaPct >= 0.08) adjustSentiment(state, 3, 'Public market pop helped morale in the boardroom.');
 }
 
+export function onBoardSentiment(state, delta) {
+  adjustSentiment(state, delta, 'Board task completed.');
+}
+
 export function canRaiseSeriesA(state) {
+  const arr = state.finance?.arr ?? 0;
   return Boolean(
     state.flags?.seedRoundClosed &&
       !state.flags?.seriesAClosed &&
       !state.flags?.ipoFiled &&
-      (state.finance?.lifetimeRevenue ?? 0) >= 2_000_000
+      arr >= 2_000_000
   );
 }
 
 export function canRaiseSeriesB(state) {
+  const arr = state.finance?.arr ?? 0;
   return Boolean(
     state.flags?.seriesAClosed &&
       !state.flags?.seriesBClosed &&
       !state.flags?.ipoFiled &&
-      (state.finance?.lifetimeRevenue ?? 0) >= 12_000_000
+      arr >= 12_000_000
   );
 }
 

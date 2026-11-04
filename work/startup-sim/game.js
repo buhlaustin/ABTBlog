@@ -5,9 +5,13 @@ import {
   loadTaskCatalog,
   getTaskDef,
   getTaskDefinitions,
-  dealMonthlyTasks,
-  isTaskCatalogReady
+  isTaskCatalogReady,
+  toggleTaskOffer,
+  confirmTaskLineup
 } from './modules/Tasks.js';
+import { completeBoardTask } from './modules/Board.js';
+import { purchaseWorkspaceTier } from './modules/Workspace.js';
+import { hireCoo } from './modules/Executives.js';
 import {
   initNarrativeApiUrl,
   isNarrativeApiEnabled,
@@ -426,6 +430,62 @@ function handleAddSatellite() {
 function bindGameInteractions() {
   const app = document.getElementById('app');
   app?.addEventListener('click', (e) => {
+    const boardBtn = e.target.closest('[data-complete-board-task]');
+    if (boardBtn && sessionState) {
+      const result = completeBoardTask(sessionState, boardBtn.getAttribute('data-complete-board-task'));
+      if (!result.ok) setGameFeedback(result.reason || 'Could not complete board task.', true);
+      else {
+        appendLog(sessionState, `Board: “${result.def.title}”.`);
+        setGameFeedback('Board task done.');
+      }
+      refresh();
+      return;
+    }
+
+    const offerBtn = e.target.closest('[data-toggle-task-offer]');
+    if (offerBtn && sessionState) {
+      const result = toggleTaskOffer(sessionState, offerBtn.getAttribute('data-toggle-task-offer'));
+      if (!result.ok) showDeskFeedback(result.reason, true);
+      refresh();
+      return;
+    }
+
+    if (e.target.id === 'btn-confirm-task-lineup' && sessionState) {
+      const result = confirmTaskLineup(sessionState);
+      if (!result.ok) showDeskFeedback(result.reason, true);
+      else {
+        showDeskFeedback('Desk lineup locked — get to work.');
+        appendLog(sessionState, 'Monthly desk lineup locked.');
+      }
+      refresh();
+      return;
+    }
+
+    const purchaseBtn = e.target.closest('[data-purchase-workspace]');
+    if (purchaseBtn && sessionState) {
+      const tier = purchaseBtn.getAttribute('data-purchase-workspace');
+      const result = purchaseWorkspaceTier(sessionState, tier);
+      if (!result.ok) showOfficesFeedback(result.reason, true);
+      else {
+        appendLog(sessionState, `Leased ${tier} office — rent added to monthly burn.`);
+        showOfficesFeedback('Office leased.');
+        syncStageFromProgress(sessionState);
+      }
+      refresh();
+      return;
+    }
+
+    if (e.target.id === 'btn-hire-coo' && sessionState) {
+      const result = hireCoo(sessionState);
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else {
+        appendLog(sessionState, `Hired ${result.executive.name} as COO.`);
+        showPeopleFeedback(`${result.executive.name} joined as COO.`);
+      }
+      refresh();
+      return;
+    }
+
     const completeBtn = e.target.closest('[data-complete-task]');
     if (completeBtn) {
       handleCompleteTask(completeBtn.getAttribute('data-complete-task'));
@@ -725,11 +785,13 @@ async function init() {
     e.preventDefault();
     const fd = new FormData(setupForm);
     const companyName = String(fd.get('companyName') || '').trim();
+    const ceoFirstName = String(fd.get('ceoFirstName') || '').trim();
+    const ceoLastName = String(fd.get('ceoLastName') || '').trim();
     const categoryId = String(fd.get('category') || '');
     const mode = String(fd.get('mode') || 'career');
     const sandboxCash = fd.get('sandboxCash');
 
-    if (!companyName || !categoryId) return;
+    if (!companyName || !ceoFirstName || !ceoLastName || !categoryId) return;
 
     if (!getTaskDefinitions().length) {
       const el = document.getElementById('setup-form');
@@ -751,6 +813,8 @@ async function init() {
     enterGame(
       createInitialState({
         companyName,
+        ceoFirstName,
+        ceoLastName,
         categoryId,
         mode,
         sandboxCash,

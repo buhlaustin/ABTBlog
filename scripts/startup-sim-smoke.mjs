@@ -20,7 +20,8 @@ const {
   hydrateTaskCatalog,
   dealMonthlyTasks,
   pickMonthlyTaskDefs,
-  monthDealHasDuplicateTaskIds
+  monthDealHasDuplicateTaskIds,
+  confirmTaskLineup
 } = await import(`file://${join(sim, 'modules/Tasks.js')}`);
 hydrateTaskCatalog(tasksJson);
 
@@ -99,8 +100,18 @@ const state = createInitialState({
   mode: 'career'
 });
 
-if (!state.calendar.monthTasks?.length) {
+if (!state.calendar.monthTaskOffers?.length) {
   dealMonthlyTasks(state);
+}
+if (state.calendar.monthTaskOffers?.length && !state.calendar.taskLineupConfirmed) {
+  const slots = state.calendar.monthTaskSlotTarget ?? 4;
+  let picked = 0;
+  for (const offer of state.calendar.monthTaskOffers) {
+    if (picked >= slots) break;
+    offer.selected = true;
+    picked += 1;
+  }
+  confirmTaskLineup(state);
 }
 if (!state.calendar.monthTasks?.length) {
   console.error('FAIL: could not deal tasks after hydrating catalog');
@@ -110,8 +121,8 @@ if (!state.calendar.monthTasks?.length) {
 }
 
 const { totalHeadcountCap } = await import(`file://${join(sim, 'modules/Offices.js')}`);
-if (totalHeadcountCap(state) !== 2) {
-  console.error('FAIL: garage headcount cap expected 2 got', totalHeadcountCap(state));
+if (totalHeadcountCap(state) !== 0) {
+  console.error('FAIL: garage headcount cap expected 0 got', totalHeadcountCap(state));
   failed = true;
 } else {
   console.log('OK: Offices STAGES import / headcount cap');

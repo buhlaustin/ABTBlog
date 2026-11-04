@@ -1,5 +1,12 @@
-import { STAGES, formatMoney, fixedCostsForStage } from './constants.js';
-import { totalHeadcountCap } from './Offices.js';
+import { STAGES, formatMoney } from './constants.js';
+import {
+  headcountCap,
+  getWorkspaceTier,
+  WORKSPACE_TIER,
+  workspaceRentMonthly,
+  salaryTierMult
+} from './Workspace.js';
+import { executivePayrollMonthly, renderOrgChart } from './Executives.js';
 import { setGameFeedback } from './GameFeedback.js';
 
 export const DEPARTMENTS = [
@@ -40,20 +47,17 @@ export function syncDraftFromFinalized(state) {
   state.staff.draftHeadcountByDept = { ...finalized };
 }
 
-export function maxHeadcountForStage(stage, state = null) {
-  if (state) return totalHeadcountCap(state);
-  if (stage === STAGES.GARAGE) return 2;
-  if (stage === STAGES.OFFICE) return 12;
-  if (stage === STAGES.XC || stage === STAGES.POST_XC) return 24;
-  return 48;
+export function maxHeadcountForStage(_stage, state = null) {
+  if (!state) return 0;
+  return headcountCap(state);
 }
 
-export function salaryForDept(deptId, stage, state = null) {
+export function salaryForDept(deptId, _stage, state = null) {
   const base = DEFAULT_SALARY[deptId] ?? 6000;
-  let salary = stage === STAGES.GARAGE ? Math.round(base * 0.85) : base;
-  const salMult = state?.offices?.modifiers?.salaryMult ?? 1;
-  if (state?.offices?.hubId) salary = Math.round(salary * salMult);
-  return salary;
+  if (!state) return base;
+  const tier = getWorkspaceTier(state);
+  if (tier === WORKSPACE_TIER.GARAGE) return 0;
+  return Math.round(base * salaryTierMult(state));
 }
 
 export function computePayroll(headcount, stage, state = null) {
@@ -62,6 +66,7 @@ export function computePayroll(headcount, stage, state = null) {
     const n = headcount[dept.id] ?? 0;
     total += n * salaryForDept(dept.id, stage, state);
   }
+  if (state) total += executivePayrollMonthly(state);
   return total;
 }
 
@@ -69,11 +74,19 @@ export function totalHeadcount(headcount) {
   return Object.values(headcount ?? {}).reduce((a, b) => a + (Number(b) || 0), 0);
 }
 
-export function visibleDepartments(stage) {
+export function visibleDepartments(stage, state = null) {
+  if (state && getWorkspaceTier(state) === WORKSPACE_TIER.GARAGE) return [];
   return DEPARTMENTS.filter((d) => !(d.unlockStage && stage === STAGES.GARAGE));
 }
 
+export function hiringAllowed(state) {
+  return getWorkspaceTier(state) !== WORKSPACE_TIER.GARAGE;
+}
+
 export function adjustDraftHeadcount(state, deptId, delta) {
+  if (!hiringAllowed(state)) {
+    return { ok: false, reason: 'Lease a small office ($10k ARR) before hiring.' };
+  }
   if (!state.staff?.draftHeadcountByDept) return { ok: false, reason: 'People tab is out of sync — switch tabs and try again.' };
   const draft = state.staff.draftHeadcountByDept;
   const current = draft[deptId] ?? 0;
@@ -90,6 +103,9 @@ export function adjustDraftHeadcount(state, deptId, delta) {
 }
 
 export function setDraftHeadcount(state, deptId, value) {
+  if (!hiringAllowed(state)) {
+    return { ok: false, reason: 'Lease a small office ($10k ARR) before hiring.' };
+  }
   const n = Math.max(0, Math.floor(Number(value) || 0));
   const draft = { ...state.staff.draftHeadcountByDept, [deptId]: 0 };
   const max = maxHeadcountForStage(state.stage, state);
@@ -111,10 +127,7 @@ export function staffRevenueMultiplier(state) {
 export function projectStaffEconomics(state) {
   const draft = state.staff?.draftHeadcountByDept ?? emptyHeadcount();
   const payroll = computePayroll(draft, state.stage, state);
-  const fixed =
-    typeof state.finance?.fixedCostsMonthly === 'number'
-      ? state.finance.fixedCostsMonthly
-      : fixedCostsForStage(state.stage);
+  const fixed = workspaceRentMonthly(state);
   const burn = payroll + fixed;
   const revenue =
     (state.calendar?.monthRevenue ?? 0) > 0
@@ -169,7 +182,11 @@ export function renderPeoplePanel(container, state) {
       ? `Y${state.staff.lastFinalizedYear} M${state.staff.lastFinalizedMonth}`
       : 'never';
 
-  const rows = visibleDepartments(state.stage)
+  const orgMount = hiringAllowed(state)
+    ? ''
+    : '<p class="desk-feedback">You’re in the garage — no employees yet. Hit Finance to lease a small office at $10k ARR.</p>';
+
+  const rows = visibleDepartments(state.stage, state)
     .map((dept) => {
       const n = state.staff.draftHeadcountByDept[dept.id] ?? 0;
       const sub = n * salaryForDept(dept.id, state.stage, state);
@@ -187,7 +204,9 @@ export function renderPeoplePanel(container, state) {
     .join('');
 
   container.innerHTML = `
-    <p class="panel-lede">Adjust draft headcount, preview burn vs last month revenue, then <strong>Finalize staffing</strong>. Month-end payroll uses last finalized counts.</p>
+    ${orgMount}
+    <div id="org-chart-mount"></div>
+    <p class="panel-lede">Adjust draft headcount, preview burn vs last month revenue, then <strong>Finalize staffing</strong>. Executives (COO) sit outside the headcount cap.</p>
     <table class="data-table">
       <thead><tr><th>Department</th><th>Headcount</th><th>$/head/mo</th><th>Subtotal</th></tr></thead>
       <tbody>${rows}</tbody>
@@ -200,9 +219,10 @@ export function renderPeoplePanel(container, state) {
       <div><span class="stat-label">vs last mo. rev.</span><span class="stat-value ${econ.surplus >= 0 ? 'positive' : 'negative'}">${formatMoney(econ.surplus)}</span></div>
       <div><span class="stat-label">Last finalized</span><span class="stat-value">${finalizedLabel}</span></div>
     </div>
-    <button type="button" class="btn btn-primary" id="btn-finalize-staff">Finalize staffing</button>
+    <button type="button" class="btn btn-primary" id="btn-finalize-staff" ${hiringAllowed(state) ? '' : 'disabled'}>Finalize staffing</button>
     <p id="people-feedback" class="desk-feedback" hidden></p>
   `;
+  renderOrgChart(document.getElementById('org-chart-mount'), state);
 }
 
 export function showPeopleFeedback(message, isError = false) {

@@ -1,5 +1,6 @@
 import { STAGES, formatMoney, createInitialPublicMarket } from './constants.js';
 import { getEffectiveIpoGate } from './SandboxTuning.js';
+import { getArr } from './Workspace.js';
 import { calendarTurn } from './XC.js';
 import { getFounderRow } from './CapTable.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
@@ -49,7 +50,7 @@ export function fileIpo(state) {
   if (!state.flags?.ipoUnlocked) {
     return {
       ok: false,
-      reason: `Reach ${formatMoney(getEffectiveIpoGate(state))} lifetime revenue to unlock the IPO window.`
+      reason: `Reach ${formatMoney(getEffectiveIpoGate(state))} ARR to unlock the IPO window.`
     };
   }
   if (state.flags?.gameOver) {
@@ -260,7 +261,7 @@ export function renderIpoPanel(container, state) {
   let block = '';
   if (canFileIpo(state)) {
     block = `<div class="finance-action ipo-action">
-      <p><strong>IPO window open</strong> — You crossed ${formatMoney(getEffectiveIpoGate(state))} lifetime revenue. File to list on the fictional exchange.</p>
+      <p><strong>IPO window open</strong> — You crossed ${formatMoney(getEffectiveIpoGate(state))} ARR. File to list on the fictional exchange.</p>
       <p class="fine-print">Market sentiment from recent news can nudge the opening pop. After listing, the stock updates each month.</p>
       <button type="button" class="btn btn-primary btn-small" id="btn-file-ipo">File IPO</button>
     </div>`;
@@ -284,7 +285,7 @@ export function renderIpoPanel(container, state) {
   } else if (state.flags?.cashedOut) {
     block = `<p class="fine-print">You already cashed out — start a new company from the main menu.</p>`;
   } else if (state.flags?.seedRoundClosed && !state.flags?.ipoUnlocked) {
-    block = `<p class="fine-print">Reach ${formatMoney(getEffectiveIpoGate(state))} lifetime revenue to unlock the IPO window.</p>`;
+    block = `<p class="fine-print">Reach ${formatMoney(getEffectiveIpoGate(state))} ARR to unlock the IPO window.</p>`;
   }
 
   mount.innerHTML = block;

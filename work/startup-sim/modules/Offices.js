@@ -1,6 +1,18 @@
 import { assetBaseUrl } from './utils.js';
 import { STAGES, formatMoney } from './constants.js';
 import { setGameFeedback } from './GameFeedback.js';
+import {
+  WORKSPACE_TIER,
+  ARR_GATES,
+  getArr,
+  getWorkspaceTier,
+  canPurchaseTier,
+  purchaseWorkspaceTier,
+  workspaceLabel,
+  workspaceRentMonthly,
+  applyWorkspaceBurn,
+  headcountCap
+} from './Workspace.js';
 import bundledHubs from '../data/hubs.json' with { type: 'json' };
 
 let hubsCache = bundledHubs;
@@ -43,12 +55,10 @@ export function getHubById(hubId, list = hubsCache) {
   return getHubs(list).find((h) => h.id === hubId);
 }
 
+/** @deprecated use headcountCap from Workspace.js */
 export function baseHeadcountCap(stage) {
-  if (stage === STAGES.GARAGE) return 2;
-  if (stage === STAGES.OFFICE) return 12;
-  if (stage === STAGES.XC) return 24;
-  if (stage === STAGES.POST_XC) return 30;
-  if (stage === STAGES.PUBLIC) return 48;
+  if (stage === STAGES.GARAGE) return 0;
+  if (stage === STAGES.OFFICE) return 4;
   return 12;
 }
 
@@ -61,7 +71,7 @@ export function satelliteRent(state) {
 }
 
 export function totalHeadcountCap(state) {
-  return baseHeadcountCap(state.stage) + satelliteSeats(state);
+  return headcountCap(state) + satelliteSeats(state);
 }
 
 export function selectHub(state, hubId) {
@@ -69,6 +79,15 @@ export function selectHub(state, hubId) {
   if (!hub) return { ok: false, reason: 'Unknown hub.' };
   if (!state.flags?.xcResidencyComplete) {
     return { ok: false, reason: 'Finish the 3-month XC batch first.' };
+  }
+  const arr = getArr(state);
+  if (arr < ARR_GATES.HUB_HQ) {
+    return { ok: false, reason: `Reach ${formatMoney(ARR_GATES.HUB_HQ)} ARR before a city hub HQ.` };
+  }
+  if (getWorkspaceTier(state) !== WORKSPACE_TIER.HUB && !state.workspace?.hubOwned) {
+    const buy = purchaseWorkspaceTier(state, WORKSPACE_TIER.HUB);
+    if (!buy.ok) return buy;
+    state.workspace.hubOwned = true;
   }
   if (state.offices?.hubId) {
     return { ok: false, reason: 'Hub already selected.' };
@@ -81,7 +100,8 @@ export function selectHub(state, hubId) {
     revenueMult: hub.revenueMult,
     salaryMult: hub.salaryMult
   };
-  state.finance.fixedCostsMonthly = hub.fixedBase;
+  state.finance.hubRentMonthly = hub.fixedBase;
+  applyWorkspaceBurn(state);
   state.company.location = hub.label;
   state.stage = STAGES.POST_XC;
   return { ok: true, hub };
@@ -89,7 +109,7 @@ export function selectHub(state, hubId) {
 
 export function addSatellite(state, templateId) {
   if (!state.offices?.hubId) {
-    return { ok: false, reason: 'Choose a hub office first.' };
+    return { ok: false, reason: 'Open a city hub HQ first.' };
   }
   const t = getSatelliteTemplates().find((s) => s.id === templateId);
   if (!t) return { ok: false, reason: 'Unknown satellite template.' };
@@ -120,16 +140,41 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
+function workspacePurchaseBlock(state) {
+  const arr = getArr(state);
+  const tier = getWorkspaceTier(state);
+  const tiers = [
+    { id: WORKSPACE_TIER.SMALL, label: 'Small office', rent: '$2k/mo', gate: ARR_GATES.SMALL_OFFICE, cap: 4 },
+    { id: WORKSPACE_TIER.MEDIUM, label: 'Medium office', rent: '$5k/mo', gate: ARR_GATES.MEDIUM_OFFICE, cap: 12 },
+    { id: WORKSPACE_TIER.LARGE, label: 'Large office', rent: '$12k/mo', gate: ARR_GATES.LARGE_OFFICE, cap: 24 }
+  ];
+  const buttons = tiers
+    .map((t) => {
+      const can = canPurchaseTier(state, t.id);
+      const disabled = !can.ok ? 'disabled' : '';
+      const title = can.ok ? '' : ` title="${escapeHtml(can.reason)}"`;
+      return `<button type="button" class="btn btn-ghost btn-small" data-purchase-workspace="${t.id}" ${disabled}${title}>${escapeHtml(t.label)} · ${t.rent} · ${t.cap} seats</button>`;
+    })
+    .join('');
+
+  return `
+    <div class="finance-action">
+      <p><strong>Workspace</strong> — ${escapeHtml(workspaceLabel(tier))} · rent ${formatMoney(workspaceRentMonthly(state))}/mo · ARR ${formatMoney(arr)}</p>
+      <p class="fine-print">Offices are purchased at ARR gates; rent rolls into monthly burn. Garage has no hires.</p>
+      <div class="workspace-purchase-row">${buttons}</div>
+    </div>`;
+}
+
 export function renderOfficesPanel(container, state) {
   if (!container) return;
 
-  const cap = totalHeadcountCap(state);
+  const cap = headcountCap(state) + satelliteSeats(state);
   const hub = state.offices?.hubId ? getHubById(state.offices.hubId) : null;
   const residency = state.xc?.residencyMonthsRemaining ?? 0;
   const inResidency = state.flags?.xcAccepted && !state.flags?.xcResidencyComplete;
 
   let hubSection = '';
-  if (state.flags?.xcResidencyComplete && !state.offices?.hubId) {
+  if (state.flags?.xcResidencyComplete && !state.offices?.hubId && getArr(state) >= ARR_GATES.HUB_HQ) {
     const options = getHubs()
       .map(
         (h) =>
@@ -138,17 +183,17 @@ export function renderOfficesPanel(container, state) {
       .join('');
     hubSection = `
       <div class="finance-action">
-        <p><strong>Choose permanent hub</strong> after XC (required before seed close).</p>
+        <p><strong>City hub HQ</strong> — unlocked at ${formatMoney(ARR_GATES.HUB_HQ)} ARR. Unlimited staffing.</p>
         <select id="hub-select" class="hub-select">
           <option value="">Select hub…</option>
           ${options}
         </select>
-        <button type="button" class="btn btn-primary btn-small" id="btn-select-hub">Set hub HQ</button>
+        <button type="button" class="btn btn-primary btn-small" id="btn-select-hub">Open hub HQ</button>
       </div>`;
   } else if (hub) {
-    hubSection = `<p class="fine-print">HQ: <strong>${escapeHtml(state.offices.hubLabel)}</strong> · headcount cap ${cap} (base + satellites)</p>`;
+    hubSection = `<p class="fine-print">HQ: <strong>${escapeHtml(state.offices.hubLabel)}</strong> · headcount cap ${cap}</p>`;
   } else if (inResidency) {
-    hubSection = `<p class="fine-print">SF batch — ${residency} month(s) left before hub selection.</p>`;
+    hubSection = `<p class="fine-print">SF batch — ${residency} month(s) left. Desk tasks are XC-only.</p>`;
   }
 
   const satRows = (state.offices?.satellites ?? [])
@@ -167,7 +212,6 @@ export function renderOfficesPanel(container, state) {
     state.offices?.hubId
       ? `
     <h3 class="log-head">Satellite offices</h3>
-    <p class="panel-lede">Buy another office — more seats for hiring and another line on the rent bill.</p>
     <table class="data-table">
       <thead><tr><th>Office</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
       <tbody>${satRows || '<tr><td colspan="4">No satellites yet.</td></tr>'}</tbody>
@@ -179,6 +223,7 @@ export function renderOfficesPanel(container, state) {
       : '';
 
   container.innerHTML = `
+    ${workspacePurchaseBlock(state)}
     ${hubSection}
     ${satelliteBlock}
     <p id="offices-feedback" class="desk-feedback" hidden></p>

@@ -28,7 +28,7 @@ export function applyXCSafe(state) {
     return { ok: false, reason: 'Already accepted into X Combinator.' };
   }
   if (!state.flags?.xcUnlocked) {
-    return { ok: false, reason: 'Reach $500k lifetime revenue to apply.' };
+    return { ok: false, reason: 'Reach $100k ARR to apply.' };
   }
 
   const founder = getFounderRow(state);
@@ -73,8 +73,8 @@ export function applySeedRound(state) {
   if (!state.flags?.xcResidencyComplete) {
     return { ok: false, reason: 'Finish the 3-month XC batch first.' };
   }
-  if (!state.offices?.hubId) {
-    return { ok: false, reason: 'Choose a permanent hub office first.' };
+  if (!state.workspace?.smallOfficeOwned) {
+    return { ok: false, reason: 'Lease a small office before closing seed.' };
   }
   if (state.flags?.seedRoundClosed) {
     return { ok: false, reason: 'Seed round already closed.' };

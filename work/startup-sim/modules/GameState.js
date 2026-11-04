@@ -5,6 +5,9 @@ import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
+import { createInitialWorkspace, applyWorkspaceBurn } from './Workspace.js';
+import { createInitialExecutives } from './Executives.js';
+import { createInitialBoard } from './Board.js';
 import { createInitialXcState } from './XC.js';
 import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
@@ -23,7 +26,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 9;
+export const SAVE_VERSION = 10;
 
 export {
   STAGES,
@@ -57,10 +60,15 @@ export function createInitialState(options) {
     sandboxTuning: mode === 'sandbox' ? options.sandboxTuning ?? null : null,
     company: {
       name: String(options.companyName || 'Untitled Co.').trim(),
+      ceoFirstName: String(options.ceoFirstName || 'Founder').trim(),
+      ceoLastName: String(options.ceoLastName || '').trim(),
       categoryId: category.id,
       categoryLabel: category.label,
       economics
     },
+    workspace: createInitialWorkspace(),
+    executives: createInitialExecutives(),
+    board: createInitialBoard(),
     stage: STAGES.GARAGE,
     calendar: createInitialCalendar(),
     finance: {
@@ -69,6 +77,7 @@ export function createInitialState(options) {
       monthlyRevenue: 0,
       monthlyBurn: 0,
       mrr: 0,
+      arr: 0,
       valuation: null,
       fixedCostsMonthly: fixedCostsForStage(STAGES.GARAGE),
       instruments: [],
@@ -124,6 +133,7 @@ export function createInitialState(options) {
     applySandboxStartingStage(state);
   }
 
+  applyWorkspaceBurn(state);
   state.meta.runStartedTurn = calendarTurn(state);
   startMonth(state);
   return state;
@@ -149,6 +159,18 @@ export function normalizeSave(raw) {
     if (!state.calendar.monthTasks) state.calendar.monthTasks = [];
     if (!state.calendar.log) state.calendar.log = [];
     if (!state.calendar.recentTaskIds) state.calendar.recentTaskIds = [];
+    if (!state.calendar.monthTaskOffers) state.calendar.monthTaskOffers = [];
+    if (state.calendar.taskLineupConfirmed === undefined) {
+      state.calendar.taskLineupConfirmed = (state.calendar.monthTasks?.length ?? 0) > 0;
+    }
+    if (!state.workspace) state.workspace = createInitialWorkspace();
+    if (!state.executives) state.executives = createInitialExecutives();
+    if (!state.board) state.board = createInitialBoard();
+    if (state.finance.arr === undefined) {
+      state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);
+    }
+    if (!state.company.ceoFirstName) state.company.ceoFirstName = 'Founder';
+    if (state.company.ceoLastName === undefined) state.company.ceoLastName = '';
     if (!state.company.economics) {
       const cat = getCategoryById(state.company?.categoryId);
       if (!cat) return null;
@@ -236,11 +258,18 @@ export function normalizeSave(raw) {
       recalculateCapTablePercentages(state.capTable);
     }
 
+    if (state.stage === STAGES.OFFICE && state.workspace?.tier === 'garage') {
+      state.workspace.tier = 'small';
+      state.workspace.smallOfficeOwned = true;
+      applyWorkspaceBurn(state);
+    }
+
     if (!state.calendar.monthTasks.length && !state.flags.gameOver) {
       startMonth(state);
     }
 
     syncStageFromProgress(state);
+    applyWorkspaceBurn(state);
 
     state.version = SAVE_VERSION;
     return state;
