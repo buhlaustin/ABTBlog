@@ -12,18 +12,14 @@ The static **Startup Simulator** client calls these `kind` values on the shared 
 
 The game works **without** them (offline fallbacks). Enable live AI by deploying the Lambda code that includes Startup kinds.
 
-## When you are ready
+## Deploy
 
-1. Replace `index.mjs` with the prepared bundle:
+**Phase 7** includes Startup kinds in `infra/lambda/hos-narrative/index.mjs` (kept in sync with `docs/startup-simulator-hos-narrative-index.mjs`).
 
-   ```bash
-   cp docs/startup-simulator-hos-narrative-index.mjs infra/lambda/hos-narrative/index.mjs
-   ```
+Merging that file to **`main`** triggers [`.github/workflows/deploy-hos-narrative-api.yml`](../../.github/workflows/deploy-hos-narrative-api.yml) automatically, or run **Deploy HOS narrative API** via `workflow_dispatch`.
 
-2. Merge to `main` **or** run the **Deploy HOS narrative API** workflow manually (`workflow_dispatch`).
+After deploy, the game probes `startup_health` on load; the title screen shows **AI narrative connected** when the live Lambda responds.
 
-Pushing only `infra/lambda/hos-narrative/**` changes to `main` triggers [`.github/workflows/deploy-hos-narrative-api.yml`](../../.github/workflows/deploy-hos-narrative-api.yml) automatically.
+## Client-only changes
 
-## Game-only merge
-
-Merging Startup Simulator under `work/startup-sim/` does **not** deploy Lambda. Only changes to `infra/lambda/hos-narrative/index.mjs` (or the CloudFormation template) on `main` trigger deploy — not docs-only bundles.
+Merging only `work/startup-sim/**` does **not** deploy Lambda. Production AI stays offline until `index.mjs` reaches `main`.

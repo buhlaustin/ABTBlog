@@ -2,7 +2,12 @@ import { loadCategories } from './modules/Categories.js';
 import { createInitialState, normalizeSave } from './modules/GameState.js';
 import { StorageManager } from './modules/Storage.js';
 import { loadTaskCatalog, getTaskDef, getTaskDefinitions, dealMonthlyTasks } from './modules/Tasks.js';
-import { initNarrativeApiUrl, isNarrativeApiEnabled } from './modules/NarrativeApi.js';
+import {
+  initNarrativeApiUrl,
+  isNarrativeApiEnabled,
+  isNarrativeApiLive,
+  probeNarrativeApi
+} from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
 import { formatMoney } from './modules/GameState.js';
@@ -74,7 +79,7 @@ function enterGame(state) {
 async function openXcInterview() {
   if (!sessionState) return;
   const mount = document.getElementById('xc-interview-mount');
-  await renderInterviewForm(mount);
+  await renderInterviewForm(mount, sessionState);
   showScreen('xcInterview');
 }
 
@@ -95,6 +100,17 @@ async function submitXcInterview(e) {
   }
 
   const score = await scoreInterview(sessionState, answers);
+  if (score.waitlisted) {
+    sessionState.xc = sessionState.xc ?? {};
+    sessionState.xc.retryAvailableTurn =
+      (sessionState.calendar.year - 1) * 12 + sessionState.calendar.monthIndex + 1;
+    sessionState.xc.needsFollowUpQuestion = true;
+    appendLog(sessionState, `XC waitlist (score ${score.score}) — reapply next month.`);
+    showFinanceFeedback(score.feedback);
+    showScreen('game');
+    refresh();
+    return;
+  }
   if (!score.accepted) {
     if (feedback) {
       feedback.textContent = score.feedback;
@@ -102,6 +118,10 @@ async function submitXcInterview(e) {
     }
     return;
   }
+
+  sessionState.xc = sessionState.xc ?? {};
+  sessionState.xc.retryAvailableTurn = null;
+  sessionState.xc.needsFollowUpQuestion = false;
 
   const result = completeXcAcceptance(sessionState);
   if (!result.ok) {
@@ -421,6 +441,7 @@ async function init() {
     loadAssetManifest(),
     initNarrativeApiUrl()
   ]);
+  await probeNarrativeApi();
 
   const categories = await loadCategories();
   const categorySelect = document.getElementById('startup-category');
@@ -445,9 +466,18 @@ async function init() {
   const apiStatus = document.getElementById('start-api-status');
   if (apiStatus) {
     apiStatus.hidden = false;
-    apiStatus.textContent = isNarrativeApiEnabled()
-      ? 'AI narrative optional (XC, news, social, advisor, IPO press). Offline fallbacks always work.'
-      : 'AI offline — lenient local fallbacks for XC, news, social, and advisor.';
+    apiStatus.classList.remove('error');
+    if (isNarrativeApiLive()) {
+      apiStatus.textContent =
+        'AI narrative connected — XC scoring, news, social, advisor, and IPO press use live generation.';
+    } else if (isNarrativeApiEnabled()) {
+      apiStatus.textContent =
+        'Narrative API unreachable — deploy hos-narrative with Startup kinds (see docs). Using offline fallbacks until then.';
+      apiStatus.classList.add('error');
+    } else {
+      apiStatus.textContent = 'No narrative URL configured — offline fallbacks only.';
+      apiStatus.classList.add('error');
+    }
   }
 
   document.getElementById('btn-new')?.addEventListener('click', () => {

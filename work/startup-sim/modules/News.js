@@ -1,5 +1,5 @@
 import { assetBaseUrl } from './utils.js';
-import { requestNarrative, isNarrativeApiEnabled } from './NarrativeApi.js';
+import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 import { stageLabel } from './constants.js';
 
@@ -114,7 +114,7 @@ export async function generateMonthlyNews(state) {
     rules: 'Use parody names only (Macrohard, Financier Times). No real CEOs or trademarks.'
   };
 
-  if (isNarrativeApiEnabled()) {
+  if (shouldUseNarrativeAi()) {
     try {
       const res = await requestNarrative('startup_news_month', context);
       const articles = res?.articles ?? res?.result?.articles;

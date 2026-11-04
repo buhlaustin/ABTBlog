@@ -16,5 +16,12 @@
       "prompt": "Why X Combinator, and what will you achieve in the batch?",
       "hint": "What you will ship in 3 months."
     }
+  ],
+  "followUpQuestions": [
+    {
+      "id": "metrics",
+      "prompt": "What single metric will you move in the next 30 days, and how?",
+      "hint": "One number, one plan — partners love clarity on a retry."
+    }
   ]
 }

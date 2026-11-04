@@ -2,7 +2,7 @@ import { STAGES } from './constants.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
-import { tickPublicMarket, isPublicCompany } from './IPO.js';
+import { tickPublicMarket, tickIpoLockup, isPublicCompany } from './IPO.js';
 import { syncDraftFromFinalized } from './Staff.js';
 import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
@@ -77,6 +77,9 @@ export function endMonth(state) {
 
   if (isPublicCompany(state)) {
     for (const line of tickPublicMarket(state).lines ?? []) {
+      appendLog(state, line);
+    }
+    for (const line of tickIpoLockup(state)) {
       appendLog(state, line);
     }
   }

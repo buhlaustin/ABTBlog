@@ -37,7 +37,8 @@ export function createInitialPublicMarket() {
     priceHistory: [],
     pressHeadline: null,
     pressDek: null,
-    monthsPublic: 0
+    monthsPublic: 0,
+    lockupMonthsRemaining: 0
   };
 }
 

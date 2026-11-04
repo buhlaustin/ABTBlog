@@ -1,6 +1,6 @@
 import { assetBaseUrl } from './utils.js';
 import { applyXCSafe } from './CapTable.js';
-import { requestNarrative, isNarrativeApiEnabled } from './NarrativeApi.js';
+import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 
 let interviewCache = null;
 
@@ -18,12 +18,28 @@ export async function loadInterviewQuestions() {
 export function createInitialXcState() {
   return {
     residencyMonthsRemaining: 0,
-    batchLabel: null
+    batchLabel: null,
+    retryAvailableTurn: null,
+    needsFollowUpQuestion: false
   };
 }
 
+export function calendarTurn(state) {
+  const year = state.calendar?.year ?? 1;
+  const month = state.calendar?.monthIndex ?? 1;
+  return (year - 1) * 12 + month;
+}
+
+export function xcWaitingForRetry(state) {
+  const retry = state.xc?.retryAvailableTurn;
+  if (retry == null) return false;
+  return calendarTurn(state) < retry;
+}
+
 export function canStartInterview(state) {
-  return Boolean(state.flags?.xcUnlocked && !state.flags?.xcAccepted);
+  if (!state.flags?.xcUnlocked || state.flags?.xcAccepted) return false;
+  if (xcWaitingForRetry(state)) return false;
+  return true;
 }
 
 export function isInResidency(state) {
@@ -36,12 +52,16 @@ export function scoreInterviewOffline(answers) {
   const filled = values.filter((a) => String(a).trim().length >= 20);
   const score = Math.min(100, 55 + filled.length * 15);
   const accepted = filled.length >= 2 || values.some((a) => String(a).trim().length >= 40);
+  const waitlisted = !accepted && filled.length >= 1;
   return {
     accepted,
+    waitlisted,
     score,
     feedback: accepted
       ? 'Partners liked your clarity — welcome to the batch.'
-      : 'Add more detail to your answers and try again.'
+      : waitlisted
+        ? 'Promising — partners want one more month of clarity. Reapply next month.'
+        : 'Add more detail to your answers and try again.'
   };
 }
 
@@ -58,12 +78,15 @@ export async function scoreInterview(state, answers) {
     }))
   };
 
-  if (isNarrativeApiEnabled()) {
+  if (shouldUseNarrativeAi()) {
     try {
       const res = await requestNarrative('startup_xc_interview_score', payload);
-      if (res?.accepted !== undefined) {
+      if (res?.accepted !== undefined || res?.waitlisted !== undefined) {
+        const accepted = Boolean(res.accepted);
+        const waitlisted = Boolean(res.waitlisted) && !accepted;
         return {
-          accepted: Boolean(res.accepted),
+          accepted,
+          waitlisted,
           score: Number(res.score) || 70,
           feedback: String(res.feedback || 'Decision rendered.')
         };
@@ -86,8 +109,10 @@ function parseScoreJson(text) {
     const end = trimmed.lastIndexOf('}');
     if (start >= 0 && end > start) {
       const parsed = JSON.parse(trimmed.slice(start, end + 1));
+      const accepted = Boolean(parsed.accepted);
       return {
-        accepted: Boolean(parsed.accepted),
+        accepted,
+        waitlisted: Boolean(parsed.waitlisted) && !accepted,
         score: Number(parsed.score) || 70,
         feedback: String(parsed.feedback || 'Decision rendered.')
       };
@@ -134,9 +159,13 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
-export async function renderInterviewForm(container) {
+export async function renderInterviewForm(container, state) {
   if (!container) return;
-  const { questions } = await loadInterviewQuestions();
+  const data = await loadInterviewQuestions();
+  const questions = [...(data.questions ?? [])];
+  if (state?.xc?.needsFollowUpQuestion && data.followUpQuestions?.length) {
+    questions.push(data.followUpQuestions[0]);
+  }
   const fields = questions
     .map(
       (q) => `

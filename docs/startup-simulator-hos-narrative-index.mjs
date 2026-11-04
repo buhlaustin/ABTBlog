@@ -98,8 +98,8 @@ No markdown. Context: ${ctx}`;
 
   if (kind === 'startup_xc_interview_score') {
     return `You are a fictional X Combinator partner in the game "Startup Simulator". Score the founder's batch application.
-Return ONLY valid JSON (no markdown): {"accepted":true|false,"score":0-100,"feedback":"one short encouraging sentence"}
-Rules: Be LENIENT — this is a game, not real YC. Accept if answers show any real effort (≥2 substantive answers). Reject only if answers are empty or nonsense. score 65-95 on accept, 40-55 on reject.
+Return ONLY valid JSON (no markdown): {"accepted":true|false,"waitlisted":true|false,"score":0-100,"feedback":"one short encouraging sentence"}
+Rules: Be LENIENT — this is a game, not real YC. Accept if answers show real effort (≥2 substantive answers). If effort is mixed, set waitlisted true and accepted false (retry next month). Reject only if answers are empty or nonsense (waitlisted false). score 65-95 on accept, 50-64 on waitlist, 40-55 on hard reject.
 Context: ${ctx}`;
   }
 
@@ -113,7 +113,7 @@ Context: ${ctx}`;
   if (kind === 'startup_social_reactions') {
     return `You generate social reactions for Startup Simulator (ProNet/LinkedIn-like or Chirp/Twitter-like).
 Return ONLY valid JSON: {"likes":number,"reposts":number,"comments":[{"author":"name","text":"under 200 chars"}]}
-Rules: 1-3 comments, playful professional tone for pronet, punchy for chirp. Use persona names from context when fitting.
+Rules: 1-3 comments, playful professional tone for pronet, punchy for chirp. Use persona names from context when fitting. If context.recentHeadlines or context.playerRecentPosts exist, reference them naturally in at least one comment when relevant.
 Context: ${ctx}`;
   }
 
@@ -302,8 +302,11 @@ function parseStartupXcScore(text) {
   const end = trimmed.lastIndexOf('}');
   if (start < 0 || end <= start) throw new Error('No JSON in XC score response');
   const parsed = JSON.parse(trimmed.slice(start, end + 1));
+  const accepted = Boolean(parsed.accepted);
+  const waitlisted = Boolean(parsed.waitlisted) && !accepted;
   return {
-    accepted: Boolean(parsed.accepted),
+    accepted,
+    waitlisted,
     score: Math.max(0, Math.min(100, Math.round(Number(parsed.score) || 70))),
     feedback: String(parsed.feedback || 'Thanks for applying.').slice(0, 280)
   };
@@ -339,6 +342,10 @@ export async function handler(event) {
   const context = payload.context;
   if (!context || typeof context !== 'object') {
     return json(400, { error: 'Missing context object' }, event);
+  }
+
+  if (kind === 'startup_health') {
+    return json(200, { ok: true, startupKinds: true, type: 'startup_health' }, event);
   }
 
   try {

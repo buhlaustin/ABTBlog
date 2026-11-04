@@ -1,11 +1,13 @@
 /**
  * AI narrative client — mirrors HOS/EER pattern.
- * Phase 4: same URL as HOS (hos-narrative Lambda) with startup-specific `kind`s.
+ * Phase 7: health probe confirms Startup kinds on deployed hos-narrative Lambda.
  */
 import { STARTUP_NARRATIVE_API_URL } from './startup-config.js';
 import { assetBaseUrl } from './utils.js';
 
 let resolvedUrl = null;
+/** @type {boolean | null} null = not probed yet */
+let narrativeApiLive = null;
 
 export function resolveNarrativeApiUrl() {
   if (typeof window !== 'undefined') {
@@ -53,6 +55,43 @@ export async function initNarrativeApiUrl() {
 
 export function isNarrativeApiEnabled() {
   return Boolean(resolveNarrativeApiUrl() || getNarrativeApiUrl());
+}
+
+export function isNarrativeApiLive() {
+  return narrativeApiLive === true;
+}
+
+/** Use live OpenAI-backed narrative when URL exists and health probe did not fail. */
+export function shouldUseNarrativeAi() {
+  if (!isNarrativeApiEnabled()) return false;
+  if (narrativeApiLive === false) return false;
+  return true;
+}
+
+export async function probeNarrativeApi() {
+  const url = resolveNarrativeApiUrl() || getNarrativeApiUrl();
+  if (!url) {
+    narrativeApiLive = false;
+    return false;
+  }
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ kind: 'startup_health', context: { ping: true } })
+    });
+    if (!res.ok) {
+      narrativeApiLive = false;
+      return false;
+    }
+    const data = await res.json();
+    narrativeApiLive = Boolean(data?.ok && data?.startupKinds);
+    return narrativeApiLive;
+  } catch {
+    narrativeApiLive = false;
+    return false;
+  }
 }
 
 export async function requestNarrative(kind, context) {

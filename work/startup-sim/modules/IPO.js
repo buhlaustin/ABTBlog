@@ -1,6 +1,6 @@
 import { STAGES, REVENUE_GATES, formatMoney, createInitialPublicMarket } from './constants.js';
 import { getFounderRow } from './CapTable.js';
-import { requestNarrative } from './NarrativeApi.js';
+import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 
 function totalOutstandingShares(state) {
@@ -72,6 +72,7 @@ export function fileIpo(state) {
   state.publicMarket.priorMonthMrr = state.finance.mrr ?? 0;
   state.publicMarket.priceHistory = [{ month: state.calendar.monthIndex, year: state.calendar.year, price: openPrice }];
   state.publicMarket.monthsPublic = 0;
+  state.publicMarket.lockupMonthsRemaining = 1;
 
   state.finance.valuation = Math.round(openPrice * shares);
   state.flags.ipoFiled = true;
@@ -148,11 +149,36 @@ function readNewsSentiment(state) {
 }
 
 export function canCashOut(state) {
-  return Boolean(isPublicCompany(state) && !state.flags?.cashedOut && !state.flags?.gameOver);
+  const lockup = state.publicMarket?.lockupMonthsRemaining ?? 0;
+  return Boolean(
+    isPublicCompany(state) &&
+      !state.flags?.cashedOut &&
+      !state.flags?.gameOver &&
+      lockup <= 0
+  );
+}
+
+/** Decrement IPO lockup after a month closes while public. */
+export function tickIpoLockup(state) {
+  if (!isPublicCompany(state) || state.flags?.cashedOut) return [];
+  const pm = state.publicMarket;
+  if (!pm || (pm.lockupMonthsRemaining ?? 0) <= 0) return [];
+  pm.lockupMonthsRemaining = Math.max(0, pm.lockupMonthsRemaining - 1);
+  if (pm.lockupMonthsRemaining === 0) {
+    return ['Founder lockup ended — you may step down and cash out when ready.'];
+  }
+  return [`Founder lockup: ${pm.lockupMonthsRemaining} month(s) before you can cash out.`];
 }
 
 export function cashOut(state) {
   if (!canCashOut(state)) {
+    const lockup = state.publicMarket?.lockupMonthsRemaining ?? 0;
+    if (lockup > 0) {
+      return {
+        ok: false,
+        reason: `Founder lockup — wait ${lockup} more month(s) after listing before cashing out.`
+      };
+    }
     return { ok: false, reason: 'Cash out unlocks after you take the company public.' };
   }
 
@@ -185,6 +211,16 @@ export async function fetchIpoPress(state) {
     openPrice: state.publicMarket?.sharePrice,
     companyName: state.company?.name
   };
+
+  if (!shouldUseNarrativeAi()) {
+    const name = state.company?.name ?? 'Your startup';
+    const ticker = state.publicMarket?.ticker ?? 'CO';
+    const headline = `${name} (${ticker}) rings the fictional opening bell`;
+    const dek = `Wall Street pretends to understand the pitch deck as shares begin trading.`;
+    state.publicMarket.pressHeadline = headline;
+    state.publicMarket.pressDek = dek;
+    return { source: 'offline', headline, dek };
+  }
 
   try {
     const res = await requestNarrative('startup_ipo_press', context);
@@ -235,7 +271,11 @@ export function renderIpoPanel(container, state) {
           ? `<blockquote class="ipo-press"><strong>${escapeHtml(pm.pressHeadline)}</strong><br>${escapeHtml(pm.pressDek || '')}</blockquote>`
           : ''
       }
-      <button type="button" class="btn btn-primary btn-small" id="btn-cash-out">Step down &amp; cash out</button>
+      ${
+        (pm.lockupMonthsRemaining ?? 0) > 0
+          ? `<p class="fine-print">Founder lockup: ${pm.lockupMonthsRemaining} month(s) remaining before cash-out.</p>`
+          : `<button type="button" class="btn btn-primary btn-small" id="btn-cash-out">Step down &amp; cash out</button>`
+      }
     </div>`;
   } else if (state.flags?.cashedOut) {
     block = `<p class="fine-print">You already cashed out — load a new run from the main menu.</p>`;

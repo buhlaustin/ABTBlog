@@ -402,13 +402,13 @@ Ship criteria: **live narrative AI is required** for this phase (all five `kind`
 
 #### Live AI (required)
 
-- [ ] Promote staged handler: `docs/startup-simulator-hos-narrative-index.mjs` → `infra/lambda/hos-narrative/index.mjs` and deploy per [`startup-simulator-lambda-deploy.md`](./startup-simulator-lambda-deploy.md)
-- [ ] Verify in production: `startup_xc_interview_score`, `startup_news_month`, `startup_social_reactions`, `startup_advisor_chat`, `startup_ipo_press`
-- [ ] Start screen / settings: show **API connected** when narrative URL responds; surface clear error if Lambda is down (player still gets fallbacks, but status is honest)
-- [ ] **Advisor memory:** server-side or client bundle includes last N turns + snapshot so advice references recent decisions
-- [ ] **Social NPC threads:** reactions/comments reference last month’s headlines or the player’s last post (same `startup_social_reactions` flow, richer context)
-- [ ] **XC waitlist path:** lenient reject → retry next month with one new question (reuse scoring infra)
-- [ ] **IPO day beat:** extra `startup_ipo_press` moment + optional one-month **lockup** before cash-out is allowed
+- [x] Promote staged handler: `docs/startup-simulator-hos-narrative-index.mjs` → `infra/lambda/hos-narrative/index.mjs` and deploy per [`startup-simulator-lambda-deploy.md`](./startup-simulator-lambda-deploy.md)
+- [ ] Verify in production: `startup_xc_interview_score`, `startup_news_month`, `startup_social_reactions`, `startup_advisor_chat`, `startup_ipo_press` (after merge deploy)
+- [x] Start screen / settings: show **API connected** when `startup_health` probe succeeds; clear error if Lambda is down (fallbacks when probe fails)
+- [x] **Advisor memory:** client sends last N turns + snapshot (`startup_advisor_chat` context)
+- [x] **Social NPC threads:** reactions include `recentHeadlines` + `playerRecentPosts` in context; Lambda prompt references them
+- [x] **XC waitlist path:** waitlist → retry next month with follow-up question (`xc-interview.json`)
+- [x] **IPO day beat:** `startup_ipo_press` on file + one-month **lockup** before cash-out
 
 #### Gameplay depth
 

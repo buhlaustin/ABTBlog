@@ -17,7 +17,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 export {
   STAGES,
@@ -139,8 +139,13 @@ export function normalizeSave(raw) {
     if (state.flags.seedRoundClosed === undefined) state.flags.seedRoundClosed = false;
     if (!state.offices) state.offices = createInitialOffices();
     if (!state.xc) state.xc = createInitialXcState();
+    if (state.xc.retryAvailableTurn === undefined) state.xc.retryAvailableTurn = null;
+    if (state.xc.needsFollowUpQuestion === undefined) state.xc.needsFollowUpQuestion = false;
     if (!state.advisor) state.advisor = createInitialAdvisor();
     if (!state.publicMarket) state.publicMarket = createInitialPublicMarket();
+    if (state.publicMarket.lockupMonthsRemaining === undefined) {
+      state.publicMarket.lockupMonthsRemaining = state.flags?.ipoFiled ? 0 : 0;
+    }
     if (state.ending === undefined) state.ending = null;
     if (state.flags.ipoUnlockedLogged === undefined) state.flags.ipoUnlockedLogged = false;
     if (state.flags.ipoFiled === undefined) state.flags.ipoFiled = false;

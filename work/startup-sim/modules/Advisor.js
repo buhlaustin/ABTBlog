@@ -1,4 +1,4 @@
-import { requestNarrative, isNarrativeApiEnabled } from './NarrativeApi.js';
+import { requestNarrative, shouldUseNarrativeAi, isNarrativeApiLive } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 
 const MAX_HISTORY = 12;
@@ -47,7 +47,7 @@ export async function sendAdvisorMessage(state, userText) {
 
   let reply = offlineAdvisorReply(state);
 
-  if (isNarrativeApiEnabled()) {
+  if (shouldUseNarrativeAi()) {
     try {
       const context = {
         snapshot: buildGameSnapshot(state),
@@ -79,7 +79,12 @@ function escapeHtml(s) {
 export function renderAdvisorPanel(container, state) {
   if (!container) return;
   if (!state.advisor) state.advisor = createInitialAdvisor();
-  const api = isNarrativeApiEnabled() ? 'AI chief of staff' : 'Offline tips mode';
+  let api = 'Offline tips mode';
+  if (shouldUseNarrativeAi() && isNarrativeApiLive()) {
+    api = 'AI chief of staff (connected)';
+  } else if (shouldUseNarrativeAi()) {
+    api = 'AI chief of staff';
+  }
 
   const msgs = (state.advisor.messages ?? [])
     .map(

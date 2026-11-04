@@ -1,7 +1,7 @@
 import { applySeedRound, seedRoundPreview, renderCapTableRows } from './CapTable.js';
 import { renderFinanceSummary } from './Finance.js';
 import { formatMoney } from './constants.js';
-import { canStartInterview, isInResidency } from './XC.js';
+import { canStartInterview, isInResidency, xcWaitingForRetry } from './XC.js';
 import { renderOfficesPanel } from './Offices.js';
 import { renderIpoPanel } from './IPO.js';
 
@@ -39,10 +39,15 @@ export function renderFinancePanel(container, state) {
 
   let xcBlock = '';
   if (canStartInterview(state)) {
+    const retryNote = state.xc?.needsFollowUpQuestion
+      ? ' Partners added one follow-up question on this application.'
+      : '';
     xcBlock = `<div class="finance-action">
-        <p><strong>X Combinator</strong> — apply with a short interview ($500k SAFE, ~6%).</p>
+        <p><strong>X Combinator</strong> — apply with a short interview ($500k SAFE, ~6%).${retryNote}</p>
         <button type="button" class="btn btn-primary btn-small" id="btn-xc-apply">Apply to XC</button>
       </div>`;
+  } else if (xcWaitingForRetry(state)) {
+    xcBlock = `<p class="fine-print">XC waitlist — finish this month and reapply next month with sharper metrics.</p>`;
   } else if (isInResidency(state)) {
     xcBlock = `<p class="fine-print">In SF batch — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) remaining before hub selection.</p>`;
   } else if (state.flags?.xcAccepted) {

@@ -1,5 +1,5 @@
 import { assetBaseUrl } from './utils.js';
-import { requestNarrative, isNarrativeApiEnabled } from './NarrativeApi.js';
+import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 
 let personasCache = null;
@@ -66,17 +66,33 @@ export async function publishPlayerPost(state, network, text) {
   return { ok: true, post };
 }
 
+function recentPlayerPosts(state, excludeId) {
+  const posts = []
+    .concat(state.social?.pronet?.posts ?? [])
+    .concat(state.social?.chirp?.posts ?? [])
+    .filter((p) => p.authorId === 'player' && p.id !== excludeId)
+    .sort((a, b) => (b.month ?? 0) - (a.month ?? 0));
+  return posts.slice(0, 3).map((p) => ({ network: p.network, text: p.text }));
+}
+
 async function attachReactions(state, post) {
   const personas = await loadPersonas();
+  const headlines = (state.news?.currentMonthArticles ?? [])
+    .concat((state.news?.archive ?? []).flatMap((b) => b.articles ?? []))
+    .slice(0, 4)
+    .map((a) => a.headline)
+    .filter(Boolean);
   const context = {
     snapshot: buildGameSnapshot(state),
     post: { network: post.network, text: post.text, author: post.authorName },
-    personas: personas.slice(0, 6)
+    personas: personas.slice(0, 6),
+    recentHeadlines: headlines,
+    playerRecentPosts: recentPlayerPosts(state, post.id)
   };
 
   let reactions = offlineReactions(post, personas);
 
-  if (isNarrativeApiEnabled()) {
+  if (shouldUseNarrativeAi()) {
     try {
       const res = await requestNarrative('startup_social_reactions', context);
       if (res?.comments || res?.likes !== undefined) {
