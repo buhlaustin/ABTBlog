@@ -56,6 +56,8 @@ textarea:focus-visible {
   max-width: 960px;
   margin: 0 auto;
   padding: 1.5rem 1rem 3rem;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 #screen-game {
@@ -313,6 +315,7 @@ h1 {
 .stat-value {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .name-row {
@@ -400,6 +403,8 @@ h1 {
   background: var(--surface);
   padding: 1rem 1.15rem;
   min-height: 200px;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 .panel-lede {
@@ -423,6 +428,10 @@ h1 {
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 0.75rem 1rem;
   margin-bottom: 1rem;
+}
+
+.summary-grid > div {
+  min-width: 0;
 }
 
 .stat-value.positive {
@@ -993,12 +1002,26 @@ h1 {
     margin-right: -0.15rem;
     padding-left: 0.15rem;
     padding-right: 0.15rem;
+    scroll-padding-inline: max(0.65rem, env(safe-area-inset-left, 0px))
+      max(0.65rem, env(safe-area-inset-right, 0px));
+    scroll-snap-type: x proximity;
   }
 
   .game-tabs button {
     flex-shrink: 0;
     min-height: 44px;
     padding: 0.45rem 0.85rem;
+    scroll-snap-align: start;
+  }
+
+  .social-subtabs button {
+    min-height: 44px;
+    padding: 0.45rem 0.95rem;
+    font-size: 0.82rem;
+  }
+
+  .social-subtabs {
+    flex-wrap: wrap;
   }
 
   .hud-stats {
@@ -1009,6 +1032,10 @@ h1 {
 
   .hud-stats > div {
     min-width: calc(50% - 0.5rem);
+  }
+
+  .hud-stats .stat-value {
+    font-size: 0.92rem;
   }
 
   .summary-grid {
@@ -1045,10 +1072,67 @@ h1 {
 
   .setup-form input,
   .setup-form select,
+  .setup-form textarea,
   .hub-select,
   .satellite-add select,
-  #social-post-text {
+  #social-post-text,
+  #advisor-input {
     font-size: 16px;
+  }
+
+  .task-meta {
+    overflow-wrap: anywhere;
+  }
+
+  .workspace-purchase-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .workspace-purchase-row .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .satellite-add {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .satellite-add select,
+  .satellite-add .btn {
+    width: 100%;
+    max-width: none;
+  }
+
+  .tutorial-banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tutorial-banner .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #social-post-form .btn,
+  #advisor-form .btn,
+  .task-offers .btn,
+  .finance-action .btn,
+  .product-action .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .game-panel {
+    padding: 0.85rem 0.75rem;
+  }
+
+  .panel-lede .fine-print {
+    display: block;
+    margin-top: 0.35rem;
   }
 
   .game-footer {

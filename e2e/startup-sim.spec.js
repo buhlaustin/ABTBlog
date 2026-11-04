@@ -123,6 +123,70 @@ test.describe('Startup Simulator', () => {
     await expect(page.locator('#panel-finance .table-scroll')).toBeVisible();
     await expect(page.locator('#tab-desk')).toHaveCSS('min-height', '44px');
 
+    const tabIds = [
+      'desk',
+      'product',
+      'growth',
+      'people',
+      'finance',
+      'board',
+      'social',
+      'news',
+      'advisor',
+    ];
+    for (const tab of tabIds) {
+      await page.locator(`#tab-${tab}`).click();
+      const docWidth = await page.evaluate(() => document.documentElement.clientWidth);
+      const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+      expect(scrollWidth, `horizontal overflow on tab ${tab}`).toBeLessThanOrEqual(docWidth + 2);
+    }
+
+    await context.close();
+  });
+
+  test('mobile viewport: sandbox post-XC lineup and finance workspace controls', async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true,
+    });
+    const page = await context.newPage();
+    page.on('dialog', (dialog) => dialog.accept());
+
+    await page.goto('/play/startup-sim/index.html', { waitUntil: 'load' });
+    await page.evaluate((key) => localStorage.removeItem(key), SAVE_KEY);
+    await page.goto('/play/startup-sim/index.html', { waitUntil: 'load' });
+    await expect(page.locator('body[data-startup-sim-ready="true"]')).toBeVisible({
+      timeout: 45_000,
+    });
+
+    await page.getByRole('button', { name: 'New game' }).click();
+    await page.locator('input[value="sandbox"]').check();
+    await page.locator('#sandbox-start-stage').selectOption('post_xc');
+    await page.locator('#company-name').fill('Sandbox Mobile Co With A Long Name');
+    await page.locator('#ceo-first-name').fill('Alex');
+    await page.locator('#ceo-last-name').fill('Founder');
+    await page.locator('#startup-category').selectOption('b2b-saas');
+    await page.locator('#btn-start-game').click();
+    await expect(page.locator('#screen-game')).toBeVisible();
+
+    const lockBtn = page.locator('#btn-confirm-task-lineup');
+    const offers = page.locator('[data-toggle-task-offer]');
+    for (let guard = 0; guard < 12 && (await lockBtn.isDisabled()); guard += 1) {
+      const count = await offers.count();
+      if (count === 0) break;
+      await offers.nth(guard % count).click();
+    }
+    await expect(lockBtn).toBeEnabled({ timeout: 10_000 });
+    await lockBtn.click();
+
+    await page.locator('#tab-finance').click();
+    await expect(page.locator('.workspace-purchase-row .btn').first()).toBeVisible();
+    await page.locator('#tab-social').click();
+    await expect(page.locator('.social-subtabs button').first()).toHaveCSS('min-height', '44px');
+
     const docWidth = await page.evaluate(() => document.documentElement.clientWidth);
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
     expect(scrollWidth).toBeLessThanOrEqual(docWidth + 2);

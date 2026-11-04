@@ -287,17 +287,20 @@ export function selectTab(tabId) {
 }
 
 function activateTab(nav, tab) {
+  let activeBtn = null;
   nav.querySelectorAll('[data-tab]').forEach((b) => {
     const active = b.dataset.tab === tab;
     b.classList.toggle('active', active);
     b.setAttribute('aria-selected', active ? 'true' : 'false');
     b.tabIndex = active ? 0 : -1;
+    if (active) activeBtn = b;
   });
   document.querySelectorAll('[data-panel]').forEach((panel) => {
     const active = panel.dataset.panel === tab;
     panel.hidden = !active;
     panel.tabIndex = active ? 0 : -1;
   });
+  activeBtn?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' });
 }
 
 export function bindTabNavigation() {

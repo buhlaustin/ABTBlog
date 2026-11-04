@@ -40,7 +40,7 @@ export function HostedWorkFrame({
         title={title}
         src={entryPath}
         className="w-full flex-1 border-0 bg-[#0f1419]"
-        style={{ minHeight: 0, flex: "1 1 auto" }}
+        style={{ minHeight: 0, flex: "1 1 auto", touchAction: "manipulation" }}
         allow="fullscreen"
       />
     </div>
