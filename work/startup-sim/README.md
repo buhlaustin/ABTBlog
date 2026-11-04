@@ -31,4 +31,4 @@ Progress saves automatically in your browser as you play. Use **Continue saved g
 
 ## Production AI
 
-Startup kinds ship in `infra/lambda/hos-narrative/index.mjs`. Merging to **`main`** triggers **Deploy HOS narrative API**. The client probes `startup_health` on load; until deploy completes, the title screen warns and offline fallbacks apply. See `docs/startup-simulator-lambda-deploy.md`.
+Game data (`tasks.json`, categories, hubs, crises, etc.) ships **inside the client bundle** (JSON imports) with optional network refresh. Live headlines/social/advisor/XC scoring use the shared narrative API — see `docs/startup-simulator-lambda-deploy.md`.
