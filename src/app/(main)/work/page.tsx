@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { workItems } from "@/lib/work-registry";
 import { WorkCard } from "@/components/work-card";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Work",
-  description: "Projects hosted on austinbuhltech.com and selected open-source work.",
-};
+  description:
+    "Browser games, simulations, and open-source projects by Austin Buhl—hosted demos and GitHub repos.",
+  path: "/work/",
+});
 
 export default function WorkIndexPage() {
   return (

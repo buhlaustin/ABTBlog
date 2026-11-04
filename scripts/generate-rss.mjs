@@ -2,10 +2,14 @@ import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
+import {
+  siteUrl,
+  rssChannelTitle,
+  rssChannelDescription,
+} from "./site-config.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const blogDir = join(root, "content", "blog");
-const siteUrl = "https://austinbuhltech.com";
 
 const files = readdirSync(blogDir).filter((f) => f.endsWith(".md"));
 
@@ -41,9 +45,9 @@ const items = posts
 const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>Austin Buhl</title>
+    <title>${escapeXml(rssChannelTitle)}</title>
     <link>${siteUrl}</link>
-    <description>Personal site — writing and work at austinbuhltech.com</description>
+    <description>${escapeXml(rssChannelDescription)}</description>
     ${items}
   </channel>
 </rss>

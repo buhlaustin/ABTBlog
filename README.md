@@ -22,7 +22,8 @@ Hosted project assets live in `work/` (source of truth). `npm run prebuild` copi
 1. Create `work/<slug>/` with your app (static entry HTML or assets).
 2. Register the project in `src/lib/work-registry.ts` (`kind: "hosted"`, `hostedEntry`).
 3. Add the slug to `scripts/copy-work-assets.mjs` `projects` array.
-4. Add a route entry in `scripts/generate-sitemap.mjs` or extend it to read the registry.
+4. Register the slug in `src/lib/work-registry.ts` (sitemap is generated from the registry at build time via `src/app/sitemap.ts`).
+5. Add a Next route under `src/app/work/<slug>/page.tsx` using `workPageMetadata()` from `src/lib/work-seo.ts`.
 
 ## House of Strategy (HOS)
 

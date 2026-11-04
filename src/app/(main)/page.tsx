@@ -1,17 +1,19 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
+import { JsonLd } from "@/components/json-ld";
 import { SiteLogo } from "@/components/site-logo";
 import { profile, siteConfig } from "@/lib/profile";
+import { pageMetadata, personJsonLd } from "@/lib/seo";
 import { workItems } from "@/lib/work-registry";
 import { WorkCard } from "@/components/work-card";
 
-export const metadata: Metadata = {
-  title: { absolute: siteConfig.title },
-  description:
-    "Builder and software engineer in Knoxville, TN—real-time edtech, browser games, simulations, and open source.",
-};
+export const metadata = pageMetadata({
+  title: siteConfig.defaultTitle,
+  description: siteConfig.description,
+  path: "/",
+  absoluteTitle: true,
+});
 
 const focusPillars = [
   {
@@ -74,7 +76,9 @@ export default function HomePage() {
   const bioSide = profile.bioParagraphs[3];
 
   return (
-    <main className="flex-1">
+    <>
+      <JsonLd data={personJsonLd()} />
+      <main className="flex-1">
       {/* Hero */}
       <section className="relative border-b border-border">
         <div
@@ -247,5 +251,6 @@ export default function HomePage() {
         </section>
       </div>
     </main>
+    </>
   );
 }

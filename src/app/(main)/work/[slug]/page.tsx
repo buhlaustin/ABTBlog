@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MarkdownContent } from "@/components/markdown-content";
 import { getWorkItem, type WorkItem, workItems } from "@/lib/work-registry";
+import { workPageMetadata } from "@/lib/work-seo";
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
@@ -24,14 +24,11 @@ export function generateStaticParams() {
     .map((entry) => ({ slug: entry.slug }));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const item = getWorkItem(slug);
   if (!item) return {};
-  return {
-    title: item.title,
-    description: item.summary,
-  };
+  return workPageMetadata(item);
 }
 
 function ExternalWorkDetail({ item }: { item: WorkItem }) {

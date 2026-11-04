@@ -3,8 +3,16 @@
   <channel>
     <title>Austin Buhl</title>
     <link>https://austinbuhltech.com</link>
-    <description>Personal site — writing and work at austinbuhltech.com</description>
+    <description>Writing on software engineering, edtech, browser games, and side projects by Austin Buhl.</description>
     
+    <item>
+      <title>Introducing Startup Simulator</title>
+      <link>https://austinbuhltech.com/blog/introducing-startup-simulator/</link>
+      <guid>https://austinbuhltech.com/blog/introducing-startup-simulator/</guid>
+      <pubDate>Wed, 04 Nov 2026 00:00:00 GMT</pubDate>
+      <description>A turn-based browser tycoon—monthly desk tasks, runway, fundraising, fake tech press, and client-side saves.</description>
+      <author>Austin Buhl</author>
+    </item>
     <item>
       <title>Executive Email Roulette</title>
       <link>https://austinbuhltech.com/blog/executive-email-roulette/</link>

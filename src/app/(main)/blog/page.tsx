@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Blog",
-  description: "Writing on building, edtech, and side projects.",
-};
+  description:
+    "Essays and notes on software engineering, edtech, browser games, and side projects by Austin Buhl.",
+  path: "/blog/",
+});
 
 export default function BlogIndexPage() {
   const posts = getAllPosts();

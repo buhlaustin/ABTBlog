@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { JsonLd } from "@/components/json-ld";
 import { MarkdownContent } from "@/components/markdown-content";
 import { PostAuthorCard } from "@/components/post-author-card";
 import { getAllPostSlugs, getPostBySlug } from "@/lib/blog";
+import { articleJsonLd, pageMetadata } from "@/lib/seo";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -13,14 +14,19 @@ export function generateStaticParams() {
   return getAllPostSlugs().map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) return {};
-  return {
+  return pageMetadata({
     title: post.title,
     description: post.description,
-  };
+    path: `/blog/${post.slug}/`,
+    openGraphType: "article",
+    publishedTime: new Date(post.date).toISOString(),
+    authors: [post.author],
+    tags: post.tags,
+  });
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
@@ -28,7 +34,17 @@ export default async function BlogPostPage({ params }: PageProps) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
+  const jsonLd = articleJsonLd({
+    title: post.title,
+    description: post.description,
+    path: `/blog/${post.slug}/`,
+    datePublished: new Date(post.date).toISOString(),
+    authorName: post.author,
+  });
+
   return (
+    <>
+      <JsonLd data={jsonLd} />
     <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-10 sm:py-16">
       <Link
         href="/blog/"
@@ -68,5 +84,6 @@ export default async function BlogPostPage({ params }: PageProps) {
         </aside>
       </article>
     </main>
+    </>
   );
 }

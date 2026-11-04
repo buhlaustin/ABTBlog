@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ResumeTimeline } from "@/components/resume-timeline";
@@ -11,11 +10,13 @@ import {
 import { focusAreas, resumeGroups } from "@/lib/resume";
 import { workItems } from "@/lib/work-registry";
 import { WorkCard } from "@/components/work-card";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "About",
-  description: `${siteConfig.name} — software engineer in Knoxville, TN. Real-time edtech, simulations, games, and open source.`,
-};
+  description: `About ${siteConfig.name}, a software engineer and indie game designer in Knoxville, TN—real-time edtech, browser games, and open source.`,
+  path: "/about/",
+});
 
 function AboutSection({
   title,

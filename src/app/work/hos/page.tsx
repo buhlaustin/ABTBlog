@@ -1,13 +1,10 @@
-import type { Metadata } from "next";
 import { HostedWorkFrame } from "@/components/hosted-work-frame";
 import { getWorkItem } from "@/lib/work-registry";
+import { workPageMetadata } from "@/lib/work-seo";
 
 const item = getWorkItem("hos")!;
 
-export const metadata: Metadata = {
-  title: item.title,
-  description: item.summary,
-};
+export const metadata = workPageMetadata(item);
 
 export default function HosPlayPage() {
   return (
