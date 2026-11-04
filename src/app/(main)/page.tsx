@@ -133,7 +133,6 @@ export default function HomePage() {
               <div className="min-w-0 text-sm leading-snug">
                 <p className="font-semibold text-foreground">{siteConfig.name}</p>
                 <p className="text-muted">{profile.role}</p>
-                <p className="text-muted">{profile.tagline}</p>
               </div>
             </div>
             <Link
