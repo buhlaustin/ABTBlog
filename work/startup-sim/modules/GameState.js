@@ -28,6 +28,15 @@ import {
 
 export const SAVE_VERSION = 11;
 
+const SANDBOX_CASH_MIN = 10_000;
+const SANDBOX_CASH_MAX = 1_000_000_000;
+
+function clampSandboxStartingCash(raw, fallback) {
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(SANDBOX_CASH_MIN, Math.min(SANDBOX_CASH_MAX, Math.round(n)));
+}
+
 export {
   STAGES,
   REVENUE_GATES,
@@ -43,7 +52,7 @@ export function createInitialState(options) {
   const modeCfg = MODE_CONFIG[mode];
   const startingCash =
     mode === 'sandbox'
-      ? Number(options.sandboxCash) || modeCfg.startingCash
+      ? clampSandboxStartingCash(Number(options.sandboxCash), modeCfg.startingCash)
       : modeCfg.startingCash;
 
   const category = getCategoryById(options.categoryId);
