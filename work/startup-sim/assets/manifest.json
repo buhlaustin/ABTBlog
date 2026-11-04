@@ -1,96 +1,96 @@
 {
-  "version": 3,
+  "version": 4,
   "assets": [
     {
       "id": "assets-icons-garage",
-      "path": "assets/icons/garage.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/garage.svg"
+      "path": "assets/icons/garage.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/garage.jpg"
     },
     {
       "id": "assets-icons-office",
-      "path": "assets/icons/office.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/office.svg"
+      "path": "assets/icons/office.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/office.jpg"
     },
     {
       "id": "assets-icons-skyline",
-      "path": "assets/icons/skyline.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/skyline.svg"
+      "path": "assets/icons/skyline.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/skyline.jpg"
     },
     {
       "id": "assets-icons-public",
-      "path": "assets/icons/public.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/public.svg"
+      "path": "assets/icons/public.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/icons/public.jpg"
     },
     {
       "id": "assets-backgrounds-garage-bg",
-      "path": "assets/backgrounds/garage-bg.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/garage-bg.svg"
+      "path": "assets/backgrounds/garage-bg.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/garage-bg.jpg"
     },
     {
       "id": "assets-backgrounds-office-bg",
-      "path": "assets/backgrounds/office-bg.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/office-bg.svg"
+      "path": "assets/backgrounds/office-bg.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/office-bg.jpg"
     },
     {
       "id": "assets-backgrounds-skyline-bg",
-      "path": "assets/backgrounds/skyline-bg.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/skyline-bg.svg"
+      "path": "assets/backgrounds/skyline-bg.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/skyline-bg.jpg"
     },
     {
       "id": "assets-backgrounds-public-bg",
-      "path": "assets/backgrounds/public-bg.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/public-bg.svg"
+      "path": "assets/backgrounds/public-bg.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/public-bg.jpg"
     },
     {
       "id": "assets-backgrounds-hub-bay",
-      "path": "assets/backgrounds/hub-bay.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-bay.svg"
+      "path": "assets/backgrounds/hub-bay.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-bay.jpg"
     },
     {
       "id": "assets-backgrounds-hub-nyc",
-      "path": "assets/backgrounds/hub-nyc.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-nyc.svg"
+      "path": "assets/backgrounds/hub-nyc.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-nyc.jpg"
     },
     {
       "id": "assets-backgrounds-hub-miami",
-      "path": "assets/backgrounds/hub-miami.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-miami.svg"
+      "path": "assets/backgrounds/hub-miami.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-miami.jpg"
     },
     {
       "id": "assets-backgrounds-hub-dallas",
-      "path": "assets/backgrounds/hub-dallas.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-dallas.svg"
+      "path": "assets/backgrounds/hub-dallas.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-dallas.jpg"
     },
     {
       "id": "assets-backgrounds-hub-atlanta",
-      "path": "assets/backgrounds/hub-atlanta.svg",
-      "license": "CC0-1.0",
-      "author": "Startup Simulator (ABTBlog)",
-      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-atlanta.svg"
+      "path": "assets/backgrounds/hub-atlanta.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-atlanta.jpg"
     }
   ]
 }

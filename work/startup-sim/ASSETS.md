@@ -1,21 +1,13 @@
 # Asset provenance
 
-All shipped art/audio must be listed in `assets/manifest.json` with license and source URL.
+All shipped art must be listed in `assets/manifest.json` with license and source URL.
 
-Curated sources (prefer CC0 / CC-BY with attribution):
+## Stage & hub photography (manifest v4)
 
-- Kenney.nl — UI packs
-- Wikimedia Commons — photography
-- OpenGameArt.org — per-file license check
+**Backdrops** (`assets/backgrounds/*.jpg`) and **HUD icons** (`assets/icons/*.jpg`) are **original game art** generated for Startup Simulator — not stock libraries, not scraped from the web, not CC0 packs. License: **Proprietary (game art)** for use in this project.
 
-Do not commit generative “placeholder slop” as final assets.
+Replace or extend only by adding new manifest entries and updating paths in `modules/Assets.js`. Run `node scripts/validate-startup-sim-assets.mjs` before release builds.
 
-## Shipped (Phase 6)
-
-Stage HUD icons under `assets/icons/*.svg` — simple vector art authored for this game, **CC0-1.0**, listed in `manifest.json`. Replace or extend via the manifest; run `node scripts/validate-startup-sim-assets.mjs` before release builds.
-
-## Shipped (Phase 7 — content & polish)
-
-Wide **stage backdrops** (`1200×280`, layered gradients, skylines, hub palettes) under `assets/backgrounds/*-bg.svg` and **hub skylines** under `assets/backgrounds/hub-*.svg` — authored SVG (CC0-1.0), `manifest.json` v3, applied via `Assets.js` (`gameBackdropUrl`).
+## Audio
 
 **Audio** uses Web Audio sine tones in `modules/Audio.js` (no binary assets); off by default, toggled in the game footer.

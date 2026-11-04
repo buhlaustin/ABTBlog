@@ -25,11 +25,11 @@ export function assetUrl(relativePath) {
 }
 
 const STAGE_ICON = {
-  [STAGES.GARAGE]: 'assets/icons/garage.svg',
-  [STAGES.OFFICE]: 'assets/icons/office.svg',
-  [STAGES.XC]: 'assets/icons/skyline.svg',
-  [STAGES.POST_XC]: 'assets/icons/skyline.svg',
-  [STAGES.PUBLIC]: 'assets/icons/public.svg'
+  [STAGES.GARAGE]: 'assets/icons/garage.jpg',
+  [STAGES.OFFICE]: 'assets/icons/office.jpg',
+  [STAGES.XC]: 'assets/icons/skyline.jpg',
+  [STAGES.POST_XC]: 'assets/icons/skyline.jpg',
+  [STAGES.PUBLIC]: 'assets/icons/public.jpg'
 };
 
 export function stageIconPath(stage) {
@@ -41,19 +41,19 @@ export function stageIconUrl(stage) {
 }
 
 const STAGE_BACKDROP = {
-  [STAGES.GARAGE]: 'assets/backgrounds/garage-bg.svg',
-  [STAGES.OFFICE]: 'assets/backgrounds/office-bg.svg',
-  [STAGES.XC]: 'assets/backgrounds/skyline-bg.svg',
-  [STAGES.POST_XC]: 'assets/backgrounds/skyline-bg.svg',
-  [STAGES.PUBLIC]: 'assets/backgrounds/public-bg.svg'
+  [STAGES.GARAGE]: 'assets/backgrounds/garage-bg.jpg',
+  [STAGES.OFFICE]: 'assets/backgrounds/office-bg.jpg',
+  [STAGES.XC]: 'assets/backgrounds/skyline-bg.jpg',
+  [STAGES.POST_XC]: 'assets/backgrounds/skyline-bg.jpg',
+  [STAGES.PUBLIC]: 'assets/backgrounds/public-bg.jpg'
 };
 
 const HUB_BACKDROP = {
-  bay: 'assets/backgrounds/hub-bay.svg',
-  nyc: 'assets/backgrounds/hub-nyc.svg',
-  miami: 'assets/backgrounds/hub-miami.svg',
-  dallas: 'assets/backgrounds/hub-dallas.svg',
-  atlanta: 'assets/backgrounds/hub-atlanta.svg'
+  bay: 'assets/backgrounds/hub-bay.jpg',
+  nyc: 'assets/backgrounds/hub-nyc.jpg',
+  miami: 'assets/backgrounds/hub-miami.jpg',
+  dallas: 'assets/backgrounds/hub-dallas.jpg',
+  atlanta: 'assets/backgrounds/hub-atlanta.jpg'
 };
 
 /** Wide stage / hub backdrop for the main game shell. */
