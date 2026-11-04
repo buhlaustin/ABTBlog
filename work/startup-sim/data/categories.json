@@ -1,0 +1,12 @@
+[
+  { "id": "b2b-saas", "label": "B2B SaaS", "defaultACV": 12000, "salesCycleWeeks": 8 },
+  { "id": "consumer-social", "label": "Consumer social", "defaultACV": 0, "salesCycleWeeks": 0 },
+  { "id": "marketplace", "label": "Marketplace / gig economy", "defaultACV": 2400, "salesCycleWeeks": 4 },
+  { "id": "delivery", "label": "Delivery & logistics", "defaultACV": 1800, "salesCycleWeeks": 2 },
+  { "id": "fintech", "label": "Fintech", "defaultACV": 8000, "salesCycleWeeks": 12 },
+  { "id": "ai-tools", "label": "AI tools", "defaultACV": 15000, "salesCycleWeeks": 6 },
+  { "id": "hardware", "label": "Hardware + software", "defaultACV": 50000, "salesCycleWeeks": 16 },
+  { "id": "healthtech", "label": "Healthtech", "defaultACV": 25000, "salesCycleWeeks": 14 },
+  { "id": "climate", "label": "Climate & energy", "defaultACV": 40000, "salesCycleWeeks": 20 },
+  { "id": "gaming-media", "label": "Gaming & media", "defaultACV": 6000, "salesCycleWeeks": 6 }
+]

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Startup Simulator</title>
+  <meta name="description" content="Garage-to-IPO startup tycoon with fundraising, headlines, social buzz, and monthly stock simulation.">
+  <link rel="stylesheet" href="/play/startup-sim/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div id="app">
+    <section id="screen-start" class="screen screen-start" aria-labelledby="start-title">
+      <header class="hero" id="main-content">
+        <p class="eyebrow">Startup tycoon</p>
+        <h1 id="start-title">Startup Simulator</h1>
+        <p class="lede">
+          Build from a garage to IPO. Career is the standard climb with $120k in the bank. Sandbox lets you stack extra cash and tune the rules for a wilder run.
+        </p>
+      </header>
+      <div id="start-continue-offer" class="start-continue-offer" hidden>
+        <p class="lede">Welcome back — your company is waiting.</p>
+        <button id="btn-continue-open" class="btn btn-primary" type="button">Continue where you left off</button>
+        <button id="btn-dismiss-continue-offer" class="btn btn-ghost btn-small" type="button">Stay on menu</button>
+      </div>
+      <div class="start-actions">
+        <button id="btn-load" class="btn btn-ghost" type="button" disabled>Continue saved game</button>
+        <button id="btn-new" class="btn btn-primary" type="button">New game</button>
+      </div>
+      <p id="start-save-hint" class="fine-print" hidden>Your progress saves as you play. Hit Continue to pick up where you left off.</p>
+      <p id="start-boot-status" class="fine-print" hidden aria-live="polite"></p>
+      <p id="start-api-status" class="fine-print" hidden></p>
+      <div id="hall-of-fame" class="hall-of-fame" hidden aria-label="Hall of fame"></div>
+    </section>
+
+    <section id="screen-setup" class="screen" hidden>
+      <header class="panel-head">
+        <button id="btn-setup-back" class="btn btn-ghost btn-small" type="button">← Back</button>
+        <h2>Found your company</h2>
+      </header>
+      <form id="setup-form" class="setup-form">
+        <label for="company-name">Company name</label>
+        <input id="company-name" name="companyName" type="text" maxlength="48" required placeholder="Acme Labs">
+
+        <label for="startup-category">Startup type</label>
+        <select id="startup-category" name="category" required>
+          <option value="" disabled hidden>Choose a category…</option>
+        </select>
+
+        <fieldset class="mode-fieldset">
+          <legend>Game mode</legend>
+          <label class="radio-row">
+            <input type="radio" name="mode" value="career" checked>
+            <span><strong>Career</strong> — $120k starting cash, standard difficulty</span>
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="mode" value="sandbox">
+            <span><strong>Sandbox</strong> — extra starting cash, softer penalties</span>
+          </label>
+        </fieldset>
+
+        <div id="sandbox-cash-wrap" class="sandbox-cash" hidden>
+          <label for="sandbox-cash">Sandbox starting cash</label>
+          <select id="sandbox-cash" name="sandboxCash">
+            <option value="500000">$500,000</option>
+            <option value="1000000">$1,000,000</option>
+            <option value="10000000">$10,000,000</option>
+            <option value="100000000">$100,000,000</option>
+            <option value="1000000000">$1,000,000,000</option>
+          </select>
+        </div>
+
+        <div id="sandbox-tuning-wrap" class="sandbox-cash" hidden>
+          <p class="fine-print">Sandbox knobs apply only to this new Sandbox company.</p>
+          <label for="sandbox-revenue-mult">Task revenue multiplier</label>
+          <select id="sandbox-revenue-mult" name="sandboxRevenueMult">
+            <option value="1">1× (default)</option>
+            <option value="1.25">1.25×</option>
+            <option value="1.5">1.5×</option>
+            <option value="2">2×</option>
+          </select>
+          <label for="sandbox-start-stage">Starting stage</label>
+          <select id="sandbox-start-stage" name="sandboxStartStage">
+            <option value="garage">Garage</option>
+            <option value="office">Small office</option>
+            <option value="post_xc">Post-XC hub (seed closed)</option>
+          </select>
+          <label for="sandbox-ipo-gate">IPO lifetime revenue gate</label>
+          <select id="sandbox-ipo-gate" name="sandboxIpoGate">
+            <option value="1000000000">$1B (Career default)</option>
+            <option value="250000000">$250M (shorter sandbox run)</option>
+            <option value="50000000">$50M (fast test)</option>
+          </select>
+        </div>
+
+        <button id="btn-start-game" class="btn btn-primary" type="submit">Enter the garage</button>
+      </form>
+    </section>
+
+    <section id="screen-game" class="screen" hidden>
+      <header class="hud">
+        <div class="hud-brand">
+          <img id="hud-stage-art" class="hud-stage-art" width="48" height="48" alt="" decoding="async">
+          <div>
+          <p class="hud-eyebrow" id="hud-stage">Garage</p>
+          <h2 id="hud-company">Company</h2>
+          <p class="hud-mode" id="hud-mode">Career</p>
+          </div>
+        </div>
+        <div class="hud-stats">
+          <div><span class="stat-label">Cash</span><span id="hud-cash" class="stat-value">—</span></div>
+          <div><span class="stat-label">Revenue (life)</span><span id="hud-revenue" class="stat-value">—</span></div>
+          <div><span class="stat-label">Last mo.</span><span id="hud-mrr" class="stat-value">—</span></div>
+          <div><span class="stat-label">Month</span><span id="hud-month" class="stat-value">—</span></div>
+          <div id="hud-stock-wrap"><span class="stat-label">Stock</span><span id="hud-stock" class="stat-value" hidden>—</span></div>
+        </div>
+      </header>
+
+      <nav id="game-tabs" class="game-tabs" role="tablist" aria-label="Company sections">
+        <button type="button" role="tab" class="active" data-tab="desk" id="tab-desk" aria-selected="true" aria-controls="panel-desk">Desk</button>
+        <button type="button" role="tab" data-tab="product" id="tab-product" aria-selected="false" aria-controls="panel-product">Product</button>
+        <button type="button" role="tab" data-tab="growth" id="tab-growth" aria-selected="false" aria-controls="panel-growth">Growth</button>
+        <button type="button" role="tab" data-tab="people" id="tab-people" aria-selected="false" aria-controls="panel-people">People</button>
+        <button type="button" role="tab" data-tab="finance" id="tab-finance" aria-selected="false" aria-controls="panel-finance">Finance</button>
+        <button type="button" role="tab" data-tab="social" id="tab-social" aria-selected="false" aria-controls="panel-social">Social</button>
+        <button type="button" role="tab" data-tab="news" id="tab-news" aria-selected="false" aria-controls="panel-news">News</button>
+        <button type="button" role="tab" data-tab="advisor" id="tab-advisor" aria-selected="false" aria-controls="panel-advisor">Advisor</button>
+      </nav>
+
+      <div class="game-panels">
+        <div id="panel-desk" class="game-panel" data-panel="desk" role="tabpanel" aria-labelledby="tab-desk"></div>
+        <div id="panel-product" class="game-panel" data-panel="product" role="tabpanel" aria-labelledby="tab-product" hidden></div>
+        <div id="panel-growth" class="game-panel" data-panel="growth" role="tabpanel" aria-labelledby="tab-growth" hidden></div>
+        <div id="panel-people" class="game-panel" data-panel="people" role="tabpanel" aria-labelledby="tab-people" hidden></div>
+        <div id="panel-finance" class="game-panel" data-panel="finance" role="tabpanel" aria-labelledby="tab-finance" hidden></div>
+        <div id="panel-social" class="game-panel" data-panel="social" role="tabpanel" aria-labelledby="tab-social" hidden></div>
+        <div id="panel-news" class="game-panel" data-panel="news" role="tabpanel" aria-labelledby="tab-news" hidden></div>
+        <div id="panel-advisor" class="game-panel" data-panel="advisor" role="tabpanel" aria-labelledby="tab-advisor" hidden></div>
+      </div>
+
+      <footer class="game-footer">
+        <p id="game-flash" class="game-flash desk-feedback" hidden aria-live="polite"></p>
+        <span id="save-status" class="save-status fine-print" aria-live="polite" hidden>Progress saved</span>
+        <label class="audio-toggle fine-print">
+          <input type="checkbox" id="toggle-audio" aria-describedby="audio-toggle-hint">
+          Sound effects
+        </label>
+        <span id="audio-toggle-hint" class="visually-hidden">Optional UI clicks and month-close chime</span>
+        <button id="btn-save" class="btn btn-ghost btn-small" type="button" title="Save now — the game also saves as you go">Save</button>
+        <button id="btn-back-start" class="btn btn-ghost btn-small" type="button">Main menu</button>
+      </footer>
+    </section>
+
+    <section id="screen-crisis" class="screen" hidden>
+      <header class="panel-head">
+        <h2>Month-start crisis</h2>
+      </header>
+      <div id="crisis-mount" class="crisis-panel"></div>
+    </section>
+
+    <section id="screen-xc-interview" class="screen" hidden>
+      <header class="panel-head">
+        <h2>X Combinator application</h2>
+      </header>
+      <div id="xc-interview-mount"></div>
+    </section>
+
+    <section id="screen-gameover" class="screen" hidden>
+      <header class="hero">
+        <p class="eyebrow">Run ended</p>
+        <h1 id="gameover-title" tabindex="-1">Company</h1>
+        <div id="gameover-body" class="lede"></div>
+      </header>
+      <div class="gameover-actions">
+        <button id="btn-export-run" class="btn btn-ghost" type="button">Copy run summary</button>
+        <button id="btn-gameover-menu" class="btn btn-primary" type="button">Main menu</button>
+      </div>
+      <p id="export-run-feedback" class="fine-print" hidden aria-live="polite"></p>
+    </section>
+
+    <dialog id="month-summary-dialog" class="month-summary-dialog" aria-labelledby="month-summary-title">
+      <div id="month-summary-body"></div>
+      <form method="dialog" class="month-summary-actions">
+        <button id="btn-month-summary-close" class="btn btn-primary" type="submit">Start next month</button>
+      </form>
+    </dialog>
+  </div>
+  <script>window.__STARTUP_NARRATIVE_API_URL="https://austinbuhltech.com/play/hos/narrate";</script>
+  <script type="module" src="/play/startup-sim/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,979 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "customer-interviews",
+      "title": "Run 10 customer interviews",
+      "description": "Validate pain points before you build the wrong thing.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 150,
+      "revenue": [
+        0,
+        400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "mvp-sprint",
+      "title": "Ship launch sprint",
+      "description": "Close the loop on a thin vertical slice customers can touch.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 800,
+      "revenue": [
+        200,
+        1200
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "landing-page",
+      "title": "Launch landing page + waitlist",
+      "description": "Explain the vision and capture emails.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 350,
+      "revenue": [
+        100,
+        900
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "local-outreach",
+      "title": "Local founder outreach",
+      "description": "Coffee chats, co-working boards, and awkward intros.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 120,
+      "revenue": [
+        300,
+        1500
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "content-blitz",
+      "title": "Content marketing blitz",
+      "description": "Posts, threads, and a newsletter no one asked for yet.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 250,
+      "revenue": [
+        150,
+        1100
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cold-email",
+      "title": "Cold email campaign",
+      "description": "100 personalized emails. 3 replies. 1 maybe.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 100,
+      "revenue": [
+        400,
+        2200
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "bug-bash",
+      "title": "Bug bash week",
+      "description": "Stability over sparkle — keep early users from churning.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 400,
+      "revenue": [
+        100,
+        800
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "partnership-pilot",
+      "title": "Pilot with a friendly partner",
+      "description": "Borrow someone else's logo for credibility.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 500,
+      "revenue": [
+        800,
+        3500
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "pricing-test",
+      "title": "Pricing experiment",
+      "description": "Try three price points; pick the least embarrassing.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 200,
+      "revenue": [
+        200,
+        1400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "community-beta",
+      "title": "Community beta launch",
+      "description": "Invite power users into a noisy Slack you'll regret.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 300,
+      "revenue": [
+        250,
+        1800
+      ],
+      "product": 1,
+      "buzz": 4
+    },
+    {
+      "id": "feature-polish",
+      "title": "Polish core feature",
+      "description": "Make the demo path actually work in meetings.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office"
+      ],
+      "cost": 1200,
+      "revenue": [
+        500,
+        2800
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "paid-ads-test",
+      "title": "Paid ads test budget",
+      "description": "Small spend to learn CAC before you scale.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office"
+      ],
+      "cost": 2000,
+      "revenue": [
+        400,
+        4500
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "xc-demo-day-prep",
+      "title": "Demo Day deck sprint",
+      "description": "Rewrite the narrative until partners stop flinching.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 400,
+      "revenue": [
+        500,
+        2200
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "xc-office-hours",
+      "title": "Partner office hours",
+      "description": "Absorb advice; pretend you already knew it.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 100,
+      "revenue": [
+        200,
+        1200
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "xc-batch-dinner",
+      "title": "Batch dinner networking",
+      "description": "Founders trading intros like Pokémon cards.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "cost": 250,
+      "revenue": [
+        400,
+        2000
+      ],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "xc-investor-coffee",
+      "title": "Investor coffee marathon",
+      "description": "Twelve meetings, one term sheet maybe.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "cost": 350,
+      "revenue": [
+        800,
+        4000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "hub-enterprise-push",
+      "title": "Enterprise hub launch",
+      "description": "Use your new HQ city for flagship customer hunts.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "cost": 2500,
+      "revenue": [
+        1500,
+        6500
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "post-xc-kpi-review",
+      "title": "Company KPI review",
+      "description": "Board deck, metric owners, and one chart that actually trends up.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 1800,
+      "revenue": [
+        1200,
+        7500
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "post-xc-manager-layer",
+      "title": "Build the manager layer",
+      "description": "Team leads, 1:1 templates, and fewer Slack fires.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 3200,
+      "revenue": [
+        2500,
+        11000
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "post-xc-security-review",
+      "title": "Enterprise security review",
+      "description": "Questionnaires, pen tests, and polite answers about encryption.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 4500,
+      "revenue": [
+        4000,
+        18000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "post-xc-churn-war-room",
+      "title": "Churn war room",
+      "description": "Cohort charts, save offers, and a blameless postmortem.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 2800,
+      "revenue": [
+        3500,
+        16000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "national-campaign",
+      "title": "National brand campaign",
+      "description": "Billboards, podcasts, and awkward celebrity endorsements.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 8000,
+      "revenue": [
+        12000,
+        85000
+      ],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "platform-partnerships",
+      "title": "Platform partnership blitz",
+      "description": "Integrate everywhere; hope nobody reads the SLA.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 12000,
+      "revenue": [
+        35000,
+        220000
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "mega-deal-close",
+      "title": "Close the mega-deal",
+      "description": "Legal redlines, procurement gauntlet, champagne that tastes like stress.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 18000,
+      "revenue": [
+        80000,
+        450000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "earnings-call-tour",
+      "title": "Earnings call roadshow",
+      "description": "Explain the same chart to analysts who will forget it immediately.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "cost": 15000,
+      "revenue": [
+        50000,
+        180000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "global-expansion-blitz",
+      "title": "Global expansion sprint",
+      "description": "Open three countries before legal finishes reading page one.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "cost": 22000,
+      "revenue": [
+        90000,
+        320000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "platform-ecosystem-summit",
+      "title": "Platform ecosystem summit",
+      "description": "Keynotes, partner badges, and one demo that actually works.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "cost": 18000,
+      "revenue": [
+        70000,
+        260000
+      ],
+      "product": 2,
+      "buzz": 4
+    },
+    {
+      "id": "cat-saas-soc2",
+      "title": "SOC2 theater sprint",
+      "description": "Audit-ready PDFs before product-ready APIs.",
+      "categories": [
+        "b2b-saas"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "cost": 2200,
+      "revenue": [
+        800,
+        4200
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "cat-saas-enterprise",
+      "title": "Enterprise POC gauntlet",
+      "description": "Three pilots, one procurement dragon.",
+      "categories": [
+        "b2b-saas"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 4500,
+      "revenue": [
+        12000,
+        95000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cat-social-viral",
+      "title": "Viral loop hackathon",
+      "description": "Invite friends to invite friends (ethically-ish).",
+      "categories": [
+        "consumer-social"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 400,
+      "revenue": [
+        300,
+        2800
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "cat-social-creator",
+      "title": "Creator fund launch",
+      "description": "Pay influencers in equity and hope.",
+      "categories": [
+        "consumer-social"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "cost": 1800,
+      "revenue": [
+        2000,
+        12000
+      ],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "cat-mkt-supply",
+      "title": "Supply-side blitz",
+      "description": "Recruit drivers/cleaners/hosts with coupons.",
+      "categories": [
+        "marketplace"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 600,
+      "revenue": [
+        500,
+        3200
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cat-mkt-trust",
+      "title": "Trust & safety sprint",
+      "description": "Background checks and apology templates.",
+      "categories": [
+        "marketplace"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "cost": 1500,
+      "revenue": [
+        2500,
+        14000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "cat-del-routing",
+      "title": "Routing algo tune-up",
+      "description": "Shave minutes off ETA lies.",
+      "categories": [
+        "delivery"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "cost": 2000,
+      "revenue": [
+        4000,
+        18000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "cat-del-dark",
+      "title": "Dark store pilot",
+      "description": "Warehouses full of impulse snacks.",
+      "categories": [
+        "delivery"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 6000,
+      "revenue": [
+        15000,
+        72000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cat-fin-compliance",
+      "title": "Compliance moonshot",
+      "description": "KYC flows that almost feel human.",
+      "categories": [
+        "fintech"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "cost": 3500,
+      "revenue": [
+        3000,
+        22000
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fin-bank",
+      "title": "Bank partner roadshow",
+      "description": "Charm risk officers with charts.",
+      "categories": [
+        "fintech"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 8000,
+      "revenue": [
+        20000,
+        110000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-ai-finetune",
+      "title": "Fine-tune weekend",
+      "description": "GPU bills arrive Monday.",
+      "categories": [
+        "ai-tools"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 900,
+      "revenue": [
+        600,
+        4500
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "cat-ai-enterprise",
+      "title": "Enterprise AI guardrails",
+      "description": "Sell safety slides to nervous CIOs.",
+      "categories": [
+        "ai-tools"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 5000,
+      "revenue": [
+        18000,
+        88000
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "cat-hw-prototype",
+      "title": "Prototype fab run",
+      "description": "Rev D still smells like hot glue.",
+      "categories": [
+        "hardware"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 2500,
+      "revenue": [
+        400,
+        3500
+      ],
+      "product": 3,
+      "buzz": 1
+    },
+    {
+      "id": "cat-hw-retail",
+      "title": "Retail channel test",
+      "description": "Big-box meeting, small-box shipment.",
+      "categories": [
+        "hardware"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "cost": 7000,
+      "revenue": [
+        8000,
+        42000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cat-health-irb",
+      "title": "IRB paperwork marathon",
+      "description": "Ethics boards move at geological speed.",
+      "categories": [
+        "healthtech"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "cost": 4000,
+      "revenue": [
+        5000,
+        28000
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-health-pilot",
+      "title": "Hospital pilot program",
+      "description": "One ward, infinite forms.",
+      "categories": [
+        "healthtech"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 12000,
+      "revenue": [
+        25000,
+        130000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "cat-cl-grid",
+      "title": "Grid partnership pitch",
+      "description": "Utilities love pilots, hate timelines.",
+      "categories": [
+        "climate"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "cost": 5000,
+      "revenue": [
+        6000,
+        38000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cat-cl-credits",
+      "title": "Carbon credit storytelling",
+      "description": "Make offsets sound measurable.",
+      "categories": [
+        "climate"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "cost": 9000,
+      "revenue": [
+        22000,
+        98000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-game-playtest",
+      "title": "Playtest fest",
+      "description": "Streamers break your tutorial in six minutes.",
+      "categories": [
+        "gaming-media"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "cost": 500,
+      "revenue": [
+        400,
+        3200
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "cat-game-live",
+      "title": "Live ops event",
+      "description": "Limited-time skins, unlimited server load.",
+      "categories": [
+        "gaming-media"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "cost": 2800,
+      "revenue": [
+        3500,
+        24000
+      ],
+      "product": 1,
+      "buzz": 4
+    },
+    {
+      "id": "public-investor-day",
+      "title": "Investor day webcast",
+      "description": "Analysts pretend to understand your TAM.",
+      "stages": [
+        "public"
+      ],
+      "cost": 12000,
+      "revenue": [
+        45000,
+        165000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "public-stock-buyback",
+      "title": "Announce buyback theater",
+      "description": "Board approves returning cash you do not have yet.",
+      "stages": [
+        "public"
+      ],
+      "cost": 25000,
+      "revenue": [
+        20000,
+        95000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "public-activist-response",
+      "title": "Activist investor response",
+      "description": "Open letter, closed door, public tweetstorm.",
+      "stages": [
+        "public"
+      ],
+      "cost": 8000,
+      "revenue": [
+        35000,
+        140000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "public-ma-rumor",
+      "title": "M&A rumor management",
+      "description": "Deny the merger talks you started.",
+      "stages": [
+        "public"
+      ],
+      "cost": 5000,
+      "revenue": [
+        60000,
+        220000
+      ],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "public-product-keynote",
+      "title": "Product keynote livestream",
+      "description": "Demo gods must be appeased.",
+      "stages": [
+        "public"
+      ],
+      "cost": 14000,
+      "revenue": [
+        55000,
+        190000
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "public-regulatory-filing",
+      "title": "Regulatory filing sprint",
+      "description": "Lawyers bill, stock ticks.",
+      "stages": [
+        "public"
+      ],
+      "cost": 18000,
+      "revenue": [
+        40000,
+        155000
+      ],
+      "product": 0,
+      "buzz": 0
+    }
+  ]
+}

@@ -27,6 +27,17 @@ export const workItems: WorkItem[] = [
     hostedEntry: "/play/eer/index.html",
   },
   {
+    slug: "startup-sim",
+    title: "Startup Simulator",
+    summary:
+      "Garage-to-IPO startup tycoon: revenue gates, fundraising, cap table, AI news and social feeds, and a chief-of-staff advisor. Career and Sandbox modes.",
+    kind: "hosted",
+    status: "live",
+    tags: ["game", "javascript", "simulation"],
+    featured: true,
+    hostedEntry: "/play/startup-sim/index.html",
+  },
+  {
     slug: "hos",
     title: "House of Strategy",
     summary:

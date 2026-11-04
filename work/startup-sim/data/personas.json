@@ -1,0 +1,10 @@
+{
+  "personas": [
+    { "id": "vc-parrot", "name": "Patty Fundsworth", "handle": "@fundsworth", "network": "chirp", "role": "VC" },
+    { "id": "tech-journo", "name": "Sam Scoop", "handle": "sam-scoop", "network": "pronet", "role": "journalist" },
+    { "id": "rival-ceo", "name": "Blake Rival", "handle": "blake-rival", "network": "pronet", "role": "competitor" },
+    { "id": "eng-hire", "name": "Jordan Backend", "handle": "@jbackend", "network": "chirp", "role": "employee" },
+    { "id": "anon-founder", "name": "Stealth Mode Stan", "handle": "@stealthstan", "network": "chirp", "role": "founder" },
+    { "id": "corp-dev", "name": "Morgan Acqui", "handle": "morgan-acqui", "network": "pronet", "role": "corp" }
+  ]
+}

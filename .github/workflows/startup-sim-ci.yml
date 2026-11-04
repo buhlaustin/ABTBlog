@@ -1,0 +1,60 @@
+name: Startup Simulator CI
+
+on:
+  push:
+    branches: [main, 'cursor/**']
+    paths:
+      - 'work/startup-sim/**'
+      - 'scripts/startup-sim-*.mjs'
+      - 'scripts/validate-startup-sim-assets.mjs'
+      - 'scripts/copy-work-assets.mjs'
+      - 'e2e/**'
+      - 'playwright.config.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/startup-sim-ci.yml'
+  pull_request:
+    paths:
+      - 'work/startup-sim/**'
+      - 'scripts/startup-sim-*.mjs'
+      - 'scripts/validate-startup-sim-assets.mjs'
+      - 'scripts/copy-work-assets.mjs'
+      - 'e2e/**'
+      - 'playwright.config.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/startup-sim-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  startup-sim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Headless module smoke
+        run: npm run smoke:startup-sim
+
+      - name: UI wiring audit
+        run: npm run audit:startup-sim-wiring
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Playwright browser smoke
+        run: npm run e2e:startup-sim
+
+      - name: Narrative API health (optional)
+        continue-on-error: true
+        run: npm run smoke:startup-sim-ai
+        env:
+          HOS_NARRATIVE_API_URL: ${{ secrets.HOS_NARRATIVE_API_URL }}
