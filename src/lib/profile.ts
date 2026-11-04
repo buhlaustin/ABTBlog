@@ -10,7 +10,6 @@ export const authorCard = {
 
 export const profile = {
   role: "Software Engineer",
-  tagline: "Indie game designer",
   company: "ClassQuip",
   companyUrl: "https://www.classquip.com",
   previousEmployer: "Stride / K12",
