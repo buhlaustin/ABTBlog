@@ -1,16 +1,20 @@
 import { STAGES } from './constants.js';
 import { assetBaseUrl } from './utils.js';
+import bundledManifest from '../assets/manifest.json' with { type: 'json' };
 
-let manifest = null;
+let manifest = bundledManifest;
 
 export async function loadAssetManifest() {
-  if (manifest) return manifest;
   try {
     const res = await fetch(`${assetBaseUrl()}assets/manifest.json`, { cache: 'no-store' });
-    if (!res.ok) throw new Error('manifest missing');
-    manifest = await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.assets) && data.assets.length > 0) {
+        manifest = data;
+      }
+    }
   } catch {
-    manifest = { version: 1, assets: [] };
+    /* keep bundled manifest */
   }
   return manifest;
 }

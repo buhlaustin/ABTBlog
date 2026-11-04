@@ -68,30 +68,37 @@ export function shouldUseNarrativeAi() {
   return true;
 }
 
-export async function probeNarrativeApi() {
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function probeNarrativeApi({ retries = 3 } = {}) {
   const url = resolveNarrativeApiUrl() || getNarrativeApiUrl();
   if (!url) {
     narrativeApiLive = false;
     return false;
   }
 
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ kind: 'startup_health', context: { ping: true } })
-    });
-    if (!res.ok) {
-      narrativeApiLive = false;
-      return false;
+  for (let attempt = 0; attempt < retries; attempt += 1) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ kind: 'startup_health', context: { ping: true } })
+      });
+      if (!res.ok) throw new Error(`health ${res.status}`);
+      const data = await res.json();
+      narrativeApiLive = Boolean(data?.ok && data?.startupKinds);
+      return narrativeApiLive;
+    } catch {
+      if (attempt < retries - 1) {
+        await sleep(350 * (attempt + 1));
+      }
     }
-    const data = await res.json();
-    narrativeApiLive = Boolean(data?.ok && data?.startupKinds);
-    return narrativeApiLive;
-  } catch {
-    narrativeApiLive = false;
-    return false;
   }
+
+  narrativeApiLive = false;
+  return false;
 }
 
 export async function requestNarrative(kind, context) {

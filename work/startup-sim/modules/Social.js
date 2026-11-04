@@ -1,8 +1,9 @@
 import { assetBaseUrl } from './utils.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
+import bundledPersonas from '../data/personas.json' with { type: 'json' };
 
-let personasCache = null;
+let personasCache = bundledPersonas.personas ?? [];
 export const CHIRP_LIMIT = 240;
 
 export function createInitialSocial() {
@@ -15,12 +16,16 @@ export function createInitialSocial() {
 }
 
 async function loadPersonas() {
-  if (personasCache) return personasCache;
   try {
     const res = await fetch(`${assetBaseUrl()}data/personas.json`, { cache: 'no-store' });
-    personasCache = (await res.json()).personas ?? [];
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.personas) && data.personas.length > 0) {
+        personasCache = data.personas;
+      }
+    }
   } catch {
-    personasCache = [];
+    /* keep bundled personas */
   }
   return personasCache;
 }

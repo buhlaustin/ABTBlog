@@ -1,14 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-  <rect width="800" height="120" fill="#0d1520"/>
-  <rect x="0" y="95" width="800" height="25" fill="#1e2636"/>
-  <rect x="40" y="35" width="35" height="60" fill="#141c28" stroke="#5b9cff"/>
-  <rect x="90" y="22" width="50" height="73" fill="#141c28" stroke="#9aa7bd"/>
-  <rect x="160" y="40" width="30" height="55" fill="#141c28" stroke="#9aa7bd"/>
-  <rect x="220" y="12" width="65" height="83" fill="#141c28" stroke="#3dd68c"/>
-  <rect x="310" y="28" width="45" height="67" fill="#141c28" stroke="#5b9cff"/>
-  <rect x="380" y="8" width="80" height="87" fill="#141c28" stroke="#5b9cff"/>
-  <rect x="480" y="32" width="40" height="63" fill="#141c28" stroke="#9aa7bd"/>
-  <rect x="540" y="18" width="55" height="77" fill="#141c28" stroke="#9aa7bd"/>
-  <rect x="620" y="38" width="38" height="57" fill="#141c28" stroke="#9aa7bd"/>
-  <rect x="680" y="25" width="70" height="70" fill="#141c28" stroke="#5b9cff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="bay-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a6fa5"/>
+      <stop offset="100%" stop-color="#0f1824"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="280" fill="url(#bay-sky)"/>
+  <path d="M0 230 Q200 210 400 225 T800 218 T1200 228 L1200 280 L0 280 Z" fill="#152030"/>
+  <path d="M180 228 L220 80 L260 228 Z" fill="#1e2838" stroke="#9aa7bd"/>
+  <path d="M520 228 L560 45 L600 228 Z" fill="#243044" stroke="#5b9cff"/>
+  <path d="M200 228 L600 178 L1000 228" stroke="#c45c26" stroke-width="4" fill="none" opacity="0.75"/>
+  <g fill="#121820" stroke="#3d4a5c">
+    <rect x="60" y="120" width="50" height="108"/><rect x="130" y="95" width="65" height="133"/>
+    <rect x="320" y="110" width="45" height="118"/><rect x="680" y="100" width="70" height="128"/>
+    <rect x="780" y="130" width="42" height="98"/><rect x="850" y="85" width="80" height="143"/>
+    <rect x="960" y="115" width="55" height="113"/><rect x="1040" y="140" width="48" height="88"/>
+  </g>
+  <g fill="#ffe9b0" opacity="0.45">
+    <rect x="870" y="100" width="4" height="7"/><rect x="885" y="120" width="4" height="7"/><rect x="900" y="95" width="4" height="7"/>
+  </g>
 </svg>

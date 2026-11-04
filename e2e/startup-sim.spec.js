@@ -8,6 +8,7 @@ test.describe('Startup Simulator', () => {
     await page.goto('/play/startup-sim/index.html');
     await page.evaluate((key) => localStorage.removeItem(key), SAVE_KEY);
     await page.reload();
+    await expect(page.locator('body[data-startup-sim-ready="true"]')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole('button', { name: 'New game' })).toBeVisible();
   });
 

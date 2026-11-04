@@ -16,6 +16,6 @@ Stage HUD icons under `assets/icons/*.svg` — simple vector art authored for th
 
 ## Shipped (Phase 7 — content & polish)
 
-Wide **stage backdrops** under `assets/backgrounds/*-bg.svg` and **hub skylines** under `assets/backgrounds/hub-*.svg` — authored SVG (CC0-1.0), referenced from `manifest.json` v2 and applied in-game via `Assets.js` (`gameBackdropUrl`).
+Wide **stage backdrops** (`1200×280`, layered gradients, skylines, hub palettes) under `assets/backgrounds/*-bg.svg` and **hub skylines** under `assets/backgrounds/hub-*.svg` — authored SVG (CC0-1.0), `manifest.json` v3, applied via `Assets.js` (`gameBackdropUrl`).
 
 **Audio** uses Web Audio sine tones in `modules/Audio.js` (no binary assets); off by default, toggled in the game footer.

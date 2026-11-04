@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-  <rect x="14" y="12" width="36" height="44" rx="2" fill="#151a22" stroke="#5b9cff" stroke-width="2"/>
-  <rect x="20" y="18" width="8" height="8" fill="#3d6fbf" opacity="0.8"/>
-  <rect x="36" y="18" width="8" height="8" fill="#3d6fbf" opacity="0.8"/>
-  <rect x="20" y="30" width="8" height="8" fill="#3d6fbf" opacity="0.6"/>
-  <rect x="36" y="30" width="8" height="8" fill="#3d6fbf" opacity="0.6"/>
-  <rect x="28" y="44" width="8" height="12" fill="#0c0f14"/>
+  <rect x="4" y="4" width="56" height="56" rx="8" fill="#0c0f14"/>
+  <rect x="14" y="18" width="36" height="38" rx="2" fill="#1a2332" stroke="#5b9cff" stroke-width="1.5"/>
+  <g stroke="#2a3344" stroke-width="1">
+    <line x1="26" y1="18" x2="26" y2="56"/><line x1="38" y1="18" x2="38" y2="56"/>
+    <line x1="14" y1="32" x2="50" y2="32"/><line x1="14" y1="44" x2="50" y2="44"/>
+  </g>
+  <rect x="18" y="22" width="6" height="7" fill="#ffe9b0" opacity="0.7"/>
+  <rect x="30" y="36" width="6" height="7" fill="#ffe9b0" opacity="0.55"/>
+  <rect x="42" y="24" width="6" height="7" fill="#5b9cff" opacity="0.45"/>
+  <rect x="12" y="56" width="40" height="4" fill="#2a3344"/>
 </svg>

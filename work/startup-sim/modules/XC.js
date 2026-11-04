@@ -1,16 +1,21 @@
 import { assetBaseUrl } from './utils.js';
 import { applyXCSafe } from './CapTable.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
+import bundledInterview from '../data/xc-interview.json' with { type: 'json' };
 
-let interviewCache = null;
+let interviewCache = bundledInterview;
 
 export async function loadInterviewQuestions() {
-  if (interviewCache) return interviewCache;
   try {
     const res = await fetch(`${assetBaseUrl()}data/xc-interview.json`, { cache: 'no-store' });
-    interviewCache = await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.questions) && data.questions.length > 0) {
+        interviewCache = data;
+      }
+    }
   } catch {
-    interviewCache = { questions: [] };
+    /* keep bundled questions */
   }
   return interviewCache;
 }

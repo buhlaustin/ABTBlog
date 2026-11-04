@@ -2,20 +2,25 @@ import { assetBaseUrl } from './utils.js';
 import { adjustSentiment } from './Sentiment.js';
 import { bumpCompetitorPressure, easeCompetitorPressure } from './Competitor.js';
 import { isPublicCompany } from './IPO.js';
+import bundledCrises from '../data/crises.json' with { type: 'json' };
 
-let crisisCatalog = null;
+let crisisCatalog = bundledCrises;
 
 export function createInitialCrisisState() {
   return { active: null };
 }
 
 async function loadCrises() {
-  if (crisisCatalog) return crisisCatalog;
   try {
     const res = await fetch(`${assetBaseUrl()}data/crises.json`, { cache: 'no-store' });
-    crisisCatalog = await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.crises) && data.crises.length > 0) {
+        crisisCatalog = data;
+      }
+    }
   } catch {
-    crisisCatalog = { crises: [] };
+    /* keep bundled crises */
   }
   return crisisCatalog;
 }

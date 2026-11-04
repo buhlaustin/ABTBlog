@@ -1,15 +1,22 @@
 import { assetBaseUrl } from './utils.js';
 import { STAGES, formatMoney } from './constants.js';
+import bundledHubs from '../data/hubs.json' with { type: 'json' };
 
-let hubsCache = null;
+let hubsCache = bundledHubs;
 
 export async function loadHubData() {
-  if (hubsCache) return hubsCache;
+  if (!hubsCache?.hubs?.length) {
+    throw new Error('startup-sim: bundled hubs.json is empty');
+  }
   try {
     const res = await fetch(`${assetBaseUrl()}data/hubs.json`, { cache: 'no-store' });
-    hubsCache = await res.json();
+    if (!res.ok) return hubsCache;
+    const data = await res.json();
+    if (Array.isArray(data.hubs) && data.hubs.length > 0) {
+      hubsCache = data;
+    }
   } catch {
-    hubsCache = { hubs: [], satelliteTemplates: [] };
+    /* keep bundled hubs */
   }
   return hubsCache;
 }

@@ -1,13 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-  <rect width="800" height="120" fill="#0a1018"/>
-  <rect x="0" y="98" width="800" height="22" fill="#252530"/>
-  <rect x="50" y="15" width="55" height="83" fill="#121820" stroke="#fbbf24" opacity="0.9"/>
-  <rect x="120" y="35" width="40" height="63" fill="#121820" stroke="#9aa7bd"/>
-  <rect x="175" y="8" width="70" height="90" fill="#121820" stroke="#9aa7bd"/>
-  <rect x="260" y="28" width="45" height="70" fill="#121820" stroke="#9aa7bd"/>
-  <rect x="320" y="5" width="90" height="93" fill="#121820" stroke="#fbbf24"/>
-  <rect x="430" y="30" width="50" height="68" fill="#121820" stroke="#9aa7bd"/>
-  <rect x="500" y="12" width="60" height="86" fill="#121820" stroke="#9aa7bd"/>
-  <rect x="580" y="25" width="75" height="73" fill="#121820" stroke="#5b9cff"/>
-  <rect x="670" y="40" width="55" height="58" fill="#121820" stroke="#9aa7bd"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="nyc-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a3548"/>
+      <stop offset="100%" stop-color="#0a0e14"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="280" fill="url(#nyc-sky)"/>
+  <rect x="0" y="235" width="1200" height="45" fill="#1a1a1a"/>
+  <rect x="520" y="35" width="160" height="200" fill="#141c28" stroke="#9aa7bd"/>
+  <rect x="575" y="15" width="50" height="220" fill="#1a2332" stroke="#5b9cff"/>
+  <g fill="#101820" stroke="#2a3344">
+    <rect x="80" y="100" width="55" height="135"/><rect x="160" y="130" width="48" height="105"/>
+    <rect x="240" y="85" width="72" height="150"/><rect x="340" y="115" width="40" height="120"/>
+    <rect x="720" y="105" width="60" height="130"/><rect x="800" y="140" width="45" height="95"/>
+    <rect x="880" y="90" width="78" height="145"/><rect x="980" y="125" width="50" height="110"/>
+    <rect x="1060" y="150" width="55" height="85"/>
+  </g>
+  <rect x="0" y="248" width="120" height="8" fill="#fbbf24" opacity="0.85"/>
+  <rect x="140" y="252" width="80" height="5" fill="#fbbf24" opacity="0.5"/>
 </svg>

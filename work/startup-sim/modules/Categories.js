@@ -1,30 +1,36 @@
 import { assetBaseUrl } from './utils.js';
 import { clamp } from './utils.js';
+import bundledCategories from '../data/categories.json' with { type: 'json' };
 
-let categoriesCache = null;
+let categoriesCache = bundledCategories;
 
 export async function loadCategories() {
-  if (categoriesCache) return categoriesCache;
+  if (!categoriesCache?.length) {
+    throw new Error('startup-sim: bundled categories.json is empty');
+  }
   try {
     const res = await fetch(`${assetBaseUrl()}data/categories.json`, { cache: 'no-store' });
-    if (!res.ok) throw new Error('categories fetch failed');
-    categoriesCache = await res.json();
+    if (!res.ok) return categoriesCache;
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      categoriesCache = data;
+    }
   } catch {
-    categoriesCache = FALLBACK_CATEGORIES;
+    /* keep bundled list */
   }
   return categoriesCache;
 }
 
 export function getCategoryById(id, list = categoriesCache) {
-  const source = list || FALLBACK_CATEGORIES;
+  const source = list || bundledCategories;
   return source.find((c) => c.id === id);
 }
 
 export function getCategoriesSync() {
-  return categoriesCache ?? FALLBACK_CATEGORIES;
+  return categoriesCache ?? bundledCategories;
 }
 
-/** Category-driven unit economics for Phase 1 tasks. */
+/** Category-driven unit economics for tasks. */
 export function categoryEconomics(category) {
   if (!category) {
     return { revenueMult: 1, costMult: 1, label: 'General' };
@@ -41,11 +47,5 @@ export function categoryEconomics(category) {
   return { revenueMult, costMult, label: category.label };
 }
 
-const FALLBACK_CATEGORIES = [
-  { id: 'b2b-saas', label: 'B2B SaaS', defaultACV: 12000, salesCycleWeeks: 8 },
-  { id: 'consumer-social', label: 'Consumer social', defaultACV: 0, salesCycleWeeks: 0 },
-  { id: 'marketplace', label: 'Marketplace / gig economy', defaultACV: 2400, salesCycleWeeks: 4 }
-];
-
 /** @deprecated use loadCategories */
-export const STARTUP_CATEGORIES = FALLBACK_CATEGORIES;
+export const STARTUP_CATEGORIES = bundledCategories;

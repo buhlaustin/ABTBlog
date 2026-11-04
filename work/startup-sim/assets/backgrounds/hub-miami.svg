@@ -1,15 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
   <defs>
-    <linearGradient id="m" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0a1830"/>
-      <stop offset="100%" stop-color="#1a3050"/>
+    <linearGradient id="mia-sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff9a8b"/>
+      <stop offset="45%" stop-color="#6b8cff"/>
+      <stop offset="100%" stop-color="#1a2840"/>
     </linearGradient>
   </defs>
-  <rect width="800" height="120" fill="url(#m)"/>
-  <rect x="0" y="100" width="800" height="20" fill="#2a6080" opacity="0.5"/>
-  <rect x="100" y="45" width="120" height="55" fill="#142030" stroke="#5b9cff"/>
-  <rect x="250" y="55" width="80" height="45" fill="#142030" stroke="#3dd68c"/>
-  <rect x="360" y="30" width="50" height="70" fill="#142030" stroke="#f472b6"/>
-  <rect x="430" y="50" width="200" height="50" fill="#142030" stroke="#5b9cff"/>
-  <rect x="650" y="38" width="60" height="62" fill="#142030" stroke="#3dd68c"/>
+  <rect width="1200" height="280" fill="url(#mia-sky)"/>
+  <rect x="0" y="240" width="1200" height="40" fill="#f4a896" opacity="0.35"/>
+  <g fill="#fce4d6" stroke="#e8a598">
+    <rect x="200" y="130" width="120" height="110" rx="2"/>
+    <rect x="350" y="110" width="100" height="130" rx="2"/>
+    <rect x="480" y="125" width="90" height="115" rx="2"/>
+    <rect x="600" y="100" width="130" height="140" rx="2"/>
+    <rect x="760" y="120" width="95" height="120" rx="2"/>
+    <rect x="880" y="135" width="110" height="105" rx="2"/>
+  </g>
+  <g fill="#5b9cff" opacity="0.35">
+    <rect x="215" y="145" width="8" height="12"/><rect x="240" y="160" width="8" height="12"/>
+    <rect x="615" y="120" width="8" height="12"/><rect x="640" y="140" width="8" height="12"/>
+  </g>
+  <path d="M0 250 Q300 235 600 245 T1200 238 L1200 280 L0 280 Z" fill="#0d3d56" opacity="0.5"/>
 </svg>

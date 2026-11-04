@@ -1,7 +1,13 @@
 import { loadCategories } from './modules/Categories.js';
 import { createInitialState, normalizeSave } from './modules/GameState.js';
 import { StorageManager } from './modules/Storage.js';
-import { loadTaskCatalog, getTaskDef, getTaskDefinitions, dealMonthlyTasks } from './modules/Tasks.js';
+import {
+  loadTaskCatalog,
+  getTaskDef,
+  getTaskDefinitions,
+  dealMonthlyTasks,
+  isTaskCatalogReady
+} from './modules/Tasks.js';
 import {
   initNarrativeApiUrl,
   isNarrativeApiEnabled,
@@ -603,14 +609,41 @@ function bindGameInteractions() {
 }
 
 async function init() {
-  await Promise.all([
-    loadCategories(),
-    loadTaskCatalog(),
-    loadHubData(),
-    loadAssetManifest(),
-    initNarrativeApiUrl()
-  ]);
-  await probeNarrativeApi();
+  function showBootstrapError(message) {
+    const el = document.getElementById('start-boot-status');
+    if (!el) return;
+    el.hidden = false;
+    el.textContent = message;
+    el.classList.add('error');
+    document.getElementById('btn-new')?.setAttribute('disabled', 'disabled');
+    document.getElementById('btn-load')?.setAttribute('disabled', 'disabled');
+  }
+
+  function flashLoadError(message) {
+    const el = document.getElementById('start-boot-status');
+    if (!el) return;
+    el.hidden = false;
+    el.textContent = message;
+    el.classList.add('error');
+  }
+
+  try {
+    await Promise.all([
+      loadCategories(),
+      loadTaskCatalog(),
+      loadHubData(),
+      loadAssetManifest(),
+      initNarrativeApiUrl()
+    ]);
+  } catch {
+    showBootstrapError('Game data did not load. Reload the page and try again.');
+    return;
+  }
+
+  if (!isTaskCatalogReady()) {
+    showBootstrapError('Task list missing — reload the page.');
+    return;
+  }
 
   const categories = await loadCategories();
   const categorySelect = document.getElementById('startup-category');
@@ -632,16 +665,9 @@ async function init() {
     setAudioEnabled(e.target.checked);
   });
 
-  function flashLoadError(message) {
-    const el = document.getElementById('start-api-status');
-    if (!el) return;
-    el.hidden = false;
-    el.textContent = message;
-    el.classList.add('error');
-  }
-
-  const apiStatus = document.getElementById('start-api-status');
-  if (apiStatus) {
+  function syncNarrativeStatus() {
+    const apiStatus = document.getElementById('start-api-status');
+    if (!apiStatus) return;
     apiStatus.hidden = false;
     apiStatus.classList.remove('error');
     if (isNarrativeApiLive()) {
@@ -649,7 +675,7 @@ async function init() {
         'The wire is live — batch interviews, headlines, social chatter, advisor notes, and IPO press are freshly written.';
     } else if (isNarrativeApiEnabled()) {
       apiStatus.textContent =
-        'Headlines and chatter are on backup scripts for now. Same game — a little less surprise on the News and Social tabs.';
+        'Story server did not respond — reload the page. Interviews, headlines, and social need that connection.';
       apiStatus.classList.add('error');
     } else {
       apiStatus.hidden = true;
@@ -737,6 +763,9 @@ async function init() {
   });
 
   showScreen('start');
+  document.body.dataset.startupSimReady = 'true';
+
+  void probeNarrativeApi({ retries: 3 }).then(() => syncNarrativeStatus());
 }
 
 init();

@@ -3,16 +3,21 @@ import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 import { maybeCompetitorNewsArticle, bumpCompetitorPressure } from './Competitor.js';
 import { stageLabel } from './constants.js';
+import bundledTimeline from '../data/news-timeline-seed.json' with { type: 'json' };
 
-let timelineSeed = null;
+let timelineSeed = bundledTimeline;
 
 async function loadTimelineSeed() {
-  if (timelineSeed) return timelineSeed;
   try {
     const res = await fetch(`${assetBaseUrl()}data/news-timeline-seed.json`, { cache: 'no-store' });
-    timelineSeed = await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.events)) {
+        timelineSeed = data;
+      }
+    }
   } catch {
-    timelineSeed = { events: [] };
+    /* keep bundled timeline */
   }
   return timelineSeed;
 }
