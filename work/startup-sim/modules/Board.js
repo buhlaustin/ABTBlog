@@ -97,10 +97,14 @@ export function renderBoardPanel(container, state) {
       const btn = done
         ? '<span class="task-done-label">Done</span>'
         : `<button type="button" class="btn btn-ghost btn-small" data-complete-board-task="${escapeHtml(inst.instanceId)}">Do task</button>`;
+      const approval =
+        def.sentiment != null && def.sentiment !== 0
+          ? ` · board approval +${def.sentiment}`
+          : '';
       return `<article class="task-card ${done ? 'done' : ''}">
         <h3>${escapeHtml(def.title)}</h3>
         <p>${escapeHtml(def.description)}</p>
-        <p class="task-meta">Cost ~${formatMoney(def.cost)} · optional · boosts board mood</p>
+        <p class="task-meta">Cost ~${formatMoney(def.cost)} · optional${approval}${def.buzz ? ` · buzz +${def.buzz}` : ''}</p>
         ${btn}
       </article>`;
     })

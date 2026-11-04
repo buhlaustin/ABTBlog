@@ -131,4 +131,84 @@ if (totalHeadcountCap(state) !== 0) {
 if (normalizeSave(null) !== null) failed = true;
 if (normalizeSave({ company: {}, finance: {} }) !== null) failed = true;
 
+const { getTaskRevenueMultiplierPreview } = await import(
+  `file://${join(sim, 'modules/Finance.js')}`
+);
+const careerMult = getTaskRevenueMultiplierPreview(state);
+if (careerMult < 0.9 || careerMult > 2.5) {
+  console.error(`FAIL: career HUD revenue mult out of range: ${careerMult}`);
+  failed = true;
+} else {
+  console.log(`OK: career effective revenue mult ${careerMult}`);
+}
+
+const sandboxState = createInitialState({
+  companyName: 'SandboxMult',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxTuning: { revenueMult: 2, costMult: 1, ipoGateArr: 1_000_000_000 }
+});
+const sandboxMult = getTaskRevenueMultiplierPreview(sandboxState);
+if (sandboxMult < 1.5) {
+  console.error(`FAIL: sandbox 2x tuning should raise effective mult, got ${sandboxMult}`);
+  failed = true;
+} else {
+  console.log(`OK: sandbox tuned revenue mult ${sandboxMult}`);
+}
+
+const { completeXcAcceptance, maybeStartScheduledXcBatch, isInResidency } = await import(
+  `file://${join(sim, 'modules/XC.js')}`
+);
+const { startMonth } = await import(`file://${join(sim, 'modules/Calendar.js')}`);
+const xcState = createInitialState({
+  companyName: 'XCSchedule',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+xcState.flags.xcUnlocked = true;
+const accept = completeXcAcceptance(xcState);
+if (!accept.ok || !xcState.xc?.batchStartsTurn) {
+  console.error('FAIL: XC acceptance should schedule batch start turn');
+  failed = true;
+} else if (isInResidency(xcState)) {
+  console.error('FAIL: XC batch should not start same month as acceptance');
+  failed = true;
+} else {
+  xcState.calendar.monthIndex += 1;
+  startMonth(xcState);
+  if (!isInResidency(xcState) || xcState.xc?.residencyMonthsRemaining !== 3) {
+    console.error('FAIL: XC batch should begin next month with 3 months remaining');
+    failed = true;
+  } else {
+    console.log('OK: XC batch starts month after acceptance');
+  }
+}
+
+const { completeBoardTask, dealBoardTasks } = await import(
+  `file://${join(sim, 'modules/Board.js')}`
+);
+const boardState = createInitialState({
+  companyName: 'BoardSmoke',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+dealBoardTasks(boardState);
+const inst = boardState.board?.monthTasks?.[0];
+if (!inst) {
+  console.error('FAIL: board tasks not dealt');
+  failed = true;
+} else {
+  const boardResult = completeBoardTask(boardState, inst.instanceId);
+  if (
+    !boardResult.ok ||
+    boardResult.sentimentAfter == null ||
+    boardResult.sentimentDelta == null
+  ) {
+    console.error('FAIL: board task should return approval delta and new score');
+    failed = true;
+  } else {
+    console.log('OK: board task outcome fields');
+  }
+}
+
 process.exit(failed ? 1 : 0);

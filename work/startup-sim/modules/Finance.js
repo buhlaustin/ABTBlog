@@ -11,7 +11,7 @@ import { satelliteRent } from './Offices.js';
 import { workspaceRentMonthly, getArr } from './Workspace.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
-import { xcProgramRevenueMult } from './XC.js';
+import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
 
 /** Post-seed scaling so late-game tasks can reach the $1B gate in a reasonable run. */
@@ -98,9 +98,10 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + revenue;
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
 
-  const productGain = Math.round((rolled.product ?? 0) * (state.xc?.graduateBoostMonths ? 1.05 : 1));
+  const productGain = Math.round((rolled.product ?? 0) * xcProgramProductBonus(state));
   state.product.level = (state.product.level ?? 0) + productGain;
-  state.product.buzz = (state.product.buzz ?? 0) + (rolled.buzz ?? 0);
+  const buzzGain = rolled.buzz ?? 0;
+  state.product.buzz = (state.product.buzz ?? 0) + buzzGain;
 
   return { cost, revenue };
 }

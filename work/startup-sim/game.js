@@ -547,7 +547,7 @@ function handleSelectHub() {
     refresh();
     return;
   }
-  appendLog(sessionState, `HQ set in ${result.hub.label} — seed fundraising unlocked.`);
+  appendLog(sessionState, `HQ set in ${result.hub.label} — hub modifiers active.`);
   syncStageFromProgress(sessionState);
   showOfficesFeedback(`Hub: ${result.hub.label}`);
   refresh();

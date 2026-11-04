@@ -49,7 +49,14 @@ export function advanceCalendarMonth(state) {
 }
 
 export function startMonth(state) {
+  const stageBeforeBatch = state.stage;
   maybeStartScheduledXcBatch(state);
+  syncStageFromProgress(state);
+  if (state.stage !== stageBeforeBatch) {
+    for (const line of onStageChange(state, stageBeforeBatch, state.stage)) {
+      appendLog(state, line);
+    }
+  }
   syncDraftFromFinalized(state);
   dealMonthlyTasks(state);
   dealBoardTasks(state);
@@ -105,6 +112,14 @@ export function endMonth(state) {
   }
   tickXcGraduateBoost(state);
   tickAcceleratorBoost(state);
+
+  const stageBeforeResidencySync = state.stage;
+  syncStageFromProgress(state);
+  if (state.stage !== stageBeforeResidencySync) {
+    for (const line of onStageChange(state, stageBeforeResidencySync, state.stage)) {
+      appendLog(state, line);
+    }
+  }
 
   if (state.finance.cash < 0) {
     state.flags.gameOver = true;

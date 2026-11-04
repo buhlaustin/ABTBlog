@@ -8,13 +8,12 @@ import { createInitialOffices } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn } from './Workspace.js';
 import { createInitialExecutives, migrateLegacyCoo } from './Executives.js';
 import { createInitialBoard } from './Board.js';
-import { createInitialXcState } from './XC.js';
+import { createInitialXcState, calendarTurn } from './XC.js';
 import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
 import { createInitialCrisisState } from './Crisis.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
-import { calendarTurn } from './XC.js';
 import { syncStageFromProgress } from './Progression.js';
 import { syncLifetimeProfit } from './Finance.js';
 import {

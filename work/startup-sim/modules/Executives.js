@@ -65,37 +65,106 @@ function pick(pool, rng, usedSet) {
 }
 
 const ROLE_BIO_LEADS = {
-  COO: 'Operator who scales teams without breaking culture.',
-  CFO: 'Finance leader obsessed with runway and clean audits.',
-  CTO: 'Technical exec who still reads diffs on Friday nights.',
-  CMO: 'Brand builder who turns buzz into pipeline.',
-  CRO: 'Revenue leader who lives in the CRM.',
-  CPO: 'Product exec who talks to customers every week.',
-  CHRO: 'People leader who hires fast and fires fair.',
-  CIO: 'Systems exec who untangles enterprise messes.',
-  CSO: 'Security-minded exec for when the board asks hard questions.',
-  'General Counsel': 'Startup lawyer who has seen every term sheet trick.',
-  'VP Engineering': 'Engineering leader who ships predictable quarters.',
-  'VP Sales': 'Sales leader who builds repeatable outbound.',
-  'VP Marketing': 'Marketing leader who measures everything.',
-  'VP Product': 'Product leader who connects roadmap to revenue.',
-  'VP Operations': 'Ops leader who makes chaos boring.',
-  'VP Finance': 'Finance leader who models scenarios in spreadsheets.'
+  COO: [
+    'Operator who scales teams without breaking culture.',
+    'Process nerd who makes weekly ops reviews actually useful.',
+    'Former chief of staff who learned to say no to the CEO politely.'
+  ],
+  CFO: [
+    'Finance leader obsessed with runway and clean audits.',
+    'FP&A hawk who models three scenarios before breakfast.',
+    'Ex-auditor who keeps the board out of surprise restatements.'
+  ],
+  CTO: [
+    'Technical exec who still reads diffs on Friday nights.',
+    'Architecture-first leader who hates one-off hacks.',
+    'Shipped two zero-downtime migrations and talks about both.'
+  ],
+  CMO: [
+    'Brand builder who turns buzz into pipeline.',
+    'Demand-gen lead who A/B tests the A/B tests.',
+    'Storyteller who makes analysts care about your wedge.'
+  ],
+  CRO: [
+    'Revenue leader who lives in the CRM.',
+    'Quota crusher who coaches reps on discovery calls.',
+    'Enterprise closer who speaks procurement fluently.'
+  ],
+  CPO: [
+    'Product exec who talks to customers every week.',
+    'Roadmap diplomat between sales promises and eng reality.',
+    'Metrics-driven PM who killed a beloved feature once.'
+  ],
+  CHRO: [
+    'People leader who hires fast and fires fair.',
+    'Culture carrier who fixes broken performance reviews.',
+    'Comp whisperer who keeps exec hires from blowing the band.'
+  ],
+  CIO: [
+    'Systems exec who untangles enterprise messes.',
+    'Integration veteran who survived three ERP go-lives.',
+    'Data governance nerd the board actually listens to.'
+  ],
+  CSO: [
+    'Security-minded exec for when the board asks hard questions.',
+    'Incident commander who ran a tabletop that saved a deal.',
+    'Zero-trust advocate with scars from a phishing test fail.'
+  ],
+  'General Counsel': [
+    'Startup lawyer who has seen every term sheet trick.',
+    'Commercial counsel who redlines without killing momentum.',
+    'IP hawk who stopped a nasty trademark surprise early.'
+  ],
+  'VP Engineering': [
+    'Engineering leader who ships predictable quarters.',
+    'Platform builder who cut deploy time in half.',
+    'Manager of managers who protects maker time.'
+  ],
+  'VP Sales': [
+    'Sales leader who builds repeatable outbound.',
+    'Playbook author who made SDR handoffs boringly reliable.',
+    'Channel partner whisperer with a rolodex of resellers.'
+  ],
+  'VP Marketing': [
+    'Marketing leader who measures everything.',
+    'Category creator who owns a niche on LinkedIn.',
+    'Launch captain who coordinated three successful GA days.'
+  ],
+  'VP Product': [
+    'Product leader who connects roadmap to revenue.',
+    'Discovery obsessive who banned solution-first PRDs.',
+    'Pricing experimenter who found a packaging win.'
+  ],
+  'VP Operations': [
+    'Ops leader who makes chaos boring.',
+    'Vendor negotiator who re-signed AWS with a discount.',
+    'Support-to-ops bridge who fixed SLA misses.'
+  ],
+  'VP Finance': [
+    'Finance leader who models scenarios in spreadsheets.',
+    'Controller-minded exec who closed books in five days.',
+    'Treasury hawk who sweats idle cash.'
+  ]
 };
 
-function roleBio(roleTitle, snippet, former, rng) {
-  const lead = ROLE_BIO_LEADS[roleTitle] ?? `Seasoned ${roleTitle} for high-growth startups.`;
+function roleBio(roleTitle, snippet, former, rng, candidateIndex) {
+  const pool = ROLE_BIO_LEADS[roleTitle];
+  const lead = Array.isArray(pool)
+    ? pool[candidateIndex % pool.length]
+    : pool ?? `Seasoned ${roleTitle} for high-growth startups.`;
   const extra = pick(
     [
       'Known for crisp board updates.',
       'Brings a network of operators and angels.',
       'Has zero patience for vanity metrics.',
-      'Turned around a messy cap table once already.'
+      'Turned around a messy cap table once already.',
+      'Still answers Slack from former reports.',
+      'Will challenge your hiring plan with data.'
     ],
     rng,
     new Set()
   );
-  return `${lead} ${snippet} Previously at ${former}. ${extra}`;
+  return `${snippet} Previously at ${former}. ${lead} ${extra}`;
 }
 
 export async function generateExecutiveCandidates(state, roleTitle, count = 4) {
@@ -121,7 +190,7 @@ export async function generateExecutiveCandidates(state, roleTitle, count = 4) {
       id: `exec-cand-${Date.now()}-${i}-${Math.floor(rng() * 1e6)}`,
       roleTitle: roleTitle.trim() || 'COO',
       name,
-      bio: roleBio(roleTitle, snippet, former, rng),
+      bio: roleBio(roleTitle, snippet, former, rng, i),
       salaryMonthly: salary,
       formerCompany: former
     });

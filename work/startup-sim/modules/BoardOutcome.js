@@ -11,8 +11,9 @@ export function openBoardTaskOutcomeDialog({ title, sentimentDelta, sentimentAft
   const body = document.getElementById('board-outcome-body');
   if (!dialog || !body) return Promise.resolve();
 
-  const deltaLabel =
-    sentimentDelta >= 0 ? `+${sentimentDelta}` : String(sentimentDelta);
+  const delta = Number(sentimentDelta) || 0;
+  const deltaLabel = delta === 0 ? 'No change' : delta > 0 ? `+${delta}` : String(delta);
+  const deltaClass = delta > 0 ? 'positive' : delta < 0 ? 'negative' : '';
   const buzzLine =
     buzzDelta > 0
       ? `<p class="fine-print">Product buzz +${buzzDelta} from the board’s network.</p>`
@@ -22,7 +23,7 @@ export function openBoardTaskOutcomeDialog({ title, sentimentDelta, sentimentAft
     <p class="eyebrow">Board task complete</p>
     <h2 id="board-outcome-title" class="month-summary-title">${escapeHtml(title)}</h2>
     <div class="summary-grid">
-      <div><span class="stat-label">Board approval</span><span class="stat-value positive">${deltaLabel} pts</span></div>
+      <div><span class="stat-label">Board approval</span><span class="stat-value ${deltaClass}">${deltaLabel}${delta !== 0 ? ' pts' : ''}</span></div>
       <div><span class="stat-label">New score</span><span class="stat-value">${sentimentAfter}/100</span></div>
     </div>
     ${buzzLine}
