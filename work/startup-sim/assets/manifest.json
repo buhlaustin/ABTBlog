@@ -91,6 +91,13 @@
       "license": "Proprietary (game art)",
       "author": "Generated for Startup Simulator (ABTBlog)",
       "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-atlanta.jpg"
+    },
+    {
+      "id": "assets-backgrounds-hub-nashville",
+      "path": "assets/backgrounds/hub-nashville.jpg",
+      "license": "Proprietary (game art)",
+      "author": "Generated for Startup Simulator (ABTBlog)",
+      "url": "https://github.com/buhlaustin/ABTBlog/tree/main/work/startup-sim/assets/backgrounds/hub-nashville.jpg"
     }
   ]
 }

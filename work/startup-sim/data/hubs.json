@@ -39,6 +39,14 @@
       "revenueMult": 1.0,
       "salaryMult": 0.92,
       "fixedBase": 5000
+    },
+    {
+      "id": "nashville",
+      "label": "Nashville",
+      "costMult": 0.93,
+      "revenueMult": 1.03,
+      "salaryMult": 0.94,
+      "fixedBase": 5200
     }
   ],
   "satelliteTemplates": [
