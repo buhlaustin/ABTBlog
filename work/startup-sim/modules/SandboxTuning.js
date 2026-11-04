@@ -15,17 +15,19 @@ export function parseSandboxTuning(formData, mode) {
   if (mode !== 'sandbox') return null;
   const revenueMult = Number(formData.get('sandboxRevenueMult')) || 1;
   const startingStage = String(formData.get('sandboxStartStage') || 'garage');
-  const ipoGateRevenue = Number(formData.get('sandboxIpoGate')) || REVENUE_GATES.IPO;
+  const ipoGateArr = Number(formData.get('sandboxIpoGate')) || REVENUE_GATES.IPO;
   return {
     revenueMult: Math.max(0.5, Math.min(3, revenueMult)),
     startingStage,
-    ipoGateRevenue: Math.max(500_000, Math.min(REVENUE_GATES.IPO, ipoGateRevenue))
+    ipoGateArr: Math.max(500_000, Math.min(REVENUE_GATES.IPO, ipoGateArr))
   };
 }
 
 export function getEffectiveIpoGate(state) {
-  if (state.mode === 'sandbox' && state.sandboxTuning?.ipoGateRevenue) {
-    return state.sandboxTuning.ipoGateRevenue;
+  if (state.mode === 'sandbox') {
+    const arrGate =
+      state.sandboxTuning?.ipoGateArr ?? state.sandboxTuning?.ipoGateRevenue;
+    if (arrGate) return arrGate;
   }
   return REVENUE_GATES.IPO;
 }

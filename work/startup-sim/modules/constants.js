@@ -8,7 +8,7 @@ export const STAGES = {
   PUBLIC: 'public'
 };
 
-/** @deprecated Use ARR_GATES in Workspace.js — kept for sandbox IPO default. */
+/** Legacy name — IPO value is an ARR gate ($1B default), not lifetime revenue. */
 export const REVENUE_GATES = {
   OFFICE: 10_000,
   XC: 100_000,

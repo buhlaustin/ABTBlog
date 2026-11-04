@@ -22,7 +22,7 @@ Hiring is a spreadsheet, not The Sims. You set department counts, preview burn, 
 
 Fundraising, cap table stuff, accelerator application, priced rounds, down rounds if you time it badly: that lives under Finance. It is deliberately not mixed into the desk slots. Same for leasing space, posting on ProNet and Chirp, board tasks, the occasional crisis card. I wanted month-end to feel like admin catching up with the work you already did.
 
-If you play long enough in career mode, the endgame is IPO territory: a big lifetime revenue gate (a billion dollars earned by default), public stock that ticks once per month, optional cash-out ending. Sandbox can shorten that gate if you set it up that way.
+If you play long enough in career mode, the endgame is IPO territory: hit a billion dollars of ARR (annualized from your recurring revenue, not lifetime cash collected), file, and you are public. The stock ticks once per month after that. You can cash out when you are ready to stop. Sandbox mode can lower the ARR bar if you are testing, not grinding.
 
 The part I did not expect to care about was the press.
 

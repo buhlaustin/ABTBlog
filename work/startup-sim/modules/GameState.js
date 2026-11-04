@@ -229,6 +229,9 @@ export function normalizeSave(raw) {
     if (state.mode === 'sandbox' && state.sandboxTuning === undefined) {
       state.sandboxTuning = null;
     }
+    if (state.sandboxTuning?.ipoGateRevenue != null && state.sandboxTuning.ipoGateArr == null) {
+      state.sandboxTuning.ipoGateArr = state.sandboxTuning.ipoGateRevenue;
+    }
     if (!state.publicMarket) state.publicMarket = createInitialPublicMarket();
     if (state.publicMarket.lockupMonthsRemaining === undefined) {
       state.publicMarket.lockupMonthsRemaining = state.flags?.ipoFiled ? 0 : 0;
