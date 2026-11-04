@@ -6,7 +6,7 @@ import { createInitialCalendar, startMonth } from './Calendar.js';
 import { recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn } from './Workspace.js';
-import { createInitialExecutives } from './Executives.js';
+import { createInitialExecutives, migrateLegacyCoo } from './Executives.js';
 import { createInitialBoard } from './Board.js';
 import { createInitialXcState } from './XC.js';
 import { createInitialAdvisor } from './Advisor.js';
@@ -16,6 +16,7 @@ import { createInitialCrisisState } from './Crisis.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { calendarTurn } from './XC.js';
 import { syncStageFromProgress } from './Progression.js';
+import { syncLifetimeProfit } from './Finance.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -26,7 +27,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 10;
+export const SAVE_VERSION = 11;
 
 export {
   STAGES,
@@ -74,6 +75,8 @@ export function createInitialState(options) {
     finance: {
       cash: startingCash,
       lifetimeRevenue: 0,
+      lifetimeExpenses: 0,
+      lifetimeProfit: 0,
       monthlyRevenue: 0,
       monthlyBurn: 0,
       mrr: 0,
@@ -95,6 +98,8 @@ export function createInitialState(options) {
     crisis: createInitialCrisisState(),
     meta: {
       runStartedTurn: 1,
+      runSeed: Math.floor(Math.random() * 2_147_483_647),
+      initialInvestmentCash: startingCash,
       monthsAtIpo: null,
       hofRecorded: false,
       hofHighlights: []
@@ -165,6 +170,19 @@ export function normalizeSave(raw) {
     }
     if (!state.workspace) state.workspace = createInitialWorkspace();
     if (!state.executives) state.executives = createInitialExecutives();
+    migrateLegacyCoo(state);
+    if (state.finance.lifetimeExpenses === undefined) state.finance.lifetimeExpenses = 0;
+    if (state.finance.lifetimeProfit === undefined) {
+      state.finance.lifetimeProfit =
+        (state.finance.lifetimeRevenue ?? 0) - (state.finance.lifetimeExpenses ?? 0);
+    }
+    if (state.meta.initialInvestmentCash === undefined) {
+      state.meta.initialInvestmentCash =
+        state.sandboxStartingCash ?? MODE_CONFIG[state.mode === 'sandbox' ? 'sandbox' : 'career'].startingCash;
+    }
+    if (state.meta.runSeed === undefined) {
+      state.meta.runSeed = Math.floor(Math.random() * 2_147_483_647);
+    }
     if (!state.board) state.board = createInitialBoard();
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);
@@ -270,6 +288,7 @@ export function normalizeSave(raw) {
 
     syncStageFromProgress(state);
     applyWorkspaceBurn(state);
+    syncLifetimeProfit(state);
 
     state.version = SAVE_VERSION;
     return state;

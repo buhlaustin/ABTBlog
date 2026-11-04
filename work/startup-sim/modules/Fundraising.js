@@ -140,6 +140,11 @@ export function renderFinancePanel(container, state) {
       <div><span class="stat-label">Runway</span><span class="stat-value">${sum.runway}</span></div>
       <div><span class="stat-label">Valuation</span><span class="stat-value">${state.finance.valuation ? formatMoney(state.finance.valuation) : '—'}</span></div>
       <div><span class="stat-label">Location</span><span class="stat-value">${escapeHtml(state.company.location || '—')}</span></div>
+      <div><span class="stat-label">Lifetime revenue</span><span class="stat-value">${sum.lifetimeRevenueLabel}</span></div>
+      <div><span class="stat-label">Lifetime expenses</span><span class="stat-value">${sum.lifetimeExpensesLabel}</span></div>
+      <div><span class="stat-label">Lifetime profit</span><span class="stat-value">${sum.lifetimeProfitLabel}</span></div>
+      <div><span class="stat-label">Starting cash (investment)</span><span class="stat-value">${sum.initialInvestmentLabel}</span></div>
+      <div><span class="stat-label">Founder stake @ valuation</span><span class="stat-value">${sum.founderStakeLabel}</span></div>
     </div>
     ${sentimentBlock}
     ${xcBlock}

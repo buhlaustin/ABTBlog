@@ -53,6 +53,7 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   state.finance.cash -= cost;
   state.finance.cash += revenue;
   state.finance.lifetimeRevenue += revenue;
+  if (cost > 0) recordCashOutflow(state, cost, 'task');
   state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + revenue;
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
 
@@ -73,10 +74,47 @@ export function rollTaskOutcome(taskDef, state) {
   return { revenue, product, buzz };
 }
 
+/** Track spend for lifetime P&L (does not move cash — caller adjusts cash separately). */
+export function recordCashOutflow(state, amount, _category = 'other') {
+  const n = Math.max(0, Math.round(Number(amount) || 0));
+  if (!n) return;
+  if (!state.finance) state.finance = {};
+  state.finance.lifetimeExpenses = (state.finance.lifetimeExpenses ?? 0) + n;
+  syncLifetimeProfit(state);
+}
+
+export function syncLifetimeProfit(state) {
+  if (!state.finance) return 0;
+  const rev = state.finance.lifetimeRevenue ?? 0;
+  const exp = state.finance.lifetimeExpenses ?? 0;
+  state.finance.lifetimeProfit = rev - exp;
+  return state.finance.lifetimeProfit;
+}
+
+export function founderEquityPct(state) {
+  return state.capTable?.find((r) => r.id === 'founder')?.pct ?? 100;
+}
+
+/** Paper wealth from last known private valuation (pre-IPO). */
+export function founderValuationStake(state) {
+  const val = state.finance?.valuation;
+  if (!val || val <= 0) return null;
+  return Math.round((val * founderEquityPct(state)) / 100);
+}
+
+export function initialInvestmentCash(state) {
+  if (state.meta?.initialInvestmentCash != null) return state.meta.initialInvestmentCash;
+  if (state.mode === 'sandbox' && state.sandboxStartingCash != null) {
+    return state.sandboxStartingCash;
+  }
+  return MODE_CONFIG[state.mode === 'sandbox' ? 'sandbox' : 'career'].startingCash;
+}
+
 /** Month-end: payroll + fixed burn, update MRR snapshot. */
 export function resolveMonthEndBurn(state) {
   const burn = projectMonthlyBurn(state);
   state.finance.cash -= burn;
+  recordCashOutflow(state, burn, 'overhead');
   state.finance.monthlyBurn = burn;
   state.finance.monthlyRevenue = state.calendar.monthRevenue ?? 0;
   state.finance.mrr = Math.round(state.finance.monthlyRevenue);
@@ -88,12 +126,18 @@ export function renderFinanceSummary(state) {
   const burn = projectMonthlyBurn(state);
   const cash = state.finance?.cash ?? 0;
   const runway = burn > 0 ? `${(cash / burn).toFixed(1)} mo` : '∞';
+  syncLifetimeProfit(state);
 
   return {
     burn,
     runway,
     burnLabel: formatMoney(burn),
     cashLabel: formatMoney(cash),
-    mrrLabel: formatMoney(state.finance?.mrr ?? 0)
+    mrrLabel: formatMoney(state.finance?.mrr ?? 0),
+    lifetimeRevenueLabel: formatMoney(state.finance?.lifetimeRevenue ?? 0),
+    lifetimeExpensesLabel: formatMoney(state.finance?.lifetimeExpenses ?? 0),
+    lifetimeProfitLabel: formatMoney(state.finance?.lifetimeProfit ?? 0),
+    initialInvestmentLabel: formatMoney(initialInvestmentCash(state)),
+    founderStakeLabel: founderValuationStake(state) != null ? formatMoney(founderValuationStake(state)) : '—'
   };
 }

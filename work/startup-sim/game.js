@@ -11,7 +11,12 @@ import {
 } from './modules/Tasks.js';
 import { completeBoardTask } from './modules/Board.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
-import { hireCoo } from './modules/Executives.js';
+import {
+  openExecutiveHireFlow,
+  hireExecutiveCandidate,
+  cancelExecutiveHire
+} from './modules/Executives.js';
+import { runProductAction, showProductActionFeedback } from './modules/ProductActions.js';
 import {
   initNarrativeApiUrl,
   isNarrativeApiEnabled,
@@ -43,7 +48,7 @@ import {
   renderCrisisPanel
 } from './modules/Crisis.js';
 import { recordLayoffEvent, generateMonthlyNews, toggleNewsArchive } from './modules/News.js';
-import { publishPlayerPost, setSocialNetwork, showSocialFeedback } from './modules/Social.js';
+import { publishPlayerPost, setSocialNetwork, showSocialFeedback, generateMonthlySocial } from './modules/Social.js';
 import { sendAdvisorMessage } from './modules/Advisor.js';
 import {
   renderInterviewForm,
@@ -250,6 +255,11 @@ async function handleEndMonth() {
     sessionState,
     news.source === 'ai' ? 'Fresh headlines hit the wire.' : 'Headlines updated.'
   );
+  const social = await generateMonthlySocial(sessionState);
+  appendLog(
+    sessionState,
+    social.source === 'ai' ? 'ProNet and Chirp are buzzing.' : 'Social feeds updated.'
+  );
   const headline = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
   if (result.monthSummary) {
     await openMonthSummaryDialog(sessionState, result.monthSummary, headline);
@@ -286,7 +296,11 @@ function handleFinalizeStaff() {
     onLayoffSentiment(sessionState, result.layoffPct);
   }
   if (result.significantLayoff) {
-    recordLayoffEvent(sessionState, result.layoffPct);
+    recordLayoffEvent(sessionState, {
+      layoffPct: result.layoffPct,
+      priorTotal: result.priorTotal,
+      newTotal: result.newTotal
+    });
     appendLog(
       sessionState,
       `Layoffs (${Math.round(result.layoffPct * 100)}% of headcount) — watch the News tab next month close.`
@@ -475,12 +489,45 @@ function bindGameInteractions() {
       return;
     }
 
-    if (e.target.id === 'btn-hire-coo' && sessionState) {
-      const result = hireCoo(sessionState);
+    if (e.target.id === 'btn-start-exec-hire' && sessionState) {
+      const titleEl = document.getElementById('exec-role-title');
+      const title = titleEl?.value ?? 'COO';
+      openExecutiveHireFlow(sessionState, title).then((result) => {
+        if (!result.ok) showPeopleFeedback(result.reason, true);
+        else showPeopleFeedback('Pick a candidate below.');
+        refresh();
+      });
+      return;
+    }
+
+    if (e.target.id === 'btn-cancel-exec-hire' && sessionState) {
+      cancelExecutiveHire(sessionState);
+      showPeopleFeedback('');
+      refresh();
+      return;
+    }
+
+    const hireExecBtn = e.target.closest('[data-hire-exec]');
+    if (hireExecBtn && sessionState) {
+      const id = hireExecBtn.getAttribute('data-hire-exec');
+      const result = hireExecutiveCandidate(sessionState, id);
       if (!result.ok) showPeopleFeedback(result.reason, true);
       else {
-        appendLog(sessionState, `Hired ${result.executive.name} as COO.`);
-        showPeopleFeedback(`${result.executive.name} joined as COO.`);
+        appendLog(sessionState, `Hired ${result.executive.name} as ${result.executive.roleTitle}.`);
+        showPeopleFeedback(`${result.executive.name} joined as ${result.executive.roleTitle}.`);
+      }
+      refresh();
+      return;
+    }
+
+    const productActionBtn = e.target.closest('[data-product-action]');
+    if (productActionBtn && sessionState) {
+      const actionId = productActionBtn.getAttribute('data-product-action');
+      const result = runProductAction(sessionState, actionId);
+      if (!result.ok) showProductActionFeedback(result.reason, true);
+      else {
+        appendLog(sessionState, `Product spend: ${result.action.label}.`);
+        showProductActionFeedback(`${result.action.label} — buzz +${result.action.buzz}.`);
       }
       refresh();
       return;

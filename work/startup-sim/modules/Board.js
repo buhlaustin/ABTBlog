@@ -1,5 +1,6 @@
 import bundledBoard from '../data/board-tasks.json' with { type: 'json' };
 import { formatMoney } from './constants.js';
+import { recordCashOutflow } from './Finance.js';
 import { setGameFeedback } from './GameFeedback.js';
 import { onBoardSentiment } from './Sentiment.js';
 
@@ -49,6 +50,7 @@ export function completeBoardTask(state, instanceId) {
 
   const cost = def.cost ?? 0;
   state.finance.cash -= cost;
+  if (cost > 0) recordCashOutflow(state, cost, 'board');
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
   if (def.sentiment) onBoardSentiment(state, def.sentiment);
   if (def.buzz) state.product.buzz = (state.product.buzz ?? 0) + def.buzz;

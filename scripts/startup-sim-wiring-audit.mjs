@@ -23,7 +23,7 @@ const dataAttrs = new Set();
 for (const { text } of sources) {
   for (const m of text.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) btnIds.add(m[1]);
   for (const m of text.matchAll(/\bid='(btn-[a-z0-9-]+)'/g)) btnIds.add(m[1]);
-  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace)/g)) {
+  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action)/g)) {
     dataAttrs.add(m[1]);
   }
 }
@@ -42,7 +42,8 @@ const externalBtnHandlers = new Set([
   'btn-start-game',
   'btn-month-summary-close',
   'btn-confirm-task-lineup',
-  'btn-hire-coo'
+  'btn-start-exec-hire',
+  'btn-cancel-exec-hire'
 ]);
 
 const unhandled = [];
@@ -68,7 +69,9 @@ const dataPatterns = {
   'tutorial-id': 'btn-dismiss-tutorial',
   'toggle-task-offer': "closest('[data-toggle-task-offer]')",
   'purchase-workspace': "closest('[data-purchase-workspace]')",
-  'complete-board-task': "closest('[data-complete-board-task]')"
+  'complete-board-task': "closest('[data-complete-board-task]')",
+  'hire-exec': "closest('[data-hire-exec]')",
+  'product-action': "closest('[data-product-action]')"
 };
 
 for (const attr of dataAttrs) {

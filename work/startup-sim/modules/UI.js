@@ -23,6 +23,7 @@ import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
+import { renderProductActionsPanel } from './ProductActions.js';
 import { sentimentLabel } from './Sentiment.js';
 import { competitorRevenueMult } from './Competitor.js';
 
@@ -457,7 +458,9 @@ export function renderProductPanel(container, state) {
       <div><span class="stat-label">Category</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
     </div>
     ${pivotBlock}
+    <div id="product-actions-mount"></div>
   `;
+  renderProductActionsPanel(document.getElementById('product-actions-mount'), state);
 }
 
 export function renderGameOver(state) {

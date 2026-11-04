@@ -1,6 +1,6 @@
 import { assetBaseUrl } from './utils.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
-import { buildGameSnapshot } from './GameContext.js';
+import { buildGameSnapshot, buildNarrativeContext } from './GameContext.js';
 import { setGameFeedback } from './GameFeedback.js';
 import bundledPersonas from '../data/personas.json' with { type: 'json' };
 
@@ -89,6 +89,7 @@ async function attachReactions(state, post) {
     .map((a) => a.headline)
     .filter(Boolean);
   const context = {
+    narrative: buildNarrativeContext(state),
     snapshot: buildGameSnapshot(state),
     post: { network: post.network, text: post.text, author: post.authorName },
     personas: personas.slice(0, 6),
@@ -117,6 +118,104 @@ async function attachReactions(state, post) {
   }
 
   post.reactions = reactions;
+}
+
+function headlineList(state) {
+  return (state.news?.currentMonthArticles ?? [])
+    .concat((state.news?.archive ?? []).flatMap((b) => b.articles ?? []))
+    .slice(0, 6)
+    .map((a) => a.headline)
+    .filter(Boolean);
+}
+
+function pushFeedPost(state, network, authorName, text) {
+  const post = {
+    id: `feed-${network}-${Date.now()}-${Math.floor(Math.random() * 1e5)}`,
+    network,
+    authorId: 'npc',
+    authorName,
+    text: String(text).slice(0, network === 'chirp' ? CHIRP_LIMIT : 600),
+    month: state.calendar.monthIndex,
+    year: state.calendar.year,
+    reactions: { likes: 2 + Math.floor(Math.random() * 30), reposts: Math.floor(Math.random() * 8), comments: [] }
+  };
+  postList(state, network).unshift(post);
+}
+
+function offlineMonthlyPosts(state, personas) {
+  const company = state.company?.name ?? 'A startup';
+  const headlines = headlineList(state);
+  const h = headlines[0];
+  const pronet = personas.filter((p) => p.network !== 'chirp');
+  const chirp = personas.filter((p) => p.network === 'chirp');
+  const pick = (list) => list[Math.floor(Math.random() * list.length)] ?? { name: 'Industry watcher' };
+
+  if (h) {
+    pushFeedPost(
+      state,
+      'pronet',
+      pick(pronet).name,
+      `${company} is all over the trades after "${h}" — curious how the team executes from here.`
+    );
+    pushFeedPost(
+      state,
+      'chirp',
+      pick(chirp).name,
+      h.length > 90 ? `${company} making noise again 👀` : `${h} — huge if true for ${company}.`
+    );
+  } else {
+    pushFeedPost(
+      state,
+      'pronet',
+      pick(pronet).name,
+      `Quiet month for ${company}, but the category keeps heating up.`
+    );
+    pushFeedPost(
+      state,
+      'chirp',
+      pick(chirp).name,
+      `${company} still building. Respect the grind.`
+    );
+  }
+  pushFeedPost(
+    state,
+    'chirp',
+    pick(chirp).name,
+    `Someone at ${company} definitely refreshing Macrohard Newsdesk right now.`
+  );
+  trimSocial(state);
+}
+
+export async function generateMonthlySocial(state) {
+  if (!state.social) state.social = createInitialSocial();
+  const personas = await loadPersonas();
+  const headlines = headlineList(state);
+  const context = {
+    narrative: buildNarrativeContext(state),
+    headlines,
+    personas: personas.slice(0, 8),
+    rules: 'Generate in-world posts. No sandbox, levels, or game UI terms.'
+  };
+
+  if (shouldUseNarrativeAi()) {
+    try {
+      const res = await requestNarrative('startup_social_month', context);
+      const posts = res?.posts ?? res?.result?.posts;
+      if (Array.isArray(posts) && posts.length) {
+        for (const p of posts.slice(0, 6)) {
+          const network = p.network === 'chirp' ? 'chirp' : 'pronet';
+          pushFeedPost(state, network, String(p.author ?? p.authorName ?? 'Anon').slice(0, 60), p.text);
+        }
+        trimSocial(state);
+        return { ok: true, source: 'ai' };
+      }
+    } catch {
+      /* offline */
+    }
+  }
+
+  offlineMonthlyPosts(state, personas);
+  return { ok: true, source: 'offline' };
 }
 
 function offlineReactions(post, personas) {

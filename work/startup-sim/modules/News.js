@@ -1,8 +1,7 @@
 import { assetBaseUrl } from './utils.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
-import { buildGameSnapshot } from './GameContext.js';
+import { buildNarrativeContext } from './GameContext.js';
 import { maybeCompetitorNewsArticle, bumpCompetitorPressure } from './Competitor.js';
-import { stageLabel } from './constants.js';
 import bundledTimeline from '../data/news-timeline-seed.json' with { type: 'json' };
 
 let timelineSeed = bundledTimeline;
@@ -32,12 +31,18 @@ export function createInitialNews() {
   };
 }
 
-export function recordLayoffEvent(state, layoffPct) {
+export function recordLayoffEvent(state, detail) {
   if (!state.news) state.news = createInitialNews();
+  const priorHeadcount = detail.priorTotal ?? detail.priorHeadcount ?? 0;
+  const newHeadcount = detail.newTotal ?? detail.newHeadcount ?? 0;
+  if (priorHeadcount <= 0 || newHeadcount >= priorHeadcount) return;
   state.news.layoffQueue.push({
     month: state.calendar.monthIndex,
     year: state.calendar.year,
-    layoffPct: Math.round(layoffPct * 100)
+    priorHeadcount,
+    newHeadcount,
+    layoffPct: Math.round(detail.layoffPct * 100),
+    consumed: false
   });
 }
 
@@ -54,6 +59,7 @@ export function archiveCurrentNews(state) {
     state.news.archive = state.news.archive.slice(0, 24);
   }
   state.news.currentMonthArticles = [];
+  state.news.layoffQueue = (state.news.layoffQueue ?? []).filter((e) => !e.consumed);
 }
 
 function matchingTimelineEvents(state, events) {
@@ -62,24 +68,35 @@ function matchingTimelineEvents(state, events) {
   return events.filter((e) => e.month === m && e.year === y);
 }
 
+function consumeNextLayoff(state) {
+  const queue = state.news?.layoffQueue ?? [];
+  const idx = queue.findIndex((e) => !e.consumed);
+  if (idx < 0) return null;
+  queue[idx].consumed = true;
+  return queue[idx];
+}
+
 function offlineNewsArticles(state) {
   const company = state.company?.name ?? 'Startup';
+  const narrative = buildNarrativeContext(state);
+  const rev = formatMoneyShort(state.finance?.monthlyRevenue ?? 0);
   const articles = [
     {
-      headline: `${company} keeps grinding in ${stageLabel(state.stage)} mode`,
-      dek: 'Analysts pretend to be surprised.',
-      body: `The Financier Times notes ${company} closed another month with ${formatMoneyShort(state.finance?.monthlyRevenue ?? 0)} in revenue signals. Parody markets remain unregulated.`,
+      headline: `${company} reports another month of operating momentum`,
+      dek: 'Analysts watch hiring and recurring revenue.',
+      body: `${company}, a ${narrative.category} company working from ${narrative.workspaceDescription}, closed the month with roughly ${rev} in revenue. Insiders describe the team as ${narrative.productMaturityNote} with ${narrative.marketBuzzNote}.`,
       source: 'The Financier Times',
       date: monthLabel(state)
     }
   ];
 
-  const layoff = state.news?.layoffQueue?.shift();
-  if (layoff) {
+  const layoff = consumeNextLayoff(state);
+  if (layoff && layoff.priorHeadcount >= 5) {
+    const cut = layoff.priorHeadcount - layoff.newHeadcount;
     articles.push({
-      headline: `${company} trims headcount amid restructuring chatter`,
-      dek: 'LinkedIn engagement spikes (ProNet, technically).',
-      body: `Macrohard Newsdesk reports a ${layoff.layoffPct}% workforce reduction. Former employees already pitching competing startups.`,
+      headline: `${company} reduces staff by ${cut} roles in restructuring`,
+      dek: 'Leadership cites focus and runway.',
+      body: `Macrohard Newsdesk confirmed ${company} lowered headcount from ${layoff.priorHeadcount} to ${layoff.newHeadcount} employees. The move represents about ${layoff.layoffPct}% of the prior team. Executives declined to comment on further changes.`,
       source: 'Macrohard Newsdesk',
       date: monthLabel(state)
     });
@@ -124,7 +141,28 @@ function formatMoneyShort(n) {
 }
 
 function monthLabel(state) {
-  return `Y${state.calendar.year} M${state.calendar.monthIndex}`;
+  return `Year ${state.calendar.year}, month ${state.calendar.monthIndex}`;
+}
+
+const META_BLOCKLIST =
+  /\b(sandbox|career mode|desk task|headcount cap|level \d|product level|save v|task slot|XC-only|garage mode|ARR gate|hub hq gate)\b/gi;
+
+function sanitizeNarrativeText(text) {
+  return String(text ?? '')
+    .replace(META_BLOCKLIST, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+function sanitizeArticles(raw, state) {
+  return raw.slice(0, 4).map((a, i) => ({
+    id: `news-${state.calendar.year}-${state.calendar.monthIndex}-${i}`,
+    headline: sanitizeNarrativeText(String(a.headline ?? 'Market moves')).slice(0, 120),
+    dek: sanitizeNarrativeText(String(a.dek ?? '')).slice(0, 200),
+    body: sanitizeNarrativeText(String(a.body ?? '')).slice(0, 1200),
+    source: String(a.source ?? 'Parody Wire').slice(0, 80),
+    date: String(a.date ?? monthLabel(state)).slice(0, 40)
+  }));
 }
 
 export async function generateMonthlyNews(state) {
@@ -133,10 +171,10 @@ export async function generateMonthlyNews(state) {
   const timeline = matchingTimelineEvents(state, seed.events ?? []);
 
   const context = {
-    snapshot: buildGameSnapshot(state),
+    narrative: buildNarrativeContext(state),
     timelineEvents: timeline,
-    layoffsPending: state.news.layoffQueue?.length ?? 0,
-    rules: 'Use parody names only (Macrohard, Financier Times). No real CEOs or trademarks.'
+    rules:
+      'In-world journalism only. Use narrative.recentLayoffEvents for layoff stories (at most one). Never reference game mechanics listed in narrative.narrativeRules.'
   };
 
   if (shouldUseNarrativeAi()) {
@@ -144,7 +182,10 @@ export async function generateMonthlyNews(state) {
       const res = await requestNarrative('startup_news_month', context);
       const articles = res?.articles ?? res?.result?.articles;
       if (Array.isArray(articles) && articles.length) {
-        state.news.currentMonthArticles = normalizeArticles(articles, state);
+        state.news.currentMonthArticles = sanitizeArticles(articles, state);
+        if ((state.news.layoffQueue ?? []).some((e) => !e.consumed)) {
+          consumeNextLayoff(state);
+        }
         return { ok: true, source: 'ai' };
       }
     } catch {
@@ -154,17 +195,6 @@ export async function generateMonthlyNews(state) {
 
   state.news.currentMonthArticles = offlineNewsArticles(state);
   return { ok: true, source: 'offline' };
-}
-
-function normalizeArticles(raw, state) {
-  return raw.slice(0, 4).map((a, i) => ({
-    id: `news-${state.calendar.year}-${state.calendar.monthIndex}-${i}`,
-    headline: String(a.headline ?? 'Market moves').slice(0, 120),
-    dek: String(a.dek ?? '').slice(0, 200),
-    body: String(a.body ?? '').slice(0, 1200),
-    source: String(a.source ?? 'Parody Wire').slice(0, 80),
-    date: String(a.date ?? monthLabel(state)).slice(0, 40)
-  }));
 }
 
 function escapeHtml(s) {
@@ -208,12 +238,10 @@ export function renderNewsPanel(container, state) {
     : '';
 
   container.innerHTML = `
-    <p class="panel-lede">Three or four fresh stories land each time you close the month — all from fictional outlets.</p>
-    <button type="button" class="btn btn-ghost btn-small" id="btn-toggle-news-archive">
-      ${showArchive ? 'Hide archive' : 'Show archive'}
-    </button>
-    <div class="news-feed">${current || '<div class="tab-placeholder">Close the month to fetch new headlines.</div>'}</div>
-    ${showArchive ? `<div class="news-archive">${archive || '<p class="fine-print">No archived months yet.</p>'}</div>` : ''}
+    <p class="panel-lede">Parody press coverage updates when you close each month.</p>
+    <button type="button" class="btn btn-small" id="btn-toggle-news-archive">${showArchive ? 'Hide archive' : 'Show archive'}</button>
+    <div class="news-feed">${current || '<p class="fine-print">No headlines yet this month.</p>'}</div>
+    ${archive}
   `;
 }
 

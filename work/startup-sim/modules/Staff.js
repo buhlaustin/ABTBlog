@@ -157,10 +157,18 @@ export function finalizeStaffing(state) {
     layoffPct = (priorTotal - total) / priorTotal;
   }
 
+  const cut = priorTotal - total;
+  const significantLayoff =
+    cut > 0 &&
+    ((priorTotal >= 5 && (cut >= 3 || layoffPct >= 0.25)) ||
+      (priorTotal >= 10 && layoffPct >= 0.15));
+
   return {
     ok: true,
     layoffPct,
-    significantLayoff: layoffPct >= 0.15
+    priorTotal,
+    newTotal: total,
+    significantLayoff
   };
 }
 
@@ -206,7 +214,7 @@ export function renderPeoplePanel(container, state) {
   container.innerHTML = `
     ${orgMount}
     <div id="org-chart-mount"></div>
-    <p class="panel-lede">Adjust draft headcount, preview burn vs last month revenue, then <strong>Finalize staffing</strong>. Executives (COO) sit outside the headcount cap.</p>
+    <p class="panel-lede">Adjust draft headcount, preview burn vs last month revenue, then <strong>Finalize staffing</strong>. C-suite hires sit outside the headcount cap.</p>
     <table class="data-table">
       <thead><tr><th>Department</th><th>Headcount</th><th>$/head/mo</th><th>Subtotal</th></tr></thead>
       <tbody>${rows}</tbody>

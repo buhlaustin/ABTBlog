@@ -1,0 +1,56 @@
+{
+  "firstNames": [
+    "Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Quinn", "Avery", "Blake", "Cameron",
+    "Dakota", "Elliot", "Finley", "Harper", "Jamie", "Kendall", "Logan", "Marley", "Noel", "Parker",
+    "Reese", "Sage", "Skyler", "Tatum", "Wren", "Adrian", "Bianca", "Carlos", "Diana", "Elena",
+    "Felix", "Grace", "Hugo", "Ingrid", "Jonah", "Keiko", "Leo", "Maya", "Nina", "Omar",
+    "Priya", "Rafael", "Sofia", "Theo", "Uma", "Viktor", "Willa", "Xavier", "Yara", "Zoe",
+    "Amir", "Beth", "Cole", "Dora", "Ethan", "Fiona", "Gavin", "Hannah", "Ivan", "Jade",
+    "Kai", "Liam", "Mila", "Noah", "Olivia", "Paul", "Rosa", "Sam", "Tara", "Ulysses",
+    "Vera", "Wes", "Yuki", "Zara", "Anya", "Bruno", "Cleo", "Dean", "Eva", "Frank",
+    "Gia", "Hank", "Iris", "Jules", "Kira", "Luna", "Max", "Nora", "Owen", "Pia"
+  ],
+  "lastNames": [
+    "Ellis", "Chen", "Patel", "Nguyen", "Brooks", "Foster", "Hayes", "Kim", "Lopez", "Martinez",
+    "Okonkwo", "Reed", "Singh", "Torres", "Vega", "Walsh", "Yamamoto", "Zimmerman", "Abbott", "Bauer",
+    "Choi", "Dunn", "Edwards", "Franco", "Grant", "Huang", "Ibrahim", "Jensen", "Khan", "Larson",
+    "Morales", "Nash", "Olsen", "Price", "Quinn", "Ramos", "Stone", "Tran", "Underwood", "Voss",
+    "Webb", "Xu", "Young", "Zhang", "Archer", "Bennett", "Cross", "Dalton", "Emery", "Finch",
+    "Gordon", "Holt", "Ingram", "Joyce", "Keller", "Lang", "Meyer", "Novak", "Owens", "Porter",
+    "Rowe", "Shaw", "Tyler", "Upton", "Vance", "Wade", "Yates", "Baldwin", "Carter", "Dixon",
+    "Evans", "Fisher", "Green", "Harris", "Irwin", "James", "King", "Lee", "Miller", "Nelson",
+    "Perry", "Russell", "Scott", "Turner", "Walker", "White", "Adams", "Baker", "Clark", "Davis"
+  ],
+  "formerCompanies": [
+    "Macrohard", "Giggle", "Amazoom", "Palantyr", "Stripey", "Slackwave", "Notionary", "FigmaFlow",
+    "UberLift", "AirBnB-ish", "DoorDashy", "InstaCartel", "RobinHoodie", "Coinbaseball", "Snowflakey",
+    "Databricksy", "Canvaverse", "Discordia", "Zoomies", "Dropboxer", "BoxBox", "AsanaFlow", "Monday.com-ish",
+    "HubSpotty", "Salesforcey", "Oracle-ish", "SAPpy", "ServiceNow-ish", "Workdaydream", "Shopifyfy",
+    "SquarePeg", "Blockbuster 2.0", "Netflixed", "Spotify-ish", "TikTak", "SnapGhost", "MetaLite",
+    "Threads-ish", "BlueSkyline", "Mastodonkey", "OpenAI-ish", "Anthropique", "Cohere-ish", "HuggingFacey",
+    "ScaleAI-ish", "Weights & Biasesy", "Replit-ish", "GitHubby", "GitLab-ish", "Atlassian-ish",
+    "JiraForce", "Confluence-ish", "Linear-ish", "Height-ish", "Airtable-ish", "Coda-ish", "Retool-ish",
+    "Zapier-ish", "Make.com-ish", "Segment-ish", "Mixpanel-ish", "Amplitude-ish", "Heap-ish",
+    "PostHog-ish", "LaunchDarkly-ish", "Split.io-ish", "Optimizely-ish", "VWO-ish", "Intercom-ish",
+    "Zendesk-ish", "Freshdesk-ish", "Drift-ish", "Gong-ish", "Chorus-ish", "Outreach-ish", "SalesLoft-ish",
+    "Clari-ish", "Anaplan-ish", "Adaptive-ish", "NetSuite-ish", "QuickBooksy", "Xero-ish", "Brex-ish",
+    "Ramp-ish", "Mercury-ish", "Stripe Treasury-ish", "Plaid-ish", "Marqeta-ish", "Affirm-ish", "Klarna-ish",
+    "Afterpay-ish", "Shop Pay-ish", "Apple Pay-ish", "Google Pay-ish", "Venmo-ish", "Cash App-ish"
+  ],
+  "bioSnippets": [
+    "Scaled ops from 20 to 800 without losing the plot.",
+    "Known for turning chaotic launches into boring, profitable quarters.",
+    "Former consultant who actually shipped product afterward.",
+    "Ran two pivots and lived to tell the board about it.",
+    "Obsessed with unit economics and decent coffee.",
+    "Built the playbook your competitor wishes they had.",
+    "Calm under pressure; loud about runway.",
+    "Turned a support backlog into a growth channel.",
+    "Hired fast, fired fair, kept the culture.",
+    "Can explain ARR to your uncle at Thanksgiving."
+  ],
+  "suggestedTitles": [
+    "COO", "CFO", "CTO", "CMO", "CRO", "CPO", "CHRO", "CIO", "CSO", "General Counsel",
+    "VP Engineering", "VP Sales", "VP Marketing", "VP Product", "VP Operations", "VP Finance"
+  ]
+}
