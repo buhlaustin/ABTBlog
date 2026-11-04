@@ -10,6 +10,8 @@ import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
 import { createInitialCrisisState } from './Crisis.js';
+import { applySandboxStartingStage } from './SandboxTuning.js';
+import { calendarTurn } from './XC.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -20,7 +22,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 8;
+export const SAVE_VERSION = 9;
 
 export {
   STAGES,
@@ -51,6 +53,7 @@ export function createInitialState(options) {
     version: SAVE_VERSION,
     mode,
     sandboxStartingCash: mode === 'sandbox' ? startingCash : null,
+    sandboxTuning: mode === 'sandbox' ? options.sandboxTuning ?? null : null,
     company: {
       name: String(options.companyName || 'Untitled Co.').trim(),
       categoryId: category.id,
@@ -80,6 +83,12 @@ export function createInitialState(options) {
     sentiment: createInitialSentiment(),
     world: { competitor: createCompetitorForCategory(category.id) },
     crisis: createInitialCrisisState(),
+    meta: {
+      runStartedTurn: 1,
+      monthsAtIpo: null,
+      hofRecorded: false,
+      hofHighlights: []
+    },
     publicMarket: createInitialPublicMarket(),
     ending: null,
     capTable: [
@@ -105,10 +114,16 @@ export function createInitialState(options) {
       cashedOut: false,
       xcUnlockedLogged: false,
       gameOver: false,
-      gameOverReason: null
+      gameOverReason: null,
+      pivotUsed: false
     }
   };
 
+  if (mode === 'sandbox') {
+    applySandboxStartingStage(state);
+  }
+
+  state.meta.runStartedTurn = calendarTurn(state);
   startMonth(state);
   return state;
 }
@@ -161,6 +176,16 @@ export function normalizeSave(raw) {
     if (state.flags.seriesAClosed === undefined) state.flags.seriesAClosed = false;
     if (state.flags.seriesBClosed === undefined) state.flags.seriesBClosed = false;
     if (state.flags.lastDownRound === undefined) state.flags.lastDownRound = false;
+    if (state.flags.pivotUsed === undefined) state.flags.pivotUsed = false;
+    if (!state.meta) {
+      state.meta = { runStartedTurn: 1, monthsAtIpo: null, hofRecorded: false, hofHighlights: [] };
+    }
+    if (state.meta.monthsAtIpo === undefined) state.meta.monthsAtIpo = null;
+    if (state.meta.hofRecorded === undefined) state.meta.hofRecorded = false;
+    if (!state.meta.hofHighlights) state.meta.hofHighlights = [];
+    if (state.mode === 'sandbox' && state.sandboxTuning === undefined) {
+      state.sandboxTuning = null;
+    }
     if (!state.publicMarket) state.publicMarket = createInitialPublicMarket();
     if (state.publicMarket.lockupMonthsRemaining === undefined) {
       state.publicMarket.lockupMonthsRemaining = state.flags?.ipoFiled ? 0 : 0;

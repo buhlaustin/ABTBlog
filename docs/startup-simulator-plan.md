@@ -420,9 +420,9 @@ Ship criteria: **live narrative AI is required** for this phase (all five `kind`
 
 #### Progression & meta
 
-- [ ] **Run summary / hall of fame** — local persistence of best valuation, fastest to IPO, founder payout across runs
-- [ ] **Sandbox tuning panel** — optional revenue mult, starting stage, IPO gate (sandbox only; does not affect career gates)
-- [ ] **One-time pivot** — change category/positioning once per run with buzz hit + news cycle
+- [x] **Run summary / hall of fame** — local persistence of best valuation, fastest to IPO, founder payout across runs
+- [x] **Sandbox tuning panel** — optional revenue mult, starting stage, IPO gate (sandbox only; does not affect career gates)
+- [x] **One-time pivot** — change category/positioning once per run with buzz hit + news cycle
 
 #### UX & retention
 
@@ -441,7 +441,7 @@ Ship criteria: **live narrative AI is required** for this phase (all five `kind`
 #### Ops & quality
 
 - [ ] **Playwright smoke** — new game → task → save → reload → continue in CI (complements `smoke:startup-sim`)
-- [ ] **Save migration v7** — explicit version steps when Phase 7 fields land
+- [x] **Save migration v7+** — explicit version steps through save **v9** (meta, sandbox tuning, pivot)
 - [ ] **AI integration smoke** — scripted or manual checklist hitting each `kind` against staging/production URL before release
 
 ---

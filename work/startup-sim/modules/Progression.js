@@ -1,4 +1,5 @@
 import { REVENUE_GATES, STAGES, fixedCostsForStage } from './constants.js';
+import { getEffectiveIpoGate } from './SandboxTuning.js';
 
 /** Apply stage upgrades from revenue gates. */
 const STAGE_RANK = {
@@ -20,7 +21,7 @@ export function syncStageFromProgress(state) {
   if (r >= REVENUE_GATES.XC) {
     state.flags.xcUnlocked = true;
   }
-  if (r >= REVENUE_GATES.IPO) {
+  if (r >= getEffectiveIpoGate(state)) {
     state.flags.ipoUnlocked = true;
   }
   if (state.flags?.ipoFiled) {
@@ -68,7 +69,8 @@ export function nextRevenueMilestone(state) {
   const r = state.finance?.lifetimeRevenue ?? 0;
   if (r < REVENUE_GATES.OFFICE) return { label: 'Small office', amount: REVENUE_GATES.OFFICE };
   if (r < REVENUE_GATES.XC) return { label: 'X Combinator', amount: REVENUE_GATES.XC };
-  if (r < REVENUE_GATES.IPO) return { label: 'IPO eligibility', amount: REVENUE_GATES.IPO };
-  if (!state.flags?.ipoFiled) return { label: 'File IPO', amount: REVENUE_GATES.IPO };
+  const ipoGate = getEffectiveIpoGate(state);
+  if (r < ipoGate) return { label: 'IPO eligibility', amount: ipoGate };
+  if (!state.flags?.ipoFiled) return { label: 'File IPO', amount: ipoGate };
   return { label: 'Grow stock / cash out', amount: null };
 }

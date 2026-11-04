@@ -1,4 +1,6 @@
-import { STAGES, REVENUE_GATES, formatMoney, createInitialPublicMarket } from './constants.js';
+import { STAGES, formatMoney, createInitialPublicMarket } from './constants.js';
+import { getEffectiveIpoGate } from './SandboxTuning.js';
+import { calendarTurn } from './XC.js';
 import { getFounderRow } from './CapTable.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
@@ -47,7 +49,7 @@ export function fileIpo(state) {
   if (!state.flags?.ipoUnlocked) {
     return {
       ok: false,
-      reason: `Reach ${formatMoney(REVENUE_GATES.IPO)} lifetime revenue to unlock the IPO window.`
+      reason: `Reach ${formatMoney(getEffectiveIpoGate(state))} lifetime revenue to unlock the IPO window.`
     };
   }
   if (state.flags?.gameOver) {
@@ -78,6 +80,8 @@ export function fileIpo(state) {
   state.flags.ipoFiled = true;
   state.stage = STAGES.PUBLIC;
   state.finance.fixedCostsMonthly = 6_500;
+  if (!state.meta) state.meta = {};
+  state.meta.monthsAtIpo = calendarTurn(state);
 
   return { ok: true, ticker: state.publicMarket.ticker, openPrice, valuation: state.finance.valuation };
 }
@@ -280,7 +284,7 @@ export function renderIpoPanel(container, state) {
   } else if (state.flags?.cashedOut) {
     block = `<p class="fine-print">You already cashed out — load a new run from the main menu.</p>`;
   } else if (state.flags?.seedRoundClosed && !state.flags?.ipoUnlocked) {
-    block = `<p class="fine-print">Reach ${formatMoney(1_000_000_000)} lifetime revenue to unlock the IPO window.</p>`;
+    block = `<p class="fine-print">Reach ${formatMoney(getEffectiveIpoGate(state))} lifetime revenue to unlock the IPO window.</p>`;
   }
 
   mount.innerHTML = block;

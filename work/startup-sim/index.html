@@ -24,6 +24,7 @@
       </div>
       <p id="start-save-hint" class="fine-print" hidden>Progress is saved automatically on your device. Use Continue to pick up where you left off.</p>
       <p id="start-api-status" class="fine-print" hidden></p>
+      <div id="hall-of-fame" class="hall-of-fame" hidden aria-label="Hall of fame"></div>
     </section>
 
     <section id="screen-setup" class="screen" hidden>
@@ -60,6 +61,29 @@
             <option value="10000000">$10,000,000</option>
             <option value="100000000">$100,000,000</option>
             <option value="1000000000">$1,000,000,000</option>
+          </select>
+        </div>
+
+        <div id="sandbox-tuning-wrap" class="sandbox-cash" hidden>
+          <p class="fine-print">Sandbox tuning does not affect Career rules on other saves.</p>
+          <label for="sandbox-revenue-mult">Task revenue multiplier</label>
+          <select id="sandbox-revenue-mult" name="sandboxRevenueMult">
+            <option value="1">1× (default)</option>
+            <option value="1.25">1.25×</option>
+            <option value="1.5">1.5×</option>
+            <option value="2">2×</option>
+          </select>
+          <label for="sandbox-start-stage">Starting stage</label>
+          <select id="sandbox-start-stage" name="sandboxStartStage">
+            <option value="garage">Garage</option>
+            <option value="office">Small office</option>
+            <option value="post_xc">Post-XC hub (seed closed)</option>
+          </select>
+          <label for="sandbox-ipo-gate">IPO lifetime revenue gate</label>
+          <select id="sandbox-ipo-gate" name="sandboxIpoGate">
+            <option value="1000000000">$1B (Career default)</option>
+            <option value="250000000">$250M (shorter sandbox run)</option>
+            <option value="50000000">$50M (fast test)</option>
           </select>
         </div>
 

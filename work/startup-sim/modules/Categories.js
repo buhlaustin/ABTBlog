@@ -20,6 +20,10 @@ export function getCategoryById(id, list = categoriesCache) {
   return source.find((c) => c.id === id);
 }
 
+export function getCategoriesSync() {
+  return categoriesCache ?? FALLBACK_CATEGORIES;
+}
+
 /** Category-driven unit economics for Phase 1 tasks. */
 export function categoryEconomics(category) {
   if (!category) {

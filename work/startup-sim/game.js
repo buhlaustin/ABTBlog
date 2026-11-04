@@ -43,6 +43,9 @@ import {
 import { loadHubData, selectHub, addSatellite, removeSatellite, showOfficesFeedback } from './modules/Offices.js';
 import { loadAssetManifest } from './modules/Assets.js';
 import { dismissTutorialStep } from './modules/Tutorial.js';
+import { recordRunInHallOfFame, renderHallOfFameBlock } from './modules/HallOfFame.js';
+import { parseSandboxTuning } from './modules/SandboxTuning.js';
+import { applyPivot } from './modules/Pivot.js';
 import {
   bindSandboxCashToggle,
   bindTabNavigation,
@@ -78,6 +81,14 @@ function refresh() {
     persistProgress(true);
     return;
   }
+  if (sessionState.flags?.gameOver && !sessionState.meta?.hofRecorded) {
+    const { highlights } = recordRunInHallOfFame(sessionState);
+    sessionState.meta = sessionState.meta ?? {};
+    sessionState.meta.hofRecorded = true;
+    sessionState.meta.hofHighlights = highlights;
+    renderHallOfFameBlock(document.getElementById('hall-of-fame'));
+  }
+
   renderAllPanels(sessionState);
   persistProgress(true);
   if (sessionState.flags?.gameOver) {
@@ -514,12 +525,32 @@ function bindGameInteractions() {
         return;
       }
       refresh();
+      return;
+    }
+    if (e.target.id === 'pivot-form') {
+      e.preventDefault();
+      if (!sessionState) return;
+      const cat = document.getElementById('pivot-category')?.value;
+      const result = applyPivot(sessionState, cat);
+      const fb = document.getElementById('pivot-feedback');
+      if (fb) {
+        fb.hidden = false;
+        fb.textContent = result.ok
+          ? `Pivoted to ${result.newLabel}. Desk tasks refreshed; check News.`
+          : result.reason || 'Could not pivot.';
+        fb.classList.toggle('error', !result.ok);
+      }
+      if (result.ok) {
+        appendLog(sessionState, `Pivoted from ${result.oldLabel} to ${result.newLabel}.`);
+      }
+      refresh();
     }
   });
 
   document.getElementById('btn-gameover-menu')?.addEventListener('click', () => {
     sessionState = null;
     syncStartScreen();
+    renderHallOfFameBlock(document.getElementById('hall-of-fame'));
     showScreen('start');
   });
 }
@@ -545,6 +576,7 @@ async function init() {
 
   setLoadButtonEnabled(StorageManager.hasSave());
   syncStartScreen();
+  renderHallOfFameBlock(document.getElementById('hall-of-fame'));
 
   function flashLoadError(message) {
     const el = document.getElementById('start-api-status');
@@ -640,7 +672,8 @@ async function init() {
         companyName,
         categoryId,
         mode,
-        sandboxCash
+        sandboxCash,
+        sandboxTuning: parseSandboxTuning(new FormData(setupForm), mode)
       })
     );
   });

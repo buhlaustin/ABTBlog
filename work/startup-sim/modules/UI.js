@@ -11,6 +11,9 @@ import { hasActiveCrisis } from './Crisis.js';
 import { isPublicCompany, founderStakeValue } from './IPO.js';
 import { stageIconUrl } from './Assets.js';
 import { activeTutorialStep, renderTutorialBanner } from './Tutorial.js';
+import { getCategoriesSync } from './Categories.js';
+import { canPivot } from './Pivot.js';
+import { formatHallHighlights } from './HallOfFame.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -51,11 +54,14 @@ export function populateCategorySelect(selectEl, categories) {
 
 export function bindSandboxCashToggle(form) {
   const wrap = document.getElementById('sandbox-cash-wrap');
+  const tuning = document.getElementById('sandbox-tuning-wrap');
   if (!form || !wrap) return;
 
   const sync = () => {
     const mode = form.querySelector('input[name="mode"]:checked')?.value;
-    wrap.hidden = mode !== 'sandbox';
+    const sandbox = mode === 'sandbox';
+    wrap.hidden = !sandbox;
+    if (tuning) tuning.hidden = !sandbox;
   };
 
   form.addEventListener('change', sync);
@@ -276,17 +282,7 @@ export function renderAllPanels(state) {
   renderGameHud(state);
   renderDeskPanel(state);
 
-  const product = document.getElementById('panel-product');
-  if (product) {
-    product.innerHTML = `
-      <p class="panel-lede">Product strength feeds task outcomes (revenue multiplier).</p>
-      <div class="summary-grid">
-        <div><span class="stat-label">Product level</span><span class="stat-value">${state.product.level ?? 0}</span></div>
-        <div><span class="stat-label">Buzz</span><span class="stat-value">${state.product.buzz ?? 0}</span></div>
-        <div><span class="stat-label">Category</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
-      </div>
-    `;
-  }
+  renderProductPanel(document.getElementById('panel-product'), state);
 
   const growth = document.getElementById('panel-growth');
   if (growth) {
@@ -303,6 +299,44 @@ export function renderAllPanels(state) {
   renderSocialPanel(document.getElementById('panel-social'), state);
   renderNewsPanel(document.getElementById('panel-news'), state);
   renderAdvisorPanel(document.getElementById('panel-advisor'), state);
+}
+
+export function renderProductPanel(container, state) {
+  if (!container) return;
+  const pivotAllowed = canPivot(state);
+  const categories = getCategoriesSync();
+  const options = categories
+    .filter((c) => c.id !== state.company.categoryId)
+    .map(
+      (c) =>
+        `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}</option>`
+    )
+    .join('');
+
+  const pivotBlock = pivotAllowed
+    ? `<form id="pivot-form" class="setup-form finance-action">
+        <p><strong>One-time pivot</strong> — reposition the company (buzz and board sentiment take a hit).</p>
+        <label for="pivot-category">New category</label>
+        <select id="pivot-category" name="pivotCategory" required>
+          <option value="" disabled selected>Choose new positioning…</option>
+          ${options}
+        </select>
+        <button type="submit" class="btn btn-primary btn-small">Pivot company</button>
+      </form>
+      <p id="pivot-feedback" class="desk-feedback" hidden></p>`
+    : state.flags?.pivotUsed
+      ? '<p class="fine-print">You already used your one-time pivot this run.</p>'
+      : '';
+
+  container.innerHTML = `
+    <p class="panel-lede">Product strength feeds task outcomes (revenue multiplier).</p>
+    <div class="summary-grid">
+      <div><span class="stat-label">Product level</span><span class="stat-value">${state.product.level ?? 0}</span></div>
+      <div><span class="stat-label">Buzz</span><span class="stat-value">${state.product.buzz ?? 0}</span></div>
+      <div><span class="stat-label">Category</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
+    </div>
+    ${pivotBlock}
+  `;
 }
 
 export function renderGameOver(state) {
@@ -324,6 +358,11 @@ export function renderGameOver(state) {
             ? `<blockquote class="ipo-press"><strong>${escapeHtml(e.pressHeadline)}</strong><br>${escapeHtml(e.pressDek || '')}</blockquote>`
             : ''
         }
+        ${
+          state.meta?.hofHighlights?.length
+            ? `<p class="hof-highlight">${escapeHtml(formatHallHighlights(state.meta.hofHighlights))}</p>`
+            : ''
+        }
         <div class="summary-grid gameover-stats">
           <div><span class="stat-label">Cash-out</span><span class="stat-value">${formatMoney(e.payout)}</span></div>
           <div><span class="stat-label">Share price</span><span class="stat-value">${formatMoney(e.sharePrice)}</span></div>
@@ -335,6 +374,11 @@ export function renderGameOver(state) {
       `;
     } else {
       body.innerHTML = `
+        ${
+          state.meta?.hofHighlights?.length
+            ? `<p class="hof-highlight">${escapeHtml(formatHallHighlights(state.meta.hofHighlights))}</p>`
+            : ''
+        }
         <p>${escapeHtml(state.flags.gameOverReason || 'Your run ended.')}</p>
         <p>Lifetime revenue: <strong>${formatMoney(state.finance.lifetimeRevenue)}</strong></p>
         <p>Months played: <strong>${months}</strong></p>
