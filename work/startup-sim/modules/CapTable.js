@@ -17,9 +17,15 @@ export function targetIpoSharePrice(state, valuation) {
 /** ESOP created at seed — 8% fully-diluted (was 10%). */
 export const SEED_ESOP_FD_PCT = 0.08;
 
+/** Typical IPO: ~25% tradable float; ~8% primary (new shares, cash to company). */
+export const IPO_TARGET_FLOAT_FD_PCT = 0.26;
+export const IPO_PRIMARY_FD_PCT = 0.08;
+/** Cap valuation-implied share inflation (old bug pushed ~70%+ float). */
+export const IPO_MAX_FLOAT_FD_PCT = 0.32;
+
 /**
- * IPO listing: primary shares (cash to company) + liquidity float.
- * Avoids the old ~74% forced float that crushed founder ownership.
+ * IPO listing: primary shares (cash to company) + public float (secondary + free float).
+ * Targets realistic dilution — not the pre-fix ~74% float, and not an ~18% toy float.
  */
 export function applyPublicListingCapTable(state, valuation, sharePrice, opts = {}) {
   if (!state.capTable?.length) {
@@ -28,26 +34,29 @@ export function applyPublicListingCapTable(state, valuation, sharePrice, opts = 
   const rows = state.capTable.filter((r) => r.id !== PUBLIC_FLOAT_ROW_ID).map((r) => ({ ...r }));
   const insider = rows.reduce((s, r) => s + (r.shares ?? 0), 0);
   const price = Math.max(Number(sharePrice) || 0, 0.01);
-  const primaryFdPct = opts.primaryFdPct ?? 0.1;
+  const floatFdPct = opts.floatFdPct ?? IPO_TARGET_FLOAT_FD_PCT;
+  const primaryFdPct = opts.primaryFdPct ?? IPO_PRIMARY_FD_PCT;
+  const maxFloatFdPct = opts.maxFloatFdPct ?? IPO_MAX_FLOAT_FD_PCT;
 
-  const primaryShares = Math.max(1, Math.round((insider * primaryFdPct) / (1 - primaryFdPct)));
-  const primaryProceeds = Math.round(primaryShares * price);
+  const fromFloatTarget = Math.round(insider / (1 - floatFdPct));
+  const fromValuation = Math.round(valuation / price);
+  const capTotal = Math.round(insider / (1 - maxFloatFdPct));
+  let totalShares = Math.max(fromFloatTarget, fromValuation);
+  totalShares = Math.min(totalShares, capTotal);
+  totalShares = Math.max(totalShares, insider + 1);
 
-  let totalShares = Math.max(insider + primaryShares + 1, Math.round(valuation / price));
-  let liquidityShares = totalShares - insider - primaryShares;
-  const minLiquidity = Math.max(
-    1,
-    Math.round(((insider + primaryShares) * 0.1) / 0.9)
+  const newPublicShares = totalShares - insider;
+  const primaryShares = Math.min(
+    Math.max(1, Math.round(primaryFdPct * totalShares)),
+    newPublicShares
   );
-  if (liquidityShares < minLiquidity) {
-    liquidityShares = minLiquidity;
-    totalShares = insider + primaryShares + liquidityShares;
-  }
+  const liquidityShares = newPublicShares - primaryShares;
+  const primaryProceeds = Math.round(primaryShares * price);
 
   rows.push({
     id: PUBLIC_FLOAT_ROW_ID,
-    name: 'Public shareholders (float + IPO primary)',
-    shares: primaryShares + liquidityShares,
+    name: 'Public shareholders (float)',
+    shares: newPublicShares,
     class: 'public'
   });
   state.capTable = recalculateCapTablePercentages(rows);
@@ -56,7 +65,7 @@ export function applyPublicListingCapTable(state, valuation, sharePrice, opts = 
     primaryShares,
     primaryProceeds,
     liquidityShares,
-    publicFloatShares: primaryShares + liquidityShares
+    publicFloatShares: newPublicShares
   };
 }
 

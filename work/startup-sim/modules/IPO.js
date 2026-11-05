@@ -10,7 +10,9 @@ import {
   retirePublicFloatShares,
   targetIpoSharePrice,
   totalOutstandingShares,
-  PUBLIC_FLOAT_ROW_ID
+  PUBLIC_FLOAT_ROW_ID,
+  IPO_PRIMARY_FD_PCT,
+  IPO_TARGET_FLOAT_FD_PCT
 } from './CapTable.js';
 import {
   ceoEndgameCompSnapshot,
@@ -77,7 +79,10 @@ export function fileIpo(state) {
   const pop = 1.08 + Math.random() * 0.12;
   const openPrice = Math.round(ipoPrice * pop * 100) / 100;
   const openValuation = Math.round(valuation * pop);
-  const listing = applyPublicListingCapTable(state, openValuation, openPrice, { primaryFdPct: 0.1 });
+  const listing = applyPublicListingCapTable(state, openValuation, openPrice, {
+    floatFdPct: IPO_TARGET_FLOAT_FD_PCT,
+    primaryFdPct: IPO_PRIMARY_FD_PCT
+  });
   const primaryProceeds = listing.primaryProceeds ?? 0;
   if (primaryProceeds > 0) {
     state.finance.cash = (state.finance.cash ?? 0) + primaryProceeds;
@@ -826,7 +831,7 @@ export function renderIpoPanel(container, state) {
   if (canFileIpo(state)) {
     block = `<div class="finance-action ipo-action">
       <p><strong>IPO window open</strong> — You crossed ${formatMoney(getEffectiveIpoGate(state))} ARR. File to list on the fictional exchange.</p>
-      <p class="fine-print">Listing sells ~10% primary shares at the open — proceeds deposit to company cash. Market sentiment nudges the opening pop; the stock updates each month.</p>
+      <p class="fine-print">Typical listing: ~8% primary (new shares, cash to the company) and ~26% public float — insiders dilute accordingly. Sentiment nudges the opening pop; the stock marks monthly after that.</p>
       <button type="button" class="btn btn-primary btn-small" id="btn-file-ipo">File IPO</button>
     </div>`;
   } else if (isPublicCompany(state) && !state.flags?.cashedOut) {

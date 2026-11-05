@@ -846,13 +846,21 @@ if (!ipo.ok) {
   failed = true;
 } else {
   const founder = getFounderRow(pub);
+  const floatPct = floatRow?.pct ?? 0;
   if ((founder?.pct ?? 0) < 18) {
-    console.error(`FAIL: founder pct at IPO too low (${founder?.pct}%) after float fix`);
+    console.error(`FAIL: founder pct at IPO too low (${founder?.pct}%)`);
     failed = true;
+  } else if (floatPct < 20 || floatPct > 34) {
+    console.error(`FAIL: IPO public float should be realistic (~20–32% FD, got ${floatPct}%)`);
+    failed = true;
+  } else if ((founder?.pct ?? 0) > 82) {
+    console.error(`FAIL: IPO float too small — founder still ${founder?.pct}% (expected meaningful dilution)`);
+    failed = true;
+  } else {
+    console.log(
+      `OK: IPO primary + float (${formatMoney(ipo.primaryProceeds)} primary, float ${floatPct}%, founder ${founder?.pct}%, ${formatMoney(listPrice)}/share)`
+    );
   }
-  console.log(
-    `OK: IPO primary + float (${formatMoney(ipo.primaryProceeds)} primary, founder ${founder?.pct}%, ${formatMoney(listPrice)}/share)`
-  );
   const tone = setPublicGuidanceTone(pub, 'aggressive');
   if (!tone.ok || whisperRevenueTarget(pub) <= 0) {
     console.error('FAIL: public guidance / whisper target');
