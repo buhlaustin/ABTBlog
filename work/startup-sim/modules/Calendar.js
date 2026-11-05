@@ -5,7 +5,7 @@ import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { serviceLoanAtMonthEnd } from './BankLoan.js';
 import { settleRevenueAdvanceAtMonthEnd } from './RevenueAdvance.js';
-import { recordCeoSalaryForMonth } from './CeoEconomics.js';
+import { recordCeoSalaryForMonth, settlePersonalExpensesAtMonthEnd } from './CeoEconomics.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
 import { tickPublicMarket, tickIpoLockup, tickPublicMarketAtMonthStart, isPublicCompany } from './IPO.js';
 import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
@@ -112,6 +112,9 @@ export function endMonth(state) {
   const growthCampaignsClosed = state.growth?.campaignsThisMonth?.length ?? 0;
   const burn = resolveMonthEndBurn(state);
   for (const line of recordCeoSalaryForMonth(state)) {
+    appendLog(state, line);
+  }
+  for (const line of settlePersonalExpensesAtMonthEnd(state)) {
     appendLog(state, line);
   }
   for (const line of settleRevenueAdvanceAtMonthEnd(state)) {

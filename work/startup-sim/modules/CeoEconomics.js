@@ -2,16 +2,23 @@ import { STAGES, formatMoney } from './constants.js';
 import { recordCashOutflow, founderValuationStake, founderEquityPct, projectMonthlyBurn } from './Finance.js';
 import { founderStakeValue, isPublicCompany, canCashOut } from './IPO.js';
 import { getFounderRow } from './CapTable.js';
-import { calendarTurn } from './XC.js';
+import { calendarTurn, isInResidency } from './XC.js';
+
+const PERSONAL_BANK_MIN = 4_500;
+const PERSONAL_BANK_MAX = 10_500;
 
 export function createInitialCeoState() {
   return {
     salaryAnnual: 0,
     careerSalaryPaid: 0,
     careerOwnerDraws: 0,
+    bankBalance: null,
+    personalBurnMonthly: null,
+    personalBurnCustom: false,
     drawLog: [],
     salaryPayLog: [],
-    salaryChangeLog: []
+    salaryChangeLog: [],
+    bankLog: []
   };
 }
 
@@ -20,7 +27,143 @@ function ceoState(state) {
   if (!state.ceo.drawLog) state.ceo.drawLog = [];
   if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];
   if (!state.ceo.salaryChangeLog) state.ceo.salaryChangeLog = [];
+  if (!state.ceo.bankLog) state.ceo.bankLog = [];
   return state.ceo;
+}
+
+function logStamp(state) {
+  return {
+    turn: calendarTurn(state),
+    month: state.calendar?.monthIndex,
+    year: state.calendar?.year
+  };
+}
+
+/** Deterministic per-run personal starting cash (never a single hardcoded value). */
+export function rollInitialPersonalBankBalance(state) {
+  const seed = state.meta?.runSeed ?? 0;
+  const nameSalt =
+    ((state.company?.ceoFirstName ?? '').length + 1) * 7919 +
+    ((state.company?.ceoLastName ?? '').length + 1) * 104729;
+  let h = (seed ^ nameSalt) >>> 0;
+  h = Math.imul(h ^ 0x9e3779b9, 0x85ebca6b) >>> 0;
+  h = Math.imul(h ^ (state.company?.categoryId?.length ?? 0), 0xc2b2ae35) >>> 0;
+  const u = h / 0xffffffff;
+  return Math.round(PERSONAL_BANK_MIN + u * (PERSONAL_BANK_MAX - PERSONAL_BANK_MIN));
+}
+
+export function ensureCeoPersonalBank(state) {
+  const ceo = ceoState(state);
+  if (ceo.bankBalance == null || !Number.isFinite(ceo.bankBalance)) {
+    const opening = rollInitialPersonalBankBalance(state);
+    ceo.bankBalance = opening;
+    if (!state.meta) state.meta = {};
+    state.meta.ceoOpeningBankBalance = opening;
+    pushCeoLog(ceo, 'bankLog', {
+      kind: 'opening',
+      amount: opening,
+      delta: opening,
+      balanceAfter: opening,
+      label: 'Opening personal balance',
+      ...logStamp(state)
+    });
+  }
+  return ceo.bankBalance;
+}
+
+export function initializeCeoPersonalFinances(state) {
+  ensureCeoPersonalBank(state);
+}
+
+function creditPersonalBank(state, amount, label, kind) {
+  const pay = Math.round(Number(amount) || 0);
+  if (pay <= 0) return 0;
+  const ceo = ceoState(state);
+  ensureCeoPersonalBank(state);
+  ceo.bankBalance = (ceo.bankBalance ?? 0) + pay;
+  pushCeoLog(ceo, 'bankLog', {
+    kind,
+    amount: pay,
+    delta: pay,
+    balanceAfter: ceo.bankBalance,
+    label,
+    ...logStamp(state)
+  });
+  return pay;
+}
+
+function debitPersonalBank(state, amount, label, kind) {
+  const pay = Math.round(Number(amount) || 0);
+  if (pay <= 0) return 0;
+  const ceo = ceoState(state);
+  ensureCeoPersonalBank(state);
+  const applied = Math.min(pay, ceo.bankBalance ?? 0);
+  ceo.bankBalance = Math.max(0, (ceo.bankBalance ?? 0) - applied);
+  pushCeoLog(ceo, 'bankLog', {
+    kind,
+    amount: applied,
+    delta: -applied,
+    balanceAfter: ceo.bankBalance,
+    label,
+    ...logStamp(state)
+  });
+  return applied;
+}
+
+export function ceoPersonalBankBalance(state) {
+  return ensureCeoPersonalBank(state);
+}
+
+export function recommendedPersonalBurnMonthly(state) {
+  let base = 3_200;
+  if (state.stage === STAGES.GARAGE && !state.flags?.seedRoundClosed) base = 3_400;
+  else if (!state.flags?.seedRoundClosed) base = 4_100;
+  else if (!state.flags?.seriesAClosed) base = 5_200;
+  else if (!state.flags?.seriesBClosed) base = 6_800;
+  else if (!isPublicCompany(state)) base = 8_400;
+  else base = 10_500;
+  if (isInResidency(state) || state.company?.location?.includes('San Francisco')) base += 900;
+  if (state.offices?.hubLabel?.match(/NYC|New York/i)) base += 700;
+  const seed = state.meta?.runSeed ?? 1;
+  const jitter = ((seed >>> 8) % 89) / 89;
+  return Math.round(base * (0.94 + jitter * 0.12));
+}
+
+export function effectivePersonalBurnMonthly(state) {
+  const ceo = ceoState(state);
+  if (ceo.personalBurnCustom && ceo.personalBurnMonthly != null) {
+    return Math.max(0, Math.round(ceo.personalBurnMonthly));
+  }
+  return recommendedPersonalBurnMonthly(state);
+}
+
+export function setCeoPersonalBurnMonthly(state, monthly) {
+  if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
+  const n = Math.max(1_500, Math.min(30_000, Math.round(Number(monthly) || 0)));
+  const ceo = ceoState(state);
+  ceo.personalBurnMonthly = n;
+  ceo.personalBurnCustom = true;
+  const rec = recommendedPersonalBurnMonthly(state);
+  return {
+    ok: true,
+    monthly: n,
+    summary: `Personal budget set to ${formatMoney(n)}/mo (recommended ${formatMoney(rec)} for your stage).`
+  };
+}
+
+export function resetCeoPersonalBurnToRecommended(state) {
+  const ceo = ceoState(state);
+  ceo.personalBurnMonthly = null;
+  ceo.personalBurnCustom = false;
+  const rec = recommendedPersonalBurnMonthly(state);
+  return { ok: true, summary: `Personal budget follows recommendation (${formatMoney(rec)}/mo).` };
+}
+
+export function personalBankRunway(state) {
+  const bal = ceoPersonalBankBalance(state);
+  const burn = effectivePersonalBurnMonthly(state);
+  if (burn <= 0) return { burn, balance: bal, label: '∞' };
+  return { burn, balance: bal, label: `${(bal / burn).toFixed(1)} mo` };
 }
 
 function pushCeoLog(ceo, key, entry, max = 10) {
@@ -166,7 +309,28 @@ export function recordCeoSalaryForMonth(state) {
     month: state.calendar?.monthIndex,
     year: state.calendar?.year
   });
-  return [`CEO salary ${formatMoney(pay)} — career cash comp ${formatMoney(ceo.careerSalaryPaid)}.`];
+  creditPersonalBank(state, pay, 'CEO salary deposit', 'salary');
+  return [
+    `CEO salary ${formatMoney(pay)} deposited — personal bank ${formatMoney(ceo.bankBalance)} (career ${formatMoney(ceo.careerSalaryPaid)}).`
+  ];
+}
+
+/** Personal living expenses — after salary hits the bank this month. */
+export function settlePersonalExpensesAtMonthEnd(state) {
+  const burn = effectivePersonalBurnMonthly(state);
+  if (burn <= 0) return [];
+  const ceo = ceoState(state);
+  ensureCeoPersonalBank(state);
+  const paid = debitPersonalBank(state, burn, 'Personal living expenses', 'expenses');
+  const lines = [
+    `Personal expenses ${formatMoney(paid)} — bank balance ${formatMoney(ceo.bankBalance)}.`
+  ];
+  if ((ceo.bankBalance ?? 0) <= 0 && paid > 0) {
+    lines.push('Personal bank at $0 — raise salary or take an owner draw before next month.');
+  } else if ((ceo.bankBalance ?? 0) < burn * 0.5) {
+    lines.push('Personal cash is tight versus your monthly budget.');
+  }
+  return lines;
 }
 
 export function maxOwnerDrawAmount(state) {
@@ -198,11 +362,16 @@ export function takeOwnerDraw(state, amount) {
     month: state.calendar?.monthIndex,
     year: state.calendar?.year
   });
+  creditPersonalBank(state, draw, 'Owner draw deposit', 'draw');
   return {
     ok: true,
     draw,
-    summary: `Owner draw ${formatMoney(draw)} — personal total ${formatMoney(ceo.careerOwnerDraws)} (company cash ${formatMoney(state.finance.cash)}).`
+    summary: `Owner draw ${formatMoney(draw)} — personal bank ${formatMoney(ceo.bankBalance)} (company cash ${formatMoney(state.finance.cash)}).`
   };
+}
+
+export function depositStockCashOutToPersonalBank(state, payout) {
+  return creditPersonalBank(state, payout, 'Founder stake cash-out', 'cash_out');
 }
 
 function totalCapShares(state) {
@@ -255,24 +424,21 @@ export function ceoPersonalCashComp(state) {
 }
 
 export function ceoNetWorth(state) {
-  return ceoPersonalCashComp(state) + (founderEquityValue(state) ?? 0);
+  return ceoPersonalBankBalance(state) + (founderEquityValue(state) ?? 0);
 }
 
 export function wealthMix(state) {
-  const salary = state.ceo?.careerSalaryPaid ?? 0;
-  const draws = state.ceo?.careerOwnerDraws ?? 0;
+  const cash = ceoPersonalBankBalance(state);
   const equity = founderEquityValue(state) ?? 0;
-  const total = salary + draws + equity;
+  const total = cash + equity;
   if (total <= 0) {
-    return { salary, draws, equity, total: 0, salaryPct: 0, drawsPct: 0, equityPct: 100 };
+    return { cash, equity, total: 0, cashPct: 0, equityPct: 100 };
   }
   return {
-    salary,
-    draws,
+    cash,
     equity,
     total,
-    salaryPct: Math.round((salary / total) * 1000) / 10,
-    drawsPct: Math.round((draws / total) * 1000) / 10,
+    cashPct: Math.round((cash / total) * 1000) / 10,
     equityPct: Math.round((equity / total) * 1000) / 10
   };
 }
@@ -301,13 +467,15 @@ export function ceoEndgameCompSnapshot(state) {
   const draws = state.ceo?.careerOwnerDraws ?? 0;
   const equity = founderEquityValue(state) ?? 0;
   const stockPayout = state.ending?.type === 'cash_out' ? state.ending.payout ?? 0 : 0;
+  const bank = ceoPersonalBankBalance(state);
   return {
     salary,
     draws,
     equityPaper: equity,
     stockPayout,
+    bankBalance: bank,
     totalCareerCash: salary + draws + stockPayout,
-    netWorthEstimate: salary + draws + (stockPayout || equity)
+    netWorthEstimate: bank + (stockPayout || equity)
   };
 }
 
@@ -316,33 +484,24 @@ export function renderCeoCompBreakdown(state) {
   const equity = founderEquityValue(state);
   const salary = state.ceo?.careerSalaryPaid ?? 0;
   const draws = state.ceo?.careerOwnerDraws ?? 0;
-  const liquid = salary + draws;
-  const net = liquid + equity;
+  const bank = ceoPersonalBankBalance(state);
+  const net = bank + equity;
   const publicCo = isPublicCompany(state);
-  return { pct, equity, salary, draws, liquid, net, publicCo };
+  return { pct, equity, salary, draws, bank, net, publicCo };
 }
 
-export function buildCompLedger(state, limit = 8) {
+export function buildCompLedger(state, limit = 12) {
   const ceo = state.ceo ?? {};
   const rows = [];
-  for (const e of ceo.salaryPayLog ?? []) {
+  for (const e of ceo.bankLog ?? []) {
     rows.push({
-      kind: 'salary',
-      amount: e.amount,
+      kind: e.kind ?? 'bank',
+      amount: e.delta ?? e.amount,
       turn: e.turn,
       month: e.month,
       year: e.year,
-      label: 'Salary paid'
-    });
-  }
-  for (const e of ceo.drawLog ?? []) {
-    rows.push({
-      kind: 'draw',
-      amount: e.amount,
-      turn: e.turn,
-      month: e.month,
-      year: e.year,
-      label: 'Owner draw'
+      label: e.label ?? 'Bank',
+      balanceAfter: e.balanceAfter
     });
   }
   rows.sort((a, b) => (b.turn ?? 0) - (a.turn ?? 0));
@@ -354,11 +513,11 @@ export function cashOutPreview(state) {
   const stats = founderShareStats(state);
   if (!stats.publicCo) return null;
   const payout = founderStakeValue(state);
-  const liquid = ceoPersonalCashComp(state);
+  const bank = ceoPersonalBankBalance(state);
   return {
     payout,
-    liquid,
-    combined: payout + liquid,
+    liquid: bank,
+    combined: payout + bank,
     sharePrice: stats.markPx,
     gainSinceIpo: stats.gainSinceIpo
   };

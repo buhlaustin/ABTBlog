@@ -691,6 +691,7 @@ export function renderGameOver(state) {
           <div><span class="stat-label">Stock cash-out</span><span class="stat-value">${formatMoney(e.payout)}</span></div>
           <div><span class="stat-label">CEO salary (career)</span><span class="stat-value">${formatMoney(e.ceoSalaryCareer ?? 0)}</span></div>
           <div><span class="stat-label">Owner draws</span><span class="stat-value">${formatMoney(e.ceoOwnerDraws ?? 0)}</span></div>
+          <div><span class="stat-label">Personal bank</span><span class="stat-value">${formatMoney(e.ceoBankBalance ?? 0)}</span></div>
           <div><span class="stat-label">Total personal cash</span><span class="stat-value">${formatMoney(e.totalCareerCashComp ?? e.payout)}</span></div>
           <div><span class="stat-label">Share price</span><span class="stat-value">${formatMoney(e.sharePrice)}</span></div>
           <div><span class="stat-label">Founder stake</span><span class="stat-value">${e.founderPct}%</span></div>

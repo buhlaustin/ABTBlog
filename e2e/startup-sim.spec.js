@@ -84,7 +84,8 @@ test.describe('Startup Simulator', () => {
     await page.locator('#tab-ceo').click();
     await expect(page.locator('#panel-ceo')).toContainText('CEO salary');
     await expect(page.locator('#panel-ceo')).toContainText('Est. net worth');
-    await expect(page.locator('#panel-ceo')).toContainText('Compensation ledger');
+    await expect(page.locator('#panel-ceo')).toContainText('Personal bank');
+    await expect(page.locator('#panel-ceo')).toContainText('Personal bank ledger');
 
     await page.locator('#tab-finance').click();
     await expect(page.locator('#panel-finance')).toContainText('Cap table');

@@ -754,6 +754,33 @@ if (!failed) {
 const { isRealCalendarYear, formatStateMonth } = await import(
   `file://${join(sim, 'modules/GameCalendar.js')}`
 );
+const {
+  rollInitialPersonalBankBalance,
+  ceoPersonalBankBalance,
+  settlePersonalExpensesAtMonthEnd
+} = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
+const bankA = createInitialState({ companyName: 'Bank A', categoryId: 'b2b-saas', mode: 'career', ceoFirstName: 'A', ceoLastName: 'One' });
+const bankB = createInitialState({ companyName: 'Bank B', categoryId: 'b2b-saas', mode: 'career', ceoFirstName: 'B', ceoLastName: 'Two' });
+const openA = ceoPersonalBankBalance(bankA);
+const openB = ceoPersonalBankBalance(bankB);
+if (openA < 4500 || openA > 10500 || openB < 4500 || openB > 10500) {
+  console.error('FAIL: personal bank opening range');
+  failed = true;
+} else if (openA === openB && bankA.meta.runSeed !== bankB.meta.runSeed) {
+  console.error('FAIL: personal bank should vary by run');
+  failed = true;
+}
+if (!failed) {
+  setCeoSalaryAnnual(bankA, 120_000);
+  recordCeoSalaryForMonth(bankA);
+  const beforeExp = bankA.ceo.bankBalance;
+  settlePersonalExpensesAtMonthEnd(bankA);
+  if (bankA.ceo.bankBalance >= beforeExp) {
+    console.error('FAIL: personal expenses should reduce bank');
+    failed = true;
+  }
+}
+
 const calState = createInitialState({ companyName: 'Cal Co', categoryId: 'b2b-saas', mode: 'career' });
 if (!isRealCalendarYear(calState.calendar.year)) {
   console.error('FAIL: career should start on real calendar year');

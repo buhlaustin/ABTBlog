@@ -71,7 +71,12 @@ import {
   drawRevenueAdvance,
   showFinanceFeedback
 } from './modules/Fundraising.js';
-import { setCeoSalaryAnnual, takeOwnerDraw } from './modules/Ceo.js';
+import {
+  setCeoSalaryAnnual,
+  takeOwnerDraw,
+  setCeoPersonalBurnMonthly,
+  resetCeoPersonalBurnToRecommended
+} from './modules/Ceo.js';
 import { loadAccelerators } from './modules/Accelerators.js';
 import { onLayoffSentiment } from './modules/Sentiment.js';
 import {
@@ -938,6 +943,24 @@ function bindGameInteractions() {
     }
     if (e.target.id === 'btn-xc-interview-cancel') {
       showScreen('game');
+      return;
+    }
+    if (e.target.id === 'btn-save-ceo-personal-burn' && sessionState) {
+      const input = document.getElementById('ceo-personal-burn-input');
+      const result = setCeoPersonalBurnMonthly(sessionState, input?.value);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Invalid budget.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-reset-ceo-personal-burn' && sessionState) {
+      const result = resetCeoPersonalBurnToRecommended(sessionState);
+      appendLog(sessionState, result.summary);
+      showFinanceFeedback(result.summary);
+      refresh();
       return;
     }
     if (e.target.id === 'btn-save-ceo-salary' && sessionState) {

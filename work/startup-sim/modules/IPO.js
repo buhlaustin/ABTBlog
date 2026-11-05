@@ -3,7 +3,7 @@ import { getEffectiveIpoGate } from './SandboxTuning.js';
 import { getArr } from './Workspace.js';
 import { calendarTurn } from './XC.js';
 import { getFounderRow } from './CapTable.js';
-import { ceoEndgameCompSnapshot } from './CeoEconomics.js';
+import { ceoEndgameCompSnapshot, depositStockCashOutToPersonalBank } from './CeoEconomics.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
@@ -560,10 +560,10 @@ export function cashOut(state) {
     pressDek: state.publicMarket?.pressDek ?? null,
     ceoSalaryCareer: comp.salary,
     ceoOwnerDraws: comp.draws,
-    totalCareerCashComp: comp.totalCareerCash
+    ceoBankBalance: depositStockCashOutToPersonalBank(state, payout),
+    totalCareerCashComp: comp.salary + comp.draws + payout
   };
 
-  state.finance.cash = (state.finance.cash ?? 0) + payout;
   state.flags.cashedOut = true;
   state.flags.gameOver = true;
   state.flags.gameOverReason = 'You stepped down as CEO and cashed out your founder stake.';
