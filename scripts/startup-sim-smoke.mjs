@@ -1169,6 +1169,29 @@ if (!failed) {
   } else {
     console.log(`OK: hub city rent (${hubMo}/mo) above campus HQ (${campusRent}/mo)`);
   }
+
+  const { addSatellite, getSatelliteTemplates, availableSatelliteTemplates } = await import(
+    `file://${join(sim, 'modules/Offices.js')}`
+  );
+  const catalog = getSatelliteTemplates();
+  if (catalog.length < 30) {
+    console.error(`FAIL: expected 30+ satellite cities (got ${catalog.length})`);
+    failed = true;
+  }
+  const satState = createInitialState({ companyName: 'SatCo', categoryId: 'b2b-saas', mode: 'sandbox' });
+  satState.offices = { hubId: 'atlanta', hubLabel: 'Atlanta', satellites: [], usedSatelliteTemplateIds: [] };
+  const open = addSatellite(satState, 'sat-denver');
+  const dup = addSatellite(satState, 'sat-denver');
+  const avail = availableSatelliteTemplates(satState);
+  if (!open.ok || dup.ok) {
+    console.error(`FAIL: satellite one-time use (open ${open.ok}, dup ${dup.ok})`);
+    failed = true;
+  } else if (avail.some((t) => t.id === 'sat-denver')) {
+    console.error('FAIL: used satellite should not appear in available list');
+    failed = true;
+  } else if (!failed) {
+    console.log(`OK: satellite catalog (${catalog.length} cities, one-time open)`);
+  }
 }
 if (!failed) {
   const publicCoo = createInitialState({ companyName: 'Public COO', categoryId: 'b2b-saas', mode: 'sandbox' });

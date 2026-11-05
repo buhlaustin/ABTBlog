@@ -833,8 +833,11 @@ function handleAddSatellite() {
     refresh();
     return;
   }
-  appendLog(sessionState, `Opened ${result.entry.label} (+${result.entry.seats} seats).`);
-  showOfficesFeedback('Satellite added.');
+  appendLog(
+    sessionState,
+    `Opened ${result.entry.label} satellite (+${result.entry.seats} seats, ${formatMoney(result.entry.rentMonthly)}/mo).`
+  );
+  showOfficesFeedback(`Opened ${result.entry.label} — this city cannot be opened again this run.`);
   refresh();
 }
 

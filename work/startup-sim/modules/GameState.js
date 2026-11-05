@@ -4,7 +4,7 @@ import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
 import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './CapTable.js';
-import { createInitialOffices } from './Offices.js';
+import { createInitialOffices, satelliteTemplateIdFromEntry } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
 import { createInitialBoard } from './Board.js';
 import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart } from './XC.js';
@@ -355,6 +355,15 @@ export function normalizeSave(raw) {
     if (state.flags.gameOver === undefined) state.flags.gameOver = false;
     if (state.flags.seedRoundClosed === undefined) state.flags.seedRoundClosed = false;
     if (!state.offices) state.offices = createInitialOffices();
+    if (state.offices && !state.offices.usedSatelliteTemplateIds) {
+      state.offices.usedSatelliteTemplateIds = [];
+      for (const s of state.offices.satellites ?? []) {
+        const tid = satelliteTemplateIdFromEntry(s);
+        if (tid && !state.offices.usedSatelliteTemplateIds.includes(tid)) {
+          state.offices.usedSatelliteTemplateIds.push(tid);
+        }
+      }
+    }
     if (!state.xc) state.xc = createInitialXcState();
     if (state.xc.retryAvailableTurn === undefined) state.xc.retryAvailableTurn = null;
     if (state.xc.needsFollowUpQuestion === undefined) state.xc.needsFollowUpQuestion = false;
