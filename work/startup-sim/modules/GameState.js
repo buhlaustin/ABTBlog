@@ -4,7 +4,7 @@ import { createInitialSocial } from './Social.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
-import { recalculateCapTablePercentages } from './CapTable.js';
+import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
 import { createInitialBoard } from './Board.js';
@@ -477,6 +477,7 @@ export function normalizeSave(raw) {
       ];
     } else {
       recalculateCapTablePercentages(state.capTable);
+      migratePublicFloatCapTable(state);
     }
 
     if (state.stage === STAGES.OFFICE && state.workspace?.tier === 'garage') {

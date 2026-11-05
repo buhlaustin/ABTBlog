@@ -1,4 +1,81 @@
 import { STAGES } from './constants.js';
+import { getArr } from './Workspace.js';
+
+export const PUBLIC_FLOAT_ROW_ID = 'public-float';
+
+/** IPO listing price target — keeps sticker sane vs ARR and valuation. */
+export function targetIpoSharePrice(state, valuation) {
+  const arr = Math.max(getArr(state), (state.finance?.mrr ?? 0) * 12, 1);
+  const ps = valuation / arr;
+  const fromArr = 16 + Math.log10(Math.max(arr, 1e6)) * 10.5;
+  const fromVal = Math.sqrt(valuation / 40_000_000) * 4.2;
+  let price = Math.round(((fromArr + fromVal) / 2) * 100) / 100;
+  if (ps > 35) price *= 0.72;
+  return Math.max(8, Math.min(420, price));
+}
+
+/** Issue tradable float so outstanding shares match market cap / price. */
+export function ensurePublicFloatOnCapTable(state, valuation, sharePrice) {
+  if (!state.capTable?.length) return 0;
+  const rows = state.capTable.filter((r) => r.id !== PUBLIC_FLOAT_ROW_ID).map((r) => ({ ...r }));
+  const insider = rows.reduce((s, r) => s + (r.shares ?? 0), 0);
+  const price = Math.max(Number(sharePrice) || 0, 0.01);
+  let total = Math.max(insider + 1, Math.round(valuation / price));
+  let floatShares = total - insider;
+  if (floatShares < Math.round(insider * 0.45)) {
+    total = insider + Math.round(insider * 2.8);
+    floatShares = total - insider;
+  }
+  rows.push({
+    id: PUBLIC_FLOAT_ROW_ID,
+    name: 'Public shareholders (float)',
+    shares: floatShares,
+    class: 'public'
+  });
+  state.capTable = recalculateCapTablePercentages(rows);
+  return total;
+}
+
+export function migratePublicFloatCapTable(state) {
+  if (!state.flags?.ipoFiled) return;
+  if (state.capTable?.some((r) => r.id === PUBLIC_FLOAT_ROW_ID)) return;
+  const price = state.publicMarket?.sharePrice ?? state.publicMarket?.ipoPrice ?? 0;
+  const valuation = state.finance?.valuation ?? 0;
+  if (price > 0 && valuation > 0) {
+    ensurePublicFloatOnCapTable(state, valuation, price);
+  }
+}
+
+export function issueFollowOnShares(state, dilutionPct = 0.025) {
+  const rows = state.capTable.map((r) => ({ ...r }));
+  const total = rows.reduce((s, r) => s + (r.shares ?? 0), 0);
+  const newShares = Math.max(1, Math.round(total * (dilutionPct / (1 - dilutionPct))));
+  let row = rows.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
+  if (!row) {
+    row = {
+      id: PUBLIC_FLOAT_ROW_ID,
+      name: 'Public shareholders (float)',
+      shares: 0,
+      class: 'public'
+    };
+    rows.push(row);
+  }
+  row.shares += newShares;
+  state.capTable = recalculateCapTablePercentages(rows);
+  return newShares;
+}
+
+export function retirePublicFloatShares(state, shareCount) {
+  const n = Math.max(0, Math.floor(Number(shareCount) || 0));
+  if (!n) return 0;
+  const rows = state.capTable.map((r) => ({ ...r }));
+  const row = rows.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
+  if (!row?.shares) return 0;
+  const retired = Math.min(row.shares, n);
+  row.shares -= retired;
+  state.capTable = recalculateCapTablePercentages(rows);
+  return retired;
+}
 import { isFundraisingBlockedByScenario } from './ScenarioEffects.js';
 import { convertOutstandingSafesAtSeed } from './FinanceCapital.js';
 import {

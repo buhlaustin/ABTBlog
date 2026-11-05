@@ -43,8 +43,8 @@ if (!lifetimeSample.endsWith('T') || lifetimeSample !== '$20.75T') {
   console.log(`OK: formatMoney commas (${lifetimeSample}, ${groupedHuge})`);
 }
 
-if (taskCatalogSize() < 1100) {
-  console.error(`FAIL: merged task catalog ${taskCatalogSize()} < 1100`);
+if (taskCatalogSize() < 1200) {
+  console.error(`FAIL: merged task catalog ${taskCatalogSize()} < 1200`);
   failed = true;
 } else {
   console.log(`OK: task catalog size ${taskCatalogSize()} (cooldown ${RECENT_TASK_COOLDOWN_MONTHS} months)`);
@@ -267,7 +267,8 @@ const {
   getCoreTaskRevenueMult,
   getRawTaskRevenueMultiplier,
   REV_MULT_CAP_CAREER,
-  REV_MULT_CAP_SANDBOX
+  REV_MULT_CAP_SANDBOX,
+  getTaskRevenueCap
 } = await import(`file://${join(sim, 'modules/Finance.js')}`);
 const careerMult = getTaskRevenueMultiplierPreview(state);
 if (careerMult < 0.9 || careerMult > 2.5) {
@@ -556,12 +557,25 @@ maxedSand.offices = JSON.parse(JSON.stringify(maxed.offices));
 maxedSand.finance = { ...maxed.finance };
 maxedSand.product = { ...maxed.product };
 maxedSand.staff = JSON.parse(JSON.stringify(maxed.staff));
+maxedSand.staff.headcountByDept = {
+  engineering: 2500,
+  product: 1500,
+  sales: 2500,
+  marketing: 2000,
+  finance: 800,
+  support: 700
+};
+maxedSand.staff.draftHeadcountByDept = { ...maxedSand.staff.headcountByDept };
+const sandCap = getTaskRevenueCap(maxedSand);
 const cappedSand = getTaskRevenueMultiplierPreview(maxedSand);
-if (cappedSand > REV_MULT_CAP_SANDBOX + 0.01) {
-  console.error(`FAIL: sandbox cap exceeded: ${cappedSand}`);
+if (cappedSand > sandCap + 0.01) {
+  console.error(`FAIL: sandbox cap exceeded: ${cappedSand} > ${sandCap}`);
+  failed = true;
+} else if (sandCap < REV_MULT_CAP_SANDBOX - 1) {
+  console.error(`FAIL: expected full sandbox workforce cap ${REV_MULT_CAP_SANDBOX}× got ${sandCap}×`);
   failed = true;
 } else {
-  console.log(`OK: sandbox rev mult cap ${cappedSand}×`);
+  console.log(`OK: sandbox rev mult cap ${cappedSand}× (workforce ceiling ${sandCap}×)`);
 }
 
 const { completeBoardTask, dealBoardTasks } = await import(
@@ -779,6 +793,7 @@ if (!buy.ok) {
 }
 
 const { STAGES: ST } = await import(`file://${join(sim, 'modules/constants.js')}`);
+const { PUBLIC_FLOAT_ROW_ID } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
 const {
   fileIpo,
   tickPublicMarket,
@@ -794,10 +809,19 @@ pub.finance.mrr = 5_000_000;
 pub.finance.monthlyBurn = 400_000;
 pub.finance.cash = 50_000_000;
 const ipo = fileIpo(pub);
+const floatRow = pub.capTable?.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
+const listPrice = pub.publicMarket?.sharePrice ?? 0;
 if (!ipo.ok) {
   console.error(`FAIL: fileIpo smoke: ${ipo.reason}`);
   failed = true;
+} else if (!floatRow?.shares || floatRow.shares < 1000) {
+  console.error('FAIL: IPO should add public float shares on cap table');
+  failed = true;
+} else if (listPrice > 450 || listPrice < 5) {
+  console.error(`FAIL: IPO share price out of band (${listPrice})`);
+  failed = true;
 } else {
+  console.log(`OK: IPO public float on cap table (${floatRow.pct}% float, ${formatMoney(listPrice)}/share)`);
   const tone = setPublicGuidanceTone(pub, 'aggressive');
   if (!tone.ok || whisperRevenueTarget(pub) <= 0) {
     console.error('FAIL: public guidance / whisper target');

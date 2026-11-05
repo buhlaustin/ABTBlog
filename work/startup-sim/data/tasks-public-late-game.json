@@ -1,0 +1,2264 @@
+{
+  "tasks": [
+    {
+      "id": "public-whale-001",
+      "title": "Public whale desk #1: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 290000,
+      "revenue": [
+        1625000000,
+        4305000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-002",
+      "title": "Public whale desk #2: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 330000,
+      "revenue": [
+        1750000000,
+        4610000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-003",
+      "title": "Public whale desk #3: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 370000,
+      "revenue": [
+        1875000000,
+        4915000000
+      ],
+      "product": 1,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-004",
+      "title": "Public whale desk #4: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 410000,
+      "revenue": [
+        2000000000,
+        5220000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-005",
+      "title": "Public whale desk #5: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 450000,
+      "revenue": [
+        2125000000,
+        5525000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-006",
+      "title": "Public whale desk #6: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 490000,
+      "revenue": [
+        2250000000,
+        5830000000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-007",
+      "title": "Public whale desk #7: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 530000,
+      "revenue": [
+        2375000000,
+        6135000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-008",
+      "title": "Public whale desk #8: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 570000,
+      "revenue": [
+        2500000000,
+        6440000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-009",
+      "title": "Public whale desk #9: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 610000,
+      "revenue": [
+        2625000000,
+        6745000000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-010",
+      "title": "Public whale desk #10: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 650000,
+      "revenue": [
+        2750000000,
+        7050000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-011",
+      "title": "Public whale desk #11: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 690000,
+      "revenue": [
+        2875000000,
+        7355000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-012",
+      "title": "Public whale desk #12: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 250000,
+      "revenue": [
+        3000000000,
+        7660000000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-013",
+      "title": "Public whale desk #13: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 290000,
+      "revenue": [
+        3125000000,
+        7965000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-014",
+      "title": "Public whale desk #14: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 330000,
+      "revenue": [
+        3250000000,
+        8270000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-015",
+      "title": "Public whale desk #15: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 370000,
+      "revenue": [
+        3375000000,
+        8575000000
+      ],
+      "product": 1,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-016",
+      "title": "Public whale desk #16: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 410000,
+      "revenue": [
+        3500000000,
+        8880000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-017",
+      "title": "Public whale desk #17: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 450000,
+      "revenue": [
+        3625000000,
+        6125000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-018",
+      "title": "Public whale desk #18: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 490000,
+      "revenue": [
+        3750000000,
+        6430000000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-019",
+      "title": "Public whale desk #19: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 530000,
+      "revenue": [
+        3875000000,
+        6735000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-020",
+      "title": "Public whale desk #20: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 570000,
+      "revenue": [
+        4000000000,
+        7040000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-021",
+      "title": "Public whale desk #21: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 610000,
+      "revenue": [
+        4125000000,
+        7345000000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-022",
+      "title": "Public whale desk #22: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 650000,
+      "revenue": [
+        4250000000,
+        7650000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-023",
+      "title": "Public whale desk #23: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 690000,
+      "revenue": [
+        4375000000,
+        7955000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-024",
+      "title": "Public whale desk #24: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 250000,
+      "revenue": [
+        4500000000,
+        8260000000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-025",
+      "title": "Public whale desk #25: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 290000,
+      "revenue": [
+        4625000000,
+        8565000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-026",
+      "title": "Public whale desk #26: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 330000,
+      "revenue": [
+        4750000000,
+        8870000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-027",
+      "title": "Public whale desk #27: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 370000,
+      "revenue": [
+        4875000000,
+        9175000000
+      ],
+      "product": 1,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-028",
+      "title": "Public whale desk #28: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 410000,
+      "revenue": [
+        5000000000,
+        9480000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-029",
+      "title": "Public whale desk #29: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 450000,
+      "revenue": [
+        5125000000,
+        9785000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-030",
+      "title": "Public whale desk #30: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 490000,
+      "revenue": [
+        5250000000,
+        10090000000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-031",
+      "title": "Public whale desk #31: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 530000,
+      "revenue": [
+        5375000000,
+        10395000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-032",
+      "title": "Public whale desk #32: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 570000,
+      "revenue": [
+        5500000000,
+        10700000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-033",
+      "title": "Public whale desk #33: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 610000,
+      "revenue": [
+        5625000000,
+        11005000000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-034",
+      "title": "Public whale desk #34: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 650000,
+      "revenue": [
+        5750000000,
+        8250000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-035",
+      "title": "Public whale desk #35: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 690000,
+      "revenue": [
+        5875000000,
+        8555000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-036",
+      "title": "Public whale desk #36: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 250000,
+      "revenue": [
+        6000000000,
+        8860000000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-037",
+      "title": "Public whale desk #37: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 290000,
+      "revenue": [
+        6125000000,
+        9165000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-038",
+      "title": "Public whale desk #38: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 330000,
+      "revenue": [
+        6250000000,
+        9470000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-039",
+      "title": "Public whale desk #39: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 370000,
+      "revenue": [
+        6375000000,
+        9775000000
+      ],
+      "product": 1,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-040",
+      "title": "Public whale desk #40: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 410000,
+      "revenue": [
+        1500000000,
+        5080000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-041",
+      "title": "Public whale desk #41: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 450000,
+      "revenue": [
+        1625000000,
+        5385000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-042",
+      "title": "Public whale desk #42: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 490000,
+      "revenue": [
+        1750000000,
+        5690000000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-043",
+      "title": "Public whale desk #43: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 530000,
+      "revenue": [
+        1875000000,
+        5995000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-044",
+      "title": "Public whale desk #44: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 570000,
+      "revenue": [
+        2000000000,
+        6300000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-045",
+      "title": "Public whale desk #45: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 610000,
+      "revenue": [
+        2125000000,
+        6605000000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-046",
+      "title": "Public whale desk #46: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 650000,
+      "revenue": [
+        2250000000,
+        6910000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-047",
+      "title": "Public whale desk #47: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 690000,
+      "revenue": [
+        2375000000,
+        7215000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-048",
+      "title": "Public whale desk #48: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 250000,
+      "revenue": [
+        2500000000,
+        7520000000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-049",
+      "title": "Public whale desk #49: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 290000,
+      "revenue": [
+        2625000000,
+        7825000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-050",
+      "title": "Public whale desk #50: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 330000,
+      "revenue": [
+        2750000000,
+        8130000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-051",
+      "title": "Public whale desk #51: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 370000,
+      "revenue": [
+        2875000000,
+        5375000000
+      ],
+      "product": 1,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-052",
+      "title": "Public whale desk #52: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 410000,
+      "revenue": [
+        3000000000,
+        5680000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-053",
+      "title": "Public whale desk #53: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 450000,
+      "revenue": [
+        3125000000,
+        5985000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-054",
+      "title": "Public whale desk #54: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 490000,
+      "revenue": [
+        3250000000,
+        6290000000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-055",
+      "title": "Public whale desk #55: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 530000,
+      "revenue": [
+        3375000000,
+        6595000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-056",
+      "title": "Public whale desk #56: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 570000,
+      "revenue": [
+        3500000000,
+        6900000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-057",
+      "title": "Public whale desk #57: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 610000,
+      "revenue": [
+        3625000000,
+        7205000000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-058",
+      "title": "Public whale desk #58: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 650000,
+      "revenue": [
+        3750000000,
+        7510000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-059",
+      "title": "Public whale desk #59: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 690000,
+      "revenue": [
+        3875000000,
+        7815000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-060",
+      "title": "Public whale desk #60: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 250000,
+      "revenue": [
+        4000000000,
+        8120000000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-061",
+      "title": "Public whale desk #61: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 290000,
+      "revenue": [
+        4125000000,
+        8425000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-062",
+      "title": "Public whale desk #62: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 330000,
+      "revenue": [
+        4250000000,
+        8730000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-063",
+      "title": "Public whale desk #63: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 370000,
+      "revenue": [
+        4375000000,
+        9035000000
+      ],
+      "product": 1,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-064",
+      "title": "Public whale desk #64: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 410000,
+      "revenue": [
+        4500000000,
+        9340000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-065",
+      "title": "Public whale desk #65: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 450000,
+      "revenue": [
+        4625000000,
+        9645000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-066",
+      "title": "Public whale desk #66: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 490000,
+      "revenue": [
+        4750000000,
+        9950000000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-067",
+      "title": "Public whale desk #67: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 530000,
+      "revenue": [
+        4875000000,
+        10255000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-068",
+      "title": "Public whale desk #68: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 570000,
+      "revenue": [
+        5000000000,
+        7500000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-069",
+      "title": "Public whale desk #69: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 610000,
+      "revenue": [
+        5125000000,
+        7805000000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-070",
+      "title": "Public whale desk #70: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 650000,
+      "revenue": [
+        5250000000,
+        8110000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-071",
+      "title": "Public whale desk #71: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 690000,
+      "revenue": [
+        5375000000,
+        8415000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-072",
+      "title": "Public whale desk #72: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 250000,
+      "revenue": [
+        5500000000,
+        8720000000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-073",
+      "title": "Public whale desk #73: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 290000,
+      "revenue": [
+        5625000000,
+        9025000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-074",
+      "title": "Public whale desk #74: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 330000,
+      "revenue": [
+        5750000000,
+        9330000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-075",
+      "title": "Public whale desk #75: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 370000,
+      "revenue": [
+        5875000000,
+        9635000000
+      ],
+      "product": 1,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-076",
+      "title": "Public whale desk #76: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 410000,
+      "revenue": [
+        6000000000,
+        9940000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-077",
+      "title": "Public whale desk #77: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 450000,
+      "revenue": [
+        6125000000,
+        10245000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-078",
+      "title": "Public whale desk #78: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 490000,
+      "revenue": [
+        6250000000,
+        10550000000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-079",
+      "title": "Public whale desk #79: mega enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 530000,
+      "revenue": [
+        6375000000,
+        10855000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-080",
+      "title": "Public whale desk #80: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 570000,
+      "revenue": [
+        1500000000,
+        6160000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-081",
+      "title": "Public whale desk #81: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 610000,
+      "revenue": [
+        1625000000,
+        6465000000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-082",
+      "title": "Public whale desk #82: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 650000,
+      "revenue": [
+        1750000000,
+        6770000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-083",
+      "title": "Public whale desk #83: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 690000,
+      "revenue": [
+        1875000000,
+        7075000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-084",
+      "title": "Public whale desk #84: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 250000,
+      "revenue": [
+        2000000000,
+        7380000000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-085",
+      "title": "Public whale desk #85: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 290000,
+      "revenue": [
+        2125000000,
+        4625000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-086",
+      "title": "Public whale desk #86: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 330000,
+      "revenue": [
+        2250000000,
+        4930000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-087",
+      "title": "Public whale desk #87: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 370000,
+      "revenue": [
+        2375000000,
+        5235000000
+      ],
+      "product": 1,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-088",
+      "title": "Public whale desk #88: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 410000,
+      "revenue": [
+        2500000000,
+        5540000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-089",
+      "title": "Public whale desk #89: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 450000,
+      "revenue": [
+        2625000000,
+        5845000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-090",
+      "title": "Public whale desk #90: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 490000,
+      "revenue": [
+        2750000000,
+        6150000000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-091",
+      "title": "Public whale desk #91: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 530000,
+      "revenue": [
+        2875000000,
+        6455000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-092",
+      "title": "Public whale desk #92: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 570000,
+      "revenue": [
+        3000000000,
+        6760000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-093",
+      "title": "Public whale desk #93: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 610000,
+      "revenue": [
+        3125000000,
+        7065000000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-094",
+      "title": "Public whale desk #94: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 650000,
+      "revenue": [
+        3250000000,
+        7370000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-095",
+      "title": "Public whale desk #95: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 690000,
+      "revenue": [
+        3375000000,
+        7675000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.008
+    },
+    {
+      "id": "public-whale-096",
+      "title": "Public whale desk #96: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 250000,
+      "revenue": [
+        3500000000,
+        7980000000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.012
+    },
+    {
+      "id": "public-whale-097",
+      "title": "Public whale desk #97: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 290000,
+      "revenue": [
+        3625000000,
+        8285000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "public-whale-098",
+      "title": "Public whale desk #98: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 330000,
+      "revenue": [
+        3750000000,
+        8590000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "public-whale-099",
+      "title": "Public whale desk #99: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 370000,
+      "revenue": [
+        3875000000,
+        8895000000
+      ],
+      "product": 1,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.024
+    },
+    {
+      "id": "public-whale-100",
+      "title": "Public whale desk #100: giga enterprise close",
+      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 410000,
+      "revenue": [
+        4000000000,
+        9200000000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "whale": true,
+      "stockPct": 0.008
+    }
+  ]
+}

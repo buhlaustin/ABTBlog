@@ -99,6 +99,7 @@ export function salaryTierMult(state) {
 }
 
 export function headcountCap(state) {
+  if (state?.mode === 'sandbox') return 10_000;
   const tier = getWorkspaceTier(state);
   if (tier === WORKSPACE_TIER.GARAGE) return 0;
   if (tier === WORKSPACE_TIER.SMALL) return 4;
