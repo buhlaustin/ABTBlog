@@ -563,6 +563,10 @@ h1 {
   background: #22c55e;
 }
 
+.ceo-wealth-home {
+  background: #f59e0b;
+}
+
 .ceo-wealth-legend {
   margin-bottom: 1rem;
 }
@@ -582,6 +586,17 @@ h1 {
 
 .ceo-dot-cash {
   background: #22c55e;
+}
+
+.ceo-dot-home {
+  background: #f59e0b;
+}
+
+.ceo-home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
 }
 
 .ceo-debit-panel .ceo-debit-table {

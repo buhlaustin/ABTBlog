@@ -19,8 +19,15 @@ import {
   scheduledPersonalExpense,
   typicalPersonalExpenseMonthly,
   personalBankRunway,
-  ceoPersonalCashComp
+  ceoPersonalCashComp,
+  ceoNetWorth
 } from './CeoEconomics.js';
+import {
+  CEO_HOME_TIERS,
+  CEO_LIFESTYLE_PURCHASES,
+  ceoHousingSummary,
+  standardMortgagePayment
+} from './CeoLifestyle.js';
 import { isPublicCompany, canSellFounderStock } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 
@@ -45,13 +52,23 @@ function renderWealthBar(mix) {
   if (mix.total <= 0) {
     return '<p class="fine-print">Net worth fills in as personal cash and equity grow.</p>';
   }
-  return `<div class="ceo-wealth-bar" role="img" aria-label="Wealth mix: ${mix.equityPct}% equity, ${mix.cashPct}% personal cash">
+  const homeSeg =
+    mix.home > 0
+      ? `<div class="ceo-wealth-seg ceo-wealth-home" style="width:${mix.homePct}%"></div>`
+      : '';
+  const homeLegend =
+    mix.home > 0
+      ? `<li><span class="ceo-dot ceo-dot-home"></span> Home equity ${formatMoney(mix.home)} (${mix.homePct}%)</li>`
+      : '';
+  return `<div class="ceo-wealth-bar" role="img" aria-label="Wealth mix">
     <div class="ceo-wealth-seg ceo-wealth-equity" style="width:${mix.equityPct}%"></div>
     <div class="ceo-wealth-seg ceo-wealth-cash" style="width:${mix.cashPct}%"></div>
+    ${homeSeg}
   </div>
   <ul class="ceo-wealth-legend instrument-list">
     <li><span class="ceo-dot ceo-dot-equity"></span> Equity ${formatMoney(mix.equity)} (${mix.equityPct}%)</li>
     <li><span class="ceo-dot ceo-dot-cash"></span> Personal bank ${formatMoney(mix.cash)} (${mix.cashPct}%)</li>
+    ${homeLegend}
   </ul>`;
 }
 
@@ -91,6 +108,8 @@ export function renderCeoPanel(container, state) {
   const band = suggestedCeoSalaryBand(state);
   const boardNote = ceoSalaryBoardNote(state);
   const mix = wealthMix(state);
+  const housing = ceoHousingSummary(state);
+  const lifestyleOwned = new Set(state.ceo?.lifestyleOwned ?? []);
   const runway = ceoRunwayNote(state);
   const personalRunway = personalBankRunway(state);
   const expenseBand = personalExpenseBand(state);
@@ -210,6 +229,39 @@ export function renderCeoPanel(container, state) {
         ? `<p class="fine-print finance-ceo-pointer">Run ended — start a new company from the main menu.</p>`
         : `<p class="fine-print finance-ceo-pointer">IPO unlocks a liquid exit; until then, salary and draws fund your personal bank. Company cash → <strong>Finance</strong>.</p>`;
 
+  const homeCards = CEO_HOME_TIERS.map((tier) => {
+    const down = Math.round(tier.cashPrice * (tier.downPct ?? 0.2));
+    const principal = tier.cashPrice - down;
+    const mo = standardMortgagePayment(principal, tier.mortgageApr);
+    const canBuy = housing.mode === 'rent' && !disabled;
+    return `<div class="finance-action people-perk-card ceo-home-card">
+      <p><strong>${escapeHtml(tier.label)}</strong> — ${formatMoney(tier.cashPrice)}</p>
+      <p class="fine-print">${escapeHtml(tier.blurb)}</p>
+      <p class="fine-print people-perk-effects">Cash ${formatMoney(tier.cashPrice)} · mortgage ${formatMoney(down)} down · ~${formatMoney(mo)}/mo · upkeep ${formatMoney(tier.maintenanceMo)}/mo</p>
+      <div class="ceo-home-actions">
+        <button type="button" class="btn btn-primary btn-small" data-ceo-home-cash="${escapeHtml(tier.id)}" ${canBuy ? '' : 'disabled'}>Buy cash</button>
+        <button type="button" class="btn btn-ghost btn-small" data-ceo-home-mortgage="${escapeHtml(tier.id)}" ${canBuy ? '' : 'disabled'}>Mortgage</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const lifestyleCards = CEO_LIFESTYLE_PURCHASES.map((item) => {
+    const owned = lifestyleOwned.has(item.id);
+    return `<div class="finance-action people-perk-card">
+      <p><strong>${escapeHtml(item.label)}</strong> — ${formatMoney(item.cost)}${owned ? ' <span class="task-tag">Owned</span>' : ''}</p>
+      <p class="fine-print">${escapeHtml(item.blurb)}</p>
+      ${item.monthlyDebitBump ? `<p class="fine-print people-perk-effects">+${formatMoney(item.monthlyDebitBump)}/mo discretionary debits</p>` : ''}
+      <button type="button" class="btn btn-primary btn-small" data-ceo-lifestyle="${escapeHtml(item.id)}" ${owned || disabled ? 'disabled' : ''}>Buy</button>
+    </div>`;
+  }).join('');
+
+  const housingStatusLine =
+    housing.mode === 'rent'
+      ? 'You are renting — Housing is part of the rolled monthly debit band.'
+      : housing.mode === 'mortgage'
+        ? `${escapeHtml(housing.label)} · mortgage ~${formatMoney(housing.monthlyHousingDebit)}/mo in debits · balance ${formatMoney(housing.mortgageBalance)} · equity ${formatMoney(housing.equity)}`
+        : `${escapeHtml(housing.label)} · upkeep ~${formatMoney(housing.monthlyHousingDebit)}/mo · equity ${formatMoney(housing.equity)}`;
+
   const runwaySalaryNote =
     runway.ceoMo > 0 && runway.deltaMo
       ? `<p class="fine-print finance-details-note">CEO salary adds ~${formatMoney(runway.ceoMo)}/mo company overhead (≈${runway.deltaMo} mo less runway vs $0).</p>`
@@ -274,6 +326,24 @@ export function renderCeoPanel(container, state) {
 
       ${publicBlock}
       ${sellStockBlock}
+
+      <section class="finance-section finance-card ceo-lifestyle-section" aria-label="Real estate and lifestyle">
+        <div class="finance-section-head">
+          <h3 class="finance-section-title">Real estate &amp; lifestyle</h3>
+          <span class="growth-channel-badge growth-channel-badge--inline">${escapeHtml(housing.label)}</span>
+        </div>
+        <p class="fine-print people-benefits-lede">Spend <strong>personal bank</strong> cash on homes and toys. A mortgage replaces the rolled <strong>Housing</strong> debit with your payment; paid-off homes switch to upkeep.</p>
+        <p class="fine-print">${housingStatusLine}</p>
+        <div class="finance-kpi-row people-kpi-row">
+          ${ceoStatCard('Home equity', formatMoney(housing.equity), { hero: housing.equity > 0 })}
+          ${ceoStatCard('Est. net worth', formatMoney(ceoNetWorth(state)))}
+          ${ceoStatCard('Personal bank', formatMoney(bank))}
+        </div>
+        <h4 class="finance-section-title">Homes</h4>
+        <div class="people-perk-grid ceo-home-grid">${homeCards}</div>
+        <h4 class="finance-section-title">One-time splurges</h4>
+        <div class="people-perk-grid">${lifestyleCards}</div>
+      </section>
 
       <section class="finance-section ceo-comp-stack">
         <h3 class="finance-section-title">Compensation</h3>

@@ -356,6 +356,19 @@ export function normalizeSave(raw) {
       }
       delete state.ceo.personalBurnMonthly;
       delete state.ceo.personalBurnCustom;
+      if (!state.ceo.housing) {
+        state.ceo.housing = {
+          mode: 'rent',
+          tierId: 'rent',
+          purchasePrice: 0,
+          mortgageBalance: 0,
+          mortgagePaymentMonthly: 0,
+          maintenanceMonthly: 0,
+          purchasedTurn: null
+        };
+      }
+      if (!state.ceo.lifestyleOwned) state.ceo.lifestyleOwned = [];
+      if (state.ceo.lifestyleDebitBump == null) state.ceo.lifestyleDebitBump = 0;
     }
     ensureCeoPersonalBank(state);
     preparePersonalExpensesForMonth(state);

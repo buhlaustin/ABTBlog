@@ -93,7 +93,13 @@ import {
   drawRevenueAdvance,
   showFinanceFeedback
 } from './modules/Fundraising.js';
-import { setCeoSalaryAnnual, takeOwnerDraw } from './modules/Ceo.js';
+import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback } from './modules/Ceo.js';
+import {
+  purchaseCeoHomeCash,
+  purchaseCeoHomeMortgage,
+  purchaseCeoLifestyle
+} from './modules/CeoLifestyle.js';
+import { preparePersonalExpensesForMonth } from './modules/CeoEconomics.js';
 import {
   hireCoo,
   releaseCoo,
@@ -1237,6 +1243,45 @@ function bindGameInteractions() {
       else {
         appendLog(sessionState, result.summary);
         showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const homeCashBtn = e.target.closest('[data-ceo-home-cash]');
+    if (homeCashBtn && sessionState) {
+      const result = purchaseCeoHomeCash(sessionState, homeCashBtn.getAttribute('data-ceo-home-cash'));
+      if (!result.ok) showCeoFeedback(result.reason || 'Purchase failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    const homeMortgageBtn = e.target.closest('[data-ceo-home-mortgage]');
+    if (homeMortgageBtn && sessionState) {
+      const result = purchaseCeoHomeMortgage(
+        sessionState,
+        homeMortgageBtn.getAttribute('data-ceo-home-mortgage')
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Mortgage declined.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    const lifestyleBtn = e.target.closest('[data-ceo-lifestyle]');
+    if (lifestyleBtn && sessionState) {
+      const result = purchaseCeoLifestyle(sessionState, lifestyleBtn.getAttribute('data-ceo-lifestyle'));
+      if (!result.ok) showCeoFeedback(result.reason || 'Purchase failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
       }
       refresh();
       return;

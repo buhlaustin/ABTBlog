@@ -1147,6 +1147,35 @@ if (!failed) {
   bankA.finance.arr = 500_000_000;
   preparePersonalExpensesForMonth(bankA);
   const dueRich = scheduledPersonalExpense(bankA).total;
+  const { purchaseCeoHomeMortgage, ceoHousingSummary } = await import(
+    `file://${join(sim, 'modules/CeoLifestyle.js')}`
+  );
+  const homeState = createInitialState({ companyName: 'Home CEO', categoryId: 'b2b-saas', mode: 'sandbox' });
+  homeState.ceo.bankBalance = 2_000_000;
+  homeState.ceo.salaryAnnual = 350_000;
+  const beforeSched = scheduledPersonalExpense(homeState);
+  const housingLineBefore = beforeSched.breakdown.find((l) => l.label === 'Housing')?.amount ?? 0;
+  const mort = purchaseCeoHomeMortgage(homeState, 'starter-condo');
+  if (!mort.ok) {
+    console.error(`FAIL: CEO mortgage purchase: ${mort.reason}`);
+    failed = true;
+  } else {
+    preparePersonalExpensesForMonth(homeState);
+    const afterSched = scheduledPersonalExpense(homeState);
+    const housingLine = afterSched.breakdown.find((l) => l.label.startsWith('Mortgage'));
+    const summary = ceoHousingSummary(homeState);
+    if (!housingLine || housingLine.amount !== summary.monthlyHousingDebit) {
+      console.error('FAIL: mortgage should replace Housing debit line');
+      failed = true;
+    } else if (afterSched.total === beforeSched.total) {
+      console.error('FAIL: scheduled debit total should change after mortgage');
+      failed = true;
+    } else {
+      console.log(
+        `OK: CEO mortgage replaces housing debit (${formatMoney(housingLineBefore)} → ${formatMoney(housingLine.amount)})`
+      );
+    }
+  }
   if (dueRich > band60.max * 1.2) {
     console.error(`FAIL: personal debits should not scale with ARR (${dueRich})`);
     failed = true;

@@ -9,6 +9,11 @@ import {
 import { founderStakeValue, isPublicCompany, canCashOut } from './IPO.js';
 import { getFounderRow } from './CapTable.js';
 import { calendarTurn } from './XC.js';
+import {
+  applyHousingToPersonalExpenses,
+  ceoHomeEquity,
+  serviceCeoMortgageAtMonthEnd
+} from './CeoLifestyle.js';
 
 const EXPENSE_DEBIT_CATEGORIES = [
   'Housing',
@@ -36,7 +41,18 @@ export function createInitialCeoState() {
     drawLog: [],
     salaryPayLog: [],
     salaryChangeLog: [],
-    bankLog: []
+    bankLog: [],
+    housing: {
+      mode: 'rent',
+      tierId: 'rent',
+      purchasePrice: 0,
+      mortgageBalance: 0,
+      mortgagePaymentMonthly: 0,
+      maintenanceMonthly: 0,
+      purchasedTurn: null
+    },
+    lifestyleOwned: [],
+    lifestyleDebitBump: 0
   };
 }
 
@@ -158,8 +174,9 @@ export function rollPersonalExpenseTotal(state) {
 export function preparePersonalExpensesForMonth(state) {
   const ceo = ceoState(state);
   const turn = calendarTurn(state);
-  const total = rollPersonalExpenseTotal(state);
-  const breakdown = buildPersonalExpenseBreakdown(state, total);
+  const totalRaw = rollPersonalExpenseTotal(state);
+  const breakdownRaw = buildPersonalExpenseBreakdown(state, totalRaw);
+  const { breakdown, total } = applyHousingToPersonalExpenses(state, breakdownRaw, totalRaw);
   ceo.personalExpenseScheduled = {
     turn,
     total,
@@ -420,6 +437,7 @@ export function settlePersonalExpensesAtMonthEnd(state) {
   const lines = [
     `Personal debits ${formatMoney(paid)} (auto, salary-based) — bank ${formatMoney(ceo.bankBalance)}.`
   ];
+  lines.push(...serviceCeoMortgageAtMonthEnd(state));
   const top = sched.breakdown?.[0];
   if (top) {
     lines.push(`Largest line: ${top.label} ${formatMoney(top.amount)}.`);
@@ -546,22 +564,27 @@ export function ceoPersonalCashComp(state) {
 }
 
 export function ceoNetWorth(state) {
-  return ceoPersonalBankBalance(state) + (founderEquityValue(state) ?? 0);
+  return (
+    ceoPersonalBankBalance(state) + (founderEquityValue(state) ?? 0) + ceoHomeEquity(state)
+  );
 }
 
 export function wealthMix(state) {
   const cash = ceoPersonalBankBalance(state);
   const equity = founderEquityValue(state) ?? 0;
-  const total = cash + equity;
+  const home = ceoHomeEquity(state);
+  const total = cash + equity + home;
   if (total <= 0) {
-    return { cash, equity, total: 0, cashPct: 0, equityPct: 100 };
+    return { cash, equity, home, total: 0, cashPct: 0, equityPct: 100, homePct: 0 };
   }
   return {
     cash,
     equity,
+    home,
     total,
     cashPct: Math.round((cash / total) * 1000) / 10,
-    equityPct: Math.round((equity / total) * 1000) / 10
+    equityPct: Math.round((equity / total) * 1000) / 10,
+    homePct: Math.round((home / total) * 1000) / 10
   };
 }
 
