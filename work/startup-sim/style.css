@@ -380,6 +380,10 @@ h1 {
   margin-bottom: 1rem;
 }
 
+.game-tabs button[hidden] {
+  display: none !important;
+}
+
 .game-tabs button {
   border: 1px solid var(--border);
   background: var(--surface);

@@ -256,6 +256,7 @@ const boardState = createInitialState({
   categoryId: 'b2b-saas',
   mode: 'career'
 });
+boardState.flags.seriesAClosed = true;
 dealBoardTasks(boardState);
 const inst = boardState.board?.monthTasks?.[0];
 if (!inst) {

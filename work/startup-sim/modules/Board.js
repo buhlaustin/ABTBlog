@@ -5,6 +5,7 @@ import { setGameFeedback } from './GameFeedback.js';
 import { onBoardSentiment } from './Sentiment.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { isPublicCompany } from './IPO.js';
+import { hasInstitutionalBoard, sentimentLabel } from './Sentiment.js';
 
 let boardCatalog = bundledBoard;
 
@@ -40,6 +41,11 @@ function boardTaskAllowed(def, state) {
 
 export function dealBoardTasks(state) {
   if (!state.board) state.board = createInitialBoard();
+  if (!hasInstitutionalBoard(state)) {
+    state.board.monthTasks = [];
+    state.board.completedThisMonth = 0;
+    return;
+  }
   let pool = getBoardTaskDefs().filter((t) => boardTaskAllowed(t, state));
   if (!pool.length) pool = getBoardTaskDefs();
   const recent = new Set((state.board.recentTaskIds ?? []).slice(-BOARD_TASK_COOLDOWN * 3));
@@ -98,7 +104,15 @@ function escapeHtml(s) {
 
 export function renderBoardPanel(container, state) {
   if (!container) return;
+  if (!hasInstitutionalBoard(state)) {
+    container.innerHTML = `
+      <p class="panel-lede">No board yet — you're still running solo.</p>
+      <p class="fine-print">Garage and seed-stage founders usually answer to themselves. When you close <strong>Series A</strong> on the Finance tab, a lead investor takes a seat and optional board prep unlocks here.</p>
+    `;
+    return;
+  }
   const tasks = state.board?.monthTasks ?? [];
+  const approval = state.sentiment?.score ?? 68;
   const cards = tasks
     .map((inst) => {
       const def = getBoardTaskDef(inst.taskId);
@@ -120,13 +134,9 @@ export function renderBoardPanel(container, state) {
     })
     .join('');
 
-  const governanceNote = state.flags?.seriesAClosed
-    ? '<p class="fine-print">After Series A, skipping <em>all</em> board prep this month hurts sentiment and heats up your rival.</p>'
-    : '';
-
   container.innerHTML = `
-    <p class="panel-lede">Optional board work — does not count toward desk slots. Good for sentiment before fundraising.</p>
-    ${governanceNote}
+    <p class="panel-lede">Optional board work — does not count toward desk slots. Board approval is ${approval}/100 (${escapeHtml(sentimentLabel(approval))}).</p>
+    <p class="fine-print">Skipping <em>all</em> board prep in a month hurts approval and heats up your rival.</p>
     <div class="task-list">${cards || '<div class="tab-placeholder">New board tasks appear each month.</div>'}</div>
   `;
 }

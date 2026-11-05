@@ -436,6 +436,9 @@ function handleCloseSeriesA() {
     sessionState,
     `Series A — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post${result.downRound ? ' (down round)' : ''}.`
   );
+  if (result.boardSeated) {
+    appendLog(sessionState, 'Lead investor seated — board approval tracking and Board tab unlocked.');
+  }
   showFinanceFeedback(result.downRound ? 'Series A closed on down-round terms.' : 'Series A closed.');
   refresh();
 }

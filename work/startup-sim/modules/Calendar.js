@@ -11,6 +11,7 @@ import { archiveCurrentNews } from './News.js';
 import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
 import { tickAcceleratorBoost } from './Accelerators.js';
 import { resetGrowthCampaignsMonth } from './GrowthCampaigns.js';
+import { resetProductActionsMonth } from './ProductActions.js';
 import {
   applyBuzzDecayAtMonthStart,
   settleRivalHeatAtMonthEnd,
@@ -66,6 +67,7 @@ export function startMonth(state) {
   }
   syncDraftFromFinalized(state);
   resetGrowthCampaignsMonth(state);
+  resetProductActionsMonth(state);
   for (const line of applyBuzzDecayAtMonthStart(state)) {
     appendLog(state, line);
   }

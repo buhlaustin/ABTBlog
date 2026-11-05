@@ -25,7 +25,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 13;
+export const SAVE_VERSION = 14;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -94,7 +94,7 @@ export function createInitialState(options) {
       lastRound: null
     },
     staff: createInitialStaff(),
-    product: { level: 0, buzz: 0 },
+    product: { level: 0, buzz: 0, actionsThisMonth: 0 },
     social: createInitialSocial(),
     news: createInitialNews(),
     offices: createInitialOffices(),
@@ -173,6 +173,7 @@ export function normalizeSave(raw) {
     if (!state.news) state.news = createInitialNews();
     if (!state.product) state.product = { level: 0, buzz: 0 };
     if (!state.product.buzz && state.product.buzz !== 0) state.product.buzz = 0;
+    if (state.product.actionsThisMonth === undefined) state.product.actionsThisMonth = 0;
     if (!state.calendar) state.calendar = createInitialCalendar();
     if (!state.calendar.monthTasks) state.calendar.monthTasks = [];
     if (!state.calendar.log) state.calendar.log = [];

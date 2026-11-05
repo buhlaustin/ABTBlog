@@ -28,7 +28,9 @@ export function applyPivot(state, newCategoryId) {
   state.company.economics = categoryEconomics(cat);
   state.world.competitor = createCompetitorForCategory(cat.id);
   state.product.buzz = Math.max(0, (state.product.buzz ?? 0) - 4);
-  adjustSentiment(state, -6, 'Investors side-eye the pivot.');
+  if (state.flags?.seriesAClosed) {
+    adjustSentiment(state, -6, 'Board side-eyes the pivot.');
+  }
   state.flags.pivotUsed = true;
 
   if (!state.news) state.news = createInitialNews();

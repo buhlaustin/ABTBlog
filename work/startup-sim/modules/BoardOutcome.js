@@ -27,7 +27,7 @@ export function openBoardTaskOutcomeDialog({ title, sentimentDelta, sentimentAft
       <div><span class="stat-label">New score</span><span class="stat-value">${sentimentAfter}/100</span></div>
     </div>
     ${buzzLine}
-    <p class="fine-print">Board approval is your investor sentiment score — it gates follow-on rounds.</p>
+    <p class="fine-print">Board approval gates follow-on rounds after Series A.</p>
   `;
 
   if (typeof dialog.showModal === 'function') {

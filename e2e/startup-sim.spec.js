@@ -69,12 +69,11 @@ test.describe('Startup Simulator', () => {
     }
     await page.locator('#btn-confirm-task-lineup').click();
 
-    await page.locator('#tab-board').click();
-    await expect(page.locator('#panel-board')).toContainText('optional');
+    await expect(page.locator('#tab-board')).toBeHidden();
 
     await page.locator('#tab-growth').click();
     await expect(page.locator('#panel-growth')).toContainText('Rival');
-    await expect(page.locator('#panel-growth')).toContainText('Board');
+    await expect(page.locator('#panel-growth')).toContainText('Runway');
 
     await page.locator('#tab-social').click();
     await expect(page.locator('[data-social-tab="archive"]')).toBeVisible();
@@ -84,7 +83,7 @@ test.describe('Startup Simulator', () => {
 
     await page.locator('#tab-finance').click();
     await expect(page.locator('#panel-finance')).toContainText('Cap table');
-    await expect(page.locator('#panel-finance')).toContainText('Board sentiment');
+    await expect(page.locator('#panel-finance')).toContainText('Solo founder mode');
   });
 
   test('mobile viewport: tabs and people table scroll without horizontal page overflow', async ({
@@ -135,7 +134,9 @@ test.describe('Startup Simulator', () => {
       'advisor',
     ];
     for (const tab of tabIds) {
-      await page.locator(`#tab-${tab}`).click();
+      const tabBtn = page.locator(`#tab-${tab}`);
+      if (!(await tabBtn.isVisible())) continue;
+      await tabBtn.click();
       const docWidth = await page.evaluate(() => document.documentElement.clientWidth);
       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(scrollWidth, `horizontal overflow on tab ${tab}`).toBeLessThanOrEqual(docWidth + 2);

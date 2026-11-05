@@ -24,7 +24,8 @@ import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
 import { renderProductActionsPanel } from './ProductActions.js';
-import { sentimentLabel } from './Sentiment.js';
+import { sentimentLabel, hasInstitutionalBoard } from './Sentiment.js';
+import { runwayLabel } from './MonthSummary.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
 import {
@@ -152,6 +153,15 @@ export function renderGameHud(state) {
     mode.textContent = `${state.mode === 'sandbox' ? 'Sandbox' : 'Career'} · rev×${revMult.toFixed(2)}`;
   }
   if (mrr) mrr.textContent = formatMoney(state.finance.mrr ?? 0);
+  const boardTab = document.getElementById('tab-board');
+  if (boardTab) {
+    const showBoard = hasInstitutionalBoard(state);
+    boardTab.hidden = !showBoard;
+    boardTab.disabled = !showBoard;
+    if (!showBoard && getActiveTabId() === 'board') {
+      selectTab('desk');
+    }
+  }
   if (stock) {
     if (isPublicCompany(state)) {
       const pm = state.publicMarket ?? {};
@@ -482,7 +492,11 @@ export function renderGrowthPanel(container, state) {
       <div><span class="stat-label">Heat</span><span class="stat-value">${pressure}/5</span></div>
       <div><span class="stat-label">Rev. modifier</span><span class="stat-value">${(revMult * 100).toFixed(0)}%</span></div>
       <div><span class="stat-label">Buzz</span><span class="stat-value">${buzz}</span></div>
-      <div><span class="stat-label">Board</span><span class="stat-value">${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}</span></div>
+      ${
+        hasInstitutionalBoard(state)
+          ? `<div><span class="stat-label">Board approval</span><span class="stat-value">${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}</span></div>`
+          : `<div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(runwayLabel(state))}</span></div>`
+      }
       <div><span class="stat-label">Desk tasks left</span><span class="stat-value">${pendingDesk}</span></div>
     </div>
     ${
@@ -491,7 +505,7 @@ export function renderGrowthPanel(container, state) {
         : ''
     }
     ${
-      lastReason
+      hasInstitutionalBoard(state) && lastReason
         ? `<p class="fine-print">Latest board note: ${escapeHtml(lastReason)}</p>`
         : '<p class="fine-print">Desk tasks scale with funding rounds and HQ tier. Paid campaigns below do not use desk slots.</p>'
     }
@@ -513,7 +527,7 @@ export function renderProductPanel(container, state) {
 
   const pivotBlock = pivotAllowed
     ? `<form id="pivot-form" class="setup-form finance-action">
-        <p><strong>One-time pivot</strong> — reposition the company (buzz and board sentiment take a hit).</p>
+        <p><strong>One-time pivot</strong> — reposition the company (buzz hit${hasInstitutionalBoard(state) ? '; board approval drops if you have a board' : ''}).</p>
         <label for="pivot-category">New category</label>
         <select id="pivot-category" name="pivotCategory" required>
           <option value="" disabled selected>Choose new positioning…</option>
