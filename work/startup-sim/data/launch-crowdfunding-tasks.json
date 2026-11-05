@@ -212,6 +212,21 @@
       "buzz": 2
     },
     {
+      "id": "launch-pre-crowd-space-backers",
+      "launchPhase": "pre_launch",
+      "crowdfunding": true,
+      "categories": ["space-exploration"],
+      "title": "Backer tier: name a star tracker",
+      "description": "Kickstarter rewards that map to real mission milestones — and tiny recurring payload fees.",
+      "types": ["marketing"],
+      "stages": ["garage"],
+      "cost": 340,
+      "revenue": [420, 2800],
+      "mrrGain": [35, 140],
+      "product": 1,
+      "buzz": 3
+    },
+    {
       "id": "launch-pre-crowd-micro-saas-bundle",
       "launchPhase": "pre_launch",
       "crowdfunding": true,

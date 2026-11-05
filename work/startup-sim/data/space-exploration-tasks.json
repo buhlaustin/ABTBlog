@@ -1,0 +1,956 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "cat-space-exploration-orbital-mechanics-notebook",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Orbital mechanics notebook",
+      "description": "Delta-v budgets, phasing, and one napkin drawing investors pretend to understand.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 120,
+      "revenue": [
+        80,
+        650
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "cat-space-exploration-cubesat-bench",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "CubeSat bench integration",
+      "description": "Stack, power budget, and a vibration test that rattles the garage door.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 420,
+      "revenue": [
+        200,
+        1400
+      ],
+      "product": 3,
+      "buzz": 1
+    },
+    {
+      "id": "cat-space-exploration-fcc-filing-draft",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "FCC filing draft",
+      "description": "Frequency coordination paperwork — lawyers bill by the kilohertz.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 4,
+      "cost": 850,
+      "revenue": [
+        400,
+        2800
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-space-exploration-launch-broker-intro",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Launch broker intro tour",
+      "description": "Compare rideshare manifests while SpaceXY hogs the manifest headlines.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 4,
+      "cost": 1200,
+      "revenue": [
+        1500,
+        8500
+      ],
+      "product": 0,
+      "buzz": 2,
+      "rivalPressure": -1
+    },
+    {
+      "id": "cat-space-exploration-mission-patch-design",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Mission patch & brand kit",
+      "description": "Merch before margin — astronauts love stickers.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 280,
+      "revenue": [
+        150,
+        1200
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-exploration-ground-station-lease",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Ground station lease pilot",
+      "description": "Rent dish time before you build your own telemetry farm.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 5,
+      "cost": 6500,
+      "revenue": [
+        8000,
+        42000
+      ],
+      "product": 2,
+      "buzz": 1,
+      "mrrGain": [
+        120,
+        480
+      ]
+    },
+    {
+      "id": "cat-space-exploration-propulsion-hot-fire",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Propulsion hot-fire test",
+      "description": "One successful burn; neighbors call the fire department anyway.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 6,
+      "cost": 18000,
+      "revenue": [
+        12000,
+        68000
+      ],
+      "product": 3,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-exploration-mission-control-ui",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Mission control UI sprint",
+      "description": "Pass predictions, alarms, and buttons engineers swear they will not mash.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 6,
+      "cost": 9200,
+      "revenue": [
+        11000,
+        58000
+      ],
+      "product": 3,
+      "buzz": 1
+    },
+    {
+      "id": "cat-space-exploration-nasa-sbir-narrative",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "NASA SBIR narrative pack",
+      "description": "Dual-use story that makes reviewers feel patriotic and prudent.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 5,
+      "cost": 4800,
+      "revenue": [
+        6000,
+        32000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-exploration-debris-mitigation-plan",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Debris mitigation plan",
+      "description": "Passivation, disposal orbit, and slides for regulators.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 2,
+      "tierMax": 7,
+      "cost": 7200,
+      "revenue": [
+        5000,
+        28000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "cat-space-exploration-payload-integration-review",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Payload integration review",
+      "description": "Mass, volume, and power — customer hardware meets your bus.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 6,
+      "cost": 11000,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 2,
+      "buzz": 1,
+      "mrrGain": [
+        200,
+        850
+      ]
+    },
+    {
+      "id": "cat-space-exploration-space-force-liaison",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Space Force liaison briefing",
+      "description": "Classification questions you answer very carefully.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 14000,
+      "revenue": [
+        25000,
+        140000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-exploration-rideshare-manifest",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Rideshare manifest slot hunt",
+      "description": "Secondary payload slot — launch date moves twice before confirmation.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 6,
+      "cost": 22000,
+      "revenue": [
+        35000,
+        185000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "rivalPressure": -1
+    },
+    {
+      "id": "cat-space-exploration-launch-insurance-bind",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Launch insurance bind",
+      "description": "Underwriters ask about your last anomaly; you show the fix.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 85000,
+      "revenue": [
+        45000,
+        220000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-space-exploration-trajectory-optimization",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Trajectory optimization sprint",
+      "description": "Fuel savings that finance converts to extra missions per year.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 16000,
+      "revenue": [
+        22000,
+        120000
+      ],
+      "product": 3,
+      "buzz": 1
+    },
+    {
+      "id": "cat-space-exploration-on-orbit-commissioning",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "On-orbit commissioning playbook",
+      "description": "Checklist from separation through first payload bits.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 12000,
+      "revenue": [
+        28000,
+        155000
+      ],
+      "product": 3,
+      "buzz": 2,
+      "mrrGain": [
+        350,
+        1200
+      ]
+    },
+    {
+      "id": "cat-space-exploration-satellite-bus-rfp",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Satellite bus vendor RFP",
+      "description": "Compare buses; one vendor ghosted procurement.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 5,
+      "cost": 9800,
+      "revenue": [
+        14000,
+        72000
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-space-exploration-deep-space-comms",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Deep-space comms array study",
+      "description": "Link budgets for missions beyond LEO — investors love the slide.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 42000,
+      "revenue": [
+        55000,
+        310000
+      ],
+      "product": 3,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-exploration-reentry-license",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Reentry licensing package",
+      "description": "Heat shield test data for regulators and nervous insurers.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 38000,
+      "revenue": [
+        32000,
+        175000
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-exploration-constellation-phase-two",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Constellation phase-two financing deck",
+      "description": "Plane count, capex, and coverage maps for the next raise.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 28000,
+      "revenue": [
+        120000,
+        620000
+      ],
+      "product": 1,
+      "buzz": 4
+    },
+    {
+      "id": "cat-space-exploration-lunar-payload-conference",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Lunar payload customer conference",
+      "description": "Booth on the show floor; everyone mentions SpaceXY anyway.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 95000,
+      "revenue": [
+        85000,
+        480000
+      ],
+      "product": 1,
+      "buzz": 4,
+      "rivalPressure": -2
+    },
+    {
+      "id": "cat-space-exploration-analyst-day-orbit",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Orbit services analyst day",
+      "description": "Backlog, cadence, and utilization metrics for the street.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 120000,
+      "revenue": [
+        200000,
+        980000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-exploration-national-security-bid",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "National security space bid",
+      "description": "Colorless room, long NDAs, recurring revenue if you win.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 185000,
+      "revenue": [
+        320000,
+        1650000
+      ],
+      "product": 2,
+      "buzz": 2,
+      "mrrGain": [
+        2500,
+        8500
+      ]
+    },
+    {
+      "id": "cat-space-exploration-space-weather-payload",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Space weather payload demo",
+      "description": "Science mission that doubles as a data product pitch.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 5,
+      "cost": 14000,
+      "revenue": [
+        18000,
+        88000
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-exploration-isam-prototype",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "In-space assembly prototype",
+      "description": "Robot arm demo video — manufacturing hype meets engineering reality.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 72000,
+      "revenue": [
+        95000,
+        520000
+      ],
+      "product": 4,
+      "buzz": 4
+    },
+    {
+      "id": "cat-space-exploration-spaceport-ops-manual",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Spaceport ops manual",
+      "description": "Range safety, scrub criteria, and who signs the go/no-go.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 6,
+      "cost": 8800,
+      "revenue": [
+        7000,
+        38000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "cat-space-exploration-thermal-vac-chamber",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Thermal-vac chamber booking",
+      "description": "Bake-out week; one leak ruined Thursday.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 6,
+      "cost": 24000,
+      "revenue": [
+        15000,
+        82000
+      ],
+      "product": 3,
+      "buzz": 1
+    },
+    {
+      "id": "cat-space-exploration-star-tracker-calibration",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Star tracker calibration run",
+      "description": "Attitude knowledge good enough to trust the first burn.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 5,
+      "cost": 11500,
+      "revenue": [
+        9000,
+        48000
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-space-exploration-space-tourism-waitlist",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Space tourism waitlist campaign",
+      "description": "Deposits for a seat you promise is only a few years out.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 4,
+      "cost": 6200,
+      "revenue": [
+        12000,
+        68000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "mrrGain": [
+        80,
+        320
+      ]
+    },
+    {
+      "id": "cat-space-exploration-regulatory-scrub-playbook",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Regulatory scrub playbook",
+      "description": "Turn launch delays into transparent customer comms.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 5200,
+      "revenue": [
+        8000,
+        42000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-exploration-space-data-api",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Space data API beta",
+      "description": "Sell telemetry streams to downstream analytics customers.",
+      "types": [
+        "product",
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 18000,
+      "revenue": [
+        28000,
+        165000
+      ],
+      "product": 3,
+      "buzz": 2,
+      "mrrGain": [
+        450,
+        1800
+      ]
+    },
+    {
+      "id": "cat-space-exploration-space-xy-competitive-teardown",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "SpaceXY competitive teardown",
+      "description": "Public cadence, pricing, and where your stack is honestly different.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 6,
+      "cost": 4200,
+      "revenue": [
+        5500,
+        32000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "rivalPressure": -2
+    },
+    {
+      "id": "sig-space-exploration-first-nominal-telemetry",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "First nominal telemetry lock",
+      "description": "Clean pass over your ground station — the whole team refreshes the dashboard.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office",
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 6,
+      "cost": 2400,
+      "revenue": [
+        8000,
+        48000
+      ],
+      "product": 3,
+      "buzz": 4,
+      "rivalPressure": -1
+    },
+    {
+      "id": "cat-space-exploration-xc-demo-payload",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "XC demo payload partner pitch",
+      "description": "Batch demo day story: real orbit path, not just slides.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3200,
+      "revenue": [
+        6500,
+        38000
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-exploration-export-itars-review",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Export / ITAR review sprint",
+      "description": "Classification boundaries before international customers sign.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 22000,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "cat-space-exploration-launch-cadence-war-room",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Launch cadence war room",
+      "description": "Integrate ops, range, and customer SLAs for two missions this quarter.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 45000,
+      "revenue": [
+        95000,
+        520000
+      ],
+      "product": 2,
+      "buzz": 3,
+      "mrrGain": [
+        1200,
+        4200
+      ]
+    },
+    {
+      "id": "cat-space-exploration-space-debris-sensor-pilot",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Space debris sensor pilot",
+      "description": "Track conjunction scares; sell alerts to constellation operators.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 6,
+      "cost": 28000,
+      "revenue": [
+        32000,
+        185000
+      ],
+      "product": 2,
+      "buzz": 2,
+      "mrrGain": [
+        280,
+        950
+      ]
+    },
+    {
+      "id": "cat-space-exploration-in-space-refuel-study",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "In-space refueling study",
+      "description": "Docking demo roadmap — capex heavy, strategic slide deck heavier.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 68000,
+      "revenue": [
+        55000,
+        310000
+      ],
+      "product": 2,
+      "buzz": 3
+    }
+  ]
+}

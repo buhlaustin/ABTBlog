@@ -75,5 +75,12 @@
     "blurb": "Games and entertainment — live ops, platforms, and content deals.",
     "defaultACV": 6000,
     "salesCycleWeeks": 6
+  },
+  {
+    "id": "space-exploration",
+    "label": "Space exploration",
+    "blurb": "Launch, orbit, and ground segment — long cycles, payload customers, and rivals like SpaceXY on every manifest.",
+    "defaultACV": 95000,
+    "salesCycleWeeks": 22
   }
 ]

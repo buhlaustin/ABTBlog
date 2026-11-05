@@ -1005,6 +1005,26 @@ if (
   console.log(`OK: dynamic side limits (${earlyPlays}→${scaledPlays} plays, hub unlimited)`);
 }
 
+const spaceState = createInitialState({
+  companyName: 'Orbit Labs',
+  categoryId: 'space-exploration',
+  mode: 'career'
+});
+if (spaceState.world?.competitor?.name !== 'SpaceXY') {
+  console.error(`FAIL: space rival expected SpaceXY got ${spaceState.world?.competitor?.name}`);
+  failed = true;
+}
+const spaceDesk = getTaskDefinitions().filter((t) => t.categories?.includes('space-exploration'));
+if (spaceDesk.length < 35) {
+  console.error(`FAIL: space-exploration desk bank ${spaceDesk.length} < 35`);
+  failed = true;
+} else if (getTaskPoolSize(spaceState) < getMonthlyTaskOfferCount(STAGES.GARAGE)) {
+  console.error(`FAIL: space-exploration garage pool ${getTaskPoolSize(spaceState)} too small`);
+  failed = true;
+} else {
+  console.log(`OK: space-exploration category (${spaceDesk.length} custom desk tasks, rival SpaceXY)`);
+}
+
 const productSideBank = sideTaskBankSize(['product', 'both']);
 if (growthCampaignCatalogSize() < 130) {
   console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()})`);

@@ -630,6 +630,50 @@
       "revenue": [4100, 22000],
       "product": 1,
       "buzz": 1
+    },
+    {
+      "id": "preseed-cat-space-exploration-manifest-hold",
+      "categories": ["space-exploration"],
+      "title": "Manifest hold deposit",
+      "description": "Lock a rideshare slot before SpaceXY buys the window.",
+      "types": ["sales"],
+      "stages": ["post_xc"],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 5200,
+      "revenue": [8500, 42000],
+      "product": 0,
+      "buzz": 2,
+      "mrrGain": [90, 320]
+    },
+    {
+      "id": "preseed-cat-space-exploration-range-safety-review",
+      "categories": ["space-exploration"],
+      "title": "Range safety data review",
+      "description": "Close open items before the first licensed launch attempt.",
+      "types": ["research"],
+      "stages": ["post_xc"],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 6100,
+      "revenue": [4800, 26000],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "preseed-cat-space-exploration-ground-network-pilot",
+      "categories": ["space-exploration"],
+      "title": "Ground network pilot customer",
+      "description": "One anchor operator prepays downlink minutes.",
+      "types": ["sales"],
+      "stages": ["post_xc"],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 4400,
+      "revenue": [7200, 38000],
+      "product": 1,
+      "buzz": 1,
+      "mrrGain": [120, 450]
     }
   ]
 }

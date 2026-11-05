@@ -13,7 +13,8 @@ const RIVALS = {
   healthtech: { name: 'MediMesh', product: 'HIPAA PDFs' },
   edtech: { name: 'LessonLoop', product: 'yet another LMS' },
   climate: { name: 'GreenStack', product: 'carbon dashboards' },
-  'gaming-media': { name: 'LootLoop', product: 'battle passes' }
+  'gaming-media': { name: 'LootLoop', product: 'battle passes' },
+  'space-exploration': { name: 'SpaceXY', product: 'reusable heavy lift' }
 };
 
 export function createCompetitorForCategory(categoryId) {
@@ -47,6 +48,16 @@ export function maybeCompetitorNewsArticle(state) {
   const rival = state.world?.competitor;
   if (!rival || Math.random() > 0.35) return null;
   const company = state.company?.name ?? 'You';
+  const categoryId = state.company?.categoryId;
+  if (categoryId === 'space-exploration' && Math.random() < 0.45) {
+    return {
+      headline: `SpaceXY scrubs again; ${company} says cadence still competitive`,
+      dek: `Analysts compare ${rival.product} manifest slots to your pipeline.`,
+      body: `${rival.name} pushed T-0 for weather. Your comms team resists quote-tweeting. Range safety threads are undefeated.`,
+      source: 'Orbit Daily',
+      date: formatStateMonth(state, 'short')
+    };
+  }
   return {
     headline: `${rival.name} raises a loud seed round in the same lane as ${company}`,
     dek: `Investors pretend ${rival.product} is not the same idea.`,

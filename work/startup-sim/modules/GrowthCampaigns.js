@@ -2,6 +2,7 @@ import bundled from '../data/growth-campaigns.json' with { type: 'json' };
 import bundledExtra from '../data/growth-campaigns-extra.json' with { type: 'json' };
 import bundledExtra2 from '../data/growth-campaigns-extra2.json' with { type: 'json' };
 import bundledExtra3 from '../data/growth-campaigns-extra3.json' with { type: 'json' };
+import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
@@ -24,7 +25,7 @@ function mergeCampaignCatalog(base, ...extras) {
   return { ...base, campaigns };
 }
 
-const bundledExtras = [bundledExtra, bundledExtra2, bundledExtra3];
+const bundledExtras = [bundledExtra, bundledExtra2, bundledExtra3, bundledSpaceGrowth];
 
 let catalog = mergeCampaignCatalog(bundled, ...bundledExtras);
 
@@ -52,11 +53,18 @@ function campaignRevenueMult(state) {
   return getTaskRevenueMultiplierPreview(state);
 }
 
+function campaignCategoryAllowed(def, state) {
+  const cats = def?.categories;
+  if (!cats?.length) return true;
+  return cats.includes(state.company?.categoryId);
+}
+
 export function availableCampaigns(state) {
   const tier = progressionTier(state);
   const used = new Set(state.growth?.campaignsThisMonth ?? []);
   return getGrowthCampaigns().filter(
     (c) =>
+      campaignCategoryAllowed(c, state) &&
       tier >= (c.tierMin ?? 0) &&
       tier <= (c.tierMax ?? 99) &&
       !used.has(c.id)
@@ -67,6 +75,9 @@ export function runGrowthCampaign(state, campaignId) {
   const def = getGrowthCampaigns().find((c) => c.id === campaignId);
   if (!def) return { ok: false, reason: 'Unknown campaign.' };
   const tier = progressionTier(state);
+  if (!campaignCategoryAllowed(def, state)) {
+    return { ok: false, reason: 'Campaign not available for your industry.' };
+  }
   if (tier < (def.tierMin ?? 0) || tier > (def.tierMax ?? 99)) {
     return { ok: false, reason: 'Campaign not unlocked at your current stage.' };
   }

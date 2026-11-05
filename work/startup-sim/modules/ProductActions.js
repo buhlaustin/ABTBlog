@@ -16,6 +16,7 @@ import bundledLevers from '../data/growth-levers.json' with { type: 'json' };
 import bundledLeversExtra from '../data/growth-levers-extra.json' with { type: 'json' };
 import bundledLeversExtra2 from '../data/growth-levers-extra2.json' with { type: 'json' };
 import bundledLeversExtra3 from '../data/growth-levers-extra3.json' with { type: 'json' };
+import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { type: 'json' };
 
 function mergeLeverCatalog(base, ...extras) {
   const actions = [...(base?.actions ?? [])];
@@ -31,7 +32,7 @@ function mergeLeverCatalog(base, ...extras) {
   return actions;
 }
 
-const bundledLeverExtras = [bundledLeversExtra, bundledLeversExtra2, bundledLeversExtra3];
+const bundledLeverExtras = [bundledLeversExtra, bundledLeversExtra2, bundledLeversExtra3, bundledSpaceGrowth];
 
 let leverCatalog = mergeLeverCatalog(bundledLevers, ...bundledLeverExtras);
 
@@ -82,6 +83,8 @@ function actionUnlocked(def, state) {
   const tier = progressionTier(state);
   if ((def.tierMin ?? 0) > tier) return false;
   if ((def.tierMax ?? 99) < tier) return false;
+  const cats = def.categories;
+  if (cats?.length && !cats.includes(state.company?.categoryId)) return false;
   return true;
 }
 

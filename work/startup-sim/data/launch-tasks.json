@@ -619,6 +619,30 @@
       "buzz": 1
     },
     {
+      "id": "launch-pre-cat-space-exploration",
+      "launchPhase": "pre_launch",
+      "title": "Suborbital demo payload pre-sell",
+      "description": "Deposit-backed manifest slot — SpaceXY launches get the headlines, you get the LOIs.",
+      "types": [
+        "marketing",
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "space-exploration"
+      ],
+      "cost": 420,
+      "revenue": [
+        680,
+        4200
+      ],
+      "mrrGain": [45, 180],
+      "product": 2,
+      "buzz": 2
+    },
+    {
       "id": "launch-pre-cat-edtech",
       "launchPhase": "pre_launch",
       "title": "District champion intro",

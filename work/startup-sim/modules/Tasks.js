@@ -6,6 +6,7 @@ import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
 import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
 import bundledLaunchCrowd from '../data/launch-crowdfunding-tasks.json' with { type: 'json' };
+import bundledSpaceExploration from '../data/space-exploration-tasks.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
@@ -64,9 +65,22 @@ function mergeXcDemoDayTasks(base) {
   return { ...base, tasks: merged };
 }
 
+function mergeSpaceExplorationTasks(base) {
+  const extra = bundledSpaceExploration?.tasks ?? [];
+  if (!extra.length) return base;
+  const ids = new Set((base.tasks ?? []).map((t) => t.id));
+  const merged = [...(base.tasks ?? [])];
+  for (const t of extra) {
+    if (!ids.has(t.id)) merged.push(t);
+  }
+  return { ...base, tasks: merged };
+}
+
 function mergeCatalog(base) {
   return mergeXcDemoDayTasks(
-    mergePostXcPreSeedTasks(mergeLaunchTasks(mergeSignatureTasks(base)))
+    mergePostXcPreSeedTasks(
+      mergeLaunchTasks(mergeSpaceExplorationTasks(mergeSignatureTasks(base)))
+    )
   );
 }
 
