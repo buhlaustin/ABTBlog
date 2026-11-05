@@ -29,6 +29,7 @@ import {
 } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
+import { onScheduleLaunchTaskCompleted } from './modules/LaunchLifecycle.js';
 import { formatMoney } from './modules/GameState.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './modules/Progression.js';
 import { fileIpo, fetchIpoPress, cashOut } from './modules/IPO.js';
@@ -247,6 +248,15 @@ function handleCompleteTask(instanceId) {
     sessionState,
     `“${def.title}” — +${formatMoney(revenue)} revenue, -${formatMoney(cost)} spend.`
   );
+  if (def.scheduleLaunch) {
+    const sched = onScheduleLaunchTaskCompleted(sessionState);
+    for (const line of sched.lines ?? []) {
+      appendLog(sessionState, line);
+    }
+    if (sched.ok) {
+      showDeskFeedback('Public launch scheduled for next month.');
+    }
+  }
 
   const priorStage = sessionState.stage;
   syncStageFromProgress(sessionState);

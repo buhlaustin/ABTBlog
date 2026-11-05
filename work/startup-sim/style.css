@@ -543,6 +543,13 @@ h1 {
   font-weight: 600;
 }
 
+.launch-phase-banner {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  border-left: 3px solid var(--accent-dim, #6b4ce6);
+  background: color-mix(in srgb, var(--surface) 92%, var(--accent-dim) 8%);
+}
+
 .task-tag {
   display: inline-block;
   margin-left: 0.35rem;

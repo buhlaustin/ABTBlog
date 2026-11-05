@@ -13,6 +13,11 @@ import { tickAcceleratorBoost } from './Accelerators.js';
 import { resetGrowthCampaignsMonth } from './GrowthCampaigns.js';
 import { resetProductActionsMonth } from './ProductActions.js';
 import {
+  tickLaunchAtMonthStart,
+  settleLaunchAtMonthEnd,
+  graduateLaunchIfLeftGarage
+} from './LaunchLifecycle.js';
+import {
   applyBuzzDecayAtMonthStart,
   settleRivalHeatAtMonthEnd,
   settleBoardGovernance,
@@ -71,6 +76,9 @@ export function startMonth(state) {
   for (const line of applyBuzzDecayAtMonthStart(state)) {
     appendLog(state, line);
   }
+  for (const line of tickLaunchAtMonthStart(state)) {
+    appendLog(state, line);
+  }
   dealMonthlyTasks(state);
   dealBoardTasks(state);
   return state;
@@ -108,8 +116,14 @@ export function endMonth(state) {
   for (const line of settleRivalHeatAtMonthEnd(state, monthRevenue, burn)) {
     appendLog(state, line);
   }
+  for (const line of settleLaunchAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
 
   syncStageFromProgress(state);
+  for (const line of graduateLaunchIfLeftGarage(state)) {
+    appendLog(state, line);
+  }
   if (state.stage !== priorStage) {
     for (const line of onStageChange(state, priorStage, state.stage)) {
       appendLog(state, line);

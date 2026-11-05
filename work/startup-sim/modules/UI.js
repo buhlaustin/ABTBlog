@@ -36,6 +36,7 @@ import {
 } from './Finance.js';
 import { progressionTierLabel } from './ProgressionEconomy.js';
 import { renderGrowthCampaignsBlock } from './GrowthCampaigns.js';
+import { launchLifecycleActive, launchPhaseLabel } from './LaunchLifecycle.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -204,8 +205,9 @@ export function renderDeskPanel(state) {
           if (!def) return '';
           const sel = offer.selected ? 'task-offer selected' : 'task-offer';
           const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
+          const launchTag = def.scheduleLaunch ? ' <span class="task-tag">Launch gate</span>' : '';
           return `<article class="${sel}">
-            <h3>${escapeHtml(def.title)}${sig}</h3>
+            <h3>${escapeHtml(def.title)}${sig}${launchTag}</h3>
             <p>${escapeHtml(def.description)}</p>
             <button type="button" class="btn btn-ghost btn-small" data-toggle-task-offer="${escapeHtml(offer.offerId)}">${offer.selected ? 'Selected' : 'Select'}</button>
           </article>`;
@@ -243,9 +245,13 @@ export function renderDeskPanel(state) {
   const monthSpend = state.calendar.monthSpend ?? 0;
 
   const tutorial = renderTutorialBanner(activeTutorialStep(state));
+  const launchBanner = launchLifecycleActive(state)
+    ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — desk offers are from the launch playbook until you graduate (complete post-launch months or leave the garage).</p>`
+    : '';
 
   desk.innerHTML = `
     ${tutorial}
+    ${launchBanner}
     ${
       catalogError
         ? '<p class="desk-feedback error" role="alert">Tasks did not load — reload the page. You cannot close the month until the desk is full.</p>'

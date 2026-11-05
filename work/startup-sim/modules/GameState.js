@@ -12,6 +12,7 @@ import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
 import { createInitialCrisisState } from './Crisis.js';
+import { createInitialLaunchState } from './LaunchLifecycle.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
 import { syncLifetimeProfit } from './Finance.js';
@@ -25,7 +26,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 14;
+export const SAVE_VERSION = 15;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -103,6 +104,7 @@ export function createInitialState(options) {
     sentiment: createInitialSentiment(),
     world: { competitor: createCompetitorForCategory(category.id) },
     crisis: createInitialCrisisState(),
+    launch: createInitialLaunchState(),
     meta: {
       runStartedTurn: 1,
       runSeed: Math.floor(Math.random() * 2_147_483_647),
@@ -201,6 +203,7 @@ export function normalizeSave(raw) {
     if (state.meta.runSeed === undefined) {
       state.meta.runSeed = Math.floor(Math.random() * 2_147_483_647);
     }
+    if (!state.launch) state.launch = createInitialLaunchState();
     if (!state.board) state.board = createInitialBoard();
     if (state.board.governanceStreak === undefined) state.board.governanceStreak = 0;
     if (state.publicMarket && state.publicMarket.guidanceBeatStreak === undefined) {

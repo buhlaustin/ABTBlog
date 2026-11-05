@@ -4,6 +4,12 @@ import { getTaskStage } from './Workspace.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
+import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
+import {
+  currentLaunchTaskPhase,
+  launchPhaseAllowed,
+  launchLifecycleActive
+} from './LaunchLifecycle.js';
 
 /** Shipped catalog — always available with the game bundle. */
 function mergeSignatureTasks(base) {
@@ -17,17 +23,32 @@ function mergeSignatureTasks(base) {
   return { ...base, tasks: merged };
 }
 
-let taskCatalog = mergeSignatureTasks(bundledCatalog);
+function mergeLaunchTasks(base) {
+  const launch = bundledLaunch?.tasks ?? [];
+  if (!launch.length) return base;
+  const ids = new Set((base.tasks ?? []).map((t) => t.id));
+  const merged = [...(base.tasks ?? [])];
+  for (const t of launch) {
+    if (!ids.has(t.id)) merged.push(t);
+  }
+  return { ...base, tasks: merged };
+}
+
+function mergeCatalog(base) {
+  return mergeLaunchTasks(mergeSignatureTasks(base));
+}
+
+let taskCatalog = mergeCatalog(bundledCatalog);
 
 export async function loadTaskCatalog() {
   if (!taskCatalog?.tasks?.length) {
     throw new Error('startup-sim: bundled tasks.json is empty');
   }
-  taskCatalog = mergeSignatureTasks(taskCatalog);
+  taskCatalog = mergeCatalog(taskCatalog);
   try {
     const data = await fetchGameJson('data/tasks.json');
     if (Array.isArray(data?.tasks) && data.tasks.length > 0) {
-      taskCatalog = mergeSignatureTasks(data);
+      taskCatalog = mergeCatalog(data);
     }
   } catch {
     /* keep bundled catalog */
@@ -45,7 +66,7 @@ export function isTaskCatalogReady() {
 
 /** Used by headless smoke tests only (loads tasks.json without fetch). */
 export function hydrateTaskCatalog(data) {
-  if (data?.tasks?.length) taskCatalog = mergeSignatureTasks(data);
+  if (data?.tasks?.length) taskCatalog = mergeCatalog(data);
 }
 
 function shuffle(arr) {
@@ -86,7 +107,7 @@ export function pickMonthlyTaskDefs(pool, slots, recentTaskIds = []) {
   }
 
   const signaturePool = pool.filter((t) => t.signature);
-  if (signaturePool.length && slots > 0) {
+  if (signaturePool.length && slots > 0 && !pool.some((t) => t.launchPhase)) {
     const sig = shuffle(signaturePool)[0];
     used.add(sig.id);
     picked.push(sig);
@@ -176,7 +197,8 @@ function buildTaskPool(state) {
     (t) =>
       stageAllowed(t, taskStage) &&
       categoryAllowed(t, categoryId) &&
-      taskTierAllowed(t, state)
+      taskTierAllowed(t, state) &&
+      launchPhaseAllowed(t, state)
   );
 }
 
@@ -199,10 +221,19 @@ export function dealMonthlyTasks(state) {
   state.calendar.taskCatalogError = false;
   const recent = state.calendar.recentTaskIds ?? [];
   let offered = pickMonthlyTaskDefs(pool, offerCount, recent);
-  const sigPool = pool.filter((t) => t.signature);
-  if (sigPool.length && !offered.some((t) => t.signature) && offered.length > 0) {
-    const sig = shuffle(sigPool)[0];
-    offered = [...offered.slice(0, -1), sig];
+  const launchDesk = currentLaunchTaskPhase(state);
+  if (launchDesk === 'pre_launch' && state.launch?.phase === 'pre_launch') {
+    const sched = pool.find((t) => t.scheduleLaunch);
+    if (sched && !offered.some((t) => t.id === sched.id)) {
+      offered = [sched, ...offered.filter((t) => t.id !== sched.id)].slice(0, offerCount);
+    }
+  }
+  if (!launchLifecycleActive(state)) {
+    const sigPool = pool.filter((t) => t.signature);
+    if (sigPool.length && !offered.some((t) => t.signature) && offered.length > 0) {
+      const sig = shuffle(sigPool)[0];
+      offered = [...offered.slice(0, -1), sig];
+    }
   }
   state.calendar.monthTaskSlotTarget = slots;
   state.calendar.monthTaskOffers = offered.map((def, index) => ({

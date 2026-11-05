@@ -120,6 +120,21 @@ if (!state.calendar.monthTasks?.length) {
   console.log(`OK: initial deal ${state.calendar.monthTasks.length} tasks`);
 }
 
+const { getTaskDef } = await import(`file://${join(sim, 'modules/Tasks.js')}`);
+const garageOffers = state.calendar.monthTaskOffers?.length
+  ? state.calendar.monthTaskOffers
+  : state.calendar.monthTasks;
+const preLaunchOnly = (garageOffers ?? []).every((o) => {
+  const def = getTaskDef(o.taskId);
+  return def?.launchPhase === 'pre_launch';
+});
+if (!preLaunchOnly || !(garageOffers?.length >= 4)) {
+  console.error('FAIL: garage should deal pre-launch playbook tasks only');
+  failed = true;
+} else {
+  console.log('OK: garage pre-launch task pool');
+}
+
 const { totalHeadcountCap } = await import(`file://${join(sim, 'modules/Offices.js')}`);
 if (totalHeadcountCap(state) !== 0) {
   console.error('FAIL: garage headcount cap expected 0 got', totalHeadcountCap(state));
