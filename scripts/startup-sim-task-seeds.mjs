@@ -36,7 +36,8 @@ export function packCategoryTasks(categoryId, items) {
     revenue: item.revenue,
     product: item.product ?? 0,
     buzz: item.buzz ?? 0,
-    ...(item.rivalPressure != null ? { rivalPressure: item.rivalPressure } : {})
+    ...(item.rivalPressure != null ? { rivalPressure: item.rivalPressure } : {}),
+    ...(item.authored ? { authored: true } : {})
   }));
 }
 

@@ -7,6 +7,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SEEDS, packCategoryTasks } from './startup-sim-task-seeds.mjs';
 import { EXTRA_ROWS } from './startup-sim-category-extra.mjs';
+import { HAND_AUTHORED } from './startup-sim-task-seeds-authored.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const path = join(root, 'work/startup-sim/data/tasks.json');
@@ -366,8 +367,8 @@ const extraCategoryTasks = Object.entries(EXTRA_ROWS).flatMap(([categoryId, rows
 );
 
 const categoryTasks = [
-  ...(SEEDS['b2b-saas'] ?? []),
-  ...(SEEDS.healthtech ?? []),
+  ...Object.values(SEEDS).flat(),
+  ...Object.values(HAND_AUTHORED).flat(),
   ...Object.values(BULK).flat(),
   ...extraCategoryTasks
 ];
