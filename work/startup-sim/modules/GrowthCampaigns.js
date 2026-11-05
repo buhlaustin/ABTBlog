@@ -7,7 +7,11 @@ import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json
 import bundledPublicLate from '../data/growth-campaigns-public-late.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
-import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
+import {
+  clampBookedRevenue,
+  recordCashOutflow,
+  getTaskRevenueMultiplierPreview
+} from './Finance.js';
 import { formatMoney } from './constants.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
 import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
@@ -113,26 +117,8 @@ export function refreshGrowthCampaignOffers(state) {
   const offerCount = growthMonthlyOfferCount(state);
   let offers = pickMonthlyCampaignDefs(pool, offerCount, recent);
 
-  if (progressionTier(state) >= 7) {
-    const recentSet = new Set(recent);
-    const whales = pool.filter(
-      (c) =>
-        !recentSet.has(c.id) &&
-        (c.whale || (c.revenue?.[1] ?? 0) >= 500_000_000)
-    );
-    if (whales.length) {
-      const injectCount = Math.random() < 0.5 ? 2 : 1;
-      for (let w = 0; w < injectCount; w += 1) {
-        const pick = shuffle(whales)[0];
-        if (pick) offers = mergeUniqueCampaignOffers(offers, pick, offerCount);
-      }
-    }
-  }
-
   state.growth.monthCampaignOffers = offers.map((c) => c.id);
-  state.growth.lastRosterWhaleCount = offers.filter(
-    (c) => c.whale || (c.revenue?.[1] ?? 0) >= 500_000_000
-  ).length;
+  state.growth.lastRosterWhaleCount = offers.filter((c) => c.whale === true).length;
   return offers;
 }
 
@@ -218,7 +204,7 @@ export function runGrowthCampaign(state, campaignId) {
   }
   const [rMin, rMax] = def.revenue ?? [0, 0];
   const base = rMin + Math.random() * Math.max(0, rMax - rMin);
-  const revenue = Math.round(base * campaignRevenueMult(state));
+  const revenue = clampBookedRevenue(state, Math.round(base * campaignRevenueMult(state)));
 
   state.finance.cash -= cost;
   state.finance.cash += revenue;

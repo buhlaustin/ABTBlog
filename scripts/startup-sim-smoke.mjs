@@ -1164,25 +1164,31 @@ if (roster.length < 1 || roster.length > expectedOffers) {
   console.error(`FAIL: growth monthly roster size ${roster.length} (max ${expectedOffers})`);
   failed = true;
 } else {
-  const whales = availableCampaigns(growthRosterState).filter(
-    (c) => (c.revenue?.[1] ?? 0) >= 500_000_000
-  );
-  if (!whales.length) {
-    console.error('FAIL: public growth roster should include billion-scale plays');
+  const playable = availableCampaigns(growthRosterState);
+  if (!playable.length) {
+    console.error('FAIL: public growth roster has no playable campaigns');
     failed = true;
   } else {
-    const first = whales[0];
-    const run = runGrowthCampaign(growthRosterState, first.id);
-    if (!run.ok || !growthRosterState.growth.recentCampaignIds?.includes(first.id)) {
-      console.error(`FAIL: growth campaign run / cooldown track: ${run.reason ?? 'ok'}`);
+    const first = playable[0];
+    if ((first.revenue?.[1] ?? 0) > 50_000_000) {
+      console.error(`FAIL: growth campaign rev max unrealistic (${first.revenue?.[1]})`);
       failed = true;
     } else {
-      resetGrowthCampaignsMonth(growthRosterState);
-      if (availableCampaigns(growthRosterState).some((c) => c.id === first.id)) {
-        console.error('FAIL: ran growth campaign should stay off roster until cooldown');
+      const run = runGrowthCampaign(growthRosterState, first.id);
+      if (!run.ok || !growthRosterState.growth.recentCampaignIds?.includes(first.id)) {
+        console.error(`FAIL: growth campaign run / cooldown track: ${run.reason ?? 'ok'}`);
+        failed = true;
+      } else if (run.revenue > 50_000_000) {
+        console.error(`FAIL: growth payout too large (${run.revenue})`);
         failed = true;
       } else {
-        console.log(`OK: growth roster + cooldown (${roster.length}/mo, whales in pool)`);
+        resetGrowthCampaignsMonth(growthRosterState);
+        if (availableCampaigns(growthRosterState).some((c) => c.id === first.id)) {
+          console.error('FAIL: ran growth campaign should stay off roster until cooldown');
+          failed = true;
+        } else {
+          console.log(`OK: growth roster + cooldown (${roster.length}/mo, realistic payouts)`);
+        }
       }
     }
   }

@@ -339,16 +339,6 @@ export function dealMonthlyTasks(state) {
     const demo = pool.find((t) => t.id === XC_DEMO_DAY_TASK_ID);
     if (demo) offered = mergeUniqueTaskOffers(offered, demo, offerCount);
   }
-  if (progressionTier(state) >= 7) {
-    const whales = pool.filter((t) => t.whale || (t.revenue?.[1] ?? 0) >= 1_000_000_000);
-    if (whales.length) {
-      const injectCount = Math.random() < 0.45 ? 2 : 1;
-      for (let w = 0; w < injectCount; w += 1) {
-        const pick = shuffle(whales)[0];
-        if (pick) offered = mergeUniqueTaskOffers(offered, pick, offerCount);
-      }
-    }
-  }
   if (!launchLifecycleActive(state)) {
     const sigPool = pool.filter((t) => t.signature);
     if (sigPool.length && !offered.some((t) => t.signature) && offered.length > 0) {

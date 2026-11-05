@@ -1,5 +1,5 @@
 /**
- * Generates work/startup-sim/data/growth-campaigns-public-late.json (~200 paid growth plays).
+ * ~200 tier 4–7 growth plays — unique titles, original-scale revenue (no billion bases).
  */
 import { writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -10,73 +10,104 @@ const outPath = join(
   '../data/growth-campaigns-public-late.json'
 );
 
-const whaleChannels = [
-  'CNBC takeover week',
-  'Times Square domination',
-  'global CFO roadshow',
-  'institutional ETF push',
-  'sovereign wealth tour',
-  'Olympics sponsorship bloc',
-  'F1 title partnership',
-  'Super Bowl halftime adjacency',
-  'Davos pavilion blitz',
-  'NYSE bell tour'
+const channels = [
+  'Bloomberg TV',
+  'CNBC Squawk Box',
+  'Wall Street Journal',
+  'Financial Times',
+  'TechCrunch Disrupt',
+  'SaaStr Annual',
+  'Dreamforce alley',
+  'AWS re:Invent',
+  'Google Cloud Next',
+  'Microsoft Ignite',
+  'LinkedIn thought-leadership',
+  'YouTube pre-roll',
+  'Spotify host-read',
+  'Netflix ad tier',
+  'Hulu sports adjacency',
+  'Reddit AMA week',
+  'Discord partner server',
+  'Twitch sponsored stream',
+  'Substack crossover',
+  'Newsletter bundle'
 ];
 
-const midChannels = [
-  'podcast network buy',
-  'creator marketplace burst',
-  'retail media coop',
-  'campus ambassador wave',
-  'partner co-marketing grid'
+const plays = [
+  'brand lift sprint',
+  'demand gen burst',
+  'enterprise pipeline push',
+  'developer awareness wave',
+  'analyst mindshare blitz',
+  'partner co-marketing grid',
+  'retail media test',
+  'campus hiring funnel',
+  'CFO breakfast series',
+  'CISO roundtable tour',
+  'vertical podcast takeover',
+  'industry report sponsor',
+  'customer story film',
+  'case study roadshow',
+  'search keyword siege',
+  'ABM account surge',
+  'event keynote package',
+  'airport terminal domination',
+  'transit wrap pilot',
+  'stadium jumbotron rotation'
 ];
+
+const descFor = (channel, play) => {
+  const lines = [
+    `${channel} — ${play}. Finance asks for attribution; marketing cites “brand.”`,
+    `Paid ${play} on ${channel}. Legal clears claims; growth clears the invoice.`,
+    `${channel} buys a month of ${play}. Sales wants leads by Friday.`,
+    `One-month ${play} through ${channel}. IR watches mentions; ops watches traffic.`,
+    `${channel} package built around ${play}. CAC slides get updated reluctantly.`
+  ];
+  return lines[(channel.length + play.length) % lines.length];
+};
 
 const campaigns = [];
 
-for (let i = 1; i <= 200; i += 1) {
-  const n = String(i).padStart(3, '0');
-  const isWhale = i <= 90;
-  const tierMin = isWhale ? 7 : 4 + (i % 4);
+for (let i = 0; i < 200; i += 1) {
+  const n = String(i + 1).padStart(3, '0');
+  const channel = channels[i % channels.length];
+  const play = plays[Math.floor(i / channels.length) % plays.length];
+  const title = `${channel}: ${play}`;
+  const tierMin = i < 60 ? 4 + (i % 3) : i < 140 ? 5 + (i % 2) : 7;
   const tierMax = 7;
+
   let cost;
   let revMin;
   let revMax;
-  if (isWhale) {
-    cost = 800_000 + (i % 20) * 450_000;
-    revMin = 400_000_000 + (i % 35) * 95_000_000;
-    revMax = revMin + 1_200_000_000 + (i % 11) * 220_000_000;
+  if (tierMin >= 7) {
+    cost = 650_000 + (i % 18) * 185_000;
+    revMin = 520_000 + (i % 14) * 95_000;
+    revMax = Math.min(12_000_000, revMin + 1_800_000 + (i % 9) * 420_000);
+  } else if (tierMin >= 5) {
+    cost = 85_000 + (i % 16) * 22_000;
+    revMin = 70_000 + (i % 20) * 38_000;
+    revMax = revMin + 650_000 + (i % 11) * 85_000;
   } else {
-    cost = 40_000 + (i % 15) * 18_000;
-    revMin = 80_000 + (i % 25) * 45_000;
-    revMax = revMin + 400_000 + (i % 9) * 120_000;
-    if (i % 7 === 0) {
-      revMin = 2_000_000 + (i % 10) * 800_000;
-      revMax = revMin + 8_000_000 + (i % 6) * 1_500_000;
-    }
+    cost = 18_000 + (i % 12) * 8_500;
+    revMin = 15_000 + (i % 18) * 12_000;
+    revMax = revMin + 180_000 + (i % 8) * 35_000;
   }
 
-  const channel = isWhale
-    ? whaleChannels[i % whaleChannels.length]
-    : midChannels[i % midChannels.length];
-
-  campaigns.push({
+  const entry = {
     id: `growth-public-late-${n}`,
-    title: isWhale ? `${channel} (${i})` : `${channel} — wave ${i}`,
-    description: isWhale
-      ? 'Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.'
-      : 'Mid/late growth lever with spend that scales with your funding era.',
+    title,
+    description: descFor(channel, play),
     cost,
     revenue: [revMin, revMax],
-    buzz: isWhale ? 4 + (i % 3) : 2 + (i % 3),
+    buzz: tierMin >= 7 ? 5 + (i % 4) : 2 + (i % 4),
     tierMin,
-    tierMax,
-    ...(isWhale
-      ? {
-          whale: true,
-          stockPct: Number((0.006 + (i % 6) * 0.003).toFixed(3))
-        }
-      : {})
-  });
+    tierMax
+  };
+  if (tierMin >= 7 && i % 7 === 0) {
+    entry.stockPct = Number((0.004 + (i % 5) * 0.002).toFixed(3));
+  }
+  campaigns.push(entry);
 }
 
 writeFileSync(outPath, `${JSON.stringify({ campaigns }, null, 2)}\n`, 'utf8');

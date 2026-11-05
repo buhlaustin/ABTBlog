@@ -13,7 +13,7 @@ import { competitorRevenueMult } from './Competitor.js';
 import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
 import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
-import { progressionRevenueMult } from './ProgressionEconomy.js';
+import { progressionRevenueMult, progressionTier } from './ProgressionEconomy.js';
 import { applyTaskRivalEffects } from './WorldDynamics.js';
 import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 import { loanOverheadMonthly } from './BankLoan.js';
@@ -179,6 +179,19 @@ function sandboxMult(state) {
   return state.mode === 'sandbox' ? MODE_CONFIG.sandbox.difficulty : MODE_CONFIG.career.difficulty;
 }
 
+/** Cap one desk/growth cash booking so rev× cannot 100× MRR in a single month. */
+export function clampBookedRevenue(state, raw) {
+  const amount = Math.max(0, Math.round(Number(raw) || 0));
+  const tier = progressionTier(state);
+  if (tier < 5) return amount;
+  const mrr = Math.max(Number(state.finance?.mrr) || 0, getArr(state) / 12);
+  if (mrr <= 0) return amount;
+  let share = tier >= 7 ? 0.08 : 0.14;
+  if (state.mode === 'sandbox') share = Math.min(0.12, share * 1.2);
+  const cap = Math.max(250_000, Math.round(mrr * share));
+  return Math.min(amount, cap);
+}
+
 /** Apply one task's cash flow immediately when completed. */
 export function applyTaskOutcome(state, taskDef, rolled) {
   const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
@@ -192,7 +205,10 @@ export function applyTaskOutcome(state, taskDef, rolled) {
       scenarioCostMult(state)
   );
   const payoutMult = getTaskRevenueMultiplierPreview(state);
-  const revenue = Math.round(rolled.revenue * payoutMult * staffRetentionBonus(state, taskDef));
+  const revenue = clampBookedRevenue(
+    state,
+    Math.round(rolled.revenue * payoutMult * staffRetentionBonus(state, taskDef))
+  );
 
   state.finance.cash -= cost;
   state.finance.cash += revenue;
