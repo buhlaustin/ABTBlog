@@ -26,6 +26,8 @@ function computeSideTaskPlays(state) {
   n += Math.min(2, Math.floor((head.marketing ?? 0) / 8));
   n += Math.min(2, Math.floor((head.product ?? 0) / 8));
   n += Math.min(1, Math.floor((head.engineering ?? 0) / 12));
+  n += Math.min(1, Math.floor((head.design ?? 0) / 10));
+  n += Math.min(1, Math.floor((head.partnerships ?? 0) / 10));
 
   const ws = getWorkspaceTier(state);
   if (ws === WORKSPACE_TIER.MEDIUM || ws === WORKSPACE_TIER.LARGE) n += 1;
@@ -46,7 +48,9 @@ export function growthCampaignSlots(state) {
   slots += Math.floor((state.product?.buzz ?? 0) / 20);
 
   const marketing = state.staff?.headcountByDept?.marketing ?? 0;
+  const partnerships = state.staff?.headcountByDept?.partnerships ?? 0;
   slots += Math.min(4, Math.floor(marketing / 6));
+  slots += Math.min(2, Math.floor(partnerships / 8));
 
   const ws = getWorkspaceTier(state);
   if (ws === WORKSPACE_TIER.LARGE) slots += 1;

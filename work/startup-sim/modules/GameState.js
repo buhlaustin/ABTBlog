@@ -1,5 +1,5 @@
 import { getCategoryById, categoryEconomics } from './Categories.js';
-import { createInitialStaff } from './Staff.js';
+import { createInitialStaff, migrateStaffHeadcount } from './Staff.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
@@ -202,6 +202,7 @@ export function normalizeSave(raw) {
     if (!state.staff.benefitsThisMonth) {
       state.staff.benefitsThisMonth = { companyBonusPct: null, offsiteId: null, perks: [] };
     }
+    migrateStaffHeadcount(state);
     if (state.staff.companyBonusAnnualMode === undefined) state.staff.companyBonusAnnualMode = false;
     if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
     if (state.staff.optionPoolExpandedThisMonth === undefined) {

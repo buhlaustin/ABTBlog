@@ -1707,4 +1707,49 @@ if (getTaskDefinitions().some((t) => t.id === TAX_FILING_TASK_ID)) {
   failed = true;
 }
 
+const {
+  DEPARTMENTS,
+  emptyHeadcount,
+  visibleDepartments,
+  isDepartmentUnlocked,
+  migrateStaffHeadcount
+} = await import(`file://${join(sim, 'modules/Staff.js')}`);
+if (DEPARTMENTS.length < 15) {
+  console.error(`FAIL: expected 15 departments, got ${DEPARTMENTS.length}`);
+  failed = true;
+} else {
+  const keys = Object.keys(emptyHeadcount());
+  if (keys.length !== DEPARTMENTS.length || DEPARTMENTS.some((d) => !keys.includes(d.id))) {
+    console.error('FAIL: emptyHeadcount keys must match DEPARTMENTS ids');
+    failed = true;
+  } else {
+    const officeState = createInitialState({ companyName: 'DeptUnlock', categoryId: 'b2b-saas', mode: 'sandbox' });
+    officeState.workspace.tier = WORKSPACE_TIER.SMALL;
+    officeState.stage = STAGES.OFFICE;
+    const open = visibleDepartments(officeState.stage, officeState).length;
+    if (open < 7) {
+      console.error(`FAIL: office-tier should unlock core departments (got ${open} open)`);
+      failed = true;
+    } else {
+      const legacyState = createInitialState({ companyName: 'LegacyHC', categoryId: 'b2b-saas', mode: 'sandbox' });
+      legacyState.staff.headcountByDept = { engineering: 2, sales: 1 };
+      legacyState.staff.draftHeadcountByDept = { engineering: 2, sales: 1 };
+      migrateStaffHeadcount(legacyState);
+      if (Object.keys(legacyState.staff.headcountByDept).length !== DEPARTMENTS.length) {
+        console.error('FAIL: migrateStaffHeadcount should backfill all department keys');
+        failed = true;
+      } else {
+        const research = DEPARTMENTS.find((d) => d.id === 'research');
+        officeState.flags.seriesAClosed = false;
+        if (isDepartmentUnlocked(research, officeState)) {
+          console.error('FAIL: R&D should require Series A');
+          failed = true;
+        } else {
+          console.log(`OK: departments (${DEPARTMENTS.length}, ${open} open at office tier)`);
+        }
+      }
+    }
+  }
+}
+
 process.exit(failed ? 1 : 0);

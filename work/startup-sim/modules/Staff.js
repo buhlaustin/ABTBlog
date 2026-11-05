@@ -1,4 +1,4 @@
-import { STAGES, formatMoney } from './constants.js';
+import { STAGES, formatMoney, stageLabel } from './constants.js';
 import { totalHeadcountCap, headcountCapBreakdown } from './Offices.js';
 import {
   getWorkspaceTier,
@@ -11,23 +11,167 @@ import { formatCalendarStamp } from './GameCalendar.js';
 import { renderLeadershipOrgChart, cooSalaryMonthly } from './Coo.js';
 import { panelStatCard } from './PanelChrome.js';
 
+const STAGE_ORDER = [STAGES.GARAGE, STAGES.OFFICE, STAGES.XC, STAGES.POST_XC, STAGES.PUBLIC];
+
+function stageRank(stage) {
+  const i = STAGE_ORDER.indexOf(stage);
+  return i >= 0 ? i : 0;
+}
+
+/**
+ * Departments — `minStage` gates visibility; `requireFlag` optional funding flag.
+ * `taskCoeffs` per task type id (from tasks.json) for desk payout mix.
+ */
 export const DEPARTMENTS = [
-  { id: 'engineering', label: 'Engineering' },
-  { id: 'product', label: 'Product' },
-  { id: 'sales', label: 'Sales' },
-  { id: 'marketing', label: 'Marketing' },
-  { id: 'finance', label: 'Finance / G&A' },
-  { id: 'support', label: 'Support', unlockStage: STAGES.OFFICE }
+  {
+    id: 'engineering',
+    label: 'Engineering',
+    group: 'Core',
+    minStage: STAGES.OFFICE,
+    salary: 9500,
+    taskCoeffs: { product: 0.025, research: 0.02 },
+    taskAll: 0.012
+  },
+  {
+    id: 'product',
+    label: 'Product',
+    group: 'Core',
+    minStage: STAGES.OFFICE,
+    salary: 8500,
+    taskCoeffs: { product: 0.035, research: 0.02 }
+  },
+  {
+    id: 'sales',
+    label: 'Sales',
+    group: 'Core',
+    minStage: STAGES.OFFICE,
+    salary: 7000,
+    taskCoeffs: { sales: 0.05 }
+  },
+  {
+    id: 'marketing',
+    label: 'Marketing',
+    group: 'Core',
+    minStage: STAGES.OFFICE,
+    salary: 6500,
+    taskCoeffs: { marketing: 0.04, growth: 0.035 }
+  },
+  {
+    id: 'finance',
+    label: 'Finance / G&A',
+    group: 'Core',
+    minStage: STAGES.OFFICE,
+    salary: 7500,
+    costCutPerHead: 0.015
+  },
+  {
+    id: 'support',
+    label: 'Support',
+    group: 'Core',
+    minStage: STAGES.OFFICE,
+    salary: 5500,
+    taskCoeffs: { support: 0.03, success: 0.025 }
+  },
+  {
+    id: 'design',
+    label: 'Design & UX',
+    group: 'Core',
+    minStage: STAGES.OFFICE,
+    salary: 7800,
+    taskCoeffs: { product: 0.02, marketing: 0.025, growth: 0.015 }
+  },
+  {
+    id: 'partnerships',
+    label: 'Partnerships / BD',
+    group: 'Growth',
+    minStage: STAGES.POST_XC,
+    salary: 8200,
+    taskCoeffs: { sales: 0.03, growth: 0.03, marketing: 0.015 }
+  },
+  {
+    id: 'data',
+    label: 'Data & analytics',
+    group: 'Growth',
+    minStage: STAGES.POST_XC,
+    salary: 9000,
+    taskCoeffs: { research: 0.035, product: 0.015, marketing: 0.01 }
+  },
+  {
+    id: 'customer-success',
+    label: 'Customer success',
+    group: 'Growth',
+    minStage: STAGES.POST_XC,
+    salary: 6800,
+    taskCoeffs: { support: 0.035, success: 0.04, sales: 0.015 }
+  },
+  {
+    id: 'operations',
+    label: 'Operations',
+    group: 'Growth',
+    minStage: STAGES.POST_XC,
+    salary: 6200,
+    taskCoeffs: { support: 0.015 },
+    costCutPerHead: 0.008
+  },
+  {
+    id: 'people',
+    label: 'People / HR',
+    group: 'Scale',
+    minStage: STAGES.POST_XC,
+    requireFlag: 'seedRoundClosed',
+    salary: 7200,
+    retentionPerHead: 0.012
+  },
+  {
+    id: 'legal',
+    label: 'Legal & compliance',
+    group: 'Scale',
+    minStage: STAGES.POST_XC,
+    requireFlag: 'seedRoundClosed',
+    salary: 9800,
+    costCutPerHead: 0.012
+  },
+  {
+    id: 'security',
+    label: 'Security & IT',
+    group: 'Scale',
+    minStage: STAGES.POST_XC,
+    requireFlag: 'seedRoundClosed',
+    salary: 9200,
+    taskCoeffs: { product: 0.012, research: 0.015 }
+  },
+  {
+    id: 'research',
+    label: 'R&D / labs',
+    group: 'Scale',
+    minStage: STAGES.POST_XC,
+    requireFlag: 'seriesAClosed',
+    salary: 10_500,
+    taskCoeffs: { research: 0.045, product: 0.02 }
+  }
 ];
 
-const DEFAULT_SALARY = {
-  engineering: 9500,
-  product: 8500,
-  sales: 7000,
-  marketing: 6500,
-  finance: 7500,
-  support: 5500
-};
+export function getDepartment(deptId) {
+  return DEPARTMENTS.find((d) => d.id === deptId) ?? null;
+}
+
+export function isDepartmentUnlocked(dept, state) {
+  if (!dept) return false;
+  if (getWorkspaceTier(state) === WORKSPACE_TIER.GARAGE) return false;
+  if (stageRank(state.stage) < stageRank(dept.minStage ?? STAGES.OFFICE)) return false;
+  if (dept.requireFlag && !state.flags?.[dept.requireFlag]) return false;
+  return true;
+}
+
+/** Merge missing dept keys into saved headcount (new departments in old saves). */
+export function migrateStaffHeadcount(state) {
+  if (!state.staff) return;
+  const blank = emptyHeadcount();
+  for (const key of Object.keys(blank)) {
+    if (state.staff.headcountByDept?.[key] == null) state.staff.headcountByDept[key] = 0;
+    if (state.staff.draftHeadcountByDept?.[key] == null) state.staff.draftHeadcountByDept[key] = 0;
+  }
+}
 
 export function emptyHeadcount() {
   return Object.fromEntries(DEPARTMENTS.map((d) => [d.id, 0]));
@@ -59,7 +203,7 @@ export function maxHeadcountForStage(_stage, state = null) {
 }
 
 export function salaryForDept(deptId, _stage, state = null) {
-  const base = DEFAULT_SALARY[deptId] ?? 6000;
+  const base = getDepartment(deptId)?.salary ?? 6000;
   if (!state) return base;
   const tier = getWorkspaceTier(state);
   if (tier === WORKSPACE_TIER.GARAGE) return 0;
@@ -79,9 +223,14 @@ export function totalHeadcount(headcount) {
   return Object.values(headcount ?? {}).reduce((a, b) => a + (Number(b) || 0), 0);
 }
 
-export function visibleDepartments(stage, state = null) {
-  if (state && getWorkspaceTier(state) === WORKSPACE_TIER.GARAGE) return [];
-  return DEPARTMENTS.filter((d) => !(d.unlockStage && stage === STAGES.GARAGE));
+export function visibleDepartments(_stage, state = null) {
+  if (!state || !hiringAllowed(state)) return [];
+  return DEPARTMENTS.filter((d) => isDepartmentUnlocked(d, state));
+}
+
+export function lockedDepartments(state) {
+  if (!state || !hiringAllowed(state)) return [];
+  return DEPARTMENTS.filter((d) => !isDepartmentUnlocked(d, state));
 }
 
 export function hiringAllowed(state) {
@@ -91,6 +240,10 @@ export function hiringAllowed(state) {
 export function adjustDraftHeadcount(state, deptId, delta) {
   if (!hiringAllowed(state)) {
     return { ok: false, reason: 'Lease a small office ($10k ARR) before hiring.' };
+  }
+  const dept = getDepartment(deptId);
+  if (!dept || !isDepartmentUnlocked(dept, state)) {
+    return { ok: false, reason: 'That department is not unlocked yet.' };
   }
   if (!state.staff?.draftHeadcountByDept) return { ok: false, reason: 'People tab is out of sync — switch tabs and try again.' };
   const draft = state.staff.draftHeadcountByDept;
@@ -111,6 +264,10 @@ export function setDraftHeadcount(state, deptId, value) {
   if (!hiringAllowed(state)) {
     return { ok: false, reason: 'Lease a small office ($10k ARR) before hiring.' };
   }
+  const dept = getDepartment(deptId);
+  if (!dept || !isDepartmentUnlocked(dept, state)) {
+    return { ok: false, reason: 'That department is not unlocked yet.' };
+  }
   const n = Math.max(0, Math.floor(Number(value) || 0));
   const draft = { ...state.staff.draftHeadcountByDept, [deptId]: 0 };
   const max = maxHeadcountForStage(state.stage, state);
@@ -129,11 +286,12 @@ function finalizedHeadcount(state) {
 /** Legacy aggregate — prefer taskOutcomeMultipliers for desk tasks. */
 export function staffRevenueMultiplier(state) {
   const hc = finalizedHeadcount(state);
-  const m =
-    (hc.marketing ?? 0) * 0.028 +
-    (hc.sales ?? 0) * 0.038 +
-    (hc.engineering ?? 0) * 0.022 +
-    (hc.product ?? 0) * 0.018;
+  let m = 0;
+  for (const dept of DEPARTMENTS) {
+    const n = hc[dept.id] ?? 0;
+    if (!n) continue;
+    m += n * (dept.revenueWeight ?? (dept.taskCoeffs?.sales ? 0.032 : dept.taskCoeffs?.marketing ? 0.026 : 0.018));
+  }
   return 1 + Math.min(0.45, m);
 }
 
@@ -150,28 +308,40 @@ export function headcountExecutionScale(state, taskDef) {
 /** Department mix for a task roll. */
 export function departmentTaskMultiplier(state, taskDef) {
   const hc = finalizedHeadcount(state);
-  const types = new Set(taskDef?.types ?? []);
+  const types = [...(taskDef?.types ?? [])];
   let bonus = 0;
-  if (types.has('sales')) bonus += (hc.sales ?? 0) * 0.05;
-  if (types.has('marketing') || types.has('growth')) bonus += (hc.marketing ?? 0) * 0.04;
-  if (types.has('product')) bonus += (hc.product ?? 0) * 0.035 + (hc.engineering ?? 0) * 0.025;
-  if (types.has('research')) bonus += (hc.product ?? 0) * 0.02;
-  bonus += (hc.engineering ?? 0) * 0.015;
+  for (const dept of DEPARTMENTS) {
+    const n = hc[dept.id] ?? 0;
+    if (!n) continue;
+    const coeffs = dept.taskCoeffs ?? {};
+    for (const t of types) {
+      bonus += n * (coeffs[t] ?? 0);
+    }
+    if (dept.taskAll) bonus += n * dept.taskAll;
+  }
   return 1 + Math.min(0.55, bonus);
 }
 
 /** Finance team trims task spend; support stabilizes MRR tasks slightly. */
 export function staffCostMultiplier(state) {
   const hc = finalizedHeadcount(state);
-  const financeCut = Math.min(0.12, (hc.finance ?? 0) * 0.015);
-  return Math.max(0.82, 1 - financeCut);
+  let cut = 0;
+  for (const dept of DEPARTMENTS) {
+    const rate = dept.costCutPerHead ?? 0;
+    if (rate > 0) cut += (hc[dept.id] ?? 0) * rate;
+  }
+  return Math.max(0.82, 1 - Math.min(0.14, cut));
 }
 
 export function staffRetentionBonus(state, taskDef) {
   const hc = finalizedHeadcount(state);
   const types = taskDef?.types ?? [];
   if (!types.includes('support') && !types.includes('success')) return 1;
-  return 1 + Math.min(0.2, (hc.support ?? 0) * 0.025);
+  let bonus = (hc.support ?? 0) * 0.025 + (hc['customer-success'] ?? 0) * 0.022;
+  for (const dept of DEPARTMENTS) {
+    if (dept.retentionPerHead) bonus += (hc[dept.id] ?? 0) * dept.retentionPerHead;
+  }
+  return 1 + Math.min(0.22, bonus);
 }
 
 export function projectStaffEconomics(state) {
@@ -249,11 +419,10 @@ export function renderPeopleStaffingPanel(container, state) {
 
   const orgMount = '';
 
-  const rows = visibleDepartments(state.stage, state)
-    .map((dept) => {
-      const n = state.staff.draftHeadcountByDept[dept.id] ?? 0;
-      const sub = n * salaryForDept(dept.id, state.stage, state);
-      return `<tr>
+  const renderDeptRow = (dept) => {
+    const n = state.staff.draftHeadcountByDept[dept.id] ?? 0;
+    const sub = n * salaryForDept(dept.id, state.stage, state);
+    return `<tr>
         <td>${escapeHtml(dept.label)}</td>
         <td class="num headcount-cell">
           <button type="button" class="btn-step" data-staff-delta="${dept.id}" data-delta="-1" aria-label="Decrease">−</button>
@@ -263,8 +432,30 @@ export function renderPeopleStaffingPanel(container, state) {
         <td class="num">${formatMoney(salaryForDept(dept.id, state.stage, state))}</td>
         <td class="num">${formatMoney(sub)}</td>
       </tr>`;
+  };
+
+  const unlocked = visibleDepartments(state.stage, state);
+  const groups = ['Core', 'Growth', 'Scale'];
+  const rows = groups
+    .map((group) => {
+      const depts = unlocked.filter((d) => (d.group ?? 'Core') === group);
+      if (!depts.length) return '';
+      return `<tr class="people-dept-group-row"><td colspan="4"><strong>${escapeHtml(group)}</strong></td></tr>${depts.map(renderDeptRow).join('')}`;
     })
     .join('');
+
+  const locked = lockedDepartments(state);
+  const lockedNote = locked.length
+    ? `<details class="finance-details people-dept-locked"><summary>${locked.length} more departments unlock as you scale</summary><ul class="instrument-list">${locked
+        .map((d) => {
+          const gates = [];
+          if (d.minStage && d.minStage !== STAGES.OFFICE) gates.push(stageLabel(d.minStage) + '+');
+          if (d.requireFlag === 'seedRoundClosed') gates.push('seed closed');
+          if (d.requireFlag === 'seriesAClosed') gates.push('Series A');
+          return `<li><strong>${escapeHtml(d.label)}</strong>${gates.length ? ` — ${escapeHtml(gates.join(', '))}` : ''}</li>`;
+        })
+        .join('')}</ul></details>`
+    : '';
 
   container.innerHTML = `
     <section class="finance-section people-staffing-section">
@@ -289,6 +480,8 @@ export function renderPeopleStaffingPanel(container, state) {
           <tbody>${rows}</tbody>
         </table>
       </div>
+      ${lockedNote}
+      <p class="fine-print">${unlocked.length} departments open · ${DEPARTMENTS.length} total in org model.</p>
       <div class="desk-actions">
         <button type="button" class="btn btn-primary" id="btn-finalize-staff" ${hiringAllowed(state) ? '' : 'disabled'}>Finalize staffing</button>
         <p id="people-feedback" class="desk-feedback" hidden></p>

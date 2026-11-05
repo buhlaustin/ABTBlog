@@ -1663,6 +1663,19 @@ h1 {
   margin-right: 0.35rem;
 }
 
+.people-dept-group-row td {
+  background: var(--panel-muted, rgba(255, 255, 255, 0.04));
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted, #8b949e);
+  padding-top: 0.75rem;
+}
+
+.people-dept-locked {
+  margin-top: 0.75rem;
+}
+
 .headcount-cell {
   white-space: nowrap;
 }
