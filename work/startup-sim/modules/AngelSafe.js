@@ -8,6 +8,15 @@ export const ANGEL_SAFE_CAP = 1_500_000;
 export const ANGEL_SAFE_MAX_ROUNDS = 6;
 const EST_PCT = Math.round((ANGEL_SAFE_AMOUNT / ANGEL_SAFE_CAP) * 1000) / 10;
 
+const ANGEL_LEADS = [
+  'Maya Chen (Operator Angels)',
+  'James Okonkwo (Weekend Fund II)',
+  'Priya Nair (Former VP Eng, Stripe)',
+  'The Harbor Syndicate',
+  'North Loop Angels',
+  'Caltrain Commute Club'
+];
+
 export function angelSafesClosedCount(state) {
   return (state.finance?.instruments ?? []).filter((i) => i.type === 'safe' && i.id?.startsWith('angel-')).length;
 }
@@ -46,6 +55,7 @@ export function closeAngelSafe(state) {
 
   const n = angelSafesClosedCount(state) + 1;
   const id = `angel-${n}`;
+  const leadName = ANGEL_LEADS[(n - 1) % ANGEL_LEADS.length];
   const founder = getFounderRow(state);
   const founderShares = founder?.shares ?? 10_000_000;
   const pct = ANGEL_SAFE_AMOUNT / ANGEL_SAFE_CAP;
@@ -60,13 +70,16 @@ export function closeAngelSafe(state) {
     amount: ANGEL_SAFE_AMOUNT,
     cap: ANGEL_SAFE_CAP,
     discount: 0,
-    estConversionPct: EST_PCT
+    estConversionPct: EST_PCT,
+    leadName,
+    closedMonth: state.calendar?.monthIndex,
+    closedYear: state.calendar?.year
   });
 
   const table = state.capTable.filter((r) => r.id !== id);
   table.push({
     id,
-    name: `Angel syndicate #${n} (SAFE)`,
+    name: `${leadName} (SAFE)`,
     shares: investorShares,
     class: 'investor'
   });
@@ -80,6 +93,6 @@ export function closeAngelSafe(state) {
     raised: ANGEL_SAFE_AMOUNT,
     cap: ANGEL_SAFE_CAP,
     round: n,
-    summary: `Angel SAFE #${n}: ${formatMoney(ANGEL_SAFE_AMOUNT)} on ${formatMoney(ANGEL_SAFE_CAP)} post-money cap (~${EST_PCT}% est.).`
+    summary: `Angel SAFE #${n} (${leadName}): ${formatMoney(ANGEL_SAFE_AMOUNT)} on ${formatMoney(ANGEL_SAFE_CAP)} cap (~${EST_PCT}% est.).`
   };
 }

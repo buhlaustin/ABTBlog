@@ -47,11 +47,26 @@ import {
   loanOutstanding,
   loanPaymentMonthly,
   requestLoanDraw,
-  bankApprovalOdds
+  bankApprovalBreakdown,
+  creditScoreLabel,
+  prepayLoan,
+  refinanceLoanAfterSeed,
+  renderLoanHistoryList
 } from './BankLoan.js';
+import {
+  renderCapitalStackSummary,
+  renderSafeInstrumentList,
+  totalSafePrincipal,
+  estSafeDilutionAtSeed
+} from './FinanceCapital.js';
+import {
+  canDrawRevenueAdvance,
+  drawRevenueAdvance,
+  rbfOutstanding
+} from './RevenueAdvance.js';
 
 export { joinAccelerator };
-export { closeAngelSafe, requestLoanDraw };
+export { closeAngelSafe, requestLoanDraw, prepayLoan, refinanceLoanAfterSeed, drawRevenueAdvance };
 import { renderOfficesPanel } from './Offices.js';
 import { renderIpoPanel } from './IPO.js';
 
@@ -118,9 +133,10 @@ export function renderFinancePanel(container, state) {
   const sentimentScore = state.sentiment?.score ?? 68;
   const rival = state.world?.competitor?.name;
   const instruments = (state.finance.instruments ?? [])
+    .filter((i) => !i.converted)
     .map(
       (i) =>
-        `<li>${escapeHtml(i.label || i.id)} — ${formatMoney(i.amount)} · cap ${formatMoney(i.cap)} · ~${i.estConversionPct ?? '—'}% est.</li>`
+        `<li>${escapeHtml(i.label || i.id)} — ${formatMoney(i.amount)} · cap ${formatMoney(i.cap)} · ~${i.estConversionPct ?? '—'}% est.${i.leadName ? ` · ${escapeHtml(i.leadName)}` : ''}</li>`
     )
     .join('');
 
@@ -212,21 +228,49 @@ export function renderFinancePanel(container, state) {
   const creditLimit = computeCreditLimit(state);
   const loanBal = loanOutstanding(state);
   const loanPay = loanPaymentMonthly(state);
-  const sampleOdds = bankApprovalOdds(state, 25_000);
+  const breakdown = bankApprovalBreakdown(state, 25_000);
+  const score = breakdown.score;
+  const factorLines = breakdown.factors
+    .map((f) => `<li>${escapeHtml(f.label)}: ${f.pts >= 0 ? '+' : ''}${f.pts} bp</li>`)
+    .join('');
   const loanBlock = `<div class="finance-action loan-panel">
     <p><strong>Bank line of credit</strong> — draw subject to approval; repay monthly as overhead.</p>
-    <p class="fine-print">Limit ${formatMoney(creditLimit)} · Outstanding ${formatMoney(loanBal)} · Debt service ${formatMoney(loanPay)}/mo${loanBal > 0 ? '' : ` · sample approval ~${Math.round(sampleOdds * 100)}% on $25k`}</p>
+    <p class="fine-print">Limit ${formatMoney(creditLimit)} · Headroom ${formatMoney(breakdown.headroom)} · Outstanding ${formatMoney(loanBal)} · Debt service ${formatMoney(loanPay)}/mo · APR ${Math.round((state.finance?.loan?.apr ?? 0.14) * 100)}%</p>
+    <p class="fine-print">Credit score <strong>${score}</strong> (${escapeHtml(creditScoreLabel(score))}) · ~${Math.round(breakdown.odds * 100)}% approval on $25k draw</p>
+    <details class="loan-breakdown"><summary>Approval breakdown</summary><ul class="instrument-list">${factorLines}</ul></details>
     <div class="stock-actions">
       <button type="button" class="btn btn-small" data-loan-draw="25000" ${loanBal + 25_000 > creditLimit ? 'disabled' : ''}>Draw $25k</button>
       <button type="button" class="btn btn-small" data-loan-draw="50000" ${loanBal + 50_000 > creditLimit ? 'disabled' : ''}>Draw $50k</button>
       <button type="button" class="btn btn-small" data-loan-draw="100000" ${loanBal + 100_000 > creditLimit ? 'disabled' : ''}>Draw $100k</button>
+      ${loanBal > 0 ? `<button type="button" class="btn btn-ghost btn-small" data-loan-prepay="10000">Prepay $10k</button>
+      <button type="button" class="btn btn-ghost btn-small" data-loan-prepay="25000">Prepay $25k</button>` : ''}
+      ${state.flags?.seedRoundClosed && loanBal > 0 && !state.finance?.loan?.refinancedAtSeed ? `<button type="button" class="btn btn-ghost btn-small" id="btn-loan-refinance">Refinance at seed rate</button>` : ''}
     </div>
+    ${renderLoanHistoryList(state)}
   </div>`;
+
+  const rbfGate = canDrawRevenueAdvance(state);
+  const rbfOwed = rbfOutstanding(state);
+  const rbfBlock =
+    rbfOwed > 0 || rbfGate.ok
+      ? `<div class="finance-action">
+        <p><strong>Revenue advance</strong> — non-dilutive capital repaid from a slice of monthly desk revenue.</p>
+        <p class="fine-print">${rbfOwed > 0 ? `Outstanding ${formatMoney(rbfOwed)} — auto-repaid from revenue each month.` : rbfGate.ok ? 'Available once you have meaningful MRR.' : rbfGate.reason}</p>
+        <button type="button" class="btn btn-ghost btn-small" id="btn-revenue-advance" ${rbfGate.ok ? '' : 'disabled'}>Draw revenue advance</button>
+      </div>`
+      : '';
+
+  const capitalStack = renderCapitalStackSummary(state);
+  const safeList = renderSafeInstrumentList(state);
+  const seedPreviewNote =
+    preview && !state.flags?.seedRoundClosed && totalSafePrincipal(state) > 0
+      ? ` Outstanding SAFEs (~${estSafeDilutionAtSeed(state)}% est.) convert on seed close.`
+      : '';
 
   const seedBlock = canCloseSeed(state) && preview
     ? `<div class="finance-action">
         <p><strong>Seed round</strong> — raise ${formatMoney(preview.raised)} at ${formatMoney(preview.postMoney)} post-money.</p>
-        <p class="fine-print">${escapeHtml(preview.note)} Founder ~${preview.founderPctNow}% → ~${preview.founderPctAfterApprox}%.</p>
+        <p class="fine-print">${escapeHtml(preview.note)} Founder ~${preview.founderPctNow}% → ~${preview.founderPctAfterApprox}%.${seedPreviewNote}</p>
         <button type="button" class="btn btn-primary btn-small" id="btn-close-seed">Close seed round</button>
       </div>`
     : state.flags?.seedRoundClosed
@@ -263,9 +307,12 @@ export function renderFinancePanel(container, state) {
       <div><span class="stat-label">Founder stake @ valuation</span><span class="stat-value">${sum.founderStakeLabel}</span></div>
     </div>
     ${blockNote}
+    ${capitalStack}
+    ${safeList}
     ${sentimentBlock}
     ${xcBlock}
     ${angelBlock}
+    ${rbfBlock}
     ${loanBlock}
     ${seedBlock}
     ${seriesABlock}

@@ -38,6 +38,32 @@
       "buzzBoost": 1,
       "revenueMultMonths": 3,
       "revenueMult": 1.08
+    },
+    {
+      "id": "sea-bridge",
+      "name": "Sea Bridge Labs",
+      "tagline": "Seattle maritime & logistics vertical — pilot customers on the hook.",
+      "arrGate": 90000,
+      "safeAmount": 200000,
+      "valuationCap": 7500000,
+      "estPct": 4,
+      "productBoost": 2,
+      "buzzBoost": 2,
+      "revenueMultMonths": 5,
+      "revenueMult": 1.14
+    },
+    {
+      "id": "velocity-lab",
+      "name": "Velocity Lab",
+      "tagline": "Equity-free grant + intro SAFE from corporate LP strategics.",
+      "arrGate": 55000,
+      "safeAmount": 125000,
+      "valuationCap": 5200000,
+      "estPct": 3,
+      "productBoost": 2,
+      "buzzBoost": 4,
+      "revenueMultMonths": 4,
+      "revenueMult": 1.1
     }
   ]
 }

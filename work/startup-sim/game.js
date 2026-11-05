@@ -66,6 +66,9 @@ import {
   joinAccelerator,
   closeAngelSafe,
   requestLoanDraw,
+  prepayLoan,
+  refinanceLoanAfterSeed,
+  drawRevenueAdvance,
   showFinanceFeedback
 } from './modules/Fundraising.js';
 import { loadAccelerators } from './modules/Accelerators.js';
@@ -551,6 +554,9 @@ function handleCloseSeed() {
     sessionState,
     `Closed seed round — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post-money.`
   );
+  for (const line of result.safeLines ?? []) {
+    appendLog(sessionState, line);
+  }
   showFinanceFeedback('Seed round closed.');
   refresh();
 }
@@ -944,6 +950,37 @@ function bindGameInteractions() {
     if (loanBtn && sessionState) {
       const result = requestLoanDraw(sessionState, loanBtn.getAttribute('data-loan-draw'));
       if (!result.ok) showFinanceFeedback(result.reason || 'Loan declined.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const prepayBtn = e.target.closest('[data-loan-prepay]');
+    if (prepayBtn && sessionState) {
+      const result = prepayLoan(sessionState, prepayBtn.getAttribute('data-loan-prepay'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Prepay failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-loan-refinance' && sessionState) {
+      const result = refinanceLoanAfterSeed(sessionState);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Cannot refinance.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-revenue-advance' && sessionState) {
+      const result = drawRevenueAdvance(sessionState);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Revenue advance unavailable.', true);
       else {
         appendLog(sessionState, result.summary);
         showFinanceFeedback(result.summary);

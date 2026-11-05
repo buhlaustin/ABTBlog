@@ -617,9 +617,10 @@ if (!ipo.ok) {
 
 const { closeAngelSafe, canCloseAngelSafe } = await import(`file://${join(sim, 'modules/AngelSafe.js')}`);
 const { joinAccelerator } = await import(`file://${join(sim, 'modules/Accelerators.js')}`);
-const { computeCreditLimit, requestLoanDraw, loanOverheadMonthly } = await import(
-  `file://${join(sim, 'modules/BankLoan.js')}`
-);
+const { computeCreditLimit, requestLoanDraw, loanOverheadMonthly, prepayLoan, computeCreditScore, bankApprovalBreakdown } =
+  await import(`file://${join(sim, 'modules/BankLoan.js')}`);
+const { convertOutstandingSafesAtSeed } = await import(`file://${join(sim, 'modules/FinanceCapital.js')}`);
+const { drawRevenueAdvance, rbfOutstanding } = await import(`file://${join(sim, 'modules/RevenueAdvance.js')}`);
 const angelState = createInitialState({ companyName: 'Angel Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 angelState.product.level = 2;
 const ag = closeAngelSafe(angelState);
@@ -659,8 +660,43 @@ if (!approved) {
 } else if (loanOverheadMonthly(loanState) <= 0) {
   console.error('FAIL: loan overhead');
   failed = true;
-} else if (!failed) {
-  console.log('OK: angel SAFE, post-XC accelerator, bank loan draw');
+}
+if (!failed && computeCreditScore(loanState) < 480) {
+  console.error('FAIL: credit score range');
+  failed = true;
+}
+if (!failed && !bankApprovalBreakdown(loanState, 25_000).factors?.length) {
+  console.error('FAIL: approval breakdown');
+  failed = true;
+}
+if (!failed) {
+  loanState.finance.cash = 200_000;
+  const prep = prepayLoan(loanState, 10_000);
+  if (!prep.ok) {
+    console.error(`FAIL: loan prepay: ${prep.reason}`);
+    failed = true;
+  }
+}
+if (!failed && ag.ok) {
+  const lines = convertOutstandingSafesAtSeed(angelState, 15_000_000);
+  const converted = angelState.finance.instruments.every((i) => i.type !== 'safe' || i.converted);
+  if (!converted || !lines.length) {
+    console.error('FAIL: SAFE conversion at seed');
+    failed = true;
+  }
+}
+const rbfState = createInitialState({ companyName: 'RBF Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+rbfState.finance.mrr = 8_000;
+const rbf = drawRevenueAdvance(rbfState);
+if (!rbf.ok) {
+  console.error(`FAIL: revenue advance: ${rbf.reason}`);
+  failed = true;
+} else if (rbfOutstanding(rbfState) <= 0) {
+  console.error('FAIL: revenue advance owed');
+  failed = true;
+}
+if (!failed) {
+  console.log('OK: finance stack (SAFE, loan, prepay, RBF, SAFE conversion)');
 }
 
 process.exit(failed ? 1 : 0);

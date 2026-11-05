@@ -1,5 +1,6 @@
 import { STAGES } from './constants.js';
 import { isFundraisingBlockedByScenario } from './ScenarioEffects.js';
+import { convertOutstandingSafesAtSeed } from './FinanceCapital.js';
 import {
   canRaiseSeriesA,
   canRaiseSeriesB,
@@ -117,7 +118,8 @@ export function applySeedRound(state) {
   };
   state.flags.seedRoundClosed = true;
   applyFundraiseMomentum(state, 'Seed');
-  return { ok: true, raised, postMoney };
+  const safeLines = convertOutstandingSafesAtSeed(state, postMoney);
+  return { ok: true, raised, postMoney, safeLines };
 }
 
 /** Cap table + instruments shape after seed — no cash or flag checks (sandbox bootstrap). */

@@ -29,7 +29,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 23;
+export const SAVE_VERSION = 24;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -268,8 +268,17 @@ export function normalizeSave(raw) {
         creditLimit: 0,
         drawsThisMonth: 0,
         lastDrawTurn: null,
-        lastServicedTurn: null
+        lastServicedTurn: null,
+        history: [],
+        creditScore: null,
+        refinancedAtSeed: false
       };
+    } else {
+      if (!state.finance.loan.history) state.finance.loan.history = [];
+      if (state.finance.loan.refinancedAtSeed === undefined) state.finance.loan.refinancedAtSeed = false;
+    }
+    if (!state.finance.rbf) {
+      state.finance.rbf = { active: false, principal: 0, owed: 0, sharePct: 0.12, feeMult: 1.28 };
     }
     if (state.finance.lastRound === undefined) state.finance.lastRound = null;
     if (!state.flags) state.flags = {};
