@@ -23,7 +23,7 @@ const dataAttrs = new Set();
 for (const { text } of sources) {
   for (const m of text.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) btnIds.add(m[1]);
   for (const m of text.matchAll(/\bid='(btn-[a-z0-9-]+)'/g)) btnIds.add(m[1]);
-  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest-pick|acquisition-reinvest-submit|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|ceo-home-cash|ceo-home-mortgage|ceo-lifestyle|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action|buy-all-side|buy-all-growth|people-tab|company-bonus|employee-offsite|employee-perk|expand-option-pool|seed-structure)/g)) {
+  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest-pick|acquisition-reinvest-submit|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|ceo-home-cash|ceo-home-mortgage|ceo-lifestyle|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action|buy-all-side|buy-all-growth|people-tab|company-bonus|company-bonus-annual|employee-offsite|employee-perk|expand-option-pool|seed-structure)/g)) {
     dataAttrs.add(m[1]);
   }
 }
@@ -90,6 +90,7 @@ const dataPatterns = {
   'buy-all-growth': "closest('[data-buy-all-growth]')",
   'people-tab': "closest('[data-people-tab]')",
   'company-bonus': "closest('[data-company-bonus]')",
+  'company-bonus-annual': '[data-company-bonus-annual]',
   'employee-offsite': "closest('[data-employee-offsite]')",
   'employee-perk': "closest('[data-employee-perk]')",
   'expand-option-pool': "closest('[data-expand-option-pool]')",

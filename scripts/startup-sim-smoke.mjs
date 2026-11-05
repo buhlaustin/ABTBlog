@@ -1540,6 +1540,26 @@ if (mass.total < 1) {
     console.log(`OK: company bonus (${bonus.pct}%, CEO ${formatMoney(bonus.ceoShare)})`);
   }
 }
+const annualBonusState = createInitialState({
+  companyName: 'AnnualBonusCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 8_000_000
+});
+annualBonusState.staff.headcountByDept.engineering = 5;
+annualBonusState.ceo.salaryAnnual = 120_000;
+annualBonusState.staff.companyBonusAnnualMode = true;
+const massAnnual = totalEmployeeSalaryMassMonthly(annualBonusState);
+const expectedAnnualPool = Math.round(massAnnual.total * 12 * 0.05);
+const bonusAnnual = payCompanyWideBonus(annualBonusState, 5);
+if (!bonusAnnual.ok || bonusAnnual.pool !== expectedAnnualPool || !bonusAnnual.annualMode) {
+  console.error(
+    `FAIL: annual company bonus: ${bonusAnnual.reason ?? `expected pool ${expectedAnnualPool}, got ${bonusAnnual.pool}`}`
+  );
+  failed = true;
+} else {
+  console.log(`OK: annual company bonus (${bonusAnnual.pct}%, pool ${formatMoney(bonusAnnual.pool)})`);
+}
 if (EXTRA_PERKS.length < 15) {
   console.error(`FAIL: expected 15+ employee perks, got ${EXTRA_PERKS.length}`);
   failed = true;

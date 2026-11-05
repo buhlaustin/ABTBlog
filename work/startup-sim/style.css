@@ -965,6 +965,18 @@ h1 {
   margin: 0.35rem 0 0.85rem;
 }
 
+.people-bonus-annual-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0.65rem;
+  cursor: pointer;
+}
+
+.people-bonus-annual-toggle input {
+  margin-top: 0.15rem;
+}
+
 .people-benefits-lede {
   margin: 0 0 0.35rem;
 }

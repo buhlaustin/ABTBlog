@@ -232,6 +232,7 @@ function ensurePeoplePrograms(state) {
   }
   if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
   if (state.staff.peopleSection == null) state.staff.peopleSection = 'staffing';
+  if (state.staff.companyBonusAnnualMode == null) state.staff.companyBonusAnnualMode = false;
 }
 
 export function resetEmployeeBenefitsMonth(state) {
@@ -289,7 +290,28 @@ function creditCeoBonusShare(state, amount, pct) {
   return pay;
 }
 
-export function payCompanyWideBonus(state, pctRaw) {
+/** Salary mass used for bonus math — one month, or ×12 when paying an annual bonus. */
+export function companyBonusSalaryBase(state, annualMode = false) {
+  const mass = totalEmployeeSalaryMassMonthly(state);
+  const mult = annualMode ? 12 : 1;
+  return {
+    ...mass,
+    bonusBase: mass.total * mult,
+    annualMode: Boolean(annualMode)
+  };
+}
+
+export function estimateCompanyBonusPool(state, pct, annualMode = false) {
+  const base = companyBonusSalaryBase(state, annualMode);
+  return Math.round(base.bonusBase * (Number(pct) / 100));
+}
+
+export function setCompanyBonusAnnualMode(state, enabled) {
+  ensurePeoplePrograms(state);
+  state.staff.companyBonusAnnualMode = Boolean(enabled);
+}
+
+export function payCompanyWideBonus(state, pctRaw, opts = {}) {
   ensurePeoplePrograms(state);
   const pct = Number(pctRaw);
   if (!COMPANY_BONUS_PCTS.includes(pct)) {
@@ -298,11 +320,12 @@ export function payCompanyWideBonus(state, pctRaw) {
   if (state.staff.benefitsThisMonth.companyBonusPct != null) {
     return { ok: false, reason: 'Already paid a company bonus this month.' };
   }
-  const mass = totalEmployeeSalaryMassMonthly(state);
+  const annualMode = opts.annual ?? state.staff.companyBonusAnnualMode ?? false;
+  const mass = companyBonusSalaryBase(state, annualMode);
   if (mass.total < 1) {
     return { ok: false, reason: 'No salary mass to bonus — hire staff or set CEO pay first.' };
   }
-  const pool = Math.round(mass.total * (pct / 100));
+  const pool = Math.round(mass.bonusBase * (pct / 100));
   const paid = payFromCompanyCash(state, pool, 'employee-bonus');
   if (!paid.ok) return paid;
 
@@ -310,12 +333,18 @@ export function payCompanyWideBonus(state, pctRaw) {
   if (ceoShare > 0) creditCeoBonusShare(state, ceoShare, pct);
 
   state.staff.benefitsThisMonth.companyBonusPct = pct;
+  state.staff.benefitsThisMonth.companyBonusAnnual = annualMode;
   state.product.buzz = (state.product?.buzz ?? 0) + Math.min(6, Math.ceil(pct / 4));
-  adjustSentiment(state, Math.min(8, Math.ceil(pct / 2)), `Company-wide ${pct}% bonus.`);
+  adjustSentiment(
+    state,
+    Math.min(8, Math.ceil(pct / 2)),
+    annualMode ? `Company-wide ${pct}% annual bonus.` : `Company-wide ${pct}% bonus.`
+  );
 
   return {
     ok: true,
     pct,
+    annualMode,
     pool: paid.cost,
     ceoShare,
     mass
@@ -464,12 +493,18 @@ export function renderEmployeeBenefitsPanel(container, state) {
   const sentiment = state.sentiment?.score ?? 68;
   const cash = state.finance?.cash ?? 0;
 
+  const annualMode = Boolean(state.staff.companyBonusAnnualMode);
+  const bonusBase = mass.total * (annualMode ? 12 : 1);
   const bonusButtons = COMPANY_BONUS_PCTS.map((pct) => {
-    const est = Math.round(mass.total * (pct / 100));
+    const est = Math.round(bonusBase * (pct / 100));
     const disabled =
       bonusDone != null || mass.total < 1 || cash < est ? ' disabled' : '';
     return `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-company-bonus="${pct}"${disabled}>${pct}% · ${formatMoney(est)}</button>`;
   }).join('');
+  const bonusPaidLabel =
+    bonusDone != null
+      ? `${bonusDone}%${state.staff.benefitsThisMonth.companyBonusAnnual ? ' annual' : ''} paid`
+      : '1× / month';
 
   const offsiteCards = OFFSITE_PROGRAMS.map((p) => {
     const disabled = offsiteDone || cash < p.cost ? ' disabled' : '';
@@ -495,7 +530,7 @@ export function renderEmployeeBenefitsPanel(container, state) {
       <div class="growth-channel-compare people-benefits-compare" role="note">
         <div class="growth-channel-card growth-channel-card--side">
           <p class="growth-channel-title"><span class="growth-channel-badge">Bonus</span></p>
-          <p class="fine-print">Percent of one month&apos;s salary mass (payroll + exec comp). Strongest single morale swing.</p>
+          <p class="fine-print">${annualMode ? 'Percent of <strong>annual</strong> salary mass (monthly payroll × 12).' : 'Percent of one month&apos;s salary mass (payroll + exec comp).'} Strongest single morale swing.</p>
         </div>
         <div class="growth-channel-card growth-channel-card--paid">
           <p class="growth-channel-title"><span class="growth-channel-badge growth-channel-badge--paid">Programs</span></p>
@@ -504,9 +539,13 @@ export function renderEmployeeBenefitsPanel(container, state) {
       </div>
       <div class="finance-section-head">
         <h3 class="finance-section-title">Company bonus</h3>
-        <span class="growth-channel-badge growth-channel-badge--inline">${bonusDone != null ? `${bonusDone}% paid` : '1× / month'}</span>
+        <span class="growth-channel-badge growth-channel-badge--inline">${bonusPaidLabel}</span>
       </div>
-      <p class="fine-print">Payroll ${formatMoney(mass.payroll)} · CEO+COO ${formatMoney(mass.ceo + mass.coo)} · ${mass.headcount} employees in salary mass.</p>
+      <p class="fine-print">Payroll ${formatMoney(mass.payroll)}/mo · CEO+COO ${formatMoney(mass.ceo + mass.coo)}/mo · ${mass.headcount} employees · bonus base ${formatMoney(bonusBase)}${annualMode ? ' (annual)' : ''}.</p>
+      <label class="people-bonus-annual-toggle fine-print">
+        <input type="checkbox" id="company-bonus-annual" data-company-bonus-annual ${annualMode ? 'checked' : ''} ${bonusDone != null ? 'disabled' : ''} />
+        Annual bonus — apply % to monthly salary mass × 12 (not just one month)
+      </label>
       <div class="benefits-preset-row">${bonusButtons}</div>
       <div class="finance-section-head">
         <h3 class="finance-section-title">Offsites</h3>

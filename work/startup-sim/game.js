@@ -72,6 +72,7 @@ import {
 } from './modules/Staff.js';
 import {
   payCompanyWideBonus,
+  setCompanyBonusAnnualMode,
   conductEmployeeOffsite,
   runExtraEmployeePerk,
   issueFurtherOptionPool,
@@ -1105,12 +1106,13 @@ function bindGameInteractions() {
       const result = payCompanyWideBonus(sessionState, bonusBtn.getAttribute('data-company-bonus'));
       if (!result.ok) showPeopleFeedback(result.reason, true);
       else {
+        const annualTag = result.annualMode ? ' annual' : '';
         appendLog(
           sessionState,
-          `People: ${result.pct}% company bonus — ${formatMoney(result.pool)} (${formatMoney(result.ceoShare)} to CEO bank).`
+          `People: ${result.pct}%${annualTag} company bonus — ${formatMoney(result.pool)} (${formatMoney(result.ceoShare)} to CEO bank).`
         );
         showPeopleFeedback(
-          `${result.pct}% bonus paid (${formatMoney(result.pool)}). CEO received ${formatMoney(result.ceoShare)} in personal bank.`
+          `${result.pct}%${annualTag} bonus paid (${formatMoney(result.pool)}). CEO received ${formatMoney(result.ceoShare)} in personal bank.`
         );
       }
       refresh();
@@ -1575,6 +1577,11 @@ function bindGameInteractions() {
   });
 
   app?.addEventListener('change', (e) => {
+    if (e.target.matches('[data-company-bonus-annual]') && sessionState) {
+      setCompanyBonusAnnualMode(sessionState, e.target.checked);
+      refresh();
+      return;
+    }
     if (e.target.matches('[data-reinvest-program-for]')) {
       handleReinvestProgramChange(e.target);
       return;

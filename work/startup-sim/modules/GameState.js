@@ -202,6 +202,7 @@ export function normalizeSave(raw) {
     if (!state.staff.benefitsThisMonth) {
       state.staff.benefitsThisMonth = { companyBonusPct: null, offsiteId: null, perks: [] };
     }
+    if (state.staff.companyBonusAnnualMode === undefined) state.staff.companyBonusAnnualMode = false;
     if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
     if (state.staff.optionPoolExpandedThisMonth === undefined) {
       state.staff.optionPoolExpandedThisMonth = false;
