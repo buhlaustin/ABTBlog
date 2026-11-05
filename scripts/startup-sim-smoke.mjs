@@ -428,4 +428,44 @@ if (!isFundraisingBlockedByScenario(scenarioState)) {
   console.log('OK: scenario fundraising block');
 }
 
+const { buzzEngagementMult, socialFollowers } = await import(
+  `file://${join(sim, 'modules/Social.js')}`
+);
+const lowBuzz = createInitialState({
+  companyName: 'SocialLow',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+lowBuzz.product.buzz = 0;
+const highBuzz = createInitialState({
+  companyName: 'SocialHigh',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+highBuzz.product.buzz = 15;
+const lowLikes = Math.round(10 * buzzEngagementMult(lowBuzz));
+const highLikes = Math.round(10 * buzzEngagementMult(highBuzz));
+if (highLikes <= lowLikes || socialFollowers(highBuzz, 'chirp') <= socialFollowers(lowBuzz, 'chirp')) {
+  console.error(`FAIL: buzz should boost social reach (${lowLikes} vs ${highLikes} likes)`);
+  failed = true;
+} else {
+  console.log(`OK: buzz scales social engagement (${lowLikes} → ${highLikes} likes, mult ${buzzEngagementMult(highBuzz).toFixed(2)}×)`);
+}
+
+const { applyOfflineMonthlySocial, unreadSocialCount } = await import(
+  `file://${join(sim, 'modules/Social.js')}`
+);
+const feedState = createInitialState({
+  companyName: 'FeedCo',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+applyOfflineMonthlySocial(feedState);
+if ((unreadSocialCount(feedState) ?? 0) < 1) {
+  console.error('FAIL: monthly social should mark unread feed posts');
+  failed = true;
+} else {
+  console.log('OK: social unread count after month feed');
+}
+
 process.exit(failed ? 1 : 0);

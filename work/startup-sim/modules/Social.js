@@ -13,8 +13,89 @@ export function createInitialSocial() {
     pronet: { posts: [] },
     chirp: { posts: [] },
     activeNetwork: 'pronet',
-    archive: []
+    archive: [],
+    unreadFeedCount: 0
   };
+}
+
+/** Desk buzz → reach on feeds (likes/reposts and displayed followers). */
+export function buzzEngagementMult(state) {
+  const buzz = Math.max(0, state.product?.buzz ?? 0);
+  return 1 + Math.min(2.5, buzz * 0.12);
+}
+
+export function socialFollowers(state, network) {
+  const buzz = Math.max(0, state.product?.buzz ?? 0);
+  const base = network === 'chirp' ? 140 : 95;
+  const perBuzz = network === 'chirp' ? 90 : 58;
+  return base + Math.floor(buzz * perBuzz);
+}
+
+function formatFollowerCount(n) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
+  if (n >= 10_000) return `${Math.round(n / 1000)}K`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K`;
+  return String(n);
+}
+
+function scaleEngagement(state, likes, reposts) {
+  const m = buzzEngagementMult(state);
+  return {
+    likes: Math.max(0, Math.round(likes * m)),
+    reposts: Math.max(0, Math.round(reposts * m))
+  };
+}
+
+function postList(state, network) {
+  return network === 'chirp' ? state.social.chirp.posts : state.social.pronet.posts;
+}
+
+function countNpcPostsThisMonth(state) {
+  const m = state.calendar.monthIndex;
+  const y = state.calendar.year;
+  let n = 0;
+  for (const net of ['pronet', 'chirp']) {
+    for (const p of postList(state, net)) {
+      if (p.authorId === 'npc' && p.month === m && p.year === y) n += 1;
+    }
+  }
+  return n;
+}
+
+export function refreshSocialUnread(state) {
+  if (!state.social) state.social = createInitialSocial();
+  state.social.unreadFeedCount = Math.min(12, countNpcPostsThisMonth(state));
+}
+
+export function markSocialAsRead(state) {
+  if (!state.social) return;
+  state.social.unreadFeedCount = 0;
+}
+
+export function unreadSocialCount(state) {
+  return state.social?.unreadFeedCount ?? 0;
+}
+
+/** Tab badge + aria for new feed posts (mirrors News). */
+export function syncSocialTabAlert(state) {
+  if (typeof document === 'undefined') return;
+  const tab = document.getElementById('tab-social');
+  if (!tab) return;
+  const n = unreadSocialCount(state);
+  let badge = tab.querySelector('.tab-badge');
+  if (n > 0) {
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'tab-badge';
+      badge.setAttribute('aria-hidden', 'true');
+      tab.appendChild(badge);
+    }
+    badge.textContent = n > 9 ? '9+' : String(n);
+    tab.setAttribute('aria-label', `Social, ${n} new post${n === 1 ? '' : 's'}`);
+  } else {
+    badge?.remove();
+    tab.setAttribute('aria-label', 'Social');
+  }
 }
 
 async function loadPersonas() {
@@ -45,10 +126,6 @@ function clearNpcPostsForMonth(state) {
       (p) => !(p.authorId === 'npc' && p.month === m && p.year === y)
     );
   }
-}
-
-function postList(state, network) {
-  return network === 'chirp' ? state.social.chirp.posts : state.social.pronet.posts;
 }
 
 function trimSocial(state) {
@@ -113,15 +190,20 @@ async function attachReactions(state, post) {
     playerRecentPosts: recentPlayerPosts(state, post.id)
   };
 
-  let reactions = offlineReactions(post, personas);
+  let reactions = offlineReactions(state, post, personas);
 
   if (shouldUseNarrativeAi()) {
     try {
       const res = await requestNarrative('startup_social_reactions', context);
       if (res?.comments || res?.likes !== undefined) {
+        const scaled = scaleEngagement(
+          state,
+          Number(res.likes) || reactions.likes,
+          Number(res.reposts) || reactions.reposts
+        );
         reactions = {
-          likes: Number(res.likes) || reactions.likes,
-          reposts: Number(res.reposts) || reactions.reposts,
+          likes: scaled.likes,
+          reposts: scaled.reposts,
           comments: (res.comments ?? []).slice(0, 5).map((c) => ({
             author: String(c.author ?? 'Anon').slice(0, 60),
             text: String(c.text ?? '').slice(0, 280)
@@ -145,6 +227,11 @@ function headlineList(state) {
 }
 
 function pushFeedPost(state, network, authorName, text) {
+  const scaled = scaleEngagement(
+    state,
+    2 + Math.floor(Math.random() * 30),
+    Math.floor(Math.random() * 8)
+  );
   const post = {
     id: `feed-${network}-${Date.now()}-${Math.floor(Math.random() * 1e5)}`,
     network,
@@ -153,7 +240,7 @@ function pushFeedPost(state, network, authorName, text) {
     text: String(text).slice(0, network === 'chirp' ? CHIRP_LIMIT : 600),
     month: state.calendar.monthIndex,
     year: state.calendar.year,
-    reactions: { likes: 2 + Math.floor(Math.random() * 30), reposts: Math.floor(Math.random() * 8), comments: [] }
+    reactions: { likes: scaled.likes, reposts: scaled.reposts, comments: [] }
   };
   postList(state, network).unshift(post);
 }
@@ -205,6 +292,7 @@ function offlineMonthlyPosts(state, personas) {
 export function applyOfflineMonthlySocial(state) {
   if (!state.social) state.social = createInitialSocial();
   offlineMonthlyPosts(state, personasCache);
+  refreshSocialUnread(state);
 }
 
 /** @returns {Promise<boolean>} true when AI posts replaced offline NPC posts for this month */
@@ -231,6 +319,7 @@ export async function enrichMonthlySocialWithAi(state) {
         pushFeedPost(state, network, String(p.author ?? p.authorName ?? 'Anon').slice(0, 60), p.text);
       }
       trimSocial(state);
+      refreshSocialUnread(state);
       return true;
     }
   } catch {
@@ -247,14 +336,19 @@ export async function generateMonthlySocial(state) {
   return { ok: true, source: 'offline' };
 }
 
-function offlineReactions(post, personas) {
+function offlineReactions(state, post, personas) {
   const p = personas[Math.floor(Math.random() * personas.length)] ?? {
     name: 'Random Founder',
     handle: '@founder'
   };
+  const scaled = scaleEngagement(
+    state,
+    3 + Math.floor(Math.random() * 20),
+    Math.floor(Math.random() * 5)
+  );
   return {
-    likes: 3 + Math.floor(Math.random() * 20),
-    reposts: Math.floor(Math.random() * 5),
+    likes: scaled.likes,
+    reposts: scaled.reposts,
     comments: [
       {
         author: p.name,
@@ -320,6 +414,15 @@ export function renderSocialPanel(container, state) {
   const chirpPosts = state.social?.chirp?.posts ?? [];
   const archivePosts = state.social?.archive ?? [];
   const onArchive = active === 'archive';
+  const unread = unreadSocialCount(state);
+  const buzz = state.product?.buzz ?? 0;
+  const pronetFollowers = formatFollowerCount(socialFollowers(state, 'pronet'));
+  const chirpFollowers = formatFollowerCount(socialFollowers(state, 'chirp'));
+  const reachNote = `<p class="fine-print">Desk buzz <strong>${buzz}</strong> scales reach — ProNet ${pronetFollowers} followers · Chirp ${chirpFollowers} followers (${buzzEngagementMult(state).toFixed(2)}× engagement).</p>`;
+  const unreadAlert =
+    unread > 0
+      ? `<p class="news-new-alert social-new-alert" role="status">${unread} new post${unread === 1 ? '' : 's'} this month — you're caught up once you've scrolled below.</p>`
+      : '';
 
   const composer = onArchive
     ? ''
@@ -341,6 +444,8 @@ export function renderSocialPanel(container, state) {
 
   container.innerHTML = `
     <p class="panel-lede">ProNet for polished updates; Chirp for hot takes. Post and watch the replies roll in.</p>
+    ${reachNote}
+    ${unreadAlert}
     <nav class="social-subtabs">
       <button type="button" class="${active === 'pronet' ? 'active' : ''}" data-social-tab="pronet">ProNet</button>
       <button type="button" class="${active === 'chirp' ? 'active' : ''}" data-social-tab="chirp">Chirp</button>

@@ -83,7 +83,9 @@ import {
   enrichMonthlySocialWithAi,
   renderSocialPanel,
   preloadSocialPersonas,
-  updateChirpCharCount
+  updateChirpCharCount,
+  unreadSocialCount,
+  syncSocialTabAlert
 } from './modules/Social.js';
 import { sendAdvisorMessage } from './modules/Advisor.js';
 import {
@@ -314,15 +316,33 @@ async function handleEndMonth() {
     applyOfflineMonthlyNews(sessionState);
     applyOfflineMonthlySocial(sessionState);
     const newArticles = unreadNewsCount(sessionState);
+    const newSocial = unreadSocialCount(sessionState);
     if (newArticles > 0) {
       appendLog(
         sessionState,
         `Press: ${newArticles} new headline${newArticles === 1 ? '' : 's'} on the News tab.`
       );
+    }
+    if (newSocial > 0) {
+      appendLog(
+        sessionState,
+        `Social: ${newSocial} new post${newSocial === 1 ? '' : 's'} on ProNet and Chirp.`
+      );
+    }
+    if (newArticles > 0 && newSocial > 0) {
+      setGameFeedback(
+        `${newArticles} new article${newArticles === 1 ? '' : 's'} and ${newSocial} new social post${newSocial === 1 ? '' : 's'} — check News and Social.`
+      );
+    } else if (newArticles > 0) {
       setGameFeedback(
         `${newArticles} new article${newArticles === 1 ? '' : 's'} posted — open News to read.`
       );
+    } else if (newSocial > 0) {
+      setGameFeedback(
+        `${newSocial} new social post${newSocial === 1 ? '' : 's'} — open Social to read.`
+      );
     }
+    syncSocialTabAlert(sessionState);
     refresh();
 
     const headlineNow = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
@@ -347,6 +367,11 @@ async function handleEndMonth() {
         }
         if (socialAi) {
           appendLog(sessionState, 'ProNet and Chirp are buzzing.');
+          const s = unreadSocialCount(sessionState);
+          if (s > 0) {
+            setGameFeedback(`${s} updated social post${s === 1 ? '' : 's'} on the Social tab.`);
+          }
+          syncSocialTabAlert(sessionState);
         }
         if (newsAi || socialAi) {
           renderNewsPanel(document.getElementById('panel-news'), sessionState);

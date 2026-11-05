@@ -176,6 +176,9 @@ export function normalizeSave(raw) {
       state.staff = createInitialStaff();
     }
     if (!state.social) state.social = createInitialSocial();
+    if (state.social && state.social.unreadFeedCount === undefined) {
+      state.social.unreadFeedCount = 0;
+    }
     if (!state.news) state.news = createInitialNews();
     if (!state.product) state.product = { level: 0, buzz: 0 };
     if (!state.product.buzz && state.product.buzz !== 0) state.product.buzz = 0;

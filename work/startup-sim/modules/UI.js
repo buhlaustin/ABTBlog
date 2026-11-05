@@ -2,7 +2,7 @@ import { formatMoney, stageLabel, getMonthlyTaskSlots } from './constants.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
 import { renderPeoplePanel } from './Staff.js';
-import { renderSocialPanel } from './Social.js';
+import { renderSocialPanel, markSocialAsRead, syncSocialTabAlert } from './Social.js';
 import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
 import { renderAdvisorPanel } from './Advisor.js';
 import {
@@ -401,8 +401,10 @@ function activateTab(nav, tab) {
   const state = panelStateProvider?.();
   if (state) {
     if (tab === 'news') markNewsAsRead(state);
+    if (tab === 'social') markSocialAsRead(state);
     renderPanelForTab(tab, state);
     if (tab === 'news') syncNewsTabAlert(state);
+    if (tab === 'social') syncSocialTabAlert(state);
   }
 }
 
@@ -481,6 +483,7 @@ export function renderAllPanels(state) {
   }
   renderGameHud(state);
   syncNewsTabAlert(state);
+  syncSocialTabAlert(state);
   renderDeskPanel(state);
   const active = getActiveTabId();
   if (active !== 'desk') {
