@@ -4,6 +4,7 @@ import { calendarTurn } from './XC.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow } from './Finance.js';
+import { accrueFiscalRevenue } from './CorporateTax.js';
 import { easeCompetitorPressure, bumpCompetitorPressure } from './Competitor.js';
 import { setGameFeedback } from './GameFeedback.js';
 import bundled from '../data/acquisition-targets.json' with { type: 'json' };
@@ -557,6 +558,7 @@ export function sellSubsidiary(state, targetId) {
   const proceeds = subsidiarySalePrice(state, holding, company);
   state.finance.cash += proceeds;
   state.finance.lifetimeRevenue = (state.finance.lifetimeRevenue ?? 0) + proceeds;
+  if (proceeds > 0) accrueFiscalRevenue(state, proceeds);
   state.acquisitions.owned.splice(idx, 1);
 
   if (company.isRival) {
@@ -611,6 +613,7 @@ export function applySubsidiaryMrrPayout(state) {
   if (!total) return { total: 0, lines: [] };
   state.finance.cash += total;
   state.finance.lifetimeRevenue = (state.finance.lifetimeRevenue ?? 0) + total;
+  if (total > 0) accrueFiscalRevenue(state, total);
   state.finance.subsidiaryMrr = total;
   ensureAcquisitions(state);
   state.acquisitions.lifetimePortfolioRevenue =

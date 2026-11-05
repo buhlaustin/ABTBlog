@@ -328,6 +328,36 @@ export function renderFinancePanel(container, state) {
       ? `${progressionTierLabel(state)}: ${coreMult.toFixed(2)}× progression × ${tuneMult.toFixed(2)}× sandbox = ${revMult.toFixed(2)}× on desk & Growth payouts.`
       : `${progressionTierLabel(state)}: ${revMult.toFixed(2)}× on desk & Growth payouts (rounds + HQ + staff).`;
 
+  const priorFyBlock = sum.fiscalShowPrior
+    ? `<div class="summary-grid fiscal-prior">
+      <div class="summary-grid-span"><span class="stat-label">Prior FY ${sum.fiscalPriorYear ?? '—'} (Jan–Dec)</span></div>
+      <div><span class="stat-label">Revenue</span><span class="stat-value">${sum.fiscalPriorRevenueLabel}</span></div>
+      <div><span class="stat-label">Expenses</span><span class="stat-value">${sum.fiscalPriorExpensesLabel}</span></div>
+      <div><span class="stat-label">Profit</span><span class="stat-value">${sum.fiscalPriorProfitLabel}</span></div>
+    </div>`
+    : '';
+
+  const taxAprilNote =
+    sum.fiscalTaxLiability > 0 && !sum.fiscalTaxPaid
+      ? `<p class="fine-print error">April taxes: ${sum.fiscalTaxLiabilityLabel} due on fiscal revenue — mandatory desk task (cash only).</p>`
+      : sum.fiscalTaxPaid && (state.calendar?.monthIndex ?? 0) === 4
+        ? `<p class="fine-print">Corporate taxes filed for ${state.calendar?.year ?? ''}.</p>`
+        : '';
+
+  const charityBlock = `<div class="finance-action">
+    <p><strong>Donate to charity</strong> — spend company cash (expense; minimum ${formatMoney(1_000)}).</p>
+    <p class="fine-print">Lifetime donated: ${sum.charityLifetimeLabel}</p>
+    <div class="btn-row">
+      <button type="button" class="btn btn-ghost btn-small" data-charity-donate="5000">Donate $5k</button>
+      <button type="button" class="btn btn-ghost btn-small" data-charity-donate="25000">Donate $25k</button>
+      <button type="button" class="btn btn-ghost btn-small" data-charity-donate="100000">Donate $100k</button>
+    </div>
+    <div class="inline-form">
+      <input type="number" id="charity-donate-input" class="input input-small" min="1000" step="1000" placeholder="Custom amount" />
+      <button type="button" class="btn btn-ghost btn-small" id="btn-charity-donate-custom">Donate custom</button>
+    </div>
+  </div>`;
+
   container.innerHTML = `
     <p class="panel-lede">Cash from desk tasks lands right away. Payroll and rent bill when you close the month. Fundraising lives here, not on the desk.</p>
     <p class="fine-print">${escapeHtml(multExpl)} Close rounds to jump task tiers and multiplier.</p>
@@ -345,6 +375,15 @@ export function renderFinancePanel(container, state) {
       <div><span class="stat-label">Lifetime profit</span><span class="stat-value">${sum.lifetimeProfitLabel}</span></div>
       <div><span class="stat-label">Starting cash (investment)</span><span class="stat-value">${sum.initialInvestmentLabel}</span></div>
     </div>
+    <h3 class="log-head">Fiscal year (Jan–Dec ${sum.fiscalCurrentYear ?? '—'})</h3>
+    <div class="summary-grid">
+      <div><span class="stat-label">FY revenue</span><span class="stat-value">${sum.fiscalCurrentRevenueLabel}</span></div>
+      <div><span class="stat-label">FY expenses</span><span class="stat-value">${sum.fiscalCurrentExpensesLabel}</span></div>
+      <div><span class="stat-label">FY profit</span><span class="stat-value">${sum.fiscalCurrentProfitLabel}</span></div>
+    </div>
+    ${priorFyBlock}
+    ${taxAprilNote}
+    ${charityBlock}
     <p class="fine-print">${sum.runwayDetail}</p>
     <p class="fine-print">Founder equity, salary, owner draws, and net worth live on the <strong>CEO</strong> tab.</p>
     ${blockNote}

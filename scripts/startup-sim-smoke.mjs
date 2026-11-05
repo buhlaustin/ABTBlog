@@ -1441,4 +1441,80 @@ if (!failed) {
   console.log('OK: finance stack + CEO salary, draws, career comp, real calendar');
 }
 
+const {
+  closeFiscalYearOnDecember,
+  computeTaxLiability,
+  completeTaxFilingTask,
+  donateToCharity,
+  isTaxFilingRequired,
+  TAX_FILING_TASK_ID,
+  ensureFiscal,
+  taxBaseRevenue
+} = await import(`file://${join(sim, 'modules/CorporateTax.js')}`);
+
+const fyRoll = createInitialState({ companyName: 'FY Co', categoryId: 'b2b-saas', mode: 'career' });
+ensureFiscal(fyRoll);
+fyRoll.finance.fiscal.current.revenue = 50_000;
+fyRoll.finance.fiscal.current.expenses = 12_000;
+const rolled = closeFiscalYearOnDecember(fyRoll, 2025, 12);
+if (!rolled || rolled.revenue !== 50_000 || rolled.profit !== 38_000) {
+  console.error('FAIL: fiscal year rollover on December close');
+  failed = true;
+} else if (fyRoll.finance.fiscal.current.year !== 2026 || fyRoll.finance.fiscal.current.revenue !== 0) {
+  console.error('FAIL: fiscal current year should reset after December close');
+  failed = true;
+} else {
+  console.log('OK: fiscal year rollover (Jan–Dec)');
+}
+
+const taxState = createInitialState({ companyName: 'Tax Co', categoryId: 'b2b-saas', mode: 'career' });
+taxState.meta.calendarStartYear = 2024;
+taxState.calendar.year = 2026;
+taxState.calendar.monthIndex = 4;
+taxState.finance.cash = 100_000;
+ensureFiscal(taxState);
+taxState.finance.fiscal.prior = { year: 2025, revenue: 100_000, expenses: 40_000, profit: 60_000 };
+if (!isTaxFilingRequired(taxState)) {
+  console.error('FAIL: April tax filing should be required with prior FY revenue');
+  failed = true;
+} else {
+  const owed = computeTaxLiability(taxState);
+  if (owed !== Math.max(500, Math.round(100_000 * 0.21))) {
+    console.error(`FAIL: tax liability on revenue base (got ${owed})`);
+    failed = true;
+  } else {
+    const filed = completeTaxFilingTask(taxState);
+    if (!filed.ok || taxState.finance.fiscal.taxPaidYear !== 2026) {
+      console.error(`FAIL: complete tax filing: ${filed.reason ?? 'bad state'}`);
+      failed = true;
+    } else if (taxBaseRevenue(taxState) !== 100_000) {
+      console.error('FAIL: tax base should use prior FY revenue after year one');
+      failed = true;
+    } else {
+      console.log(`OK: April corporate tax filing (${formatMoney(filed.owed)})`);
+    }
+  }
+}
+
+const charityState = createInitialState({ companyName: 'Give Co', categoryId: 'b2b-saas', mode: 'career' });
+charityState.finance.cash = 50_000;
+const beforeCash = charityState.finance.cash;
+const gift = donateToCharity(charityState, 5_000);
+if (!gift.ok || charityState.finance.cash !== beforeCash - 5_000) {
+  console.error(`FAIL: charity donate: ${gift.reason ?? 'cash mismatch'}`);
+  failed = true;
+} else if ((charityState.finance.fiscal?.charityDonatedLifetime ?? 0) !== 5_000) {
+  console.error('FAIL: charity lifetime tracker');
+  failed = true;
+} else {
+  console.log('OK: charity donation from company cash');
+}
+
+if (getTaskDefinitions().some((t) => t.id === TAX_FILING_TASK_ID)) {
+  console.log('OK: tax filing desk task in catalog');
+} else {
+  console.error('FAIL: tax filing task missing from merged catalog');
+  failed = true;
+}
+
 process.exit(failed ? 1 : 0);

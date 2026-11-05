@@ -1,0 +1,17 @@
+{
+  "tasks": [
+    {
+      "id": "required-annual-tax-filing",
+      "title": "File & pay annual corporate taxes",
+      "description": "April deadline — wire estimated taxes on last fiscal year revenue. No revenue; cash only.",
+      "types": ["support"],
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "taxFiling": true,
+      "cost": 0,
+      "revenue": [0, 0],
+      "product": 0,
+      "buzz": 0,
+      "mandatoryApril": true
+    }
+  ]
+}

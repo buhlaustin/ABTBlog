@@ -37,6 +37,7 @@ import {
   shouldUseNarrativeAi
 } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
+import { completeTaxFilingTask, donateToCharity } from './modules/CorporateTax.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
 import {
   onScheduleLaunchTaskCompleted,
@@ -305,6 +306,23 @@ function handleCompleteTask(instanceId) {
       `Need ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz (now ${sessionState.product?.buzz ?? 0}) and product ${PRE_LAUNCH_PRODUCT_REQUIRED}+ (now ${sessionState.product?.level ?? 0}) before scheduling.`,
       true
     );
+    return;
+  }
+
+  if (def.taxFiling) {
+    const tax = completeTaxFilingTask(sessionState);
+    if (!tax.ok) {
+      showDeskFeedback(tax.reason || 'Cannot file taxes.', true);
+      return;
+    }
+    const rolled = rollTaskOutcome(def, sessionState);
+    applyTaskOutcome(sessionState, def, rolled);
+    const result = completeTaskInstance(sessionState, instanceId, def, rolled);
+    if (!result.ok) return;
+    appendLog(sessionState, tax.summary);
+    showDeskFeedback(tax.summary);
+    playUiClick();
+    refresh();
     return;
   }
 
@@ -1172,6 +1190,28 @@ function bindGameInteractions() {
     if (drawBtn && sessionState) {
       const result = takeOwnerDraw(sessionState, drawBtn.getAttribute('data-owner-draw'));
       if (!result.ok) showFinanceFeedback(result.reason || 'Draw failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const charityBtn = e.target.closest('[data-charity-donate]');
+    if (charityBtn && sessionState) {
+      const result = donateToCharity(sessionState, charityBtn.getAttribute('data-charity-donate'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Donation failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-charity-donate-custom' && sessionState) {
+      const input = document.getElementById('charity-donate-input');
+      const result = donateToCharity(sessionState, input?.value);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Donation failed.', true);
       else {
         appendLog(sessionState, result.summary);
         showFinanceFeedback(result.summary);

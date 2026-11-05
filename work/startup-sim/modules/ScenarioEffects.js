@@ -3,6 +3,7 @@ import { adjustSentiment } from './Sentiment.js';
 import { bumpCompetitorPressure, easeCompetitorPressure } from './Competitor.js';
 import { applyStockPctMove } from './IPO.js';
 import { recordCashOutflow } from './Finance.js';
+import { accrueFiscalRevenue } from './CorporateTax.js';
 import { totalHeadcount } from './Staff.js';
 
 export function createInitialModifiers() {
@@ -130,6 +131,7 @@ export function applyScenarioEffects(state, fx, context = {}) {
     const rev = Math.round(Number(fx.instantRevenue));
     state.finance.cash += rev;
     state.finance.lifetimeRevenue += rev;
+    if (rev > 0) accrueFiscalRevenue(state, rev);
     state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + rev;
     lines.push(`Booked ${formatMoney(rev)} this month.`);
   }

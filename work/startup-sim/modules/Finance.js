@@ -23,6 +23,7 @@ import {
 import { applyTaskRivalEffects } from './WorldDynamics.js';
 import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 import { loanOverheadMonthly } from './BankLoan.js';
+import { accrueFiscalExpense, accrueFiscalRevenue, fiscalYearDisplay } from './CorporateTax.js';
 import { ceoSalaryMonthly } from './CeoEconomics.js';
 import { cooSalaryMonthly } from './Coo.js';
 import { totalHeadcount } from './Staff.js';
@@ -263,6 +264,7 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   state.finance.cash -= cost;
   state.finance.cash += revenue;
   state.finance.lifetimeRevenue += revenue;
+  if (revenue > 0) accrueFiscalRevenue(state, revenue);
   if (cost > 0) recordCashOutflow(state, cost, 'task');
   state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + revenue;
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
@@ -307,6 +309,7 @@ export function recordCashOutflow(state, amount, _category = 'other') {
   if (!n) return;
   if (!state.finance) state.finance = {};
   state.finance.lifetimeExpenses = (state.finance.lifetimeExpenses ?? 0) + n;
+  accrueFiscalExpense(state, n);
   syncLifetimeProfit(state);
 }
 
@@ -370,6 +373,7 @@ export function renderFinanceSummary(state) {
   const runwayInfo = companyRunwayDisplay(state);
   const runway = runwayInfo.monthsLabel;
   syncLifetimeProfit(state);
+  const fy = fiscalYearDisplay(state);
 
   return {
     burn,
@@ -382,6 +386,19 @@ export function renderFinanceSummary(state) {
     lifetimeExpensesLabel: formatMoney(state.finance?.lifetimeExpenses ?? 0),
     lifetimeProfitLabel: formatMoney(state.finance?.lifetimeProfit ?? 0),
     initialInvestmentLabel: formatMoney(initialInvestmentCash(state)),
-    founderStakeLabel: founderValuationStake(state) != null ? formatMoney(founderValuationStake(state)) : '—'
+    founderStakeLabel: founderValuationStake(state) != null ? formatMoney(founderValuationStake(state)) : '—',
+    fiscalCurrentYear: fy.currentYear,
+    fiscalCurrentRevenueLabel: formatMoney(fy.currentRevenue),
+    fiscalCurrentExpensesLabel: formatMoney(fy.currentExpenses),
+    fiscalCurrentProfitLabel: formatMoney(fy.currentProfit),
+    fiscalShowPrior: fy.showPrior,
+    fiscalPriorYear: fy.prior?.year,
+    fiscalPriorRevenueLabel: formatMoney(fy.prior?.revenue ?? 0),
+    fiscalPriorExpensesLabel: formatMoney(fy.prior?.expenses ?? 0),
+    fiscalPriorProfitLabel: formatMoney(fy.prior?.profit ?? 0),
+    fiscalTaxLiability: fy.taxLiability,
+    fiscalTaxLiabilityLabel: formatMoney(fy.taxLiability),
+    fiscalTaxPaid: fy.taxPaid,
+    charityLifetimeLabel: formatMoney(fy.charityLifetime)
   };
 }

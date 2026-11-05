@@ -3,6 +3,7 @@ import { advanceRealCalendarMonth, realClockNow } from './GameCalendar.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
+import { closeFiscalYearOnDecember } from './CorporateTax.js';
 import { serviceLoanAtMonthEnd } from './BankLoan.js';
 import { settleRevenueAdvanceAtMonthEnd } from './RevenueAdvance.js';
 import {
@@ -220,6 +221,13 @@ export function endMonth(state) {
   }
 
   const cashAfter = state.finance.cash;
+  const closedFy = closeFiscalYearOnDecember(state, closedYear, closedMonthIndex);
+  if (closedFy) {
+    appendLog(
+      state,
+      `Fiscal ${closedYear} closed — revenue ${formatMoney(closedFy.revenue)}, expenses ${formatMoney(closedFy.expenses)}, profit ${formatMoney(closedFy.profit)}.`
+    );
+  }
   archiveCurrentNews(state);
   advanceCalendarMonth(state);
   startMonth(state);

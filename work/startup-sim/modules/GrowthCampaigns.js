@@ -8,6 +8,7 @@ import bundledPublicLate from '../data/growth-campaigns-public-late.json' with {
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
+import { accrueFiscalRevenue } from './CorporateTax.js';
 import { eraBaseRevenueScaleForCampaign } from './ProgressionEconomy.js';
 import { formatMoney } from './constants.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
@@ -207,6 +208,7 @@ export function runGrowthCampaign(state, campaignId) {
   state.finance.cash -= cost;
   state.finance.cash += revenue;
   state.finance.lifetimeRevenue += revenue;
+  if (revenue > 0) accrueFiscalRevenue(state, revenue);
   recordCashOutflow(state, cost, 'growth');
   state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + revenue;
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;

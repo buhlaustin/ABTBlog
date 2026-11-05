@@ -97,6 +97,7 @@ const dataPatterns = {
   'loan-draw': "closest('[data-loan-draw]')",
   'loan-prepay': "closest('[data-loan-prepay]')",
   'owner-draw': "closest('[data-owner-draw]')",
+  'charity-donate': "closest('[data-charity-donate]')",
   'ceo-salary-preset': "closest('[data-ceo-salary-preset]')"
 };
 

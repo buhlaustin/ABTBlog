@@ -18,6 +18,7 @@ import { createInitialLaunchState } from './LaunchLifecycle.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
 import { syncLifetimeProfit } from './Finance.js';
+import { createInitialFiscal, ensureFiscal } from './CorporateTax.js';
 import {
   createInitialCeoState,
   initializeCeoPersonalFinances,
@@ -105,7 +106,8 @@ export function createInitialState(options) {
       valuation: null,
       fixedCostsMonthly: fixedCostsForStage(STAGES.GARAGE),
       instruments: [],
-      lastRound: null
+      lastRound: null,
+      fiscal: createInitialFiscal()
     },
     ceo: {
       salaryAnnual: 0,
@@ -243,6 +245,7 @@ export function normalizeSave(raw) {
       state.workspace.campusOwned = getWorkspaceTier(state) === 'campus';
     }
     if (state.finance.lifetimeExpenses === undefined) state.finance.lifetimeExpenses = 0;
+    ensureFiscal(state);
     if (state.finance.lifetimeProfit === undefined) {
       state.finance.lifetimeProfit =
         (state.finance.lifetimeRevenue ?? 0) - (state.finance.lifetimeExpenses ?? 0);
