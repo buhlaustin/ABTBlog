@@ -291,6 +291,36 @@ if (lowCashSandbox.finance.cash !== 25_000) {
   console.log('OK: sandbox can start at $25k with tuning');
 }
 
+const { parseSandboxTuning } = await import(`file://${join(sim, 'modules/SandboxTuning.js')}`);
+const { migrateLegacyCalendar } = await import(`file://${join(sim, 'modules/GameCalendar.js')}`);
+const sandboxCalendarForm = new FormData();
+sandboxCalendarForm.set('sandboxRevenueMult', '1');
+sandboxCalendarForm.set('sandboxStartStage', 'garage');
+sandboxCalendarForm.set('sandboxIpoGate', '1000000000');
+sandboxCalendarForm.set('sandboxStartYear', '1849');
+sandboxCalendarForm.set('sandboxStartMonth', '7');
+const calendarTuning = parseSandboxTuning(sandboxCalendarForm, 'sandbox');
+const ancientStart = createInitialState({
+  companyName: 'TimeTravel',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxTuning: calendarTuning
+});
+if (ancientStart.calendar.year !== 1849 || ancientStart.calendar.monthIndex !== 7) {
+  console.error(
+    `FAIL: sandbox calendar start expected Jul 1849 got ${ancientStart.calendar.monthIndex}/${ancientStart.calendar.year}`
+  );
+  failed = true;
+} else {
+  migrateLegacyCalendar(ancientStart);
+  if (ancientStart.calendar.year !== 1849) {
+    console.error(`FAIL: migrateLegacyCalendar rewrote sandbox year ${ancientStart.calendar.year}`);
+    failed = true;
+  } else {
+    console.log('OK: sandbox calendar year range (1849) + save migration');
+  }
+}
+
 const sandboxState = createInitialState({
   companyName: 'SandboxMult',
   categoryId: 'b2b-saas',

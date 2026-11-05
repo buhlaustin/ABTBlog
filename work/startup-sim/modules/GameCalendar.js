@@ -35,8 +35,27 @@ export function realClockNow() {
   return { year: d.getFullYear(), monthIndex: d.getMonth() + 1 };
 }
 
+/** Saves before real-world calendar used abstract Year 1, Year 2, … (always < 2000). */
 export function isRealCalendarYear(year) {
   return Number(year) >= 2000;
+}
+
+/** Sandbox start year: wide range; month math stays in safe integers. */
+export const SANDBOX_CALENDAR_YEAR_MIN = 1;
+export const SANDBOX_CALENDAR_YEAR_MAX = 999_999;
+
+export function isValidSandboxCalendarYear(year) {
+  const y = Number(year);
+  return Number.isInteger(y) && y >= SANDBOX_CALENDAR_YEAR_MIN && y <= SANDBOX_CALENDAR_YEAR_MAX;
+}
+
+export function clampSandboxCalendarYear(year) {
+  const y = Number(year);
+  if (!Number.isFinite(y)) return realClockNow().year;
+  return Math.min(
+    SANDBOX_CALENDAR_YEAR_MAX,
+    Math.max(SANDBOX_CALENDAR_YEAR_MIN, Math.round(y))
+  );
 }
 
 export function addCalendarMonths(year, monthIndex, delta) {
@@ -101,12 +120,20 @@ export function formatCalendarStamp(year, monthIndex, style = 'short') {
   return formatCalendarMonth(year, monthIndex, style);
 }
 
+function isValidCalendarStartPick(pick) {
+  return (
+    pick &&
+    isValidSandboxCalendarYear(pick.year) &&
+    pick.monthIndex >= 1 &&
+    pick.monthIndex <= 12
+  );
+}
+
 export function applyCalendarStart(state, options = {}) {
   const pick = options.calendarStart;
-  const start =
-    pick && isRealCalendarYear(pick.year) && pick.monthIndex >= 1 && pick.monthIndex <= 12
-      ? { year: pick.year, monthIndex: pick.monthIndex }
-      : realClockNow();
+  const start = isValidCalendarStartPick(pick)
+    ? { year: pick.year, monthIndex: pick.monthIndex }
+    : realClockNow();
   if (!state.calendar) state.calendar = {};
   state.calendar.year = start.year;
   state.calendar.monthIndex = start.monthIndex;
@@ -118,6 +145,12 @@ export function applyCalendarStart(state, options = {}) {
 /** Upgrade saves that still use Year 1 / Month N. */
 export function migrateLegacyCalendar(state) {
   if (!state.calendar) return;
+  if (state.meta?.calendarStartYear != null) {
+    if (state.meta.calendarStartMonth == null) {
+      state.meta.calendarStartMonth = state.calendar.monthIndex;
+    }
+    return;
+  }
   if (isRealCalendarYear(state.calendar.year)) {
     if (state.meta?.calendarStartYear == null) {
       if (!state.meta) state.meta = {};
@@ -143,9 +176,3 @@ export function advanceRealCalendarMonth(state) {
   return state;
 }
 
-export function sandboxCalendarYearOptions() {
-  const y = realClockNow().year;
-  const out = [];
-  for (let yr = y - 5; yr <= y + 3; yr += 1) out.push(yr);
-  return out;
-}

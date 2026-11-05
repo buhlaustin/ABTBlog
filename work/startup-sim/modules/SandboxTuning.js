@@ -1,4 +1,8 @@
 import { STAGES, REVENUE_GATES, fixedCostsForStage } from './constants.js';
+import {
+  clampSandboxCalendarYear,
+  isValidSandboxCalendarYear
+} from './GameCalendar.js';
 import { applySeedCapTableSnapshot } from './CapTable.js';
 import { WORKSPACE_TIER, purchaseWorkspaceTier } from './Workspace.js';
 
@@ -19,8 +23,11 @@ export function parseSandboxTuning(formData, mode) {
   const startYear = Number(formData.get('sandboxStartYear'));
   const startMonth = Number(formData.get('sandboxStartMonth'));
   let calendarStart = null;
-  if (startYear >= 2000 && startMonth >= 1 && startMonth <= 12) {
-    calendarStart = { year: startYear, monthIndex: startMonth };
+  if (isValidSandboxCalendarYear(startYear) && startMonth >= 1 && startMonth <= 12) {
+    calendarStart = {
+      year: clampSandboxCalendarYear(startYear),
+      monthIndex: startMonth
+    };
   }
   return {
     revenueMult: Math.max(0.5, Math.min(20, revenueMult)),
