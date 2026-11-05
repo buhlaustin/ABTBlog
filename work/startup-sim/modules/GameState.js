@@ -263,6 +263,10 @@ export function normalizeSave(raw) {
     if (state.launch.productTasksDone == null) state.launch.productTasksDone = 0;
     if (!state.board) state.board = createInitialBoard();
     if (state.board.governanceStreak === undefined) state.board.governanceStreak = 0;
+    if (!state.board.members) state.board.members = [];
+    if (!state.board.sentimentHistory) state.board.sentimentHistory = [];
+    if (state.board.mandateBonusClaimed === undefined) state.board.mandateBonusClaimed = false;
+    if (state.board.meetingsHeld === undefined) state.board.meetingsHeld = 0;
     if (state.publicMarket && state.publicMarket.guidanceBeatStreak === undefined) {
       state.publicMarket.guidanceBeatStreak = 0;
     }

@@ -6,7 +6,14 @@ function escapeHtml(s) {
 }
 
 /** Brief popup after completing an optional board task. */
-export function openBoardTaskOutcomeDialog({ title, sentimentDelta, sentimentAfter, buzzDelta }) {
+export function openBoardTaskOutcomeDialog({
+  title,
+  sentimentDelta,
+  sentimentAfter,
+  buzzDelta,
+  mandateBonus,
+  stockPct
+}) {
   const dialog = document.getElementById('board-outcome-dialog');
   const body = document.getElementById('board-outcome-body');
   if (!dialog || !body) return Promise.resolve();
@@ -18,6 +25,14 @@ export function openBoardTaskOutcomeDialog({ title, sentimentDelta, sentimentAft
     buzzDelta > 0
       ? `<p class="fine-print">Product buzz +${buzzDelta} from the board’s network.</p>`
       : '';
+  const mandateLine =
+    mandateBonus > 0
+      ? `<p class="fine-print positive">Lead director ask fulfilled — bonus +${mandateBonus} approval.</p>`
+      : '';
+  const stockLine =
+    stockPct != null && stockPct !== 0
+      ? `<p class="fine-print">Public stock ${stockPct > 0 ? '+' : ''}${Math.round(Number(stockPct) * 100)}% on the read-through.</p>`
+      : '';
 
   body.innerHTML = `
     <p class="eyebrow">Board task complete</p>
@@ -27,6 +42,8 @@ export function openBoardTaskOutcomeDialog({ title, sentimentDelta, sentimentAft
       <div><span class="stat-label">New score</span><span class="stat-value">${sentimentAfter}/100</span></div>
     </div>
     ${buzzLine}
+    ${mandateLine}
+    ${stockLine}
     <p class="fine-print">Board approval gates follow-on rounds after Series A.</p>
   `;
 

@@ -597,16 +597,26 @@ if (cappedSand > sandCap + 0.01) {
   console.log(`OK: sandbox rev mult cap ${cappedSand}× (workforce ceiling ${sandCap}×)`);
 }
 
-const { completeBoardTask, dealBoardTasks } = await import(
+const { completeBoardTask, dealBoardTasks, getBoardTaskDefs, ensureBoardRoster } = await import(
   `file://${join(sim, 'modules/Board.js')}`
 );
+if (getBoardTaskDefs().length < 18) {
+  console.error(`FAIL: board task catalog too small (${getBoardTaskDefs().length})`);
+  failed = true;
+}
 const boardState = createInitialState({
   companyName: 'BoardSmoke',
   categoryId: 'b2b-saas',
   mode: 'career'
 });
 boardState.flags.seriesAClosed = true;
+boardState.finance.cash = 500_000;
 dealBoardTasks(boardState);
+ensureBoardRoster(boardState);
+if ((boardState.board?.members?.length ?? 0) < 2) {
+  console.error('FAIL: board roster should include lead + founder after Series A');
+  failed = true;
+}
 const inst = boardState.board?.monthTasks?.[0];
 if (!inst) {
   console.error('FAIL: board tasks not dealt');

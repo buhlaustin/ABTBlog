@@ -23,10 +23,24 @@ export function clampSentiment(score) {
 
 export function adjustSentiment(state, delta, reason) {
   if (!state.sentiment) state.sentiment = createInitialSentiment();
-  const next = clampSentiment(state.sentiment.score + delta);
-  state.sentiment.lastDelta = next - state.sentiment.score;
+  const prior = state.sentiment.score;
+  const next = clampSentiment(prior + delta);
+  const applied = next - prior;
+  state.sentiment.lastDelta = applied;
   state.sentiment.score = next;
   if (reason) state.sentiment.lastReason = reason;
+  if (hasInstitutionalBoard(state) && applied !== 0) {
+    if (!state.board) state.board = { sentimentHistory: [] };
+    if (!state.board.sentimentHistory) state.board.sentimentHistory = [];
+    state.board.sentimentHistory.unshift({
+      score: next,
+      delta: applied,
+      reason: reason ?? 'Update',
+      month: state.calendar?.monthIndex,
+      year: state.calendar?.year
+    });
+    state.board.sentimentHistory = state.board.sentimentHistory.slice(0, 12);
+  }
   return state.sentiment.score;
 }
 

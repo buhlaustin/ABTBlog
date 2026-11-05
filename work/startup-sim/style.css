@@ -969,6 +969,103 @@ h1 {
   margin-bottom: 0.25rem;
 }
 
+.board-dashboard {
+  margin-bottom: 1rem;
+}
+
+.board-dashboard-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.board-approval-meter {
+  position: relative;
+  flex: 1 1 12rem;
+  min-width: 10rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.board-approval-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+.board-meter-support .board-approval-fill {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.board-meter-caution .board-approval-fill {
+  background: linear-gradient(90deg, #eab308, #facc15);
+}
+
+.board-meter-hostile .board-approval-fill {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.board-approval-readout {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.45);
+}
+
+.board-mandate {
+  margin: 0.75rem 0 1rem;
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.board-mandate-task {
+  border-left: 3px solid rgba(96, 165, 250, 0.65);
+}
+
+.board-mandate-badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #93c5fd;
+  font-weight: 600;
+}
+
+.board-committee-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  vertical-align: middle;
+}
+
+.board-history-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+}
+
+.board-history-list li {
+  margin: 0.2rem 0;
+}
+
+.board-history-details {
+  margin-top: 1rem;
+}
+
+.board-roster-table td {
+  vertical-align: top;
+}
+
 .stock-stats {
   margin: 0.5rem 0;
 }

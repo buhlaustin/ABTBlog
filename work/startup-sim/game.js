@@ -865,11 +865,13 @@ function bindGameInteractions() {
           return;
         }
         appendLog(sessionState, `Board: “${result.def.title}”.`);
-        if (result.def.stockPct) {
-          applyStockPctMove(sessionState, result.def.stockPct);
+        if (result.mandateBonus > 0) {
+          appendLog(sessionState, `Lead director ask fulfilled (+${result.mandateBonus} approval).`);
+        }
+        if (result.stockPct) {
           appendLog(
             sessionState,
-            `Board read-through: stock ${result.def.stockPct > 0 ? '+' : ''}${Math.round(Number(result.def.stockPct) * 100)}%.`
+            `Board read-through: stock ${result.stockPct > 0 ? '+' : ''}${Math.round(Number(result.stockPct) * 100)}%.`
           );
         }
         refresh();
@@ -877,7 +879,9 @@ function bindGameInteractions() {
           title: result.def.title,
           sentimentDelta: result.sentimentDelta ?? 0,
           sentimentAfter: result.sentimentAfter ?? 0,
-          buzzDelta: result.buzzDelta ?? 0
+          buzzDelta: result.buzzDelta ?? 0,
+          mandateBonus: result.mandateBonus ?? 0,
+          stockPct: result.stockPct
         });
         setGameFeedback('Board task done.');
         refresh();
