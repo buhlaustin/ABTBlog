@@ -219,8 +219,38 @@ export function marketPriceLabel(state, company) {
   return { ask, trend, fair, vsFair };
 }
 
+const VALUATION_MARK_MIN = 0.65;
+const VALUATION_MARK_MAX = 1.85;
+/** Max absolute monthly mark move (~±3.5%). */
+const VALUATION_DRIFT_MAX = 0.035;
+
 function holdingHealth(holding) {
   return Math.max(0.55, Math.min(2.2, Number(holding.health) || 1));
+}
+
+export function subsidiaryValuationMark(holding) {
+  return Math.max(VALUATION_MARK_MIN, Math.min(VALUATION_MARK_MAX, Number(holding?.valuationMark) || 1));
+}
+
+function monthlyValuationDriftPct(state, holdingId) {
+  const seed = state.meta?.runSeed ?? 1;
+  const turn = calendarTurn(state);
+  const u = hash01(seed, `${holdingId}-mark`, turn * 41 + 11);
+  return (u * 2 - 1) * VALUATION_DRIFT_MAX;
+}
+
+function applyMonthlyValuationDrift(state, holding) {
+  const turn = calendarTurn(state);
+  if (holding.lastMarkTurn === turn) return null;
+  holding.lastMarkTurn = turn;
+  if (holding.valuationMark == null) holding.valuationMark = 1;
+  const drift = monthlyValuationDriftPct(state, holding.id);
+  holding.lastValuationDriftPct = drift;
+  holding.valuationMark = Math.max(
+    VALUATION_MARK_MIN,
+    Math.min(VALUATION_MARK_MAX, subsidiaryValuationMark(holding) * (1 + drift))
+  );
+  return drift;
 }
 
 export function subsidiaryMrr(state, holding, company) {
@@ -256,14 +286,12 @@ export function portfolioInvestedTotal(state) {
 }
 
 export function subsidiarySalePrice(state, holding, company) {
-  const turn = calendarTurn(state);
-  const seed = state.meta?.runSeed ?? 1;
-  const vol = 0.88 + hash01(seed, `${company.id}-exit`, turn) * 0.28;
   const health = holdingHealth(holding);
+  const mark = subsidiaryValuationMark(holding);
   const invested = holding.investedTotal ?? 0;
   const held = monthsHeld(state, holding);
   const holdBonus = 1 + Math.min(0.12, Math.floor(held / 6) * 0.02);
-  const core = company.basePrice * health * vol * categorySynergyMult(state, company) * holdBonus;
+  const core = company.basePrice * health * mark * categorySynergyMult(state, company) * holdBonus;
   return Math.round(core + invested * 0.82);
 }
 
@@ -481,7 +509,10 @@ export function purchaseTarget(state, targetId) {
     health: report?.healthRoll ?? 1,
     investedTotal: 0,
     integrationMonthsLeft,
-    lastReinvestTurn: calendarTurn(state)
+    lastReinvestTurn: calendarTurn(state),
+    valuationMark: 1,
+    lastValuationDriftPct: 0,
+    lastMarkTurn: null
   };
   state.acquisitions.owned.push(holding);
   if (report) delete state.acquisitions.diligenceReports[company.id];
@@ -597,12 +628,12 @@ export function tickAcquisitionsAtMonthStart(state) {
         lines.push(`${name} integration complete — full portfolio MRR online.`);
       }
     }
-    const sinceReinvest = turn - (h.lastReinvestTurn ?? h.acquiredTurn ?? turn);
-    if (sinceReinvest >= 8 && holdingHealth(h) > 0.6) {
-      h.health = holdingHealth(h) - 0.025;
-      if (sinceReinvest === 8) {
-        lines.push(`${name} needs operator attention — MRR softens without reinvestment.`);
-      }
+    const drift = applyMonthlyValuationDrift(state, h);
+    if (drift != null && Math.abs(drift) >= 0.018) {
+      const pct = (drift * 100).toFixed(1);
+      lines.push(
+        `${name} mark ${drift >= 0 ? '+' : ''}${pct}% (now ${subsidiaryValuationMark(h).toFixed(2)}× vs purchase).`
+      );
     }
   }
   return lines;
@@ -702,6 +733,12 @@ export function renderCompaniesPanel(container, state) {
         categorySynergyMult(state, co) > 1
           ? `<span class="tag tag-synergy">${cat === state.company?.categoryId ? 'Vertical fit' : 'Rival lock-in'}</span>`
           : '';
+      const mark = subsidiaryValuationMark(h);
+      const driftPct = (Number(h.lastValuationDriftPct) || 0) * 100;
+      const driftLabel =
+        Math.abs(driftPct) >= 0.05
+          ? ` · ${driftPct >= 0 ? '+' : ''}${driftPct.toFixed(1)}% last mo`
+          : '';
       const pct2 = Math.round(exit * 0.02);
       const pct5 = Math.round(exit * 0.05);
       const pct10 = Math.round(exit * 0.1);
@@ -711,14 +748,15 @@ export function renderCompaniesPanel(container, state) {
           `<option value="${escapeHtml(p.id)}"${defaultProgram.id === p.id ? ' selected' : ''}>${escapeHtml(p.label)}</option>`
       ).join('');
       return `<tr>
-        <td><strong>${escapeHtml(name)}</strong> ${syn}<br><span class="fine-print">${escapeHtml(segmentLabel(co.segment))} · health ${holdingHealth(h).toFixed(2)}×</span><br>${integrationBar(h)}</td>
+        <td><strong>${escapeHtml(name)}</strong> ${syn}<br><span class="fine-print">${escapeHtml(segmentLabel(co.segment))} · mark ${mark.toFixed(2)}×${driftLabel}</span><br>${integrationBar(h)}</td>
         <td class="num">${formatMoney(mrr)}/mo</td>
         <td class="num">${formatMoney(costBasis)}</td>
         <td class="num">${formatMoney(exit)}<br><span class="fine-print">${roi >= 0 ? '+' : ''}${roi.toFixed(0)}% vs basis${holdBonus ? ` · +${holdBonus}% hold` : ''}</span></td>
         <td class="companies-reinvest-cell">
-          <details class="reinvest-panel">
-            <summary class="btn btn-small">Allocate capital</summary>
-            <p class="fine-print">Implied value <strong>${formatMoney(exit)}</strong> — deploy a % back into the business (not a flat $100k check).</p>
+          <button type="button" class="btn btn-small btn-danger" data-acquisition-sell="${escapeHtml(co.id)}">Sell</button>
+          <details class="reinvest-panel companies-reinvest-optional">
+            <summary class="fine-print">Optional capital</summary>
+            <p class="fine-print">Marks drift each month on their own — reinvest only if you want a health boost.</p>
             <label class="visually-hidden" for="reinvest-program-${escapeHtml(co.id)}">Program</label>
             <select id="reinvest-program-${escapeHtml(co.id)}" class="reinvest-program-select" data-reinvest-program-for="${escapeHtml(co.id)}">${programOptions}</select>
             <p class="fine-print reinvest-program-blurb" data-reinvest-blurb-for="${escapeHtml(co.id)}">${escapeHtml(defaultProgram.blurb)}</p>
@@ -733,7 +771,6 @@ export function renderCompaniesPanel(container, state) {
               <button type="button" class="btn btn-primary btn-small" data-acquisition-reinvest-submit="${escapeHtml(co.id)}">Deploy capital</button>
             </div>
           </details>
-          <button type="button" class="btn btn-small btn-danger" data-acquisition-sell="${escapeHtml(co.id)}">Sell</button>
         </td>
       </tr>`;
     })
@@ -795,7 +832,7 @@ export function renderCompaniesPanel(container, state) {
   container.innerHTML = `
     <div class="companies-panel">
       <header class="companies-hero">
-        <p class="panel-lede">Roll up operators for MRR, then reinvest as a % of each subsidiary&apos;s implied value.</p>
+        <p class="panel-lede">Roll up operators for MRR — subsidiary marks nudge up or down each month like real holdings (no mandatory reinvestment).</p>
         <p class="companies-market-chip" role="status">${escapeHtml(marketBrief(state))}</p>
       </header>
       ${lockNote}
@@ -817,7 +854,7 @@ export function renderCompaniesPanel(container, state) {
           ${companiesStatCard('Holdings', String(owned.length))}
           ${companiesStatCard('Listed targets', String(marketAll.length))}
         </div>
-        <p class="fine-print finance-details-note">Due diligence ${formatMoney(DILIGENCE_COST)} · hold 6+ mo boosts exit up to +12%</p>
+        <p class="fine-print finance-details-note">Due diligence ${formatMoney(DILIGENCE_COST)} · marks move ~±3.5%/mo · hold 6+ mo boosts exit up to +12%</p>
       </details>
 
       <section class="finance-section acquisitions-section">

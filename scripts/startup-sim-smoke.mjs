@@ -758,7 +758,9 @@ const {
   applySubsidiaryMrrPayout,
   computeReinvestQuote,
   reinvestInSubsidiary,
-  subsidiarySalePrice
+  subsidiarySalePrice,
+  subsidiaryValuationMark,
+  tickAcquisitionsAtMonthStart
 } = await import(`file://${join(sim, 'modules/Acquisitions.js')}`);
 await preloadAcquisitionCatalog();
 if (getAcquisitionCatalog().length !== 99) {
@@ -811,6 +813,25 @@ if (!buy.ok) {
         console.log(`OK: portfolio reinvest scales with value (${formatMoney(rein.amount)} for 2%)`);
       }
     }
+  }
+  const markBefore = subsidiaryValuationMark(holding);
+  const exitBefore = subsidiarySalePrice(acqState, holding, small);
+  acqState.calendar.monthIndex += 1;
+  if (acqState.calendar.monthIndex > 12) {
+    acqState.calendar.monthIndex = 1;
+    acqState.calendar.year += 1;
+  }
+  tickAcquisitionsAtMonthStart(acqState);
+  const markAfter = subsidiaryValuationMark(holding);
+  const exitAfter = subsidiarySalePrice(acqState, holding, small);
+  if (markAfter === markBefore && exitAfter === exitBefore) {
+    console.error('FAIL: portfolio valuation mark should drift monthly');
+    failed = true;
+  } else if (markAfter < 0.65 || markAfter > 1.85) {
+    console.error(`FAIL: valuation mark out of bounds (${markAfter})`);
+    failed = true;
+  } else {
+    console.log(`OK: portfolio mark drift (${markBefore.toFixed(3)}× → ${markAfter.toFixed(3)}×)`);
   }
 }
 

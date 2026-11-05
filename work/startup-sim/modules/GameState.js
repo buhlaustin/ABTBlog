@@ -509,6 +509,8 @@ export function normalizeSave(raw) {
       if (h.integrationMonthsLeft === undefined) h.integrationMonthsLeft = 0;
       if (h.purchasePrice === undefined) h.purchasePrice = 0;
       if (h.lastReinvestTurn === undefined) h.lastReinvestTurn = h.acquiredTurn ?? 1;
+      if (h.valuationMark == null) h.valuationMark = 1;
+      if (h.lastValuationDriftPct == null) h.lastValuationDriftPct = 0;
     }
     if (state.world && state.world.competitorAcquired === undefined) {
       state.world.competitorAcquired = false;
