@@ -75,9 +75,6 @@ test.describe('Startup Simulator', () => {
     await expect(page.locator('#panel-growth')).toContainText('Rival');
     await expect(page.locator('#panel-growth')).toContainText('Runway');
 
-    await page.locator('#tab-social').click();
-    await expect(page.locator('[data-social-tab="archive"]')).toBeVisible();
-
     await page.locator('#tab-news').click();
     await expect(page.locator('#btn-toggle-news-archive')).toBeVisible();
 
@@ -198,8 +195,8 @@ test.describe('Startup Simulator', () => {
 
     await page.locator('#tab-finance').click();
     await expect(page.locator('.workspace-purchase-row .btn').first()).toBeVisible();
-    await page.locator('#tab-social').click();
-    await expect(page.locator('.social-subtabs button').first()).toHaveCSS('min-height', '44px');
+    await page.locator('#tab-news').click();
+    await expect(page.locator('#btn-toggle-news-archive')).toHaveCSS('min-height', '44px');
 
     const docWidth = await page.evaluate(() => document.documentElement.clientWidth);
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);

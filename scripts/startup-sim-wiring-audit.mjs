@@ -23,7 +23,7 @@ const dataAttrs = new Set();
 for (const { text } of sources) {
   for (const m of text.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) btnIds.add(m[1]);
   for (const m of text.matchAll(/\bid='(btn-[a-z0-9-]+)'/g)) btnIds.add(m[1]);
-  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest-pick|acquisition-reinvest-submit|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action)/g)) {
+  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest-pick|acquisition-reinvest-submit|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action)/g)) {
     dataAttrs.add(m[1]);
   }
 }
@@ -78,7 +78,6 @@ const dataPatterns = {
   'stock-follow-on': "closest('[data-stock-follow-on]')",
   'stock-split': "closest('[data-stock-split]')",
   'stock-dividend': "closest('[data-stock-dividend]')",
-  'social-tab': "closest('[data-social-tab]')",
   'staff-input': "closest('[data-staff-input]')",
   'tutorial-id': 'btn-dismiss-tutorial',
   'toggle-task-offer': "closest('[data-toggle-task-offer]')",

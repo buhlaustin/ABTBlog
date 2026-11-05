@@ -108,18 +108,6 @@ import {
   syncNewsTabAlert,
   unreadNewsCount
 } from './modules/News.js';
-import {
-  publishPlayerPost,
-  setSocialNetwork,
-  showSocialFeedback,
-  applyOfflineMonthlySocial,
-  enrichMonthlySocialWithAi,
-  renderSocialPanel,
-  preloadSocialPersonas,
-  updateChirpCharCount,
-  unreadSocialCount,
-  syncSocialTabAlert
-} from './modules/Social.js';
 import { sendAdvisorMessage } from './modules/Advisor.js';
 import {
   renderInterviewForm,
@@ -395,35 +383,17 @@ async function handleEndMonth() {
     }
 
     applyOfflineMonthlyNews(sessionState);
-    applyOfflineMonthlySocial(sessionState);
     const newArticles = unreadNewsCount(sessionState);
-    const newSocial = unreadSocialCount(sessionState);
     if (newArticles > 0) {
       appendLog(
         sessionState,
         `Press: ${newArticles} new headline${newArticles === 1 ? '' : 's'} on the News tab.`
       );
-    }
-    if (newSocial > 0) {
-      appendLog(
-        sessionState,
-        `Social: ${newSocial} new post${newSocial === 1 ? '' : 's'} on ProNet and Chirp.`
-      );
-    }
-    if (newArticles > 0 && newSocial > 0) {
-      setGameFeedback(
-        `${newArticles} new article${newArticles === 1 ? '' : 's'} and ${newSocial} new social post${newSocial === 1 ? '' : 's'} — check News and Social.`
-      );
-    } else if (newArticles > 0) {
       setGameFeedback(
         `${newArticles} new article${newArticles === 1 ? '' : 's'} posted — open News to read.`
       );
-    } else if (newSocial > 0) {
-      setGameFeedback(
-        `${newSocial} new social post${newSocial === 1 ? '' : 's'} — open Social to read.`
-      );
     }
-    syncSocialTabAlert(sessionState);
+    syncNewsTabAlert(sessionState);
     refresh();
 
     const headlineNow = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
@@ -433,10 +403,7 @@ async function handleEndMonth() {
     }
 
     if (shouldUseNarrativeAi()) {
-      void Promise.all([
-        enrichMonthlyNewsWithAi(sessionState),
-        enrichMonthlySocialWithAi(sessionState)
-      ]).then(([newsAi, socialAi]) => {
+      void enrichMonthlyNewsWithAi(sessionState).then((newsAi) => {
         if (newsAi) {
           appendLog(sessionState, 'Fresh AI headlines hit the wire.');
           updateMonthSummaryHeadline(sessionState.news?.currentMonthArticles?.[0]?.headline ?? null);
@@ -445,24 +412,12 @@ async function handleEndMonth() {
             setGameFeedback(`${n} updated article${n === 1 ? '' : 's'} on the News tab.`);
           }
           syncNewsTabAlert(sessionState);
-        }
-        if (socialAi) {
-          appendLog(sessionState, 'ProNet and Chirp are buzzing.');
-          const s = unreadSocialCount(sessionState);
-          if (s > 0) {
-            setGameFeedback(`${s} updated social post${s === 1 ? '' : 's'} on the Social tab.`);
-          }
-          syncSocialTabAlert(sessionState);
-        }
-        if (newsAi || socialAi) {
           renderNewsPanel(document.getElementById('panel-news'), sessionState);
-          renderSocialPanel(document.getElementById('panel-social'), sessionState);
           persistProgress(true);
         }
       });
     } else {
       appendLog(sessionState, 'Headlines updated.');
-      appendLog(sessionState, 'Social feeds updated.');
     }
 
     if (hasActiveCrisis(sessionState)) {
@@ -1328,17 +1283,6 @@ function bindGameInteractions() {
       refresh();
       return;
     }
-    const socialTab = e.target.closest('[data-social-tab]');
-    if (socialTab && sessionState) {
-      setSocialNetwork(sessionState, socialTab.getAttribute('data-social-tab'));
-      refresh();
-    }
-  });
-
-  app?.addEventListener('input', (e) => {
-    if (e.target.id === 'social-post-text') {
-      updateChirpCharCount(e.target.value);
-    }
   });
 
   app?.addEventListener('change', (e) => {
@@ -1370,18 +1314,6 @@ function bindGameInteractions() {
   app?.addEventListener('submit', async (e) => {
     if (e.target.id === 'xc-interview-form') {
       submitXcInterview(e);
-      return;
-    }
-    if (e.target.id === 'social-post-form') {
-      e.preventDefault();
-      if (!sessionState) return;
-      const text = document.getElementById('social-post-text')?.value;
-      const network = sessionState.social?.activeNetwork ?? 'pronet';
-      showSocialFeedback('Posting…');
-      const result = await publishPlayerPost(sessionState, network, text);
-      if (!result.ok) showSocialFeedback(result.reason, true);
-      else showSocialFeedback('Posted.');
-      refresh();
       return;
     }
     if (e.target.id === 'advisor-form') {
@@ -1493,10 +1425,10 @@ async function init() {
     apiStatus.classList.remove('error');
     if (isNarrativeApiLive()) {
       apiStatus.textContent =
-        'The wire is live — batch interviews, headlines, social chatter, advisor notes, and IPO press are freshly written.';
+        'The wire is live — batch interviews, headlines, advisor notes, and IPO press are freshly written.';
     } else if (isNarrativeApiEnabled()) {
       apiStatus.textContent =
-        'Live story server is quiet — headlines and social still update each month. Reload if interviews stay stuck.';
+        'Live story server is quiet — headlines still update each month. Reload if interviews stay stuck.';
       apiStatus.classList.remove('error');
     } else {
       apiStatus.hidden = true;
@@ -1604,8 +1536,7 @@ async function init() {
         preloadCrisisCatalog(),
         preloadDecisionEvents(),
         preloadAcquisitionCatalog(),
-        preloadNewsTimeline(),
-        preloadSocialPersonas()
+        preloadNewsTimeline()
       ]);
       populateCategorySelect(categorySelect, getCategoriesSync());
     } catch {

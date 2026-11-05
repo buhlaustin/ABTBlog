@@ -12,7 +12,6 @@ import { renderCompaniesPanel } from './Acquisitions.js';
 import { renderPeoplePanel } from './Staff.js';
 import { renderCeoPanel } from './Ceo.js';
 import { ceoPersonalCashComp } from './CeoEconomics.js';
-import { renderSocialPanel, markSocialAsRead, syncSocialTabAlert } from './Social.js';
 import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
 import { renderAdvisorPanel } from './Advisor.js';
 import {
@@ -407,7 +406,6 @@ export const TAB_ORDER = [
   'finance',
   'companies',
   'board',
-  'social',
   'news',
   'advisor'
 ];
@@ -456,9 +454,6 @@ function renderPanelForTab(tab, state) {
     case 'board':
       renderBoardPanel(document.getElementById('panel-board'), state);
       break;
-    case 'social':
-      renderSocialPanel(document.getElementById('panel-social'), state);
-      break;
     case 'news':
       renderNewsPanel(document.getElementById('panel-news'), state);
       break;
@@ -492,10 +487,8 @@ function activateTab(nav, tab) {
   const state = panelStateProvider?.();
   if (state) {
     if (tab === 'news') markNewsAsRead(state);
-    if (tab === 'social') markSocialAsRead(state);
     renderPanelForTab(tab, state);
     if (tab === 'news') syncNewsTabAlert(state);
-    if (tab === 'social') syncSocialTabAlert(state);
   }
 }
 
@@ -579,7 +572,6 @@ export function renderAllPanels(state) {
   }
   renderGameHud(state);
   syncNewsTabAlert(state);
-  syncSocialTabAlert(state);
   renderDeskPanel(state);
   const active = getActiveTabId();
   if (active !== 'desk') {

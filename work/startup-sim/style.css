@@ -90,20 +90,6 @@ textarea:focus-visible {
   user-select: none;
 }
 
-.chirp-char-count {
-  margin: 0.25rem 0 0;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-.chirp-char-count.chirp-char-warn {
-  color: #fbbf24;
-}
-
-.chirp-char-count.chirp-char-over {
-  color: #f87171;
-}
-
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -1303,62 +1289,6 @@ h1 {
   border-top: 1px dashed var(--border);
 }
 
-.social-subtabs {
-  display: flex;
-  gap: 0.35rem;
-  margin-bottom: 0.75rem;
-}
-
-.social-subtabs button {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--muted);
-  border-radius: 999px;
-  padding: 0.35rem 0.85rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.social-subtabs button.active {
-  color: var(--text);
-  border-color: var(--accent-dim);
-}
-
-.social-feed.theme-pronet .social-post {
-  border-left: 3px solid #4a6fa5;
-}
-
-.social-feed.theme-chirp .social-post {
-  border-left: 3px solid #1d9bf0;
-}
-
-.social-post {
-  border: 1px solid var(--border);
-  border-radius: 0.55rem;
-  padding: 0.75rem 0.85rem;
-  margin-bottom: 0.65rem;
-  background: rgba(0, 0, 0, 0.12);
-}
-
-.social-post header {
-  margin-bottom: 0.35rem;
-  font-size: 0.88rem;
-}
-
-.social-meta {
-  margin: 0.35rem 0 0;
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
-.social-comments {
-  margin: 0.5rem 0 0;
-  padding-left: 1rem;
-  font-size: 0.82rem;
-  color: var(--muted);
-}
-
 .advisor-log {
   max-height: 280px;
   overflow-y: auto;
@@ -1492,16 +1422,6 @@ h1 {
     scroll-snap-align: start;
   }
 
-  .social-subtabs button {
-    min-height: 44px;
-    padding: 0.45rem 0.95rem;
-    font-size: 0.82rem;
-  }
-
-  .social-subtabs {
-    flex-wrap: wrap;
-  }
-
   .hud-stats {
     width: 100%;
     justify-content: space-between;
@@ -1553,7 +1473,6 @@ h1 {
   .setup-form textarea,
   .hub-select,
   .satellite-add select,
-  #social-post-text,
   #advisor-input {
     font-size: 16px;
   }
@@ -1595,7 +1514,6 @@ h1 {
     justify-content: center;
   }
 
-  #social-post-form .btn,
   #advisor-form .btn,
   .task-offers .btn,
   .finance-action .btn,

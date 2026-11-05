@@ -66,20 +66,6 @@ const KINDS = [
     }
   },
   {
-    kind: 'startup_social_reactions',
-    context: {
-      snapshot,
-      post: { network: 'chirp', text: 'Shipped v0.1 — feedback welcome', author: 'Founder' },
-      personas: [{ name: 'Patty Fundsworth' }],
-      recentHeadlines: [],
-      playerRecentPosts: []
-    },
-    validate: (d) =>
-      d &&
-      typeof d === 'object' &&
-      (Array.isArray(d.comments) || d.likes !== undefined || d.type === 'startup_social')
-  },
-  {
     kind: 'startup_advisor_chat',
     context: {
       snapshot,

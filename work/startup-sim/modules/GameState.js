@@ -1,6 +1,5 @@
 import { getCategoryById, categoryEconomics } from './Categories.js';
 import { createInitialStaff } from './Staff.js';
-import { createInitialSocial } from './Social.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
@@ -119,7 +118,6 @@ export function createInitialState(options) {
     },
     staff: createInitialStaff(),
     product: { level: 0, buzz: 0, actionsThisMonth: 0 },
-    social: createInitialSocial(),
     news: createInitialNews(),
     offices: createInitialOffices(),
     xc: createInitialXcState(),
@@ -201,10 +199,7 @@ export function normalizeSave(raw) {
     if (!state.staff?.headcountByDept) {
       state.staff = createInitialStaff();
     }
-    if (!state.social) state.social = createInitialSocial();
-    if (state.social && state.social.unreadFeedCount === undefined) {
-      state.social.unreadFeedCount = 0;
-    }
+    delete state.social;
     if (!state.news) state.news = createInitialNews();
     if (!state.product) state.product = { level: 0, buzz: 0 };
     if (!state.product.buzz && state.product.buzz !== 0) state.product.buzz = 0;
