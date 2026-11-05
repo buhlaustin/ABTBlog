@@ -7,11 +7,8 @@ import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json
 import bundledPublicLate from '../data/growth-campaigns-public-late.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
-import {
-  clampBookedRevenue,
-  recordCashOutflow,
-  getTaskRevenueMultiplierPreview
-} from './Finance.js';
+import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
+import { eraBaseRevenueScaleForCampaign } from './ProgressionEconomy.js';
 import { formatMoney } from './constants.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
 import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
@@ -204,7 +201,8 @@ export function runGrowthCampaign(state, campaignId) {
   }
   const [rMin, rMax] = def.revenue ?? [0, 0];
   const base = rMin + Math.random() * Math.max(0, rMax - rMin);
-  const revenue = clampBookedRevenue(state, Math.round(base * campaignRevenueMult(state)));
+  const era = eraBaseRevenueScaleForCampaign(def, state);
+  const revenue = Math.round(base * era * campaignRevenueMult(state));
 
   state.finance.cash -= cost;
   state.finance.cash += revenue;

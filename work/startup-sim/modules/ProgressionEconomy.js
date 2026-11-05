@@ -37,76 +37,105 @@ export function progressionTierLabelAt(tier) {
 }
 
 /**
- * Canonical base revenue bands (before rev×) and booking headroom by progression tier.
- * Desk/growth catalog tasks are authored against these ranges.
- * @type {Array<{
- *   deskBase: [number, number];
- *   deskWhale?: [number, number];
- *   growthBase: [number, number];
- *   arrGuide: string;
- *   singleActionMrrShare: number | null;
- *   monthlyBookMrrShare: number | null;
- * }>}
+ * Era scale for catalog base $ — same task id pays more as you progress (garage → IPO).
+ * Applied to rolled desk/growth base before rev×.
+ */
+export const TIER_ERA_BASE_REVENUE_MULT = [
+  1,
+  2.5,
+  6,
+  18,
+  55,
+  160,
+  420,
+  1_200
+];
+
+/**
+ * Illustrative native base bands per era (tier-native tasks, before era scale & rev×).
+ * @type {Array<{ deskBase: [number, number]; deskWhale?: [number, number]; growthBase: [number, number]; arrGuide: string }>}
  */
 export const TIER_REVENUE_PROFILE = [
   {
     deskBase: [500, 18_000],
     growthBase: [400, 24_000],
-    arrGuide: 'Garage · pre-$100k ARR',
-    singleActionMrrShare: null,
-    monthlyBookMrrShare: null
+    arrGuide: 'Garage · pre-$100k ARR'
   },
   {
     deskBase: [4_000, 27_000],
     growthBase: [2_500, 72_000],
-    arrGuide: 'Post-XC batch · ~$100k+ ARR',
-    singleActionMrrShare: null,
-    monthlyBookMrrShare: null
+    arrGuide: 'Post-XC batch · ~$100k+ ARR'
   },
   {
     deskBase: [8_000, 58_000],
     growthBase: [9_000, 185_000],
-    arrGuide: 'Seed closed · priced round + small office',
-    singleActionMrrShare: null,
-    monthlyBookMrrShare: null
+    arrGuide: 'Seed closed · priced round + small office'
   },
   {
     deskBase: [20_000, 185_000],
     growthBase: [35_000, 420_000],
-    arrGuide: 'Series A · national deals unlock',
-    singleActionMrrShare: null,
-    monthlyBookMrrShare: null
+    arrGuide: 'Series A · national deals unlock'
   },
   {
     deskBase: [35_000, 360_000],
     growthBase: [65_000, 1_800_000],
-    arrGuide: 'Series B · brand-scale campaigns',
-    singleActionMrrShare: null,
-    monthlyBookMrrShare: null
+    arrGuide: 'Series B · brand-scale campaigns'
   },
   {
     deskBase: [80_000, 520_000],
     growthBase: [120_000, 5_800_000],
-    arrGuide: 'Campus HQ · $12M+ ARR footprint',
-    singleActionMrrShare: 0.11,
-    monthlyBookMrrShare: 0.5
+    arrGuide: 'Campus HQ · $12M+ ARR footprint'
   },
   {
     deskBase: [200_000, 530_000],
     growthBase: [380_000, 12_000_000],
-    arrGuide: 'Global hub · $500M+ ARR gate',
-    singleActionMrrShare: 0.085,
-    monthlyBookMrrShare: 0.42
+    arrGuide: 'Global hub · $500M+ ARR gate'
   },
   {
-    deskBase: [85_000, 1_200_000],
-    deskWhale: [8_000_000, 35_000_000],
-    growthBase: [380_000, 12_000_000],
-    arrGuide: 'Public · IPO desk + institutional growth',
-    singleActionMrrShare: 0.035,
-    monthlyBookMrrShare: 0.28
+    deskBase: [25_000_000, 450_000_000],
+    deskWhale: [500_000_000, 2_500_000_000],
+    growthBase: [50_000_000, 800_000_000],
+    arrGuide: 'Public · enterprise + institutional scale (billions/quarter path)'
   }
 ];
+
+/** Which progression tier a task’s JSON base $ was written for (shared tasks scale up from here). */
+export function taskCatalogAnchorTier(taskDef) {
+  if (Number.isFinite(taskDef?.tierMin)) {
+    return Math.max(0, Math.min(7, Math.round(taskDef.tierMin)));
+  }
+  const stages = taskDef?.stages ?? [];
+  if (stages.length === 1 && stages[0] === 'public') return 7;
+  if (stages.includes('public')) return 2;
+  if (stages.includes('post_xc')) return 2;
+  if (stages.includes('xc')) return 1;
+  if (stages.includes('office')) return 1;
+  return 0;
+}
+
+export function campaignCatalogAnchorTier(def) {
+  if (Number.isFinite(def?.tierMin)) {
+    return Math.max(0, Math.min(7, Math.round(def.tierMin)));
+  }
+  return 0;
+}
+
+/** Multiply rolled catalog base revenue so late-game repeats of early tasks pay like late-game. */
+export function eraBaseRevenueScaleForTask(taskDef, state) {
+  const tier = progressionTier(state);
+  const anchor = taskCatalogAnchorTier(taskDef);
+  const cur = TIER_ERA_BASE_REVENUE_MULT[tier] ?? 1;
+  const anch = TIER_ERA_BASE_REVENUE_MULT[anchor] ?? 1;
+  return cur / anch;
+}
+
+export function eraBaseRevenueScaleForCampaign(def, state) {
+  const tier = progressionTier(state);
+  const anchor = campaignCatalogAnchorTier(def);
+  const cur = TIER_ERA_BASE_REVENUE_MULT[tier] ?? 1;
+  const anch = TIER_ERA_BASE_REVENUE_MULT[anchor] ?? 1;
+  return cur / anch;
+}
 
 export function getTierRevenueProfile(tier) {
   const t = Math.max(0, Math.min(7, Math.round(Number(tier) || 0)));

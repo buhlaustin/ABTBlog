@@ -974,7 +974,9 @@ const {
 } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
 const { projectMonthlyBurn, estimateEraRevenuePotential, allTierRevenuePotentialRows } =
   await import(`file://${join(sim, 'modules/Finance.js')}`);
-const { TIER_REVENUE_PROFILE } = await import(`file://${join(sim, 'modules/ProgressionEconomy.js')}`);
+const { TIER_REVENUE_PROFILE, eraBaseRevenueScaleForTask } = await import(
+  `file://${join(sim, 'modules/ProgressionEconomy.js')}`
+);
 const ceoState = createInitialState({ companyName: 'CEO Pay Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 const sal = setCeoSalaryAnnual(ceoState, 120_000);
 if (!sal.ok) {
@@ -1023,6 +1025,22 @@ if (!failed) {
     const era = estimateEraRevenuePotential(ceoState);
     if (eraRows.length !== 8 || era.desk[1] < era.desk[0] || era.growth[1] < era.growth[0]) {
       console.error('FAIL: tier revenue potential rows');
+      failed = true;
+    }
+  }
+}
+if (!failed) {
+  const sharedTask = getTaskDefinitions().find((t) => t.id === 'mega-deal-close');
+  if (sharedTask) {
+    const seedEra = createInitialState({ companyName: 'Era', categoryId: 'b2b-saas', mode: 'career' });
+    seedEra.flags.seedRoundClosed = true;
+    const pubEra = createInitialState({ companyName: 'Era', categoryId: 'b2b-saas', mode: 'career' });
+    pubEra.flags.ipoFiled = true;
+    pubEra.stage = STAGES.PUBLIC;
+    const seedRoll = rollTaskOutcome(sharedTask, seedEra).revenue;
+    const pubRoll = rollTaskOutcome(sharedTask, pubEra).revenue;
+    if (pubRoll <= seedRoll * 50) {
+      console.error(`FAIL: era base scale seed=${seedRoll} public=${pubRoll}`);
       failed = true;
     }
   }
@@ -1265,25 +1283,17 @@ if (roster.length < 1 || roster.length > expectedOffers) {
     failed = true;
   } else {
     const first = playable[0];
-    if ((first.revenue?.[1] ?? 0) > 50_000_000) {
-      console.error(`FAIL: growth campaign rev max unrealistic (${first.revenue?.[1]})`);
+    const run = runGrowthCampaign(growthRosterState, first.id);
+    if (!run.ok || !growthRosterState.growth.recentCampaignIds?.includes(first.id)) {
+      console.error(`FAIL: growth campaign run / cooldown track: ${run.reason ?? 'ok'}`);
       failed = true;
     } else {
-      const run = runGrowthCampaign(growthRosterState, first.id);
-      if (!run.ok || !growthRosterState.growth.recentCampaignIds?.includes(first.id)) {
-        console.error(`FAIL: growth campaign run / cooldown track: ${run.reason ?? 'ok'}`);
-        failed = true;
-      } else if (run.revenue > 50_000_000) {
-        console.error(`FAIL: growth payout too large (${run.revenue})`);
+      resetGrowthCampaignsMonth(growthRosterState);
+      if (availableCampaigns(growthRosterState).some((c) => c.id === first.id)) {
+        console.error('FAIL: ran growth campaign should stay off roster until cooldown');
         failed = true;
       } else {
-        resetGrowthCampaignsMonth(growthRosterState);
-        if (availableCampaigns(growthRosterState).some((c) => c.id === first.id)) {
-          console.error('FAIL: ran growth campaign should stay off roster until cooldown');
-          failed = true;
-        } else {
-          console.log(`OK: growth roster + cooldown (${roster.length}/mo, realistic payouts)`);
-        }
+        console.log(`OK: growth roster + cooldown (${roster.length}/mo, era-scaled payouts)`);
       }
     }
   }

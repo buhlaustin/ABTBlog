@@ -125,14 +125,6 @@ function renderTierRevenuePotentialSection(state) {
   const body = rows
     .map((r) => {
       const rowClass = r.isCurrent ? ' class="tier-revenue-current"' : '';
-      const capNote =
-        r.isCurrent && r.singleCap
-          ? `<br><span class="fine-print">Per-play MRR cap ~${formatMoney(r.singleCap)}</span>`
-          : '';
-      const monthNote =
-        r.isCurrent && r.monthlyCap
-          ? `<br><span class="fine-print">Month booking cap ~${formatMoney(r.monthlyCap)}</span>`
-          : '';
       const whale = r.deskWhale
         ? `<br><span class="fine-print">Whale desk base ${formatMoney(r.deskWhale[0])}–${formatMoney(r.deskWhale[1])}</span>`
         : '';
@@ -140,14 +132,14 @@ function renderTierRevenuePotentialSection(state) {
         <td><strong>${escapeHtml(r.label)}</strong><br><span class="fine-print">${escapeHtml(r.arrGuide)}</span></td>
         <td>${formatMoney(r.deskBase[0])}–${formatMoney(r.deskBase[1])}${whale}</td>
         <td>${formatMoney(r.growthBase[0])}–${formatMoney(r.growthBase[1])}</td>
-        <td>${formatMoney(r.deskPayout[0])}–${formatMoney(r.deskPayout[1])}${capNote}${monthNote}</td>
+        <td>${formatMoney(r.deskPayout[0])}–${formatMoney(r.deskPayout[1])}</td>
         <td>${formatMoney(r.growthPayout[0])}–${formatMoney(r.growthPayout[1])}</td>
       </tr>`;
     })
     .join('');
   return `<section class="tier-revenue-panel">
     <h3 class="log-head">Revenue potential by scale era</h3>
-    <p class="fine-print">Task bank base ranges and estimated cash per play at your current <strong>${era.mult.toFixed(2)}×</strong> rev×. Highlighted row is your era — late-game caps scale with MRR so payouts grow without single-month spikes.</p>
+    <p class="fine-print">Native base ranges for tasks/campaigns authored at each era, and estimated cash per play at your current <strong>${era.mult.toFixed(2)}×</strong> rev×. Older tasks that reappear late-game also get an <strong>era base scale</strong> (garage $ → public $) before rev× — not the same payout twice.</p>
     <div class="table-scroll"><table class="data-table tier-revenue-table">
       <thead><tr><th>Era</th><th>Desk base</th><th>Growth base</th><th>Desk @ rev×</th><th>Growth @ rev×</th></tr></thead>
       <tbody>${body}</tbody>

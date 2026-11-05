@@ -368,7 +368,7 @@ export function renderDeskPanel(state) {
     </div>
     ${(() => {
       const era = estimateEraRevenuePotential(state);
-      return `<p class="fine-print">This era: typical desk <strong>${formatMoney(era.desk[0])}–${formatMoney(era.desk[1])}</strong> · growth <strong>${formatMoney(era.growth[0])}–${formatMoney(era.growth[1])}</strong> per play at ${era.mult.toFixed(2)}×.${era.monthlyCap ? ` Month booking cap ~${formatMoney(era.monthlyCap)}.` : ''} See Finance for all tiers.</p>`;
+      return `<p class="fine-print">This era: native desk <strong>${formatMoney(era.desk[0])}–${formatMoney(era.desk[1])}</strong> · growth <strong>${formatMoney(era.growth[0])}–${formatMoney(era.growth[1])}</strong> per play at ${era.mult.toFixed(2)}× (shared early tasks scale up automatically). Finance tab has the full ladder.</p>`;
     })()}
     ${
       lineupOpen
