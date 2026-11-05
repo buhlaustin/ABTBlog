@@ -2,7 +2,20 @@ import bundled from '../data/accelerators.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { recalculateCapTablePercentages, getFounderRow } from './CapTable.js';
 import { getArr } from './Workspace.js';
-import { formatMoney } from './constants.js';
+import { formatMoney, STAGES } from './constants.js';
+
+/** X Combinator + at most one other program before seed / Series A. */
+export const MAX_ACCELERATOR_PROGRAMS = 2;
+
+export function acceleratorProgramsUsed(state) {
+  return (state.accelerators?.joined?.length ?? 0) + (state.flags?.xcAccepted ? 1 : 0);
+}
+
+export function isAcceleratorFundraisingClosed(state) {
+  return Boolean(
+    state.flags?.seriesAClosed || state.flags?.ipoFiled || state.stage === STAGES.PUBLIC
+  );
+}
 
 let catalog = bundled;
 
@@ -39,6 +52,18 @@ export function canJoinAccelerator(state, programId) {
   const joined = state.accelerators?.joined ?? [];
   if (joined.includes(prog.id)) {
     return { ok: false, reason: 'Already joined this program.' };
+  }
+  if (isAcceleratorFundraisingClosed(state)) {
+    return {
+      ok: false,
+      reason: 'After Series A or going public, new accelerator programs are closed.'
+    };
+  }
+  if (acceleratorProgramsUsed(state) >= MAX_ACCELERATOR_PROGRAMS) {
+    return {
+      ok: false,
+      reason: `Cap of ${MAX_ACCELERATOR_PROGRAMS} accelerator programs (including X Combinator) before Series A.`
+    };
   }
   if (getArr(state) < prog.arrGate) {
     return { ok: false, reason: `Need ${formatMoney(prog.arrGate)} ARR for ${prog.name}.` };
@@ -113,8 +138,6 @@ export function renderAcceleratorsBlock(state) {
     })
     .join('');
 
-  const xcNote = state.flags?.xcAccepted
-    ? '<p class="fine-print">You can stack other accelerator SAFEs alongside X Combinator — each program once.</p>'
-    : '';
-  return `<h3 class="log-head">Other accelerators & SAFE paths</h3>${xcNote}${cards}`;
+  const capNote = `<p class="fine-print">Limit: ${MAX_ACCELERATOR_PROGRAMS} accelerator programs total (X Combinator counts as one), plus seed. After Series A / IPO, new programs close.</p>`;
+  return `<h3 class="log-head">Other accelerators & SAFE paths</h3>${capNote}${cards}`;
 }

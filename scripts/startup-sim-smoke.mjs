@@ -862,6 +862,9 @@ if (!ag.ok) {
 } else if (angelState.finance.cash < 50_000) {
   console.error('FAIL: angel SAFE cash');
   failed = true;
+} else if (closeAngelSafe(angelState).ok) {
+  console.error('FAIL: second angel SAFE should be blocked');
+  failed = true;
 }
 const xcAccel = createInitialState({ companyName: 'Accel Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 xcAccel.flags.xcAccepted = true;
@@ -870,6 +873,17 @@ xcAccel.finance.mrr = Math.round(80_000 / 12);
 const ja = joinAccelerator(xcAccel, 'angel-rail');
 if (!ja.ok) {
   console.error(`FAIL: accelerator after XC: ${ja.reason}`);
+  failed = true;
+} else if (joinAccelerator(xcAccel, 'techlot').ok) {
+  console.error('FAIL: third accelerator should be blocked');
+  failed = true;
+}
+const postASeries = createInitialState({ companyName: 'Post A', categoryId: 'b2b-saas', mode: 'sandbox' });
+postASeries.flags.seriesAClosed = true;
+postASeries.finance.arr = 5_000_000;
+postASeries.finance.mrr = Math.round(5_000_000 / 12);
+if (joinAccelerator(postASeries, 'velocity-lab').ok) {
+  console.error('FAIL: accelerator after Series A should be blocked');
   failed = true;
 }
 const loanState = createInitialState({ companyName: 'Loan Co', categoryId: 'b2b-saas', mode: 'sandbox' });
@@ -979,6 +993,13 @@ if (!failed) {
     failed = true;
   }
 }
+if (!failed) {
+  const bigSal = setCeoSalaryAnnual(ceoState, 20_000_000);
+  if (!bigSal.ok || bigSal.annual !== 20_000_000) {
+    console.error('FAIL: CEO salary should not be capped at $2M');
+    failed = true;
+  }
+}
 const { isRealCalendarYear, formatStateMonth } = await import(
   `file://${join(sim, 'modules/GameCalendar.js')}`
 );
@@ -1075,6 +1096,46 @@ if (!hireMax.ok || cooSalaryMonthly(garageZero) !== 0) {
   failed = true;
 } else {
   console.log('OK: 10% garage COO at $0/mo');
+}
+if (!failed) {
+  const { workspaceRentMonthly, WORKSPACE_TIER: WS_TIER } = await import(
+    `file://${join(sim, 'modules/Workspace.js')}`
+  );
+  const campusRent = workspaceRentMonthly({
+    workspace: { tier: WS_TIER.CAMPUS }
+  });
+  const hubRentState = createInitialState({ companyName: 'Hub Rent', categoryId: 'b2b-saas', mode: 'career' });
+  hubRentState.workspace.tier = WS_TIER.HUB;
+  hubRentState.offices = { hubId: 'nashville' };
+  hubRentState.finance.hubRentMonthly = 125_000;
+  const hubMo = workspaceRentMonthly(hubRentState);
+  if (hubMo < 125_000 || hubMo <= campusRent) {
+    console.error(`FAIL: hub rent ${hubMo} should exceed campus ${campusRent}`);
+    failed = true;
+  } else {
+    console.log(`OK: hub city rent (${hubMo}/mo) above campus HQ (${campusRent}/mo)`);
+  }
+}
+if (!failed) {
+  const publicCoo = createInitialState({ companyName: 'Public COO', categoryId: 'b2b-saas', mode: 'sandbox' });
+  publicCoo.workspace.tier = WORKSPACE_TIER.LARGE;
+  publicCoo.flags.ipoFiled = true;
+  publicCoo.stage = STAGES.PUBLIC;
+  setCeoSalaryAnnual(publicCoo, 20_000_000);
+  const hired = hireCoo(publicCoo, { firstName: 'Sam', lastName: 'Ops', equityPct: 2 });
+  if (!hired.ok) {
+    console.error(`FAIL: public COO hire: ${hired.reason}`);
+    failed = true;
+  } else {
+    const expectedFloor = Math.round((20_000_000 / 12) * 0.6);
+    const cooMo = cooSalaryMonthly(publicCoo);
+    if (cooMo < expectedFloor) {
+      console.error(`FAIL: public COO ${cooMo} < 60% CEO ${expectedFloor}`);
+      failed = true;
+    } else {
+      console.log(`OK: public COO comp tracks CEO (${cooMo}/mo ≥ 60% floor)`);
+    }
+  }
 }
 
 const {

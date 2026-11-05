@@ -339,7 +339,7 @@ export function ceoSalaryBoardNote(state) {
 
 export function setCeoSalaryAnnual(state, annual) {
   if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
-  const n = Math.max(0, Math.min(2_000_000, Math.round(Number(annual) || 0)));
+  const n = Math.max(0, Math.round(Number(annual) || 0));
   const ceo = ceoState(state);
   const prior = ceo.salaryAnnual ?? 0;
   if (prior !== n) {

@@ -202,7 +202,7 @@ export function renderCeoPanel(container, state) {
       <div class="stock-actions">${presetBtns}</div>
       <div class="name-row ceo-salary-row">
         <label class="visually-hidden" for="ceo-salary-input">Annual salary</label>
-        <input id="ceo-salary-input" type="number" min="0" max="2000000" step="1000" value="${annual}" ${disabled}>
+        <input id="ceo-salary-input" type="number" min="0" step="1000" value="${annual}" ${disabled}>
         <button type="button" class="btn btn-small" id="btn-save-ceo-salary" ${disabled}>Save salary</button>
       </div>
       ${salaryChanges ? `<details><summary>Salary changes</summary><ul class="instrument-list">${salaryChanges}</ul></details>` : ''}

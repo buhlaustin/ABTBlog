@@ -139,6 +139,15 @@ export function applyXCSafe(state) {
   if (!state.flags?.xcUnlocked) {
     return { ok: false, reason: 'Reach $100k ARR to apply.' };
   }
+  if (state.flags?.seriesAClosed || state.flags?.ipoFiled || state.stage === STAGES.PUBLIC) {
+    return { ok: false, reason: 'X Combinator acceptance closes after Series A / going public.' };
+  }
+  if ((state.accelerators?.joined?.length ?? 0) >= 2) {
+    return {
+      ok: false,
+      reason: 'You already joined two accelerator programs — cannot add X Combinator.'
+    };
+  }
 
   const founder = getFounderRow(state);
   const founderShares = founder?.shares ?? FOUNDER_AUTHORIZED;

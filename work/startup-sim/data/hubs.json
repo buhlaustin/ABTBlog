@@ -6,7 +6,7 @@
       "costMult": 1.15,
       "revenueMult": 1.12,
       "salaryMult": 1.12,
-      "fixedBase": 8500
+      "fixedBase": 168000
     },
     {
       "id": "nyc",
@@ -14,7 +14,7 @@
       "costMult": 1.1,
       "revenueMult": 1.08,
       "salaryMult": 1.08,
-      "fixedBase": 8000
+      "fixedBase": 158000
     },
     {
       "id": "miami",
@@ -22,7 +22,7 @@
       "costMult": 0.95,
       "revenueMult": 1.02,
       "salaryMult": 0.95,
-      "fixedBase": 5500
+      "fixedBase": 108000
     },
     {
       "id": "dallas",
@@ -30,7 +30,7 @@
       "costMult": 0.88,
       "revenueMult": 0.98,
       "salaryMult": 0.9,
-      "fixedBase": 4800
+      "fixedBase": 98000
     },
     {
       "id": "atlanta",
@@ -38,7 +38,7 @@
       "costMult": 0.9,
       "revenueMult": 1.0,
       "salaryMult": 0.92,
-      "fixedBase": 5000
+      "fixedBase": 102000
     },
     {
       "id": "nashville",
@@ -46,7 +46,7 @@
       "costMult": 0.93,
       "revenueMult": 1.03,
       "salaryMult": 0.94,
-      "fixedBase": 5200
+      "fixedBase": 125000
     }
   ],
   "satelliteTemplates": [

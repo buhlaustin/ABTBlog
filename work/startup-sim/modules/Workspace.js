@@ -26,7 +26,8 @@ const RENT_BY_TIER = {
   [WORKSPACE_TIER.MEDIUM]: 5_000,
   [WORKSPACE_TIER.LARGE]: 12_000,
   [WORKSPACE_TIER.CAMPUS]: 28_000,
-  [WORKSPACE_TIER.HUB]: 18_000
+  /** Placeholder until a hub city is selected; city `fixedBase` in hubs.json applies. */
+  [WORKSPACE_TIER.HUB]: 125_000
 };
 
 /** Salary multiplier vs “large office” baseline in Staff.DEFAULT_SALARY. */

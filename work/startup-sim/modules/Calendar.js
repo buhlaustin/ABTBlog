@@ -18,6 +18,7 @@ import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
 import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
 import { tickAcceleratorBoost } from './Accelerators.js';
+import { tickCooCompensationReview } from './Coo.js';
 import { resetGrowthCampaignsMonth, growthRosterRefreshLine } from './GrowthCampaigns.js';
 import { resetProductActionsMonth } from './ProductActions.js';
 import {
@@ -118,6 +119,9 @@ export function endMonth(state) {
   const growthCampaignsClosed = state.growth?.campaignsThisMonth?.length ?? 0;
   const burn = resolveMonthEndBurn(state);
   for (const line of recordCeoSalaryForMonth(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickCooCompensationReview(state)) {
     appendLog(state, line);
   }
   for (const line of settlePersonalExpensesAtMonthEnd(state)) {
