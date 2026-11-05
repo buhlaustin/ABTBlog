@@ -5,7 +5,11 @@ import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { serviceLoanAtMonthEnd } from './BankLoan.js';
 import { settleRevenueAdvanceAtMonthEnd } from './RevenueAdvance.js';
-import { recordCeoSalaryForMonth, settlePersonalExpensesAtMonthEnd } from './CeoEconomics.js';
+import {
+  recordCeoSalaryForMonth,
+  settlePersonalExpensesAtMonthEnd,
+  preparePersonalExpensesForMonth
+} from './CeoEconomics.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
 import { tickPublicMarket, tickIpoLockup, tickPublicMarketAtMonthStart, isPublicCompany } from './IPO.js';
 import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
@@ -93,6 +97,7 @@ export function startMonth(state) {
   }
   dealMonthlyTasks(state);
   dealBoardTasks(state);
+  preparePersonalExpensesForMonth(state);
   return state;
 }
 

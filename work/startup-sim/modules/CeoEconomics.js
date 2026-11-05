@@ -1,8 +1,17 @@
-import { STAGES, formatMoney } from './constants.js';
+import { formatMoney } from './constants.js';
 import { recordCashOutflow, founderValuationStake, founderEquityPct, projectMonthlyBurn } from './Finance.js';
 import { founderStakeValue, isPublicCompany, canCashOut } from './IPO.js';
 import { getFounderRow } from './CapTable.js';
-import { calendarTurn, isInResidency } from './XC.js';
+import { calendarTurn } from './XC.js';
+
+const EXPENSE_DEBIT_CATEGORIES = [
+  'Housing',
+  'Food & household',
+  'Insurance & health',
+  'Transport',
+  'Family & childcare',
+  'Discretionary'
+];
 
 const PERSONAL_BANK_MIN = 4_500;
 const PERSONAL_BANK_MAX = 10_500;
@@ -13,8 +22,9 @@ export function createInitialCeoState() {
     careerSalaryPaid: 0,
     careerOwnerDraws: 0,
     bankBalance: null,
-    personalBurnMonthly: null,
-    personalBurnCustom: false,
+    personalExpenseScheduled: null,
+    lastPersonalExpense: null,
+    careerPersonalExpensesPaid: 0,
     drawLog: [],
     salaryPayLog: [],
     salaryChangeLog: [],
@@ -73,6 +83,109 @@ export function ensureCeoPersonalBank(state) {
 
 export function initializeCeoPersonalFinances(state) {
   ensureCeoPersonalBank(state);
+  preparePersonalExpensesForMonth(state);
+}
+
+/** Monthly lifestyle spend band — driven only by CEO salary, not company ARR. */
+export function personalExpenseBandForSalary(annualSalary) {
+  const a = Math.max(0, Math.round(Number(annualSalary) || 0));
+  if (a === 0) {
+    return {
+      min: 2_100,
+      max: 3_500,
+      label: '$0 salary — lean personal burn (savings / side income fictionally cover gaps)'
+    };
+  }
+  const monthlyGross = a / 12;
+  const min = Math.max(1_650, Math.round(monthlyGross * 0.36));
+  const max = Math.max(min + 350, Math.round(monthlyGross * 0.68));
+  let label = 'Household band tied to your CEO salary';
+  if (a <= 80_000) label = 'Frugal professional household';
+  else if (a <= 200_000) label = 'Mid-career executive household';
+  else if (a <= 400_000) label = 'Senior executive household';
+  else label = 'Top-comp public-CEO lifestyle band';
+  return { min, max, label, annual: a };
+}
+
+export function personalExpenseBand(state) {
+  return personalExpenseBandForSalary(ceoState(state).salaryAnnual ?? 0);
+}
+
+function personalExpenseRollUnit(state, salt = 0) {
+  const turn = calendarTurn(state);
+  const annual = Math.round(ceoState(state).salaryAnnual ?? 0);
+  const seed = state.meta?.runSeed ?? 0;
+  let h =
+    (seed ^ Math.imul(turn + salt * 19, 2_654_435_761) ^ Math.imul(annual, 1_597_334_677)) >>> 0;
+  h = Math.imul(h ^ 0x9e3779b9, 0x85ebca6b) >>> 0;
+  return h / 0xffffffff;
+}
+
+function buildPersonalExpenseBreakdown(state, total) {
+  const weights = EXPENSE_DEBIT_CATEGORIES.map((_, i) => 0.45 + personalExpenseRollUnit(state, 30 + i));
+  const weightSum = weights.reduce((s, w) => s + w, 0);
+  const parts = EXPENSE_DEBIT_CATEGORIES.map((label, i) => ({
+    label,
+    amount: Math.max(i === 0 ? 280 : 60, Math.round((weights[i] / weightSum) * total))
+  }));
+  let delta = total - parts.reduce((s, p) => s + p.amount, 0);
+  parts[0].amount += delta;
+  return parts;
+}
+
+/** Deterministic for this calendar month + salary — still varies month to month. */
+export function rollPersonalExpenseTotal(state) {
+  const band = personalExpenseBand(state);
+  const u = personalExpenseRollUnit(state, 0);
+  let total = Math.round(band.min + u * (band.max - band.min));
+  const spikeRoll = personalExpenseRollUnit(state, 1);
+  if (spikeRoll < 0.1) {
+    total = Math.round(total * (1.05 + spikeRoll * 0.35));
+    total = Math.min(total, Math.round(band.max * 1.15));
+  }
+  return Math.max(band.min, total);
+}
+
+/** Roll debits for the current in-game month (not player-controlled). */
+export function preparePersonalExpensesForMonth(state) {
+  const ceo = ceoState(state);
+  const turn = calendarTurn(state);
+  const total = rollPersonalExpenseTotal(state);
+  const breakdown = buildPersonalExpenseBreakdown(state, total);
+  ceo.personalExpenseScheduled = {
+    turn,
+    total,
+    breakdown,
+    salaryAnnual: ceo.salaryAnnual ?? 0,
+    month: state.calendar?.monthIndex,
+    year: state.calendar?.year
+  };
+  return ceo.personalExpenseScheduled;
+}
+
+export function scheduledPersonalExpense(state) {
+  const ceo = ceoState(state);
+  const turn = calendarTurn(state);
+  if (ceo.personalExpenseScheduled?.turn === turn) {
+    return ceo.personalExpenseScheduled;
+  }
+  return preparePersonalExpensesForMonth(state);
+}
+
+/** Midpoint of salary band — for runway estimates only. */
+export function typicalPersonalExpenseMonthly(state) {
+  const band = personalExpenseBand(state);
+  return Math.round((band.min + band.max) / 2);
+}
+
+/** @deprecated use scheduledPersonalExpense(state).total */
+export function effectivePersonalBurnMonthly(state) {
+  return scheduledPersonalExpense(state).total;
+}
+
+/** @deprecated */
+export function recommendedPersonalBurnMonthly(state) {
+  return typicalPersonalExpenseMonthly(state);
 }
 
 function creditPersonalBank(state, amount, label, kind) {
@@ -114,54 +227,9 @@ export function ceoPersonalBankBalance(state) {
   return ensureCeoPersonalBank(state);
 }
 
-export function recommendedPersonalBurnMonthly(state) {
-  let base = 3_200;
-  if (state.stage === STAGES.GARAGE && !state.flags?.seedRoundClosed) base = 3_400;
-  else if (!state.flags?.seedRoundClosed) base = 4_100;
-  else if (!state.flags?.seriesAClosed) base = 5_200;
-  else if (!state.flags?.seriesBClosed) base = 6_800;
-  else if (!isPublicCompany(state)) base = 8_400;
-  else base = 10_500;
-  if (isInResidency(state) || state.company?.location?.includes('San Francisco')) base += 900;
-  if (state.offices?.hubLabel?.match(/NYC|New York/i)) base += 700;
-  const seed = state.meta?.runSeed ?? 1;
-  const jitter = ((seed >>> 8) % 89) / 89;
-  return Math.round(base * (0.94 + jitter * 0.12));
-}
-
-export function effectivePersonalBurnMonthly(state) {
-  const ceo = ceoState(state);
-  if (ceo.personalBurnCustom && ceo.personalBurnMonthly != null) {
-    return Math.max(0, Math.round(ceo.personalBurnMonthly));
-  }
-  return recommendedPersonalBurnMonthly(state);
-}
-
-export function setCeoPersonalBurnMonthly(state, monthly) {
-  if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
-  const n = Math.max(1_500, Math.min(30_000, Math.round(Number(monthly) || 0)));
-  const ceo = ceoState(state);
-  ceo.personalBurnMonthly = n;
-  ceo.personalBurnCustom = true;
-  const rec = recommendedPersonalBurnMonthly(state);
-  return {
-    ok: true,
-    monthly: n,
-    summary: `Personal budget set to ${formatMoney(n)}/mo (recommended ${formatMoney(rec)} for your stage).`
-  };
-}
-
-export function resetCeoPersonalBurnToRecommended(state) {
-  const ceo = ceoState(state);
-  ceo.personalBurnMonthly = null;
-  ceo.personalBurnCustom = false;
-  const rec = recommendedPersonalBurnMonthly(state);
-  return { ok: true, summary: `Personal budget follows recommendation (${formatMoney(rec)}/mo).` };
-}
-
 export function personalBankRunway(state) {
   const bal = ceoPersonalBankBalance(state);
-  const burn = effectivePersonalBurnMonthly(state);
+  const burn = typicalPersonalExpenseMonthly(state);
   if (burn <= 0) return { burn, balance: bal, label: '∞' };
   return { burn, balance: bal, label: `${(bal / burn).toFixed(1)} mo` };
 }
@@ -284,6 +352,7 @@ export function setCeoSalaryAnnual(state, annual) {
     });
   }
   ceo.salaryAnnual = n;
+  preparePersonalExpensesForMonth(state);
   const boardNote = ceoSalaryBoardNote(state);
   return {
     ok: true,
@@ -317,18 +386,41 @@ export function recordCeoSalaryForMonth(state) {
 
 /** Personal living expenses — after salary hits the bank this month. */
 export function settlePersonalExpensesAtMonthEnd(state) {
-  const burn = effectivePersonalBurnMonthly(state);
+  const sched = scheduledPersonalExpense(state);
+  const burn = sched.total;
   if (burn <= 0) return [];
   const ceo = ceoState(state);
   ensureCeoPersonalBank(state);
-  const paid = debitPersonalBank(state, burn, 'Personal living expenses', 'expenses');
+  const paid = debitPersonalBank(state, burn, 'Personal debits (auto)', 'expenses');
+  ceo.careerPersonalExpensesPaid = (ceo.careerPersonalExpensesPaid ?? 0) + paid;
+  ceo.lastPersonalExpense = {
+    total: paid,
+    breakdown: sched.breakdown,
+    scheduled: burn,
+    ...logStamp(state)
+  };
+  pushCeoLog(ceo, 'bankLog', {
+    kind: 'expense_detail',
+    amount: paid,
+    delta: -paid,
+    balanceAfter: ceo.bankBalance,
+    label: 'Debit breakdown',
+    breakdown: sched.breakdown,
+    ...logStamp(state)
+  });
+  ceo.personalExpenseScheduled = null;
   const lines = [
-    `Personal expenses ${formatMoney(paid)} — bank balance ${formatMoney(ceo.bankBalance)}.`
+    `Personal debits ${formatMoney(paid)} (auto, salary-based) — bank ${formatMoney(ceo.bankBalance)}.`
   ];
+  const top = sched.breakdown?.[0];
+  if (top) {
+    lines.push(`Largest line: ${top.label} ${formatMoney(top.amount)}.`);
+  }
+  const typical = typicalPersonalExpenseMonthly(state);
   if ((ceo.bankBalance ?? 0) <= 0 && paid > 0) {
     lines.push('Personal bank at $0 — raise salary or take an owner draw before next month.');
-  } else if ((ceo.bankBalance ?? 0) < burn * 0.5) {
-    lines.push('Personal cash is tight versus your monthly budget.');
+  } else if ((ceo.bankBalance ?? 0) < typical * 0.5) {
+    lines.push('Personal cash is tight versus your typical salary band.');
   }
   return lines;
 }

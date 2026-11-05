@@ -20,7 +20,12 @@ import { createInitialLaunchState } from './LaunchLifecycle.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
 import { syncLifetimeProfit } from './Finance.js';
-import { createInitialCeoState, initializeCeoPersonalFinances, ensureCeoPersonalBank } from './CeoEconomics.js';
+import {
+  createInitialCeoState,
+  initializeCeoPersonalFinances,
+  ensureCeoPersonalBank,
+  preparePersonalExpensesForMonth
+} from './CeoEconomics.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -31,7 +36,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 31;
+export const SAVE_VERSION = 32;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -308,9 +313,16 @@ export function normalizeSave(raw) {
       if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];
       if (!state.ceo.salaryChangeLog) state.ceo.salaryChangeLog = [];
       if (!state.ceo.bankLog) state.ceo.bankLog = [];
-      if (state.ceo.personalBurnCustom === undefined) state.ceo.personalBurnCustom = false;
+      if (state.ceo.personalExpenseScheduled === undefined) state.ceo.personalExpenseScheduled = null;
+      if (state.ceo.lastPersonalExpense === undefined) state.ceo.lastPersonalExpense = null;
+      if (state.ceo.careerPersonalExpensesPaid === undefined) {
+        state.ceo.careerPersonalExpensesPaid = 0;
+      }
+      delete state.ceo.personalBurnMonthly;
+      delete state.ceo.personalBurnCustom;
     }
     ensureCeoPersonalBank(state);
+    preparePersonalExpensesForMonth(state);
     if (state.finance.lastRound === undefined) state.finance.lastRound = null;
     if (!state.flags) state.flags = {};
     if (state.flags.gameOver === undefined) state.flags.gameOver = false;

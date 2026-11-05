@@ -848,7 +848,11 @@ const { isRealCalendarYear, formatStateMonth } = await import(
 const {
   rollInitialPersonalBankBalance,
   ceoPersonalBankBalance,
-  settlePersonalExpensesAtMonthEnd
+  settlePersonalExpensesAtMonthEnd,
+  personalExpenseBandForSalary,
+  scheduledPersonalExpense,
+  preparePersonalExpensesForMonth,
+  rollPersonalExpenseTotal
 } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
 const bankA = createInitialState({ companyName: 'Bank A', categoryId: 'b2b-saas', mode: 'career', ceoFirstName: 'A', ceoLastName: 'One' });
 const bankB = createInitialState({ companyName: 'Bank B', categoryId: 'b2b-saas', mode: 'career', ceoFirstName: 'B', ceoLastName: 'Two' });
@@ -862,13 +866,37 @@ if (openA < 4500 || openA > 10500 || openB < 4500 || openB > 10500) {
   failed = true;
 }
 if (!failed) {
-  setCeoSalaryAnnual(bankA, 120_000);
+  setCeoSalaryAnnual(bankA, 60_000);
   recordCeoSalaryForMonth(bankA);
+  const band60 = personalExpenseBandForSalary(60_000);
+  const due = scheduledPersonalExpense(bankA).total;
+  if (due > band60.max * 1.2 || due < band60.min * 0.9) {
+    console.error(`FAIL: $60k salary expense ${due} outside band ${band60.min}-${band60.max}`);
+    failed = true;
+  }
+  bankA.finance.arr = 500_000_000;
+  preparePersonalExpensesForMonth(bankA);
+  const dueRich = scheduledPersonalExpense(bankA).total;
+  if (dueRich > band60.max * 1.2) {
+    console.error(`FAIL: personal debits should not scale with ARR (${dueRich})`);
+    failed = true;
+  }
   const beforeExp = bankA.ceo.bankBalance;
   settlePersonalExpensesAtMonthEnd(bankA);
   if (bankA.ceo.bankBalance >= beforeExp) {
     console.error('FAIL: personal expenses should reduce bank');
     failed = true;
+  }
+  const { advanceCalendarMonth } = await import(`file://${join(sim, 'modules/Calendar.js')}`);
+  const monthA = rollPersonalExpenseTotal(bankA);
+  advanceCalendarMonth(bankA);
+  preparePersonalExpensesForMonth(bankA);
+  const monthB = rollPersonalExpenseTotal(bankA);
+  if (monthA === monthB) {
+    console.error('FAIL: personal debits should vary month to month');
+    failed = true;
+  } else {
+    console.log('OK: salary-based personal debits (not ARR, vary monthly)');
   }
 }
 

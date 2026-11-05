@@ -15,11 +15,10 @@ import {
   cashOutPreview,
   maxOwnerDrawAmount,
   ceoPersonalBankBalance,
-  recommendedPersonalBurnMonthly,
-  effectivePersonalBurnMonthly,
+  personalExpenseBand,
+  scheduledPersonalExpense,
+  typicalPersonalExpenseMonthly,
   personalBankRunway,
-  setCeoPersonalBurnMonthly,
-  resetCeoPersonalBurnToRecommended,
   ceoPersonalCashComp
 } from './CeoEconomics.js';
 import { isPublicCompany } from './IPO.js';
@@ -32,12 +31,7 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
-export {
-  setCeoSalaryAnnual,
-  takeOwnerDraw,
-  setCeoPersonalBurnMonthly,
-  resetCeoPersonalBurnToRecommended
-};
+export { setCeoSalaryAnnual, takeOwnerDraw };
 
 function renderWealthBar(mix) {
   if (mix.total <= 0) {
@@ -60,6 +54,22 @@ function formatLedgerAmount(n) {
   return formatMoney(0);
 }
 
+function renderDebitBreakdown(breakdown) {
+  if (!breakdown?.length) return '';
+  const rows = breakdown
+    .map(
+      (line) =>
+        `<tr><td>${escapeHtml(line.label)}</td><td class="num">${formatMoney(line.amount)}</td></tr>`
+    )
+    .join('');
+  return `<div class="table-scroll ceo-debit-table">
+    <table class="data-table">
+      <thead><tr><th>Category</th><th>This month</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
 export function renderCeoPanel(container, state) {
   if (!container) return;
   const name = ceoDisplayName(state);
@@ -73,16 +83,18 @@ export function renderCeoPanel(container, state) {
   const mix = wealthMix(state);
   const runway = ceoRunwayNote(state);
   const personalRunway = personalBankRunway(state);
-  const recBurn = recommendedPersonalBurnMonthly(state);
-  const personalBurn = effectivePersonalBurnMonthly(state);
-  const burnCustom = state.ceo?.personalBurnCustom ?? false;
+  const expenseBand = personalExpenseBand(state);
+  const scheduled = scheduledPersonalExpense(state);
+  const typicalBurn = typicalPersonalExpenseMonthly(state);
+  const lastExpense = state.ceo?.lastPersonalExpense;
+  const careerDebits = state.ceo?.careerPersonalExpensesPaid ?? 0;
   const shares = founderShareStats(state);
   const ledger = buildCompLedger(state);
   const exitPrev = cashOutPreview(state);
   const maxDraw = maxOwnerDrawAmount(state);
   const disabled = state.flags?.gameOver ? 'disabled' : '';
   const opening = state.meta?.ceoOpeningBankBalance;
-  const bankLow = bank < personalBurn * 0.75;
+  const bankLow = bank < scheduled.total * 0.75;
 
   const presetBtns = band.presets
     .map(
@@ -107,6 +119,10 @@ export function renderCeoPanel(container, state) {
         `<li>${formatMoney(c.prior)}/yr → ${formatMoney(c.annual)}/yr · ${escapeHtml(c.year ? formatCalendarStamp(c.year, c.month) : '—')}</li>`
     )
     .join('');
+
+  const lastDebitBlock = lastExpense?.breakdown?.length
+    ? `<details class="ceo-debit-history"><summary>Last month debited ${formatMoney(lastExpense.total)}</summary>${renderDebitBreakdown(lastExpense.breakdown)}</details>`
+    : '';
 
   const publicBlock =
     publicCo && !state.flags?.cashedOut
@@ -134,12 +150,26 @@ export function renderCeoPanel(container, state) {
       : '';
 
   container.innerHTML = `
-    <p class="panel-lede">${escapeHtml(name)} — <strong>company cash</strong> is on Finance; this tab is your personal bank, salary, draws, and equity.</p>
+    <p class="panel-lede">${escapeHtml(name)} — <strong>company cash</strong> is on Finance; this tab is your personal bank, salary, auto debits, draws, and equity.</p>
 
     <div class="capital-stack ceo-bank-panel" role="region" aria-label="Personal bank">
       <p class="prelaunch-progress-title"><strong>Personal bank</strong> ${formatMoney(bank)}</p>
-      <p class="fine-print">${opening != null ? `Opened this run at ${formatMoney(opening)}.` : 'Randomized opening balance for this run.'} Salary deposits and owner draws land here; living expenses debit each month close.</p>
-      ${bankLow ? `<p class="fine-print error">Personal runway ${escapeHtml(personalRunway.label)} at ${formatMoney(personalBurn)}/mo — increase salary or draw from the company.</p>` : `<p class="fine-print">Personal runway ~${escapeHtml(personalRunway.label)} at ${formatMoney(personalBurn)}/mo living budget.</p>`}
+      <p class="fine-print">${opening != null ? `Opened this run at ${formatMoney(opening)}.` : 'Randomized opening balance for this run.'} Salary and owner draws credit here; living debits hit at month close.</p>
+      ${bankLow ? `<p class="fine-print error">Personal runway ${escapeHtml(personalRunway.label)} with ~${formatMoney(typicalBurn)}/mo typical spend — raise salary or draw from the company.</p>` : `<p class="fine-print">Personal runway ~${escapeHtml(personalRunway.label)} (typical spend ${formatMoney(typicalBurn)}/mo from salary band).</p>`}
+    </div>
+
+    <div class="capital-stack ceo-debit-panel" role="region" aria-label="Personal debits">
+      <p class="prelaunch-progress-title"><strong>Personal debits</strong> <span class="fine-print">(not editable)</span></p>
+      <p class="fine-print">${escapeHtml(expenseBand.label)} · salary ${formatMoney(annual)}/yr → band ${formatMoney(expenseBand.min)}–${formatMoney(expenseBand.max)}/mo. Company ARR does <strong>not</strong> change this.</p>
+      <div class="summary-grid">
+        <div><span class="stat-label">This month (rolled)</span><span class="stat-value">${formatMoney(scheduled.total)}</span></div>
+        <div><span class="stat-label">Typical midpoint</span><span class="stat-value">${formatMoney(typicalBurn)}/mo</span></div>
+        <div><span class="stat-label">Career debits paid</span><span class="stat-value">${formatMoney(careerDebits)}</span></div>
+        <div><span class="stat-label">Stage (company)</span><span class="stat-value">${escapeHtml(stageLabel(state.stage))}</span></div>
+      </div>
+      <p class="fine-print">Each month rolls a new total inside your salary band (rent, food, insurance, etc.) — you do not set a budget.</p>
+      ${renderDebitBreakdown(scheduled.breakdown)}
+      ${lastDebitBlock}
     </div>
 
     <div class="capital-stack" role="region" aria-label="Estimated net worth">
@@ -153,9 +183,9 @@ export function renderCeoPanel(container, state) {
       <div><span class="stat-label">Owner draws (total)</span><span class="stat-value">${formatMoney(draws)}</span></div>
       <div><span class="stat-label">Founder ownership</span><span class="stat-value">${pct}%</span></div>
       <div><span class="stat-label">CEO pay plan</span><span class="stat-value">${formatMoney(monthly)}/mo</span></div>
-      <div><span class="stat-label">Living budget</span><span class="stat-value">${formatMoney(personalBurn)}/mo</span></div>
       <div><span class="stat-label">Company runway</span><span class="stat-value">${runway.runwayLabel}</span></div>
       <div><span class="stat-label">Implied share px</span><span class="stat-value">${shares.markPx > 0 ? formatMoney(shares.markPx) : '—'}</span></div>
+      <div><span class="stat-label">Personal cash comp</span><span class="stat-value">${formatMoney(ceoPersonalCashComp(state))}</span></div>
     </div>
     ${
       runway.ceoMo > 0 && runway.deltaMo
@@ -163,21 +193,10 @@ export function renderCeoPanel(container, state) {
         : ''
     }
 
-    <div class="finance-action">
-      <p><strong>Personal living budget</strong> — recommended ${formatMoney(recBurn)}/mo for ${escapeHtml(stageLabel(state.stage))}${burnCustom ? ' · using your custom amount' : ' · auto-tracked'}.</p>
-      <p class="fine-print">Debited from your personal bank when you close each month (rent, food, insurance — fictionally).</p>
-      <div class="name-row ceo-salary-row">
-        <label class="visually-hidden" for="ceo-personal-burn-input">Monthly personal budget</label>
-        <input id="ceo-personal-burn-input" type="number" min="1500" max="30000" step="100" value="${burnCustom ? personalBurn : recBurn}" ${disabled}>
-        <button type="button" class="btn btn-small" id="btn-save-ceo-personal-burn" ${disabled}>Save budget</button>
-        <button type="button" class="btn btn-ghost btn-small" id="btn-reset-ceo-personal-burn" ${disabled}>Use recommended</button>
-      </div>
-    </div>
-
     ${publicBlock}
 
     <div class="finance-action">
-      <p><strong>CEO salary</strong> — ${escapeHtml(band.label)} · typical ${formatMoney(band.typical)}/yr. Paid from company cash at month close, then deposited to your bank.</p>
+      <p><strong>CEO salary</strong> — ${escapeHtml(band.label)} · typical ${formatMoney(band.typical)}/yr. Paid from company cash at month close, then deposited to your bank. <strong>Salary sets your personal debit band.</strong></p>
       <p class="fine-print">${escapeHtml(band.note)}</p>
       ${boardNote ? `<p class="fine-print error">${escapeHtml(boardNote)}</p>` : ''}
       <div class="stock-actions">${presetBtns}</div>
@@ -202,7 +221,7 @@ export function renderCeoPanel(container, state) {
         <input id="ceo-draw-input" type="number" min="500" step="500" placeholder="Custom amount" ${disabled}>
         <button type="button" class="btn btn-small" id="btn-ceo-draw-custom" ${disabled}>Draw custom</button>
       </div>
-      <p class="fine-print">Lifetime cash comp (salary + draws): ${formatMoney(ceoPersonalCashComp(state))}.</p>
+      <p class="fine-print">Lifetime cash comp (salary + draws, before debits): ${formatMoney(ceoPersonalCashComp(state))}.</p>
     </div>
 
     <h3 class="log-head">Personal bank ledger</h3>
