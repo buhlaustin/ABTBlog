@@ -659,6 +659,32 @@ h1 {
   margin: 1rem 0 1.25rem;
 }
 
+.companies-brief {
+  font-size: 0.9rem;
+  opacity: 0.92;
+  margin: 0.35rem 0 0.75rem;
+  line-height: 1.45;
+}
+
+.companies-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.companies-search-input {
+  flex: 1 1 12rem;
+  min-width: 10rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.2);
+  color: inherit;
+  font-size: 0.9rem;
+}
+
 .companies-filters {
   display: flex;
   flex-wrap: wrap;
@@ -708,6 +734,11 @@ h1 {
   border-radius: 4px;
   margin-left: 0.25rem;
   vertical-align: middle;
+}
+
+.tag-fire {
+  background: rgba(249, 115, 22, 0.22);
+  color: #fed7aa;
 }
 
 .tag-hot {

@@ -29,9 +29,14 @@ export function createInitialAcquisitionsState() {
   return {
     owned: [],
     marketSegment: 'all',
+    marketSort: 'ask',
+    marketSearch: '',
     marketPage: 0,
     lifetimePortfolioRevenue: 0,
-    dealLog: []
+    dealLog: [],
+    diligenceReports: {},
+    fireSaleIds: [],
+    fireSaleTurn: null
   };
 }
 
@@ -74,6 +79,62 @@ function ensureAcquisitions(state) {
   if (!state.acquisitions.dealLog) state.acquisitions.dealLog = [];
   if (!state.acquisitions.marketSegment) state.acquisitions.marketSegment = 'all';
   if (state.acquisitions.marketPage == null) state.acquisitions.marketPage = 0;
+  if (!state.acquisitions.marketSort) state.acquisitions.marketSort = 'ask';
+  if (state.acquisitions.marketSearch == null) state.acquisitions.marketSearch = '';
+  if (!state.acquisitions.diligenceReports) state.acquisitions.diligenceReports = {};
+  if (!state.acquisitions.fireSaleIds) state.acquisitions.fireSaleIds = [];
+}
+
+function isFireSale(state, companyId) {
+  return (state.acquisitions?.fireSaleIds ?? []).includes(companyId);
+}
+
+function monthsHeld(state, holding) {
+  return Math.max(0, calendarTurn(state) - (holding.acquiredTurn ?? calendarTurn(state)));
+}
+
+function refreshFireSales(state) {
+  ensureAcquisitions(state);
+  const turn = calendarTurn(state);
+  if (state.acquisitions.fireSaleTurn === turn) return;
+  state.acquisitions.fireSaleTurn = turn;
+  const seed = state.meta?.runSeed ?? 1;
+  const pool = catalog.filter((c) => isTargetVisible(state, c) && !ownedIds(state).has(c.id));
+  const picks = [];
+  for (let attempt = 0; attempt < 24 && picks.length < 2 && pool.length; attempt += 1) {
+    const idx = Math.floor(hash01(seed, 'fire-sale', turn * 17 + attempt) * pool.length);
+    const id = pool[idx]?.id;
+    if (id && !picks.includes(id)) picks.push(id);
+  }
+  state.acquisitions.fireSaleIds = picks;
+}
+
+export function marketBrief(state) {
+  const turn = calendarTurn(state);
+  const seed = state.meta?.runSeed ?? 1;
+  const tier = progressionTier(state);
+  const notes = [
+    'Bulge-bracket bankers say strategics are back — enterprise asks firming.',
+    'Small-cap roll-ups trading below 6× ARR in your segment this month.',
+    'Debt markets tight; sellers prefer cash at close.',
+    'PE funds circling mid-market SaaS — expect bidding wars on hot names.',
+    'Public comps wobbled — soft asks on mid-market targets may linger.',
+    'Corporate development teams hunting vertical fit before year-end.'
+  ];
+  const base = notes[Math.floor(hash01(seed, 'brief', turn) * notes.length)];
+  const tierNote = tier >= 4 ? ' Your scale lets you digest larger platforms.' : '';
+  const fire = (state.acquisitions?.fireSaleIds?.length ?? 0) > 0 ? ' Two fire-sale listings at −15%.' : '';
+  return `${base}${tierNote}${fire}`;
+}
+
+export function portfolioMix(state) {
+  const mix = { small: 0, mid: 0, enterprise: 0 };
+  for (const h of state.acquisitions?.owned ?? []) {
+    const def = catalog.find((c) => c.id === h.id);
+    if (!def) continue;
+    mix[def.segment] = (mix[def.segment] ?? 0) + subsidiaryMrr(state, h, def);
+  }
+  return mix;
 }
 
 function ownedIds(state) {
@@ -121,15 +182,20 @@ function integrationMrrFactor(holding) {
   return 0.4;
 }
 
-export function targetAskPrice(state, company) {
-  if (ownedIds(state).has(company.id)) return null;
+function baseAskPrice(state, company) {
   const turn = calendarTurn(state);
   const seed = state.meta?.runSeed ?? 1;
   const vol = 0.82 + hash01(seed, company.id, turn) * 0.38;
   const tierBoost = 1 + progressionTier(state) * 0.035;
-  const synergyDiscount =
-    categorySynergyMult(state, company) > 1 ? 0.97 : 1;
-  return Math.round(company.basePrice * vol * tierBoost * synergyDiscount);
+  const synergyDiscount = categorySynergyMult(state, company) > 1 ? 0.97 : 1;
+  return company.basePrice * vol * tierBoost * synergyDiscount;
+}
+
+export function targetAskPrice(state, company) {
+  if (ownedIds(state).has(company.id)) return null;
+  let price = baseAskPrice(state, company);
+  if (isFireSale(state, company.id)) price *= 0.85;
+  return Math.round(price);
 }
 
 export function fairValueEstimate(state, company) {
@@ -193,7 +259,9 @@ export function subsidiarySalePrice(state, holding, company) {
   const vol = 0.88 + hash01(seed, `${company.id}-exit`, turn) * 0.28;
   const health = holdingHealth(holding);
   const invested = holding.investedTotal ?? 0;
-  const core = company.basePrice * health * vol * categorySynergyMult(state, company);
+  const held = monthsHeld(state, holding);
+  const holdBonus = 1 + Math.min(0.12, Math.floor(held / 6) * 0.02);
+  const core = company.basePrice * health * vol * categorySynergyMult(state, company) * holdBonus;
   return Math.round(core + invested * 0.82);
 }
 
@@ -221,16 +289,84 @@ export function setCompaniesMarketPage(state, delta) {
   state.acquisitions.marketPage = Math.max(0, Math.min(maxPage, next));
 }
 
+export function setCompaniesMarketSort(state, sort) {
+  ensureAcquisitions(state);
+  state.acquisitions.marketSort = sort || 'ask';
+  state.acquisitions.marketPage = 0;
+}
+
+export function setCompaniesMarketSearch(state, query) {
+  ensureAcquisitions(state);
+  state.acquisitions.marketSearch = String(query ?? '').trim().toLowerCase();
+  state.acquisitions.marketPage = 0;
+}
+
+const DILIGENCE_COST = 10_000;
+
+export function runDueDiligence(state, targetId) {
+  if (!acquisitionsUnlocked(state)) {
+    return { ok: false, reason: 'Acquisitions unlock after your XC batch.' };
+  }
+  ensureAcquisitions(state);
+  const company = catalog.find((c) => c.id === targetId);
+  if (!company) return { ok: false, reason: 'Target not found.' };
+  if (ownedIds(state).has(targetId)) return { ok: false, reason: 'You already own this company.' };
+  if (state.acquisitions.diligenceReports[targetId]) {
+    return { ok: false, reason: 'Due diligence already on file for this target.' };
+  }
+  if ((state.finance?.cash ?? 0) < DILIGENCE_COST) {
+    return { ok: false, reason: `Due diligence costs ${formatMoney(DILIGENCE_COST)}.` };
+  }
+  state.finance.cash -= DILIGENCE_COST;
+  recordCashOutflow(state, DILIGENCE_COST, 'acquisition-diligence');
+  const seed = state.meta?.runSeed ?? 1;
+  const healthRoll = Math.round((0.9 + hash01(seed, targetId, 404) * 0.18) * 100) / 100;
+  const hiddenDebt = hash01(seed, targetId, 405) > 0.82;
+  state.acquisitions.diligenceReports[targetId] = {
+    healthRoll,
+    hiddenDebt,
+    integrationExtra: hiddenDebt ? 1 : 0
+  };
+  const name = displayName(state, company);
+  return {
+    ok: true,
+    company,
+    name,
+    healthRoll,
+    hiddenDebt,
+    summary: hiddenDebt
+      ? `${name}: opens at ${healthRoll}× health — hidden integration debt (+1 mo).`
+      : `${name}: clean file — expect ~${healthRoll}× starting health.`
+  };
+}
+
 function filteredMarketTargets(state) {
+  refreshFireSales(state);
   const seg = state.acquisitions?.marketSegment ?? 'all';
-  return catalog
+  const q = state.acquisitions?.marketSearch ?? '';
+  const list = catalog
     .filter((c) => isTargetVisible(state, c) && !ownedIds(state).has(c.id))
     .filter((c) => {
       if (seg === 'all') return true;
       if (seg === 'rival') return c.isRival;
       return c.segment === seg;
     })
-    .sort((a, b) => targetAskPrice(state, b) - targetAskPrice(state, a));
+    .filter((c) => {
+      if (!q) return true;
+      const name = displayName(state, c).toLowerCase();
+      return name.includes(q) || c.description?.toLowerCase().includes(q);
+    });
+  const sort = state.acquisitions?.marketSort ?? 'ask';
+  list.sort((a, b) => {
+    if (sort === 'mrr') return b.baseMrr - a.baseMrr;
+    if (sort === 'multiple') {
+      const ma = targetAskPrice(state, a) / Math.max(1, a.baseMrr * 12);
+      const mb = targetAskPrice(state, b) / Math.max(1, b.baseMrr * 12);
+      return ma - mb;
+    }
+    return targetAskPrice(state, b) - targetAskPrice(state, a);
+  });
+  return list;
 }
 
 export function purchaseTarget(state, targetId) {
@@ -250,17 +386,21 @@ export function purchaseTarget(state, targetId) {
 
   state.finance.cash -= price;
   recordCashOutflow(state, price, 'acquisition');
-  const integrationMonthsLeft = integrationMonthsForSegment(company.segment, company.isRival);
+  const report = state.acquisitions.diligenceReports?.[company.id];
+  let integrationMonthsLeft = integrationMonthsForSegment(company.segment, company.isRival);
+  if (report?.integrationExtra) integrationMonthsLeft += 1;
   const holding = {
     id: company.id,
     acquiredTurn: calendarTurn(state),
     purchasePrice: price,
-    health: 1,
+    health: report?.healthRoll ?? 1,
     investedTotal: 0,
     integrationMonthsLeft,
     lastReinvestTurn: calendarTurn(state)
   };
   state.acquisitions.owned.push(holding);
+  if (report) delete state.acquisitions.diligenceReports[company.id];
+  state.acquisitions.fireSaleIds = (state.acquisitions.fireSaleIds ?? []).filter((id) => id !== company.id);
 
   if (company.isRival) {
     state.world.competitorAcquired = true;
@@ -346,12 +486,18 @@ export function sellSubsidiary(state, targetId) {
   return { ok: true, company, proceeds };
 }
 
-/** Month-start: integration countdown + neglect decay. */
+/** Month-start: fire sales, integration countdown + neglect decay. */
 export function tickAcquisitionsAtMonthStart(state) {
-  if (!state.acquisitions?.owned?.length) return [];
+  if (!acquisitionsUnlocked(state)) return [];
+  refreshFireSales(state);
   const lines = [];
+  if ((state.acquisitions?.fireSaleIds?.length ?? 0) > 0) {
+    lines.push('M&A desk: fire-sale listings live on the Companies tab (−15% ask).');
+  }
+  if (!state.acquisitions?.owned?.length) return lines;
   const turn = calendarTurn(state);
   for (const h of state.acquisitions.owned) {
+    h.monthsHeld = monthsHeld(state, h);
     const def = catalog.find((c) => c.id === h.id);
     if (!def) continue;
     const name = def.isRival ? state.world?.competitor?.name ?? def.name : def.name;
@@ -429,7 +575,13 @@ export function renderCompaniesPanel(container, state) {
   const lifetime = state.acquisitions.lifetimePortfolioRevenue ?? 0;
   const cash = state.finance?.cash ?? 0;
   const filter = state.acquisitions.marketSegment ?? 'all';
+  const sort = state.acquisitions.marketSort ?? 'ask';
+  const search = state.acquisitions.marketSearch ?? '';
   const marketAll = filteredMarketTargets(state);
+  const mix = portfolioMix(state);
+  const mixNote = owned.length
+    ? `Mix: ${formatMoney(mix.small)}/mo small · ${formatMoney(mix.mid)}/mo mid · ${formatMoney(mix.enterprise)}/mo enterprise`
+    : '';
   const page = state.acquisitions.marketPage ?? 0;
   const pageSlice = marketAll.slice(page * MARKET_PAGE_SIZE, (page + 1) * MARKET_PAGE_SIZE);
   const maxPage = Math.max(0, Math.ceil(marketAll.length / MARKET_PAGE_SIZE) - 1);
@@ -445,6 +597,8 @@ export function renderCompaniesPanel(container, state) {
       const exit = subsidiarySalePrice(state, h, co);
       const name = displayName(state, co);
       const costBasis = (h.purchasePrice ?? 0) + (h.investedTotal ?? 0);
+      const held = monthsHeld(state, h);
+      const holdBonus = Math.min(12, Math.floor(held / 6) * 2);
       const roi = costBasis > 0 ? ((exit - costBasis) / costBasis) * 100 : 0;
       const cat = inferredMarketCategory(state, co);
       const syn =
@@ -455,7 +609,7 @@ export function renderCompaniesPanel(container, state) {
         <td><strong>${escapeHtml(name)}</strong> ${syn}<br><span class="fine-print">${escapeHtml(segmentLabel(co.segment))} · health ${holdingHealth(h).toFixed(2)}×</span><br>${integrationBar(h)}</td>
         <td class="num">${formatMoney(mrr)}/mo</td>
         <td class="num">${formatMoney(costBasis)}</td>
-        <td class="num">${formatMoney(exit)}<br><span class="fine-print">${roi >= 0 ? '+' : ''}${roi.toFixed(0)}% vs basis</span></td>
+        <td class="num">${formatMoney(exit)}<br><span class="fine-print">${roi >= 0 ? '+' : ''}${roi.toFixed(0)}% vs basis${holdBonus ? ` · +${holdBonus}% hold` : ''}</span></td>
         <td class="num companies-actions">
           <button type="button" class="btn btn-small" data-acquisition-reinvest="${escapeHtml(co.id)}" data-acquisition-reinvest-amt="25000">+$25k</button>
           <button type="button" class="btn btn-small" data-acquisition-reinvest="${escapeHtml(co.id)}" data-acquisition-reinvest-amt="100000">+$100k</button>
@@ -477,12 +631,24 @@ export function renderCompaniesPanel(container, state) {
           ? `<span class="tag tag-synergy">Fits ${escapeHtml(state.company?.categoryLabel ?? 'your vertical')}</span>`
           : `<span class="fine-print">${escapeHtml(cat.replace(/-/g, ' '))}</span>`;
       const canAfford = cash >= ask;
+      const fire = isFireSale(state, co.id) ? '<span class="tag tag-fire">Fire sale −15%</span> ' : '';
+      const diligenced = state.acquisitions.diligenceReports?.[co.id];
+      const ddNote = diligenced
+        ? `<span class="fine-print">On file: ~${diligenced.healthRoll}× health${diligenced.hiddenDebt ? ', +1 mo integration' : ''}</span>`
+        : '';
       return `<tr>
-        <td><strong>${escapeHtml(name)}</strong>${co.isRival ? ' <span class="tag tag-rival">Rival</span>' : ''}<br><span class="fine-print">${escapeHtml(co.description)}</span><br>${fit}</td>
+        <td><strong>${escapeHtml(name)}</strong>${co.isRival ? ' <span class="tag tag-rival">Rival</span>' : ''} ${fire}<br><span class="fine-print">${escapeHtml(co.description)}</span><br>${fit}${ddNote ? `<br>${ddNote}` : ''}</td>
         <td>${escapeHtml(segmentLabel(co.segment))}</td>
         <td class="num">${formatMoney(co.baseMrr)}/mo</td>
         <td class="num">${formatMoney(ask)} ${trendBadge(trend)}<br><span class="fine-print">Fair ~${formatMoney(fair)}${escapeHtml(vsFair ?? '')} · ${multiple}× rev</span></td>
-        <td class="num"><button type="button" class="btn btn-primary btn-small" data-acquisition-buy="${escapeHtml(co.id)}" ${canAfford ? '' : 'disabled'}>Acquire</button></td>
+        <td class="num companies-actions">
+          <button type="button" class="btn btn-primary btn-small" data-acquisition-buy="${escapeHtml(co.id)}" ${canAfford ? '' : 'disabled'}>Acquire</button>
+          ${
+            diligenced
+              ? ''
+              : `<button type="button" class="btn btn-small" data-acquisition-diligence="${escapeHtml(co.id)}" ${cash >= DILIGENCE_COST ? '' : 'disabled'}>DD ${formatMoney(DILIGENCE_COST)}</button>`
+          }
+        </td>
       </tr>`;
     })
     .join('');
@@ -509,6 +675,8 @@ export function renderCompaniesPanel(container, state) {
     <p class="panel-lede">Build a roll-up: buy operators for recurring MRR, reinvest to raise health and exit value, or sell when the market pays a premium.</p>
     ${lockNote}
     ${rivalNote}
+    <p class="companies-brief fine-print" role="status"><strong>Market brief:</strong> ${escapeHtml(marketBrief(state))}</p>
+    ${mixNote ? `<p class="fine-print">${mixNote}</p>` : ''}
     <div class="companies-summary summary-grid">
       <div><span class="stat-label">Portfolio MRR</span><span class="stat-value">${formatMoney(portfolioMrr)}/mo</span></div>
       <div><span class="stat-label">Synergy stack</span><span class="stat-value">${((synergy - 1) * 100).toFixed(1)}%</span></div>
@@ -542,7 +710,16 @@ export function renderCompaniesPanel(container, state) {
         ${filterBtn('enterprise', 'Enterprise')}
         ${filterBtn('rival', 'Rival')}
       </nav>
-      <p class="fine-print">${marketAll.length} targets · prices refresh each month · reinvest accelerates integration</p>
+      <div class="companies-toolbar">
+        <label class="companies-search fine-print">Search
+          <input type="search" id="companies-market-search" class="companies-search-input" placeholder="Name or niche…" value="${escapeHtml(search)}" autocomplete="off" />
+        </label>
+        <span class="fine-print">Sort:</span>
+        <button type="button" class="companies-filter ${sort === 'ask' ? 'active' : ''}" data-companies-sort="ask">Ask</button>
+        <button type="button" class="companies-filter ${sort === 'mrr' ? 'active' : ''}" data-companies-sort="mrr">MRR</button>
+        <button type="button" class="companies-filter ${sort === 'multiple' ? 'active' : ''}" data-companies-sort="multiple">Multiple</button>
+      </div>
+      <p class="fine-print">${marketAll.length} targets · due diligence ${formatMoney(DILIGENCE_COST)} · hold 6+ mo boosts exit up to +12%</p>
       <div class="table-scroll"><table class="data-table acquisitions-table">
         <thead><tr><th>Target</th><th>Size</th><th>Base MRR</th><th>Ask</th><th></th></tr></thead>
         <tbody>${marketRows || '<tr><td colspan="5">No targets in this filter.</td></tr>'}</tbody>

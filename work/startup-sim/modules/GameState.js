@@ -29,7 +29,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 18;
+export const SAVE_VERSION = 19;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -324,6 +324,11 @@ export function normalizeSave(raw) {
     if (state.acquisitions.lifetimePortfolioRevenue === undefined) {
       state.acquisitions.lifetimePortfolioRevenue = 0;
     }
+    if (!state.acquisitions.diligenceReports) state.acquisitions.diligenceReports = {};
+    if (!state.acquisitions.fireSaleIds) state.acquisitions.fireSaleIds = [];
+    if (state.acquisitions.fireSaleTurn === undefined) state.acquisitions.fireSaleTurn = null;
+    if (!state.acquisitions.marketSort) state.acquisitions.marketSort = 'ask';
+    if (state.acquisitions.marketSearch === undefined) state.acquisitions.marketSearch = '';
     for (const h of state.acquisitions.owned) {
       if (h.integrationMonthsLeft === undefined) h.integrationMonthsLeft = 0;
       if (h.purchasePrice === undefined) h.purchasePrice = 0;

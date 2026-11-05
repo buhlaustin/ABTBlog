@@ -106,7 +106,10 @@ import {
   preloadAcquisitionCatalog,
   showCompaniesFeedback,
   setCompaniesMarketFilter,
-  setCompaniesMarketPage
+  setCompaniesMarketPage,
+  setCompaniesMarketSort,
+  setCompaniesMarketSearch,
+  runDueDiligence
 } from './modules/Acquisitions.js';
 import { openMonthSummaryDialog, updateMonthSummaryHeadline } from './modules/MonthSummary.js';
 import { copyRunExportToClipboard } from './modules/RunExport.js';
@@ -952,6 +955,23 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const sortBtn = e.target.closest('[data-companies-sort]');
+    if (sortBtn && sessionState) {
+      setCompaniesMarketSort(sessionState, sortBtn.getAttribute('data-companies-sort'));
+      refresh();
+      return;
+    }
+    const ddBtn = e.target.closest('[data-acquisition-diligence]');
+    if (ddBtn && sessionState) {
+      const result = runDueDiligence(sessionState, ddBtn.getAttribute('data-acquisition-diligence'));
+      if (!result.ok) showCompaniesFeedback(result.reason || 'Due diligence failed.', true);
+      else {
+        appendLog(sessionState, `Due diligence: ${result.summary}`);
+        showCompaniesFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     if (e.target.id === 'btn-file-ipo') {
       handleFileIpo();
       return;
@@ -1069,6 +1089,12 @@ function bindGameInteractions() {
       fb.hidden = false;
       fb.textContent = result.ok ? 'Run summary copied to clipboard.' : result.reason ?? 'Copy failed.';
     }
+  });
+
+  app?.addEventListener('input', (e) => {
+    if (e.target.id !== 'companies-market-search' || !sessionState) return;
+    setCompaniesMarketSearch(sessionState, e.target.value);
+    refresh();
   });
 }
 
