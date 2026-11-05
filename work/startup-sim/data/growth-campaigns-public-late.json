@@ -1,1442 +1,91 @@
 {
   "campaigns": [
     {
-      "id": "growth-public-late-001",
-      "title": "Bloomberg TV: brand lift sprint",
-      "description": "Bloomberg TV package built around brand lift sprint. CAC slides get updated reluctantly.",
-      "cost": 18000,
+      "id": "growth-public-earnings-beat-cnbc-spot",
+      "title": "Earnings beat CNBC spot",
+      "description": "Analysts nod on air while your stock ticker pulses green.",
+      "cost": 420000,
       "revenue": [
-        15000,
-        195000
-      ],
-      "buzz": 2,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-002",
-      "title": "CNBC Squawk Box: brand lift sprint",
-      "description": "CNBC Squawk Box buys a month of brand lift sprint. Sales wants leads by Friday.",
-      "cost": 107000,
-      "revenue": [
-        108000,
-        843000
-      ],
-      "buzz": 3,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-003",
-      "title": "Wall Street Journal: brand lift sprint",
-      "description": "Paid brand lift sprint on Wall Street Journal. Legal clears claims; growth clears the invoice.",
-      "cost": 129000,
-      "revenue": [
-        146000,
-        966000
-      ],
-      "buzz": 4,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-004",
-      "title": "Financial Times: brand lift sprint",
-      "description": "Financial Times buys a month of brand lift sprint. Sales wants leads by Friday.",
-      "cost": 43500,
-      "revenue": [
-        51000,
-        336000
+        380000,
+        2100000
       ],
       "buzz": 5,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-005",
-      "title": "TechCrunch Disrupt: brand lift sprint",
-      "description": "TechCrunch Disrupt — brand lift sprint. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 173000,
-      "revenue": [
-        222000,
-        1212000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-006",
-      "title": "SaaStr Annual: brand lift sprint",
-      "description": "SaaStr Annual — brand lift sprint. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 195000,
-      "revenue": [
-        260000,
-        1335000
-      ],
-      "buzz": 3,
       "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-007",
-      "title": "Dreamforce alley: brand lift sprint",
-      "description": "One-month brand lift sprint through Dreamforce alley. IR watches mentions; ops watches traffic.",
-      "cost": 69000,
+      "id": "growth-public-wsj-leader-profile",
+      "title": "Wall Street Journal leader profile",
+      "description": "CEO portrait with quotes legal spent a week polishing.",
+      "cost": 280000,
       "revenue": [
-        87000,
-        477000
+        240000,
+        1400000
       ],
       "buzz": 4,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-008",
-      "title": "AWS re:Invent: brand lift sprint",
-      "description": "AWS re:Invent — brand lift sprint. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 239000,
-      "revenue": [
-        336000,
-        1581000
-      ],
-      "buzz": 5,
       "tierMin": 5,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-009",
-      "title": "Google Cloud Next: brand lift sprint",
-      "description": "Google Cloud Next package built around brand lift sprint. CAC slides get updated reluctantly.",
-      "cost": 261000,
+      "id": "growth-public-ft-weekend-magazine-spread",
+      "title": "Financial Times weekend spread",
+      "description": "Long-read prestige for readers who still print articles.",
+      "cost": 350000,
       "revenue": [
-        374000,
-        1704000
+        300000,
+        1800000
       ],
-      "buzz": 2,
+      "buzz": 5,
       "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-010",
-      "title": "Microsoft Ignite: brand lift sprint",
-      "description": "One-month brand lift sprint through Microsoft Ignite. IR watches mentions; ops watches traffic.",
-      "cost": 94500,
-      "revenue": [
-        123000,
-        338000
-      ],
-      "buzz": 3,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-011",
-      "title": "LinkedIn thought-leadership: brand lift sprint",
-      "description": "LinkedIn thought-leadership package built around brand lift sprint. CAC slides get updated reluctantly.",
-      "cost": 305000,
+      "id": "growth-public-bloomberg-terminal-takeover",
+      "title": "Bloomberg terminal takeover",
+      "description": "Trader desktops glow with your ticker all week.",
+      "cost": 520000,
       "revenue": [
         450000,
-        1950000
+        2800000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "stockPct": 0.006
+    },
+    {
+      "id": "growth-public-reuters-global-wire-bundle",
+      "title": "Reuters global wire bundle",
+      "description": "Headlines in every timezone before competitors wake up.",
+      "cost": 180000,
+      "revenue": [
+        160000,
+        920000
       ],
       "buzz": 4,
       "tierMin": 5,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-012",
-      "title": "YouTube pre-roll: brand lift sprint",
-      "description": "One-month brand lift sprint through YouTube pre-roll. IR watches mentions; ops watches traffic.",
-      "cost": 327000,
+      "id": "growth-public-economist-back-page-ad",
+      "title": "Economist back-page ad",
+      "description": "One witty paragraph for people who read footnotes.",
+      "cost": 95000,
       "revenue": [
-        488000,
-        1138000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-013",
-      "title": "Spotify host-read: brand lift sprint",
-      "description": "Spotify host-read package built around brand lift sprint. CAC slides get updated reluctantly.",
-      "cost": 18000,
-      "revenue": [
-        159000,
-        479000
-      ],
-      "buzz": 2,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-014",
-      "title": "Netflix ad tier: brand lift sprint",
-      "description": "Netflix ad tier buys a month of brand lift sprint. Sales wants leads by Friday.",
-      "cost": 371000,
-      "revenue": [
-        564000,
-        1384000
-      ],
-      "buzz": 3,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-015",
-      "title": "Hulu sports adjacency: brand lift sprint",
-      "description": "One-month brand lift sprint through Hulu sports adjacency. IR watches mentions; ops watches traffic.",
-      "cost": 393000,
-      "revenue": [
-        602000,
-        1507000
-      ],
-      "buzz": 4,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-016",
-      "title": "Reddit AMA week: brand lift sprint",
-      "description": "Reddit AMA week buys a month of brand lift sprint. Sales wants leads by Friday.",
-      "cost": 43500,
-      "revenue": [
-        195000,
-        620000
-      ],
-      "buzz": 5,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-017",
-      "title": "Discord partner server: brand lift sprint",
-      "description": "Discord partner server package built around brand lift sprint. CAC slides get updated reluctantly.",
-      "cost": 85000,
-      "revenue": [
-        678000,
-        1753000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-018",
-      "title": "Twitch sponsored stream: brand lift sprint",
-      "description": "Twitch sponsored stream — brand lift sprint. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 107000,
-      "revenue": [
-        716000,
-        1876000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-019",
-      "title": "Substack crossover: brand lift sprint",
-      "description": "Substack crossover — brand lift sprint. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 69000,
-      "revenue": [
-        15000,
-        265000
-      ],
-      "buzz": 4,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-020",
-      "title": "Newsletter bundle: brand lift sprint",
-      "description": "Newsletter bundle package built around brand lift sprint. CAC slides get updated reluctantly.",
-      "cost": 151000,
-      "revenue": [
-        792000,
-        2122000
-      ],
-      "buzz": 5,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-021",
-      "title": "Bloomberg TV: demand gen burst",
-      "description": "One-month demand gen burst through Bloomberg TV. IR watches mentions; ops watches traffic.",
-      "cost": 173000,
-      "revenue": [
-        70000,
-        1485000
-      ],
-      "buzz": 2,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-022",
-      "title": "CNBC Squawk Box: demand gen burst",
-      "description": "Paid demand gen burst on CNBC Squawk Box. Legal clears claims; growth clears the invoice.",
-      "cost": 94500,
-      "revenue": [
-        51000,
-        406000
-      ],
-      "buzz": 3,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-023",
-      "title": "Wall Street Journal: demand gen burst",
-      "description": "Wall Street Journal — demand gen burst. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 217000,
-      "revenue": [
-        146000,
-        796000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-024",
-      "title": "Financial Times: demand gen burst",
-      "description": "Paid demand gen burst on Financial Times. Legal clears claims; growth clears the invoice.",
-      "cost": 239000,
-      "revenue": [
-        184000,
-        919000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-025",
-      "title": "TechCrunch Disrupt: demand gen burst",
-      "description": "TechCrunch Disrupt package built around demand gen burst. CAC slides get updated reluctantly.",
-      "cost": 18000,
-      "revenue": [
-        87000,
-        267000
-      ],
-      "buzz": 2,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-026",
-      "title": "SaaStr Annual: demand gen burst",
-      "description": "SaaStr Annual package built around demand gen burst. CAC slides get updated reluctantly.",
-      "cost": 283000,
-      "revenue": [
-        260000,
-        1165000
-      ],
-      "buzz": 3,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-027",
-      "title": "Dreamforce alley: demand gen burst",
-      "description": "Dreamforce alley buys a month of demand gen burst. Sales wants leads by Friday.",
-      "cost": 305000,
-      "revenue": [
-        298000,
-        1288000
-      ],
-      "buzz": 4,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-028",
-      "title": "AWS re:Invent: demand gen burst",
-      "description": "AWS re:Invent package built around demand gen burst. CAC slides get updated reluctantly.",
-      "cost": 43500,
-      "revenue": [
-        123000,
-        408000
-      ],
-      "buzz": 5,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-029",
-      "title": "Google Cloud Next: demand gen burst",
-      "description": "One-month demand gen burst through Google Cloud Next. IR watches mentions; ops watches traffic.",
-      "cost": 349000,
-      "revenue": [
-        374000,
-        1534000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-030",
-      "title": "Microsoft Ignite: demand gen burst",
-      "description": "Microsoft Ignite buys a month of demand gen burst. Sales wants leads by Friday.",
-      "cost": 371000,
-      "revenue": [
-        412000,
-        1657000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-031",
-      "title": "LinkedIn thought-leadership: demand gen burst",
-      "description": "One-month demand gen burst through LinkedIn thought-leadership. IR watches mentions; ops watches traffic.",
-      "cost": 69000,
-      "revenue": [
-        159000,
-        549000
-      ],
-      "buzz": 4,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-032",
-      "title": "YouTube pre-roll: demand gen burst",
-      "description": "YouTube pre-roll buys a month of demand gen burst. Sales wants leads by Friday.",
-      "cost": 415000,
-      "revenue": [
-        488000,
-        1903000
-      ],
-      "buzz": 5,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-033",
-      "title": "Spotify host-read: demand gen burst",
-      "description": "One-month demand gen burst through Spotify host-read. IR watches mentions; ops watches traffic.",
-      "cost": 85000,
-      "revenue": [
-        526000,
-        2026000
-      ],
-      "buzz": 2,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-034",
-      "title": "Netflix ad tier: demand gen burst",
-      "description": "Paid demand gen burst on Netflix ad tier. Legal clears claims; growth clears the invoice.",
-      "cost": 94500,
-      "revenue": [
-        195000,
-        410000
-      ],
-      "buzz": 3,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-035",
-      "title": "Hulu sports adjacency: demand gen burst",
-      "description": "Hulu sports adjacency buys a month of demand gen burst. Sales wants leads by Friday.",
-      "cost": 129000,
-      "revenue": [
-        602000,
-        1337000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-036",
-      "title": "Reddit AMA week: demand gen burst",
-      "description": "Paid demand gen burst on Reddit AMA week. Legal clears claims; growth clears the invoice.",
-      "cost": 151000,
-      "revenue": [
-        640000,
-        1460000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-037",
-      "title": "Discord partner server: demand gen burst",
-      "description": "One-month demand gen burst through Discord partner server. IR watches mentions; ops watches traffic.",
-      "cost": 18000,
-      "revenue": [
-        15000,
-        335000
-      ],
-      "buzz": 2,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-038",
-      "title": "Twitch sponsored stream: demand gen burst",
-      "description": "Twitch sponsored stream package built around demand gen burst. CAC slides get updated reluctantly.",
-      "cost": 195000,
-      "revenue": [
-        716000,
-        1706000
-      ],
-      "buzz": 3,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-039",
-      "title": "Substack crossover: demand gen burst",
-      "description": "Substack crossover package built around demand gen burst. CAC slides get updated reluctantly.",
-      "cost": 217000,
-      "revenue": [
-        754000,
-        1829000
-      ],
-      "buzz": 4,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-040",
-      "title": "Newsletter bundle: demand gen burst",
-      "description": "One-month demand gen burst through Newsletter bundle. IR watches mentions; ops watches traffic.",
-      "cost": 43500,
-      "revenue": [
-        51000,
-        476000
-      ],
-      "buzz": 5,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-041",
-      "title": "Bloomberg TV: enterprise pipeline push",
-      "description": "Paid enterprise pipeline push on Bloomberg TV. Legal clears claims; growth clears the invoice.",
-      "cost": 261000,
-      "revenue": [
-        70000,
-        1315000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-042",
-      "title": "CNBC Squawk Box: enterprise pipeline push",
-      "description": "CNBC Squawk Box package built around enterprise pipeline push. CAC slides get updated reluctantly.",
-      "cost": 283000,
-      "revenue": [
-        108000,
-        1438000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-043",
-      "title": "Wall Street Journal: enterprise pipeline push",
-      "description": "One-month enterprise pipeline push through Wall Street Journal. IR watches mentions; ops watches traffic.",
-      "cost": 69000,
-      "revenue": [
-        87000,
-        337000
-      ],
-      "buzz": 4,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-044",
-      "title": "Financial Times: enterprise pipeline push",
-      "description": "Financial Times package built around enterprise pipeline push. CAC slides get updated reluctantly.",
-      "cost": 327000,
-      "revenue": [
-        184000,
-        1684000
-      ],
-      "buzz": 5,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-045",
-      "title": "TechCrunch Disrupt: enterprise pipeline push",
-      "description": "TechCrunch Disrupt buys a month of enterprise pipeline push. Sales wants leads by Friday.",
-      "cost": 349000,
-      "revenue": [
-        222000,
-        872000
-      ],
-      "buzz": 2,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-046",
-      "title": "SaaStr Annual: enterprise pipeline push",
-      "description": "SaaStr Annual buys a month of enterprise pipeline push. Sales wants leads by Friday.",
-      "cost": 94500,
-      "revenue": [
-        123000,
-        478000
-      ],
-      "buzz": 3,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-047",
-      "title": "Dreamforce alley: enterprise pipeline push",
-      "description": "Dreamforce alley — enterprise pipeline push. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 393000,
-      "revenue": [
-        298000,
-        1118000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-048",
-      "title": "AWS re:Invent: enterprise pipeline push",
-      "description": "AWS re:Invent buys a month of enterprise pipeline push. Sales wants leads by Friday.",
-      "cost": 415000,
-      "revenue": [
-        336000,
-        1241000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-049",
-      "title": "Google Cloud Next: enterprise pipeline push",
-      "description": "Paid enterprise pipeline push on Google Cloud Next. Legal clears claims; growth clears the invoice.",
-      "cost": 18000,
-      "revenue": [
-        159000,
-        339000
-      ],
-      "buzz": 2,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-050",
-      "title": "Microsoft Ignite: enterprise pipeline push",
-      "description": "Microsoft Ignite — enterprise pipeline push. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 107000,
-      "revenue": [
-        412000,
-        1487000
-      ],
-      "buzz": 3,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-051",
-      "title": "LinkedIn thought-leadership: enterprise pipeline push",
-      "description": "Paid enterprise pipeline push on LinkedIn thought-leadership. Legal clears claims; growth clears the invoice.",
-      "cost": 129000,
-      "revenue": [
-        450000,
-        1610000
-      ],
-      "buzz": 4,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-052",
-      "title": "YouTube pre-roll: enterprise pipeline push",
-      "description": "YouTube pre-roll — enterprise pipeline push. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 43500,
-      "revenue": [
-        195000,
+        85000,
         480000
       ],
-      "buzz": 5,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-053",
-      "title": "Spotify host-read: enterprise pipeline push",
-      "description": "Paid enterprise pipeline push on Spotify host-read. Legal clears claims; growth clears the invoice.",
-      "cost": 173000,
-      "revenue": [
-        526000,
-        1856000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-054",
-      "title": "Netflix ad tier: enterprise pipeline push",
-      "description": "Netflix ad tier package built around enterprise pipeline push. CAC slides get updated reluctantly.",
-      "cost": 195000,
-      "revenue": [
-        564000,
-        1979000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-055",
-      "title": "Hulu sports adjacency: enterprise pipeline push",
-      "description": "Hulu sports adjacency — enterprise pipeline push. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 69000,
-      "revenue": [
-        15000,
-        405000
-      ],
-      "buzz": 4,
-      "tierMin": 4,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-056",
-      "title": "Reddit AMA week: enterprise pipeline push",
-      "description": "Reddit AMA week package built around enterprise pipeline push. CAC slides get updated reluctantly.",
-      "cost": 239000,
-      "revenue": [
-        640000,
-        1290000
-      ],
-      "buzz": 5,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-057",
-      "title": "Discord partner server: enterprise pipeline push",
-      "description": "Paid enterprise pipeline push on Discord partner server. Legal clears claims; growth clears the invoice.",
-      "cost": 261000,
-      "revenue": [
-        678000,
-        1413000
-      ],
-      "buzz": 2,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-058",
-      "title": "Twitch sponsored stream: enterprise pipeline push",
-      "description": "Twitch sponsored stream buys a month of enterprise pipeline push. Sales wants leads by Friday.",
-      "cost": 94500,
-      "revenue": [
-        51000,
-        266000
-      ],
       "buzz": 3,
       "tierMin": 4,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-059",
-      "title": "Substack crossover: enterprise pipeline push",
-      "description": "Substack crossover buys a month of enterprise pipeline push. Sales wants leads by Friday.",
-      "cost": 305000,
+      "id": "growth-public-barron-roundtable-sponsor",
+      "title": "Barron's roundtable sponsor",
+      "description": "Wealth managers debate your TAM over coffee.",
+      "cost": 210000,
       "revenue": [
-        754000,
-        1659000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-060",
-      "title": "Newsletter bundle: enterprise pipeline push",
-      "description": "Paid enterprise pipeline push on Newsletter bundle. Legal clears claims; growth clears the invoice.",
-      "cost": 327000,
-      "revenue": [
-        792000,
-        1782000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-061",
-      "title": "Bloomberg TV: developer awareness wave",
-      "description": "Paid developer awareness wave on Bloomberg TV. Legal clears claims; growth clears the invoice.",
-      "cost": 349000,
-      "revenue": [
-        70000,
-        1145000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-062",
-      "title": "CNBC Squawk Box: developer awareness wave",
-      "description": "CNBC Squawk Box package built around developer awareness wave. CAC slides get updated reluctantly.",
-      "cost": 371000,
-      "revenue": [
-        108000,
-        1268000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-063",
-      "title": "Wall Street Journal: developer awareness wave",
-      "description": "One-month developer awareness wave through Wall Street Journal. IR watches mentions; ops watches traffic.",
-      "cost": 393000,
-      "revenue": [
-        146000,
-        1391000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-064",
-      "title": "Financial Times: developer awareness wave",
-      "description": "Financial Times package built around developer awareness wave. CAC slides get updated reluctantly.",
-      "cost": 415000,
-      "revenue": [
-        184000,
-        1514000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-065",
-      "title": "TechCrunch Disrupt: developer awareness wave",
-      "description": "TechCrunch Disrupt buys a month of developer awareness wave. Sales wants leads by Friday.",
-      "cost": 85000,
-      "revenue": [
-        222000,
-        1637000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-066",
-      "title": "SaaStr Annual: developer awareness wave",
-      "description": "SaaStr Annual buys a month of developer awareness wave. Sales wants leads by Friday.",
-      "cost": 107000,
-      "revenue": [
-        260000,
-        1760000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-067",
-      "title": "Dreamforce alley: developer awareness wave",
-      "description": "Dreamforce alley — developer awareness wave. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 129000,
-      "revenue": [
-        298000,
-        948000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-068",
-      "title": "AWS re:Invent: developer awareness wave",
-      "description": "AWS re:Invent buys a month of developer awareness wave. Sales wants leads by Friday.",
-      "cost": 151000,
-      "revenue": [
-        336000,
-        1071000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-069",
-      "title": "Google Cloud Next: developer awareness wave",
-      "description": "Paid developer awareness wave on Google Cloud Next. Legal clears claims; growth clears the invoice.",
-      "cost": 173000,
-      "revenue": [
-        374000,
-        1194000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-070",
-      "title": "Microsoft Ignite: developer awareness wave",
-      "description": "Microsoft Ignite — developer awareness wave. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 195000,
-      "revenue": [
-        412000,
-        1317000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-071",
-      "title": "LinkedIn thought-leadership: developer awareness wave",
-      "description": "Paid developer awareness wave on LinkedIn thought-leadership. Legal clears claims; growth clears the invoice.",
-      "cost": 217000,
-      "revenue": [
-        450000,
-        1440000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-072",
-      "title": "YouTube pre-roll: developer awareness wave",
-      "description": "YouTube pre-roll — developer awareness wave. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 239000,
-      "revenue": [
-        488000,
-        1563000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-073",
-      "title": "Spotify host-read: developer awareness wave",
-      "description": "Paid developer awareness wave on Spotify host-read. Legal clears claims; growth clears the invoice.",
-      "cost": 261000,
-      "revenue": [
-        526000,
-        1686000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-074",
-      "title": "Netflix ad tier: developer awareness wave",
-      "description": "Netflix ad tier package built around developer awareness wave. CAC slides get updated reluctantly.",
-      "cost": 283000,
-      "revenue": [
-        564000,
-        1809000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-075",
-      "title": "Hulu sports adjacency: developer awareness wave",
-      "description": "Hulu sports adjacency — developer awareness wave. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 305000,
-      "revenue": [
-        602000,
-        1932000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-076",
-      "title": "Reddit AMA week: developer awareness wave",
-      "description": "Reddit AMA week package built around developer awareness wave. CAC slides get updated reluctantly.",
-      "cost": 327000,
-      "revenue": [
-        640000,
-        2055000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-077",
-      "title": "Discord partner server: developer awareness wave",
-      "description": "Paid developer awareness wave on Discord partner server. Legal clears claims; growth clears the invoice.",
-      "cost": 349000,
-      "revenue": [
-        678000,
-        2178000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-078",
-      "title": "Twitch sponsored stream: developer awareness wave",
-      "description": "Twitch sponsored stream buys a month of developer awareness wave. Sales wants leads by Friday.",
-      "cost": 371000,
-      "revenue": [
-        716000,
-        1366000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-079",
-      "title": "Substack crossover: developer awareness wave",
-      "description": "Substack crossover buys a month of developer awareness wave. Sales wants leads by Friday.",
-      "cost": 393000,
-      "revenue": [
-        754000,
-        1489000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-080",
-      "title": "Newsletter bundle: developer awareness wave",
-      "description": "Paid developer awareness wave on Newsletter bundle. Legal clears claims; growth clears the invoice.",
-      "cost": 415000,
-      "revenue": [
-        792000,
-        1612000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-081",
-      "title": "Bloomberg TV: analyst mindshare blitz",
-      "description": "Bloomberg TV — analyst mindshare blitz. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 85000,
-      "revenue": [
-        70000,
-        975000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-082",
-      "title": "CNBC Squawk Box: analyst mindshare blitz",
-      "description": "One-month analyst mindshare blitz through CNBC Squawk Box. IR watches mentions; ops watches traffic.",
-      "cost": 107000,
-      "revenue": [
-        108000,
-        1098000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-083",
-      "title": "Wall Street Journal: analyst mindshare blitz",
-      "description": "Wall Street Journal buys a month of analyst mindshare blitz. Sales wants leads by Friday.",
-      "cost": 129000,
-      "revenue": [
-        146000,
-        1221000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-084",
-      "title": "Financial Times: analyst mindshare blitz",
-      "description": "One-month analyst mindshare blitz through Financial Times. IR watches mentions; ops watches traffic.",
-      "cost": 151000,
-      "revenue": [
-        184000,
-        1344000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-085",
-      "title": "TechCrunch Disrupt: analyst mindshare blitz",
-      "description": "Paid analyst mindshare blitz on TechCrunch Disrupt. Legal clears claims; growth clears the invoice.",
-      "cost": 173000,
-      "revenue": [
-        222000,
-        1467000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-086",
-      "title": "SaaStr Annual: analyst mindshare blitz",
-      "description": "Paid analyst mindshare blitz on SaaStr Annual. Legal clears claims; growth clears the invoice.",
-      "cost": 195000,
-      "revenue": [
-        260000,
-        1590000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-087",
-      "title": "Dreamforce alley: analyst mindshare blitz",
-      "description": "Dreamforce alley package built around analyst mindshare blitz. CAC slides get updated reluctantly.",
-      "cost": 217000,
-      "revenue": [
-        298000,
-        1713000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-088",
-      "title": "AWS re:Invent: analyst mindshare blitz",
-      "description": "Paid analyst mindshare blitz on AWS re:Invent. Legal clears claims; growth clears the invoice.",
-      "cost": 239000,
-      "revenue": [
-        336000,
-        1836000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-089",
-      "title": "Google Cloud Next: analyst mindshare blitz",
-      "description": "Google Cloud Next — analyst mindshare blitz. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 261000,
-      "revenue": [
-        374000,
-        1024000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-090",
-      "title": "Microsoft Ignite: analyst mindshare blitz",
-      "description": "Microsoft Ignite package built around analyst mindshare blitz. CAC slides get updated reluctantly.",
-      "cost": 283000,
-      "revenue": [
-        412000,
-        1147000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-091",
-      "title": "LinkedIn thought-leadership: analyst mindshare blitz",
-      "description": "LinkedIn thought-leadership — analyst mindshare blitz. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 305000,
-      "revenue": [
-        450000,
-        1270000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-092",
-      "title": "YouTube pre-roll: analyst mindshare blitz",
-      "description": "YouTube pre-roll package built around analyst mindshare blitz. CAC slides get updated reluctantly.",
-      "cost": 327000,
-      "revenue": [
-        488000,
-        1393000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-093",
-      "title": "Spotify host-read: analyst mindshare blitz",
-      "description": "Spotify host-read — analyst mindshare blitz. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 349000,
-      "revenue": [
-        526000,
-        1516000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-094",
-      "title": "Netflix ad tier: analyst mindshare blitz",
-      "description": "One-month analyst mindshare blitz through Netflix ad tier. IR watches mentions; ops watches traffic.",
-      "cost": 371000,
-      "revenue": [
-        564000,
-        1639000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-095",
-      "title": "Hulu sports adjacency: analyst mindshare blitz",
-      "description": "Hulu sports adjacency package built around analyst mindshare blitz. CAC slides get updated reluctantly.",
-      "cost": 393000,
-      "revenue": [
-        602000,
-        1762000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-096",
-      "title": "Reddit AMA week: analyst mindshare blitz",
-      "description": "One-month analyst mindshare blitz through Reddit AMA week. IR watches mentions; ops watches traffic.",
-      "cost": 415000,
-      "revenue": [
-        640000,
-        1885000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-097",
-      "title": "Discord partner server: analyst mindshare blitz",
-      "description": "Discord partner server — analyst mindshare blitz. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 85000,
-      "revenue": [
-        678000,
-        2008000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-098",
-      "title": "Twitch sponsored stream: analyst mindshare blitz",
-      "description": "Paid analyst mindshare blitz on Twitch sponsored stream. Legal clears claims; growth clears the invoice.",
-      "cost": 107000,
-      "revenue": [
-        716000,
-        2131000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-099",
-      "title": "Substack crossover: analyst mindshare blitz",
-      "description": "Paid analyst mindshare blitz on Substack crossover. Legal clears claims; growth clears the invoice.",
-      "cost": 129000,
-      "revenue": [
-        754000,
-        2254000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-100",
-      "title": "Newsletter bundle: analyst mindshare blitz",
-      "description": "Newsletter bundle — analyst mindshare blitz. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 151000,
-      "revenue": [
-        792000,
-        1442000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-101",
-      "title": "Bloomberg TV: partner co-marketing grid",
-      "description": "Bloomberg TV buys a month of partner co-marketing grid. Sales wants leads by Friday.",
-      "cost": 173000,
-      "revenue": [
-        70000,
-        805000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-102",
-      "title": "CNBC Squawk Box: partner co-marketing grid",
-      "description": "CNBC Squawk Box — partner co-marketing grid. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 195000,
-      "revenue": [
-        108000,
-        928000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-103",
-      "title": "Wall Street Journal: partner co-marketing grid",
-      "description": "Wall Street Journal package built around partner co-marketing grid. CAC slides get updated reluctantly.",
-      "cost": 217000,
-      "revenue": [
-        146000,
-        1051000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-104",
-      "title": "Financial Times: partner co-marketing grid",
-      "description": "Financial Times — partner co-marketing grid. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 239000,
-      "revenue": [
-        184000,
-        1174000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-105",
-      "title": "TechCrunch Disrupt: partner co-marketing grid",
-      "description": "One-month partner co-marketing grid through TechCrunch Disrupt. IR watches mentions; ops watches traffic.",
-      "cost": 261000,
-      "revenue": [
-        222000,
-        1297000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-106",
-      "title": "SaaStr Annual: partner co-marketing grid",
-      "description": "One-month partner co-marketing grid through SaaStr Annual. IR watches mentions; ops watches traffic.",
-      "cost": 283000,
-      "revenue": [
-        260000,
-        1420000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-107",
-      "title": "Dreamforce alley: partner co-marketing grid",
-      "description": "Paid partner co-marketing grid on Dreamforce alley. Legal clears claims; growth clears the invoice.",
-      "cost": 305000,
-      "revenue": [
-        298000,
-        1543000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-108",
-      "title": "AWS re:Invent: partner co-marketing grid",
-      "description": "One-month partner co-marketing grid through AWS re:Invent. IR watches mentions; ops watches traffic.",
-      "cost": 327000,
-      "revenue": [
-        336000,
-        1666000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-109",
-      "title": "Google Cloud Next: partner co-marketing grid",
-      "description": "Google Cloud Next buys a month of partner co-marketing grid. Sales wants leads by Friday.",
-      "cost": 349000,
-      "revenue": [
-        374000,
-        1789000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-110",
-      "title": "Microsoft Ignite: partner co-marketing grid",
-      "description": "Paid partner co-marketing grid on Microsoft Ignite. Legal clears claims; growth clears the invoice.",
-      "cost": 371000,
-      "revenue": [
-        412000,
-        1912000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-111",
-      "title": "LinkedIn thought-leadership: partner co-marketing grid",
-      "description": "LinkedIn thought-leadership buys a month of partner co-marketing grid. Sales wants leads by Friday.",
-      "cost": 393000,
-      "revenue": [
-        450000,
+        185000,
         1100000
       ],
       "buzz": 4,
@@ -1444,1169 +93,1480 @@
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-112",
-      "title": "YouTube pre-roll: partner co-marketing grid",
-      "description": "Paid partner co-marketing grid on YouTube pre-roll. Legal clears claims; growth clears the invoice.",
-      "cost": 415000,
-      "revenue": [
-        488000,
-        1223000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-113",
-      "title": "Spotify host-read: partner co-marketing grid",
-      "description": "Spotify host-read buys a month of partner co-marketing grid. Sales wants leads by Friday.",
-      "cost": 85000,
-      "revenue": [
-        526000,
-        1346000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-114",
-      "title": "Netflix ad tier: partner co-marketing grid",
-      "description": "Netflix ad tier — partner co-marketing grid. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 107000,
-      "revenue": [
-        564000,
-        1469000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-115",
-      "title": "Hulu sports adjacency: partner co-marketing grid",
-      "description": "Paid partner co-marketing grid on Hulu sports adjacency. Legal clears claims; growth clears the invoice.",
-      "cost": 129000,
-      "revenue": [
-        602000,
-        1592000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-116",
-      "title": "Reddit AMA week: partner co-marketing grid",
-      "description": "Reddit AMA week — partner co-marketing grid. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 151000,
-      "revenue": [
-        640000,
-        1715000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-117",
-      "title": "Discord partner server: partner co-marketing grid",
-      "description": "Discord partner server buys a month of partner co-marketing grid. Sales wants leads by Friday.",
-      "cost": 173000,
-      "revenue": [
-        678000,
-        1838000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-118",
-      "title": "Twitch sponsored stream: partner co-marketing grid",
-      "description": "One-month partner co-marketing grid through Twitch sponsored stream. IR watches mentions; ops watches traffic.",
-      "cost": 195000,
-      "revenue": [
-        716000,
-        1961000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-119",
-      "title": "Substack crossover: partner co-marketing grid",
-      "description": "One-month partner co-marketing grid through Substack crossover. IR watches mentions; ops watches traffic.",
-      "cost": 217000,
-      "revenue": [
-        754000,
-        2084000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-120",
-      "title": "Newsletter bundle: partner co-marketing grid",
-      "description": "Newsletter bundle buys a month of partner co-marketing grid. Sales wants leads by Friday.",
-      "cost": 239000,
-      "revenue": [
-        792000,
-        2207000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-121",
-      "title": "Bloomberg TV: retail media test",
-      "description": "Bloomberg TV package built around retail media test. CAC slides get updated reluctantly.",
-      "cost": 261000,
-      "revenue": [
-        70000,
-        1570000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-122",
-      "title": "CNBC Squawk Box: retail media test",
-      "description": "CNBC Squawk Box buys a month of retail media test. Sales wants leads by Friday.",
-      "cost": 283000,
-      "revenue": [
-        108000,
-        758000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-123",
-      "title": "Wall Street Journal: retail media test",
-      "description": "Paid retail media test on Wall Street Journal. Legal clears claims; growth clears the invoice.",
-      "cost": 305000,
-      "revenue": [
-        146000,
-        881000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-124",
-      "title": "Financial Times: retail media test",
-      "description": "Financial Times buys a month of retail media test. Sales wants leads by Friday.",
-      "cost": 327000,
-      "revenue": [
-        184000,
-        1004000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-125",
-      "title": "TechCrunch Disrupt: retail media test",
-      "description": "TechCrunch Disrupt — retail media test. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 349000,
-      "revenue": [
-        222000,
-        1127000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-126",
-      "title": "SaaStr Annual: retail media test",
-      "description": "SaaStr Annual — retail media test. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 371000,
-      "revenue": [
-        260000,
-        1250000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-127",
-      "title": "Dreamforce alley: retail media test",
-      "description": "One-month retail media test through Dreamforce alley. IR watches mentions; ops watches traffic.",
-      "cost": 393000,
-      "revenue": [
-        298000,
-        1373000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-128",
-      "title": "AWS re:Invent: retail media test",
-      "description": "AWS re:Invent — retail media test. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 415000,
-      "revenue": [
-        336000,
-        1496000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-129",
-      "title": "Google Cloud Next: retail media test",
-      "description": "Google Cloud Next package built around retail media test. CAC slides get updated reluctantly.",
-      "cost": 85000,
-      "revenue": [
-        374000,
-        1619000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-130",
-      "title": "Microsoft Ignite: retail media test",
-      "description": "One-month retail media test through Microsoft Ignite. IR watches mentions; ops watches traffic.",
-      "cost": 107000,
-      "revenue": [
-        412000,
-        1742000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-131",
-      "title": "LinkedIn thought-leadership: retail media test",
-      "description": "LinkedIn thought-leadership package built around retail media test. CAC slides get updated reluctantly.",
-      "cost": 129000,
-      "revenue": [
-        450000,
-        1865000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-132",
-      "title": "YouTube pre-roll: retail media test",
-      "description": "One-month retail media test through YouTube pre-roll. IR watches mentions; ops watches traffic.",
-      "cost": 151000,
-      "revenue": [
-        488000,
-        1988000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-133",
-      "title": "Spotify host-read: retail media test",
-      "description": "Spotify host-read package built around retail media test. CAC slides get updated reluctantly.",
-      "cost": 173000,
-      "revenue": [
-        526000,
-        1176000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-134",
-      "title": "Netflix ad tier: retail media test",
-      "description": "Netflix ad tier buys a month of retail media test. Sales wants leads by Friday.",
-      "cost": 195000,
-      "revenue": [
-        564000,
-        1299000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-135",
-      "title": "Hulu sports adjacency: retail media test",
-      "description": "One-month retail media test through Hulu sports adjacency. IR watches mentions; ops watches traffic.",
-      "cost": 217000,
-      "revenue": [
-        602000,
-        1422000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-136",
-      "title": "Reddit AMA week: retail media test",
-      "description": "Reddit AMA week buys a month of retail media test. Sales wants leads by Friday.",
-      "cost": 239000,
-      "revenue": [
-        640000,
-        1545000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-137",
-      "title": "Discord partner server: retail media test",
-      "description": "Discord partner server package built around retail media test. CAC slides get updated reluctantly.",
-      "cost": 261000,
-      "revenue": [
-        678000,
-        1668000
-      ],
-      "buzz": 2,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-138",
-      "title": "Twitch sponsored stream: retail media test",
-      "description": "Twitch sponsored stream — retail media test. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 283000,
-      "revenue": [
-        716000,
-        1791000
-      ],
-      "buzz": 3,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-139",
-      "title": "Substack crossover: retail media test",
-      "description": "Substack crossover — retail media test. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 305000,
-      "revenue": [
-        754000,
-        1914000
-      ],
-      "buzz": 4,
-      "tierMin": 5,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-140",
-      "title": "Newsletter bundle: retail media test",
-      "description": "Newsletter bundle package built around retail media test. CAC slides get updated reluctantly.",
-      "cost": 327000,
-      "revenue": [
-        792000,
-        2037000
-      ],
-      "buzz": 5,
-      "tierMin": 6,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-141",
-      "title": "Bloomberg TV: campus hiring funnel",
-      "description": "Bloomberg TV buys a month of campus hiring funnel. Sales wants leads by Friday.",
-      "cost": 3240000,
-      "revenue": [
-        520000,
-        4420000
-      ],
-      "buzz": 5,
-      "tierMin": 7,
-      "tierMax": 7,
-      "stockPct": 0.004
-    },
-    {
-      "id": "growth-public-late-142",
-      "title": "CNBC Squawk Box: campus hiring funnel",
-      "description": "CNBC Squawk Box — campus hiring funnel. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 3425000,
-      "revenue": [
-        615000,
-        4935000
-      ],
-      "buzz": 6,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-143",
-      "title": "Wall Street Journal: campus hiring funnel",
-      "description": "Wall Street Journal package built around campus hiring funnel. CAC slides get updated reluctantly.",
-      "cost": 3610000,
-      "revenue": [
-        710000,
-        5450000
-      ],
-      "buzz": 7,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-144",
-      "title": "Financial Times: campus hiring funnel",
-      "description": "Financial Times — campus hiring funnel. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 3795000,
-      "revenue": [
-        805000,
-        5965000
-      ],
-      "buzz": 8,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-145",
-      "title": "TechCrunch Disrupt: campus hiring funnel",
-      "description": "One-month campus hiring funnel through TechCrunch Disrupt. IR watches mentions; ops watches traffic.",
+      "id": "growth-public-fortune-500-list-party",
+      "title": "Fortune 500 list party",
+      "description": "Ranking clout rented for one champagne-soaked evening.",
       "cost": 650000,
       "revenue": [
-        900000,
-        2700000
-      ],
-      "buzz": 5,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-146",
-      "title": "SaaStr Annual: campus hiring funnel",
-      "description": "One-month campus hiring funnel through SaaStr Annual. IR watches mentions; ops watches traffic.",
-      "cost": 835000,
-      "revenue": [
-        995000,
-        3215000
+        580000,
+        3200000
       ],
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-147",
-      "title": "Dreamforce alley: campus hiring funnel",
-      "description": "Paid campus hiring funnel on Dreamforce alley. Legal clears claims; growth clears the invoice.",
-      "cost": 1020000,
+      "id": "growth-public-forbes-cover-story-bid",
+      "title": "Forbes cover story bid",
+      "description": "Thirty-under-forty narrative pushed to editors.",
+      "cost": 140000,
       "revenue": [
-        1090000,
-        3730000
+        120000,
+        680000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-techcrunch-disrupt-main-stage",
+      "title": "TechCrunch Disrupt main stage",
+      "description": "Demo gods smile or your VP sweats under lights.",
+      "cost": 320000,
+      "revenue": [
+        280000,
+        1600000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-saasstr-annual-keynote-sponsor",
+      "title": "SaaStr annual keynote sponsor",
+      "description": "Founders tweet quotes before you leave the stage.",
+      "cost": 275000,
+      "revenue": [
+        240000,
+        1350000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-dreamforce-partner-pavilion",
+      "title": "Dreamforce partner pavilion",
+      "description": "Badge scans, mascots, and a line for lukewarm espresso.",
+      "cost": 890000,
+      "revenue": [
+        780000,
+        4200000
       ],
       "buzz": 7,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-148",
-      "title": "AWS re:Invent: campus hiring funnel",
-      "description": "One-month campus hiring funnel through AWS re:Invent. IR watches mentions; ops watches traffic.",
-      "cost": 1205000,
+      "id": "growth-public-aws-reinvent-breakout-title",
+      "title": "re:Invent breakout title sponsor",
+      "description": "Cloud architects screenshot your roadmap slide.",
+      "cost": 760000,
       "revenue": [
-        1185000,
-        4245000
+        680000,
+        3800000
       ],
-      "buzz": 8,
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-google-next-demo-theater",
+      "title": "Google Next demo theater",
+      "description": "Multi-cloud story told under fluorescent optimism.",
+      "cost": 540000,
+      "revenue": [
+        480000,
+        2600000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-microsoft-ignite-co-sell",
+      "title": "Microsoft Ignite co-sell push",
+      "description": "Azure credits whispered into enterprise ears.",
+      "cost": 620000,
+      "revenue": [
+        550000,
+        3000000
+      ],
+      "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
       "stockPct": 0.008
     },
     {
-      "id": "growth-public-late-149",
-      "title": "Google Cloud Next: campus hiring funnel",
-      "description": "Google Cloud Next buys a month of campus hiring funnel. Sales wants leads by Friday.",
-      "cost": 1390000,
+      "id": "growth-public-oracle-openworld-red-carpet",
+      "title": "Oracle OpenWorld red carpet",
+      "description": "Database loyalists and migration skeptics collide.",
+      "cost": 480000,
       "revenue": [
-        1280000,
-        4760000
+        420000,
+        2300000
       ],
       "buzz": 5,
-      "tierMin": 7,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-150",
-      "title": "Microsoft Ignite: campus hiring funnel",
-      "description": "Paid campus hiring funnel on Microsoft Ignite. Legal clears claims; growth clears the invoice.",
-      "cost": 1575000,
+      "id": "growth-public-salesforce-tower-light-show",
+      "title": "Salesforce tower light show",
+      "description": "City skyline carries your logo after sunset.",
+      "cost": 380000,
       "revenue": [
-        1375000,
-        5275000
-      ],
-      "buzz": 6,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-151",
-      "title": "LinkedIn thought-leadership: campus hiring funnel",
-      "description": "LinkedIn thought-leadership buys a month of campus hiring funnel. Sales wants leads by Friday.",
-      "cost": 1760000,
-      "revenue": [
-        1470000,
-        5790000
-      ],
-      "buzz": 7,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-152",
-      "title": "YouTube pre-roll: campus hiring funnel",
-      "description": "Paid campus hiring funnel on YouTube pre-roll. Legal clears claims; growth clears the invoice.",
-      "cost": 1945000,
-      "revenue": [
-        1565000,
-        6305000
-      ],
-      "buzz": 8,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-153",
-      "title": "Spotify host-read: campus hiring funnel",
-      "description": "Spotify host-read buys a month of campus hiring funnel. Sales wants leads by Friday.",
-      "cost": 2130000,
-      "revenue": [
-        1660000,
-        6820000
+        330000,
+        1850000
       ],
       "buzz": 5,
-      "tierMin": 7,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-154",
-      "title": "Netflix ad tier: campus hiring funnel",
-      "description": "Netflix ad tier — campus hiring funnel. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 2315000,
+      "id": "growth-public-nasdaq-opening-bell",
+      "title": "Nasdaq opening bell",
+      "description": "Confetti cannons for a quarter that barely beat.",
+      "cost": 125000,
       "revenue": [
-        1755000,
-        3555000
+        110000,
+        620000
       ],
-      "buzz": 6,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-155",
-      "title": "Hulu sports adjacency: campus hiring funnel",
-      "description": "Paid campus hiring funnel on Hulu sports adjacency. Legal clears claims; growth clears the invoice.",
-      "cost": 2500000,
-      "revenue": [
-        520000,
-        2740000
-      ],
-      "buzz": 7,
+      "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
       "stockPct": 0.012
     },
     {
-      "id": "growth-public-late-156",
-      "title": "Reddit AMA week: campus hiring funnel",
-      "description": "Reddit AMA week — campus hiring funnel. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 2685000,
+      "id": "growth-public-nyse-investor-tea",
+      "title": "NYSE investor tea",
+      "description": "Institutional holders sip while you pitch guidance.",
+      "cost": 95000,
       "revenue": [
-        615000,
-        3255000
+        82000,
+        450000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-madison-ave-creative-review",
+      "title": "Madison Ave creative review",
+      "description": "Agency decks stack higher than your brand guidelines.",
+      "cost": 220000,
+      "revenue": [
+        190000,
+        1050000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-super-bowl-second-screen",
+      "title": "Super Bowl second-screen blitz",
+      "description": "Hashtag war while someone else owns the TV spot.",
+      "cost": 2800000,
+      "revenue": [
+        2400000,
+        11500000
       ],
       "buzz": 8,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-157",
-      "title": "Discord partner server: campus hiring funnel",
-      "description": "Discord partner server buys a month of campus hiring funnel. Sales wants leads by Friday.",
-      "cost": 2870000,
+      "id": "growth-public-march-madness-bracket-sponsor",
+      "title": "March Madness bracket sponsor",
+      "description": "Office pools carry your logo into every trash talk.",
+      "cost": 450000,
       "revenue": [
-        710000,
-        3770000
-      ],
-      "buzz": 5,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-158",
-      "title": "Twitch sponsored stream: campus hiring funnel",
-      "description": "One-month campus hiring funnel through Twitch sponsored stream. IR watches mentions; ops watches traffic.",
-      "cost": 3055000,
-      "revenue": [
-        805000,
-        4285000
+        390000,
+        2100000
       ],
       "buzz": 6,
-      "tierMin": 7,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-159",
-      "title": "Substack crossover: campus hiring funnel",
-      "description": "One-month campus hiring funnel through Substack crossover. IR watches mentions; ops watches traffic.",
-      "cost": 3240000,
+      "id": "growth-public-world-series-dugout-sign",
+      "title": "World Series dugout sign",
+      "description": "Seven games of brand exposure if baseball cooperates.",
+      "cost": 680000,
       "revenue": [
-        900000,
-        4800000
+        600000,
+        3400000
       ],
       "buzz": 7,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-160",
-      "title": "Newsletter bundle: campus hiring funnel",
-      "description": "Newsletter bundle buys a month of campus hiring funnel. Sales wants leads by Friday.",
-      "cost": 3425000,
+      "id": "growth-public-olympics-streaming-overlay",
+      "title": "Olympics streaming overlay",
+      "description": "Medal moments tagged with your pixel-perfect bug.",
+      "cost": 1200000,
       "revenue": [
-        995000,
-        5315000
-      ],
-      "buzz": 8,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-161",
-      "title": "Bloomberg TV: CFO breakfast series",
-      "description": "Bloomberg TV buys a month of CFO breakfast series. Sales wants leads by Friday.",
-      "cost": 3610000,
-      "revenue": [
-        1090000,
-        5830000
-      ],
-      "buzz": 5,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-162",
-      "title": "CNBC Squawk Box: CFO breakfast series",
-      "description": "CNBC Squawk Box — CFO breakfast series. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 3795000,
-      "revenue": [
-        1185000,
-        6345000
-      ],
-      "buzz": 6,
-      "tierMin": 7,
-      "tierMax": 7,
-      "stockPct": 0.006
-    },
-    {
-      "id": "growth-public-late-163",
-      "title": "Wall Street Journal: CFO breakfast series",
-      "description": "Wall Street Journal package built around CFO breakfast series. CAC slides get updated reluctantly.",
-      "cost": 650000,
-      "revenue": [
-        1280000,
-        3080000
+        1050000,
+        5800000
       ],
       "buzz": 7,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-164",
-      "title": "Financial Times: CFO breakfast series",
-      "description": "Financial Times — CFO breakfast series. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 835000,
+      "id": "growth-public-f1-paddock-club-hospitality",
+      "title": "F1 paddock club hospitality",
+      "description": "VIP guests pretend to understand tire strategy.",
+      "cost": 550000,
       "revenue": [
-        1375000,
-        3595000
-      ],
-      "buzz": 8,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-165",
-      "title": "TechCrunch Disrupt: CFO breakfast series",
-      "description": "One-month CFO breakfast series through TechCrunch Disrupt. IR watches mentions; ops watches traffic.",
-      "cost": 1020000,
-      "revenue": [
-        1470000,
-        4110000
-      ],
-      "buzz": 5,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-166",
-      "title": "SaaStr Annual: CFO breakfast series",
-      "description": "One-month CFO breakfast series through SaaStr Annual. IR watches mentions; ops watches traffic.",
-      "cost": 1205000,
-      "revenue": [
-        1565000,
-        4625000
+        480000,
+        2700000
       ],
       "buzz": 6,
-      "tierMin": 7,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-167",
-      "title": "Dreamforce alley: CFO breakfast series",
-      "description": "Paid CFO breakfast series on Dreamforce alley. Legal clears claims; growth clears the invoice.",
-      "cost": 1390000,
+      "id": "growth-public-tour-de-france-team-kit",
+      "title": "Tour de France team kit",
+      "description": "Cyclists sweat in your colors up Alpine climbs.",
+      "cost": 320000,
       "revenue": [
-        1660000,
-        5140000
+        280000,
+        1550000
+      ],
+      "buzz": 5,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-wimbledon-strawberries-branding",
+      "title": "Wimbledon strawberries branding",
+      "description": "Polite applause for a very British product placement.",
+      "cost": 410000,
+      "revenue": [
+        360000,
+        1900000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-met-gala-afterparty-host",
+      "title": "Met Gala afterparty host",
+      "description": "Celebrity selfies with your hashtag barely visible.",
+      "cost": 890000,
+      "revenue": [
+        780000,
+        4100000
       ],
       "buzz": 7,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-168",
-      "title": "AWS re:Invent: CFO breakfast series",
-      "description": "One-month CFO breakfast series through AWS re:Invent. IR watches mentions; ops watches traffic.",
-      "cost": 1575000,
+      "id": "growth-public-coachella-sahara-tent",
+      "title": "Coachella Sahara tent",
+      "description": "Bass drops sync with QR codes on wristbands.",
+      "cost": 720000,
       "revenue": [
-        1755000,
-        5655000
+        640000,
+        3500000
       ],
-      "buzz": 8,
+      "buzz": 7,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-sxsw-house-takeover",
+      "title": "SXSW house takeover",
+      "description": "Lines around the block for free tacos and demos.",
+      "cost": 380000,
+      "revenue": [
+        330000,
+        1800000
+      ],
+      "buzz": 5,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-ces-keynote-livestream",
+      "title": "CES keynote livestream",
+      "description": "Gadget fatigue broken by one surprising feature.",
+      "cost": 290000,
+      "revenue": [
+        250000,
+        1400000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-mwc-barcelona-hall-headliner",
+      "title": "MWC Barcelona hall headliner",
+      "description": "Telco execs roam aisles hunting “AI-native network.”",
+      "cost": 640000,
+      "revenue": [
+        560000,
+        3100000
+      ],
+      "buzz": 6,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-169",
-      "title": "Google Cloud Next: CFO breakfast series",
-      "description": "Google Cloud Next buys a month of CFO breakfast series. Sales wants leads by Friday.",
-      "cost": 1760000,
+      "id": "growth-public-black-hat-briefing-sponsor",
+      "title": "Black Hat briefing sponsor",
+      "description": "Security crowd skeptical until you show the exploit fix.",
+      "cost": 260000,
       "revenue": [
-        520000,
-        4840000
+        225000,
+        1250000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-rsa-conference-trust-village",
+      "title": "RSA Conference trust village",
+      "description": "Zero-trust slogans on every lanyard.",
+      "cost": 310000,
+      "revenue": [
+        270000,
+        1500000
       ],
       "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-def-con-village-demo",
+      "title": "DEF CON village demo",
+      "description": "Hackers cheer responsible disclosure—not your logo size.",
+      "cost": 85000,
+      "revenue": [
+        72000,
+        380000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-nyc-subway-domination-week",
+      "title": "NYC subway domination week",
+      "description": "Commuters memorize your tagline between delays.",
+      "cost": 420000,
+      "revenue": [
+        370000,
+        2000000
+      ],
+      "buzz": 6,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-london-tube-escalator-wraps",
+      "title": "London tube escalator wraps",
+      "description": "Mind the gap—and the brand on every step.",
+      "cost": 360000,
+      "revenue": [
+        310000,
+        1750000
+      ],
+      "buzz": 5,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-tokyo-shibuya-crossing-screen",
+      "title": "Shibuya crossing screen takeover",
+      "description": "Ten seconds of chaos branding at the world’s busiest scramble.",
+      "cost": 480000,
+      "revenue": [
+        420000,
+        2300000
+      ],
+      "buzz": 6,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-dubai-burj-light-projection",
+      "title": "Burj Khalifa light projection",
+      "description": "Vertical logo visible from every rooftop pool.",
+      "cost": 920000,
+      "revenue": [
+        810000,
+        4500000
+      ],
+      "buzz": 7,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-singapore-marina-bay-float",
+      "title": "Marina Bay floating stage",
+      "description": "Waterfront launch with humidity as co-star.",
+      "cost": 540000,
+      "revenue": [
+        470000,
+        2600000
+      ],
+      "buzz": 6,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-sydney-harbour-fireworks-title",
+      "title": "Sydney Harbour fireworks title",
+      "description": "New Year’s sky writes your name in sparklers.",
+      "cost": 1100000,
+      "revenue": [
+        980000,
+        5200000
+      ],
+      "buzz": 7,
       "tierMin": 7,
       "tierMax": 7,
       "stockPct": 0.01
     },
     {
-      "id": "growth-public-late-170",
-      "title": "Microsoft Ignite: CFO breakfast series",
-      "description": "Paid CFO breakfast series on Microsoft Ignite. Legal clears claims; growth clears the invoice.",
-      "cost": 1945000,
+      "id": "growth-public-podcast-network-upfront",
+      "title": "Podcast network upfront",
+      "description": "Host-read ads that sound almost unscripted.",
+      "cost": 45000,
       "revenue": [
-        615000,
-        5355000
+        38000,
+        210000
       ],
-      "buzz": 6,
-      "tierMin": 7,
+      "buzz": 2,
+      "tierMin": 4,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-171",
-      "title": "LinkedIn thought-leadership: CFO breakfast series",
-      "description": "LinkedIn thought-leadership buys a month of CFO breakfast series. Sales wants leads by Friday.",
-      "cost": 2130000,
+      "id": "growth-public-spotify-audio-series",
+      "title": "Spotify exclusive audio series",
+      "description": "Binge-listeners learn your category between songs.",
+      "cost": 120000,
       "revenue": [
-        710000,
-        5870000
+        105000,
+        580000
       ],
-      "buzz": 7,
-      "tierMin": 7,
+      "buzz": 4,
+      "tierMin": 5,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-172",
-      "title": "YouTube pre-roll: CFO breakfast series",
-      "description": "Paid CFO breakfast series on YouTube pre-roll. Legal clears claims; growth clears the invoice.",
-      "cost": 2315000,
+      "id": "growth-public-youtube-premiere-takeover",
+      "title": "YouTube premiere takeover",
+      "description": "Premiere chat spammed with heart emojis and links.",
+      "cost": 95000,
       "revenue": [
-        805000,
-        2605000
+        82000,
+        460000
       ],
-      "buzz": 8,
-      "tierMin": 7,
+      "buzz": 3,
+      "tierMin": 4,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-173",
-      "title": "Spotify host-read: CFO breakfast series",
-      "description": "Spotify host-read buys a month of CFO breakfast series. Sales wants leads by Friday.",
-      "cost": 2500000,
+      "id": "growth-public-twitch-integrated-stream",
+      "title": "Twitch integrated stream",
+      "description": "Chat copypastas your product name for hours.",
+      "cost": 65000,
       "revenue": [
-        900000,
-        3120000
+        55000,
+        290000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-tiktok-challenge-hash",
+      "title": "TikTok challenge hashtag",
+      "description": "Dance optional; virality mandatory.",
+      "cost": 180000,
+      "revenue": [
+        155000,
+        820000
       ],
       "buzz": 5,
-      "tierMin": 7,
+      "tierMin": 5,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-174",
-      "title": "Netflix ad tier: CFO breakfast series",
-      "description": "Netflix ad tier — CFO breakfast series. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 2685000,
+      "id": "growth-public-instagram-shopping-drop",
+      "title": "Instagram shopping drop",
+      "description": "Stories swipe-up until checkout friction appears.",
+      "cost": 75000,
       "revenue": [
-        995000,
-        3635000
+        65000,
+        340000
       ],
-      "buzz": 6,
-      "tierMin": 7,
+      "buzz": 3,
+      "tierMin": 4,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-175",
-      "title": "Hulu sports adjacency: CFO breakfast series",
-      "description": "Paid CFO breakfast series on Hulu sports adjacency. Legal clears claims; growth clears the invoice.",
-      "cost": 2870000,
+      "id": "growth-public-linkedin-thought-leader-ads",
+      "title": "LinkedIn thought-leader ads",
+      "description": "Exec bylines boosted to every rival’s feed.",
+      "cost": 55000,
       "revenue": [
-        1090000,
-        4150000
+        48000,
+        260000
       ],
-      "buzz": 7,
-      "tierMin": 7,
+      "buzz": 2,
+      "tierMin": 4,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-176",
-      "title": "Reddit AMA week: CFO breakfast series",
-      "description": "Reddit AMA week — CFO breakfast series. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 3055000,
+      "id": "growth-public-reddit-ama-engineering",
+      "title": "Reddit AMA with engineering",
+      "description": "Top question: “When Linux client?”",
+      "cost": 25000,
       "revenue": [
-        1185000,
-        4665000
+        22000,
+        120000
       ],
-      "buzz": 8,
-      "tierMin": 7,
-      "tierMax": 7,
-      "stockPct": 0.004
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
     },
     {
-      "id": "growth-public-late-177",
-      "title": "Discord partner server: CFO breakfast series",
-      "description": "Discord partner server buys a month of CFO breakfast series. Sales wants leads by Friday.",
-      "cost": 3240000,
+      "id": "growth-public-discord-community-partner",
+      "title": "Discord community partner",
+      "description": "Moderators keep hype civil during outage week.",
+      "cost": 35000,
       "revenue": [
-        1280000,
-        5180000
+        30000,
+        165000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-newsletter-sponsorship-bundle",
+      "title": "Newsletter sponsorship bundle",
+      "description": "Morning inboxes stacked with your single CTA.",
+      "cost": 42000,
+      "revenue": [
+        36000,
+        195000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-wikipedia-trust-campaign",
+      "title": "Wikipedia-adjacent trust campaign",
+      "description": "Donation drives—not editing wars, promise.",
+      "cost": 28000,
+      "revenue": [
+        24000,
+        130000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-college-campus-tour-fall",
+      "title": "Fall campus recruiting tour",
+      "description": "Career fairs, free socks, and leaky demo Wi‑Fi.",
+      "cost": 85000,
+      "revenue": [
+        72000,
+        380000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-hackathon-series-title",
+      "title": "Global hackathon series title",
+      "description": "Midnight commits sponsored by your API keys.",
+      "cost": 140000,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-open-source-foundation-grant",
+      "title": "Open-source foundation grant",
+      "description": "Goodwill measured in GitHub stars and blog posts.",
+      "cost": 60000,
+      "revenue": [
+        52000,
+        280000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-developer-docs-redesign-push",
+      "title": "Developer docs redesign push",
+      "description": "Search finally finds the quickstart—growth cheers.",
+      "cost": 48000,
+      "revenue": [
+        41000,
+        220000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-customer-ref-film-premiere",
+      "title": "Customer reference film premiere",
+      "description": "Cinematic case study with real tears in act two.",
+      "cost": 175000,
+      "revenue": [
+        150000,
+        780000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-analyst-magic-quadrant-push",
+      "title": "Analyst Magic Quadrant push",
+      "description": "Briefings until the dot moves one inch upward.",
+      "cost": 320000,
+      "revenue": [
+        280000,
+        1550000
       ],
       "buzz": 5,
-      "tierMin": 7,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-178",
-      "title": "Twitch sponsored stream: CFO breakfast series",
-      "description": "One-month CFO breakfast series through Twitch sponsored stream. IR watches mentions; ops watches traffic.",
-      "cost": 3425000,
+      "id": "growth-public-gartner-peer-insights-blitz",
+      "title": "Gartner Peer Insights blitz",
+      "description": "Review requests polite enough to avoid spam folders.",
+      "cost": 85000,
       "revenue": [
-        1375000,
-        5695000
+        74000,
+        390000
       ],
-      "buzz": 6,
-      "tierMin": 7,
+      "buzz": 3,
+      "tierMin": 5,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-179",
-      "title": "Substack crossover: CFO breakfast series",
-      "description": "One-month CFO breakfast series through Substack crossover. IR watches mentions; ops watches traffic.",
-      "cost": 3610000,
+      "id": "growth-public-forrester-wave-submission",
+      "title": "Forrester Wave submission sprint",
+      "description": "Evidence packs heavier than the final PDF.",
+      "cost": 210000,
       "revenue": [
-        1470000,
-        6210000
+        185000,
+        980000
       ],
-      "buzz": 7,
-      "tierMin": 7,
+      "buzz": 4,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-180",
-      "title": "Newsletter bundle: CFO breakfast series",
-      "description": "Newsletter bundle buys a month of CFO breakfast series. Sales wants leads by Friday.",
-      "cost": 3795000,
+      "id": "growth-public-idc-marketscape-highlight",
+      "title": "IDC MarketScape highlight",
+      "description": "Quadrant screenshot framed in every sales deck.",
+      "cost": 190000,
       "revenue": [
-        1565000,
-        6725000
+        165000,
+        880000
       ],
-      "buzz": 8,
-      "tierMin": 7,
+      "buzz": 4,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-181",
-      "title": "Bloomberg TV: CISO roundtable tour",
-      "description": "Bloomberg TV buys a month of CISO roundtable tour. Sales wants leads by Friday.",
-      "cost": 650000,
+      "id": "growth-public-trustpilot-review-drive",
+      "title": "Trustpilot review drive",
+      "description": "Happy customers nudged before the angry ones arrive.",
+      "cost": 32000,
       "revenue": [
-        1660000,
-        3460000
+        28000,
+        150000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-g2-badge-season-blitz",
+      "title": "G2 badge season blitz",
+      "description": "Grid screenshots slapped on every landing page.",
+      "cost": 45000,
+      "revenue": [
+        39000,
+        210000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-capterra-featured-listing",
+      "title": "Capterra featured listing",
+      "description": "Category page real estate bought for thirty days.",
+      "cost": 38000,
+      "revenue": [
+        33000,
+        175000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-airport-lounge-screen-loop",
+      "title": "Airport lounge screen loop",
+      "description": "Road warriors see your ad between gate changes.",
+      "cost": 220000,
+      "revenue": [
+        190000,
+        980000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-in-flight-magazine-cover",
+      "title": "In-flight magazine cover",
+      "description": "Tray-table reading for captive audiences.",
+      "cost": 165000,
+      "revenue": [
+        140000,
+        720000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-high-speed-rail-placards",
+      "title": "High-speed rail placards",
+      "description": "Two hundred mph branding with motion blur charm.",
+      "cost": 130000,
+      "revenue": [
+        112000,
+        580000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-rideshare-app-splash-week",
+      "title": "Rideshare app splash week",
+      "description": "Open the app—your logo before they book.",
+      "cost": 240000,
+      "revenue": [
+        210000,
+        1100000
       ],
       "buzz": 5,
-      "tierMin": 7,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-182",
-      "title": "CNBC Squawk Box: CISO roundtable tour",
-      "description": "CNBC Squawk Box — CISO roundtable tour. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 835000,
+      "id": "growth-public-food-delivery-bag-sticker",
+      "title": "Food delivery bag sticker",
+      "description": "Greasy logos still count as impressions.",
+      "cost": 55000,
       "revenue": [
-        1755000,
-        3975000
+        48000,
+        250000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-grocery-receipt-coupon-back",
+      "title": "Grocery receipt coupon back",
+      "description": "Thermal paper marketing for the patient.",
+      "cost": 18000,
+      "revenue": [
+        15000,
+        85000
+      ],
+      "buzz": 1,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-streaming-ctv-holiday-pack",
+      "title": "Streaming CTV holiday pack",
+      "description": "Living rooms flooded during cookie-baking season.",
+      "cost": 680000,
+      "revenue": [
+        600000,
+        3400000
       ],
       "buzz": 6,
-      "tierMin": 7,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-183",
-      "title": "Wall Street Journal: CISO roundtable tour",
-      "description": "Wall Street Journal package built around CISO roundtable tour. CAC slides get updated reluctantly.",
-      "cost": 1020000,
+      "id": "growth-public-hulu-interactive-ad-pilot",
+      "title": "Hulu interactive ad pilot",
+      "description": "Choose-your-own CTA ending—mostly clicks option B.",
+      "cost": 420000,
       "revenue": [
-        520000,
-        3160000
-      ],
-      "buzz": 7,
-      "tierMin": 7,
-      "tierMax": 7,
-      "stockPct": 0.008
-    },
-    {
-      "id": "growth-public-late-184",
-      "title": "Financial Times: CISO roundtable tour",
-      "description": "Financial Times — CISO roundtable tour. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 1205000,
-      "revenue": [
-        615000,
-        3675000
-      ],
-      "buzz": 8,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-185",
-      "title": "TechCrunch Disrupt: CISO roundtable tour",
-      "description": "One-month CISO roundtable tour through TechCrunch Disrupt. IR watches mentions; ops watches traffic.",
-      "cost": 1390000,
-      "revenue": [
-        710000,
-        4190000
+        370000,
+        2000000
       ],
       "buzz": 5,
-      "tierMin": 7,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-186",
-      "title": "SaaStr Annual: CISO roundtable tour",
-      "description": "One-month CISO roundtable tour through SaaStr Annual. IR watches mentions; ops watches traffic.",
-      "cost": 1575000,
+      "id": "growth-public-netflix-ad-tier-experiment",
+      "title": "Netflix ad-tier experiment",
+      "description": "Brand sits between binge episodes, politely.",
+      "cost": 890000,
       "revenue": [
-        805000,
-        4705000
+        780000,
+        4100000
       ],
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-187",
-      "title": "Dreamforce alley: CISO roundtable tour",
-      "description": "Paid CISO roundtable tour on Dreamforce alley. Legal clears claims; growth clears the invoice.",
-      "cost": 1760000,
+      "id": "growth-public-disney-plus-family-bundle",
+      "title": "Disney+ family bundle promo",
+      "description": "Parents tolerate ads if the kids stay quiet.",
+      "cost": 720000,
       "revenue": [
-        900000,
-        5220000
-      ],
-      "buzz": 7,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-188",
-      "title": "AWS re:Invent: CISO roundtable tour",
-      "description": "One-month CISO roundtable tour through AWS re:Invent. IR watches mentions; ops watches traffic.",
-      "cost": 1945000,
-      "revenue": [
-        995000,
-        5735000
-      ],
-      "buzz": 8,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-189",
-      "title": "Google Cloud Next: CISO roundtable tour",
-      "description": "Google Cloud Next buys a month of CISO roundtable tour. Sales wants leads by Friday.",
-      "cost": 2130000,
-      "revenue": [
-        1090000,
-        6250000
-      ],
-      "buzz": 5,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-190",
-      "title": "Microsoft Ignite: CISO roundtable tour",
-      "description": "Paid CISO roundtable tour on Microsoft Ignite. Legal clears claims; growth clears the invoice.",
-      "cost": 2315000,
-      "revenue": [
-        1185000,
-        2985000
-      ],
-      "buzz": 6,
-      "tierMin": 7,
-      "tierMax": 7,
-      "stockPct": 0.012
-    },
-    {
-      "id": "growth-public-late-191",
-      "title": "LinkedIn thought-leadership: CISO roundtable tour",
-      "description": "LinkedIn thought-leadership buys a month of CISO roundtable tour. Sales wants leads by Friday.",
-      "cost": 2500000,
-      "revenue": [
-        1280000,
+        640000,
         3500000
       ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-amazon-dsp-retarget-wall",
+      "title": "Amazon DSP retarget wall",
+      "description": "Shopping carts haunt users across the internet.",
+      "cost": 380000,
+      "revenue": [
+        330000,
+        1800000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-walmart-connect-endcap",
+      "title": "Walmart Connect endcap",
+      "description": "In-store screens next to impulse buys.",
+      "cost": 520000,
+      "revenue": [
+        460000,
+        2500000
+      ],
+      "buzz": 6,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-target-roundel-circular",
+      "title": "Target Roundel circular",
+      "description": "Red-cart shoppers see you beside laundry detergent.",
+      "cost": 410000,
+      "revenue": [
+        360000,
+        1900000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-costco-sample-booth-partner",
+      "title": "Costco sample booth partner",
+      "description": "Free tastes, serious bulk-buy consideration.",
+      "cost": 280000,
+      "revenue": [
+        245000,
+        1300000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-starbucks-cup-sleeve-run",
+      "title": "Starbucks cup sleeve run",
+      "description": "Caffeine and category awareness in one sip.",
+      "cost": 350000,
+      "revenue": [
+        310000,
+        1650000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-mcdelivery-partner-push",
+      "title": "McDelivery partner push",
+      "description": "Fries and your QR code in the same bag.",
+      "cost": 480000,
+      "revenue": [
+        420000,
+        2300000
+      ],
+      "buzz": 6,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-chipotle-boorito-tie-in",
+      "title": "Chipotle Halloween tie-in",
+      "description": "Costumed customers scan for promo codes.",
+      "cost": 220000,
+      "revenue": [
+        190000,
+        980000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-airbnb-host-welcome-kit",
+      "title": "Airbnb host welcome kit",
+      "description": "Travelers discover you beside the Wi‑Fi password.",
+      "cost": 140000,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-marriott-room-tablet-loop",
+      "title": "Marriott in-room tablet loop",
+      "description": "Business travelers tap skip faster than read.",
+      "cost": 360000,
+      "revenue": [
+        315000,
+        1750000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-delta-seatback-pre-roll",
+      "title": "Delta seatback pre-roll",
+      "description": "Skip button disabled for thirty seconds of glory.",
+      "cost": 540000,
+      "revenue": [
+        475000,
+        2600000
+      ],
+      "buzz": 6,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-united-mileageplus-email",
+      "title": "United MileagePlus email",
+      "description": "Inbox placement fought like landing slots at ORD.",
+      "cost": 180000,
+      "revenue": [
+        155000,
+        820000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-amex-platinum-offer",
+      "title": "Amex Platinum partner offer",
+      "description": "Concierge mentions you to cardmembers who never look up.",
+      "cost": 290000,
+      "revenue": [
+        255000,
+        1400000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-chase-sapphire-lounge",
+      "title": "Chase Sapphire lounge screens",
+      "description": "Wealthy travelers charge laptops beside your ad.",
+      "cost": 320000,
+      "revenue": [
+        280000,
+        1550000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-paypal-checkout-badge",
+      "title": "PayPal checkout badge test",
+      "description": "Trust seal A/B on millions of carts.",
+      "cost": 95000,
+      "revenue": [
+        82000,
+        450000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-shop-pay-installments",
+      "title": "Shop Pay installments co-marketing",
+      "description": "Split payments, unified brand story.",
+      "cost": 110000,
+      "revenue": [
+        95000,
+        520000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-stripe-ecosystem-spotlight",
+      "title": "Stripe ecosystem spotlight",
+      "description": "Dev Twitter notices when the status page stays green.",
+      "cost": 75000,
+      "revenue": [
+        65000,
+        340000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-plaid-fintech-fair-booth",
+      "title": "Plaid fintech fair booth",
+      "description": "API handshake demos with real bank sandboxes.",
+      "cost": 130000,
+      "revenue": [
+        112000,
+        580000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-quickbooks-accountant-bundle",
+      "title": "QuickBooks accountant bundle",
+      "description": "SMB advisors recommend you beside tax season panic.",
+      "cost": 85000,
+      "revenue": [
+        74000,
+        390000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-coursera-enterprise-cohort",
+      "title": "Coursera enterprise cohort",
+      "description": "Upskilling certificates with your logo in the corner.",
+      "cost": 210000,
+      "revenue": [
+        185000,
+        980000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-udemy-business-spotlight",
+      "title": "Udemy Business spotlight",
+      "description": "Managers assign courses; employees half-watch.",
+      "cost": 140000,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-linkedin-learning-path",
+      "title": "LinkedIn Learning path sponsor",
+      "description": "Professional development with a branded capstone.",
+      "cost": 175000,
+      "revenue": [
+        150000,
+        780000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-museum-sponsor-wall",
+      "title": "Museum sponsor wall",
+      "description": "Culture and capitalism share a bronze plaque.",
+      "cost": 380000,
+      "revenue": [
+        330000,
+        1800000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-charity-gala-title-sponsor",
+      "title": "Charity gala title sponsor",
+      "description": "Black-tie selfies for the CSR annual report.",
+      "cost": 650000,
+      "revenue": [
+        570000,
+        3100000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "stockPct": 0.007
+    },
+    {
+      "id": "growth-public-davos-lounge-host",
+      "title": "Davos lounge host",
+      "description": "World leaders ignore swag but notice the espresso.",
+      "cost": 980000,
+      "revenue": [
+        860000,
+        4800000
+      ],
+      "buzz": 7,
+      "tierMin": 7,
+      "tierMax": 7,
+      "stockPct": 0.009
+    },
+    {
+      "id": "growth-public-cannes-lions-beach-chalet",
+      "title": "Cannes Lions beach chalet",
+      "description": "Agencies judge your creative between rosé refills.",
+      "cost": 750000,
+      "revenue": [
+        660000,
+        3600000
+      ],
       "buzz": 7,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-192",
-      "title": "YouTube pre-roll: CISO roundtable tour",
-      "description": "Paid CISO roundtable tour on YouTube pre-roll. Legal clears claims; growth clears the invoice.",
-      "cost": 2685000,
+      "id": "growth-public-mobile-world-capital",
+      "title": "Mobile World capital city program",
+      "description": "Citywide branding when the congress comes town.",
+      "cost": 580000,
       "revenue": [
-        1375000,
-        4015000
-      ],
-      "buzz": 8,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-193",
-      "title": "Spotify host-read: CISO roundtable tour",
-      "description": "Spotify host-read buys a month of CISO roundtable tour. Sales wants leads by Friday.",
-      "cost": 2870000,
-      "revenue": [
-        1470000,
-        4530000
-      ],
-      "buzz": 5,
-      "tierMin": 7,
-      "tierMax": 7
-    },
-    {
-      "id": "growth-public-late-194",
-      "title": "Netflix ad tier: CISO roundtable tour",
-      "description": "Netflix ad tier — CISO roundtable tour. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 3055000,
-      "revenue": [
-        1565000,
-        5045000
+        510000,
+        2900000
       ],
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-195",
-      "title": "Hulu sports adjacency: CISO roundtable tour",
-      "description": "Paid CISO roundtable tour on Hulu sports adjacency. Legal clears claims; growth clears the invoice.",
-      "cost": 3240000,
+      "id": "growth-public-web-summit-centre-stage",
+      "title": "Web Summit centre stage",
+      "description": "Founder hoodies and VC speed dating.",
+      "cost": 620000,
       "revenue": [
-        1660000,
-        5560000
+        550000,
+        3000000
       ],
-      "buzz": 7,
+      "buzz": 6,
       "tierMin": 7,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-196",
-      "title": "Reddit AMA week: CISO roundtable tour",
-      "description": "Reddit AMA week — CISO roundtable tour. Finance asks for attribution; marketing cites “brand.”",
-      "cost": 3425000,
+      "id": "growth-public-public-company-esg-report-launch",
+      "title": "Public ESG report launch campaign",
+      "description": "Sustainability PDF pushed to every ESG indexer.",
+      "cost": 220000,
       "revenue": [
-        1755000,
-        6075000
+        190000,
+        1050000
       ],
-      "buzz": 8,
+      "buzz": 4,
       "tierMin": 7,
-      "tierMax": 7
+      "tierMax": 7,
+      "stockPct": 0.005
     },
     {
-      "id": "growth-public-late-197",
-      "title": "Discord partner server: CISO roundtable tour",
-      "description": "Discord partner server buys a month of CISO roundtable tour. Sales wants leads by Friday.",
-      "cost": 3610000,
+      "id": "growth-public-institutional-investor-day-live",
+      "title": "Institutional investor day livestream",
+      "description": "Buy-side analysts multitask through your deck.",
+      "cost": 340000,
       "revenue": [
-        520000,
-        5260000
+        300000,
+        1650000
       ],
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "stockPct": 0.006
+      "stockPct": 0.011
     },
     {
-      "id": "growth-public-late-198",
-      "title": "Twitch sponsored stream: CISO roundtable tour",
-      "description": "One-month CISO roundtable tour through Twitch sponsored stream. IR watches mentions; ops watches traffic.",
-      "cost": 3795000,
+      "id": "growth-public-retail-investor-education-tour",
+      "title": "Retail investor education tour",
+      "description": "Explain the moat without meme-stock energy.",
+      "cost": 85000,
       "revenue": [
-        615000,
-        5775000
+        74000,
+        390000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-index-rebalance-preview",
+      "title": "Index rebalance preview ads",
+      "description": "Passive flows incoming—brand before the rebalance.",
+      "cost": 410000,
+      "revenue": [
+        360000,
+        1900000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "stockPct": 0.014
+    },
+    {
+      "id": "growth-public-customer-community-conference",
+      "title": "Customer community conference",
+      "description": "Power users host sessions better than marketing.",
+      "cost": 290000,
+      "revenue": [
+        255000,
+        1400000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-crisis-comms-drill-public",
+      "title": "Crisis comms drill (public)",
+      "description": "Simulated outage tested before the real one trends.",
+      "cost": 95000,
+      "revenue": [
+        82000,
+        450000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-brand-refresh-unveil",
+      "title": "Brand refresh unveil tour",
+      "description": "New logo debuts; old swag mysteriously vanishes.",
+      "cost": 520000,
+      "revenue": [
+        460000,
+        2500000
       ],
       "buzz": 6,
-      "tierMin": 7,
+      "tierMin": 6,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-199",
-      "title": "Substack crossover: CISO roundtable tour",
-      "description": "One-month CISO roundtable tour through Substack crossover. IR watches mentions; ops watches traffic.",
-      "cost": 650000,
+      "id": "growth-public-salesforce-appexchange-star",
+      "title": "AppExchange star campaign",
+      "description": "Reviews cultivated like a vineyard.",
+      "cost": 120000,
       "revenue": [
-        710000,
-        2510000
+        105000,
+        580000
       ],
-      "buzz": 7,
-      "tierMin": 7,
+      "buzz": 4,
+      "tierMin": 5,
       "tierMax": 7
     },
     {
-      "id": "growth-public-late-200",
-      "title": "Newsletter bundle: CISO roundtable tour",
-      "description": "Newsletter bundle buys a month of CISO roundtable tour. Sales wants leads by Friday.",
-      "cost": 835000,
+      "id": "growth-public-slack-app-directory-boost",
+      "title": "Slack app directory boost",
+      "description": "Install button glows in every remote standup.",
+      "cost": 55000,
       "revenue": [
-        805000,
-        3025000
+        48000,
+        250000
       ],
-      "buzz": 8,
-      "tierMin": 7,
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-github-sponsor-spotlight",
+      "title": "GitHub sponsor spotlight",
+      "description": "Maintainers mention you in release notes.",
+      "cost": 48000,
+      "revenue": [
+        41000,
+        220000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-npr-underwriting-spot",
+      "title": "NPR underwriting spot",
+      "description": "Soft-spoken gratitude between news segments.",
+      "cost": 180000,
+      "revenue": [
+        155000,
+        820000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-ces-unveiled-preview",
+      "title": "CES Unveiled preview night",
+      "description": "Press scribbles before the hall opens.",
+      "cost": 240000,
+      "revenue": [
+        210000,
+        1100000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-viva-tech-paris-pavilion",
+      "title": "VivaTech Paris pavilion",
+      "description": "EU regulators stroll past your demo pod.",
+      "cost": 470000,
+      "revenue": [
+        410000,
+        2300000
+      ],
+      "buzz": 6,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-rise-hong-kong-keynote",
+      "title": "RISE Hong Kong keynote",
+      "description": "Harbor views and late-night pitch decks.",
+      "cost": 410000,
+      "revenue": [
+        360000,
+        1900000
+      ],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-corporate-podcast-network",
+      "title": "Corporate podcast network launch",
+      "description": "Twelve episodes of thoughtful revenue narrative.",
+      "cost": 130000,
+      "revenue": [
+        112000,
+        580000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-employee-advocacy-amplification",
+      "title": "Employee advocacy amplification",
+      "description": "Staff posts boosted until HR sends a reminder.",
+      "cost": 42000,
+      "revenue": [
+        36000,
+        195000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-api-hackathon-challenge",
+      "title": "Public API hackathon challenge",
+      "description": "Prize money and rate-limit waivers for winners.",
+      "cost": 110000,
+      "revenue": [
+        95000,
+        520000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-year-end-thank-you-campaign",
+      "title": "Year-end thank-you campaign",
+      "description": "Gratitude ads that somehow still ask for renewals.",
+      "cost": 140000,
+      "revenue": [
+        120000,
+        650000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-founder-memo-media-cycle",
+      "title": "Founder memo media cycle",
+      "description": "Long letter quoted in every tech newsletter.",
+      "cost": 68000,
+      "revenue": [
+        58000,
+        310000
+      ],
+      "buzz": 3,
+      "tierMin": 6,
       "tierMax": 7
     }
   ]

@@ -1195,7 +1195,7 @@ if (roster.length < 1 || roster.length > expectedOffers) {
 }
 
 const productSideBank = sideTaskBankSize(['product', 'both']);
-if (growthCampaignCatalogSize() < 350) {
+if (growthCampaignCatalogSize() < 270) {
   console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()})`);
   failed = true;
 } else if (getProductActions().length < 75) {

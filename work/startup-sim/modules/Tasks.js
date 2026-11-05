@@ -10,6 +10,7 @@ import bundledSpaceExploration from '../data/space-exploration-tasks.json' with 
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
 import bundledCatalogExpansion from '../data/tasks-catalog-expansion.json' with { type: 'json' };
 import bundledPublicLate from '../data/tasks-public-late-game.json' with { type: 'json' };
+import bundledPublicLateExtra from '../data/tasks-public-late-game-extra.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
@@ -81,7 +82,10 @@ function mergeCatalogExpansion(base) {
 }
 
 function mergePublicLateGameTasks(base) {
-  return mergeTaskPack(base, bundledPublicLate?.tasks ?? []);
+  return mergeTaskPack(
+    mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
+    bundledPublicLateExtra?.tasks ?? []
+  );
 }
 
 function mergeCatalog(base) {

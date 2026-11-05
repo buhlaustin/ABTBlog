@@ -179,17 +179,46 @@ function sandboxMult(state) {
   return state.mode === 'sandbox' ? MODE_CONFIG.sandbox.difficulty : MODE_CONFIG.career.difficulty;
 }
 
-/** Cap one desk/growth cash booking so rev× cannot 100× MRR in a single month. */
+/** MRR-aware ceiling for one desk task or growth campaign (scales up at mega-cap). */
+export function maxSingleBookedRevenue(state) {
+  const tier = progressionTier(state);
+  if (tier < 5) return Number.POSITIVE_INFINITY;
+  const mrr = Math.max(Number(state.finance?.mrr) || 0, getArr(state) / 12);
+  if (mrr <= 0) return Number.POSITIVE_INFINITY;
+  const logM = Math.log10(Math.max(mrr, 1e6));
+  let share = tier >= 7 ? 0.035 + (logM - 6) * 0.01 : 0.12;
+  share = Math.min(0.2, Math.max(0.035, share));
+  if (state.mode === 'sandbox') share = Math.min(0.25, share * 1.12);
+  const perAction = Math.round(mrr * share);
+  const absolute = state.mode === 'sandbox' ? 400_000_000_000 : 120_000_000_000;
+  return Math.max(1_000_000, Math.min(perAction, absolute));
+}
+
+/** Monthly cap on booked desk + growth cash (prevents multi-trillion single-month spikes). */
+export function maxMonthlyBookedRevenue(state) {
+  const tier = progressionTier(state);
+  if (tier < 5) return Number.POSITIVE_INFINITY;
+  const mrr = Math.max(Number(state.finance?.mrr) || 0, getArr(state) / 12);
+  if (mrr <= 0) return Number.POSITIVE_INFINITY;
+  const logM = Math.log10(Math.max(mrr, 1e6));
+  let share = tier >= 7 ? 0.28 + (logM - 6) * 0.035 : 0.5;
+  share = Math.min(0.72, Math.max(0.25, share));
+  if (state.mode === 'sandbox') share = Math.min(0.78, share * 1.05);
+  const monthly = Math.round(mrr * share);
+  const absolute = state.mode === 'sandbox' ? 900_000_000_000 : 350_000_000_000;
+  return Math.max(5_000_000, Math.min(monthly, absolute));
+}
+
+/** Cap one booking; also respects remaining room in the current month. */
 export function clampBookedRevenue(state, raw) {
   const amount = Math.max(0, Math.round(Number(raw) || 0));
   const tier = progressionTier(state);
   if (tier < 5) return amount;
-  const mrr = Math.max(Number(state.finance?.mrr) || 0, getArr(state) / 12);
-  if (mrr <= 0) return amount;
-  let share = tier >= 7 ? 0.08 : 0.14;
-  if (state.mode === 'sandbox') share = Math.min(0.12, share * 1.2);
-  const cap = Math.max(250_000, Math.round(mrr * share));
-  return Math.min(amount, cap);
+  let capped = Math.min(amount, maxSingleBookedRevenue(state));
+  const monthCap = maxMonthlyBookedRevenue(state);
+  const booked = state.calendar?.monthRevenue ?? 0;
+  capped = Math.min(capped, Math.max(0, monthCap - booked));
+  return capped;
 }
 
 /** Apply one task's cash flow immediately when completed. */

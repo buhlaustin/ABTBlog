@@ -1,0 +1,1879 @@
+{
+  "tasks": [
+    {
+      "id": "sovereign-cloud-frame-agreement",
+      "title": "Sovereign cloud frame agreement",
+      "description": "Three ministries, one pricing table, and a translator on speed dial.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 12000,
+      "revenue": [
+        95000,
+        310000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "g7-critical-infra-certification",
+      "title": "G7 critical infra certification",
+      "description": "Auditors want paper trails longer than your runway history.",
+      "types": [
+        "research",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 18500,
+      "revenue": [
+        110000,
+        420000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "central-bank-pilot-sandbox",
+      "title": "Central bank pilot sandbox",
+      "description": "Regulators nod slowly while your demo runs in read-only mode.",
+      "types": [
+        "sales",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 22000,
+      "revenue": [
+        140000,
+        520000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "stockPct": 0.006
+    },
+    {
+      "id": "fortune-50-boardroom-roadshow",
+      "title": "Fortune 50 boardroom roadshow",
+      "description": "C-suite calendars align once a quarter; you have forty-eight hours.",
+      "types": [
+        "marketing",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 35000,
+      "revenue": [
+        180000,
+        680000
+      ],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "global-partner-summit-keynote",
+      "title": "Global partner summit keynote",
+      "description": "Channel chiefs expect roadmap clarity and an open bar.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 28000,
+      "revenue": [
+        125000,
+        480000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "hyperscaler-marketplace-listing",
+      "title": "Hyperscaler marketplace listing",
+      "description": "Listing fees are cheap; co-sell paperwork is not.",
+      "types": [
+        "product",
+        "growth"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 15000,
+      "revenue": [
+        88000,
+        290000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "tier-one-bank-core-integration",
+      "title": "Tier-one bank core integration",
+      "description": "Mainframe handshake with a slide that says “modern API.”",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 42000,
+      "revenue": [
+        210000,
+        780000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "national-health-exchange-connector",
+      "title": "National health exchange connector",
+      "description": "HL7 purists debate your field mapping over lunch.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 31000,
+      "revenue": [
+        165000,
+        590000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "cross-border-data-treaty-pack",
+      "title": "Cross-border data treaty pack",
+      "description": "Lawyers circle jurisdictions while eng ships feature flags.",
+      "types": [
+        "research",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 19000,
+      "revenue": [
+        102000,
+        360000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "stockPct": 0.01
+    },
+    {
+      "id": "mega-retailer-unified-commerce",
+      "title": "Mega-retailer unified commerce",
+      "description": "POS, e-com, and loyalty finally share one SKU truth.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 48000,
+      "revenue": [
+        240000,
+        920000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "streaming-wars-ad-stack-refresh",
+      "title": "Streaming wars ad stack refresh",
+      "description": "Programmatic pods need clean metadata before upfront week.",
+      "types": [
+        "marketing",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 26000,
+      "revenue": [
+        130000,
+        510000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "automotive-ota-analytics-deal",
+      "title": "Automotive OTA analytics deal",
+      "description": "Fleet telemetry meets warranty analytics in one dashboard.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 33000,
+      "revenue": [
+        175000,
+        640000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "aerospace-mro-predictive-module",
+      "title": "Aerospace MRO predictive module",
+      "description": "Turnaround time KPIs get a machine-learning garnish.",
+      "types": [
+        "research",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 37000,
+      "revenue": [
+        195000,
+        720000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "utilities-grid-balancing-addon",
+      "title": "Utilities grid balancing add-on",
+      "description": "Peak load alerts must not page the wrong substation.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 24000,
+      "revenue": [
+        128000,
+        470000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "chemical-plant-safety-audit-trail",
+      "title": "Chemical plant safety audit trail",
+      "description": "OSHA-friendly logs with timestamps nobody will misread.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 14000,
+      "revenue": [
+        82000,
+        280000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "mining-operator-fleet-dispatch",
+      "title": "Mining operator fleet dispatch",
+      "description": "Dusty tablets still need offline-first routing.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 29000,
+      "revenue": [
+        155000,
+        580000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "rail-network-schedule-optimizer",
+      "title": "Rail network schedule optimizer",
+      "description": "Delay cascades shrink when planners trust the model.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 34000,
+      "revenue": [
+        188000,
+        690000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "stockPct": 0.012
+    },
+    {
+      "id": "port-authority-container-visibility",
+      "title": "Port authority container visibility",
+      "description": "Crane schedules and customs holds in one pane of glass.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 27000,
+      "revenue": [
+        142000,
+        530000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "air-traffic-flow-analytics-pilot",
+      "title": "Air traffic flow analytics pilot",
+      "description": "FAA-adjacent stakeholders want sims before signatures.",
+      "types": [
+        "research",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 45000,
+      "revenue": [
+        230000,
+        850000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "defense-prime-subcontract-tranche",
+      "title": "Defense prime subcontract tranche",
+      "description": "CMMC folders thicker than the statement of work.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 52000,
+      "revenue": [
+        265000,
+        980000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "intel-community-analyst-workbench",
+      "title": "Intel community analyst workbench",
+      "description": "Air-gapped demo on hardware that arrived yesterday.",
+      "types": [
+        "product",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 61000,
+      "revenue": [
+        310000,
+        1150000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "nato-allied-interoperability-pack",
+      "title": "NATO allied interoperability pack",
+      "description": "Standards alignment deck reviewed in three time zones.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 38000,
+      "revenue": [
+        200000,
+        740000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "un-peacekeeping-logistics-hub",
+      "title": "UN peacekeeping logistics hub",
+      "description": "Multilingual workflows with donation-grade uptime targets.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 33000,
+      "revenue": [
+        170000,
+        620000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "world-cup-sponsor-data-layer",
+      "title": "World Cup sponsor data layer",
+      "description": "Fan engagement metrics due before the opening whistle.",
+      "types": [
+        "marketing",
+        "growth"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 55000,
+      "revenue": [
+        285000,
+        1050000
+      ],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "olympic-broadcast-partner-suite",
+      "title": "Olympic broadcast partner suite",
+      "description": "Latency charts for rights holders who never refresh.",
+      "types": [
+        "marketing",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 47000,
+      "revenue": [
+        245000,
+        900000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "stockPct": 0.009
+    },
+    {
+      "id": "formula-one-pit-wall-integration",
+      "title": "Formula One pit wall integration",
+      "description": "Milliseconds matter; so does your SLA footnote.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 41000,
+      "revenue": [
+        215000,
+        800000
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "esports-league-whitelabel-stats",
+      "title": "Esports league whitelabel stats",
+      "description": "Casters want overlays without crashing OBS.",
+      "types": [
+        "product",
+        "growth"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 18000,
+      "revenue": [
+        98000,
+        340000
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "music-label-royalty-reconciliation",
+      "title": "Music label royalty reconciliation",
+      "description": "Streams, splits, and angry artist managers in one export.",
+      "types": [
+        "research",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 22000,
+      "revenue": [
+        118000,
+        430000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "movie-studio-dailies-pipeline",
+      "title": "Movie studio dailies pipeline",
+      "description": "Petabyte ingress with a producer asking for “the clip.”",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 36000,
+      "revenue": [
+        190000,
+        710000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "newsroom-fact-check-assist",
+      "title": "Newsroom fact-check assist",
+      "description": "Editors want citations, not another black-box summary.",
+      "types": [
+        "research",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 16000,
+      "revenue": [
+        90000,
+        320000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "magazine-paywall-experiment-lift",
+      "title": "Magazine paywall experiment lift",
+      "description": "Metered vs. hard gate A/B with subscriber wrath monitored.",
+      "types": [
+        "growth",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 13000,
+      "revenue": [
+        85000,
+        270000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "telco-5g-edge-monetization",
+      "title": "Telco 5G edge monetization",
+      "description": "Slice pricing slides for carriers who love acronyms.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 39000,
+      "revenue": [
+        205000,
+        760000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "satellite-operator-ground-segment",
+      "title": "Satellite operator ground segment",
+      "description": "Downlink dashboards for orbits you cannot spell.",
+      "types": [
+        "product",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 44000,
+      "revenue": [
+        225000,
+        840000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "space-tourism-crm-launch",
+      "title": "Space tourism CRM launch",
+      "description": "Waitlists for trips with deposit clauses from Mars.",
+      "types": [
+        "marketing",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 21000,
+      "revenue": [
+        115000,
+        410000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "quantum-lab-partner-announcement",
+      "title": "Quantum lab partner announcement",
+      "description": "Press release mentions qubits; sales mentions POs.",
+      "types": [
+        "marketing",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 25000,
+      "revenue": [
+        132000,
+        490000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "stockPct": 0.007
+    },
+    {
+      "id": "biotech-trial-site-network",
+      "title": "Biotech trial site network",
+      "description": "Patient enrollment dashboards with HIPAA whisper mode.",
+      "types": [
+        "research",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 32000,
+      "revenue": [
+        168000,
+        610000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "hospital-network-clinical-ai-guard",
+      "title": "Hospital network clinical AI guard",
+      "description": "Clinicians want override buttons, not autopilot.",
+      "types": [
+        "product",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 35000,
+      "revenue": [
+        182000,
+        670000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "dental-rollup-practice-os",
+      "title": "Dental rollup practice OS",
+      "description": "Forty acquisitions, one scheduling truth.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 23000,
+      "revenue": [
+        122000,
+        450000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "luxury-hotel-guest-graph",
+      "title": "Luxury hotel guest graph",
+      "description": "Concierge notes without creeping out billionaires.",
+      "types": [
+        "product",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 17000,
+      "revenue": [
+        95000,
+        330000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cruise-line-shore-excursion-hub",
+      "title": "Cruise line shore excursion hub",
+      "description": "Inventory sync while passengers lose Wi‑Fi at sea.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 28000,
+      "revenue": [
+        148000,
+        540000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "airline-alliance-loyalty-bridge",
+      "title": "Airline alliance loyalty bridge",
+      "description": "Miles math that finance will actually sign.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 30000,
+      "revenue": [
+        158000,
+        580000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "stockPct": 0.011
+    },
+    {
+      "id": "fast-fashion-supply-radar",
+      "title": "Fast-fashion supply radar",
+      "description": "Trend spikes mapped to factory capacity in hours.",
+      "types": [
+        "research",
+        "growth"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 19000,
+      "revenue": [
+        105000,
+        380000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "luxury-maison-clienteling-app",
+      "title": "Luxury maison clienteling app",
+      "description": "Boutique associates need offline client notes.",
+      "types": [
+        "product",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 24000,
+      "revenue": [
+        128000,
+        470000
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "grocery-delivery-slot-optimizer",
+      "title": "Grocery delivery slot optimizer",
+      "description": "Drivers, dasher math, and angry avocados.",
+      "types": [
+        "product",
+        "growth"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 15000,
+      "revenue": [
+        88000,
+        300000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cpg-national-shelf-analytics",
+      "title": "CPG national shelf analytics",
+      "description": "Planogram truth from photos clerks actually take.",
+      "types": [
+        "research",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 26000,
+      "revenue": [
+        138000,
+        500000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "beverage-distributor-route-ai",
+      "title": "Beverage distributor route AI",
+      "description": "Warm beer prevention as a KPI, seriously.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 21000,
+      "revenue": [
+        112000,
+        400000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "insurtech-cat-model-ingest",
+      "title": "Insurtech cat model ingest",
+      "description": "Actuaries want reproducible peril layers, not vibes.",
+      "types": [
+        "research",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 34000,
+      "revenue": [
+        178000,
+        650000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "stockPct": 0.005
+    },
+    {
+      "id": "reinsurance-treaty-analytics",
+      "title": "Reinsurance treaty analytics",
+      "description": "Layers, attachments, and Excel PTSD.",
+      "types": [
+        "sales",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 37000,
+      "revenue": [
+        192000,
+        710000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "private-equity-portfolio-cockpit",
+      "title": "Private equity portfolio cockpit",
+      "description": "LP letters auto-draft from portfolio KPIs.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 42000,
+      "revenue": [
+        220000,
+        810000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "hedge-fund-alt-data-feed",
+      "title": "Hedge fund alt-data feed",
+      "description": "Quants want timestamps aligned to the nanosecond joke.",
+      "types": [
+        "research",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 48000,
+      "revenue": [
+        250000,
+        920000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "asset-manager-esg-scoring-addon",
+      "title": "Asset manager ESG scoring addon",
+      "description": "Ratings vendors argue while you ship the connector.",
+      "types": [
+        "product",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 25000,
+      "revenue": [
+        135000,
+        490000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "commercial-real-estate-valuation-ai",
+      "title": "Commercial real estate valuation AI",
+      "description": "Cap rates and comp sets with audit-friendly lineage.",
+      "types": [
+        "research",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 31000,
+      "revenue": [
+        162000,
+        600000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "proptech-smart-building-os",
+      "title": "Proptech smart building OS",
+      "description": "HVAC, badges, and tenant complaints unified.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 27000,
+      "revenue": [
+        145000,
+        530000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "construction-gc-schedule-risk",
+      "title": "Construction GC schedule risk",
+      "description": "Subcontractor delays predicted before concrete pours.",
+      "types": [
+        "research",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 22000,
+      "revenue": [
+        118000,
+        430000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "legal-am-law-discovery-suite",
+      "title": "Legal Am Law discovery suite",
+      "description": "Partners bill hours reviewing your redaction UI.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 45000,
+      "revenue": [
+        235000,
+        870000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "accounting-big-four-workflow",
+      "title": "Accounting Big Four workflow",
+      "description": "PBC lists that sync instead of suffocate.",
+      "types": [
+        "sales",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 39000,
+      "revenue": [
+        205000,
+        750000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "stockPct": 0.015
+    },
+    {
+      "id": "consulting-firm-knowledge-graph",
+      "title": "Consulting firm knowledge graph",
+      "description": "Past decks findable without a librarian guild.",
+      "types": [
+        "research",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 20000,
+      "revenue": [
+        108000,
+        390000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "staffing-giant-vms-integration",
+      "title": "Staffing giant VMS integration",
+      "description": "Timesheets flow; margin leaks get flagged.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 26000,
+      "revenue": [
+        140000,
+        520000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "hr-outsourcing-global-payroll",
+      "title": "HR outsourcing global payroll",
+      "description": "Forty currencies, one payday panic button.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 33000,
+      "revenue": [
+        172000,
+        630000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "university-research-grant-portal",
+      "title": "University research grant portal",
+      "description": "Indirect costs calculated without faculty tears.",
+      "types": [
+        "research",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 17000,
+      "revenue": [
+        92000,
+        330000
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "k12-state-assessment-platform",
+      "title": "K-12 state assessment platform",
+      "description": "Proctors, accommodations, and audit trails galore.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 36000,
+      "revenue": [
+        188000,
+        690000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "ed-publisher-adaptive-curriculum",
+      "title": "Ed publisher adaptive curriculum",
+      "description": "Standards maps updated before legislature does.",
+      "types": [
+        "product",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 24000,
+      "revenue": [
+        126000,
+        460000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "gov-cloud-ila-renewal-push",
+      "title": "GovCloud ILA renewal push",
+      "description": "FedRAMP paperwork resurrected for one more year.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 22000,
+      "revenue": [
+        120000,
+        440000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "stockPct": 0.008
+    },
+    {
+      "id": "state-dmv-modernization-phase",
+      "title": "State DMV modernization phase",
+      "description": "Queue times down; political photo ops up.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 58000,
+      "revenue": [
+        295000,
+        1080000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "national-census-analytics-partner",
+      "title": "National census analytics partner",
+      "description": "Aggregates only—individual rows never leave the vault.",
+      "types": [
+        "research",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 41000,
+      "revenue": [
+        215000,
+        790000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "postal-service-sorting-ai",
+      "title": "Postal service sorting AI",
+      "description": "Barcodes misread less; holiday chaos slightly less.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 35000,
+      "revenue": [
+        184000,
+        680000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "customs-border-risk-scoring",
+      "title": "Customs border risk scoring",
+      "description": "Inspectors trust scores with explainability attached.",
+      "types": [
+        "research",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 32000,
+      "revenue": [
+        168000,
+        620000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "tax-authority-e-filing-bridge",
+      "title": "Tax authority e-filing bridge",
+      "description": "Schema updates land mid-filing season, naturally.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 28000,
+      "revenue": [
+        150000,
+        550000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "central-procurement-catalog-win",
+      "title": "Central procurement catalog win",
+      "description": "Lowest bidder rules meet your premium SKU.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 24000,
+      "revenue": [
+        130000,
+        480000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "whale-global-retail-platform",
+      "title": "Global retail platform transformation",
+      "description": "One throat to choke across forty countries and one board.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 95000,
+      "revenue": [
+        8200000,
+        28000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.018
+    },
+    {
+      "id": "whale-hyperscale-cloud-commit",
+      "title": "Hyperscale cloud commit bundle",
+      "description": "Three-year spend promise with quarterly true-ups.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 88000,
+      "revenue": [
+        12000000,
+        35000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true
+    },
+    {
+      "id": "whale-sovereign-wealth-digital",
+      "title": "Sovereign wealth digital stack",
+      "description": "Nation-scale portfolio tools with diplomatic patience.",
+      "types": [
+        "sales",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 102000,
+      "revenue": [
+        9500000,
+        32000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.02
+    },
+    {
+      "id": "whale-universal-bank-transformation",
+      "title": "Universal bank transformation program",
+      "description": "Core replacement rhetoric with phased rollout reality.",
+      "types": [
+        "sales",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 115000,
+      "revenue": [
+        14000000,
+        34000000
+      ],
+      "product": 1,
+      "buzz": 2,
+      "whale": true
+    },
+    {
+      "id": "whale-auto-oem-software-stack",
+      "title": "Auto OEM software stack mandate",
+      "description": "Every model year ships your module or delays the line.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 78000,
+      "revenue": [
+        8800000,
+        26000000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "whale": true
+    },
+    {
+      "id": "whale-pharma-global-launch",
+      "title": "Pharma global launch orchestration",
+      "description": "Regulatory matrices thicker than the patient brochure.",
+      "types": [
+        "research",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 92000,
+      "revenue": [
+        10500000,
+        30000000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "whale": true,
+      "stockPct": 0.016
+    },
+    {
+      "id": "whale-energy-majors-carbon-hub",
+      "title": "Energy majors carbon hub deal",
+      "description": "Scope 3 debates fuel a nine-figure statement of work.",
+      "types": [
+        "sales",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 86000,
+      "revenue": [
+        9000000,
+        27000000
+      ],
+      "product": 0,
+      "buzz": 2,
+      "whale": true
+    },
+    {
+      "id": "whale-tech-conglomerate-alliance",
+      "title": "Tech conglomerate strategic alliance",
+      "description": "Co-sell slides forever; revenue starts next quarter.",
+      "types": [
+        "marketing",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 72000,
+      "revenue": [
+        7800000,
+        24000000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "whale": true,
+      "stockPct": 0.014
+    },
+    {
+      "id": "investor-day-narrative-reset",
+      "title": "Investor day narrative reset",
+      "description": "Story arc polished until IR stops crossing things out.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 34000,
+      "revenue": [
+        175000,
+        640000
+      ],
+      "product": 0,
+      "buzz": 4,
+      "stockPct": 0.019
+    },
+    {
+      "id": "proxy-season-shareholder-outreach",
+      "title": "Proxy season shareholder outreach",
+      "description": "Glass Lewis letters answered with metrics, not adjectives.",
+      "types": [
+        "marketing",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 29000,
+      "revenue": [
+        152000,
+        560000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "short-seller-response-war-room",
+      "title": "Short seller response war room",
+      "description": "Fact pack assembled faster than the tweet thread.",
+      "types": [
+        "research",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 38000,
+      "revenue": [
+        198000,
+        730000
+      ],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "dual-listing-compliance-sprint",
+      "title": "Dual listing compliance sprint",
+      "description": "Two exchanges, two rulebooks, one exhausted legal team.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 42000,
+      "revenue": [
+        218000,
+        800000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "stock-split-retail-education",
+      "title": "Stock split retail education",
+      "description": "Explain adjusted basis before Reddit does it wrong.",
+      "types": [
+        "marketing",
+        "growth"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 16000,
+      "revenue": [
+        92000,
+        310000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "buyback-announcement-media-tour",
+      "title": "Buyback announcement media tour",
+      "description": "Capital return story without sounding defensive.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 27000,
+      "revenue": [
+        142000,
+        520000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "stockPct": 0.004
+    },
+    {
+      "id": "debt-refinance-investor-lunch",
+      "title": "Debt refinance investor lunch",
+      "description": "Bondholders want covenants in plain English.",
+      "types": [
+        "sales",
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 31000,
+      "revenue": [
+        165000,
+        600000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "mna-target-diligence-data-room",
+      "title": "M&A target diligence data room",
+      "description": "Terabytes indexed; bankers still ask for PDFs.",
+      "types": [
+        "research",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 47000,
+      "revenue": [
+        245000,
+        900000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "internal-ai-copilot-rollout",
+      "title": "Internal AI copilot rollout",
+      "description": "Employees ask if it replaces them before logging in.",
+      "types": [
+        "product",
+        "growth"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 25000,
+      "revenue": [
+        135000,
+        490000
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "platform-api-deprecated-sunset",
+      "title": "Platform API deprecated sunset",
+      "description": "Six-month notice and migration tools—or riot.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 19000,
+      "revenue": [
+        104000,
+        370000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "trust-safety-council-public-report",
+      "title": "Trust & safety council public report",
+      "description": "Transparency PDF that lawyers actually cleared.",
+      "types": [
+        "research",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 23000,
+      "revenue": [
+        125000,
+        450000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "global-tax-pillar-two-readiness",
+      "title": "Global tax Pillar Two readiness",
+      "description": "Minimum tax rules modeled before auditors arrive.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 33000,
+      "revenue": [
+        172000,
+        630000
+      ],
+      "product": 0,
+      "buzz": 1,
+      "stockPct": 0.013
+    }
+  ]
+}

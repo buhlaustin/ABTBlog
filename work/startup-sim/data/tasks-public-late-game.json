@@ -1,7 +1,7 @@
 {
   "tasks": [
     {
-      "id": "public-late-001",
+      "id": "renew-fortune-100-platform-deal",
       "title": "Renew Fortune 100 platform deal",
       "description": "Legal redlines the size of a phone book; procurement still wants 3% off.",
       "types": [
@@ -22,7 +22,7 @@
       "stockPct": 0.008
     },
     {
-      "id": "public-late-002",
+      "id": "close-federal-rfp-tranche",
       "title": "Close federal RFP tranche",
       "description": "Compliance docs, pen tests, and a demo that cannot drop Wi‑Fi.",
       "types": [
@@ -43,7 +43,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-003",
+      "id": "upsell-enterprise-ai-add-on",
       "title": "Upsell enterprise AI add-on",
       "description": "Customer already pays for seats; now they want “copilot everywhere.”",
       "types": [
@@ -64,7 +64,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-004",
+      "id": "defend-renewal-against-rival-bake-off",
       "title": "Defend renewal against rival bake-off",
       "description": "Incumbent discount vs. your new roadmap slide deck.",
       "types": [
@@ -84,7 +84,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-005",
+      "id": "launch-analyst-day-dry-run",
       "title": "Launch analyst day dry run",
       "description": "IR coaches the CEO on saying “confident” without promising numbers.",
       "types": [
@@ -105,7 +105,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-006",
+      "id": "ship-public-sector-reference-win",
       "title": "Ship public-sector reference win",
       "description": "Case study with enough redactions to look mysterious.",
       "types": [
@@ -126,7 +126,7 @@
       "stockPct": 0.02
     },
     {
-      "id": "public-late-007",
+      "id": "negotiate-multi-year-ela",
       "title": "Negotiate multi-year ELA",
       "description": "Legal wants five years; customer wants a one-year escape hatch.",
       "types": [
@@ -147,7 +147,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-008",
+      "id": "run-global-pricing-harmonization",
       "title": "Run global pricing harmonization",
       "description": "Same SKU, twelve currencies, one angry CFO in France.",
       "types": [
@@ -168,7 +168,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-009",
+      "id": "land-healthcare-system-expansion",
       "title": "Land healthcare system expansion",
       "description": "HIPAA packet, BAA signatures, and a go-live date that moved twice.",
       "types": [
@@ -188,7 +188,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-010",
+      "id": "close-media-conglomerate-pilot",
       "title": "Close media conglomerate pilot",
       "description": "POC success metric is “executives stopped emailing.”",
       "types": [
@@ -209,7 +209,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-011",
+      "id": "expand-telco-edge-deployment",
       "title": "Expand telco edge deployment",
       "description": "Field engineers, SLAs, and a rival claiming they were “almost done.”",
       "types": [
@@ -230,7 +230,7 @@
       "stockPct": 0.014
     },
     {
-      "id": "public-late-012",
+      "id": "win-retailer-peak-season-prep",
       "title": "Win retailer peak-season prep",
       "description": "Black Friday load test or bust; marketing wants logos early.",
       "types": [
@@ -251,7 +251,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-013",
+      "id": "secure-university-system-contract",
       "title": "Secure university system contract",
       "description": "Procurement via committee; students want SSO yesterday.",
       "types": [
@@ -272,7 +272,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-014",
+      "id": "close-automotive-oem-tier-2-deal",
       "title": "Close automotive OEM tier-2 deal",
       "description": "Long cycle, longer security questionnaire.",
       "types": [
@@ -292,7 +292,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-015",
+      "id": "renew-insurance-carrier-book",
       "title": "Renew insurance carrier book",
       "description": "Actuarial models meet your uptime chart.",
       "types": [
@@ -313,7 +313,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-016",
+      "id": "land-energy-sector-analytics-pack",
       "title": "Land energy sector analytics pack",
       "description": "OT network approval took longer than the sale.",
       "types": [
@@ -334,7 +334,7 @@
       "stockPct": 0.008
     },
     {
-      "id": "public-late-017",
+      "id": "expand-logistics-partner-network",
       "title": "Expand logistics partner network",
       "description": "API keys for partners who still email CSVs.",
       "types": [
@@ -355,7 +355,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-018",
+      "id": "close-hospitality-chain-rollout",
       "title": "Close hospitality chain rollout",
       "description": "Property managers care about tablets, not your architecture diagram.",
       "types": [
@@ -376,7 +376,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-019",
+      "id": "win-gaming-publisher-live-ops",
       "title": "Win gaming publisher live-ops",
       "description": "Launch week traffic spikes are the only sermon they hear.",
       "types": [
@@ -396,7 +396,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-020",
+      "id": "defend-public-sector-renewal",
       "title": "Defend public-sector renewal",
       "description": "New commissioner, same budget, fresh RFP anyway.",
       "types": [
@@ -417,7 +417,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-021",
+      "id": "upsell-manufacturing-mes-bridge",
       "title": "Upsell manufacturing MES bridge",
       "description": "Shop floor tablets finally talk to finance.",
       "types": [
@@ -438,7 +438,7 @@
       "stockPct": 0.02
     },
     {
-      "id": "public-late-022",
+      "id": "land-pharma-validation-package",
       "title": "Land pharma validation package",
       "description": "CSV docs and auditors who love checklists.",
       "types": [
@@ -459,7 +459,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-023",
+      "id": "close-airline-loyalty-integration",
       "title": "Close airline loyalty integration",
       "description": "Miles, points, and a middleware team on both sides.",
       "types": [
@@ -480,7 +480,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-024",
+      "id": "expand-neobank-feature-bundle",
       "title": "Expand neobank feature bundle",
       "description": "Regulators peek over the fence; ship anyway.",
       "types": [
@@ -500,7 +500,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-025",
+      "id": "renew-saas-reseller-agreement",
       "title": "Renew SaaS reseller agreement",
       "description": "Channel margin fight with a partner who also resells your rival.",
       "types": [
@@ -521,7 +521,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-026",
+      "id": "win-municipal-open-data-portal",
       "title": "Win municipal open-data portal",
       "description": "Press release drafted before procurement finishes.",
       "types": [
@@ -542,7 +542,7 @@
       "stockPct": 0.014
     },
     {
-      "id": "public-late-027",
+      "id": "land-defense-subcontract-scope",
       "title": "Land defense subcontract scope",
       "description": "Clearance paperwork slower than the product roadmap.",
       "types": [
@@ -563,7 +563,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-028",
+      "id": "close-sports-league-stats-deal",
       "title": "Close sports league stats deal",
       "description": "Real-time feeds; fans complain on Twitter if you lag.",
       "types": [
@@ -584,7 +584,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-029",
+      "id": "expand-payment-processor-rails",
       "title": "Expand payment processor rails",
       "description": "Chargebacks, disputes, and a fraud model update.",
       "types": [
@@ -604,7 +604,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-030",
+      "id": "renew-hr-platform-global-seats",
       "title": "Renew HR platform global seats",
       "description": "Payroll cutover weekend — nobody sleeps.",
       "types": [
@@ -625,7 +625,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-031",
+      "id": "win-edtech-district-wide-sso",
       "title": "Win edtech district-wide SSO",
       "description": "Parent emails, teacher training, and one broken Chromebook cart.",
       "types": [
@@ -646,7 +646,7 @@
       "stockPct": 0.008
     },
     {
-      "id": "public-late-032",
+      "id": "land-cre-portfolio-analytics",
       "title": "Land CRE portfolio analytics",
       "description": "Owners want occupancy dashboards, not jargon.",
       "types": [
@@ -667,7 +667,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-033",
+      "id": "close-cybersecurity-mssp-bundle",
       "title": "Close cybersecurity MSSP bundle",
       "description": "SOC handoff runbook thicker than the contract.",
       "types": [
@@ -688,7 +688,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-034",
+      "id": "expand-iot-fleet-telemetry",
       "title": "Expand IoT fleet telemetry",
       "description": "Devices in the field that never get firmware updates.",
       "types": [
@@ -708,7 +708,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-035",
+      "id": "defend-media-streaming-renewal",
       "title": "Defend media streaming renewal",
       "description": "Churn cohort slide saves the quarter.",
       "types": [
@@ -729,7 +729,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-036",
+      "id": "upsell-ad-tech-clean-room",
       "title": "Upsell ad-tech clean room",
       "description": "Privacy lawyers finally nod in the same meeting.",
       "types": [
@@ -750,7 +750,7 @@
       "stockPct": 0.02
     },
     {
-      "id": "public-late-037",
+      "id": "win-semiconductor-yield-module",
       "title": "Win semiconductor yield module",
       "description": "Fab managers speak in acronyms; you learn fast.",
       "types": [
@@ -771,7 +771,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-038",
+      "id": "close-agricultural-co-op-order",
       "title": "Close agricultural co-op order",
       "description": "Harvest season deadline beats your sprint planning.",
       "types": [
@@ -792,7 +792,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-039",
+      "id": "renew-legal-tech-matter-sync",
       "title": "Renew legal tech matter sync",
       "description": "Partners trust redlines, not roadmaps.",
       "types": [
@@ -812,7 +812,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-040",
+      "id": "land-nonprofit-grant-reporting",
       "title": "Land nonprofit grant reporting",
       "description": "Donors want impact metrics in plain English.",
       "types": [
@@ -833,7 +833,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-041",
+      "id": "expand-marketplace-take-rate-test",
       "title": "Expand marketplace take-rate test",
       "description": "GMV up; sellers complain about fees on Discord.",
       "types": [
@@ -854,7 +854,7 @@
       "stockPct": 0.014
     },
     {
-      "id": "public-late-042",
+      "id": "close-real-estate-brokerage-crm",
       "title": "Close real-estate brokerage CRM",
       "description": "Agents want mobile; IT wants MDM.",
       "types": [
@@ -875,7 +875,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-043",
+      "id": "win-public-transit-mobile-tickets",
       "title": "Win public transit mobile tickets",
       "description": "Riders want offline mode; ops wants fraud controls.",
       "types": [
@@ -896,7 +896,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-044",
+      "id": "defend-healthcare-payer-renewal",
       "title": "Defend healthcare payer renewal",
       "description": "Claims volume spike after flu season.",
       "types": [
@@ -916,7 +916,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-045",
+      "id": "land-warehouse-robotics-api",
       "title": "Land warehouse robotics API",
       "description": "Pick rates up when the robots stop arguing with WMS.",
       "types": [
@@ -937,7 +937,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-046",
+      "id": "renew-cybersecurity-insurance-attestation",
       "title": "Renew cybersecurity insurance attestation",
       "description": "Questionnaire answers become product requirements.",
       "types": [
@@ -958,7 +958,7 @@
       "stockPct": 0.008
     },
     {
-      "id": "public-late-047",
+      "id": "close-consortium-data-share",
       "title": "Close consortium data share",
       "description": "Competitors share threat intel without sharing customers.",
       "types": [
@@ -979,7 +979,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-048",
+      "id": "expand-latam-reseller-mesh",
       "title": "Expand LATAM reseller mesh",
       "description": "Currency swings; contracts in USD anyway.",
       "types": [
@@ -1000,7 +1000,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-049",
+      "id": "win-apac-data-residency-pack",
       "title": "Win APAC data residency pack",
       "description": "Local entity, local keys, local counsel bills.",
       "types": [
@@ -1020,7 +1020,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-050",
+      "id": "land-eu-public-tender-slice",
       "title": "Land EU public tender slice",
       "description": "GDPR DPIA attached to every signature.",
       "types": [
@@ -1041,7 +1041,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-051",
+      "id": "renew-uk-government-g-cloud",
       "title": "Renew UK government G-Cloud",
       "description": "Framework paperwork is the real product.",
       "types": [
@@ -1062,7 +1062,7 @@
       "stockPct": 0.02
     },
     {
-      "id": "public-late-052",
+      "id": "close-middle-east-smart-city-pilot",
       "title": "Close Middle East smart-city pilot",
       "description": "Heat, dust, and uptime SLAs in the same sentence.",
       "types": [
@@ -1083,7 +1083,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-053",
+      "id": "expand-africa-mobile-money-bridge",
       "title": "Expand Africa mobile-money bridge",
       "description": "SMS fallbacks save the demo.",
       "types": [
@@ -1104,7 +1104,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-054",
+      "id": "win-canada-privacy-refactor",
       "title": "Win Canada privacy refactor",
       "description": "Bill C-something changed again; legal is calm (lying).",
       "types": [
@@ -1124,7 +1124,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-055",
+      "id": "defend-japan-keiretsu-renewal",
       "title": "Defend Japan keiretsu renewal",
       "description": "Relationship dinner > feature matrix.",
       "types": [
@@ -1145,7 +1145,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-056",
+      "id": "land-korea-chaebol-poc",
       "title": "Land Korea chaebol PoC",
       "description": "Speed matters; translation matters more.",
       "types": [
@@ -1166,7 +1166,7 @@
       "stockPct": 0.014
     },
     {
-      "id": "public-late-057",
+      "id": "close-australia-super-fund-module",
       "title": "Close Australia super-fund module",
       "description": "Retirement money moves slowly until it doesn’t.",
       "types": [
@@ -1187,7 +1187,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-058",
+      "id": "renew-brazil-tax-compliance-add-on",
       "title": "Renew Brazil tax compliance add-on",
       "description": "NF-e rules changed mid-quarter.",
       "types": [
@@ -1208,7 +1208,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-059",
+      "id": "win-india-upi-volume-tier",
       "title": "Win India UPI volume tier",
       "description": "Spikes during festivals; infra team sweats.",
       "types": [
@@ -1228,7 +1228,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-060",
+      "id": "expand-mexico-nearshore-support",
       "title": "Expand Mexico nearshore support",
       "description": "Same time zone; better NPS scores.",
       "types": [
@@ -1249,7 +1249,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-061",
+      "id": "close-sovereign-wealth-lp-meeting",
       "title": "Close sovereign wealth LP meeting",
       "description": "They ask about capital efficiency, not buzzwords.",
       "types": [
@@ -1270,7 +1270,7 @@
       "stockPct": 0.008
     },
     {
-      "id": "public-late-062",
+      "id": "land-pension-fund-risk-dashboard",
       "title": "Land pension fund risk dashboard",
       "description": "Board wants downside scenarios in charts.",
       "types": [
@@ -1291,7 +1291,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-063",
+      "id": "renew-endowment-reporting-suite",
       "title": "Renew endowment reporting suite",
       "description": "Quarterly letters quote your uptime footnote.",
       "types": [
@@ -1312,7 +1312,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-064",
+      "id": "win-family-office-portfolio-view",
       "title": "Win family office portfolio view",
       "description": "They still print PDFs; you accommodate.",
       "types": [
@@ -1332,7 +1332,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-065",
+      "id": "defend-activist-adjacent-renewal",
       "title": "Defend activist-adjacent renewal",
       "description": "Customer’s board drama becomes your QBR theme.",
       "types": [
@@ -1353,7 +1353,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-066",
+      "id": "close-spin-out-carve-out-deal",
       "title": "Close spin-out carve-out deal",
       "description": "Parent company TSA ends; data migration begins.",
       "types": [
@@ -1374,7 +1374,7 @@
       "stockPct": 0.02
     },
     {
-      "id": "public-late-067",
+      "id": "expand-pe-portfolio-roll-up",
       "title": "Expand PE portfolio roll-up",
       "description": "Same playbook, fifth acquisition this year.",
       "types": [
@@ -1395,7 +1395,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-068",
+      "id": "land-spac-leftover-cleanup",
       "title": "Land SPAC leftover cleanup",
       "description": "Reverse merger survivors need stable ARR stories.",
       "types": [
@@ -1416,7 +1416,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-069",
+      "id": "renew-post-merger-integration-kit",
       "title": "Renew post-merger integration kit",
       "description": "Two ERPs enter; one ERP leaves.",
       "types": [
@@ -1436,7 +1436,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-070",
+      "id": "win-divestiture-day-one-bundle",
       "title": "Win divestiture day-one bundle",
       "description": "Stand up a mini-company over a weekend.",
       "types": [
@@ -1457,7 +1457,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-071",
+      "id": "close-joint-venture-revenue-share",
       "title": "Close joint venture revenue share",
       "description": "Lawyers pick the definition of “net.”",
       "types": [
@@ -1478,7 +1478,7 @@
       "stockPct": 0.014
     },
     {
-      "id": "public-late-072",
+      "id": "expand-oem-white-label-pack",
       "title": "Expand OEM white-label pack",
       "description": "Their brand on your uptime commitments.",
       "types": [
@@ -1499,7 +1499,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-073",
+      "id": "land-franchise-analytics-rollout",
       "title": "Land franchise analytics rollout",
       "description": "Store #1,247 still uses spreadsheets.",
       "types": [
@@ -1520,7 +1520,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-074",
+      "id": "renew-co-brand-credit-card-perks",
       "title": "Renew co-brand credit card perks",
       "description": "Points liability on someone else’s balance sheet.",
       "types": [
@@ -1540,7 +1540,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-075",
+      "id": "win-embedded-finance-sdk-deal",
       "title": "Win embedded finance SDK deal",
       "description": "Developers want copy-paste; compliance wants controls.",
       "types": [
@@ -1561,7 +1561,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-076",
+      "id": "defend-api-platform-renewal",
       "title": "Defend API platform renewal",
       "description": "Rate limits become a pricing lever.",
       "types": [
@@ -1582,7 +1582,7 @@
       "stockPct": 0.008
     },
     {
-      "id": "public-late-077",
+      "id": "close-usage-based-enterprise-commit",
       "title": "Close usage-based enterprise commit",
       "description": "True-up math gives finance nightmares.",
       "types": [
@@ -1603,7 +1603,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-078",
+      "id": "expand-consumption-tier-bridge",
       "title": "Expand consumption tier bridge",
       "description": "Credits expire; customer wants rollover anyway.",
       "types": [
@@ -1624,7 +1624,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-079",
+      "id": "land-mainframe-connector-maintenance",
       "title": "Land mainframe connector maintenance",
       "description": "COBOL team retired; you are the bridge.",
       "types": [
@@ -1644,7 +1644,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-080",
+      "id": "renew-legacy-erp-plugin",
       "title": "Renew legacy ERP plugin",
       "description": "Still on-prem; still pays like clockwork.",
       "types": [
@@ -1665,7 +1665,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-081",
+      "id": "win-main-vendor-consolidation-rfp",
       "title": "Win main vendor consolidation RFP",
       "description": "You replace three tools; inherit three grudges.",
       "types": [
@@ -1686,7 +1686,7 @@
       "stockPct": 0.02
     },
     {
-      "id": "public-late-082",
+      "id": "close-board-requested-cost-takeout",
       "title": "Close board-requested cost takeout",
       "description": "Customer cuts vendors; you survive the cull.",
       "types": [
@@ -1707,7 +1707,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-083",
+      "id": "expand-customer-success-premium-tier",
       "title": "Expand customer success premium tier",
       "description": "White-glove team for accounts that email the CEO.",
       "types": [
@@ -1728,7 +1728,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-084",
+      "id": "land-professional-services-retainer",
       "title": "Land professional services retainer",
       "description": "Statement of work vague; relationship strong.",
       "types": [
@@ -1748,7 +1748,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-085",
+      "id": "renew-training-academy-license",
       "title": "Renew training academy license",
       "description": "Certified admins renew more often.",
       "types": [
@@ -1769,7 +1769,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-086",
+      "id": "win-partner-certification-blitz",
       "title": "Win partner certification blitz",
       "description": "Badges on LinkedIn; pipeline in Slack.",
       "types": [
@@ -1790,7 +1790,7 @@
       "stockPct": 0.014
     },
     {
-      "id": "public-late-087",
+      "id": "defend-low-code-integrator-renewal",
       "title": "Defend low-code integrator renewal",
       "description": "Citizen developers built a monster; you tame it.",
       "types": [
@@ -1811,7 +1811,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-088",
+      "id": "close-si-global-frame-agreement",
       "title": "Close SI global frame agreement",
       "description": "Big four partner puts you in every deck.",
       "types": [
@@ -1832,7 +1832,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-089",
+      "id": "expand-gsis-managed-offering",
       "title": "Expand GSIs managed offering",
       "description": "They resell; you stay up at night anyway.",
       "types": [
@@ -1852,7 +1852,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-090",
+      "id": "land-boutique-consultancy-package",
       "title": "Land boutique consultancy package",
       "description": "Niche industry slides that actually resonate.",
       "types": [
@@ -1873,7 +1873,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-091",
+      "id": "renew-var-annual-summit-sponsorship",
       "title": "Renew VAR annual summit sponsorship",
       "description": "T-shirts, leads, and one awkward keynote photo.",
       "types": [
@@ -1894,7 +1894,7 @@
       "stockPct": 0.008
     },
     {
-      "id": "public-late-092",
+      "id": "win-technology-alliance-press-cycle",
       "title": "Win technology alliance press cycle",
       "description": "Joint blog post timed to earnings silence.",
       "types": [
@@ -1915,7 +1915,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-093",
+      "id": "close-patent-cross-license-fee",
       "title": "Close patent cross-license fee",
       "description": "Legal settles; product ships.",
       "types": [
@@ -1936,7 +1936,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-094",
+      "id": "expand-open-source-enterprise-support",
       "title": "Expand open-source enterprise support",
       "description": "Community edition free; on-call is not.",
       "types": [
@@ -1956,7 +1956,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-095",
+      "id": "land-compliance-automation-audit",
       "title": "Land compliance automation audit",
       "description": "Controls mapped; auditors less grumpy.",
       "types": [
@@ -1977,7 +1977,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-096",
+      "id": "renew-esg-reporting-connector",
       "title": "Renew ESG reporting connector",
       "description": "Scope 3 arguments converted to charts.",
       "types": [
@@ -1998,7 +1998,7 @@
       "stockPct": 0.02
     },
     {
-      "id": "public-late-097",
+      "id": "win-supply-chain-traceability-pilot",
       "title": "Win supply-chain traceability pilot",
       "description": "Barcode scans become board slides.",
       "types": [
@@ -2019,7 +2019,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-098",
+      "id": "defend-quality-recall-readiness-module",
       "title": "Defend quality recall readiness module",
       "description": "Hope you never need it; pay anyway.",
       "types": [
@@ -2040,7 +2040,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-099",
+      "id": "close-disaster-recovery-test-week",
       "title": "Close disaster recovery test week",
       "description": "Failover works; pizza for the war room.",
       "types": [
@@ -2060,7 +2060,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-100",
+      "id": "expand-zero-trust-rollout-tranche",
       "title": "Expand zero-trust rollout tranche",
       "description": "Identity team finally owns the project.",
       "types": [
@@ -2081,7 +2081,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-101",
+      "id": "land-secrets-rotation-automation",
       "title": "Land secrets rotation automation",
       "description": "Keys roll; nobody pages at 3 a.m. this time.",
       "types": [
@@ -2102,7 +2102,7 @@
       "stockPct": 0.014
     },
     {
-      "id": "public-late-102",
+      "id": "renew-observability-unified-bill",
       "title": "Renew observability unified bill",
       "description": "Logs, metrics, traces — one invoice, one throat to choke.",
       "types": [
@@ -2123,7 +2123,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-103",
+      "id": "win-finops-chargeback-rollout",
       "title": "Win FinOps chargeback rollout",
       "description": "Engineers see cost tags; behavior shifts slowly.",
       "types": [
@@ -2144,7 +2144,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-104",
+      "id": "close-internal-developer-portal-phase",
       "title": "Close internal developer portal phase",
       "description": "Golden paths reduce Slack “how do I deploy?”",
       "types": [
@@ -2164,7 +2164,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-105",
+      "id": "expand-platform-engineering-guild",
       "title": "Expand platform engineering guild",
       "description": "Paved roads; teams still off-road sometimes.",
       "types": [
@@ -2185,7 +2185,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-106",
+      "id": "land-ai-governance-committee-win",
       "title": "Land AI governance committee win",
       "description": "Model cards attached to every release note.",
       "types": [
@@ -2206,7 +2206,7 @@
       "stockPct": 0.008
     },
     {
-      "id": "public-late-107",
+      "id": "renew-responsible-ai-attestation",
       "title": "Renew responsible-AI attestation",
       "description": "Bias tests documented; PR calm for a week.",
       "types": [
@@ -2227,7 +2227,7 @@
       "buzz": 3
     },
     {
-      "id": "public-late-108",
+      "id": "win-public-earnings-demo-prep",
       "title": "Win public earnings demo prep",
       "description": "Feature flagged for the call; nothing unrehearsed.",
       "types": [
@@ -2248,7 +2248,7 @@
       "buzz": 4
     },
     {
-      "id": "public-late-109",
+      "id": "defend-shareholder-question-dry-run",
       "title": "Defend shareholder question dry run",
       "description": "IR scripts answers for “why this metric?”",
       "types": [
@@ -2268,7 +2268,7 @@
       "buzz": 1
     },
     {
-      "id": "public-late-110",
+      "id": "close-index-inclusion-readiness",
       "title": "Close index inclusion readiness",
       "description": "Liquidity story matches the product story.",
       "types": [
@@ -2289,7 +2289,7 @@
       "buzz": 2
     },
     {
-      "id": "public-late-111",
+      "id": "expand-institutional-roadshow-week",
       "title": "Expand institutional roadshow week",
       "description": "Same deck, twelve cities, zero sleep.",
       "types": [
