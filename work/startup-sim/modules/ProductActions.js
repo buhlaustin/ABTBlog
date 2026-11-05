@@ -5,14 +5,31 @@ import { easeCompetitorPressure } from './Competitor.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { fetchGameJson } from './utils.js';
 import bundledLevers from '../data/growth-levers.json' with { type: 'json' };
+import bundledLeversExtra from '../data/growth-levers-extra.json' with { type: 'json' };
 
-let leverCatalog = bundledLevers?.actions?.length ? [...bundledLevers.actions] : [];
+function mergeLeverCatalog(base, ...extras) {
+  const actions = [...(base?.actions ?? [])];
+  const ids = new Set(actions.map((a) => a.id));
+  for (const extra of extras) {
+    for (const a of extra?.actions ?? []) {
+      if (!ids.has(a.id)) {
+        ids.add(a.id);
+        actions.push(a);
+      }
+    }
+  }
+  return actions;
+}
+
+const bundledLeverExtras = [bundledLeversExtra];
+
+let leverCatalog = mergeLeverCatalog(bundledLevers, ...bundledLeverExtras);
 
 export async function loadGrowthLevers() {
   try {
     const data = await fetchGameJson('data/growth-levers.json');
     if (Array.isArray(data?.actions) && data.actions.length) {
-      leverCatalog = data.actions;
+      leverCatalog = mergeLeverCatalog({ actions: data.actions }, ...bundledLeverExtras);
     }
   } catch {
     /* bundled */

@@ -927,10 +927,10 @@ const { growthCampaignCatalogSize } = await import(
   `file://${join(sim, 'modules/GrowthCampaigns.js')}`
 );
 const { getProductActions } = await import(`file://${join(sim, 'modules/ProductActions.js')}`);
-if (growthCampaignCatalogSize() < 55) {
+if (growthCampaignCatalogSize() < 95) {
   console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()})`);
   failed = true;
-} else if (getProductActions().length < 20) {
+} else if (getProductActions().length < 40) {
   console.error(`FAIL: growth lever bank too small (${getProductActions().length})`);
   failed = true;
 } else {

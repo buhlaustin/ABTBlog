@@ -1,5 +1,6 @@
 import bundled from '../data/growth-campaigns.json' with { type: 'json' };
 import bundledExtra from '../data/growth-campaigns-extra.json' with { type: 'json' };
+import bundledExtra2 from '../data/growth-campaigns-extra2.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
@@ -7,25 +8,29 @@ import { formatMoney } from './constants.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
 import { applyCampaignRivalEffects } from './WorldDynamics.js';
 
-function mergeCampaignCatalog(base, extra) {
+function mergeCampaignCatalog(base, ...extras) {
   const campaigns = [...(base?.campaigns ?? [])];
   const ids = new Set(campaigns.map((c) => c.id));
-  for (const c of extra?.campaigns ?? []) {
-    if (!ids.has(c.id)) {
-      ids.add(c.id);
-      campaigns.push(c);
+  for (const extra of extras) {
+    for (const c of extra?.campaigns ?? []) {
+      if (!ids.has(c.id)) {
+        ids.add(c.id);
+        campaigns.push(c);
+      }
     }
   }
   return { ...base, campaigns };
 }
 
-let catalog = mergeCampaignCatalog(bundled, bundledExtra);
+const bundledExtras = [bundledExtra, bundledExtra2];
+
+let catalog = mergeCampaignCatalog(bundled, ...bundledExtras);
 
 export async function loadGrowthCampaigns() {
   try {
     const data = await fetchGameJson('data/growth-campaigns.json');
     if (Array.isArray(data?.campaigns) && data.campaigns.length) {
-      catalog = mergeCampaignCatalog(data, bundledExtra);
+      catalog = mergeCampaignCatalog(data, ...bundledExtras);
     }
   } catch {
     /* bundled */
