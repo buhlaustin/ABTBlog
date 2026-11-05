@@ -1,5 +1,6 @@
 {
-  "version": 1,
+  "version": 2,
+  "catalogSize": 165,
   "companies": [
     {
       "id": "acq-rival-b2b-saas",
@@ -7,9 +8,135 @@
       "isRival": true,
       "rivalCategory": "b2b-saas",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 10500000,
+      "basePrice": 1575000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
+    },
+    {
+      "id": "acq-002-ledgerlite",
+      "name": "LedgerLite",
+      "segment": "small",
+      "baseMrr": 4200,
+      "basePrice": 241920,
+      "description": "SMB invoicing — sticky accountants, minimal overlap with your core SKU.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-003-quotapilot",
+      "name": "QuotaPilot",
+      "segment": "small",
+      "baseMrr": 6800,
+      "basePrice": 424320,
+      "description": "Sales quota tracking for mid-market reps — clean API, fast close.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-004-stackbeacon",
+      "name": "StackBeacon",
+      "segment": "small",
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Internal developer portal — docs + service catalog for IT buyers.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-005-northstar-crm",
+      "name": "Northstar CRM",
+      "segment": "small",
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Vertical CRM for agencies — high NPS, low churn cohort.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-006-pipeline-owl",
+      "name": "Pipeline Owl",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "Revenue intelligence widgets — embeds into Salesforce sandboxes.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-007-briefcase-bi",
+      "name": "Briefcase BI",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "Self-serve analytics for finance teams — exports to Excel reliably.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-008-contractkit",
+      "name": "ContractKit",
+      "segment": "mid",
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "CLM for procurement — annual contracts, strong upsell motion.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-009-revops-foundry",
+      "name": "RevOps Foundry",
+      "segment": "mid",
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "GTM data warehouse — connects billing, CRM, and product usage.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-010-tenantcloud",
+      "name": "TenantCloud",
+      "segment": "mid",
+      "baseMrr": 138000,
+      "basePrice": 13910400,
+      "description": "Multi-tenant identity for B2B apps — SSO bundle with SCIM.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-011-atlas-erp-bridge",
+      "name": "Atlas ERP Bridge",
+      "segment": "mid",
+      "baseMrr": 205000,
+      "basePrice": 22140000,
+      "description": "Integration layer for NetSuite — recurring SI partner revenue.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-012-summit-spend",
+      "name": "Summit Spend",
+      "segment": "mid",
+      "baseMrr": 310000,
+      "basePrice": 35712000,
+      "description": "Corporate card + expense — interchange float and SaaS fee stack.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-013-monolith-suite",
+      "name": "Monolith Suite",
+      "segment": "enterprise",
+      "baseMrr": 2800000,
+      "basePrice": 386400000,
+      "description": "Full revenue cloud — billing, CPQ, and usage metering at scale.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-014-fortress-data",
+      "name": "Fortress Data",
+      "segment": "enterprise",
+      "baseMrr": 7200000,
+      "basePrice": 1123200000,
+      "description": "Enterprise data platform — petabyte pipelines, Fortune 500 logos.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-015-orbit-works",
+      "name": "Orbit Works",
+      "segment": "enterprise",
+      "baseMrr": 16000000,
+      "basePrice": 2688000000,
+      "description": "Global workflow OS — 40 countries, heavy services attach.",
+      "marketCategory": "b2b-saas"
     },
     {
       "id": "acq-rival-consumer-social",
@@ -17,9 +144,135 @@
       "isRival": true,
       "rivalCategory": "consumer-social",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 8200000,
+      "basePrice": 1230000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
+    },
+    {
+      "id": "acq-017-campfire-chat",
+      "name": "Campfire Chat",
+      "segment": "small",
+      "baseMrr": 6800,
+      "basePrice": 424320,
+      "description": "Niche community rooms — creators pay for moderation tools.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-018-pollpop",
+      "name": "PollPop",
+      "segment": "small",
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Live polling for streamers — tips plus subscription tiers.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-019-album-alley",
+      "name": "Album Alley",
+      "segment": "small",
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Private photo sharing — family plans with print upsells.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-020-hobbyhub",
+      "name": "HobbyHub",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "Interest graph forums — ads plus premium badges.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-021-localloop",
+      "name": "LocalLoop",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "Neighborhood boards — hyperlocal ad inventory.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-022-clipforge",
+      "name": "ClipForge",
+      "segment": "small",
+      "baseMrr": 27500,
+      "basePrice": 2145000,
+      "description": "Short-form editor SDK — licensed to other social apps.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-023-pulse-events",
+      "name": "Pulse Events",
+      "segment": "mid",
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "Ticketing + social RSVPs — take rate on paid events.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-024-creatorledger",
+      "name": "CreatorLedger",
+      "segment": "mid",
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "Payouts and tax forms for influencers — float on balances.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-025-streamnest",
+      "name": "StreamNest",
+      "segment": "mid",
+      "baseMrr": 138000,
+      "basePrice": 13910400,
+      "description": "Co-watch parties — premium subs and brand sponsorships.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-026-trustcircle",
+      "name": "TrustCircle",
+      "segment": "mid",
+      "baseMrr": 205000,
+      "basePrice": 22140000,
+      "description": "Verified identity for dating apps — B2B API revenue.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-027-viralmetrics",
+      "name": "ViralMetrics",
+      "segment": "mid",
+      "baseMrr": 465000,
+      "basePrice": 56916000,
+      "description": "Growth analytics for consumer apps — annual enterprise deals.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-028-gather-global",
+      "name": "Gather Global",
+      "segment": "enterprise",
+      "baseMrr": 1650000,
+      "basePrice": 207900000,
+      "description": "Live social graph — hundreds of millions of MAU, ad-heavy.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-029-echosphere",
+      "name": "EchoSphere",
+      "segment": "enterprise",
+      "baseMrr": 4500000,
+      "basePrice": 675000000,
+      "description": "Audio-first network — podcast ads and premium audio.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-030-parlor-media",
+      "name": "Parlor Media",
+      "segment": "enterprise",
+      "baseMrr": 11500000,
+      "basePrice": 1863000000,
+      "description": "Gen-Z video feed — brand safety team already built.",
+      "marketCategory": "consumer-social"
     },
     {
       "id": "acq-rival-marketplace",
@@ -27,9 +280,135 @@
       "isRival": true,
       "rivalCategory": "marketplace",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 9400000,
+      "basePrice": 1410000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
+    },
+    {
+      "id": "acq-032-toolswap",
+      "name": "ToolSwap",
+      "segment": "small",
+      "baseMrr": 4200,
+      "basePrice": 241920,
+      "description": "Peer rental for power tools — insurance fee on each booking.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-033-tutorbay",
+      "name": "TutorBay",
+      "segment": "small",
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Lesson marketplace — 18% take rate, school partnerships.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-034-fitmatch",
+      "name": "FitMatch",
+      "segment": "small",
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Trainer booking — subscription for gyms.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-035-craftcart",
+      "name": "CraftCart",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "Handmade goods — seller SaaS plus checkout fees.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-036-rideshare-lite",
+      "name": "RideShare Lite",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "Regional ride pool — municipal contracts.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-037-parkspot",
+      "name": "ParkSpot",
+      "segment": "small",
+      "baseMrr": 27500,
+      "basePrice": 2145000,
+      "description": "Parking spot marketplace — IoT sensors bundled.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-038-proservice-hub",
+      "name": "ProService Hub",
+      "segment": "mid",
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "Home services lead gen — pay-per-lead and SaaS for pros.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-039-b2b-exchange",
+      "name": "B2B Exchange",
+      "segment": "mid",
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "Wholesale parts — escrow and logistics margin.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-040-talentlane",
+      "name": "TalentLane",
+      "segment": "mid",
+      "baseMrr": 138000,
+      "basePrice": 13910400,
+      "description": "Contractor marketplace for enterprises — VMS integrations.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-041-fleetboard",
+      "name": "FleetBoard",
+      "segment": "mid",
+      "baseMrr": 310000,
+      "basePrice": 35712000,
+      "description": "Commercial vehicle leasing marketplace — lender partnerships.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-042-supplygrid",
+      "name": "SupplyGrid",
+      "segment": "mid",
+      "baseMrr": 620000,
+      "basePrice": 80352000,
+      "description": "Industrial MRO marketplace — sticky supplier onboarding.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-043-global-bazaar",
+      "name": "Global Bazaar",
+      "segment": "enterprise",
+      "baseMrr": 2800000,
+      "basePrice": 386400000,
+      "description": "Cross-border C2C — FX spread and seller services.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-044-metro-commerce",
+      "name": "Metro Commerce",
+      "segment": "enterprise",
+      "baseMrr": 7200000,
+      "basePrice": 1123200000,
+      "description": "City-scale delivery marketplace — dense courier network.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-045-tradetower",
+      "name": "TradeTower",
+      "segment": "enterprise",
+      "baseMrr": 16000000,
+      "basePrice": 2688000000,
+      "description": "B2B procurement exchange — Fortune 500 supplier graph.",
+      "marketCategory": "marketplace"
     },
     {
       "id": "acq-rival-delivery",
@@ -37,9 +416,135 @@
       "isRival": true,
       "rivalCategory": "delivery",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 8800000,
+      "basePrice": 1320000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
+    },
+    {
+      "id": "acq-047-snackrun",
+      "name": "SnackRun",
+      "segment": "small",
+      "baseMrr": 4200,
+      "basePrice": 241920,
+      "description": "Campus food delivery — student meal plans.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-048-rxroute",
+      "name": "RxRoute",
+      "segment": "small",
+      "baseMrr": 6800,
+      "basePrice": 424320,
+      "description": "Pharmacy same-day — insurance billing integrations.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-049-bulkbox",
+      "name": "BulkBox",
+      "segment": "small",
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Wholesale grocery for restaurants — recurring routes.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-050-flowerdash",
+      "name": "FlowerDash",
+      "segment": "small",
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Florist network — holiday spikes, predictable churn.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-051-dryclean-go",
+      "name": "DryClean Go",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "Pickup/delivery for dry cleaners — B2B SaaS fee.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-052-petparcel",
+      "name": "PetParcel",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "Pet food subscription delivery — high LTV households.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-053-coldchain-co",
+      "name": "ColdChain Co",
+      "segment": "mid",
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "Temperature-controlled logistics — pharma clients.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-054-lastmile-labs",
+      "name": "LastMile Labs",
+      "segment": "mid",
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "Routing optimization SaaS sold to regional couriers.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-055-darkstore-os",
+      "name": "DarkStore OS",
+      "segment": "mid",
+      "baseMrr": 205000,
+      "basePrice": 22140000,
+      "description": "Micro-fulfillment software — per-location licensing.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-056-freightlink",
+      "name": "FreightLink",
+      "segment": "mid",
+      "baseMrr": 310000,
+      "basePrice": 35712000,
+      "description": "LTL freight matching — take rate on loads.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-057-couriercloud",
+      "name": "CourierCloud",
+      "segment": "mid",
+      "baseMrr": 465000,
+      "basePrice": 56916000,
+      "description": "White-label delivery stack for retailers.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-058-continental-carry",
+      "name": "Continental Carry",
+      "segment": "enterprise",
+      "baseMrr": 2800000,
+      "basePrice": 386400000,
+      "description": "National last-mile — owns sort centers in 30 metros.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-059-aircargo-one",
+      "name": "AirCargo One",
+      "segment": "enterprise",
+      "baseMrr": 4500000,
+      "basePrice": 675000000,
+      "description": "Express air freight — enterprise SLAs and fuel surcharges.",
+      "marketCategory": "delivery"
+    },
+    {
+      "id": "acq-060-omnilogistics",
+      "name": "OmniLogistics",
+      "segment": "enterprise",
+      "baseMrr": 11500000,
+      "basePrice": 1863000000,
+      "description": "3PL with tech layer — billion-dollar GMV run rate.",
+      "marketCategory": "delivery"
     },
     {
       "id": "acq-rival-fintech",
@@ -47,9 +552,135 @@
       "isRival": true,
       "rivalCategory": "fintech",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 11200000,
+      "basePrice": 1680000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
+    },
+    {
+      "id": "acq-062-pennyjar",
+      "name": "PennyJar",
+      "segment": "small",
+      "baseMrr": 4200,
+      "basePrice": 241920,
+      "description": "Round-up savings app — interchange share with sponsor bank.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-063-invoicefactoring",
+      "name": "InvoiceFactoring",
+      "segment": "small",
+      "baseMrr": 6800,
+      "basePrice": 424320,
+      "description": "SMB receivables advance — spread on factored invoices.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-064-taxtiny",
+      "name": "TaxTiny",
+      "segment": "small",
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Freelancer quarterly taxes — annual filing upsell.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-065-splittab",
+      "name": "SplitTab",
+      "segment": "small",
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Group payments for restaurants — viral consumer loop.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-066-creditcoach",
+      "name": "CreditCoach",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "Credit score monitoring — affiliate and subscription mix.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-067-paylink-api",
+      "name": "PayLink API",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "Embedded checkout for vertical SaaS — per-transaction fee.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-068-treasurydesk",
+      "name": "TreasuryDesk",
+      "segment": "mid",
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "Cash management for startups — yield share on deposits.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-069-lendflow",
+      "name": "LendFlow",
+      "segment": "mid",
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "Embedded lending SDK — origination fees plus servicing.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-070-wealthstack",
+      "name": "WealthStack",
+      "segment": "mid",
+      "baseMrr": 138000,
+      "basePrice": 13910400,
+      "description": "RIA platform — AUM bps and software fee.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-071-fraudshield",
+      "name": "FraudShield",
+      "segment": "mid",
+      "baseMrr": 310000,
+      "basePrice": 35712000,
+      "description": "Transaction monitoring — per-API-call pricing.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-072-cardcore",
+      "name": "CardCore",
+      "segment": "mid",
+      "baseMrr": 620000,
+      "basePrice": 80352000,
+      "description": "Issuer-processor middleware — enterprise contracts.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-073-union-trust",
+      "name": "Union Trust",
+      "segment": "enterprise",
+      "baseMrr": 2800000,
+      "basePrice": 386400000,
+      "description": "Regional bank with digital front-end — deposit base included.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-074-capitalbridge",
+      "name": "CapitalBridge",
+      "segment": "enterprise",
+      "baseMrr": 7200000,
+      "basePrice": 1123200000,
+      "description": "Investment bank tech — syndication fees and data feeds.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-075-paynet-global",
+      "name": "PayNet Global",
+      "segment": "enterprise",
+      "baseMrr": 16000000,
+      "basePrice": 2688000000,
+      "description": "Cross-border payments rail — FX and compliance moat.",
+      "marketCategory": "fintech"
     },
     {
       "id": "acq-rival-ai-tools",
@@ -57,9 +688,135 @@
       "isRival": true,
       "rivalCategory": "ai-tools",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 12800000,
+      "basePrice": 1920000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
+    },
+    {
+      "id": "acq-077-promptpad",
+      "name": "PromptPad",
+      "segment": "small",
+      "baseMrr": 4200,
+      "basePrice": 241920,
+      "description": "Prompt library for marketing teams — seat-based SaaS.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-078-labelbot",
+      "name": "LabelBot",
+      "segment": "small",
+      "baseMrr": 6800,
+      "basePrice": 424320,
+      "description": "Human-in-the-loop labeling — per-task pricing.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-079-documind",
+      "name": "DocuMind",
+      "segment": "small",
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Contract summarization — legal vertical focus.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-080-supportgenie",
+      "name": "SupportGenie",
+      "segment": "small",
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Ticket draft assistant — Zendesk marketplace leader.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-081-codereview-ai",
+      "name": "CodeReview AI",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "PR comment bot — dev-tool subscription.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-082-voiceclone-studio",
+      "name": "VoiceClone Studio",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "Synthetic voice for ads — usage-based minutes.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-083-modelhost",
+      "name": "ModelHost",
+      "segment": "mid",
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "Private model deployment — GPU markup plus support.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-084-evalforge",
+      "name": "EvalForge",
+      "segment": "mid",
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "LLM eval harness — enterprise compliance buyers.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-085-agentops",
+      "name": "AgentOps",
+      "segment": "mid",
+      "baseMrr": 138000,
+      "basePrice": 13910400,
+      "description": "Observability for AI agents — traces and guardrails.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-086-ragworks",
+      "name": "RAGWorks",
+      "segment": "mid",
+      "baseMrr": 205000,
+      "basePrice": 22140000,
+      "description": "Enterprise retrieval stack — knowledge base connectors.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-087-finetune-foundry",
+      "name": "FineTune Foundry",
+      "segment": "mid",
+      "baseMrr": 465000,
+      "basePrice": 56916000,
+      "description": "Custom model training — project fees plus hosting.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-088-cortex-cloud",
+      "name": "Cortex Cloud",
+      "segment": "enterprise",
+      "baseMrr": 4500000,
+      "basePrice": 675000000,
+      "description": "Foundation model API — hyperscaler contracts and reserved capacity.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-089-inferencegrid",
+      "name": "InferenceGrid",
+      "segment": "enterprise",
+      "baseMrr": 7200000,
+      "basePrice": 1123200000,
+      "description": "Global inference fabric — latency SLA for Fortune 100.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-090-mindcorp-platform",
+      "name": "MindCorp Platform",
+      "segment": "enterprise",
+      "baseMrr": 16000000,
+      "basePrice": 2688000000,
+      "description": "Full-stack enterprise AI — services arm drives services revenue.",
+      "marketCategory": "ai-tools"
     },
     {
       "id": "acq-rival-hardware",
@@ -67,9 +824,135 @@
       "isRival": true,
       "rivalCategory": "hardware",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 7600000,
+      "basePrice": 1140000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
+    },
+    {
+      "id": "acq-092-sensorstick",
+      "name": "SensorStick",
+      "segment": "small",
+      "baseMrr": 4200,
+      "basePrice": 241920,
+      "description": "USB environmental sensors — hardware margin plus cloud fee.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-093-badgetap",
+      "name": "BadgeTap",
+      "segment": "small",
+      "baseMrr": 6800,
+      "basePrice": 424320,
+      "description": "Office access badges — replacement hardware cycle.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-094-printpod",
+      "name": "PrintPod",
+      "segment": "small",
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Compact 3D printers — consumables revenue.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-095-dronemap-kit",
+      "name": "DroneMap Kit",
+      "segment": "small",
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Survey drones for construction — software unlock.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-096-chargetile",
+      "name": "ChargeTile",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "Wireless charging pads — retail channel partnerships.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-097-camguard",
+      "name": "CamGuard",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "Smart camera firmware — subscription for cloud clips.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-098-roboarm-co",
+      "name": "RoboArm Co",
+      "segment": "mid",
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "Warehouse cobots — lease plus maintenance contracts.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-099-edgegate",
+      "name": "EdgeGate",
+      "segment": "mid",
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "Industrial IoT gateways — recurring firmware support.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-100-powercell-systems",
+      "name": "PowerCell Systems",
+      "segment": "mid",
+      "baseMrr": 138000,
+      "basePrice": 13910400,
+      "description": "Battery packs for EV fleets — long sales cycles.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-101-fabcontrol",
+      "name": "FabControl",
+      "segment": "mid",
+      "baseMrr": 310000,
+      "basePrice": 35712000,
+      "description": "Semiconductor test equipment software — seat licenses.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-102-optilens",
+      "name": "OptiLens",
+      "segment": "mid",
+      "baseMrr": 620000,
+      "basePrice": 80352000,
+      "description": "AR optics supplier — royalty on unit shipments.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-103-silicon-foundry",
+      "name": "Silicon Foundry",
+      "segment": "enterprise",
+      "baseMrr": 2800000,
+      "basePrice": 386400000,
+      "description": "Custom ASIC house — multi-year supply agreements.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-104-megafab-industries",
+      "name": "MegaFab Industries",
+      "segment": "enterprise",
+      "baseMrr": 7200000,
+      "basePrice": 1123200000,
+      "description": "Contract manufacturing — Apple-tier clients.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-105-orbital-hardware",
+      "name": "Orbital Hardware",
+      "segment": "enterprise",
+      "baseMrr": 16000000,
+      "basePrice": 2688000000,
+      "description": "Satellite bus manufacturer — government and commercial backlog.",
+      "marketCategory": "hardware"
     },
     {
       "id": "acq-rival-healthtech",
@@ -77,9 +960,135 @@
       "isRival": true,
       "rivalCategory": "healthtech",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 9100000,
+      "basePrice": 1365000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
+    },
+    {
+      "id": "acq-107-sleeptrack",
+      "name": "SleepTrack",
+      "segment": "small",
+      "baseMrr": 4200,
+      "basePrice": 241920,
+      "description": "Consumer sleep coaching — device bundle optional.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-108-medremind",
+      "name": "MedRemind",
+      "segment": "small",
+      "baseMrr": 6800,
+      "basePrice": 424320,
+      "description": "Medication adherence app — pharma sponsorships.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-109-therapynotes-lite",
+      "name": "TherapyNotes Lite",
+      "segment": "small",
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Solo practitioner EHR — HIPAA-ready hosting.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-110-labresults-portal",
+      "name": "LabResults Portal",
+      "segment": "small",
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Patient lab viewer — clinic SaaS fee.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-111-vitalswidget",
+      "name": "VitalsWidget",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "RPM devices for clinics — per-patient monitoring fee.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-112-carecircle",
+      "name": "CareCircle",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "Family caregiver coordination — premium subs.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-113-clinicflow",
+      "name": "ClinicFlow",
+      "segment": "mid",
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "Multi-location practice management — billing clearinghouse cut.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-114-priorauth-bot",
+      "name": "PriorAuth Bot",
+      "segment": "mid",
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "Payer automation — per-authorization pricing.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-115-imagingcloud",
+      "name": "ImagingCloud",
+      "segment": "mid",
+      "baseMrr": 138000,
+      "basePrice": 13910400,
+      "description": "DICOM storage and viewer — hospital contracts.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-116-trialbridge",
+      "name": "TrialBridge",
+      "segment": "mid",
+      "baseMrr": 205000,
+      "basePrice": 22140000,
+      "description": "Clinical trial recruitment — sponsor fees.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-117-healthdata-vault",
+      "name": "HealthData Vault",
+      "segment": "mid",
+      "baseMrr": 465000,
+      "basePrice": 56916000,
+      "description": "Consent-managed records exchange — transaction fees.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-118-carenet-national",
+      "name": "CareNet National",
+      "segment": "enterprise",
+      "baseMrr": 2800000,
+      "basePrice": 386400000,
+      "description": "Payor-provider network — value-based care contracts.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-119-meddevice-corp",
+      "name": "MedDevice Corp",
+      "segment": "enterprise",
+      "baseMrr": 7200000,
+      "basePrice": 1123200000,
+      "description": "Implant portfolio — recurring sterilization and software.",
+      "marketCategory": "healthtech"
+    },
+    {
+      "id": "acq-120-biopharm-os",
+      "name": "BioPharm OS",
+      "segment": "enterprise",
+      "baseMrr": 16000000,
+      "basePrice": 2688000000,
+      "description": "Pharmacovigilance platform — global regulatory footprint.",
+      "marketCategory": "healthtech"
     },
     {
       "id": "acq-rival-edtech",
@@ -87,9 +1096,135 @@
       "isRival": true,
       "rivalCategory": "edtech",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 6900000,
+      "basePrice": 1035000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
+    },
+    {
+      "id": "acq-122-quizwhiz",
+      "name": "QuizWhiz",
+      "segment": "small",
+      "baseMrr": 4200,
+      "basePrice": 241920,
+      "description": "Classroom quizzes — freemium with school licenses.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-123-parentping",
+      "name": "ParentPing",
+      "segment": "small",
+      "baseMrr": 6800,
+      "basePrice": 424320,
+      "description": "School-parent messaging — district contracts.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-124-skillsnacks",
+      "name": "SkillSnacks",
+      "segment": "small",
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Micro-learning for pros — B2B team plans.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-125-languageloop",
+      "name": "LanguageLoop",
+      "segment": "small",
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Live tutor matching — take rate on lessons.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-126-gradegrid",
+      "name": "GradeGrid",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "Gradebook SaaS — SIS integrations.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-127-campusjobs",
+      "name": "CampusJobs",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "University job board — employer listings revenue.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-128-lms-bridge",
+      "name": "LMS Bridge",
+      "segment": "mid",
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "Corporate training LMS — seat expansion motion.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-129-credengine",
+      "name": "CredEngine",
+      "segment": "mid",
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "Digital credentials — issuer and verifier fees.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-130-simlab",
+      "name": "SimLab",
+      "segment": "mid",
+      "baseMrr": 138000,
+      "basePrice": 13910400,
+      "description": "VR training simulations — hardware bundles.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-131-admitflow",
+      "name": "AdmitFlow",
+      "segment": "mid",
+      "baseMrr": 310000,
+      "basePrice": 35712000,
+      "description": "Admissions CRM for universities — annual licenses.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-132-researchhub",
+      "name": "ResearchHub",
+      "segment": "mid",
+      "baseMrr": 620000,
+      "basePrice": 80352000,
+      "description": "Grant management — indirect cost recovery tools.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-133-eduglobal",
+      "name": "EduGlobal",
+      "segment": "enterprise",
+      "baseMrr": 2800000,
+      "basePrice": 386400000,
+      "description": "International school operator — tuition plus edtech stack.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-134-degreeworks",
+      "name": "DegreeWorks",
+      "segment": "enterprise",
+      "baseMrr": 4500000,
+      "basePrice": 675000000,
+      "description": "Online degree provider — OPM revenue share deals.",
+      "marketCategory": "edtech"
+    },
+    {
+      "id": "acq-135-scholarplatform",
+      "name": "ScholarPlatform",
+      "segment": "enterprise",
+      "baseMrr": 11500000,
+      "basePrice": 1863000000,
+      "description": "National assessment platform — government renewals.",
+      "marketCategory": "edtech"
     },
     {
       "id": "acq-rival-climate",
@@ -97,9 +1232,135 @@
       "isRival": true,
       "rivalCategory": "climate",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 8500000,
+      "basePrice": 1275000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
+    },
+    {
+      "id": "acq-137-carbonledger",
+      "name": "CarbonLedger",
+      "segment": "small",
+      "baseMrr": 4200,
+      "basePrice": 241920,
+      "description": "SMB emissions accounting — audit-ready exports.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-138-solarquote",
+      "name": "SolarQuote",
+      "segment": "small",
+      "baseMrr": 6800,
+      "basePrice": 424320,
+      "description": "Residential solar leads — installer referral fees.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-139-evcharge-map",
+      "name": "EVCharge Map",
+      "segment": "small",
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Charger discovery app — network affiliate revenue.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-140-wastewatch",
+      "name": "WasteWatch",
+      "segment": "small",
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Municipal waste analytics — SaaS for cities.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-141-watersense",
+      "name": "WaterSense",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "Smart irrigation controllers — utility rebates.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-142-heatpump-hub",
+      "name": "HeatPump Hub",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "Contractor marketplace for retrofits — lead fees.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-143-gridflex",
+      "name": "GridFlex",
+      "segment": "mid",
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "Demand response aggregator — capacity payments.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-144-rec-marketplace",
+      "name": "REC Marketplace",
+      "segment": "mid",
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "Renewable credit trading — spread on certificates.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-145-batteryos",
+      "name": "BatteryOS",
+      "segment": "mid",
+      "baseMrr": 138000,
+      "basePrice": 13910400,
+      "description": "Storage fleet software — availability bonuses.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-146-scope3-data",
+      "name": "Scope3 Data",
+      "segment": "mid",
+      "baseMrr": 205000,
+      "basePrice": 22140000,
+      "description": "Supply chain emissions — enterprise annual contracts.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-147-climaterisk-api",
+      "name": "ClimateRisk API",
+      "segment": "mid",
+      "baseMrr": 465000,
+      "basePrice": 56916000,
+      "description": "Physical risk scores for lenders — data licensing.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-148-terrapower-services",
+      "name": "TerraPower Services",
+      "segment": "enterprise",
+      "baseMrr": 2800000,
+      "basePrice": 386400000,
+      "description": "Utility-scale solar O&M — long-term service margins.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-149-carboncapture-co",
+      "name": "CarbonCapture Co",
+      "segment": "enterprise",
+      "baseMrr": 7200000,
+      "basePrice": 1123200000,
+      "description": "Industrial capture plants — tax credit stack plus offtake.",
+      "marketCategory": "climate"
+    },
+    {
+      "id": "acq-150-greeninfra-partners",
+      "name": "GreenInfra Partners",
+      "segment": "enterprise",
+      "baseMrr": 16000000,
+      "basePrice": 2688000000,
+      "description": "Renewable project developer — GW pipeline.",
+      "marketCategory": "climate"
     },
     {
       "id": "acq-rival-gaming-media",
@@ -107,713 +1368,135 @@
       "isRival": true,
       "rivalCategory": "gaming-media",
       "segment": "enterprise",
-      "baseMrr": 420000,
-      "basePrice": 48000000,
-      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+      "baseMrr": 10100000,
+      "basePrice": 1515000000,
+      "description": "Category rival at scale — buying them removes competitive drag and folds their revenue into your P&L."
     },
     {
-      "id": "acq-012-kite-status-co",
-      "name": "Kite status Co.",
+      "id": "acq-152-indieport",
+      "name": "IndiePort",
       "segment": "small",
-      "baseMrr": 2240,
-      "basePrice": 444000,
-      "description": "Profitable status pages — steady subscribers, light integration work."
+      "baseMrr": 4200,
+      "basePrice": 241920,
+      "description": "PC indie game launcher — rev share on sales.",
+      "marketCategory": "gaming-media"
     },
     {
-      "id": "acq-013-mosaic-email-co",
-      "name": "Mosaic email Co.",
+      "id": "acq-153-streamoverlay",
+      "name": "StreamOverlay",
       "segment": "small",
-      "baseMrr": 2360,
-      "basePrice": 466000,
-      "description": "Profitable email deliverability — steady subscribers, light integration work."
+      "baseMrr": 6800,
+      "basePrice": 424320,
+      "description": "OBS widgets for streamers — cosmetic marketplace.",
+      "marketCategory": "gaming-media"
     },
     {
-      "id": "acq-014-parallel-feature-co",
-      "name": "Parallel feature Co.",
+      "id": "acq-154-guildchat",
+      "name": "GuildChat",
       "segment": "small",
-      "baseMrr": 2480,
-      "basePrice": 488000,
-      "description": "Profitable feature flags — steady subscribers, light integration work."
+      "baseMrr": 9500,
+      "basePrice": 627000,
+      "description": "Clan comms for mobile games — premium server slots.",
+      "marketCategory": "gaming-media"
     },
     {
-      "id": "acq-015-quartz-observability-co",
-      "name": "Quartz observability Co.",
+      "id": "acq-155-loottracker",
+      "name": "LootTracker",
       "segment": "small",
-      "baseMrr": 2600,
-      "basePrice": 510000,
-      "description": "Profitable observability — steady subscribers, light integration work."
+      "baseMrr": 12800,
+      "basePrice": 890880,
+      "description": "Inventory analytics for MMO players — subscription.",
+      "marketCategory": "gaming-media"
     },
     {
-      "id": "acq-016-uplink-platform",
-      "name": "Uplink Platform",
+      "id": "acq-156-podcasthost",
+      "name": "PodcastHost",
+      "segment": "small",
+      "baseMrr": 16500,
+      "basePrice": 1188000,
+      "description": "Pod hosting with dynamic ads — creator rev share.",
+      "marketCategory": "gaming-media"
+    },
+    {
+      "id": "acq-157-fanart-market",
+      "name": "FanArt Market",
+      "segment": "small",
+      "baseMrr": 22000,
+      "basePrice": 1636800,
+      "description": "Licensed fan merch — IP holder splits.",
+      "marketCategory": "gaming-media"
+    },
+    {
+      "id": "acq-158-adplay-network",
+      "name": "AdPlay Network",
       "segment": "mid",
-      "baseMrr": 40800,
-      "basePrice": 5080000,
-      "description": "Profitable contract management — steady subscribers, light integration work."
+      "baseMrr": 58000,
+      "basePrice": 5011200,
+      "description": "In-game brand placements — CPM plus studio share.",
+      "marketCategory": "gaming-media"
     },
     {
-      "id": "acq-017-pixel-network",
-      "name": "Pixel Network",
+      "id": "acq-159-esportsstats",
+      "name": "EsportsStats",
       "segment": "mid",
-      "baseMrr": 42600,
-      "basePrice": 5260000,
-      "description": "Profitable procurement — steady subscribers, light integration work."
+      "baseMrr": 92000,
+      "basePrice": 8611200,
+      "description": "Data feeds for betting partners — licensing fees.",
+      "marketCategory": "gaming-media"
     },
     {
-      "id": "acq-018-north-holdings",
-      "name": "North Holdings",
+      "id": "acq-160-gamebackend",
+      "name": "GameBackend",
       "segment": "mid",
-      "baseMrr": 44400,
-      "basePrice": 5440000,
-      "description": "Profitable revenue recognition — steady subscribers, light integration work."
+      "baseMrr": 138000,
+      "basePrice": 13910400,
+      "description": "Multiplayer infra — MAU-tier pricing.",
+      "marketCategory": "gaming-media"
     },
     {
-      "id": "acq-019-cedar-industries",
-      "name": "Cedar Industries",
+      "id": "acq-161-mediarights-desk",
+      "name": "MediaRights Desk",
+      "segment": "mid",
+      "baseMrr": 310000,
+      "basePrice": 35712000,
+      "description": "Sports rights tracking — league SaaS contracts.",
+      "marketCategory": "gaming-media"
+    },
+    {
+      "id": "acq-162-creatorstudio-pro",
+      "name": "CreatorStudio Pro",
+      "segment": "mid",
+      "baseMrr": 620000,
+      "basePrice": 80352000,
+      "description": "Video editing for YouTubers — pro tier upsell.",
+      "marketCategory": "gaming-media"
+    },
+    {
+      "id": "acq-163-worldplay-entertainment",
+      "name": "WorldPlay Entertainment",
       "segment": "enterprise",
-      "baseMrr": 313000,
-      "basePrice": 63600000,
-      "description": "Profitable partner portals — steady subscribers, light integration work."
+      "baseMrr": 2800000,
+      "basePrice": 386400000,
+      "description": "AAA studio with live-service titles — catalog IP.",
+      "marketCategory": "gaming-media"
     },
     {
-      "id": "acq-020-pixel-payroll-co",
-      "name": "Pixel payroll Co.",
-      "segment": "small",
-      "baseMrr": 3200,
-      "basePrice": 620000,
-      "description": "Profitable payroll APIs — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-021-north-niche-co",
-      "name": "North niche Co.",
-      "segment": "small",
-      "baseMrr": 3320,
-      "basePrice": 642000,
-      "description": "Profitable niche CRM — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-022-harbor-vertical-co",
-      "name": "Harbor vertical Co.",
-      "segment": "small",
-      "baseMrr": 3440,
-      "basePrice": 664000,
-      "description": "Profitable vertical SaaS — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-023-swift-data-co",
-      "name": "Swift data Co.",
-      "segment": "small",
-      "baseMrr": 3560,
-      "basePrice": 686000,
-      "description": "Profitable data pipeline — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-024-lumen-customer-co",
-      "name": "Lumen customer Co.",
-      "segment": "small",
-      "baseMrr": 3680,
-      "basePrice": 708000,
-      "description": "Profitable customer support — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-025-atlas-inventory-co",
-      "name": "Atlas inventory Co.",
-      "segment": "small",
-      "baseMrr": 3800,
-      "basePrice": 730000,
-      "description": "Profitable inventory sync — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-026-echo-platform",
-      "name": "Echo Platform",
-      "segment": "mid",
-      "baseMrr": 58800,
-      "basePrice": 6880000,
-      "description": "Profitable loyalty program — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-027-forge-network",
-      "name": "Forge Network",
-      "segment": "mid",
-      "baseMrr": 60600,
-      "basePrice": 7060000,
-      "description": "Profitable field service — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-028-hatch-holdings",
-      "name": "Hatch Holdings",
-      "segment": "mid",
-      "baseMrr": 62400,
-      "basePrice": 7240000,
-      "description": "Profitable subscription billing — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-029-relay-corporation",
-      "name": "Relay Corporation",
+      "id": "acq-164-globalstream-media",
+      "name": "GlobalStream Media",
       "segment": "enterprise",
-      "baseMrr": 433000,
-      "basePrice": 27600000,
-      "description": "Profitable identity layer — steady subscribers, light integration work."
+      "baseMrr": 4500000,
+      "basePrice": 675000000,
+      "description": "FAST channels and AVOD — ad sales house included.",
+      "marketCategory": "gaming-media"
     },
     {
-      "id": "acq-030-forge-workflow-co",
-      "name": "Forge workflow Co.",
-      "segment": "small",
-      "baseMrr": 4400,
-      "basePrice": 840000,
-      "description": "Profitable workflow automation — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-031-hatch-document-co",
-      "name": "Hatch document Co.",
-      "segment": "small",
-      "baseMrr": 4520,
-      "basePrice": 862000,
-      "description": "Profitable document AI — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-032-kite-status-co",
-      "name": "Kite status Co.",
-      "segment": "small",
-      "baseMrr": 4640,
-      "basePrice": 884000,
-      "description": "Profitable status pages — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-033-mosaic-email-co",
-      "name": "Mosaic email Co.",
-      "segment": "small",
-      "baseMrr": 4760,
-      "basePrice": 906000,
-      "description": "Profitable email deliverability — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-034-parallel-feature-co",
-      "name": "Parallel feature Co.",
-      "segment": "small",
-      "baseMrr": 4880,
-      "basePrice": 928000,
-      "description": "Profitable feature flags — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-035-quartz-observability-co",
-      "name": "Quartz observability Co.",
-      "segment": "small",
-      "baseMrr": 5000,
-      "basePrice": 950000,
-      "description": "Profitable observability — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-036-uplink-platform",
-      "name": "Uplink Platform",
-      "segment": "mid",
-      "baseMrr": 13800,
-      "basePrice": 8680000,
-      "description": "Profitable contract management — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-037-pixel-network",
-      "name": "Pixel Network",
-      "segment": "mid",
-      "baseMrr": 15600,
-      "basePrice": 8860000,
-      "description": "Profitable procurement — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-038-north-holdings",
-      "name": "North Holdings",
-      "segment": "mid",
-      "baseMrr": 17400,
-      "basePrice": 9040000,
-      "description": "Profitable revenue recognition — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-039-cedar-capital",
-      "name": "Cedar Capital",
+      "id": "acq-165-interactive-empire",
+      "name": "Interactive Empire",
       "segment": "enterprise",
-      "baseMrr": 193000,
-      "basePrice": 51600000,
-      "description": "Profitable partner portals — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-040-pixel-payroll-co",
-      "name": "Pixel payroll Co.",
-      "segment": "small",
-      "baseMrr": 800,
-      "basePrice": 1060000,
-      "description": "Profitable payroll APIs — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-041-north-niche-co",
-      "name": "North niche Co.",
-      "segment": "small",
-      "baseMrr": 920,
-      "basePrice": 1082000,
-      "description": "Profitable niche CRM — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-042-harbor-vertical-co",
-      "name": "Harbor vertical Co.",
-      "segment": "small",
-      "baseMrr": 1040,
-      "basePrice": 1104000,
-      "description": "Profitable vertical SaaS — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-043-swift-data-co",
-      "name": "Swift data Co.",
-      "segment": "small",
-      "baseMrr": 1160,
-      "basePrice": 1126000,
-      "description": "Profitable data pipeline — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-044-lumen-customer-co",
-      "name": "Lumen customer Co.",
-      "segment": "small",
-      "baseMrr": 1280,
-      "basePrice": 1148000,
-      "description": "Profitable customer support — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-045-atlas-inventory-co",
-      "name": "Atlas inventory Co.",
-      "segment": "small",
-      "baseMrr": 1400,
-      "basePrice": 1170000,
-      "description": "Profitable inventory sync — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-046-echo-platform",
-      "name": "Echo Platform",
-      "segment": "mid",
-      "baseMrr": 31800,
-      "basePrice": 3280000,
-      "description": "Profitable loyalty program — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-047-forge-network",
-      "name": "Forge Network",
-      "segment": "mid",
-      "baseMrr": 33600,
-      "basePrice": 3460000,
-      "description": "Profitable field service — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-048-hatch-holdings",
-      "name": "Hatch Holdings",
-      "segment": "mid",
-      "baseMrr": 35400,
-      "basePrice": 3640000,
-      "description": "Profitable subscription billing — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-049-relay-international",
-      "name": "Relay International",
-      "segment": "enterprise",
-      "baseMrr": 313000,
-      "basePrice": 75600000,
-      "description": "Profitable identity layer — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-050-forge-workflow-co",
-      "name": "Forge workflow Co.",
-      "segment": "small",
-      "baseMrr": 2000,
-      "basePrice": 180000,
-      "description": "Profitable workflow automation — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-051-hatch-document-co",
-      "name": "Hatch document Co.",
-      "segment": "small",
-      "baseMrr": 2120,
-      "basePrice": 202000,
-      "description": "Profitable document AI — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-052-kite-status-co",
-      "name": "Kite status Co.",
-      "segment": "small",
-      "baseMrr": 2240,
-      "basePrice": 224000,
-      "description": "Profitable status pages — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-053-mosaic-email-co",
-      "name": "Mosaic email Co.",
-      "segment": "small",
-      "baseMrr": 2360,
-      "basePrice": 246000,
-      "description": "Profitable email deliverability — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-054-parallel-feature-co",
-      "name": "Parallel feature Co.",
-      "segment": "small",
-      "baseMrr": 2480,
-      "basePrice": 268000,
-      "description": "Profitable feature flags — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-055-quartz-observability-co",
-      "name": "Quartz observability Co.",
-      "segment": "small",
-      "baseMrr": 2600,
-      "basePrice": 290000,
-      "description": "Profitable observability — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-056-uplink-platform",
-      "name": "Uplink Platform",
-      "segment": "mid",
-      "baseMrr": 49800,
-      "basePrice": 5080000,
-      "description": "Profitable contract management — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-057-pixel-network",
-      "name": "Pixel Network",
-      "segment": "mid",
-      "baseMrr": 51600,
-      "basePrice": 5260000,
-      "description": "Profitable procurement — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-058-north-holdings",
-      "name": "North Holdings",
-      "segment": "mid",
-      "baseMrr": 53400,
-      "basePrice": 5440000,
-      "description": "Profitable revenue recognition — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-059-cedar-industries",
-      "name": "Cedar Industries",
-      "segment": "enterprise",
-      "baseMrr": 433000,
-      "basePrice": 39600000,
-      "description": "Profitable partner portals — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-060-pixel-payroll-co",
-      "name": "Pixel payroll Co.",
-      "segment": "small",
-      "baseMrr": 3200,
-      "basePrice": 400000,
-      "description": "Profitable payroll APIs — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-061-north-niche-co",
-      "name": "North niche Co.",
-      "segment": "small",
-      "baseMrr": 3320,
-      "basePrice": 422000,
-      "description": "Profitable niche CRM — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-062-harbor-vertical-co",
-      "name": "Harbor vertical Co.",
-      "segment": "small",
-      "baseMrr": 3440,
-      "basePrice": 444000,
-      "description": "Profitable vertical SaaS — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-063-swift-data-co",
-      "name": "Swift data Co.",
-      "segment": "small",
-      "baseMrr": 3560,
-      "basePrice": 466000,
-      "description": "Profitable data pipeline — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-064-lumen-customer-co",
-      "name": "Lumen customer Co.",
-      "segment": "small",
-      "baseMrr": 3680,
-      "basePrice": 488000,
-      "description": "Profitable customer support — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-065-atlas-inventory-co",
-      "name": "Atlas inventory Co.",
-      "segment": "small",
-      "baseMrr": 3800,
-      "basePrice": 510000,
-      "description": "Profitable inventory sync — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-066-echo-platform",
-      "name": "Echo Platform",
-      "segment": "mid",
-      "baseMrr": 67800,
-      "basePrice": 6880000,
-      "description": "Profitable loyalty program — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-067-forge-network",
-      "name": "Forge Network",
-      "segment": "mid",
-      "baseMrr": 69600,
-      "basePrice": 7060000,
-      "description": "Profitable field service — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-068-hatch-holdings",
-      "name": "Hatch Holdings",
-      "segment": "mid",
-      "baseMrr": 71400,
-      "basePrice": 7240000,
-      "description": "Profitable subscription billing — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-069-relay-corporation",
-      "name": "Relay Corporation",
-      "segment": "enterprise",
-      "baseMrr": 193000,
-      "basePrice": 63600000,
-      "description": "Profitable identity layer — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-070-forge-workflow-co",
-      "name": "Forge workflow Co.",
-      "segment": "small",
-      "baseMrr": 4400,
-      "basePrice": 620000,
-      "description": "Profitable workflow automation — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-071-hatch-document-co",
-      "name": "Hatch document Co.",
-      "segment": "small",
-      "baseMrr": 4520,
-      "basePrice": 642000,
-      "description": "Profitable document AI — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-072-kite-status-co",
-      "name": "Kite status Co.",
-      "segment": "small",
-      "baseMrr": 4640,
-      "basePrice": 664000,
-      "description": "Profitable status pages — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-073-mosaic-email-co",
-      "name": "Mosaic email Co.",
-      "segment": "small",
-      "baseMrr": 4760,
-      "basePrice": 686000,
-      "description": "Profitable email deliverability — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-074-parallel-feature-co",
-      "name": "Parallel feature Co.",
-      "segment": "small",
-      "baseMrr": 4880,
-      "basePrice": 708000,
-      "description": "Profitable feature flags — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-075-quartz-observability-co",
-      "name": "Quartz observability Co.",
-      "segment": "small",
-      "baseMrr": 5000,
-      "basePrice": 730000,
-      "description": "Profitable observability — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-076-uplink-platform",
-      "name": "Uplink Platform",
-      "segment": "mid",
-      "baseMrr": 22800,
-      "basePrice": 8680000,
-      "description": "Profitable contract management — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-077-pixel-network",
-      "name": "Pixel Network",
-      "segment": "mid",
-      "baseMrr": 24600,
-      "basePrice": 8860000,
-      "description": "Profitable procurement — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-078-north-holdings",
-      "name": "North Holdings",
-      "segment": "mid",
-      "baseMrr": 26400,
-      "basePrice": 9040000,
-      "description": "Profitable revenue recognition — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-079-cedar-capital",
-      "name": "Cedar Capital",
-      "segment": "enterprise",
-      "baseMrr": 313000,
-      "basePrice": 27600000,
-      "description": "Profitable partner portals — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-080-pixel-payroll-co",
-      "name": "Pixel payroll Co.",
-      "segment": "small",
-      "baseMrr": 800,
-      "basePrice": 840000,
-      "description": "Profitable payroll APIs — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-081-north-niche-co",
-      "name": "North niche Co.",
-      "segment": "small",
-      "baseMrr": 920,
-      "basePrice": 862000,
-      "description": "Profitable niche CRM — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-082-harbor-vertical-co",
-      "name": "Harbor vertical Co.",
-      "segment": "small",
-      "baseMrr": 1040,
-      "basePrice": 884000,
-      "description": "Profitable vertical SaaS — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-083-swift-data-co",
-      "name": "Swift data Co.",
-      "segment": "small",
-      "baseMrr": 1160,
-      "basePrice": 906000,
-      "description": "Profitable data pipeline — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-084-lumen-customer-co",
-      "name": "Lumen customer Co.",
-      "segment": "small",
-      "baseMrr": 1280,
-      "basePrice": 928000,
-      "description": "Profitable customer support — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-085-atlas-inventory-co",
-      "name": "Atlas inventory Co.",
-      "segment": "small",
-      "baseMrr": 1400,
-      "basePrice": 950000,
-      "description": "Profitable inventory sync — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-086-echo-platform",
-      "name": "Echo Platform",
-      "segment": "mid",
-      "baseMrr": 40800,
-      "basePrice": 3280000,
-      "description": "Profitable loyalty program — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-087-forge-network",
-      "name": "Forge Network",
-      "segment": "mid",
-      "baseMrr": 42600,
-      "basePrice": 3460000,
-      "description": "Profitable field service — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-088-hatch-holdings",
-      "name": "Hatch Holdings",
-      "segment": "mid",
-      "baseMrr": 44400,
-      "basePrice": 3640000,
-      "description": "Profitable subscription billing — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-089-relay-international",
-      "name": "Relay International",
-      "segment": "enterprise",
-      "baseMrr": 433000,
-      "basePrice": 51600000,
-      "description": "Profitable identity layer — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-090-forge-workflow-co",
-      "name": "Forge workflow Co.",
-      "segment": "small",
-      "baseMrr": 2000,
-      "basePrice": 1060000,
-      "description": "Profitable workflow automation — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-091-hatch-document-co",
-      "name": "Hatch document Co.",
-      "segment": "small",
-      "baseMrr": 2120,
-      "basePrice": 1082000,
-      "description": "Profitable document AI — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-092-kite-status-co",
-      "name": "Kite status Co.",
-      "segment": "small",
-      "baseMrr": 2240,
-      "basePrice": 1104000,
-      "description": "Profitable status pages — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-093-mosaic-email-co",
-      "name": "Mosaic email Co.",
-      "segment": "small",
-      "baseMrr": 2360,
-      "basePrice": 1126000,
-      "description": "Profitable email deliverability — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-094-parallel-feature-co",
-      "name": "Parallel feature Co.",
-      "segment": "small",
-      "baseMrr": 2480,
-      "basePrice": 1148000,
-      "description": "Profitable feature flags — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-095-quartz-observability-co",
-      "name": "Quartz observability Co.",
-      "segment": "small",
-      "baseMrr": 2600,
-      "basePrice": 1170000,
-      "description": "Profitable observability — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-096-uplink-platform",
-      "name": "Uplink Platform",
-      "segment": "mid",
-      "baseMrr": 58800,
-      "basePrice": 5080000,
-      "description": "Profitable contract management — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-097-pixel-network",
-      "name": "Pixel Network",
-      "segment": "mid",
-      "baseMrr": 60600,
-      "basePrice": 5260000,
-      "description": "Profitable procurement — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-098-north-holdings",
-      "name": "North Holdings",
-      "segment": "mid",
-      "baseMrr": 62400,
-      "basePrice": 5440000,
-      "description": "Profitable revenue recognition — steady subscribers, light integration work."
-    },
-    {
-      "id": "acq-099-cedar-industries",
-      "name": "Cedar Industries",
-      "segment": "enterprise",
-      "baseMrr": 193000,
-      "basePrice": 75600000,
-      "description": "Profitable partner portals — steady subscribers, light integration work."
+      "baseMrr": 11500000,
+      "basePrice": 1863000000,
+      "description": "Publisher with mobile portfolio — IAP and ads mix.",
+      "marketCategory": "gaming-media"
     }
   ]
 }

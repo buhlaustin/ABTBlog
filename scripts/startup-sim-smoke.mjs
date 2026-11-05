@@ -764,11 +764,29 @@ const {
 } = await import(`file://${join(sim, 'modules/Acquisitions.js')}`);
 const { portfolioPulseSummary } = await import(`file://${join(sim, 'modules/Companies.js')}`);
 await preloadAcquisitionCatalog();
-if (getAcquisitionCatalog().length !== 99) {
-  console.error(`FAIL: expected 99 acquisition targets, got ${getAcquisitionCatalog().length}`);
+const acqCatalog = getAcquisitionCatalog();
+const acqCatalogSize = acqCatalog.length;
+if (acqCatalogSize !== 165) {
+  console.error(`FAIL: expected 165 acquisition targets, got ${acqCatalogSize}`);
   failed = true;
 } else {
-  console.log('OK: acquisition catalog has 99 companies');
+  console.log(`OK: acquisition catalog has ${acqCatalogSize} handcrafted companies`);
+}
+const acqNames = new Set(acqCatalog.map((c) => c.name));
+if (acqNames.size !== acqCatalogSize) {
+  console.error('FAIL: acquisition catalog has duplicate company names');
+  failed = true;
+} else {
+  console.log('OK: acquisition names are unique');
+}
+const maxEntAcqMrr = Math.max(
+  ...acqCatalog.filter((c) => c.segment === 'enterprise').map((c) => c.baseMrr)
+);
+if (maxEntAcqMrr < 5_000_000) {
+  console.error(`FAIL: enterprise acquisition MRR ceiling too low (${maxEntAcqMrr})`);
+  failed = true;
+} else {
+  console.log(`OK: enterprise acquisition MRR scales to ${formatMoney(maxEntAcqMrr)}/mo`);
 }
 const acqState = createInitialState({
   companyName: 'HoldCo',
