@@ -17,7 +17,11 @@ import {
   runAllRemainingGrowthCampaigns,
   loadGrowthCampaigns
 } from './modules/GrowthCampaigns.js';
-import { openGrowthCampaignOutcomeDialog } from './modules/GrowthOutcome.js';
+import {
+  openGrowthCampaignOutcomeDialog,
+  openGrowthCampaignBulkOutcomeDialog,
+  openSidePlayBulkOutcomeDialog
+} from './modules/GrowthOutcome.js';
 import {
   getCoreTaskRevenueMult,
   getSandboxTuningMult,
@@ -943,39 +947,67 @@ function bindGameInteractions() {
 
     const buyAllSideBtn = e.target.closest('[data-buy-all-side]');
     if (buyAllSideBtn && sessionState) {
-      const result = runAllRemainingSideTasks(sessionState, ['product', 'growth', 'brand', 'both']);
-      if (!result.ok) {
-        setGameFeedback(result.reason || 'Could not buy side plays.', true);
+      void (async () => {
+        const result = runAllRemainingSideTasks(sessionState, ['product', 'growth', 'brand', 'both']);
+        if (!result.ok) {
+          setGameFeedback(result.reason || 'Could not buy side plays.', true);
+          refresh();
+          return;
+        }
+        appendLog(
+          sessionState,
+          `Growth: ran ${result.count} side play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}.`
+        );
         refresh();
-        return;
-      }
-      appendLog(
-        sessionState,
-        `Growth: ran ${result.count} side play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}.`
-      );
-      setGameFeedback(
-        `Ran ${result.count} side play${result.count === 1 ? '' : 's'} (buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}).`
-      );
-      refresh();
+        await openSidePlayBulkOutcomeDialog({
+          count: result.count,
+          totalCost: result.totalCost,
+          totalBuzz: result.totalBuzz,
+          totalProduct: result.totalProduct,
+          titles: (result.launched ?? []).map((r) => r.action?.label).filter(Boolean)
+        });
+        setGameFeedback(
+          `Ran ${result.count} side play${result.count === 1 ? '' : 's'} (buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}).`
+        );
+        refresh();
+      })();
       return;
     }
 
     const buyAllGrowthBtn = e.target.closest('[data-buy-all-growth]');
     if (buyAllGrowthBtn && sessionState) {
-      const result = runAllRemainingGrowthCampaigns(sessionState);
-      if (!result.ok) {
-        setGameFeedback(result.reason || 'Could not buy growth plays.', true);
+      void (async () => {
+        const result = runAllRemainingGrowthCampaigns(sessionState);
+        if (!result.ok) {
+          setGameFeedback(result.reason || 'Could not buy growth plays.', true);
+          refresh();
+          return;
+        }
+        appendLog(
+          sessionState,
+          `Growth: bought ${result.count} paid play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, booked ${formatMoney(result.totalRevenue)}.`
+        );
         refresh();
-        return;
-      }
-      appendLog(
-        sessionState,
-        `Growth: bought ${result.count} paid play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, booked ${formatMoney(result.totalRevenue)}.`
-      );
-      setGameFeedback(
-        `Launched ${result.count} growth campaign${result.count === 1 ? '' : 's'} (${formatMoney(result.totalRevenue)} booked).`
-      );
-      refresh();
+        const core = getCoreTaskRevenueMult(sessionState);
+        const tune = getSandboxTuningMult(sessionState);
+        const total = getTaskRevenueMultiplierPreview(sessionState);
+        const multLine =
+          sessionState.mode === 'sandbox' && tune !== 1
+            ? `${core.toFixed(2)}× progression × ${tune.toFixed(2)}× sandbox = ${total.toFixed(2)}× on these payouts.`
+            : `${total.toFixed(2)}× effective multiplier on these payouts.`;
+        await openGrowthCampaignBulkOutcomeDialog({
+          count: result.count,
+          totalCost: result.totalCost,
+          totalRevenue: result.totalRevenue,
+          totalBuzz: result.totalBuzz,
+          titles: (result.launched ?? []).map((r) => r.def?.title).filter(Boolean),
+          multLine
+        });
+        setGameFeedback(
+          `Launched ${result.count} growth campaign${result.count === 1 ? '' : 's'} (${formatMoney(result.totalRevenue)} booked).`
+        );
+        refresh();
+      })();
       return;
     }
 

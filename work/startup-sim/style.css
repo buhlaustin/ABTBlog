@@ -1035,6 +1035,13 @@ h1 {
   margin-top: 0;
 }
 
+.growth-outcome-list {
+  margin: 0.65rem 0 0;
+  padding-left: 1.15rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
 .companies-reinvest-cell {
   display: flex;
   flex-direction: column;
