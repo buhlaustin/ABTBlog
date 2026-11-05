@@ -73,7 +73,15 @@ function applyHeadcountDelta(state, delta) {
   const n = Math.floor(Number(delta) || 0);
   if (!n || !state.staff?.headcountByDept) return null;
   const hc = state.staff.headcountByDept;
-  const depts = ['engineering', 'sales', 'marketing', 'product'];
+  const depts = [
+    'engineering',
+    'product',
+    'sales',
+    'marketing',
+    'customer-success',
+    'support',
+    'operations'
+  ];
   if (n < 0) {
     let left = Math.abs(n);
     for (const d of depts) {

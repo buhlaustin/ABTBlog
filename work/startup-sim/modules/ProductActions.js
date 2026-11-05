@@ -2,7 +2,7 @@ import { formatMoney } from './constants.js';
 import { recordCashOutflow } from './Finance.js';
 import { setGameFeedback } from './GameFeedback.js';
 import { easeCompetitorPressure } from './Competitor.js';
-import { progressionTier } from './ProgressionEconomy.js';
+import { progressionTierForUnlocks } from './ProgressionEconomy.js';
 import {
   sideTaskPlaysPerMonth,
   formatMonthlySideTaskLimit,
@@ -87,7 +87,7 @@ export function resetProductActionsMonth(state) {
 }
 
 function actionUnlocked(def, state) {
-  const tier = progressionTier(state);
+  const tier = progressionTierForUnlocks(state);
   if ((def.tierMin ?? 0) > tier) return false;
   if ((def.tierMax ?? 99) < tier) return false;
   const cats = def.categories;
@@ -206,13 +206,15 @@ export function renderProductActionsPanel(container, state, options = {}) {
   const limit = sideTaskPlaysPerMonth(state);
   const left = productActionsRemaining(state);
   const leftLabel =
-    left === Infinity
-      ? 'Unlimited'
-      : `${left}/${formatMonthlySideTaskLimit(limit)}`;
+    options.slotLabel ??
+    (left === Infinity ? 'Unlimited' : `${left}/${formatMonthlySideTaskLimit(limit)}`);
   const atCap = Number.isFinite(limit) && left <= 0;
   const heading = options.heading ?? 'Growth levers';
   const focusFilter = options.focusFilter;
   const bankSize = sideTaskBankSize(focusFilter);
+  const unlockedCount = filterSideTasksByFocus(getProductActions(), focusFilter).filter((a) =>
+    actionUnlocked(a, state)
+  ).length;
   const hint = options.showLimitHint !== false ? `<p class="fine-print">${sideTaskLimitHint(state)}</p>` : '';
   const lede =
     options.lede ??
@@ -225,20 +227,30 @@ export function renderProductActionsPanel(container, state, options = {}) {
         sideTaskFocus(a) !== 'both'
           ? ` <span class="task-tag">${escapeHtml(sideTaskFocus(a))}</span>`
           : '';
-      return `<div class="finance-action product-action">
+      return `<div class="finance-action product-action growth-play-card">
       <p><strong>${escapeHtml(a.label)}</strong>${focusTag} — ${formatMoney(a.cost)}</p>
       <p class="fine-print">${escapeHtml(a.description)} Buzz +${a.buzz ?? 0}${a.product ? ` · Product +${a.product}` : ''}${rival}.</p>
-      <button type="button" class="btn btn-primary btn-small" data-product-action="${escapeHtml(a.id)}" ${atCap ? 'disabled title="No side plays left this month"' : ''}>Run play</button>
+      <button type="button" class="btn btn-primary btn-small" data-product-action="${escapeHtml(a.id)}" ${atCap ? 'disabled title="No side plays left this month"' : ''}>Run side play</button>
     </div>`;
     })
     .join('');
 
+  const isGrowthSide = options.variant === 'growth-side';
+  const sectionHead = isGrowthSide
+    ? `<div class="finance-section-head growth-section-head">
+        <h3 class="finance-section-title" id="growth-side-plays-heading">${escapeHtml(heading)}</h3>
+        <span class="growth-channel-badge growth-channel-badge--inline">Side meter · ${escapeHtml(leftLabel)}</span>
+      </div>
+      <p class="fine-print">${options.usedThisMonth ? `${options.usedThisMonth} used this month · ` : ''}${unlockedCount} unlocked · ${bankSize} in bank.</p>`
+    : `<h3 class="log-head">${escapeHtml(heading)}</h3><p class="fine-print">${lede}</p>`;
+
   container.innerHTML = `
-    <h3 class="log-head">${escapeHtml(heading)}</h3>
-    <p class="fine-print">${lede}</p>
-    ${hint}
-    ${rows || '<p class="fine-print">More levers unlock as you scale funding stage.</p>'}
-    <p id="product-action-feedback" class="desk-feedback" hidden></p>
+    <section class="finance-section growth-channel-section growth-channel-section--side" aria-labelledby="growth-side-plays-heading">
+      ${sectionHead}
+      ${hint}
+      <div class="growth-play-list">${rows || '<p class="fine-print">More levers unlock as you scale funding stage.</p>'}</div>
+      <p id="product-action-feedback" class="desk-feedback" hidden></p>
+    </section>
   `;
 }
 

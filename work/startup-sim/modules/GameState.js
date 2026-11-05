@@ -1,5 +1,5 @@
 import { getCategoryById, categoryEconomics } from './Categories.js';
-import { createInitialStaff } from './Staff.js';
+import { createInitialStaff, migrateStaffHeadcount } from './Staff.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
@@ -19,6 +19,7 @@ import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
 import { syncLifetimeProfit } from './Finance.js';
 import { createInitialFiscal, ensureFiscal } from './CorporateTax.js';
+import { ensureCeoPersonalTax } from './CeoPersonalTax.js';
 import {
   createInitialCeoState,
   initializeCeoPersonalFinances,
@@ -202,6 +203,20 @@ export function normalizeSave(raw) {
     if (!state.staff.benefitsThisMonth) {
       state.staff.benefitsThisMonth = { companyBonusPct: null, offsiteId: null, perks: [] };
     }
+    migrateStaffHeadcount(state);
+    if (state.ceo) {
+      if (!state.ceo.section) state.ceo.section = 'overview';
+      if (state.ceo.personalGivingLifetime == null) state.ceo.personalGivingLifetime = 0;
+      if (!state.ceo.netWorthHistory) state.ceo.netWorthHistory = [];
+      if (state.ceo.investmentBalance == null) state.ceo.investmentBalance = 0;
+      if (state.ceo.careerInvestmentReturns == null) state.ceo.careerInvestmentReturns = 0;
+      if (state.ceo.lastInvestmentReturn == null) state.ceo.lastInvestmentReturn = 0;
+      if (state.ceo.housing?.mortgageOriginalPrincipal == null) {
+        state.ceo.housing.mortgageOriginalPrincipal = 0;
+      }
+      ensureCeoPersonalTax(state);
+    }
+    if (state.staff.companyBonusAnnualMode === undefined) state.staff.companyBonusAnnualMode = false;
     if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
     if (state.staff.optionPoolExpandedThisMonth === undefined) {
       state.staff.optionPoolExpandedThisMonth = false;
@@ -218,6 +233,7 @@ export function normalizeSave(raw) {
     if (!state.calendar.log) state.calendar.log = [];
     if (!state.calendar.recentTaskIds) state.calendar.recentTaskIds = [];
     if (!state.calendar.monthTaskOffers) state.calendar.monthTaskOffers = [];
+    if (state.meta && state.meta.deskTasksLifetime == null) state.meta.deskTasksLifetime = 0;
     if (state.calendar.taskLineupConfirmed === undefined) {
       state.calendar.taskLineupConfirmed = (state.calendar.monthTasks?.length ?? 0) > 0;
     }
@@ -356,6 +372,19 @@ export function normalizeSave(raw) {
       }
       delete state.ceo.personalBurnMonthly;
       delete state.ceo.personalBurnCustom;
+      if (!state.ceo.housing) {
+        state.ceo.housing = {
+          mode: 'rent',
+          tierId: 'rent',
+          purchasePrice: 0,
+          mortgageBalance: 0,
+          mortgagePaymentMonthly: 0,
+          maintenanceMonthly: 0,
+          purchasedTurn: null
+        };
+      }
+      if (!state.ceo.lifestyleOwned) state.ceo.lifestyleOwned = [];
+      if (state.ceo.lifestyleDebitBump == null) state.ceo.lifestyleDebitBump = 0;
     }
     ensureCeoPersonalBank(state);
     preparePersonalExpensesForMonth(state);
@@ -396,6 +425,7 @@ export function normalizeSave(raw) {
     if (state.meta.monthsAtIpo === undefined) state.meta.monthsAtIpo = null;
     if (state.meta.hofRecorded === undefined) state.meta.hofRecorded = false;
     if (!state.meta.hofHighlights) state.meta.hofHighlights = [];
+    if (state.meta.deskTasksLifetime == null) state.meta.deskTasksLifetime = 0;
     if (state.mode === 'sandbox' && state.sandboxTuning === undefined) {
       state.sandboxTuning = null;
     }
@@ -473,12 +503,15 @@ export function normalizeSave(raw) {
     if (!state.acquisitions.diligenceReports) state.acquisitions.diligenceReports = {};
     if (!state.acquisitions.fireSaleIds) state.acquisitions.fireSaleIds = [];
     if (state.acquisitions.fireSaleTurn === undefined) state.acquisitions.fireSaleTurn = null;
+    if (!state.acquisitions.companiesSection) state.acquisitions.companiesSection = 'pulse';
     if (!state.acquisitions.marketSort) state.acquisitions.marketSort = 'ask';
     if (state.acquisitions.marketSearch === undefined) state.acquisitions.marketSearch = '';
     for (const h of state.acquisitions.owned) {
       if (h.integrationMonthsLeft === undefined) h.integrationMonthsLeft = 0;
       if (h.purchasePrice === undefined) h.purchasePrice = 0;
       if (h.lastReinvestTurn === undefined) h.lastReinvestTurn = h.acquiredTurn ?? 1;
+      if (h.valuationMark == null) h.valuationMark = 1;
+      if (h.lastValuationDriftPct == null) h.lastValuationDriftPct = 0;
     }
     if (state.world && state.world.competitorAcquired === undefined) {
       state.world.competitorAcquired = false;

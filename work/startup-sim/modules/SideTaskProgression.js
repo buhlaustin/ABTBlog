@@ -8,7 +8,9 @@ export function isHubUnlimitedSideTasks(state) {
 /** Cash product/growth levers per month (shared counter). Unlimited at worldwide hub. */
 export function sideTaskPlaysPerMonth(state) {
   if (isHubUnlimitedSideTasks(state)) return Infinity;
-  return computeSideTaskPlays(state);
+  const plays = computeSideTaskPlays(state);
+  const campaignCeiling = Math.max(growthCampaignSlots(state), 2);
+  return Math.min(plays, campaignCeiling);
 }
 
 function computeSideTaskPlays(state) {
@@ -24,6 +26,8 @@ function computeSideTaskPlays(state) {
   n += Math.min(2, Math.floor((head.marketing ?? 0) / 8));
   n += Math.min(2, Math.floor((head.product ?? 0) / 8));
   n += Math.min(1, Math.floor((head.engineering ?? 0) / 12));
+  n += Math.min(1, Math.floor((head.design ?? 0) / 10));
+  n += Math.min(1, Math.floor((head.partnerships ?? 0) / 10));
 
   const ws = getWorkspaceTier(state);
   if (ws === WORKSPACE_TIER.MEDIUM || ws === WORKSPACE_TIER.LARGE) n += 1;
@@ -44,7 +48,9 @@ export function growthCampaignSlots(state) {
   slots += Math.floor((state.product?.buzz ?? 0) / 20);
 
   const marketing = state.staff?.headcountByDept?.marketing ?? 0;
+  const partnerships = state.staff?.headcountByDept?.partnerships ?? 0;
   slots += Math.min(4, Math.floor(marketing / 6));
+  slots += Math.min(2, Math.floor(partnerships / 8));
 
   const ws = getWorkspaceTier(state);
   if (ws === WORKSPACE_TIER.LARGE) slots += 1;
@@ -71,5 +77,5 @@ export function sideTaskLimitHint(state) {
   const tier = progressionTier(state);
   const plays = sideTaskPlaysPerMonth(state);
   const campaigns = growthCampaignSlots(state);
-  return `Limits scale with funding tier (${tier}), product level, buzz, HQ tier, and headcount — now ${plays} lever play${plays === 1 ? '' : 's'} and ${campaigns} paid campaign${campaigns === 1 ? '' : 's'} per month. Hub city removes the cap.`;
+  return `Separate monthly meters — side plays capped at the same slot ceiling as paid campaigns (tier ${tier}: up to ${plays} side play${plays === 1 ? '' : 's'} and ${campaigns} paid campaign${campaigns === 1 ? '' : 's'} this month). Hub city removes both caps.`;
 }

@@ -10,9 +10,17 @@ import { ceoSalaryMonthly } from './CeoEconomics.js';
 import { cooSalaryMonthly } from './Coo.js';
 import { adjustSentiment } from './Sentiment.js';
 import { easeCompetitorPressure } from './Competitor.js';
-import { expandEmployeeOptionPool, getOptionPoolRow } from './CapTable.js';
+import {
+  expandEmployeeOptionPool,
+  getOptionPoolRow,
+  previewOptionPoolExpansion,
+  totalOutstandingShares
+} from './CapTable.js';
 import { calendarTurn } from './GameCalendar.js';
 import { formatCalendarStamp } from './GameCalendar.js';
+import { accrueCeoTaxableIncome } from './CeoPersonalTax.js';
+import { panelStatCard, escapeHtml as panelEscapeHtml } from './PanelChrome.js';
+import { meetsProgressionTierMin } from './ProgressionEconomy.js';
 
 export const COMPANY_BONUS_PCTS = [2, 5, 10, 20];
 
@@ -64,9 +72,46 @@ export const OFFSITE_PROGRAMS = [
   }
 ];
 
+export const PERK_CATEGORIES = [
+  { id: 'culture', label: 'Culture & recognition' },
+  { id: 'wellness', label: 'Wellness & flexibility' },
+  { id: 'growth', label: 'Learning & craft' },
+  { id: 'community', label: 'Community & family' }
+];
+
 export const EXTRA_PERKS = [
   {
+    id: 'celebration',
+    category: 'culture',
+    label: 'Company celebration',
+    cost: 25_000,
+    buzz: 2,
+    sentiment: 2,
+    blurb: 'Catered win party — morale patch for a brutal month.'
+  },
+  {
+    id: 'recognition',
+    category: 'culture',
+    label: 'Spot awards',
+    cost: 45_000,
+    buzz: 2,
+    sentiment: 3,
+    blurb: 'Peer-nominated $500 cards — LinkedIn posts write themselves.'
+  },
+  {
+    id: 'hackathon',
+    category: 'culture',
+    label: 'Internal hackathon',
+    cost: 150_000,
+    buzz: 3,
+    sentiment: 3,
+    product: 1,
+    tierMin: 3,
+    blurb: '48-hour build sprint — demos mandatory, sleep optional.'
+  },
+  {
     id: 'learning',
+    category: 'growth',
     label: 'Learning stipend',
     cost: 50_000,
     buzz: 1,
@@ -74,12 +119,108 @@ export const EXTRA_PERKS = [
     blurb: '$1k/person course budget — Udemy and one legit conference.'
   },
   {
-    id: 'celebration',
-    label: 'Company celebration',
-    cost: 25_000,
+    id: 'speaker',
+    category: 'growth',
+    label: 'Guest speaker series',
+    cost: 80_000,
+    buzz: 2,
+    sentiment: 3,
+    tierMin: 2,
+    blurb: 'Three outside experts — engineers pretend it is not recruiting.'
+  },
+  {
+    id: 'certification',
+    category: 'growth',
+    label: 'Certification push',
+    cost: 120_000,
+    buzz: 1,
+    sentiment: 4,
+    product: 1,
+    tierMin: 3,
+    blurb: 'Cloud and security certs — compliance deck gets easier.'
+  },
+  {
+    id: 'wellness',
+    category: 'wellness',
+    label: 'Wellness stipend',
+    cost: 75_000,
+    buzz: 1,
+    sentiment: 4,
+    blurb: 'Gym, therapy, or meditation app — no questions asked.'
+  },
+  {
+    id: 'remote-kit',
+    category: 'wellness',
+    label: 'Home office refresh',
+    cost: 110_000,
+    buzz: 1,
+    sentiment: 4,
+    blurb: 'Chair, monitor, and desk stipend — ergonomics audit optional.'
+  },
+  {
+    id: 'mental-health',
+    category: 'wellness',
+    label: 'Mental health day',
+    cost: 55_000,
+    buzz: 1,
+    sentiment: 5,
+    blurb: 'Company-wide day off — Slack status: actually offline.'
+  },
+  {
+    id: 'commuter',
+    category: 'wellness',
+    label: 'Commuter subsidy',
+    cost: 65_000,
+    buzz: 0,
+    sentiment: 3,
+    blurb: 'Transit and parking stipend — RTO debate cools one month.'
+  },
+  {
+    id: 'cafeteria',
+    category: 'culture',
+    label: 'Premium cafeteria week',
+    cost: 40_000,
     buzz: 2,
     sentiment: 2,
-    blurb: 'Catered win party — morale patch for a brutal month.'
+    blurb: 'Actual chefs on campus — lines at the espresso bar.'
+  },
+  {
+    id: 'volunteer',
+    category: 'community',
+    label: 'Volunteer day',
+    cost: 35_000,
+    buzz: 2,
+    sentiment: 4,
+    blurb: 'Paid day for local nonprofits — photo ops included.'
+  },
+  {
+    id: 'childcare',
+    category: 'community',
+    label: 'Childcare backup',
+    cost: 95_000,
+    buzz: 1,
+    sentiment: 5,
+    tierMin: 2,
+    blurb: 'Emergency childcare credits — parents exhale.'
+  },
+  {
+    id: 'family-stipend',
+    category: 'community',
+    label: 'Family support stipend',
+    cost: 130_000,
+    buzz: 1,
+    sentiment: 6,
+    tierMin: 4,
+    blurb: 'Caregiver and parental slush fund — kept deliberately vague.'
+  },
+  {
+    id: 'pet-friendly',
+    category: 'community',
+    label: 'Pet-friendly week',
+    cost: 30_000,
+    buzz: 3,
+    sentiment: 2,
+    blurb: 'Dogs in office — allergies become a leadership discussion.'
   }
 ];
 
@@ -92,6 +233,7 @@ function ensurePeoplePrograms(state) {
   }
   if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
   if (state.staff.peopleSection == null) state.staff.peopleSection = 'staffing';
+  if (state.staff.companyBonusAnnualMode == null) state.staff.companyBonusAnnualMode = false;
 }
 
 export function resetEmployeeBenefitsMonth(state) {
@@ -146,10 +288,32 @@ function creditCeoBonusShare(state, amount, pct) {
     month: state.calendar?.monthIndex,
     year: state.calendar?.year
   });
+  accrueCeoTaxableIncome(state, pay);
   return pay;
 }
 
-export function payCompanyWideBonus(state, pctRaw) {
+/** Salary mass used for bonus math — one month, or ×12 when paying an annual bonus. */
+export function companyBonusSalaryBase(state, annualMode = false) {
+  const mass = totalEmployeeSalaryMassMonthly(state);
+  const mult = annualMode ? 12 : 1;
+  return {
+    ...mass,
+    bonusBase: mass.total * mult,
+    annualMode: Boolean(annualMode)
+  };
+}
+
+export function estimateCompanyBonusPool(state, pct, annualMode = false) {
+  const base = companyBonusSalaryBase(state, annualMode);
+  return Math.round(base.bonusBase * (Number(pct) / 100));
+}
+
+export function setCompanyBonusAnnualMode(state, enabled) {
+  ensurePeoplePrograms(state);
+  state.staff.companyBonusAnnualMode = Boolean(enabled);
+}
+
+export function payCompanyWideBonus(state, pctRaw, opts = {}) {
   ensurePeoplePrograms(state);
   const pct = Number(pctRaw);
   if (!COMPANY_BONUS_PCTS.includes(pct)) {
@@ -158,11 +322,12 @@ export function payCompanyWideBonus(state, pctRaw) {
   if (state.staff.benefitsThisMonth.companyBonusPct != null) {
     return { ok: false, reason: 'Already paid a company bonus this month.' };
   }
-  const mass = totalEmployeeSalaryMassMonthly(state);
+  const annualMode = opts.annual ?? state.staff.companyBonusAnnualMode ?? false;
+  const mass = companyBonusSalaryBase(state, annualMode);
   if (mass.total < 1) {
     return { ok: false, reason: 'No salary mass to bonus — hire staff or set CEO pay first.' };
   }
-  const pool = Math.round(mass.total * (pct / 100));
+  const pool = Math.round(mass.bonusBase * (pct / 100));
   const paid = payFromCompanyCash(state, pool, 'employee-bonus');
   if (!paid.ok) return paid;
 
@@ -170,12 +335,18 @@ export function payCompanyWideBonus(state, pctRaw) {
   if (ceoShare > 0) creditCeoBonusShare(state, ceoShare, pct);
 
   state.staff.benefitsThisMonth.companyBonusPct = pct;
+  state.staff.benefitsThisMonth.companyBonusAnnual = annualMode;
   state.product.buzz = (state.product?.buzz ?? 0) + Math.min(6, Math.ceil(pct / 4));
-  adjustSentiment(state, Math.min(8, Math.ceil(pct / 2)), `Company-wide ${pct}% bonus.`);
+  adjustSentiment(
+    state,
+    Math.min(8, Math.ceil(pct / 2)),
+    annualMode ? `Company-wide ${pct}% annual bonus.` : `Company-wide ${pct}% bonus.`
+  );
 
   return {
     ok: true,
     pct,
+    annualMode,
     pool: paid.cost,
     ceoShare,
     mass
@@ -200,10 +371,17 @@ export function conductEmployeeOffsite(state, programId) {
   return { ok: true, program, cost: paid.cost };
 }
 
+function perkUnlocked(perk, state) {
+  return meetsProgressionTierMin(state, perk.tierMin ?? 0);
+}
+
 export function runExtraEmployeePerk(state, perkId) {
   ensurePeoplePrograms(state);
   const perk = EXTRA_PERKS.find((p) => p.id === perkId);
   if (!perk) return { ok: false, reason: 'Unknown perk.' };
+  if (!perkUnlocked(perk, state)) {
+    return { ok: false, reason: 'Perk unlocks at a later funding stage.' };
+  }
   const perks = state.staff.benefitsThisMonth.perks ?? [];
   if (perks.includes(perk.id)) {
     return { ok: false, reason: 'Already ran that perk this month.' };
@@ -214,7 +392,11 @@ export function runExtraEmployeePerk(state, perkId) {
   perks.push(perk.id);
   state.staff.benefitsThisMonth.perks = perks;
   state.product.buzz = (state.product?.buzz ?? 0) + (perk.buzz ?? 0);
+  if (perk.product) {
+    state.product.level = (state.product.level ?? 0) + perk.product;
+  }
   adjustSentiment(state, perk.sentiment ?? 0, perk.label);
+  if (perk.rivalEase) easeCompetitorPressure(state, perk.rivalEase);
 
   return { ok: true, perk, cost: paid.cost };
 }
@@ -249,10 +431,57 @@ export function setPeopleSection(state, section) {
 }
 
 function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return panelEscapeHtml(s);
+}
+
+function perkEffectLine(perk) {
+  const parts = [];
+  if (perk.buzz) parts.push(`buzz +${perk.buzz}`);
+  if (perk.product) parts.push(`product +${perk.product}`);
+  if (perk.sentiment) parts.push(`morale +${perk.sentiment}`);
+  if (perk.rivalEase) parts.push(`rival heat −${perk.rivalEase}`);
+  return parts.length ? parts.join(' · ') : 'Morale boost';
+}
+
+function renderPerkCard(p, state, perksDone) {
+  const unlocked = perkUnlocked(p, state);
+  const used = perksDone.has(p.id);
+  const cash = state.finance?.cash ?? 0;
+  const disabled = !unlocked || used || cash < p.cost ? ' disabled' : '';
+  const title = !unlocked
+    ? ' title="Unlocks at Series B or later — or IPO after Series A without a B raise"'
+    : used
+      ? ' title="Already ran this month"'
+      : cash < p.cost
+        ? ` title="Need ${formatMoney(p.cost)} cash"`
+        : '';
+  const status = used
+    ? ' <span class="task-tag">Done</span>'
+    : !unlocked
+      ? ' <span class="task-tag">Locked</span>'
+      : '';
+  return `<div class="finance-action people-perk-card">
+      <p><strong>${escapeHtml(p.label)}</strong>${status} — ${formatMoney(p.cost)}</p>
+      <p class="fine-print">${escapeHtml(p.blurb)}</p>
+      <p class="fine-print people-perk-effects">${escapeHtml(perkEffectLine(p))}</p>
+      <button type="button" class="btn btn-primary btn-small" data-employee-perk="${escapeHtml(p.id)}"${disabled}${title}>Run perk</button>
+    </div>`;
+}
+
+function renderPerkCategorySections(state, perksDone) {
+  return PERK_CATEGORIES.map((cat) => {
+    const items = EXTRA_PERKS.filter((p) => p.category === cat.id);
+    if (!items.length) return '';
+    const cards = items.map((p) => renderPerkCard(p, state, perksDone)).join('');
+    const doneCount = items.filter((p) => perksDone.has(p.id)).length;
+    return `<section class="finance-section people-perk-group">
+      <div class="finance-section-head">
+        <h3 class="finance-section-title">${escapeHtml(cat.label)}</h3>
+        <span class="growth-channel-badge growth-channel-badge--inline">${doneCount}/${items.length} used</span>
+      </div>
+      <div class="people-perk-grid">${cards}</div>
+    </section>`;
+  }).join('');
 }
 
 export function renderEmployeeBenefitsPanel(container, state) {
@@ -262,49 +491,73 @@ export function renderEmployeeBenefitsPanel(container, state) {
   const bonusDone = state.staff.benefitsThisMonth.companyBonusPct;
   const offsiteDone = state.staff.benefitsThisMonth.offsiteId;
   const perksDone = new Set(state.staff.benefitsThisMonth.perks ?? []);
+  const perksUsedCount = perksDone.size;
+  const sentiment = state.sentiment?.score ?? 68;
+  const cash = state.finance?.cash ?? 0;
 
+  const annualMode = Boolean(state.staff.companyBonusAnnualMode);
+  const bonusBase = mass.total * (annualMode ? 12 : 1);
   const bonusButtons = COMPANY_BONUS_PCTS.map((pct) => {
-    const est = Math.round(mass.total * (pct / 100));
+    const est = Math.round(bonusBase * (pct / 100));
     const disabled =
-      bonusDone != null || mass.total < 1 || (state.finance?.cash ?? 0) < est ? ' disabled' : '';
-    return `<button type="button" class="btn btn-ghost btn-small" data-company-bonus="${pct}"${disabled}>${pct}% · ${formatMoney(est)}</button>`;
+      bonusDone != null || mass.total < 1 || cash < est ? ' disabled' : '';
+    return `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-company-bonus="${pct}"${disabled}>${pct}% · ${formatMoney(est)}</button>`;
   }).join('');
+  const bonusPaidLabel =
+    bonusDone != null
+      ? `${bonusDone}%${state.staff.benefitsThisMonth.companyBonusAnnual ? ' annual' : ''} paid`
+      : '1× / month';
 
   const offsiteCards = OFFSITE_PROGRAMS.map((p) => {
-    const disabled =
-      offsiteDone || (state.finance?.cash ?? 0) < p.cost ? ' disabled' : '';
-    return `<div class="finance-action">
+    const disabled = offsiteDone || cash < p.cost ? ' disabled' : '';
+    return `<div class="finance-action people-perk-card">
       <p><strong>${escapeHtml(p.label)}</strong> — ${formatMoney(p.cost)}</p>
-      <p class="fine-print">${escapeHtml(p.blurb)} Buzz +${p.buzz} · morale +${p.sentiment}${p.rivalEase ? ` · rival heat −${p.rivalEase}` : ''}.</p>
+      <p class="fine-print">${escapeHtml(p.blurb)}</p>
+      <p class="fine-print people-perk-effects">Buzz +${p.buzz} · morale +${p.sentiment}${p.rivalEase ? ` · rival heat −${p.rivalEase}` : ''}</p>
       <button type="button" class="btn btn-primary btn-small" data-employee-offsite="${escapeHtml(p.id)}"${disabled}>Book offsite</button>
     </div>`;
   }).join('');
 
-  const perkCards = EXTRA_PERKS.map((p) => {
-    const disabled = perksDone.has(p.id) || (state.finance?.cash ?? 0) < p.cost ? ' disabled' : '';
-    return `<div class="finance-action">
-      <p><strong>${escapeHtml(p.label)}</strong> — ${formatMoney(p.cost)}</p>
-      <p class="fine-print">${escapeHtml(p.blurb)}</p>
-      <button type="button" class="btn btn-ghost btn-small" data-employee-perk="${escapeHtml(p.id)}"${disabled}>Run perk</button>
-    </div>`;
-  }).join('');
+  const perkSections = renderPerkCategorySections(state, perksDone);
 
   container.innerHTML = `
-    <p class="panel-lede">Perks and morale spend — not health insurance. Bonuses use <strong>one month&apos;s salary mass</strong> (payroll + CEO + COO). CEO&apos;s share deposits to the <strong>CEO tab</strong> bank ledger.</p>
-    <div class="summary-grid">
-      <div><span class="stat-label">Salary mass / mo</span><span class="stat-value">${formatMoney(mass.total)}</span></div>
-      <div><span class="stat-label">Payroll</span><span class="stat-value">${formatMoney(mass.payroll)}</span></div>
-      <div><span class="stat-label">CEO + COO</span><span class="stat-value">${formatMoney(mass.ceo + mass.coo)}</span></div>
-      <div><span class="stat-label">Headcount</span><span class="stat-value">${mass.headcount}</span></div>
-    </div>
-    <h3 class="log-head">Company bonus</h3>
-    <p class="fine-print">${bonusDone != null ? `Paid <strong>${bonusDone}%</strong> bonus this month.` : 'One bonus per month — includes CEO in the pool.'}</p>
-    <div class="benefits-preset-row">${bonusButtons}</div>
-    <h3 class="log-head">Offsites</h3>
-    <p class="fine-print">${offsiteDone ? `Booked <strong>${escapeHtml(OFFSITE_PROGRAMS.find((p) => p.id === offsiteDone)?.label ?? offsiteDone)}</strong> this month.` : 'One offsite per month.'}</p>
-    ${offsiteCards}
-    <h3 class="log-head">Quick perks</h3>
-    ${perkCards}
+    <section class="finance-section people-benefits-section">
+      <p class="fine-print people-benefits-lede">Cash morale programs — not health insurance. Bonuses scale with payroll; perks and offsites stack buzz and board approval. Each perk is <strong>once per month</strong>; CEO bonus share lands on the CEO tab.</p>
+      <div class="finance-kpi-row people-kpi-row">
+        ${panelStatCard('Salary mass / mo', formatMoney(mass.total), { hero: true })}
+        ${panelStatCard('Perks used', `${perksUsedCount}/${EXTRA_PERKS.length}`)}
+        ${panelStatCard('Board approval', `${sentiment}/100`)}
+        ${panelStatCard('Company cash', formatMoney(cash))}
+      </div>
+      <div class="growth-channel-compare people-benefits-compare" role="note">
+        <div class="growth-channel-card growth-channel-card--side">
+          <p class="growth-channel-title"><span class="growth-channel-badge">Bonus</span></p>
+          <p class="fine-print">${annualMode ? 'Percent of <strong>annual</strong> salary mass (monthly payroll × 12).' : 'Percent of one month&apos;s salary mass (payroll + exec comp).'} Strongest single morale swing.</p>
+        </div>
+        <div class="growth-channel-card growth-channel-card--paid">
+          <p class="growth-channel-title"><span class="growth-channel-badge growth-channel-badge--paid">Programs</span></p>
+          <p class="fine-print">Offsites and perk cards — mix culture, wellness, and learning; run several different perks each month.</p>
+        </div>
+      </div>
+      <div class="finance-section-head">
+        <h3 class="finance-section-title">Company bonus</h3>
+        <span class="growth-channel-badge growth-channel-badge--inline">${bonusPaidLabel}</span>
+      </div>
+      <p class="fine-print">Payroll ${formatMoney(mass.payroll)}/mo · CEO+COO ${formatMoney(mass.ceo + mass.coo)}/mo · ${mass.headcount} employees · bonus base ${formatMoney(bonusBase)}${annualMode ? ' (annual)' : ''}.</p>
+      <label class="people-bonus-annual-toggle fine-print">
+        <input type="checkbox" id="company-bonus-annual" data-company-bonus-annual ${annualMode ? 'checked' : ''} ${bonusDone != null ? 'disabled' : ''} />
+        Annual bonus — apply % to monthly salary mass × 12 (not just one month)
+      </label>
+      <div class="benefits-preset-row">${bonusButtons}</div>
+      <div class="finance-section-head">
+        <h3 class="finance-section-title">Offsites</h3>
+        <span class="growth-channel-badge growth-channel-badge--inline">${offsiteDone ? escapeHtml(OFFSITE_PROGRAMS.find((p) => p.id === offsiteDone)?.label ?? 'Booked') : '1× / month'}</span>
+      </div>
+      <div class="people-perk-grid people-offsite-grid">${offsiteCards}</div>
+      <h3 class="finance-section-title">Monthly perk catalog</h3>
+      <p class="fine-print">${EXTRA_PERKS.length} programs across culture, wellness, learning, and community — pick what fits the month.</p>
+      ${perkSections}
+    </section>
   `;
 }
 
@@ -316,12 +569,17 @@ export function renderPeoplePanel(container, state) {
     `<button type="button" class="${section === id ? 'active' : ''}" data-people-tab="${id}">${label}</button>`;
 
   container.innerHTML = `
-    <nav class="people-subtabs" aria-label="People sections">
-      ${tab('staffing', 'Staffing')}
-      ${tab('benefits', 'Employee perks')}
-      ${tab('equity', 'Option pool')}
-    </nav>
-    <div id="people-section-mount"></div>
+    <div class="people-panel finance-panel">
+      <div class="finance-hero">
+        <p class="panel-lede">Headcount, perks, and option pool — payroll finalizes when you close the month on the Desk.</p>
+      </div>
+      <nav class="people-subtabs" aria-label="People sections">
+        ${tab('staffing', 'Staffing')}
+        ${tab('benefits', 'Employee perks')}
+        ${tab('equity', 'Option pool')}
+      </nav>
+      <div id="people-section-mount"></div>
+    </div>
   `;
 
   const mount = document.getElementById('people-section-mount');
@@ -335,28 +593,63 @@ export function renderOptionPoolPanel(container, state) {
   ensurePeoplePrograms(state);
   const poolRow = getOptionPoolRow(state);
   const poolExpanded = state.staff.optionPoolExpandedThisMonth;
+  const seedClosed = Boolean(state.flags?.seedRoundClosed);
+  const totalOut = totalOutstandingShares(state);
+  const sentiment = state.sentiment?.score ?? 68;
   const poolButtons = OPTION_POOL_EXPAND_PCTS.map((pct) => {
-    const disabled = poolExpanded ? ' disabled' : '';
-    return `<button type="button" class="btn btn-primary btn-small" data-expand-option-pool="${pct}"${disabled}>Expand +${pct}% FD</button>`;
+    const disabled = poolExpanded || !seedClosed ? ' disabled' : '';
+    const preview = seedClosed ? previewOptionPoolExpansion(state, pct) : null;
+    const shareHint = preview
+      ? ` · +${preview.sharesAdded.toLocaleString()} sh`
+      : !seedClosed
+        ? ' · close seed first'
+        : '';
+    const fdHint = preview ? ` → ${preview.poolPctAfter}% FD` : '';
+    return `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-expand-option-pool="${pct}"${disabled} title="Adds ${pct}% of current pool shares; dilutes all holders">${pct}% pool${shareHint}${fdHint}</button>`;
   }).join('');
   const poolHistory = (state.staff.optionPoolLog ?? [])
     .slice(-6)
     .reverse()
     .map(
       (e) =>
-        `<li>+${e.pctPoints}% (${(e.sharesAdded ?? 0).toLocaleString()} shares) · ${escapeHtml(formatCalendarStamp(e.year, e.month))}</li>`
+        `<li>+${e.pctPoints}% pool (${(e.sharesAdded ?? 0).toLocaleString()} shares) · ${escapeHtml(formatCalendarStamp(e.year, e.month))}</li>`
     )
     .join('');
 
+  const seedGate = !seedClosed
+    ? `<div class="finance-alert finance-alert--tax" role="alert">Close <strong>seed</strong> on Finance to create the employee option pool.</div>`
+    : '';
+
   container.innerHTML = `
-    <p class="panel-lede">Refresh the employee option pool without a priced round — board consent assumed. Dilutes all holders proportionally.</p>
-    <div class="summary-grid">
-      <div><span class="stat-label">Option pool</span><span class="stat-value">${poolRow ? `${poolRow.pct}%` : '—'}</span></div>
-      <div><span class="stat-label">Pool shares</span><span class="stat-value">${poolRow ? (poolRow.shares ?? 0).toLocaleString() : '—'}</span></div>
-      <div><span class="stat-label">This month</span><span class="stat-value">${poolExpanded ? 'Expanded' : 'Available'}</span></div>
-    </div>
-    <div class="benefits-preset-row">${poolButtons}</div>
-    <p class="fine-print">One expansion per month · seed creates the initial ~10% ESOP.</p>
-    ${poolHistory ? `<ul class="fine-print">${poolHistory}</ul>` : '<p class="fine-print">No pool refreshes yet.</p>'}
+    <section class="finance-section people-equity-section">
+      <p class="fine-print people-benefits-lede">Board-approved ESOP top-ups without a priced round. Each choice adds that percent of <strong>current pool shares</strong> (not a full cap-table recap), so post-IPO numbers stay readable. <strong>One refresh per month</strong> — nicks board approval slightly.</p>
+      <div class="finance-kpi-row people-kpi-row">
+        ${panelStatCard('Pool (FD)', poolRow ? `${poolRow.pct}%` : '—', { hero: true })}
+        ${panelStatCard('Pool shares', poolRow ? (poolRow.shares ?? 0).toLocaleString() : '—')}
+        ${panelStatCard('Outstanding', totalOut.toLocaleString())}
+        ${panelStatCard('Board approval', `${sentiment}/100`)}
+      </div>
+      <div class="growth-channel-compare people-benefits-compare" role="note">
+        <div class="growth-channel-card growth-channel-card--side">
+          <p class="growth-channel-title"><span class="growth-channel-badge">Top-up</span></p>
+          <p class="fine-print">Grow the pool by 2–15% of its current size — modest dilution, no investor negotiation.</p>
+        </div>
+        <div class="growth-channel-card growth-channel-card--paid">
+          <p class="growth-channel-title"><span class="growth-channel-badge growth-channel-badge--paid">Priced round</span></p>
+          <p class="fine-print">Seed and Series rounds on Finance set the big ESOP slices; use this tab for monthly refreshes between raises.</p>
+        </div>
+      </div>
+      ${seedGate}
+      <div class="finance-section-head">
+        <h3 class="finance-section-title">Refresh option pool</h3>
+        <span class="growth-channel-badge growth-channel-badge--inline">${poolExpanded ? 'Used this month' : '1× / month'}</span>
+      </div>
+      <div class="benefits-preset-row people-pool-expand-row">${poolButtons}</div>
+      ${
+        poolHistory
+          ? `<details class="finance-details"><summary>Recent pool refreshes</summary><ul class="desk-log-list">${poolHistory}</ul></details>`
+          : '<p class="fine-print">No pool refreshes yet.</p>'
+      }
+    </section>
   `;
 }

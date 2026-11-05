@@ -137,6 +137,13 @@ Rules: Parody outlets only; no real companies or living public figures. Celebrat
 Context: ${ctx}`;
   }
 
+  if (kind === 'startup_staffing_plan') {
+    return `You are the People/HR advisor in "Startup Simulator". Return ONLY valid JSON:
+{"summary":"under 80 words","headcountByDept":{"engineering":number,...}}
+Rules: context.direction is "increase" or "decrease". Set ABSOLUTE draft headcount per department id in context.departments only — never exceed context.headcountCap total. Respect context.cash, context.surplus, and context.runwayMonths. For increase, add roles that help revenue (sales, engineering, product) when funds allow. For decrease, trim overhead-heavy roles before core builders when burn is tight. Do not invent department ids. Do not mention game UI meta.
+Context: ${ctx}`;
+  }
+
   const base = `You are the unseen narrator of "House of Strategy", a Big Brother-style social strategy game.
 Write ONE short feed line (1-3 sentences, under 280 characters). No markdown. No spoilers beyond the context.
 Do not invent evictions or wins that are not in context. Stay dramatic but plausible.`;
@@ -253,6 +260,9 @@ async function callOpenAI(apiKey, kind, context) {
   if (kind === 'startup_ipo_press') {
     return parseStartupIpoPress(text);
   }
+  if (kind === 'startup_staffing_plan') {
+    return parseStartupStaffingPlan(text);
+  }
   return text.replace(/^["']|["']$/g, '');
 }
 
@@ -300,6 +310,21 @@ function parseStartupIpoPress(text) {
   return {
     headline: String(parsed.headline ?? 'Shares begin trading').slice(0, 140),
     dek: String(parsed.dek ?? '').slice(0, 280)
+  };
+}
+
+function parseStartupStaffingPlan(text) {
+  const parsed = parseJsonObject(text);
+  const raw = parsed.headcountByDept ?? parsed.headcount ?? {};
+  const headcountByDept = {};
+  if (raw && typeof raw === 'object') {
+    for (const [k, v] of Object.entries(raw)) {
+      headcountByDept[String(k).slice(0, 40)] = Math.max(0, Math.min(9999, Math.floor(Number(v) || 0)));
+    }
+  }
+  return {
+    summary: String(parsed.summary ?? 'Staffing plan updated.').slice(0, 400),
+    headcountByDept
   };
 }
 
@@ -375,6 +400,9 @@ export async function handler(event) {
     }
     if (kind === 'startup_ipo_press') {
       return json(200, { ...result, type: 'startup_ipo_press' }, event);
+    }
+    if (kind === 'startup_staffing_plan') {
+      return json(200, { ...result, type: 'startup_staffing_plan' }, event);
     }
     return json(200, { text: result, type: 'narrative' }, event);
   } catch (err) {

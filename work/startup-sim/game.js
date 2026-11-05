@@ -9,6 +9,7 @@ import {
   toggleTaskOffer,
   confirmTaskLineup
 } from './modules/Tasks.js';
+import { autoSelectRecommendedLineup } from './modules/Desk.js';
 import { completeBoardTask } from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
@@ -17,7 +18,11 @@ import {
   runAllRemainingGrowthCampaigns,
   loadGrowthCampaigns
 } from './modules/GrowthCampaigns.js';
-import { openGrowthCampaignOutcomeDialog } from './modules/GrowthOutcome.js';
+import {
+  openGrowthCampaignOutcomeDialog,
+  openGrowthCampaignBulkOutcomeDialog,
+  openSidePlayBulkOutcomeDialog
+} from './modules/GrowthOutcome.js';
 import {
   getCoreTaskRevenueMult,
   getSandboxTuningMult,
@@ -38,6 +43,7 @@ import {
 } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
 import { completeTaxFilingTask, donateToCharity } from './modules/CorporateTax.js';
+import { completeCeoPersonalTaxFilingTask } from './modules/CeoPersonalTax.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
 import {
   onScheduleLaunchTaskCompleted,
@@ -66,8 +72,10 @@ import {
   finalizeStaffing,
   showPeopleFeedback
 } from './modules/Staff.js';
+import { autoAdjustStaffingHeadcount } from './modules/StaffingPlanner.js';
 import {
   payCompanyWideBonus,
+  setCompanyBonusAnnualMode,
   conductEmployeeOffsite,
   runExtraEmployeePerk,
   issueFurtherOptionPool,
@@ -89,7 +97,27 @@ import {
   drawRevenueAdvance,
   showFinanceFeedback
 } from './modules/Fundraising.js';
-import { setCeoSalaryAnnual, takeOwnerDraw } from './modules/Ceo.js';
+import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback, setCeoSection } from './modules/Ceo.js';
+import {
+  purchaseCeoHomeCash,
+  purchaseCeoHomeMortgage,
+  purchaseCeoLifestyle,
+  sellCeoHome,
+  prepayCeoMortgage,
+  payOffCeoMortgage,
+  getCeoHomeTier,
+  CEO_LIFESTYLE_PURCHASES
+} from './modules/CeoLifestyle.js';
+import {
+  preparePersonalExpensesForMonth,
+  takeOwnerDrawFraction,
+  donateFromPersonalBank,
+  assertCeoNetWorthGate,
+  depositPersonalInvestment,
+  withdrawPersonalInvestment,
+  personalInvestmentBalance,
+  payCeoPersonalTaxFromBank
+} from './modules/CeoEconomics.js';
 import {
   hireCoo,
   releaseCoo,
@@ -132,7 +160,14 @@ import {
   onDemoDayTaskCompleted,
   applyDemoDayPitchChoice
 } from './modules/XC.js';
-import { loadHubData, selectHub, addSatellite, removeSatellite, showOfficesFeedback } from './modules/Offices.js';
+import {
+  loadHubData,
+  selectHub,
+  addSatellite,
+  removeSatellite,
+  showOfficesFeedback,
+  previewSatelliteOpen
+} from './modules/Offices.js';
 import { loadAssetManifest } from './modules/Assets.js';
 import { dismissTutorialStep } from './modules/Tutorial.js';
 import { recordRunInHallOfFame, renderHallOfFameBlock } from './modules/HallOfFame.js';
@@ -152,6 +187,7 @@ import {
   setCompaniesMarketSearch,
   runDueDiligence
 } from './modules/Acquisitions.js';
+import { setCompaniesSection } from './modules/Companies.js';
 import { openMonthSummaryDialog, updateMonthSummaryHeadline } from './modules/MonthSummary.js';
 import { copyRunExportToClipboard } from './modules/RunExport.js';
 import {
@@ -313,6 +349,23 @@ function handleCompleteTask(instanceId) {
     const tax = completeTaxFilingTask(sessionState);
     if (!tax.ok) {
       showDeskFeedback(tax.reason || 'Cannot file taxes.', true);
+      return;
+    }
+    const rolled = rollTaskOutcome(def, sessionState);
+    applyTaskOutcome(sessionState, def, rolled);
+    const result = completeTaskInstance(sessionState, instanceId, def, rolled);
+    if (!result.ok) return;
+    appendLog(sessionState, tax.summary);
+    showDeskFeedback(tax.summary);
+    playUiClick();
+    refresh();
+    return;
+  }
+
+  if (def.ceoPersonalTaxFiling) {
+    const tax = completeCeoPersonalTaxFilingTask(sessionState, payCeoPersonalTaxFromBank);
+    if (!tax.ok) {
+      showDeskFeedback(tax.reason || 'Cannot file personal taxes.', true);
       return;
     }
     const rolled = rollTaskOutcome(def, sessionState);
@@ -503,6 +556,23 @@ function handleFinalizeStaff() {
   }
   appendLog(sessionState, 'Staffing plan finalized for payroll.');
   showPeopleFeedback('Staffing finalized — month-end payroll uses these counts.');
+  refresh();
+}
+
+async function handleAutoStaffing(direction) {
+  if (!sessionState || sessionState.flags?.gameOver) return;
+  showPeopleFeedback(
+    shouldUseNarrativeAi() ? 'Planning headcount with AI…' : 'Calculating headcount from runway and cap…'
+  );
+  const result = await autoAdjustStaffingHeadcount(sessionState, direction);
+  if (!result.ok) {
+    showPeopleFeedback(result.reason || 'Could not adjust staffing.', true);
+    refresh();
+    return;
+  }
+  appendLog(sessionState, result.summary);
+  showPeopleFeedback(`${result.summary} Review draft counts, then finalize.`);
+  playUiClick();
   refresh();
 }
 
@@ -853,10 +923,24 @@ function handleSelectHub() {
   refresh();
 }
 
+function paintSatelliteOpenPreview() {
+  const preview = document.getElementById('satellite-open-preview');
+  if (!preview) return;
+  const cityId = document.getElementById('satellite-template')?.value;
+  const sizeId = document.getElementById('satellite-size')?.value ?? 'medium';
+  if (!cityId) {
+    preview.textContent = '';
+    return;
+  }
+  const line = previewSatelliteOpen(cityId, sizeId);
+  preview.textContent = line ? `Preview: ${line}` : '';
+}
+
 function handleAddSatellite() {
   if (!sessionState) return;
   const select = document.getElementById('satellite-template');
-  const result = addSatellite(sessionState, select?.value);
+  const sizeSelect = document.getElementById('satellite-size');
+  const result = addSatellite(sessionState, select?.value, sizeSelect?.value ?? 'medium');
   if (!result.ok) {
     showOfficesFeedback(result.reason, true);
     refresh();
@@ -864,9 +948,11 @@ function handleAddSatellite() {
   }
   appendLog(
     sessionState,
-    `Opened ${result.entry.label} satellite (+${result.entry.seats} seats, ${formatMoney(result.entry.rentMonthly)}/mo).`
+    `Opened ${result.entry.sizeLabel ?? 'Medium'} ${result.entry.label} satellite (+${result.entry.seats} seats, ${formatMoney(result.entry.rentMonthly)}/mo).`
   );
-  showOfficesFeedback(`Opened ${result.entry.label} — this city cannot be opened again this run.`);
+  showOfficesFeedback(
+    `Opened ${result.entry.sizeLabel} ${result.entry.label} (+${result.entry.seats} seats, ${formatMoney(result.entry.rentMonthly)}/mo).`
+  );
   refresh();
 }
 
@@ -915,6 +1001,16 @@ function bindGameInteractions() {
       return;
     }
 
+    if (e.target.id === 'btn-desk-auto-lineup' && sessionState) {
+      const result = autoSelectRecommendedLineup(sessionState);
+      if (!result.ok) showDeskFeedback(result.reason || 'Could not auto-pick.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showDeskFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     if (e.target.id === 'btn-confirm-task-lineup' && sessionState) {
       const result = confirmTaskLineup(sessionState);
       if (!result.ok) showDeskFeedback(result.reason, true);
@@ -943,39 +1039,67 @@ function bindGameInteractions() {
 
     const buyAllSideBtn = e.target.closest('[data-buy-all-side]');
     if (buyAllSideBtn && sessionState) {
-      const result = runAllRemainingSideTasks(sessionState, ['product', 'growth', 'brand', 'both']);
-      if (!result.ok) {
-        setGameFeedback(result.reason || 'Could not buy side plays.', true);
+      void (async () => {
+        const result = runAllRemainingSideTasks(sessionState, ['product', 'growth', 'brand', 'both']);
+        if (!result.ok) {
+          setGameFeedback(result.reason || 'Could not buy side plays.', true);
+          refresh();
+          return;
+        }
+        appendLog(
+          sessionState,
+          `Growth: ran ${result.count} side play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}.`
+        );
         refresh();
-        return;
-      }
-      appendLog(
-        sessionState,
-        `Growth: ran ${result.count} side play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}.`
-      );
-      setGameFeedback(
-        `Ran ${result.count} side play${result.count === 1 ? '' : 's'} (buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}).`
-      );
-      refresh();
+        await openSidePlayBulkOutcomeDialog({
+          count: result.count,
+          totalCost: result.totalCost,
+          totalBuzz: result.totalBuzz,
+          totalProduct: result.totalProduct,
+          titles: (result.launched ?? []).map((r) => r.action?.label).filter(Boolean)
+        });
+        setGameFeedback(
+          `Ran ${result.count} side play${result.count === 1 ? '' : 's'} (buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}).`
+        );
+        refresh();
+      })();
       return;
     }
 
     const buyAllGrowthBtn = e.target.closest('[data-buy-all-growth]');
     if (buyAllGrowthBtn && sessionState) {
-      const result = runAllRemainingGrowthCampaigns(sessionState);
-      if (!result.ok) {
-        setGameFeedback(result.reason || 'Could not buy growth plays.', true);
+      void (async () => {
+        const result = runAllRemainingGrowthCampaigns(sessionState);
+        if (!result.ok) {
+          setGameFeedback(result.reason || 'Could not buy growth plays.', true);
+          refresh();
+          return;
+        }
+        appendLog(
+          sessionState,
+          `Growth: bought ${result.count} paid play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, booked ${formatMoney(result.totalRevenue)}.`
+        );
         refresh();
-        return;
-      }
-      appendLog(
-        sessionState,
-        `Growth: bought ${result.count} paid play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, booked ${formatMoney(result.totalRevenue)}.`
-      );
-      setGameFeedback(
-        `Launched ${result.count} growth campaign${result.count === 1 ? '' : 's'} (${formatMoney(result.totalRevenue)} booked).`
-      );
-      refresh();
+        const core = getCoreTaskRevenueMult(sessionState);
+        const tune = getSandboxTuningMult(sessionState);
+        const total = getTaskRevenueMultiplierPreview(sessionState);
+        const multLine =
+          sessionState.mode === 'sandbox' && tune !== 1
+            ? `${core.toFixed(2)}× progression × ${tune.toFixed(2)}× sandbox = ${total.toFixed(2)}× on these payouts.`
+            : `${total.toFixed(2)}× effective multiplier on these payouts.`;
+        await openGrowthCampaignBulkOutcomeDialog({
+          count: result.count,
+          totalCost: result.totalCost,
+          totalRevenue: result.totalRevenue,
+          totalBuzz: result.totalBuzz,
+          titles: (result.launched ?? []).map((r) => r.def?.title).filter(Boolean),
+          multLine
+        });
+        setGameFeedback(
+          `Launched ${result.count} growth campaign${result.count === 1 ? '' : 's'} (${formatMoney(result.totalRevenue)} booked).`
+        );
+        refresh();
+      })();
       return;
     }
 
@@ -1039,17 +1163,30 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const companiesTab = e.target.closest('[data-companies-tab]');
+    if (companiesTab && sessionState) {
+      setCompaniesSection(sessionState, companiesTab.getAttribute('data-companies-tab'));
+      refresh();
+      return;
+    }
+    const ceoTab = e.target.closest('[data-ceo-tab]');
+    if (ceoTab && sessionState) {
+      setCeoSection(sessionState, ceoTab.getAttribute('data-ceo-tab'));
+      refresh();
+      return;
+    }
     const bonusBtn = e.target.closest('[data-company-bonus]');
     if (bonusBtn && sessionState) {
       const result = payCompanyWideBonus(sessionState, bonusBtn.getAttribute('data-company-bonus'));
       if (!result.ok) showPeopleFeedback(result.reason, true);
       else {
+        const annualTag = result.annualMode ? ' annual' : '';
         appendLog(
           sessionState,
-          `People: ${result.pct}% company bonus — ${formatMoney(result.pool)} (${formatMoney(result.ceoShare)} to CEO bank).`
+          `People: ${result.pct}%${annualTag} company bonus — ${formatMoney(result.pool)} (${formatMoney(result.ceoShare)} to CEO bank).`
         );
         showPeopleFeedback(
-          `${result.pct}% bonus paid (${formatMoney(result.pool)}). CEO received ${formatMoney(result.ceoShare)} in personal bank.`
+          `${result.pct}%${annualTag} bonus paid (${formatMoney(result.pool)}). CEO received ${formatMoney(result.ceoShare)} in personal bank.`
         );
       }
       refresh();
@@ -1084,7 +1221,7 @@ function bindGameInteractions() {
       else {
         appendLog(
           sessionState,
-          `Cap table: option pool +${result.pctPoints}% FD (${(result.sharesAdded ?? 0).toLocaleString()} shares, now ${result.poolPct}%).`
+          `Cap table: option pool +${result.pctPoints}% (${(result.sharesAdded ?? 0).toLocaleString()} shares, now ${result.poolPct}% FD).`
         );
         showPeopleFeedback(`Option pool expanded +${result.pctPoints}% (now ${result.poolPct}%).`);
       }
@@ -1116,6 +1253,14 @@ function bindGameInteractions() {
 
     if (e.target.id === 'btn-finalize-staff') {
       handleFinalizeStaff();
+      return;
+    }
+    if (e.target.id === 'btn-staff-auto-increase') {
+      void handleAutoStaffing('increase');
+      return;
+    }
+    if (e.target.id === 'btn-staff-auto-decrease') {
+      void handleAutoStaffing('decrease');
       return;
     }
     if (e.target.id === 'btn-hire-coo' && sessionState) {
@@ -1186,6 +1331,51 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const homeCashBtn = e.target.closest('[data-ceo-home-cash]');
+    if (homeCashBtn && sessionState) {
+      const tierId = homeCashBtn.getAttribute('data-ceo-home-cash');
+      const tier = getCeoHomeTier(tierId);
+      const gate = assertCeoNetWorthGate(sessionState, tier?.minNetWorth);
+      const result = purchaseCeoHomeCash(sessionState, tierId, gate);
+      if (!result.ok) showCeoFeedback(result.reason || 'Purchase failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    const homeMortgageBtn = e.target.closest('[data-ceo-home-mortgage]');
+    if (homeMortgageBtn && sessionState) {
+      const tierId = homeMortgageBtn.getAttribute('data-ceo-home-mortgage');
+      const tier = getCeoHomeTier(tierId);
+      const gate = assertCeoNetWorthGate(sessionState, tier?.minNetWorth);
+      const result = purchaseCeoHomeMortgage(sessionState, tierId, gate);
+      if (!result.ok) showCeoFeedback(result.reason || 'Mortgage declined.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    const lifestyleBtn = e.target.closest('[data-ceo-lifestyle]');
+    if (lifestyleBtn && sessionState) {
+      const purchaseId = lifestyleBtn.getAttribute('data-ceo-lifestyle');
+      const def = CEO_LIFESTYLE_PURCHASES.find((p) => p.id === purchaseId);
+      const gate = assertCeoNetWorthGate(sessionState, def?.minNetWorth);
+      const result = purchaseCeoLifestyle(sessionState, purchaseId, gate);
+      if (!result.ok) showCeoFeedback(result.reason || 'Purchase failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
     const drawBtn = e.target.closest('[data-owner-draw]');
     if (drawBtn && sessionState) {
       const result = takeOwnerDraw(sessionState, drawBtn.getAttribute('data-owner-draw'));
@@ -1193,6 +1383,129 @@ function bindGameInteractions() {
       else {
         appendLog(sessionState, result.summary);
         showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const drawPctBtn = e.target.closest('[data-owner-draw-pct]');
+    if (drawPctBtn && sessionState) {
+      const result = takeOwnerDrawFraction(sessionState, drawPctBtn.getAttribute('data-owner-draw-pct'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Draw failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-sell-ceo-home' && sessionState) {
+      const result = sellCeoHome(sessionState);
+      if (!result.ok) showCeoFeedback(result.reason || 'Sale failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    const personalGiveBtn = e.target.closest('[data-ceo-personal-give]');
+    if (personalGiveBtn && sessionState) {
+      const result = donateFromPersonalBank(
+        sessionState,
+        personalGiveBtn.getAttribute('data-ceo-personal-give')
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-ceo-personal-give-custom' && sessionState) {
+      const input = document.getElementById('ceo-personal-give-input');
+      const result = donateFromPersonalBank(sessionState, input?.value);
+      if (!result.ok) showCeoFeedback(result.reason || 'Gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const investDepositBtn = e.target.closest('[data-ceo-invest-deposit]');
+    if (investDepositBtn && sessionState) {
+      const result = depositPersonalInvestment(
+        sessionState,
+        investDepositBtn.getAttribute('data-ceo-invest-deposit')
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Deposit failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-ceo-invest-deposit' && sessionState) {
+      const input = document.getElementById('ceo-invest-deposit-input');
+      const result = depositPersonalInvestment(sessionState, input?.value);
+      if (!result.ok) showCeoFeedback(result.reason || 'Deposit failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const investWithdrawBtn = e.target.closest('[data-ceo-invest-withdraw]');
+    if (investWithdrawBtn && sessionState) {
+      let amount = investWithdrawBtn.getAttribute('data-ceo-invest-withdraw');
+      if (amount === 'max') amount = personalInvestmentBalance(sessionState);
+      const result = withdrawPersonalInvestment(sessionState, amount);
+      if (!result.ok) showCeoFeedback(result.reason || 'Withdrawal failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const mortgagePrepayBtn = e.target.closest('[data-ceo-mortgage-prepay]');
+    if (mortgagePrepayBtn && sessionState) {
+      const result = prepayCeoMortgage(
+        sessionState,
+        mortgagePrepayBtn.getAttribute('data-ceo-mortgage-prepay')
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Prepay failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-payoff-ceo-mortgage' && sessionState) {
+      const result = payOffCeoMortgage(sessionState);
+      if (!result.ok) showCeoFeedback(result.reason || 'Payoff failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-ceo-mortgage-prepay-custom' && sessionState) {
+      const input = document.getElementById('ceo-mortgage-prepay-input');
+      const result = prepayCeoMortgage(sessionState, input?.value);
+      if (!result.ok) showCeoFeedback(result.reason || 'Prepay failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
       }
       refresh();
       return;
@@ -1469,6 +1782,17 @@ function bindGameInteractions() {
   });
 
   app?.addEventListener('change', (e) => {
+    if (e.target.id === 'satellite-template' || e.target.id === 'satellite-size') {
+      paintSatelliteOpenPreview();
+    }
+  });
+
+  app?.addEventListener('change', (e) => {
+    if (e.target.matches('[data-company-bonus-annual]') && sessionState) {
+      setCompanyBonusAnnualMode(sessionState, e.target.checked);
+      refresh();
+      return;
+    }
     if (e.target.matches('[data-reinvest-program-for]')) {
       handleReinvestProgramChange(e.target);
       return;
@@ -1509,6 +1833,19 @@ function bindGameInteractions() {
         setGameFeedback(`Pivoted to ${result.newLabel}. Fresh desk lineup — check News.`);
       } else {
         setGameFeedback(result.reason || 'Could not pivot.', true);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'loan-draw-form') {
+      e.preventDefault();
+      if (!sessionState) return;
+      const raw = e.target.elements?.amount?.value ?? document.getElementById('loan-draw-custom')?.value;
+      const result = requestLoanDraw(sessionState, raw);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Loan declined.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
       }
       refresh();
     }

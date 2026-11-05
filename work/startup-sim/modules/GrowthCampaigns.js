@@ -6,7 +6,7 @@ import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { ty
 import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json' with { type: 'json' };
 import bundledPublicLate from '../data/growth-campaigns-public-late.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
-import { progressionTier } from './ProgressionEconomy.js';
+import { progressionTier, progressionTierForUnlocks } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
 import { accrueFiscalRevenue } from './CorporateTax.js';
 import { eraBaseRevenueScaleForCampaign } from './ProgressionEconomy.js';
@@ -99,7 +99,7 @@ function mergeUniqueCampaignOffers(offered, def, offerCount) {
 }
 
 function eligibleCampaignPool(state) {
-  const tier = progressionTier(state);
+  const tier = progressionTierForUnlocks(state);
   return getGrowthCampaigns().filter(
     (c) =>
       campaignCategoryAllowed(c, state) &&
@@ -172,7 +172,7 @@ export function availableCampaigns(state) {
 export function runGrowthCampaign(state, campaignId) {
   const def = getGrowthCampaigns().find((c) => c.id === campaignId);
   if (!def) return { ok: false, reason: 'Unknown campaign.' };
-  const tier = progressionTier(state);
+  const tier = progressionTierForUnlocks(state);
   if (!campaignCategoryAllowed(def, state)) {
     return { ok: false, reason: 'Campaign not available for your industry.' };
   }
@@ -297,21 +297,28 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
-export function renderGrowthCampaignsBlock(state) {
+export function renderGrowthCampaignsBlock(state, options = {}) {
   const campaigns = availableCampaigns(state);
-  if (!campaigns.length) {
-    return '<p class="fine-print">No paid growth plays unlocked at your current stage — keep scaling funding tier to unlock more of the campaign bank.</p>';
-  }
   const bankSize = growthCampaignCatalogSize();
   const mult = getTaskRevenueMultiplierPreview(state);
   const slots = growthCampaignSlots(state);
   const remaining = growthCampaignsRemaining(state);
   const slotLabel =
-    remaining === Infinity
-      ? 'Unlimited'
-      : `${remaining}/${formatMonthlySideTaskLimit(slots)}`;
+    options.slotLabel ??
+    (remaining === Infinity ? 'Unlimited' : `${remaining}/${formatMonthlySideTaskLimit(slots)}`);
   const rosterSize = state.growth?.monthCampaignOffers?.length ?? campaigns.length;
-  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> on this month&apos;s roster (${rosterSize} offered, ${bankSize} in bank, ${GROWTH_CAMPAIGN_COOLDOWN_MONTHS}-month cooldown — does not use desk tasks).</p>`;
+  const launched = options.launchedThisMonth ?? state.growth?.campaignsThisMonth?.length ?? 0;
+
+  if (!campaigns.length) {
+    return `<section class="finance-section growth-channel-section growth-channel-section--paid">
+      <div class="finance-section-head growth-section-head">
+        <h3 class="finance-section-title">Paid campaigns</h3>
+        <span class="growth-channel-badge growth-channel-badge--inline growth-channel-badge--paid">Campaign meter · ${escapeHtml(slotLabel)}</span>
+      </div>
+      <p class="fine-print">No paid campaigns unlocked yet — keep scaling funding tier (${bankSize} in bank).</p>
+    </section>`;
+  }
+
   const sorted = [...campaigns].sort((a, b) => (b.revenue?.[1] ?? 0) - (a.revenue?.[1] ?? 0));
   const cards = sorted
     .map((c) => {
@@ -325,12 +332,20 @@ export function renderGrowthCampaignsBlock(state) {
         c.stockPct && isPublicCompany(state)
           ? ` · stock ${c.stockPct > 0 ? '+' : ''}${Math.round(Number(c.stockPct) * 100)}%`
           : '';
-      return `<div class="finance-action">
+      return `<div class="finance-action growth-play-card growth-play-card--paid">
         <p><strong>${escapeHtml(c.title)}</strong>${whaleTag} — ${escapeHtml(c.description)}</p>
-        <p class="fine-print">Cost ${formatMoney(c.cost)} · typical book ${formatMoney(r0)}–${formatMoney(r1)} at ${mult.toFixed(2)}× · buzz +${c.buzz ?? 0}${stockHint} · no desk slot</p>
-        <button type="button" class="btn btn-ghost btn-small" data-run-growth="${escapeHtml(c.id)}">Launch</button>
+        <p class="fine-print">Cost ${formatMoney(c.cost)} · typical book ${formatMoney(r0)}–${formatMoney(r1)} at ${mult.toFixed(2)}× · buzz +${c.buzz ?? 0}${stockHint}</p>
+        <button type="button" class="btn btn-primary btn-small" data-run-growth="${escapeHtml(c.id)}">Launch campaign</button>
       </div>`;
     })
     .join('');
-  return `${slotNote}<h3 class="log-head">Paid growth campaigns</h3>${cards}`;
+
+  return `<section class="finance-section growth-channel-section growth-channel-section--paid" aria-labelledby="growth-paid-campaigns-heading">
+    <div class="finance-section-head growth-section-head">
+      <h3 class="finance-section-title" id="growth-paid-campaigns-heading">Paid campaigns</h3>
+      <span class="growth-channel-badge growth-channel-badge--inline growth-channel-badge--paid">Campaign meter · ${escapeHtml(slotLabel)}</span>
+    </div>
+    <p class="fine-print">${launched ? `${launched} launched this month · ` : ''}${campaigns.length} on roster (${rosterSize} offered · ${bankSize} in bank · ${GROWTH_CAMPAIGN_COOLDOWN_MONTHS}-mo cooldown).</p>
+    <div class="growth-play-list">${cards}</div>
+  </section>`;
 }

@@ -4,11 +4,14 @@ import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { closeFiscalYearOnDecember } from './CorporateTax.js';
+import { closeCeoPersonalTaxYearOnDecember } from './CeoPersonalTax.js';
 import { serviceLoanAtMonthEnd } from './BankLoan.js';
 import { settleRevenueAdvanceAtMonthEnd } from './RevenueAdvance.js';
 import {
   recordCeoSalaryForMonth,
   settlePersonalExpensesAtMonthEnd,
+  recordCeoNetWorthSnapshot,
+  settlePersonalInvestmentsAtMonthEnd,
   preparePersonalExpensesForMonth
 } from './CeoEconomics.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
@@ -130,6 +133,10 @@ export function endMonth(state) {
   for (const line of settlePersonalExpensesAtMonthEnd(state)) {
     appendLog(state, line);
   }
+  for (const line of settlePersonalInvestmentsAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
+  recordCeoNetWorthSnapshot(state);
   for (const line of settleRevenueAdvanceAtMonthEnd(state)) {
     appendLog(state, line);
   }
@@ -228,6 +235,13 @@ export function endMonth(state) {
       `Fiscal ${closedYear} closed — revenue ${formatMoney(closedFy.revenue)}, expenses ${formatMoney(closedFy.expenses)}, profit ${formatMoney(closedFy.profit)}.`
     );
   }
+  const closedPersonalTax = closeCeoPersonalTaxYearOnDecember(state, closedYear, closedMonthIndex);
+  if (closedPersonalTax) {
+    appendLog(
+      state,
+      `Personal tax year ${closedYear} closed — taxable income ${formatMoney(closedPersonalTax.income)} (April filing).`
+    );
+  }
   archiveCurrentNews(state);
   advanceCalendarMonth(state);
   startMonth(state);
@@ -256,5 +270,7 @@ export function completeTaskInstance(state, instanceId, taskDef, rolled) {
 
   task.status = 'done';
   state.calendar.tasksCompleted = (state.calendar.tasksCompleted ?? 0) + 1;
+  if (!state.meta) state.meta = {};
+  state.meta.deskTasksLifetime = (state.meta.deskTasksLifetime ?? 0) + 1;
   return { ok: true };
 }

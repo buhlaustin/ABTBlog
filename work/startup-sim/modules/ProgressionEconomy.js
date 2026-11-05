@@ -1,9 +1,34 @@
 import { getArr, getWorkspaceTier, WORKSPACE_TIER } from './Workspace.js';
 import { isPublicCompany } from './IPO.js';
 
+/** True when the company listed after Series A without closing Series B. */
+export function skippedSeriesBToIpo(state) {
+  return Boolean(
+    state.flags?.seriesAClosed &&
+      !state.flags?.seriesBClosed &&
+      (state.flags?.ipoFiled || isPublicCompany(state))
+  );
+}
+
+/**
+ * Tier for catalog unlock gates (desk, growth, perks).
+ * IPO on the Series A → public path satisfies "Series B or later" (tierMin ≥ 4) even without a B round.
+ */
+export function progressionTierForUnlocks(state) {
+  const tier = progressionTier(state);
+  if (skippedSeriesBToIpo(state) && tier < 4) return 7;
+  return tier;
+}
+
+export function meetsProgressionTierMin(state, tierMin = 0) {
+  const required = tierMin ?? 0;
+  if (required <= 0) return true;
+  return progressionTierForUnlocks(state) >= required;
+}
+
 /** 0=pre-scale … 7=public — gates task `tier` bands in tasks.json. */
 export function progressionTier(state) {
-  if (state.flags?.ipoFiled) return 7;
+  if (state.flags?.ipoFiled || isPublicCompany(state)) return 7;
   if (state.offices?.hubId) return 6;
   if (getWorkspaceTier(state) === WORKSPACE_TIER.CAMPUS) return 5;
   if (state.flags?.seriesFClosed) return 6;

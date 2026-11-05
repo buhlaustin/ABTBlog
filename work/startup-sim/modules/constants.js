@@ -69,12 +69,29 @@ export function createInitialPublicMarket() {
   };
 }
 
-/** Whole-dollar amounts with thousands separators (no $1.2M shorthand). */
+function formatCompactDollars(value, divisor, minFraction, maxFraction, suffix) {
+  const n = value / divisor;
+  const formatted = Math.abs(n).toLocaleString('en-US', {
+    minimumFractionDigits: minFraction,
+    maximumFractionDigits: maxFraction
+  });
+  return n < 0 ? `-$${formatted}${suffix}` : `$${formatted}${suffix}`;
+}
+
+/** Comma-grouped dollars; compact k/M/B/T only at very large sizes for readability. */
 export function formatMoney(n) {
   const v = Math.round(Number(n) || 0);
-  if (v === 0) return '$0';
+  const abs = Math.abs(v);
+  if (abs === 0) return '$0';
+  const signed = v < 0 ? -abs : abs;
+  if (abs >= 1_000_000_000_000) {
+    return formatCompactDollars(signed, 1_000_000_000_000, 2, 2, 'T');
+  }
+  if (abs >= 1_000_000_000) {
+    return formatCompactDollars(signed, 1_000_000_000, 2, 2, 'B');
+  }
   const prefix = v < 0 ? '-$' : '$';
-  return prefix + Math.abs(v).toLocaleString('en-US');
+  return prefix + abs.toLocaleString('en-US');
 }
 
 /** Active desk slots to complete each month. */

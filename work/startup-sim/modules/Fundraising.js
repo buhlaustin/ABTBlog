@@ -20,9 +20,7 @@ import {
   renderFinanceSummary,
   getTaskRevenueMultiplierPreview,
   getCoreTaskRevenueMult,
-  getSandboxTuningMult,
-  allTierRevenuePotentialRows,
-  estimateEraRevenuePotential
+  getSandboxTuningMult
 } from './Finance.js';
 import { progressionTierLabel } from './ProgressionEconomy.js';
 import { formatMoney } from './constants.js';
@@ -48,7 +46,11 @@ import {
   computeCreditLimit,
   loanOutstanding,
   loanPaymentMonthly,
-  requestLoanDraw,
+  loanHeadroom,
+  loanMinimumDraw,
+  loanDrawPresets,
+  loanPrepayPresets,
+  loanDrawAmountForHeadroomFraction,
   bankApprovalBreakdown,
   creditScoreLabel,
   prepayLoan,
@@ -119,39 +121,25 @@ function renderPricedRoundBlock(state, preview, flagName, buttonId, label) {
   </div>`;
 }
 
-function renderTierRevenuePotentialSection(state) {
-  const era = estimateEraRevenuePotential(state);
-  const rows = allTierRevenuePotentialRows(state);
-  const body = rows
-    .map((r) => {
-      const rowClass = r.isCurrent ? ' class="tier-revenue-current"' : '';
-      const whale = r.deskWhale
-        ? `<br><span class="fine-print">Whale desk base ${formatMoney(r.deskWhale[0])}–${formatMoney(r.deskWhale[1])}</span>`
-        : '';
-      return `<tr${rowClass}>
-        <td><strong>${escapeHtml(r.label)}</strong><br><span class="fine-print">${escapeHtml(r.arrGuide)}</span></td>
-        <td>${formatMoney(r.deskBase[0])}–${formatMoney(r.deskBase[1])}${whale}</td>
-        <td>${formatMoney(r.growthBase[0])}–${formatMoney(r.growthBase[1])}</td>
-        <td>${formatMoney(r.deskPayout[0])}–${formatMoney(r.deskPayout[1])}</td>
-        <td>${formatMoney(r.growthPayout[0])}–${formatMoney(r.growthPayout[1])}</td>
-      </tr>`;
-    })
-    .join('');
-  return `<section class="tier-revenue-panel">
-    <h3 class="log-head">Revenue potential by scale era</h3>
-    <p class="fine-print">Native base ranges for tasks/campaigns authored at each era, and estimated cash per play at your current <strong>${era.mult.toFixed(2)}×</strong> rev×. Older tasks that reappear late-game also get an <strong>era base scale</strong> (garage $ → public $) before rev× — not the same payout twice.</p>
-    <div class="table-scroll"><table class="data-table tier-revenue-table">
-      <thead><tr><th>Era</th><th>Desk base</th><th>Growth base</th><th>Desk @ rev×</th><th>Growth @ rev×</th></tr></thead>
-      <tbody>${body}</tbody>
-    </table></div>
-  </section>`;
-}
-
 function escapeHtml(s) {
   return String(s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+function financeStatCard(label, value, { hero = false, tone = null } = {}) {
+  const classes = ['finance-stat-card'];
+  if (hero) classes.push('finance-stat-card--hero');
+  if (tone === 'pos') classes.push('finance-stat-card--pos');
+  if (tone === 'neg') classes.push('finance-stat-card--neg');
+  return `<div class="${classes.join(' ')}"><span class="finance-stat-label">${escapeHtml(label)}</span><span class="finance-stat-value">${value}</span></div>`;
+}
+
+function profitTone(n) {
+  if (n > 0) return 'pos';
+  if (n < 0) return 'neg';
+  return null;
 }
 
 export function renderFinancePanel(container, state) {
@@ -263,24 +251,47 @@ export function renderFinancePanel(container, state) {
   const creditLimit = computeCreditLimit(state);
   const loanBal = loanOutstanding(state);
   const loanPay = loanPaymentMonthly(state);
-  const breakdown = bankApprovalBreakdown(state, 25_000);
+  const headroom = loanHeadroom(state);
+  const minDraw = loanMinimumDraw(state);
+  const sampleDraw =
+    headroom > 0 ? loanDrawAmountForHeadroomFraction(state, 0.25) : Math.min(25_000, creditLimit);
+  const breakdown = bankApprovalBreakdown(state, sampleDraw);
   const score = breakdown.score;
   const factorLines = breakdown.factors
     .map((f) => `<li>${escapeHtml(f.label)}: ${f.pts >= 0 ? '+' : ''}${f.pts} bp</li>`)
     .join('');
+  const drawPresets = loanDrawPresets(state);
+  const drawButtons = drawPresets
+    .map(
+      (p) =>
+        `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-loan-draw="${p.amount}">${escapeHtml(p.label)} · ${formatMoney(p.amount)}</button>`
+    )
+    .join('');
+  const prepayButtons = loanPrepayPresets(state)
+    .map(
+      (p) =>
+        `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-loan-prepay="${p.amount}">${escapeHtml(p.label)} · ${formatMoney(p.amount)}</button>`
+    )
+    .join('');
   const loanBlock = `<div class="finance-action loan-panel">
     <p><strong>Bank line of credit</strong> — draw subject to approval; repay monthly as overhead.</p>
-    <p class="fine-print">Limit ${formatMoney(creditLimit)} · Headroom ${formatMoney(breakdown.headroom)} · Outstanding ${formatMoney(loanBal)} · Debt service ${formatMoney(loanPay)}/mo · APR ${Math.round((state.finance?.loan?.apr ?? 0.14) * 100)}%</p>
-    <p class="fine-print">Credit score <strong>${score}</strong> (${escapeHtml(creditScoreLabel(score))}) · ~${Math.round(breakdown.odds * 100)}% approval on $25k draw</p>
+    <p class="fine-print">Limit ${formatMoney(creditLimit)} · Headroom ${formatMoney(headroom)} · Outstanding ${formatMoney(loanBal)} · Debt service ${formatMoney(loanPay)}/mo · APR ${Math.round((state.finance?.loan?.apr ?? 0.14) * 100)}%</p>
+    <p class="fine-print">Credit score <strong>${score}</strong> (${escapeHtml(creditScoreLabel(score))}) · ~${Math.round(breakdown.odds * 100)}% approval on ${formatMoney(sampleDraw)} draw (25% of headroom)</p>
     <details class="loan-breakdown"><summary>Approval breakdown</summary><ul class="instrument-list">${factorLines}</ul></details>
-    <div class="stock-actions">
-      <button type="button" class="btn btn-small" data-loan-draw="25000" ${loanBal + 25_000 > creditLimit ? 'disabled' : ''}>Draw $25k</button>
-      <button type="button" class="btn btn-small" data-loan-draw="50000" ${loanBal + 50_000 > creditLimit ? 'disabled' : ''}>Draw $50k</button>
-      <button type="button" class="btn btn-small" data-loan-draw="100000" ${loanBal + 100_000 > creditLimit ? 'disabled' : ''}>Draw $100k</button>
-      ${loanBal > 0 ? `<button type="button" class="btn btn-ghost btn-small" data-loan-prepay="10000">Prepay $10k</button>
-      <button type="button" class="btn btn-ghost btn-small" data-loan-prepay="25000">Prepay $25k</button>` : ''}
-      ${state.flags?.seedRoundClosed && loanBal > 0 && !state.finance?.loan?.refinancedAtSeed ? `<button type="button" class="btn btn-ghost btn-small" id="btn-loan-refinance">Refinance at seed rate</button>` : ''}
-    </div>
+    <p class="fine-print">Quick draws are <strong>percent of remaining headroom</strong> (25 / 50 / 75 / Max). Min draw ${formatMoney(minDraw)}.</p>
+    <div class="benefits-preset-row loan-draw-presets">${drawButtons || '<p class="fine-print">Line fully drawn — prepay to free headroom.</p>'}</div>
+    <form id="loan-draw-form" class="finance-inline-form loan-draw-form">
+      <label class="fine-print">Custom draw
+        <input type="number" id="loan-draw-custom" name="amount" min="${minDraw}" max="${headroom}" step="1000" placeholder="${headroom > 0 ? formatMoney(minDraw) : '0'}" ${headroom <= 0 ? 'disabled' : ''} />
+      </label>
+      <button type="submit" class="btn btn-primary btn-small" ${headroom <= 0 ? 'disabled' : ''}>Request draw</button>
+    </form>
+    ${
+      loanBal > 0
+        ? `<div class="benefits-preset-row loan-prepay-presets">${prepayButtons}</div>
+      ${state.flags?.seedRoundClosed && !state.finance?.loan?.refinancedAtSeed ? `<button type="button" class="btn btn-ghost btn-small" id="btn-loan-refinance">Refinance at seed rate</button>` : ''}`
+        : ''
+    }
     ${renderLoanHistoryList(state)}
   </div>`;
 
@@ -328,96 +339,141 @@ export function renderFinancePanel(container, state) {
       ? `${progressionTierLabel(state)}: ${coreMult.toFixed(2)}× progression × ${tuneMult.toFixed(2)}× sandbox = ${revMult.toFixed(2)}× on desk & Growth payouts.`
       : `${progressionTierLabel(state)}: ${revMult.toFixed(2)}× on desk & Growth payouts (rounds + HQ + staff).`;
 
-  const priorFyBlock = sum.fiscalShowPrior
-    ? `<div class="summary-grid fiscal-prior">
-      <div class="summary-grid-span"><span class="stat-label">Prior FY ${sum.fiscalPriorYear ?? '—'} (Jan–Dec)</span></div>
-      <div><span class="stat-label">Revenue</span><span class="stat-value">${sum.fiscalPriorRevenueLabel}</span></div>
-      <div><span class="stat-label">Expenses</span><span class="stat-value">${sum.fiscalPriorExpensesLabel}</span></div>
-      <div><span class="stat-label">Profit</span><span class="stat-value">${sum.fiscalPriorProfitLabel}</span></div>
-    </div>`
+  const priorFyLine = sum.fiscalShowPrior
+    ? `<p class="fine-print finance-details-note">Prior FY ${sum.fiscalPriorYear ?? '—'}: ${sum.fiscalPriorRevenueLabel} rev · ${sum.fiscalPriorExpensesLabel} exp · ${sum.fiscalPriorProfitLabel} profit</p>`
     : '';
 
-  const taxAprilNote =
-    sum.fiscalTaxLiability > 0 && !sum.fiscalTaxPaid
-      ? `<p class="fine-print error">April taxes: ${sum.fiscalTaxLiabilityLabel} due on fiscal revenue — mandatory desk task (cash only).</p>`
-      : sum.fiscalTaxPaid && (state.calendar?.monthIndex ?? 0) === 4
-        ? `<p class="fine-print">Corporate taxes filed for ${state.calendar?.year ?? ''}.</p>`
-        : '';
+  const corpTaxDue = sum.fiscalTaxLiability > 0 && !sum.fiscalTaxPaid;
+  const ceoTaxDue = sum.ceoPersonalTaxFilingRequired && !sum.ceoPersonalTaxPaid;
+  let taxAprilNote = '';
+  if (corpTaxDue || ceoTaxDue) {
+    const parts = [];
+    if (corpTaxDue) {
+      parts.push(`${sum.fiscalTaxLiabilityLabel} corporate (desk task · company cash)`);
+    }
+    if (ceoTaxDue) {
+      parts.push(`${sum.ceoPersonalTaxLiabilityLabel} personal (desk task · personal bank)`);
+    }
+    taxAprilNote = `<p class="finance-alert finance-alert--tax" role="status"><strong>April taxes due</strong> — ${parts.join('; ')}.</p>`;
+  } else if (
+    (sum.fiscalTaxPaid || sum.ceoPersonalTaxPaid) &&
+    (state.calendar?.monthIndex ?? 0) === 4
+  ) {
+    taxAprilNote = `<p class="finance-alert finance-alert--ok">April filings done for ${state.calendar?.year ?? ''}${sum.ceoPersonalTaxCareerPaidLabel ? ` (lifetime personal tax ${sum.ceoPersonalTaxCareerPaidLabel})` : ''}.</p>`;
+  }
 
-  const charityBlock = `<div class="finance-action">
-    <p><strong>Donate to charity</strong> — spend company cash (expense; minimum ${formatMoney(1_000)}).</p>
-    <p class="fine-print">Lifetime donated: ${sum.charityLifetimeLabel}</p>
-    <div class="btn-row">
-      <button type="button" class="btn btn-ghost btn-small" data-charity-donate="5000">Donate $5k</button>
-      <button type="button" class="btn btn-ghost btn-small" data-charity-donate="25000">Donate $25k</button>
-      <button type="button" class="btn btn-ghost btn-small" data-charity-donate="100000">Donate $100k</button>
+  const valuationLabel = state.finance.valuation ? formatMoney(state.finance.valuation) : '—';
+  const portfolioMrr = formatMoney(totalSubsidiaryMrr(state));
+
+  const charityBlock = `<section class="finance-section finance-card finance-charity">
+    <div class="finance-section-head">
+      <h3 class="finance-section-title">Charitable giving</h3>
+      <span class="fine-print">Lifetime ${sum.charityLifetimeLabel}</span>
     </div>
-    <div class="inline-form">
-      <input type="number" id="charity-donate-input" class="input input-small" min="1000" step="1000" placeholder="Custom amount" />
-      <button type="button" class="btn btn-ghost btn-small" id="btn-charity-donate-custom">Donate custom</button>
+    <p class="fine-print">Company cash only · min ${formatMoney(1_000)} · counts as expense</p>
+    <div class="finance-charity-chips">
+      <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-charity-donate="5000">${formatMoney(5_000)}</button>
+      <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-charity-donate="25000">${formatMoney(25_000)}</button>
+      <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-charity-donate="100000">${formatMoney(100_000)}</button>
     </div>
-  </div>`;
+    <div class="finance-inline-form">
+      <input type="number" id="charity-donate-input" class="input input-small" min="1000" step="1000" placeholder="Custom amount" aria-label="Custom donation amount" />
+      <button type="button" class="btn btn-ghost btn-small" id="btn-charity-donate-custom">Donate</button>
+    </div>
+  </section>`;
+
+  const fundraisingBlocks = [
+    blockNote,
+    capitalStack,
+    safeList,
+    sentimentBlock,
+    xcBlock,
+    angelBlock,
+    rbfBlock,
+    loanBlock,
+    seedBlock,
+    seriesABlock,
+    seriesBBlock,
+    renderPricedRoundBlock(state, seriesCPreview(state), 'seriesCClosed', 'btn-close-series-c', 'Series C'),
+    renderPricedRoundBlock(state, seriesDPreview(state), 'seriesDClosed', 'btn-close-series-d', 'Series D'),
+    renderPricedRoundBlock(state, seriesEPreview(state), 'seriesEClosed', 'btn-close-series-e', 'Series E'),
+    renderPricedRoundBlock(state, seriesFPreview(state), 'seriesFClosed', 'btn-close-series-f', 'Series F'),
+    renderAcceleratorsBlock(state)
+  ]
+    .filter(Boolean)
+    .join('');
 
   container.innerHTML = `
-    <p class="panel-lede">Cash from desk tasks lands right away. Payroll and rent bill when you close the month. Fundraising lives here, not on the desk.</p>
-    <p class="fine-print">${escapeHtml(multExpl)} Close rounds to jump task tiers and multiplier.</p>
-    ${renderTierRevenuePotentialSection(state)}
-    <div class="summary-grid">
-      <div><span class="stat-label">Cash</span><span class="stat-value">${sum.cashLabel}</span></div>
-      <div><span class="stat-label">Last month rev.</span><span class="stat-value">${sum.mrrLabel}</span></div>
-      <div><span class="stat-label">Portfolio MRR</span><span class="stat-value">${formatMoney(totalSubsidiaryMrr(state))}/mo</span></div>
-      <div><span class="stat-label">Overhead/mo</span><span class="stat-value">${sum.burnLabel}</span></div>
-      <div><span class="stat-label">Runway</span><span class="stat-value">${sum.runway}</span></div>
-      <div><span class="stat-label">Valuation</span><span class="stat-value">${state.finance.valuation ? formatMoney(state.finance.valuation) : '—'}</span></div>
-      <div><span class="stat-label">Location</span><span class="stat-value">${escapeHtml(state.company.location || '—')}</span></div>
-      <div><span class="stat-label">Lifetime revenue</span><span class="stat-value">${sum.lifetimeRevenueLabel}</span></div>
-      <div><span class="stat-label">Lifetime expenses</span><span class="stat-value">${sum.lifetimeExpensesLabel}</span></div>
-      <div><span class="stat-label">Lifetime profit</span><span class="stat-value">${sum.lifetimeProfitLabel}</span></div>
-      <div><span class="stat-label">Starting cash (investment)</span><span class="stat-value">${sum.initialInvestmentLabel}</span></div>
+    <div class="finance-panel">
+      <header class="finance-hero">
+        <p class="panel-lede">Desk revenue hits cash immediately; payroll and rent close with the month.</p>
+        <p class="finance-mult-chip" title="Revenue multiplier on desk and Growth">${escapeHtml(multExpl)}</p>
+      </header>
+
+      <section class="finance-kpi-row" aria-label="Cash and runway">
+        ${financeStatCard('Company cash', sum.cashLabel, { hero: true })}
+        ${financeStatCard('Runway', sum.runway)}
+        ${financeStatCard('Overhead / mo', sum.burnLabel)}
+      </section>
+      <p class="fine-print finance-runway-detail">${sum.runwayDetail}</p>
+
+      ${taxAprilNote}
+
+      <section class="finance-section" aria-label="Operating snapshot">
+        <h3 class="finance-section-title">Operating</h3>
+        <div class="finance-operating-grid">
+          ${financeStatCard('Last month rev.', sum.mrrLabel)}
+          ${financeStatCard('Portfolio MRR', `${portfolioMrr}/mo`)}
+          ${financeStatCard('Valuation', valuationLabel)}
+          ${financeStatCard('HQ / office', escapeHtml(state.company.location || '—'))}
+        </div>
+      </section>
+
+      <details class="finance-details">
+        <summary>Lifetime & fiscal year (Jan–Dec)</summary>
+        <div class="finance-operating-grid finance-details-grid">
+          ${financeStatCard('Lifetime revenue', sum.lifetimeRevenueLabel)}
+          ${financeStatCard('Lifetime expenses', sum.lifetimeExpensesLabel)}
+          ${financeStatCard('Lifetime profit', sum.lifetimeProfitLabel, { tone: profitTone(sum.lifetimeProfit) })}
+          ${financeStatCard('Starting investment', sum.initialInvestmentLabel)}
+          ${financeStatCard(`FY ${sum.fiscalCurrentYear ?? '—'} revenue`, sum.fiscalCurrentRevenueLabel)}
+          ${financeStatCard('FY expenses', sum.fiscalCurrentExpensesLabel)}
+          ${financeStatCard('FY profit', sum.fiscalCurrentProfitLabel, { tone: profitTone(sum.fiscalCurrentProfit) })}
+        </div>
+        ${priorFyLine}
+      </details>
+
+      ${charityBlock}
+
+      <section class="finance-section finance-fundraising-stack">
+        <h3 class="finance-section-title">Fundraising & capital</h3>
+        <div id="ipo-panel-mount"></div>
+        ${fundraisingBlocks}
+      </section>
+
+      <section class="finance-section finance-section--cap">
+        <div id="offices-panel-mount"></div>
+      </section>
+
+      <section class="finance-section finance-section--cap">
+        <h3 class="finance-section-title">Cap table</h3>
+        <div class="table-scroll finance-cap-scroll">
+          <table class="data-table">
+            <thead><tr><th>Holder</th><th>Shares</th><th>%</th><th>Class</th></tr></thead>
+            <tbody>${renderCapTableRows(state) || '<tr><td colspan="4">Empty</td></tr>'}</tbody>
+          </table>
+        </div>
+        ${renderCapTableSummary(state)}
+        ${
+          instruments
+            ? `<h4 class="finance-subhead">Instruments</h4><ul class="instrument-list">${instruments}</ul>`
+            : ''
+        }
+      </section>
+
+      <p class="fine-print finance-ceo-pointer">Founder equity, salary, draws, and net worth → <strong>CEO</strong> tab.</p>
+      <p id="finance-feedback" class="desk-feedback" hidden></p>
     </div>
-    <h3 class="log-head">Fiscal year (Jan–Dec ${sum.fiscalCurrentYear ?? '—'})</h3>
-    <div class="summary-grid">
-      <div><span class="stat-label">FY revenue</span><span class="stat-value">${sum.fiscalCurrentRevenueLabel}</span></div>
-      <div><span class="stat-label">FY expenses</span><span class="stat-value">${sum.fiscalCurrentExpensesLabel}</span></div>
-      <div><span class="stat-label">FY profit</span><span class="stat-value">${sum.fiscalCurrentProfitLabel}</span></div>
-    </div>
-    ${priorFyBlock}
-    ${taxAprilNote}
-    ${charityBlock}
-    <p class="fine-print">${sum.runwayDetail}</p>
-    <p class="fine-print">Founder equity, salary, owner draws, and net worth live on the <strong>CEO</strong> tab.</p>
-    ${blockNote}
-    ${capitalStack}
-    ${safeList}
-    ${sentimentBlock}
-    ${xcBlock}
-    ${angelBlock}
-    ${rbfBlock}
-    ${loanBlock}
-    ${seedBlock}
-    ${seriesABlock}
-    ${seriesBBlock}
-    ${renderPricedRoundBlock(state, seriesCPreview(state), 'seriesCClosed', 'btn-close-series-c', 'Series C')}
-    ${renderPricedRoundBlock(state, seriesDPreview(state), 'seriesDClosed', 'btn-close-series-d', 'Series D')}
-    ${renderPricedRoundBlock(state, seriesEPreview(state), 'seriesEClosed', 'btn-close-series-e', 'Series E')}
-    ${renderPricedRoundBlock(state, seriesFPreview(state), 'seriesFClosed', 'btn-close-series-f', 'Series F')}
-    ${renderAcceleratorsBlock(state)}
-    <div id="ipo-panel-mount"></div>
-    <div id="offices-panel-mount"></div>
-    <h3 class="log-head">Cap table</h3>
-    <div class="table-scroll">
-      <table class="data-table">
-        <thead><tr><th>Holder</th><th>Shares</th><th>%</th><th>Class</th></tr></thead>
-        <tbody>${renderCapTableRows(state) || '<tr><td colspan="4">Empty</td></tr>'}</tbody>
-      </table>
-    </div>
-    ${renderCapTableSummary(state)}
-    ${
-      instruments
-        ? `<h3 class="log-head">Instruments</h3><ul class="instrument-list">${instruments}</ul>`
-        : ''
-    }
-    <p id="finance-feedback" class="desk-feedback" hidden></p>
   `;
 
   renderIpoPanel(container, state);

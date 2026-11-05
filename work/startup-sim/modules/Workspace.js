@@ -99,6 +99,9 @@ export function salaryTierMult(state) {
   return tier === WORKSPACE_TIER.HUB ? base * hubSal : base;
 }
 
+/** Max employees at the worldwide hub HQ before satellite seat bonuses (career). */
+export const HUB_HEADCOUNT_CAP = 5000;
+
 export function headcountCap(state) {
   if (state?.mode === 'sandbox') return 10_000;
   const tier = getWorkspaceTier(state);
@@ -107,7 +110,7 @@ export function headcountCap(state) {
   if (tier === WORKSPACE_TIER.MEDIUM) return 12;
   if (tier === WORKSPACE_TIER.LARGE) return 24;
   if (tier === WORKSPACE_TIER.CAMPUS) return 100;
-  if (tier === WORKSPACE_TIER.HUB) return 999;
+  if (tier === WORKSPACE_TIER.HUB) return HUB_HEADCOUNT_CAP;
   return 0;
 }
 

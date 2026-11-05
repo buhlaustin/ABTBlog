@@ -6,6 +6,7 @@ import { getArr } from './Workspace.js';
 import bundledTimeline from '../data/news-timeline-seed.json' with { type: 'json' };
 import { calendarTurn, formatStateMonth, formatCalendarStamp } from './GameCalendar.js';
 import { formatMoney } from './constants.js';
+import { panelStatCard } from './PanelChrome.js';
 
 let timelineSeed = bundledTimeline;
 let timelineHydrated = false;
@@ -607,17 +608,33 @@ export function renderNewsPanel(container, state) {
         .join('')
     : '';
 
+  const articleCount = (news.currentMonthArticles ?? []).length;
+  const archiveCount = (news.archive ?? []).reduce((n, b) => n + (b.articles?.length ?? 0), 0);
   const alertLine =
     unread > 0
-      ? `<p class="news-new-alert" role="status">${unread} new article${unread === 1 ? '' : 's'} this month — you're caught up once you've read below.</p>`
+      ? `<div class="finance-alert news-unread-alert" role="status">${unread} new article${unread === 1 ? '' : 's'} this month</div>`
       : '';
 
   container.innerHTML = `
-    <p class="panel-lede">Parody press coverage updates when you close each month.</p>
-    ${alertLine}
-    <button type="button" class="btn btn-small" id="btn-toggle-news-archive">${showArchive ? 'Hide archive' : 'Show archive'}</button>
-    <div class="news-feed">${current || '<p class="fine-print">No headlines yet this month.</p>'}</div>
-    ${archive}
+    <div class="news-panel finance-panel">
+      <div class="finance-hero">
+        <p class="panel-lede">Parody press coverage — fresh headlines when you close each month.</p>
+      </div>
+      <div class="finance-kpi-row news-kpi-row">
+        ${panelStatCard('This month', String(articleCount), { hero: true })}
+        ${panelStatCard('Unread', String(unread), { tone: unread > 0 ? 'pos' : null })}
+        ${panelStatCard('Archive', String(archiveCount))}
+      </div>
+      ${alertLine}
+      <div class="news-toolbar">
+        <button type="button" class="btn btn-primary btn-small" id="btn-toggle-news-archive">${showArchive ? 'Hide archive' : 'Show archive'}</button>
+      </div>
+      <section class="finance-section news-feed-section">
+        <h3 class="finance-section-title">${escapeHtml(monthLabel(state))} headlines</h3>
+        <div class="news-feed">${current || '<p class="fine-print">No headlines yet this month.</p>'}</div>
+      </section>
+      ${showArchive ? `<section class="finance-section news-archive-section"><h3 class="finance-section-title">Archive</h3>${archive}</section>` : ''}
+    </div>
   `;
 }
 

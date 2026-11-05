@@ -8,7 +8,7 @@ import {
 import { calendarTurn } from './XC.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
-import { renderCompaniesPanel } from './Acquisitions.js';
+import { renderCompaniesPanel } from './Companies.js';
 import { renderPeoplePanel } from './EmployeeBenefits.js';
 import { renderCeoPanel } from './Ceo.js';
 import { ceoPersonalCashComp } from './CeoEconomics.js';
@@ -33,10 +33,13 @@ import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
+import { panelStatCard } from './PanelChrome.js';
 import {
   renderProductActionsPanel,
   sideTaskBankSize,
-  canBuyAllRemainingSideTasks
+  canBuyAllRemainingSideTasks,
+  productActionsRemaining,
+  sideTaskPlaysPerMonth
 } from './ProductActions.js';
 import {
   renderGrowthCampaignsBlock,
@@ -69,6 +72,13 @@ import {
   canSchedulePublicLaunch,
   renderPreLaunchProgressBlock
 } from './LaunchLifecycle.js';
+import {
+  deskMonthCloseChecklist,
+  deskCanCloseSummary,
+  deskCompanyPulse,
+  taskTypeChipsHtml,
+  deskOfferPoolSize
+} from './Desk.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -284,9 +294,13 @@ export function renderDeskPanel(state) {
               : def.launchPhase === 'pre_launch'
                 ? launchTaskTypeTag(def)
                 : '';
+          const types = taskTypeChipsHtml(def);
+          const band = estimateTaskPayoutBand(def, state);
           return `<article class="${sel}">
             <h3>${escapeHtml(def.title)}${sig}${whale}${launchTag}</h3>
+            ${types ? `<p class="desk-type-row">${types}</p>` : ''}
             <p>${escapeHtml(def.description)}</p>
+            <p class="fine-print task-meta">Typical ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×</p>
             <button type="button" class="btn btn-ghost btn-small" data-toggle-task-offer="${escapeHtml(offer.offerId)}">${offer.selected ? 'Selected' : 'Select'}</button>
           </article>`;
         })
@@ -318,8 +332,10 @@ export function renderDeskPanel(state) {
       const mrrHint = mrrBand
         ? ` · MRR +${formatMoney(mrrBand.min)}–${formatMoney(mrrBand.max)}/mo`
         : '';
+      const types = taskTypeChipsHtml(def);
       return `<article class="${doneClass}">
         <h3>${escapeHtml(def.title)}${sig}${whale}${crowd}</h3>
+        ${types ? `<p class="desk-type-row">${types}</p>` : ''}
         <p>${escapeHtml(def.description)}</p>
         <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${mrrHint}${rival}${preHint}${def.stockPct && isPublicCompany(state) ? ` · stock ${def.stockPct > 0 ? '+' : ''}${Math.round(Number(def.stockPct) * 100)}%` : ''}</p>
         ${btn}
@@ -338,64 +354,114 @@ export function renderDeskPanel(state) {
     : '';
   const preLaunchProgress = renderPreLaunchProgressBlock(state);
 
+  const revHud = taskRevenueMultHud(state);
+  const era = estimateEraRevenuePotential(state);
+  const eraChip = `Desk ${formatMoney(era.desk[0])}–${formatMoney(era.desk[1])} · growth ${formatMoney(era.growth[0])}–${formatMoney(era.growth[1])} at ${era.mult.toFixed(2)}×`;
+  const revMultTitle = revHud.title ? ` title="${escapeHtml(revHud.title)}"` : '';
+  const pulse = deskCompanyPulse(state);
+  const checklist = deskMonthCloseChecklist(state);
+  const closeReady = canEndMonth(state);
+  const checklistHtml = checklist
+    .map(
+      (item) =>
+        `<li class="desk-check-item${item.done ? ' desk-check-item--done' : ''}"><span class="desk-check-mark" aria-hidden="true">${item.done ? '✓' : '○'}</span><span><strong>${escapeHtml(item.label)}</strong>${item.detail ? `<br><span class="fine-print">${escapeHtml(item.detail)}</span>` : ''}</span></li>`
+    )
+    .join('');
+  const modChips = pulse.modifiers.length
+    ? `<div class="finance-charity-chips desk-mod-chips">${pulse.modifiers
+        .map((m) => `<span class="growth-channel-badge growth-channel-badge--inline">${escapeHtml(m)}</span>`)
+        .join('')}</div>`
+    : '';
+  const offerPool = deskOfferPoolSize(state);
+
   desk.innerHTML = `
-    ${tutorial}
-    ${launchBanner}
-    ${preLaunchProgress}
-    ${
-      catalogError
-        ? '<p class="desk-feedback error" role="alert">Tasks did not load — reload the page. You cannot close the month until the desk is full.</p>'
-        : ''
-    }
-    ${
-      hasActiveCrisis(state)
-        ? '<p class="desk-feedback error" role="alert">Crisis on the desk — resolve it before closing the month.</p>'
-        : ''
-    }
-    ${
-      hasActiveDecision(state)
-        ? '<p class="desk-feedback error" role="alert">Strategic decision pending — pick an option below before closing the month.</p>'
-        : ''
-    }
-    ${renderDeskDecisionBlock(state)}
-    <p class="panel-lede">Pick ${slotTarget} tasks from this month’s offers, complete them, then close the month. <span class="fine-print">Shortcuts: 1–9 switch tabs, M close month.</span></p>
-    <div class="summary-grid">
-      <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slotTarget}</span></div>
-      <div><span class="stat-label">This month</span><span class="stat-value">+${formatMoney(monthRev)} / -${formatMoney(monthSpend)}</span></div>
-      <div><span class="stat-label">Next gate</span><span class="stat-value">${escapeHtml(ms)}</span></div>
-      <div><span class="stat-label">Pending</span><span class="stat-value">${pending.length}</span></div>
-      <div><span class="stat-label">Scale era</span><span class="stat-value">${escapeHtml(progressionTierLabel(state))}</span></div>
-      ${(() => {
-        const revHud = taskRevenueMultHud(state);
-        const titleAttr = revHud.title ? ` title="${escapeHtml(revHud.title)}"` : '';
-        return `<div><span class="stat-label">${escapeHtml(revHud.label)}</span><span class="stat-value"${titleAttr}>${revHud.effective.toFixed(2)}×</span></div>`;
-      })()}
+    <div class="desk-panel finance-panel">
+      ${tutorial}
+      ${launchBanner}
+      ${preLaunchProgress}
+      ${
+        catalogError
+          ? '<div class="finance-alert" role="alert">Tasks did not load — reload the page. You cannot close the month until the desk is full.</div>'
+          : ''
+      }
+      ${
+        hasActiveCrisis(state)
+          ? '<div class="finance-alert" role="alert">Crisis on the desk — resolve it before closing the month.</div>'
+          : ''
+      }
+      ${
+        hasActiveDecision(state)
+          ? '<div class="finance-alert" role="alert">Strategic decision pending — pick an option below before closing the month.</div>'
+          : ''
+      }
+      ${renderDeskDecisionBlock(state)}
+      <div class="finance-hero desk-hero">
+        <p class="panel-lede">Pick ${slotTarget} tasks from this month’s offers, complete them, then close the month. <span class="fine-print">Shortcuts: 1–9 switch tabs, M close month.</span></p>
+        <p class="finance-mult-chip">${escapeHtml(eraChip)}</p>
+      </div>
+      <div class="finance-kpi-row desk-kpi-row" aria-label="Desk progress">
+        ${panelStatCard('Tasks done', `${done} / ${slotTarget}`, { hero: true })}
+        ${panelStatCard('Pending', String(pending.length))}
+        ${panelStatCard('Month revenue', `+${formatMoney(monthRev)}`, { tone: 'pos' })}
+        ${panelStatCard('Month spend', `−${formatMoney(monthSpend)}`, { tone: monthSpend > 0 ? 'neg' : null })}
+        ${panelStatCard(revHud.label, `${revHud.effective.toFixed(2)}×`)}
+      </div>
+      <div class="finance-kpi-row desk-pulse-row" aria-label="Company pulse">
+        ${panelStatCard('ARR', formatMoney(pulse.arr))}
+        ${panelStatCard('Cash', formatMoney(pulse.cash))}
+        ${panelStatCard('Runway', escapeHtml(pulse.runway))}
+        ${panelStatCard('Product', String(pulse.product))}
+        ${panelStatCard('Buzz', String(pulse.buzz))}
+        ${panelStatCard('Career tasks', String(pulse.lifetimeTasks))}
+      </div>
+      ${modChips}
+      <section class="finance-section finance-card desk-checklist-section${closeReady ? ' desk-checklist-section--ready' : ''}" aria-label="Month close checklist">
+        <div class="finance-section-head">
+          <h3 class="finance-section-title">Month close checklist</h3>
+          <span class="growth-channel-badge growth-channel-badge--inline">${closeReady ? 'Ready' : 'In progress'}</span>
+        </div>
+        <p class="fine-print">${escapeHtml(deskCanCloseSummary(state))}</p>
+        <ul class="desk-checklist">${checklistHtml}</ul>
+      </section>
+      <details class="finance-details desk-gate-details">
+        <summary>Next gate &amp; scale era</summary>
+        <p class="fine-print"><strong>Next gate:</strong> ${escapeHtml(ms)} · <strong>Era:</strong> ${escapeHtml(progressionTierLabel(state))}<span class="desk-rev-mult-hint"${revMultTitle}> · ${escapeHtml(revHud.label)} ${revHud.effective.toFixed(2)}×</span></p>
+      </details>
+      ${
+        lineupOpen
+          ? `<section class="finance-section desk-offers-section">
+          <div class="finance-section-head">
+            <h3 class="finance-section-title">This month’s offers</h3>
+            <span class="growth-channel-badge growth-channel-badge--inline">${selectedOfferCount(state)} / ${slotTarget} selected · ${offerPool} in pool</span>
+          </div>
+          <p class="fine-print">Pick ${slotTarget} deals — auto-pick ranks by payout and recurring upside; you can still swap selections.</p>
+          <div class="task-list">${offerCards}</div>
+          <div class="desk-actions desk-lineup-actions">
+            <button type="button" id="btn-desk-auto-lineup" class="btn btn-ghost btn-small">Auto-pick best payouts</button>
+            <button type="button" id="btn-confirm-task-lineup" class="btn btn-primary btn-small" ${selectedOfferCount(state) === slotTarget ? '' : 'disabled'}>Lock desk lineup</button>
+          </div>
+        </section>`
+          : ''
+      }
+      <section class="finance-section desk-tasks-section">
+        <h3 class="finance-section-title">Active desk</h3>
+        <div class="task-list">${taskCards || (lineupOpen ? '<div class="tab-placeholder">Lock your lineup to start working tasks.</div>' : '<div class="tab-placeholder">No tasks dealt.</div>')}</div>
+      </section>
+      <div class="desk-actions finance-action desk-close-bar">
+        <button type="button" id="btn-end-month" class="btn btn-primary" ${endDisabled ? 'disabled' : ''} title="${endDisabled ? 'Finish remaining tasks first' : 'Apply overhead and start next month'}">Close month</button>
+        <p id="desk-feedback" class="desk-feedback" hidden></p>
+      </div>
+      <details class="finance-details desk-log-details">
+        <summary>Recent log</summary>
+        <ul class="desk-log-list">${(state.calendar.log ?? [])
+          .slice(0, 6)
+          .map(
+            (e) =>
+              `<li><span class="log-when">${escapeHtml(formatCalendarStamp(e.year, e.month))}</span> ${escapeHtml(e.message)}</li>`
+          )
+          .join('') || '<li class="muted">No events yet.</li>'}</ul>
+      </details>
     </div>
-    ${(() => {
-      const era = estimateEraRevenuePotential(state);
-      return `<p class="fine-print">This era: native desk <strong>${formatMoney(era.desk[0])}–${formatMoney(era.desk[1])}</strong> · growth <strong>${formatMoney(era.growth[0])}–${formatMoney(era.growth[1])}</strong> per play at ${era.mult.toFixed(2)}× (shared early tasks scale up automatically). Finance tab has the full ladder.</p>`;
-    })()}
-    ${
-      lineupOpen
-        ? `<section class="task-offers"><h3 class="log-head">This month’s offers (${selectedOfferCount(state)} / ${slotTarget} selected)</h3><div class="task-list">${offerCards}</div>
-        <button type="button" id="btn-confirm-task-lineup" class="btn btn-primary btn-small" ${selectedOfferCount(state) === slotTarget ? '' : 'disabled'}>Lock desk lineup</button></section>`
-        : ''
-    }
-    <div class="task-list">${taskCards || (lineupOpen ? '<div class="tab-placeholder">Lock your lineup to start working tasks.</div>' : '<div class="tab-placeholder">No tasks dealt.</div>')}</div>
-    <div class="desk-actions">
-      <button type="button" id="btn-end-month" class="btn btn-primary" ${endDisabled ? 'disabled' : ''} title="${endDisabled ? 'Finish remaining tasks first' : 'Apply overhead and start next month'}">Close month</button>
-      <p id="desk-feedback" class="desk-feedback" hidden></p>
-    </div>
-    <section class="month-log">
-      <h3 class="log-head">Recent log</h3>
-      <ul>${(state.calendar.log ?? [])
-        .slice(0, 6)
-        .map(
-          (e) =>
-            `<li><span class="log-when">${escapeHtml(formatCalendarStamp(e.year, e.month))}</span> ${escapeHtml(e.message)}</li>`
-        )
-        .join('') || '<li class="muted">No events yet.</li>'}</ul>
-    </section>
   `;
 }
 
@@ -572,6 +638,18 @@ export function renderAllPanels(state) {
   paintGameFeedback();
 }
 
+function growthStatCard(label, value, { hero = false, id = null } = {}) {
+  const classes = ['finance-stat-card'];
+  if (hero) classes.push('finance-stat-card--hero');
+  const idAttr = id ? ` id="${escapeHtml(id)}"` : '';
+  return `<div class="${classes.join(' ')}"><span class="finance-stat-label">${escapeHtml(label)}</span><span class="finance-stat-value"${idAttr}>${value}</span></div>`;
+}
+
+function growthSlotLabel(remaining, limit) {
+  if (remaining === Infinity || !Number.isFinite(limit)) return 'Unlimited';
+  return `${remaining}/${formatMonthlySideTaskLimit(limit)}`;
+}
+
 export function renderGrowthPanel(container, state) {
   if (!container) return;
   const rival = state.world?.competitor;
@@ -591,24 +669,25 @@ export function renderGrowthPanel(container, state) {
   const growthRuns = (state.growth?.campaignsThisMonth ?? []).length;
   const growthSlots = growthCampaignSlots(state);
   const growthLeft = growthCampaignsRemaining(state);
-  const growthSlotLabel = formatMonthlySideTaskLimit(growthSlots);
-  const growthLeftLabel =
-    growthLeft === Infinity ? 'Unlimited' : `${growthLeft}/${growthSlotLabel}`;
-  const capNote = revHud.label.includes('capped')
-    ? ` · uncapped stack ${rawMult.toFixed(1)}× → <strong>${totalMult.toFixed(2)}× cap</strong>`
-    : '';
+  const sideSlots = sideTaskPlaysPerMonth(state);
+  const sideLeft = productActionsRemaining(state);
+  const sideUsed = state.product?.actionsThisMonth ?? 0;
+  const sideSlotDisplay = growthSlotLabel(sideLeft, sideSlots);
+  const campaignSlotDisplay = growthSlotLabel(growthLeft, growthSlots);
+  const multChip =
+    state.mode === 'sandbox' && tuneMult !== 1
+      ? `${escapeHtml(era)} · desk &amp; growth ${coreMult.toFixed(2)}× × sandbox ${tuneMult.toFixed(2)}× = ${totalMult.toFixed(2)}×`
+      : `${escapeHtml(era)} · ${revHud.label.includes('capped') ? 'Rev× capped' : 'Rev×'} ${totalMult.toFixed(2)}×${
+          revHud.label.includes('capped') ? ` (stack ${rawMult.toFixed(1)}×)` : ''
+        }`;
   const modLabels = activeModifierLabels(state);
   const modNote = modLabels.length
-    ? `<p class="fine-print"><strong>Active fallout:</strong> ${modLabels.map((l) => escapeHtml(l)).join(' · ')}</p>`
+    ? `<div class="finance-alert"><strong>Active fallout:</strong> ${modLabels.map((l) => escapeHtml(l)).join(' · ')}</div>`
     : '';
   const trustScore = state.sentiment?.score ?? 68;
   const trustNote = hasInstitutionalBoard(state)
     ? ''
     : `<p class="fine-print"><strong>Market trust</strong> ${trustScore} — ${escapeHtml(marketTrustLabel(trustScore))}. Crises and desk decisions move this score; Series A needs at least 32.</p>`;
-  const multNote =
-    state.mode === 'sandbox' && tuneMult !== 1
-      ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong>${capNote} · paid campaigns ${growthLeftLabel}${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
-      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — ${revHud.label.includes('capped') ? 'Rev× (capped)' : 'effective multiplier'} <strong>${totalMult.toFixed(2)}×</strong>${capNote}${growthRuns ? ` · ${growthRuns}/${growthSlotLabel} paid campaign(s) used` : ` · ${growthLeftLabel} paid campaign(s) left`}.</p>`;
 
   const pivotAllowed = canPivot(state);
   const categories = getCategoriesSync();
@@ -636,22 +715,9 @@ export function renderGrowthPanel(container, state) {
   const sideBank = sideTaskBankSize(SIDE_TASK_FOCUS_ALL);
   const productLevel = state.product?.level ?? 0;
 
-  container.innerHTML = `
-    <p class="panel-lede">Growth hub for ${escapeHtml(state.company.categoryLabel)} — side plays and paid campaigns share progression multipliers with desk tasks.</p>
-    <div class="growth-traction-stats summary-grid" aria-label="Product traction">
-      <div><span class="stat-label">Product level</span><span class="stat-value" id="growth-stat-product-level">${productLevel}</span></div>
-      <div><span class="stat-label">Buzz</span><span class="stat-value" id="growth-stat-buzz">${buzz}</span></div>
-      <div><span class="stat-label">Industry</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
-    </div>
-    <div class="growth-buy-all-bar finance-action">
-      <button type="button" class="btn btn-primary btn-small" data-buy-all-side${sideBuyAllDisabled}>Buy all side plays</button>
-      <button type="button" class="btn btn-primary btn-small" data-buy-all-growth${paidBuyAllDisabled}>Buy all paid campaigns</button>
-      <p class="fine-print">Runs every affordable unlocked play until monthly slots or cash run out (${sideBank} side plays in bank).</p>
-    </div>
-    ${trustNote}
-    ${modNote}
-    ${multNote}
-    <div class="summary-grid">
+  const contextDetails = `<details class="finance-details growth-context-details">
+    <summary>Market context &amp; desk</summary>
+    <div class="summary-grid growth-context-grid">
       <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>
       <div><span class="stat-label">Heat</span><span class="stat-value">${pressure}/5</span></div>
       <div><span class="stat-label">Rev. modifier</span><span class="stat-value">${(revMult * 100).toFixed(0)}%</span></div>
@@ -661,32 +727,81 @@ export function renderGrowthPanel(container, state) {
           : `<div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(runwayLabel(state))}</span></div>`
       }
       <div><span class="stat-label">Desk tasks left</span><span class="stat-value">${pendingDesk}</span></div>
+      <div><span class="stat-label">Industry</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
     </div>
     ${
       !hasInstitutionalBoard(state)
         ? `<p class="fine-print">${escapeHtml(runwayDetail(state))}</p>`
         : ''
     }
-    ${pivotBlock}
     ${
       rival
-        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Strong revenue months, marketing desk tasks, and growth campaigns cool heat. Buzz decays each month — keep shipping.</p>`
+        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Marketing desk tasks and growth campaigns cool rival heat. Buzz decays each month.</p>`
         : ''
     }
     ${
       hasInstitutionalBoard(state) && lastReason
         ? `<p class="fine-print">Latest board note: ${escapeHtml(lastReason)}</p>`
-        : '<p class="fine-print">Desk tasks scale with funding rounds and HQ tier. Side plays and paid campaigns below do not use desk slots.</p>'
+        : '<p class="fine-print">Desk tasks use monthly desk slots. Side plays and paid campaigns below do not.</p>'
     }
-    <div id="growth-levers-mount"></div>
-    ${renderGrowthCampaignsBlock(state)}
+  </details>`;
+
+  container.innerHTML = `
+    <div class="growth-panel finance-panel">
+      <div class="finance-hero">
+        <p class="panel-lede">Growth for ${escapeHtml(state.company.categoryLabel)} — two cash channels outside desk tasks, both scaled by the same Rev× multiplier.</p>
+        <p class="finance-mult-chip">${multChip}</p>
+      </div>
+      <div class="finance-kpi-row growth-kpi-row" aria-label="Traction and monthly limits">
+        ${growthStatCard('Product level', String(productLevel), { hero: true, id: 'growth-stat-product-level' })}
+        ${growthStatCard('Buzz', String(buzz), { id: 'growth-stat-buzz' })}
+        ${growthStatCard('Side plays left', sideSlotDisplay, { id: 'growth-stat-side-slots' })}
+        ${growthStatCard('Campaigns left', campaignSlotDisplay)}
+        ${growthStatCard('Rev× on payouts', `${totalMult.toFixed(2)}×`)}
+      </div>
+      <p class="fine-print growth-context-visible">
+        <strong>Rival</strong> ${escapeHtml(rival?.name ?? '—')} · heat ${pressure}/5 ·
+        ${
+          hasInstitutionalBoard(state)
+            ? `<strong>Board</strong> ${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}`
+            : `<strong>Runway</strong> ${escapeHtml(runwayLabel(state))}`
+        }
+      </p>
+      <div class="growth-channel-compare" role="note">
+        <div class="growth-channel-card growth-channel-card--side">
+          <p class="growth-channel-title"><span class="growth-channel-badge">Side plays</span></p>
+          <p class="fine-print">Cheaper levers for <strong>buzz</strong> and <strong>product</strong>. Pick any unlocked play from the bank (${sideBank} in roster). Uses the side-play meter — capped at the same monthly ceiling as campaigns.</p>
+          <button type="button" class="btn btn-primary btn-small" data-buy-all-side${sideBuyAllDisabled}>Buy all side plays</button>
+        </div>
+        <div class="growth-channel-card growth-channel-card--paid">
+          <p class="growth-channel-title"><span class="growth-channel-badge">Paid campaigns</span></p>
+          <p class="fine-print">Larger spends for <strong>revenue book</strong> (and buzz). Rotating monthly roster with a 12-month cooldown. Uses the campaign meter${growthRuns ? ` — ${growthRuns} launched this month` : ''}.</p>
+          <button type="button" class="btn btn-primary btn-small" data-buy-all-growth${paidBuyAllDisabled}>Buy all paid campaigns</button>
+        </div>
+      </div>
+      ${trustNote}
+      ${modNote}
+      ${contextDetails}
+      ${pivotBlock}
+      <div id="growth-levers-mount"></div>
+      <div id="growth-campaigns-mount"></div>
+    </div>
   `;
   renderProductActionsPanel(document.getElementById('growth-levers-mount'), state, {
-    heading: 'Side growth plays',
+    heading: 'Side plays',
     focusFilter: SIDE_TASK_FOCUS_ALL,
     showLimitHint: true,
-    lede: `Marketing, brand, and product experiments outside desk tasks — <strong>${sideBank}</strong> plays in bank, one shared monthly limit.`
+    variant: 'growth-side',
+    slotLabel: sideSlotDisplay,
+    usedThisMonth: sideUsed
   });
+  const campaignsMount = document.getElementById('growth-campaigns-mount');
+  if (campaignsMount) {
+    campaignsMount.innerHTML = renderGrowthCampaignsBlock(state, {
+      slotLabel: campaignSlotDisplay,
+      launchedThisMonth: growthRuns
+    });
+  }
 }
 
 export function renderGameOver(state) {

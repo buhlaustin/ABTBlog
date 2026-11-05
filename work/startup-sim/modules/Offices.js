@@ -14,6 +14,25 @@ import {
   headcountCap
 } from './Workspace.js';
 import bundledHubs from '../data/hubs.json' with { type: 'json' };
+import {
+  SATELLITE_SIZE_IDS,
+  SATELLITE_SIZES,
+  computeSatelliteOffice,
+  formatSatellitePreview,
+  resolveSatelliteMarket,
+  satelliteSizeLabel
+} from './SatelliteOffices.js';
+
+function resolveSatelliteMarketLabel(template) {
+  const m = resolveSatelliteMarket(template);
+  return `cost ${m.costTier} · capacity ${m.capacityTier}`;
+}
+
+export function previewSatelliteOpen(templateId, sizeId = 'medium') {
+  const t = getSatelliteTemplates().find((s) => s.id === templateId);
+  if (!t) return '';
+  return formatSatellitePreview(t, sizeId);
+}
 
 let hubsCache = bundledHubs;
 
@@ -96,8 +115,22 @@ export function satelliteRent(state) {
   return (state.offices?.satellites ?? []).reduce((s, o) => s + (o.rentMonthly ?? 0), 0);
 }
 
+/** Effective hiring cap — hub HQ base plus satellite seat bonuses (career). */
 export function totalHeadcountCap(state) {
-  return headcountCap(state) + satelliteSeats(state);
+  const base = headcountCap(state);
+  if (state?.mode === 'sandbox') return base;
+  if (getWorkspaceTier(state) === WORKSPACE_TIER.HUB && state.offices?.hubId) {
+    return base + satelliteSeats(state);
+  }
+  return base;
+}
+
+export function headcountCapBreakdown(state) {
+  const base = headcountCap(state);
+  const seats = satelliteSeats(state);
+  const total = totalHeadcountCap(state);
+  const atHub = getWorkspaceTier(state) === WORKSPACE_TIER.HUB && Boolean(state.offices?.hubId);
+  return { base, seats, total, atHub };
 }
 
 export function selectHub(state, hubId) {
@@ -136,12 +169,13 @@ export function selectHub(state, hubId) {
   return { ok: true, hub };
 }
 
-export function addSatellite(state, templateId) {
+export function addSatellite(state, templateId, sizeId = 'medium') {
   if (!state.offices?.hubId) {
     return { ok: false, reason: 'Open a city hub HQ first.' };
   }
   const t = getSatelliteTemplates().find((s) => s.id === templateId);
   if (!t) return { ok: false, reason: 'Unknown satellite template.' };
+  const size = SATELLITE_SIZES[sizeId] ? sizeId : 'medium';
 
   if (!state.offices.usedSatelliteTemplateIds) state.offices.usedSatelliteTemplateIds = [];
   const used = usedSatelliteTemplateIds(state);
@@ -149,12 +183,17 @@ export function addSatellite(state, templateId) {
     return { ok: false, reason: `${t.label} satellite was already opened this run — pick another city.` };
   }
 
+  const stats = computeSatelliteOffice(t, size);
   const entry = {
     id: t.id,
     templateId: t.id,
     label: t.label,
-    seats: t.seats,
-    rentMonthly: t.rentMonthly
+    size: stats.size,
+    sizeLabel: stats.sizeLabel,
+    seats: stats.seats,
+    rentMonthly: stats.rentMonthly,
+    costTier: stats.costTier,
+    capacityTier: stats.capacityTier
   };
   state.offices.satellites.push(entry);
   if (!state.offices.usedSatelliteTemplateIds.includes(t.id)) {
@@ -164,11 +203,26 @@ export function addSatellite(state, templateId) {
 }
 
 export function removeSatellite(state, satelliteId) {
-  const before = state.offices?.satellites?.length ?? 0;
-  state.offices.satellites = (state.offices.satellites ?? []).filter((s) => s.id !== satelliteId);
-  if (state.offices.satellites.length === before) {
+  const list = state.offices?.satellites ?? [];
+  const target = list.find((s) => s.id === satelliteId);
+  if (!target) {
     return { ok: false, reason: 'Satellite not found.' };
   }
+  const nextSeats = satelliteSeats(state) - (target.seats ?? 0);
+  const base = headcountCap(state);
+  const nextCap =
+    state?.mode === 'sandbox' || !state.offices?.hubId
+      ? base
+      : base + nextSeats;
+  const hc = state.staff?.headcountByDept ?? {};
+  const active = Object.values(hc).reduce((a, b) => a + (Number(b) || 0), 0);
+  if (active > nextCap) {
+    return {
+      ok: false,
+      reason: `Cannot close ${target.label} — ${active} active employees exceeds the ${nextCap} cap without those ${target.seats ?? 0} satellite seats.`
+    };
+  }
+  state.offices.satellites = list.filter((s) => s.id !== satelliteId);
   return { ok: true };
 }
 
@@ -207,7 +261,7 @@ function workspacePurchaseBlock(state) {
         .join('');
 
   const hubNote = atHub
-    ? `<p class="fine-print">Worldwide hub HQ — add satellite offices below. Earlier office tiers are no longer listed here.</p>`
+    ? `<p class="fine-print">Worldwide hub HQ holds up to <strong>5,000</strong> employees — open satellite cities below to add seat capacity (each city once per run).</p>`
     : `<p class="fine-print">Offices are purchased at ARR gates; rent rolls into monthly burn. Garage has no hires.</p>`;
 
   const purchaseRow = buttons ? `<div class="workspace-purchase-row">${buttons}</div>` : '';
@@ -223,7 +277,8 @@ function workspacePurchaseBlock(state) {
 export function renderOfficesPanel(container, state) {
   if (!container) return;
 
-  const cap = headcountCap(state) + satelliteSeats(state);
+  const capBreakdown = headcountCapBreakdown(state);
+  const cap = capBreakdown.total;
   const hub = state.offices?.hubId ? getHubById(state.offices.hubId) : null;
   const residency = state.xc?.residencyMonthsRemaining ?? 0;
   const inResidency = state.flags?.xcAccepted && !state.flags?.xcResidencyComplete;
@@ -250,7 +305,10 @@ export function renderOfficesPanel(container, state) {
         <button type="button" class="btn btn-primary btn-small" id="btn-select-hub">Open hub HQ</button>
       </div>`;
   } else if (hub) {
-    hubSection = `<p class="fine-print">HQ: <strong>${escapeHtml(state.offices.hubLabel)}</strong> · headcount cap ${cap}</p>`;
+    const capDetail = capBreakdown.seats
+      ? `${capBreakdown.base.toLocaleString()} HQ + ${capBreakdown.seats.toLocaleString()} satellite = <strong>${cap.toLocaleString()}</strong>`
+      : `<strong>${capBreakdown.base.toLocaleString()}</strong> (open satellites to grow past hub HQ limit)`;
+    hubSection = `<p class="fine-print">HQ: <strong>${escapeHtml(state.offices.hubLabel)}</strong> · employee cap ${capDetail}</p>`;
   } else if (inResidency) {
     hubSection = `<p class="fine-print">SF batch — ${residency} month(s) left. Desk tasks are XC-only.</p>`;
   }
@@ -258,7 +316,7 @@ export function renderOfficesPanel(container, state) {
   const satRows = (state.offices?.satellites ?? [])
     .map(
       (s) =>
-        `<tr><td>${escapeHtml(s.label)}</td><td class="num">${s.seats}</td><td class="num">${formatMoney(s.rentMonthly)}</td>
+        `<tr><td>${escapeHtml(s.label)}</td><td>${escapeHtml(s.sizeLabel ?? satelliteSizeLabel(s.size ?? 'medium'))}</td><td class="num">${s.seats}</td><td class="num">${formatMoney(s.rentMonthly)}</td>
         <td><button type="button" class="btn btn-ghost btn-small" data-remove-satellite="${escapeHtml(s.id)}">Remove</button></td></tr>`
     )
     .join('');
@@ -266,29 +324,37 @@ export function renderOfficesPanel(container, state) {
   const allTemplates = getSatelliteTemplates();
   const available = availableSatelliteTemplates(state);
   const satRentTotal = satelliteRent(state);
+  const defaultCity = available[0];
+  const defaultPreview = defaultCity ? formatSatellitePreview(defaultCity, 'medium') : '';
   const satOptions = available
-    .map(
-      (t) =>
-        `<option value="${t.id}">${escapeHtml(t.label)} — ${t.seats} seats · ${formatMoney(t.rentMonthly)}/mo</option>`
-    )
+    .map((t) => {
+      const market = resolveSatelliteMarketLabel(t);
+      return `<option value="${t.id}">${escapeHtml(t.label)} (${market})</option>`;
+    })
     .join('');
+  const sizeOptions = SATELLITE_SIZE_IDS.map(
+    (id) =>
+      `<option value="${id}">${escapeHtml(SATELLITE_SIZES[id].label)} footprint</option>`
+  ).join('');
 
   const satelliteBlock =
     state.offices?.hubId
       ? `
     <h3 class="log-head">Satellite offices</h3>
-    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Each city can be opened <strong>once per run</strong>.</p>
+    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Pick a <strong>city</strong> and <strong>size</strong> — alpha markets cost more and add more seats (<strong>once per city per run</strong>).</p>
     <div class="table-scroll">
       <table class="data-table">
-        <thead><tr><th>City</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
-        <tbody>${satRows || '<tr><td colspan="4">No satellites yet.</td></tr>'}</tbody>
+        <thead><tr><th>City</th><th>Size</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
+        <tbody>${satRows || '<tr><td colspan="5">No satellites yet.</td></tr>'}</tbody>
       </table>
     </div>
     ${
       available.length > 0
         ? `<div class="satellite-add">
-      <select id="satellite-template">${satOptions}</select>
+      <select id="satellite-template" aria-label="Satellite city">${satOptions}</select>
+      <select id="satellite-size" aria-label="Satellite size">${sizeOptions}</select>
       <button type="button" class="btn btn-ghost btn-small" id="btn-add-satellite">Open satellite</button>
+      <p class="fine-print" id="satellite-open-preview">${defaultPreview ? `Preview (medium): ${escapeHtml(defaultPreview)}` : ''}</p>
     </div>`
         : `<p class="fine-print">Every satellite city in the catalog is already open this run.</p>`
     }`
