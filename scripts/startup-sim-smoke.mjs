@@ -33,14 +33,18 @@ let failed = false;
 
 const lifetimeSample = formatMoney(20_754_580_000_000);
 const groupedHuge = formatMoney(1_234_560_000_000_000);
-if (lifetimeSample !== '$20,754,580,000,000') {
-  console.error(`FAIL: formatMoney should comma-group large dollars (got ${lifetimeSample})`);
+const midSample = formatMoney(1_234_567);
+if (lifetimeSample !== '$20.75T') {
+  console.error(`FAIL: formatMoney should compact trillions (got ${lifetimeSample})`);
   failed = true;
-} else if (groupedHuge !== '$1,234,560,000,000,000') {
-  console.error(`FAIL: formatMoney should comma-group huge dollars (got ${groupedHuge})`);
+} else if (groupedHuge !== '$1,234.56T') {
+  console.error(`FAIL: formatMoney should compact huge trillions (got ${groupedHuge})`);
+  failed = true;
+} else if (midSample !== '$1,234,567') {
+  console.error(`FAIL: formatMoney should comma-group under $10M (got ${midSample})`);
   failed = true;
 } else if (!failed) {
-  console.log(`OK: formatMoney commas (${lifetimeSample}, ${groupedHuge})`);
+  console.log(`OK: formatMoney (${midSample}, ${lifetimeSample}, ${groupedHuge})`);
 }
 
 if (taskCatalogSize() < 1200) {
