@@ -1,4 +1,5 @@
 import { STAGES } from './constants.js';
+import { advanceRealCalendarMonth, realClockNow } from './GameCalendar.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
@@ -32,10 +33,11 @@ import { applySubsidiaryMrrPayout, tickAcquisitionsAtMonthStart } from './Acquis
 
 export { getMonthlyTaskSlots } from './constants.js';
 
-export function createInitialCalendar() {
+export function createInitialCalendar(start) {
+  const s = start ?? realClockNow();
   return {
-    monthIndex: 1,
-    year: 1,
+    monthIndex: s.monthIndex,
+    year: s.year,
     monthTasks: [],
     tasksCompleted: 0,
     monthRevenue: 0,
@@ -56,15 +58,7 @@ export function appendLog(state, message) {
 }
 
 export function advanceCalendarMonth(state) {
-  let { monthIndex, year } = state.calendar;
-  monthIndex += 1;
-  if (monthIndex > 12) {
-    monthIndex = 1;
-    year += 1;
-  }
-  state.calendar.monthIndex = monthIndex;
-  state.calendar.year = year;
-  return state;
+  return advanceRealCalendarMonth(state);
 }
 
 export function startMonth(state) {

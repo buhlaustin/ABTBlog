@@ -3,6 +3,7 @@ import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot, buildNarrativeContext } from './GameContext.js';
 import { setGameFeedback } from './GameFeedback.js';
 import bundledPersonas from '../data/personas.json' with { type: 'json' };
+import { formatCalendarStamp } from './GameCalendar.js';
 
 let personasCache = bundledPersonas.personas ?? [];
 let personasHydrated = false;
@@ -381,7 +382,7 @@ function renderArchivePosts(posts) {
     .map((p) => {
       const net = p.network === 'chirp' ? 'Chirp' : 'ProNet';
       return `<article class="social-post archived">
-        <header><strong>${escapeHtml(p.authorName)}</strong> <span class="fine-print">${escapeHtml(net)} · Y${p.year} M${p.month}</span></header>
+        <header><strong>${escapeHtml(p.authorName)}</strong> <span class="fine-print">${escapeHtml(net)} · ${escapeHtml(formatCalendarStamp(p.year, p.month))}</span></header>
         <p>${escapeHtml(p.text)}</p>
       </article>`;
     })
@@ -398,7 +399,7 @@ function renderPosts(posts, networkClass) {
         .map((c) => `<li><strong>${escapeHtml(c.author)}</strong> ${escapeHtml(c.text)}</li>`)
         .join('');
       return `<article class="social-post ${networkClass}">
-        <header><strong>${escapeHtml(p.authorName)}</strong> <span class="fine-print">Y${p.year} M${p.month}</span></header>
+        <header><strong>${escapeHtml(p.authorName)}</strong> <span class="fine-print">${escapeHtml(formatCalendarStamp(p.year, p.month))}</span></header>
         <p>${escapeHtml(p.text)}</p>
         <footer class="social-meta">${p.reactions?.likes ?? 0} likes · ${p.reactions?.reposts ?? 0} reposts</footer>
         ${comments ? `<ul class="social-comments">${comments}</ul>` : ''}

@@ -16,6 +16,7 @@ import {
   maxOwnerDrawAmount
 } from './CeoEconomics.js';
 import { isPublicCompany } from './IPO.js';
+import { formatCalendarStamp } from './GameCalendar.js';
 
 function escapeHtml(s) {
   return String(s)
@@ -71,7 +72,7 @@ export function renderCeoPanel(container, state) {
     ? ledger
         .map(
           (r) =>
-            `<tr><td>${escapeHtml(r.label)}</td><td>${formatMoney(r.amount)}</td><td>Y${r.year ?? '?'} M${r.month ?? '?'}</td></tr>`
+            `<tr><td>${escapeHtml(r.label)}</td><td>${formatMoney(r.amount)}</td><td>${escapeHtml(r.year ? formatCalendarStamp(r.year, r.month) : '—')}</td></tr>`
         )
         .join('')
     : '<tr><td colspan="3">No cash comp events yet.</td></tr>';
@@ -80,7 +81,7 @@ export function renderCeoPanel(container, state) {
     .slice(0, 4)
     .map(
       (c) =>
-        `<li>${formatMoney(c.prior)}/yr → ${formatMoney(c.annual)}/yr · Y${c.year ?? '?'} M${c.month ?? '?'}</li>`
+        `<li>${formatMoney(c.prior)}/yr → ${formatMoney(c.annual)}/yr · ${escapeHtml(c.year ? formatCalendarStamp(c.year, c.month) : '—')}</li>`
     )
     .join('');
 

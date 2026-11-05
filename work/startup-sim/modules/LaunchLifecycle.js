@@ -1,5 +1,6 @@
 import { STAGES, formatMoney } from './constants.js';
 import { getTaskStage } from './Workspace.js';
+import { addCalendarMonths, formatCalendarMonth } from './GameCalendar.js';
 
 /** Minimum product buzz before "Schedule public launch" unlocks. */
 export const PRE_LAUNCH_BUZZ_REQUIRED = 10;
@@ -125,7 +126,7 @@ export function launchPhaseLabel(state) {
   if (p === 'scheduled') {
     const y = state.launch.launchYear;
     const m = state.launch.launchMonthIndex;
-    return `Pre-launch · public launch scheduled Y${y} M${m}`;
+    return `Pre-launch · launch scheduled ${formatCalendarMonth(y, m)}`;
   }
   if (p === 'launch_month') return 'Launch month';
   if (p === 'post_launch') {
@@ -186,19 +187,14 @@ export function onScheduleLaunchTaskCompleted(state) {
       reason: `Need ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz (${g.buzz}) and product ${PRE_LAUNCH_PRODUCT_REQUIRED}+ (${g.level}) before scheduling launch.`
     };
   }
-  let monthIndex = state.calendar.monthIndex + 1;
-  let year = state.calendar.year;
-  if (monthIndex > 12) {
-    monthIndex = 1;
-    year += 1;
-  }
+  const next = addCalendarMonths(state.calendar.year, state.calendar.monthIndex, 1);
   state.launch.phase = 'scheduled';
-  state.launch.launchYear = year;
-  state.launch.launchMonthIndex = monthIndex;
+  state.launch.launchYear = next.year;
+  state.launch.launchMonthIndex = next.monthIndex;
   return {
     ok: true,
     lines: [
-      `Public launch scheduled for Month ${monthIndex}, Year ${year}. Finish pre-launch work until then.`
+      `Public launch scheduled for ${formatCalendarMonth(next.year, next.monthIndex)}. Finish pre-launch work until then.`
     ]
   };
 }

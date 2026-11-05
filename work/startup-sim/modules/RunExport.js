@@ -1,13 +1,16 @@
 import { formatMoney, stageLabel } from './constants.js';
+import { formatStateMonth } from './GameCalendar.js';
+import { calendarTurn } from './XC.js';
 
 export function buildRunExportText(state) {
   const lines = [];
   const company = state.company?.name ?? 'Company';
-  const months = (state.calendar.year - 1) * 12 + state.calendar.monthIndex;
+  const months = calendarTurn(state);
   lines.push(`Startup Simulator — ${company}`);
   lines.push(`Mode: ${state.mode === 'sandbox' ? 'Sandbox' : 'Career'}`);
   lines.push(`Category: ${state.company?.categoryLabel ?? '—'}`);
   lines.push(`Stage: ${stageLabel(state.stage)}`);
+  lines.push(`Calendar: ${formatStateMonth(state)}`);
   lines.push(`Months played: ${months}`);
   lines.push(`Lifetime revenue: ${formatMoney(state.finance?.lifetimeRevenue ?? 0)}`);
   lines.push(`Cash: ${formatMoney(state.finance?.cash ?? 0)}`);

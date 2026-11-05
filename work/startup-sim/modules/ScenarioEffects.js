@@ -9,9 +9,7 @@ export function createInitialModifiers() {
   return { active: [] };
 }
 
-export function calendarTurn(state) {
-  return (state.calendar.year - 1) * 12 + state.calendar.monthIndex;
-}
+export { calendarTurn } from './GameCalendar.js';
 
 export function addScenarioModifier(state, mod) {
   if (!state.modifiers) state.modifiers = createInitialModifiers();

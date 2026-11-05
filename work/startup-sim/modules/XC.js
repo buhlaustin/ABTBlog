@@ -4,6 +4,9 @@ import { applyXCSafe } from './CapTable.js';
 import { restorePostXcWorkspace } from './Workspace.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import bundledInterview from '../data/xc-interview.json' with { type: 'json' };
+import { calendarTurn, turnToCalendar, formatCalendarMonth } from './GameCalendar.js';
+
+export { calendarTurn };
 
 let interviewCache = bundledInterview;
 
@@ -28,12 +31,6 @@ export function createInitialXcState() {
     batchStartsTurn: null,
     graduateBoostMonths: 0
   };
-}
-
-export function calendarTurn(state) {
-  const year = state.calendar?.year ?? 1;
-  const month = state.calendar?.monthIndex ?? 1;
-  return (year - 1) * 12 + month;
 }
 
 export function xcWaitingForRetry(state) {
@@ -62,9 +59,12 @@ export function isXcAcceptedPendingBatch(state) {
 export function xcBatchStartLabel(state) {
   const turn = state.xc?.batchStartsTurn;
   if (turn == null) return null;
-  const year = Math.floor((turn - 1) / 12) + 1;
-  const month = ((turn - 1) % 12) + 1;
-  return { year, monthIndex: month };
+  return turnToCalendar(state, turn);
+}
+
+export function xcBatchStartLabelText(state) {
+  const start = xcBatchStartLabel(state);
+  return start ? formatCalendarMonth(start.year, start.monthIndex) : null;
 }
 
 export function xcProgramRevenueMult(state) {
@@ -160,7 +160,7 @@ function parseScoreJson(text) {
 export function beginResidency(state) {
   state.xc = state.xc ?? createInitialXcState();
   state.xc.residencyMonthsRemaining = 3;
-  state.xc.batchLabel = `Batch ${state.calendar.year}-${state.calendar.monthIndex}`;
+  state.xc.batchLabel = `Batch ${formatCalendarMonth(state.calendar.year, state.calendar.monthIndex, 'short')}`;
   state.company.location = 'San Francisco (XC batch)';
   state.finance.fixedCostsMonthly = 6_000;
   state.flags.xcResidencyComplete = false;

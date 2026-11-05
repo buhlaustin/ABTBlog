@@ -113,7 +113,9 @@ import { sendAdvisorMessage } from './modules/Advisor.js';
 import {
   renderInterviewForm,
   scoreInterview,
-  completeXcAcceptance
+  completeXcAcceptance,
+  xcBatchStartLabelText,
+  calendarTurn
 } from './modules/XC.js';
 import { loadHubData, selectHub, addSatellite, removeSatellite, showOfficesFeedback } from './modules/Offices.js';
 import { loadAssetManifest } from './modules/Assets.js';
@@ -233,7 +235,7 @@ async function submitXcInterview(e) {
   if (score.waitlisted) {
     sessionState.xc = sessionState.xc ?? {};
     sessionState.xc.retryAvailableTurn =
-      (sessionState.calendar.year - 1) * 12 + sessionState.calendar.monthIndex + 1;
+      calendarTurn(sessionState);
     sessionState.xc.needsFollowUpQuestion = true;
     appendLog(sessionState, `XC waitlist (score ${score.score}) — reapply next month.`);
     showFinanceFeedback(score.feedback);
@@ -262,10 +264,9 @@ async function submitXcInterview(e) {
     return;
   }
 
-  const start = result.batchStarts;
   appendLog(
     sessionState,
-    `XC accepted (score ${score.score}) — $500k SAFE. Batch starts Month ${start?.monthIndex ?? '?'}, Year ${start?.year ?? '?'} (3 months).`
+    `XC accepted (score ${score.score}) — $500k SAFE. Batch starts ${xcBatchStartLabelText(sessionState) ?? 'next month'} (3 months).`
   );
   syncStageFromProgress(sessionState);
   showScreen('game');

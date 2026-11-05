@@ -4,6 +4,7 @@ import { getArr } from './Workspace.js';
 import { calendarTurn } from './XC.js';
 import { getFounderRow } from './CapTable.js';
 import { ceoEndgameCompSnapshot } from './CeoEconomics.js';
+import { formatCalendarStamp } from './GameCalendar.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 import { recordCashOutflow } from './Finance.js';
@@ -650,7 +651,7 @@ export function renderIpoPanel(container, state) {
           ? `<ul class="stock-tape">${pm.marketTape
               .map(
                 (e) =>
-                  `<li><span class="tape-when">Y${e.year} M${e.month}</span> ${escapeHtml(e.text)}</li>`
+                  `<li><span class="tape-when">${escapeHtml(formatCalendarStamp(e.year, e.month))}</span> ${escapeHtml(e.text)}</li>`
               )
               .join('')}</ul>`
           : ''

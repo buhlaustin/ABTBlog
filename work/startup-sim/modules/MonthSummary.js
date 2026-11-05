@@ -1,4 +1,5 @@
 import { formatMoney } from './constants.js';
+import { formatCalendarMonth, formatStateMonth } from './GameCalendar.js';
 import { projectMonthlyBurn } from './Finance.js';
 import { isPublicCompany, marketCap } from './IPO.js';
 
@@ -32,7 +33,7 @@ export function renderMonthSummaryContent(container, state, summary, headlineTea
       : '';
 
   container.innerHTML = `
-    <p class="eyebrow">Month ${summary.closedMonthIndex}, Year ${summary.closedYear} closed</p>
+    <p class="eyebrow">${escapeHtml(formatCalendarMonth(summary.closedYear, summary.closedMonthIndex))} closed</p>
     <h2 id="month-summary-title" class="month-summary-title">Month-end summary</h2>
     <div class="summary-grid">
       <div><span class="stat-label">Cash</span><span class="stat-value">${formatMoney(summary.cashAfter)}</span></div>
@@ -52,7 +53,7 @@ export function renderMonthSummaryContent(container, state, summary, headlineTea
         ? `<p class="month-summary-headline"><strong>Headlines:</strong> ${escapeHtml(headlineTeaser)}</p>`
         : '<p class="fine-print">Headlines will appear on the News tab.</p>'
     }
-    <p class="fine-print">Now playing Month ${state.calendar.monthIndex}, Year ${state.calendar.year}.</p>
+    <p class="fine-print">Now playing ${escapeHtml(formatStateMonth(state))}.</p>
   `;
 }
 

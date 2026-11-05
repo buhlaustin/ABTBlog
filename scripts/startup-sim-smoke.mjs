@@ -280,7 +280,8 @@ if (!accept.ok || !xcState.xc?.batchStartsTurn) {
   console.error('FAIL: XC batch should not start same month as acceptance');
   failed = true;
 } else {
-  xcState.calendar.monthIndex += 1;
+  const { advanceCalendarMonth } = await import(`file://${join(sim, 'modules/Calendar.js')}`);
+  advanceCalendarMonth(xcState);
   startMonth(xcState);
   if (!isInResidency(xcState) || xcState.xc?.residencyMonthsRemaining !== 3) {
     console.error('FAIL: XC batch should begin next month with 3 months remaining');
@@ -404,7 +405,10 @@ newsA.meta.runSeed = 4242;
 applyOfflineMonthlyNews(newsA);
 const headA = newsA.news.currentMonthArticles?.[0]?.headline ?? '';
 archiveCurrentNews(newsA);
-newsA.calendar.monthIndex += 1;
+const { advanceCalendarMonth: advanceNewsMonth } = await import(
+  `file://${join(sim, 'modules/Calendar.js')}`
+);
+advanceNewsMonth(newsA);
 applyOfflineMonthlyNews(newsA);
 const headB = newsA.news.currentMonthArticles?.[0]?.headline ?? '';
 if (!headA || headA === headB) {
@@ -646,8 +650,11 @@ loanState.finance.arr = 60_000;
 loanState.finance.mrr = 5_000;
 loanState.meta.runSeed = 42;
 let approved = false;
+const { advanceCalendarMonth: advanceLoanMonth } = await import(
+  `file://${join(sim, 'modules/Calendar.js')}`
+);
 for (let i = 0; i < 12; i += 1) {
-  loanState.calendar.monthIndex = i + 1;
+  if (i > 0) advanceLoanMonth(loanState);
   const r = requestLoanDraw(loanState, 25_000);
   if (r.ok) {
     approved = true;
@@ -744,8 +751,19 @@ if (!failed) {
     failed = true;
   }
 }
+const { isRealCalendarYear, formatStateMonth } = await import(
+  `file://${join(sim, 'modules/GameCalendar.js')}`
+);
+const calState = createInitialState({ companyName: 'Cal Co', categoryId: 'b2b-saas', mode: 'career' });
+if (!isRealCalendarYear(calState.calendar.year)) {
+  console.error('FAIL: career should start on real calendar year');
+  failed = true;
+} else if (!formatStateMonth(calState).match(/\d{4}/)) {
+  console.error('FAIL: calendar label format');
+  failed = true;
+}
 if (!failed) {
-  console.log('OK: finance stack + CEO salary, draws, career comp');
+  console.log('OK: finance stack + CEO salary, draws, career comp, real calendar');
 }
 
 process.exit(failed ? 1 : 0);

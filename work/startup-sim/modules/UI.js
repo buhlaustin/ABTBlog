@@ -1,4 +1,6 @@
 import { formatMoney, stageLabel, getMonthlyTaskSlots } from './constants.js';
+import { formatStateMonth, formatCalendarStamp, realClockNow, sandboxCalendarYearOptions } from './GameCalendar.js';
+import { calendarTurn } from './XC.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
 import { renderCompaniesPanel } from './Acquisitions.js';
@@ -102,6 +104,20 @@ export function bindSandboxCashToggle(form) {
     if (tuning) tuning.hidden = !sandbox;
   };
 
+  const monthSel = document.getElementById('sandbox-start-month');
+  const yearSel = document.getElementById('sandbox-start-year');
+  if (yearSel && !yearSel.options.length) {
+    for (const yr of sandboxCalendarYearOptions()) {
+      const opt = document.createElement('option');
+      opt.value = String(yr);
+      opt.textContent = String(yr);
+      yearSel.appendChild(opt);
+    }
+  }
+  const now = realClockNow();
+  if (monthSel) monthSel.value = String(now.monthIndex);
+  if (yearSel) yearSel.value = String(now.year);
+
   form.addEventListener('change', sync);
   sync();
 }
@@ -162,7 +178,7 @@ export function renderGameHud(state) {
   if (cash) cash.textContent = formatMoney(state.finance.cash);
   if (revenue) revenue.textContent = formatMoney(getArr(state));
   if (month) {
-    month.textContent = `M${state.calendar.monthIndex}, Y${state.calendar.year}`;
+    month.textContent = formatStateMonth(state, 'hud');
   }
   if (mode) {
     const revHud = taskRevenueMultHud(state);
@@ -338,7 +354,7 @@ export function renderDeskPanel(state) {
         .slice(0, 6)
         .map(
           (e) =>
-            `<li><span class="log-when">Y${e.year} M${e.month}</span> ${escapeHtml(e.message)}</li>`
+            `<li><span class="log-when">${escapeHtml(formatCalendarStamp(e.year, e.month))}</span> ${escapeHtml(e.message)}</li>`
         )
         .join('') || '<li class="muted">No events yet.</li>'}</ul>
     </section>
@@ -656,7 +672,7 @@ export function renderGameOver(state) {
   if (eyebrow) eyebrow.textContent = victory ? 'CEO step-down' : 'Run ended';
   if (title) title.textContent = state.company.name;
   if (body) {
-    const months = (state.calendar.year - 1) * 12 + state.calendar.monthIndex - 1;
+    const months = Math.max(0, calendarTurn(state) - 1);
     if (victory) {
       const e = state.ending;
       body.innerHTML = `

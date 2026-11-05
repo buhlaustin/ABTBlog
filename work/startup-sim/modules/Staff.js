@@ -7,6 +7,7 @@ import {
   salaryTierMult
 } from './Workspace.js';
 import { setGameFeedback } from './GameFeedback.js';
+import { formatCalendarStamp } from './GameCalendar.js';
 
 export const DEPARTMENTS = [
   { id: 'engineering', label: 'Engineering' },
@@ -230,7 +231,7 @@ export function renderPeoplePanel(container, state) {
   const totalFinal = totalHeadcount(state.staff.headcountByDept);
   const finalizedLabel =
     state.staff.lastFinalizedMonth != null
-      ? `Y${state.staff.lastFinalizedYear} M${state.staff.lastFinalizedMonth}`
+      ? formatCalendarStamp(state.staff.lastFinalizedYear, state.staff.lastFinalizedMonth)
       : 'never';
 
   const orgMount = hiringAllowed(state)

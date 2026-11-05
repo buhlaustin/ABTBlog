@@ -1,3 +1,4 @@
+import { formatStateMonth } from './GameCalendar.js';
 import { getCategoryById, categoryEconomics, getCategoriesSync } from './Categories.js';
 import { createCompetitorForCategory } from './Competitor.js';
 import { adjustSentiment } from './Sentiment.js';
@@ -40,7 +41,7 @@ export function applyPivot(state, newCategoryId) {
     dek: 'Same team, new pitch deck, fresh buzz penalty.',
     body: `The Financier Times notes the repositioning. ProNet commentators debate whether it is vision or panic. Your Desk tasks will skew toward the new industry next month.`,
     source: 'The Financier Times',
-    date: `Y${state.calendar.year} M${state.calendar.monthIndex}`
+    date: formatStateMonth(state, 'short')
   };
   state.news.currentMonthArticles = [article, ...(state.news.currentMonthArticles ?? [])].slice(
     0,

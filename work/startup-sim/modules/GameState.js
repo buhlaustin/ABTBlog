@@ -3,6 +3,7 @@ import { createInitialStaff } from './Staff.js';
 import { createInitialSocial } from './Social.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
+import { realClockNow, migrateLegacyCalendar } from './GameCalendar.js';
 import { recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
@@ -30,7 +31,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 26;
+export const SAVE_VERSION = 28;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -65,6 +66,10 @@ export function createInitialState(options) {
   }
 
   const economics = categoryEconomics(category);
+  const calendarStart =
+    mode === 'sandbox' && options.sandboxTuning?.calendarStart
+      ? options.sandboxTuning.calendarStart
+      : realClockNow();
 
   const state = {
     version: SAVE_VERSION,
@@ -83,7 +88,7 @@ export function createInitialState(options) {
     growth: { campaignsThisMonth: [] },
     board: createInitialBoard(),
     stage: STAGES.GARAGE,
-    calendar: createInitialCalendar(),
+    calendar: createInitialCalendar(calendarStart),
     finance: {
       cash: startingCash,
       lifetimeRevenue: 0,
@@ -126,7 +131,9 @@ export function createInitialState(options) {
       initialInvestmentCash: startingCash,
       monthsAtIpo: null,
       hofRecorded: false,
-      hofHighlights: []
+      hofHighlights: [],
+      calendarStartYear: calendarStart.year,
+      calendarStartMonth: calendarStart.monthIndex
     },
     publicMarket: createInitialPublicMarket(),
     ending: null,
@@ -194,7 +201,8 @@ export function normalizeSave(raw) {
     if (!state.product) state.product = { level: 0, buzz: 0 };
     if (!state.product.buzz && state.product.buzz !== 0) state.product.buzz = 0;
     if (state.product.actionsThisMonth === undefined) state.product.actionsThisMonth = 0;
-    if (!state.calendar) state.calendar = createInitialCalendar();
+    if (!state.calendar) state.calendar = createInitialCalendar(realClockNow());
+    migrateLegacyCalendar(state);
     if (!state.calendar.monthTasks) state.calendar.monthTasks = [];
     if (!state.calendar.log) state.calendar.log = [];
     if (!state.calendar.recentTaskIds) state.calendar.recentTaskIds = [];

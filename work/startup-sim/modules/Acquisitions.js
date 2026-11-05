@@ -1,6 +1,7 @@
 import { fetchGameJson } from './utils.js';
 import { formatMoney } from './constants.js';
 import { calendarTurn } from './XC.js';
+import { formatCalendarStamp } from './GameCalendar.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow } from './Finance.js';
 import { easeCompetitorPressure, bumpCompetitorPressure } from './Competitor.js';
@@ -657,7 +658,7 @@ export function renderCompaniesPanel(container, state) {
     .slice(0, 6)
     .map(
       (d) =>
-        `<li><strong>Y${d.year} M${d.month}</strong> ${escapeHtml(d.kind)} ${escapeHtml(d.name)} — ${formatMoney(d.amount)} <span class="fine-print">${escapeHtml(d.detail ?? '')}</span></li>`
+        `<li><strong>${escapeHtml(formatCalendarStamp(d.year, d.month))}</strong> ${escapeHtml(d.kind)} ${escapeHtml(d.name)} — ${formatMoney(d.amount)} <span class="fine-print">${escapeHtml(d.detail ?? '')}</span></li>`
     )
     .join('');
 

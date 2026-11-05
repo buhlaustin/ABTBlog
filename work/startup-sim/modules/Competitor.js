@@ -1,3 +1,5 @@
+import { formatStateMonth } from './GameCalendar.js';
+
 /** One fictional rival per run — news flavor and light market friction. */
 
 const RIVALS = {
@@ -50,6 +52,6 @@ export function maybeCompetitorNewsArticle(state) {
     dek: `Investors pretend ${rival.product} is not the same idea.`,
     body: `${rival.name} closed a fictional round and hired your former intern. ProNet threads are unkind.`,
     source: 'Chirp Business',
-    date: `Y${state.calendar.year} M${state.calendar.monthIndex}`
+    date: formatStateMonth(state, 'short')
   };
 }

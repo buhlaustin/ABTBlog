@@ -4,6 +4,7 @@ import { buildNarrativeContext } from './GameContext.js';
 import { maybeCompetitorNewsArticle, bumpCompetitorPressure } from './Competitor.js';
 import { getArr } from './Workspace.js';
 import bundledTimeline from '../data/news-timeline-seed.json' with { type: 'json' };
+import { calendarTurn, formatStateMonth, formatCalendarStamp } from './GameCalendar.js';
 
 let timelineSeed = bundledTimeline;
 let timelineHydrated = false;
@@ -39,11 +40,11 @@ export function createInitialNews() {
 }
 
 export function monthTurn(state) {
-  return (state.calendar.year - 1) * 12 + state.calendar.monthIndex;
+  return calendarTurn(state);
 }
 
 function monthLabel(state) {
-  return `Year ${state.calendar.year}, month ${state.calendar.monthIndex}`;
+  return formatStateMonth(state);
 }
 
 function formatMoneyShort(n) {
@@ -377,7 +378,7 @@ export function archiveCurrentNews(state) {
 
 function matchingTimelineEvents(state, events) {
   const m = state.calendar.monthIndex;
-  const y = 2026 + (state.calendar.year - 1);
+  const y = state.calendar.year;
   return events.filter((e) => e.month === m && e.year === y);
 }
 
@@ -601,7 +602,7 @@ export function renderNewsPanel(container, state) {
         .map(
           (block) => `
         <section class="news-archive-block">
-          <h4>Y${block.year} M${block.month}</h4>
+          <h4>${escapeHtml(formatCalendarStamp(block.year, block.month))}</h4>
           ${block.articles
             .map(
               (a) => `<p><strong>${escapeHtml(a.headline)}</strong> — ${escapeHtml(a.source)}</p>`
