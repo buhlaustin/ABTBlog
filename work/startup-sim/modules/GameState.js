@@ -203,6 +203,11 @@ export function normalizeSave(raw) {
       state.staff.benefitsThisMonth = { companyBonusPct: null, offsiteId: null, perks: [] };
     }
     migrateStaffHeadcount(state);
+    if (state.ceo) {
+      if (!state.ceo.section) state.ceo.section = 'overview';
+      if (state.ceo.personalGivingLifetime == null) state.ceo.personalGivingLifetime = 0;
+      if (!state.ceo.netWorthHistory) state.ceo.netWorthHistory = [];
+    }
     if (state.staff.companyBonusAnnualMode === undefined) state.staff.companyBonusAnnualMode = false;
     if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
     if (state.staff.optionPoolExpandedThisMonth === undefined) {

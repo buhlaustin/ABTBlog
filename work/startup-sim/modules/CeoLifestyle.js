@@ -73,6 +73,26 @@ export const CEO_LIFESTYLE_PURCHASES = [
     cost: 2_800_000,
     monthlyDebitBump: 18_000,
     blurb: 'Dock fees, crew, and fuel — discretionary line never recovers.'
+  },
+  {
+    id: 'art-collection',
+    label: 'Contemporary art fund',
+    cost: 650_000,
+    blurb: 'Blue-chip pieces — appraisal fictionally tracks your net worth.'
+  },
+  {
+    id: 'jet-card',
+    label: 'Private jet card (25 hr)',
+    cost: 385_000,
+    monthlyDebitBump: 4_800,
+    blurb: 'Charter hours — every board meeting is “client visit”.'
+  },
+  {
+    id: 'wine-cellar',
+    label: 'Wine cellar build-out',
+    cost: 220_000,
+    monthlyDebitBump: 900,
+    blurb: 'Climate-controlled — entertainment budget finds a home.'
   }
 ];
 
@@ -209,12 +229,53 @@ function payFromPersonalBank(state, amount, label, kind) {
   return { ok: true, paid: pay };
 }
 
+export function sellCeoHome(state) {
+  const housing = ensureHousing(state);
+  if (!housing || housing.mode === HOUSING_MODE.RENT) {
+    return { ok: false, reason: 'You are renting — no home to sell.' };
+  }
+  const summary = ceoHousingSummary(state);
+  const tier = getCeoHomeTier(housing.tierId);
+  const friction = 0.06;
+  const proceeds = Math.max(0, Math.round(summary.equity * (1 - friction)));
+  if (proceeds > 0) {
+    state.ceo.bankBalance = (state.ceo.bankBalance ?? 0) + proceeds;
+    if (!state.ceo.bankLog) state.ceo.bankLog = [];
+    state.ceo.bankLog.unshift({
+      kind: 'home_sale',
+      amount: proceeds,
+      delta: proceeds,
+      balanceAfter: state.ceo.bankBalance,
+      label: `Sold ${tier?.label ?? 'home'} (net of fees)`,
+      turn: calendarTurn(state),
+      month: state.calendar?.monthIndex,
+      year: state.calendar?.year
+    });
+    if (state.ceo.bankLog.length > 12) state.ceo.bankLog.length = 12;
+  }
+  housing.mode = HOUSING_MODE.RENT;
+  housing.tierId = 'rent';
+  housing.purchasePrice = 0;
+  housing.mortgageBalance = 0;
+  housing.mortgagePaymentMonthly = 0;
+  housing.maintenanceMonthly = 0;
+  housing.purchasedTurn = null;
+  return {
+    ok: true,
+    proceeds,
+    summary:
+      proceeds > 0
+        ? `Sold ${tier?.label ?? 'home'} — ${formatMoney(proceeds)} to personal bank after ~6% sale costs. Housing debits return to the rent band.`
+        : 'Listed the home — debits return to the rent band.'
+  };
+}
+
 export function purchaseCeoHomeCash(state, tierId) {
   const tier = getCeoHomeTier(tierId);
   if (!tier) return { ok: false, reason: 'Unknown home tier.' };
   const housing = ensureHousing(state);
   if (housing.mode !== HOUSING_MODE.RENT) {
-    return { ok: false, reason: 'Sell or pay off your current home first (future feature — pick one home per run).' };
+    return { ok: false, reason: 'Sell your current home on the Lifestyle tab before buying another.' };
   }
   const paid = payFromPersonalBank(state, tier.cashPrice, `Bought ${tier.label} (cash)`, 'home_cash');
   if (!paid.ok) return paid;
@@ -238,7 +299,7 @@ export function purchaseCeoHomeMortgage(state, tierId) {
   if (!tier) return { ok: false, reason: 'Unknown home tier.' };
   const housing = ensureHousing(state);
   if (housing.mode !== HOUSING_MODE.RENT) {
-    return { ok: false, reason: 'You already own or carry a mortgage on another home.' };
+    return { ok: false, reason: 'Sell your current home before taking a new mortgage.' };
   }
   const down = Math.round(tier.cashPrice * (tier.downPct ?? 0.2));
   const paid = payFromPersonalBank(state, down, `${tier.label} down payment`, 'home_down');

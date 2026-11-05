@@ -94,13 +94,18 @@ import {
   drawRevenueAdvance,
   showFinanceFeedback
 } from './modules/Fundraising.js';
-import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback } from './modules/Ceo.js';
+import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback, setCeoSection } from './modules/Ceo.js';
 import {
   purchaseCeoHomeCash,
   purchaseCeoHomeMortgage,
   purchaseCeoLifestyle
 } from './modules/CeoLifestyle.js';
-import { preparePersonalExpensesForMonth } from './modules/CeoEconomics.js';
+import {
+  preparePersonalExpensesForMonth,
+  takeOwnerDrawFraction,
+  donateFromPersonalBank
+} from './modules/CeoEconomics.js';
+import { sellCeoHome } from './modules/CeoLifestyle.js';
 import {
   hireCoo,
   releaseCoo,
@@ -1101,6 +1106,12 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const ceoTab = e.target.closest('[data-ceo-tab]');
+    if (ceoTab && sessionState) {
+      setCeoSection(sessionState, ceoTab.getAttribute('data-ceo-tab'));
+      refresh();
+      return;
+    }
     const bonusBtn = e.target.closest('[data-company-bonus]');
     if (bonusBtn && sessionState) {
       const result = payCompanyWideBonus(sessionState, bonusBtn.getAttribute('data-company-bonus'));
@@ -1295,6 +1306,53 @@ function bindGameInteractions() {
       else {
         appendLog(sessionState, result.summary);
         showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const drawPctBtn = e.target.closest('[data-owner-draw-pct]');
+    if (drawPctBtn && sessionState) {
+      const result = takeOwnerDrawFraction(sessionState, drawPctBtn.getAttribute('data-owner-draw-pct'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Draw failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-sell-ceo-home' && sessionState) {
+      const result = sellCeoHome(sessionState);
+      if (!result.ok) showCeoFeedback(result.reason || 'Sale failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    const personalGiveBtn = e.target.closest('[data-ceo-personal-give]');
+    if (personalGiveBtn && sessionState) {
+      const result = donateFromPersonalBank(
+        sessionState,
+        personalGiveBtn.getAttribute('data-ceo-personal-give')
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-ceo-personal-give-custom' && sessionState) {
+      const input = document.getElementById('ceo-personal-give-input');
+      const result = donateFromPersonalBank(sessionState, input?.value);
+      if (!result.ok) showCeoFeedback(result.reason || 'Gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
       }
       refresh();
       return;

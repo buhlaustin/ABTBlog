@@ -592,6 +592,46 @@ h1 {
   background: #f59e0b;
 }
 
+.ceo-subtabs {
+  margin-bottom: 0.75rem;
+}
+
+.ceo-nw-history {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.ceo-nw-row {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.ceo-nw-bar {
+  display: block;
+  height: 0.45rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent, #58a6ff), var(--accent-muted, #388bfd));
+  min-width: 4px;
+}
+
+.ceo-nw-val {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ceo-home-sell {
+  margin: 0.75rem 0;
+}
+
+.ceo-home-card--current {
+  outline: 1px solid var(--accent, #58a6ff);
+}
+
 .ceo-home-actions {
   display: flex;
   flex-wrap: wrap;

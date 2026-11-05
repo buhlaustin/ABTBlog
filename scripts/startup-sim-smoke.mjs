@@ -1714,6 +1714,51 @@ const {
   isDepartmentUnlocked,
   migrateStaffHeadcount
 } = await import(`file://${join(sim, 'modules/Staff.js')}`);
+const { sellCeoHome, purchaseCeoHomeCash } = await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
+const { donateFromPersonalBank, recordCeoNetWorthSnapshot, ceoNetWorth } = await import(
+  `file://${join(sim, 'modules/CeoEconomics.js')}`
+);
+const homeState = createInitialState({
+  companyName: 'HomeSellCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 500_000
+});
+homeState.ceo.bankBalance = 2_000_000;
+const bought = purchaseCeoHomeCash(homeState, 'starter-condo');
+if (!bought.ok) {
+  console.error(`FAIL: CEO home purchase: ${bought.reason}`);
+  failed = true;
+} else {
+  const sold = sellCeoHome(homeState);
+  if (!sold.ok || homeState.ceo.housing.mode !== 'rent') {
+    console.error(`FAIL: CEO sell home: ${sold.reason ?? 'housing not reset'}`);
+    failed = true;
+  } else {
+    const giveState = createInitialState({
+      companyName: 'GivePersonal',
+      categoryId: 'b2b-saas',
+      mode: 'sandbox'
+    });
+    giveState.ceo.bankBalance = 20_000;
+    const gift = donateFromPersonalBank(giveState, 5_000);
+    if (!gift.ok || giveState.ceo.personalGivingLifetime !== 5_000) {
+      console.error(`FAIL: personal philanthropy: ${gift.reason ?? 'lifetime mismatch'}`);
+      failed = true;
+    } else {
+      recordCeoNetWorthSnapshot(giveState);
+      if (!(giveState.ceo.netWorthHistory?.[0]?.netWorth > 0)) {
+        console.error('FAIL: CEO net worth snapshot');
+        failed = true;
+      } else {
+        console.log(
+          `OK: CEO tab (sell home ${formatMoney(sold.proceeds)}, personal give, net worth ${formatMoney(ceoNetWorth(giveState))})`
+        );
+      }
+    }
+  }
+}
+
 if (DEPARTMENTS.length < 15) {
   console.error(`FAIL: expected 15 departments, got ${DEPARTMENTS.length}`);
   failed = true;

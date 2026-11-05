@@ -23,7 +23,7 @@ const dataAttrs = new Set();
 for (const { text } of sources) {
   for (const m of text.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) btnIds.add(m[1]);
   for (const m of text.matchAll(/\bid='(btn-[a-z0-9-]+)'/g)) btnIds.add(m[1]);
-  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest-pick|acquisition-reinvest-submit|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|ceo-home-cash|ceo-home-mortgage|ceo-lifestyle|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action|buy-all-side|buy-all-growth|people-tab|company-bonus|company-bonus-annual|employee-offsite|employee-perk|expand-option-pool|seed-structure)/g)) {
+  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest-pick|acquisition-reinvest-submit|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|owner-draw-pct|ceo-salary-preset|ceo-home-cash|ceo-home-mortgage|ceo-lifestyle|ceo-tab|ceo-personal-give|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action|buy-all-side|buy-all-growth|people-tab|company-bonus|company-bonus-annual|employee-offsite|employee-perk|expand-option-pool|seed-structure)/g)) {
     dataAttrs.add(m[1]);
   }
 }
@@ -98,6 +98,9 @@ const dataPatterns = {
   'loan-draw': "closest('[data-loan-draw]')",
   'loan-prepay': "closest('[data-loan-prepay]')",
   'owner-draw': "closest('[data-owner-draw]')",
+  'owner-draw-pct': "closest('[data-owner-draw-pct]')",
+  'ceo-tab': "closest('[data-ceo-tab]')",
+  'ceo-personal-give': "closest('[data-ceo-personal-give]')",
   'ceo-home-cash': "closest('[data-ceo-home-cash]')",
   'ceo-home-mortgage': "closest('[data-ceo-home-mortgage]')",
   'ceo-lifestyle': "closest('[data-ceo-lifestyle]')",

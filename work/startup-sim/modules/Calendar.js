@@ -9,6 +9,7 @@ import { settleRevenueAdvanceAtMonthEnd } from './RevenueAdvance.js';
 import {
   recordCeoSalaryForMonth,
   settlePersonalExpensesAtMonthEnd,
+  recordCeoNetWorthSnapshot,
   preparePersonalExpensesForMonth
 } from './CeoEconomics.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
@@ -130,6 +131,7 @@ export function endMonth(state) {
   for (const line of settlePersonalExpensesAtMonthEnd(state)) {
     appendLog(state, line);
   }
+  recordCeoNetWorthSnapshot(state);
   for (const line of settleRevenueAdvanceAtMonthEnd(state)) {
     appendLog(state, line);
   }

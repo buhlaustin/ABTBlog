@@ -52,7 +52,10 @@ export function createInitialCeoState() {
       purchasedTurn: null
     },
     lifestyleOwned: [],
-    lifestyleDebitBump: 0
+    lifestyleDebitBump: 0,
+    section: 'overview',
+    personalGivingLifetime: 0,
+    netWorthHistory: []
   };
 }
 
@@ -453,6 +456,55 @@ export function settlePersonalExpensesAtMonthEnd(state) {
 
 export function maxOwnerDrawAmount(state) {
   return Math.max(0, Math.floor(state.finance?.cash ?? 0));
+}
+
+export function ownerDrawAmountForFraction(state, fraction) {
+  const max = maxOwnerDrawAmount(state);
+  const f = Math.min(1, Math.max(0, Number(fraction) || 0));
+  if (f <= 0 || max < 500) return 0;
+  return Math.max(500, Math.floor(max * f));
+}
+
+export function takeOwnerDrawFraction(state, fraction) {
+  const draw = ownerDrawAmountForFraction(state, fraction);
+  if (draw < 500) {
+    return { ok: false, reason: 'Not enough company cash for a draw (min $500).' };
+  }
+  return takeOwnerDraw(state, draw);
+}
+
+export function donateFromPersonalBank(state, amountRaw) {
+  if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
+  const amount = Math.round(Number(amountRaw) || 0);
+  if (amount < 500) return { ok: false, reason: 'Minimum personal gift is $500.' };
+  const ceo = ceoState(state);
+  ensureCeoPersonalBank(state);
+  const bal = ceo.bankBalance ?? 0;
+  if (bal < amount) {
+    return { ok: false, reason: `Personal bank is ${formatMoney(bal)} — cannot give ${formatMoney(amount)}.` };
+  }
+  const paid = debitPersonalBank(state, amount, 'Personal philanthropy', 'personal_giving');
+  ceo.personalGivingLifetime = (ceo.personalGivingLifetime ?? 0) + paid;
+  return {
+    ok: true,
+    amount: paid,
+    lifetime: ceo.personalGivingLifetime,
+    summary: `Gave ${formatMoney(paid)} from your personal bank (lifetime giving ${formatMoney(ceo.personalGivingLifetime)}).`
+  };
+}
+
+export function recordCeoNetWorthSnapshot(state) {
+  const ceo = ceoState(state);
+  if (!ceo.netWorthHistory) ceo.netWorthHistory = [];
+  const net = ceoNetWorth(state);
+  const stamp = logStamp(state);
+  const last = ceo.netWorthHistory[0];
+  if (last?.turn === stamp.turn) {
+    last.netWorth = net;
+    return;
+  }
+  ceo.netWorthHistory.unshift({ netWorth: net, ...stamp });
+  if (ceo.netWorthHistory.length > 18) ceo.netWorthHistory.length = 18;
 }
 
 export function canTakeOwnerDraw(state, amount) {
