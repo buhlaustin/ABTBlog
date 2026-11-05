@@ -76,6 +76,25 @@ if (!catalogAudit.ok) {
   console.log(`OK: all ${catalogAudit.taskCount} desk tasks pass catalog audit (schema + copy bar)`);
 }
 
+const { auditGrowthCampaignCatalog } = await import(
+  `file://${join(sim, 'modules/GrowthCampaignAudit.js')}`
+);
+const { getGrowthCampaigns } = await import(`file://${join(sim, 'modules/GrowthCampaigns.js')}`);
+const growthAudit = auditGrowthCampaignCatalog(getGrowthCampaigns());
+if (!growthAudit.ok) {
+  console.error(
+    `FAIL: growth campaign audit (${growthAudit.issues.length} issues on ${growthAudit.campaignCount} campaigns)`
+  );
+  growthAudit.issues.slice(0, 12).forEach((issue) => {
+    console.error(`  ${issue.code} ${issue.campaignId ?? issue.id}: ${issue.message}`);
+  });
+  failed = true;
+} else {
+  console.log(
+    `OK: all ${growthAudit.campaignCount} paid growth campaigns pass catalog audit (unique, no template slop)`
+  );
+}
+
 function categoryAllowed(task, categoryId) {
   const cats = task.categories;
   if (!cats?.length) return true;

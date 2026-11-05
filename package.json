@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run copy-work && next dev",
-    "prebuild": "node scripts/inject-hos-config.mjs && node scripts/validate-startup-sim-assets.mjs && node scripts/startup-sim-smoke.mjs && node scripts/copy-work-assets.mjs && node scripts/generate-rss.mjs && node scripts/seo-audit.mjs",
+    "prebuild": "node scripts/inject-hos-config.mjs && node scripts/validate-startup-sim-assets.mjs && node work/startup-sim/scripts/audit-task-catalog.mjs && node work/startup-sim/scripts/audit-growth-campaigns.mjs && node scripts/startup-sim-smoke.mjs && node scripts/copy-work-assets.mjs && node scripts/generate-rss.mjs && node scripts/seo-audit.mjs",
     "audit:seo": "node scripts/seo-audit.mjs",
     "build": "next build --webpack",
     "start": "next start",

@@ -2,9 +2,22 @@
 
 const VALID_TYPES = new Set(['marketing', 'sales', 'research', 'product', 'growth', 'support', 'success']);
 const VALID_STAGES = new Set(['garage', 'office', 'xc', 'post_xc', 'public']);
-const PLACEHOLDER_DESC = /keeps the rotating catalog|desk play #/i;
-const PLACEHOLDER_TITLE = /\(cycle \d+\)/i;
+const PLACEHOLDER_DESC =
+  /keeps the rotating catalog|desk play #|legal clears claims; growth clears the invoice|sales wants leads by friday\./i;
+const PLACEHOLDER_TITLE =
+  /\(cycle \d+\)|public whale desk|giga enterprise|mega enterprise close|#\d+\s*:|desk #\d+/i;
 const NONSENSE = /\b(asdf|lorem ipsum|foo bar|test task)\b/i;
+
+/** Collapse digits so numbered clones fail audit. */
+export function normalizeTaskTitleSkeleton(title) {
+  return String(title ?? '')
+    .toLowerCase()
+    .replace(/\(\d+\)/g, '(#)')
+    .replace(/\s#\d+\b/g, ' #')
+    .replace(/\d+/g, '#')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 const MIN_DESC_CHARS = 20;
 /** Punchy one-liners are OK; reject single-phrase blurbs under three words. */
@@ -61,16 +74,16 @@ export function auditTaskDefinition(task) {
         taskId: id
       });
     }
-    if (PLACEHOLDER_DESC.test(description)) {
-      issues.push({ id, code: 'placeholder_description', message: 'Placeholder catalog copy', taskId: id });
-    }
     if (description.toLowerCase() === title.toLowerCase()) {
       issues.push({ id, code: 'description_equals_title', message: 'Description duplicates title', taskId: id });
     }
   }
 
   if (PLACEHOLDER_TITLE.test(title)) {
-    issues.push({ id, code: 'placeholder_title', message: 'Placeholder cycle title', taskId: id });
+    issues.push({ id, code: 'placeholder_title', message: 'Generated/template task title', taskId: id });
+  }
+  if (PLACEHOLDER_DESC.test(description)) {
+    issues.push({ id, code: 'placeholder_description', message: 'Generated/template description', taskId: id });
   }
   if (NONSENSE.test(`${title} ${description}`)) {
     issues.push({ id, code: 'nonsense_copy', message: 'Nonsense placeholder text', taskId: id });
@@ -133,6 +146,8 @@ export function auditTaskCatalog(tasks) {
   const issues = [];
   const ids = new Set();
   const titles = new Map();
+  const descriptions = new Map();
+  const skeletons = new Map();
 
   for (const task of tasks) {
     const id = String(task.id ?? '');
@@ -147,6 +162,18 @@ export function auditTaskCatalog(tasks) {
       titles.get(titleKey).push(id);
     }
 
+    const descKey = String(task.description ?? '').trim().toLowerCase();
+    if (descKey) {
+      if (!descriptions.has(descKey)) descriptions.set(descKey, []);
+      descriptions.get(descKey).push(id);
+    }
+
+    const sk = normalizeTaskTitleSkeleton(task.title);
+    if (sk) {
+      if (!skeletons.has(sk)) skeletons.set(sk, []);
+      skeletons.get(sk).push(id);
+    }
+
     issues.push(...auditTaskDefinition(task));
   }
 
@@ -156,6 +183,28 @@ export function auditTaskCatalog(tasks) {
         id: taskIds[0],
         code: 'duplicate_title',
         message: `Duplicate title “${titleKey}” on ${taskIds.join(', ')}`,
+        taskId: taskIds[0]
+      });
+    }
+  }
+
+  for (const [descKey, taskIds] of descriptions) {
+    if (taskIds.length > 1) {
+      issues.push({
+        id: taskIds[0],
+        code: 'duplicate_description',
+        message: `Duplicate description on ${taskIds.join(', ')}`,
+        taskId: taskIds[0]
+      });
+    }
+  }
+
+  for (const [sk, taskIds] of skeletons) {
+    if (taskIds.length > 1) {
+      issues.push({
+        id: taskIds[0],
+        code: 'template_title_skeleton',
+        message: `Template title skeleton “${sk}” on ${taskIds.join(', ')}`,
         taskId: taskIds[0]
       });
     }
