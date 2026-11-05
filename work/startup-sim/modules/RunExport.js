@@ -1,13 +1,16 @@
 import { formatMoney, stageLabel } from './constants.js';
+import { formatStateMonth } from './GameCalendar.js';
+import { calendarTurn } from './XC.js';
 
 export function buildRunExportText(state) {
   const lines = [];
   const company = state.company?.name ?? 'Company';
-  const months = (state.calendar.year - 1) * 12 + state.calendar.monthIndex;
+  const months = calendarTurn(state);
   lines.push(`Startup Simulator — ${company}`);
   lines.push(`Mode: ${state.mode === 'sandbox' ? 'Sandbox' : 'Career'}`);
   lines.push(`Category: ${state.company?.categoryLabel ?? '—'}`);
   lines.push(`Stage: ${stageLabel(state.stage)}`);
+  lines.push(`Calendar: ${formatStateMonth(state)}`);
   lines.push(`Months played: ${months}`);
   lines.push(`Lifetime revenue: ${formatMoney(state.finance?.lifetimeRevenue ?? 0)}`);
   lines.push(`Cash: ${formatMoney(state.finance?.cash ?? 0)}`);
@@ -19,6 +22,10 @@ export function buildRunExportText(state) {
     lines.push(`Payout: ${formatMoney(e.payout)}`);
     lines.push(`Ticker: ${e.ticker ?? '—'} @ ${formatMoney(e.sharePrice)}/share`);
     lines.push(`Founder stake: ${e.founderPct}%`);
+    lines.push(`CEO salary (career): ${formatMoney(e.ceoSalaryCareer ?? 0)}`);
+    lines.push(`Owner draws: ${formatMoney(e.ceoOwnerDraws ?? 0)}`);
+    lines.push(`Personal bank at exit: ${formatMoney(e.ceoBankBalance ?? 0)}`);
+    lines.push(`Total personal cash comp: ${formatMoney(e.totalCareerCashComp ?? e.payout)}`);
     if (e.pressHeadline) lines.push(`Press: ${e.pressHeadline}`);
   } else if (state.flags?.gameOver) {
     lines.push('');

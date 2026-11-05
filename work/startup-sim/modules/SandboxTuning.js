@@ -16,10 +16,17 @@ export function parseSandboxTuning(formData, mode) {
   const revenueMult = Number(formData.get('sandboxRevenueMult')) || 1;
   const startingStage = String(formData.get('sandboxStartStage') || 'garage');
   const ipoGateArr = Number(formData.get('sandboxIpoGate')) || REVENUE_GATES.IPO;
+  const startYear = Number(formData.get('sandboxStartYear'));
+  const startMonth = Number(formData.get('sandboxStartMonth'));
+  let calendarStart = null;
+  if (startYear >= 2000 && startMonth >= 1 && startMonth <= 12) {
+    calendarStart = { year: startYear, monthIndex: startMonth };
+  }
   return {
     revenueMult: Math.max(0.5, Math.min(20, revenueMult)),
     startingStage,
-    ipoGateArr: Math.max(500_000, Math.min(REVENUE_GATES.IPO, ipoGateArr))
+    ipoGateArr: Math.max(500_000, Math.min(REVENUE_GATES.IPO, ipoGateArr)),
+    calendarStart
   };
 }
 
@@ -61,8 +68,8 @@ export function applySandboxStartingStage(state) {
       raised: 3_000_000,
       preMoney: 12_000_000,
       postMoney: 15_000_000,
-      closedMonth: 1,
-      closedYear: 1
+      closedMonth: state.calendar?.monthIndex ?? 1,
+      closedYear: state.calendar?.year ?? 2026
     };
     const hub = ATLANTA_HUB;
     state.offices.hubId = hub.id;

@@ -1,4 +1,5 @@
 import { formatMoney } from './constants.js';
+import { calendarTurn } from './XC.js';
 
 const HOF_KEY = 'startup_sim_hall_of_fame_v1';
 
@@ -40,9 +41,7 @@ function saveHallOfFame(data) {
 }
 
 function monthsPlayed(state) {
-  const y = state.calendar?.year ?? 1;
-  const m = state.calendar?.monthIndex ?? 1;
-  return (y - 1) * 12 + m;
+  return calendarTurn(state);
 }
 
 function isBetter(a, b) {

@@ -98,6 +98,25 @@
             <option value="office">Small office</option>
             <option value="post_xc">Post-XC hub (seed closed)</option>
           </select>
+          <label for="sandbox-start-month">Starting calendar month</label>
+          <div class="name-row">
+            <select id="sandbox-start-month" name="sandboxStartMonth" aria-label="Starting month">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <select id="sandbox-start-year" name="sandboxStartYear" aria-label="Starting year"></select>
+          </div>
+          <p class="fine-print">Career mode always starts in the current real-world month. Sandbox can backdate or skip ahead.</p>
           <label for="sandbox-ipo-gate">IPO ARR gate</label>
           <select id="sandbox-ipo-gate" name="sandboxIpoGate">
             <option value="1000000000">$1B ARR (Career default)</option>
@@ -134,7 +153,9 @@
         <button type="button" role="tab" data-tab="product" id="tab-product" aria-selected="false" aria-controls="panel-product">Product</button>
         <button type="button" role="tab" data-tab="growth" id="tab-growth" aria-selected="false" aria-controls="panel-growth">Growth</button>
         <button type="button" role="tab" data-tab="people" id="tab-people" aria-selected="false" aria-controls="panel-people">People</button>
+        <button type="button" role="tab" data-tab="ceo" id="tab-ceo" aria-selected="false" aria-controls="panel-ceo">CEO</button>
         <button type="button" role="tab" data-tab="finance" id="tab-finance" aria-selected="false" aria-controls="panel-finance">Finance</button>
+        <button type="button" role="tab" data-tab="companies" id="tab-companies" aria-selected="false" aria-controls="panel-companies">Companies</button>
         <button type="button" role="tab" data-tab="board" id="tab-board" aria-selected="false" aria-controls="panel-board">Board</button>
         <button type="button" role="tab" data-tab="social" id="tab-social" aria-selected="false" aria-controls="panel-social">Social</button>
         <button type="button" role="tab" data-tab="news" id="tab-news" aria-selected="false" aria-controls="panel-news">News</button>
@@ -146,7 +167,9 @@
         <div id="panel-product" class="game-panel" data-panel="product" role="tabpanel" aria-labelledby="tab-product" hidden></div>
         <div id="panel-growth" class="game-panel" data-panel="growth" role="tabpanel" aria-labelledby="tab-growth" hidden></div>
         <div id="panel-people" class="game-panel" data-panel="people" role="tabpanel" aria-labelledby="tab-people" hidden></div>
+        <div id="panel-ceo" class="game-panel" data-panel="ceo" role="tabpanel" aria-labelledby="tab-ceo" hidden></div>
         <div id="panel-finance" class="game-panel" data-panel="finance" role="tabpanel" aria-labelledby="tab-finance" hidden></div>
+        <div id="panel-companies" class="game-panel" data-panel="companies" role="tabpanel" aria-labelledby="tab-companies" hidden></div>
         <div id="panel-board" class="game-panel" data-panel="board" role="tabpanel" aria-labelledby="tab-board" hidden></div>
         <div id="panel-social" class="game-panel" data-panel="social" role="tabpanel" aria-labelledby="tab-social" hidden></div>
         <div id="panel-news" class="game-panel" data-panel="news" role="tabpanel" aria-labelledby="tab-news" hidden></div>

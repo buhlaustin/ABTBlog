@@ -23,7 +23,7 @@ const dataAttrs = new Set();
 for (const { text } of sources) {
   for (const m of text.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) btnIds.add(m[1]);
   for (const m of text.matchAll(/\bid='(btn-[a-z0-9-]+)'/g)) btnIds.add(m[1]);
-  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action)/g)) {
+  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action)/g)) {
     dataAttrs.add(m[1]);
   }
 }
@@ -64,6 +64,19 @@ const dataPatterns = {
   'staff-delta': "closest('[data-staff-delta]')",
   'remove-satellite': "closest('[data-remove-satellite]')",
   'crisis-choice': "closest('[data-crisis-choice]')",
+  'decision-choice': "closest('[data-decision-choice]')",
+  'acquisition-buy': "closest('[data-acquisition-buy]')",
+  'acquisition-sell': "closest('[data-acquisition-sell]')",
+  'acquisition-reinvest': "closest('[data-acquisition-reinvest]')",
+  'companies-filter': "closest('[data-companies-filter]')",
+  'companies-page': "closest('[data-companies-page]')",
+  'companies-sort': "closest('[data-companies-sort]')",
+  'acquisition-diligence': "closest('[data-acquisition-diligence]')",
+  'stock-guidance': "closest('[data-stock-guidance]')",
+  'stock-buyback': "closest('[data-stock-buyback]')",
+  'stock-follow-on': "closest('[data-stock-follow-on]')",
+  'stock-split': "closest('[data-stock-split]')",
+  'stock-dividend': "closest('[data-stock-dividend]')",
   'social-tab': "closest('[data-social-tab]')",
   'staff-input': "closest('[data-staff-input]')",
   'tutorial-id': 'btn-dismiss-tutorial',
@@ -71,7 +84,12 @@ const dataPatterns = {
   'purchase-workspace': "closest('[data-purchase-workspace]')",
   'complete-board-task': "closest('[data-complete-board-task]')",
   'hire-exec': "closest('[data-hire-exec]')",
-  'product-action': "closest('[data-product-action]')"
+  'product-action': "closest('[data-product-action]')",
+  'join-accelerator': "closest('[data-join-accelerator]')",
+  'loan-draw': "closest('[data-loan-draw]')",
+  'loan-prepay': "closest('[data-loan-prepay]')",
+  'owner-draw': "closest('[data-owner-draw]')",
+  'ceo-salary-preset': "closest('[data-ceo-salary-preset]')"
 };
 
 for (const attr of dataAttrs) {

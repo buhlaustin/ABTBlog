@@ -15,6 +15,14 @@ import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
 import { progressionRevenueMult } from './ProgressionEconomy.js';
 import { applyTaskRivalEffects } from './WorldDynamics.js';
+import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
+import { loanOverheadMonthly } from './BankLoan.js';
+import { ceoSalaryMonthly } from './CeoEconomics.js';
+import { cooSalaryMonthly } from './Coo.js';
+
+/** Hard caps on desk + growth payout multiplier (after sandbox tuning overlay). */
+export const REV_MULT_CAP_CAREER = 60;
+export const REV_MULT_CAP_SANDBOX = 100;
 
 /** Legacy alias — progression stack replaces seed-only scaling. */
 export function scalingRevenueMult(state) {
@@ -57,7 +65,8 @@ export function getCoreTaskRevenueMult(state) {
     xcProgramRevenueMult(state) *
     acceleratorRevenueMult(state) *
     productBuzzRevenueMult(state) *
-    staffRevenueMultiplier(state);
+    staffRevenueMultiplier(state) *
+    scenarioRevenueMult(state);
   return Math.round(m * 100) / 100;
 }
 
@@ -72,9 +81,44 @@ export function getSandboxTuningMult(state) {
   return state.mode === 'sandbox' ? getSandboxExtraRevenueMult(state) : 1;
 }
 
-/** HUD rev× — full desk payout multiplier including sandbox tuning overlay. */
-export function getTaskRevenueMultiplierPreview(state) {
+export function getTaskRevenueCap(state) {
+  return state.mode === 'sandbox' ? REV_MULT_CAP_SANDBOX : REV_MULT_CAP_CAREER;
+}
+
+/** Core × sandbox tuning, before global cap. */
+export function getRawTaskRevenueMultiplier(state) {
   return applySandboxRevenueTuning(state, getCoreTaskRevenueMult(state));
+}
+
+function clampTaskRevenueMult(state, mult) {
+  const cap = getTaskRevenueCap(state);
+  return Math.round(Math.min(mult, cap) * 100) / 100;
+}
+
+/** HUD rev× — capped desk payout multiplier (sandbox tuning included). */
+export function getTaskRevenueMultiplierPreview(state) {
+  return clampTaskRevenueMult(state, getRawTaskRevenueMultiplier(state));
+}
+
+export function isTaskRevenueMultCapped(state) {
+  return getRawTaskRevenueMultiplier(state) > getTaskRevenueCap(state) + 0.001;
+}
+
+/** Label + tooltip for desk / growth HUD. */
+export function taskRevenueMultHud(state) {
+  const effective = getTaskRevenueMultiplierPreview(state);
+  const raw = getRawTaskRevenueMultiplier(state);
+  const cap = getTaskRevenueCap(state);
+  if (isTaskRevenueMultCapped(state)) {
+    return {
+      effective,
+      raw,
+      cap,
+      label: 'Rev× (capped)',
+      title: `Uncapped stack ${raw.toFixed(1)}× — payouts use ${cap}× max`
+    };
+  }
+  return { effective, raw, cap, label: 'Rev. mult', title: '' };
 }
 
 /** Rough desk payout range at current mult (before per-task headcount roll variance). */
@@ -87,12 +131,31 @@ export function estimateTaskPayoutBand(taskDef, state) {
   };
 }
 
+/** Desk tasks with `mrrGain` — shown on pre-launch crowdfunding plays. */
+export function estimateTaskMrrBand(taskDef) {
+  const spec = taskDef?.mrrGain;
+  if (spec == null) return null;
+  if (Array.isArray(spec) && spec.length >= 2) {
+    return { min: Math.round(spec[0]), max: Math.round(spec[1]) };
+  }
+  const n = Math.round(Number(spec));
+  if (!n) return null;
+  return { min: n, max: n };
+}
+
 export function projectMonthlyBurn(state) {
   const headcount = state.staff?.headcountByDept ?? {};
   const payroll = computePayroll(headcount, state.stage, state);
   let fixed = workspaceRentMonthly(state);
   fixed = Math.round(fixed * hubCostMult(state));
-  return payroll + fixed + satelliteRent(state);
+  return (
+    payroll +
+    fixed +
+    satelliteRent(state) +
+    loanOverheadMonthly(state) +
+    ceoSalaryMonthly(state) +
+    cooSalaryMonthly(state)
+  );
 }
 
 function sandboxMult(state) {
@@ -104,12 +167,15 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
   const sand = sandboxMult(state);
   const cost = Math.round(
-    (taskDef.cost ?? 0) * econ.costMult * sand * hubCostMult(state) * staffCostMultiplier(state)
+    (taskDef.cost ?? 0) *
+      econ.costMult *
+      sand *
+      hubCostMult(state) *
+      staffCostMultiplier(state) *
+      scenarioCostMult(state)
   );
-  const core = getCoreTaskRevenueMult(state);
-  const revenue = Math.round(
-    rolled.revenue * applySandboxRevenueTuning(state, core) * staffRetentionBonus(state, taskDef)
-  );
+  const payoutMult = getTaskRevenueMultiplierPreview(state);
+  const revenue = Math.round(rolled.revenue * payoutMult * staffRetentionBonus(state, taskDef));
 
   state.finance.cash -= cost;
   state.finance.cash += revenue;
@@ -122,9 +188,15 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   state.product.level = (state.product.level ?? 0) + productGain;
   const buzzGain = rolled.buzz ?? 0;
   state.product.buzz = (state.product.buzz ?? 0) + buzzGain;
+  const mrrGain = rolled.mrrGain ?? 0;
+  if (mrrGain > 0) {
+    state.finance.mrr = (state.finance.mrr ?? 0) + mrrGain;
+    state.finance.arr = Math.round(state.finance.mrr * 12);
+    state.finance.monthlyRevenue = (state.finance.monthlyRevenue ?? 0) + mrrGain;
+  }
   applyTaskRivalEffects(state, taskDef);
 
-  return { cost, revenue };
+  return { cost, revenue, mrrGain };
 }
 
 export function rollTaskOutcome(taskDef, state) {
@@ -132,12 +204,17 @@ export function rollTaskOutcome(taskDef, state) {
   const product = taskDef.product ?? 0;
   const buzz = taskDef.buzz ?? 0;
   const base = rMin + Math.random() * Math.max(0, rMax - rMin);
-  const mult =
-    headcountExecutionScale(state, taskDef) *
-    departmentTaskMultiplier(state, taskDef) *
-    productBuzzRevenueMult(state);
+  const mult = headcountExecutionScale(state, taskDef) * departmentTaskMultiplier(state, taskDef);
   const revenue = Math.round(base * mult);
-  return { revenue, product, buzz };
+  let mrrGain = 0;
+  const mrrSpec = taskDef.mrrGain;
+  if (Array.isArray(mrrSpec) && mrrSpec.length >= 2) {
+    const [mMin, mMax] = mrrSpec;
+    mrrGain = Math.round(mMin + Math.random() * Math.max(0, mMax - mMin));
+  } else if (mrrSpec > 0) {
+    mrrGain = Math.round(Number(mrrSpec));
+  }
+  return { revenue, product, buzz, mrrGain };
 }
 
 /** Track spend for lifetime P&L (does not move cash — caller adjusts cash separately). */

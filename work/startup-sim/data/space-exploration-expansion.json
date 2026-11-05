@@ -1,0 +1,1019 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "sig-space-static-fire-on-pad",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "First static fire on the pad",
+      "description": "Engines light at the cape; the hold-down clamps earn their salary.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 6,
+      "cost": 85000,
+      "revenue": [
+        45000,
+        220000
+      ],
+      "product": 4,
+      "buzz": 5,
+      "rivalPressure": -1
+    },
+    {
+      "id": "sig-space-wet-dress-rehearsal",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Full wet dress rehearsal",
+      "description": "Load propellant, count down to T-10, scrub anyway — but credibly.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 120000,
+      "revenue": [
+        80000,
+        380000
+      ],
+      "product": 3,
+      "buzz": 4
+    },
+    {
+      "id": "sig-space-hop-test-success",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Prototype hop test success",
+      "description": "150 meters up, one engine, landing pad still intact.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 5,
+      "cost": 42000,
+      "revenue": [
+        35000,
+        165000
+      ],
+      "product": 4,
+      "buzz": 5,
+      "rivalPressure": -2
+    },
+    {
+      "id": "sig-space-booster-landing-at-sea",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "First booster landing at sea",
+      "description": "Drone ship catches the stage; SpaceXY tweets congratulations through gritted teeth.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 185000,
+      "revenue": [
+        220000,
+        980000
+      ],
+      "product": 4,
+      "buzz": 6,
+      "rivalPressure": -3,
+      "mrrGain": [
+        800,
+        3200
+      ]
+    },
+    {
+      "id": "sig-space-nasa-lsp-award",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "NASA Launch Services Program award",
+      "description": "Category 2 contract — government logo on your homepage forever.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 95000,
+      "revenue": [
+        450000,
+        2200000
+      ],
+      "product": 2,
+      "buzz": 5,
+      "mrrGain": [
+        3500,
+        12000
+      ]
+    },
+    {
+      "id": "sig-space-full-stack-ifft",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Full-stack integrated flight test",
+      "description": "Booster, ship, and nerves launch together; telemetry screams then settles.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 320000,
+      "revenue": [
+        280000,
+        1450000
+      ],
+      "product": 5,
+      "buzz": 6,
+      "rivalPressure": -2
+    },
+    {
+      "id": "sig-space-crew-rated-clearance",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Crew-rated flight clearance",
+      "description": "Human-rating paperwork heavier than the capsule; astronauts trust the checklist.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 420000,
+      "revenue": [
+        380000,
+        1850000
+      ],
+      "product": 4,
+      "buzz": 5
+    },
+    {
+      "id": "sig-space-artemis-task-order",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Artemis lunar services task order",
+      "description": "NASA picks you for a cargo run moonward — press calls it a SpaceXY upset.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 280000,
+      "revenue": [
+        850000,
+        4200000
+      ],
+      "product": 3,
+      "buzz": 6,
+      "mrrGain": [
+        5000,
+        18000
+      ]
+    },
+    {
+      "id": "sig-space-constellation-deploy-60",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Single-launch 60-satellite deploy",
+      "description": "Stacked fairing, dispenser choreography, ground segment melts happily.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 145000,
+      "revenue": [
+        320000,
+        1650000
+      ],
+      "product": 4,
+      "buzz": 5,
+      "mrrGain": [
+        2200,
+        8500
+      ]
+    },
+    {
+      "id": "sig-space-catch-tower-recovery",
+      "signature": true,
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Catch tower booster recovery",
+      "description": "Chopsticks grab the stage; engineers cry in the high bay.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 520000,
+      "revenue": [
+        450000,
+        2100000
+      ],
+      "product": 5,
+      "buzz": 7,
+      "rivalPressure": -3
+    },
+    {
+      "id": "cat-space-nasa-space-act-agreement",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "NASA Space Act Agreement",
+      "description": "Non-reimbursable collaboration — their logo, your R&D burn.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 5,
+      "cost": 6200,
+      "revenue": [
+        8000,
+        42000
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-nasa-sbir-phase-ii",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "NASA SBIR Phase II closeout",
+      "description": "Deliver the prototype; transition deck for Phase III funding.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 5,
+      "cost": 14000,
+      "revenue": [
+        85000,
+        420000
+      ],
+      "product": 3,
+      "buzz": 2,
+      "mrrGain": [
+        180,
+        650
+      ]
+    },
+    {
+      "id": "cat-space-nasa-crs-proposal",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Commercial Resupply proposal",
+      "description": "ISS cargo manifest math — kilograms, margins, and nostalgia slides.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 48000,
+      "revenue": [
+        120000,
+        680000
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-nasa-clipper-launch-slot",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Flagship science launch slot bid",
+      "description": "Outer planets probe — one shot, zero margin for schedule slip.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 220000,
+      "revenue": [
+        650000,
+        3200000
+      ],
+      "product": 2,
+      "buzz": 4
+    },
+    {
+      "id": "cat-space-nasa-kennedy-pad-lease",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Kennedy pad lease negotiation",
+      "description": "LC-39 energy — heritage pads, modern invoices.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 85000,
+      "revenue": [
+        65000,
+        320000
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-nasa-niac-phase-i",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "NIAC Phase I concept study",
+      "description": "Far-future slide deck NASA funds anyway.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 4,
+      "cost": 3800,
+      "revenue": [
+        12000,
+        65000
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-dod-space-test-program",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Space Test Program ride",
+      "description": "Defense R&D payload — classification adds calendar time.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 72000,
+      "revenue": [
+        180000,
+        920000
+      ],
+      "product": 2,
+      "buzz": 2,
+      "mrrGain": [
+        900,
+        3200
+      ]
+    },
+    {
+      "id": "cat-space-noaa-weather-payload",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "NOAA weather payload integration",
+      "description": "Instruments that must not fail before hurricane season.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 6,
+      "cost": 56000,
+      "revenue": [
+        95000,
+        520000
+      ],
+      "product": 3,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-engine-test-stand",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Engine test stand commissioning",
+      "description": "Deluge system, thrust vector control, and neighbors who file complaints.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 6,
+      "cost": 28000,
+      "revenue": [
+        18000,
+        95000
+      ],
+      "product": 4,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-macro-raptor-qual-campaign",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Engine qual campaign (multi-throttle)",
+      "description": "Acceptance tests across throttle settings — one turbine surprise.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 95000,
+      "revenue": [
+        72000,
+        380000
+      ],
+      "product": 4,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-fairing-catch-net-test",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Fairing half recovery test",
+      "description": "Helicopter or ship — reuse the expensive part.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 68000,
+      "revenue": [
+        55000,
+        290000
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-grasshopper-retrograde-burn",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Suborbital retrograde burn test",
+      "description": "Prove guidance before the ocean landing attempt.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 5,
+      "cost": 22000,
+      "revenue": [
+        15000,
+        82000
+      ],
+      "product": 3,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-max-q-abort-demo",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Max-Q abort demonstration",
+      "description": "Escape system pulls the capsule while the crowd holds breath.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 125000,
+      "revenue": [
+        95000,
+        480000
+      ],
+      "product": 3,
+      "buzz": 4
+    },
+    {
+      "id": "cat-space-booster-return-to-launch-site",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Return-to-launch-site landing trial",
+      "description": "Land on the pad, not the barge — precision over weather.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 165000,
+      "revenue": [
+        140000,
+        720000
+      ],
+      "product": 3,
+      "buzz": 5,
+      "rivalPressure": -2
+    },
+    {
+      "id": "cat-space-second-stage-restart",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Second stage restart demo",
+      "description": "Coast, chill, relight — GTO missions become routine on the brochure.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 6,
+      "cost": 38000,
+      "revenue": [
+        42000,
+        210000
+      ],
+      "product": 3,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-super-heavy-booster-rollout",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Super-heavy booster rollout",
+      "description": "Crawler, chopsticks, and a rocket that blocks the horizon.",
+      "types": [
+        "marketing",
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 95000,
+      "revenue": [
+        85000,
+        420000
+      ],
+      "product": 2,
+      "buzz": 5
+    },
+    {
+      "id": "cat-space-starship-tank-welding-line",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Stainless tank welding line",
+      "description": "Production cadence for ships that stack on boosters.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 88000,
+      "revenue": [
+        65000,
+        340000
+      ],
+      "product": 4,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-launch-automation-software",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Launch automation software cutover",
+      "description": "Retire the Excel countdown; scripts hold the range.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 6,
+      "cost": 24000,
+      "revenue": [
+        28000,
+        145000
+      ],
+      "product": 3,
+      "buzz": 1
+    },
+    {
+      "id": "cat-space-faa-part-450-license",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "FAA Part 450 license package",
+      "description": "Single license for launch, reentry, and landing — attorneys rejoice.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 52000,
+      "revenue": [
+        35000,
+        185000
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-boca-chica-range-expansion",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Private range expansion EIS",
+      "description": "Environmental review for more launches per month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 145000,
+      "revenue": [
+        95000,
+        480000
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-iss-docking-demo",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "ISS docking demonstration",
+      "description": "NASA watches every telemetry point; SpaceXY livestreams shade.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 380000,
+      "revenue": [
+        520000,
+        2650000
+      ],
+      "product": 4,
+      "buzz": 6,
+      "mrrGain": [
+        4200,
+        14000
+      ]
+    },
+    {
+      "id": "cat-space-commercial-station-module",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Commercial station module delivery",
+      "description": "Private LEO destination — docking port sold separately.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 420000,
+      "revenue": [
+        680000,
+        3400000
+      ],
+      "product": 4,
+      "buzz": 5,
+      "mrrGain": [
+        3800,
+        12000
+      ]
+    },
+    {
+      "id": "cat-space-polar-launch-from-vandenberg",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Polar orbit campaign (West coast)",
+      "description": "SSO manifest fills with earth observation customers.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 78000,
+      "revenue": [
+        145000,
+        780000
+      ],
+      "product": 2,
+      "buzz": 3,
+      "mrrGain": [
+        650,
+        2400
+      ]
+    },
+    {
+      "id": "cat-space-rideshare-portfolio-pricing",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Rideshare portfolio pricing reset",
+      "description": "Undercut SpaceXY on kg-to-LEO with transparent online booking.",
+      "types": [
+        "marketing",
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 6,
+      "cost": 12000,
+      "revenue": [
+        45000,
+        240000
+      ],
+      "product": 1,
+      "buzz": 3,
+      "rivalPressure": -2
+    },
+    {
+      "id": "cat-space-internal-launch-cadence-goal",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Internal 20-launches/year goal",
+      "description": "Ops OKRs that frighten HR and excite investors.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 35000,
+      "revenue": [
+        120000,
+        620000
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "cat-space-starlink-class-ground-terminal",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Consumer terminal beta rollout",
+      "description": "Flat panel kits — waitlist converts to recurring service revenue.",
+      "types": [
+        "product",
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 115000,
+      "revenue": [
+        180000,
+        920000
+      ],
+      "product": 3,
+      "buzz": 4,
+      "mrrGain": [
+        1800,
+        6500
+      ]
+    },
+    {
+      "id": "cat-space-hypergolic-factory-retire",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Retire hypergolic propellant line",
+      "description": "Move to methane/LOX — one less toxic headache at the pad.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 62000,
+      "revenue": [
+        48000,
+        250000
+      ],
+      "product": 3,
+      "buzz": 2
+    },
+    {
+      "id": "cat-space-launch-failure-anomaly-review",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Anomaly review board (post-scrub RUD)",
+      "description": "Fault tree, fix, and a public webcast with sober engineers.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 85000,
+      "revenue": [
+        45000,
+        220000
+      ],
+      "product": 2,
+      "buzz": 4
+    },
+    {
+      "id": "cat-space-nasa-crew-demo-mission",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Crew demo mission prep",
+      "description": "Spacesuits, quarantine, and a NASA badge on every console.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 6,
+      "tierMax": 7,
+      "cost": 290000,
+      "revenue": [
+        420000,
+        2100000
+      ],
+      "product": 4,
+      "buzz": 6
+    },
+    {
+      "id": "cat-space-falcon-heavy-class-demo",
+      "categories": [
+        "space-exploration"
+      ],
+      "title": "Heavy-lift triple-core demo",
+      "description": "Synchronized side booster separation — synchronized anxiety.",
+      "types": [
+        "product",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 210000,
+      "revenue": [
+        380000,
+        1850000
+      ],
+      "product": 3,
+      "buzz": 6,
+      "rivalPressure": -2
+    }
+  ]
+}

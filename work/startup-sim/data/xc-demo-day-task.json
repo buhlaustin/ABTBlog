@@ -1,0 +1,17 @@
+{
+  "tasks": [
+    {
+      "id": "xc-demo-day",
+      "title": "Demo Day",
+      "description": "Three minutes on stage in front of the batch and a wall of investors — then the seed scramble begins.",
+      "types": ["marketing"],
+      "stages": ["xc"],
+      "xcDemoDay": true,
+      "cost": 600,
+      "revenue": [3500, 8500],
+      "product": 3,
+      "buzz": 7,
+      "mrrGain": [1800, 4200]
+    }
+  ]
+}

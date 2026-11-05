@@ -1,9 +1,17 @@
 import { STAGES } from './constants.js';
+import { advanceRealCalendarMonth, realClockNow } from './GameCalendar.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
+import { serviceLoanAtMonthEnd } from './BankLoan.js';
+import { settleRevenueAdvanceAtMonthEnd } from './RevenueAdvance.js';
+import {
+  recordCeoSalaryForMonth,
+  settlePersonalExpensesAtMonthEnd,
+  preparePersonalExpensesForMonth
+} from './CeoEconomics.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
-import { tickPublicMarket, tickIpoLockup, isPublicCompany } from './IPO.js';
+import { tickPublicMarket, tickIpoLockup, tickPublicMarketAtMonthStart, isPublicCompany } from './IPO.js';
 import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
 import { syncDraftFromFinalized } from './Staff.js';
 import { tickXcResidency } from './XC.js';
@@ -14,6 +22,7 @@ import { resetGrowthCampaignsMonth } from './GrowthCampaigns.js';
 import { resetProductActionsMonth } from './ProductActions.js';
 import {
   tickLaunchAtMonthStart,
+  tickPreLaunchAtMonthStart,
   settleLaunchAtMonthEnd,
   graduateLaunchIfLeftGarage
 } from './LaunchLifecycle.js';
@@ -23,13 +32,16 @@ import {
   settleBoardGovernance,
   scorePublicGuidanceBeat
 } from './WorldDynamics.js';
+import { tickScenarioModifiers } from './ScenarioEffects.js';
+import { applySubsidiaryMrrPayout, tickAcquisitionsAtMonthStart } from './Acquisitions.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
-export function createInitialCalendar() {
+export function createInitialCalendar(start) {
+  const s = start ?? realClockNow();
   return {
-    monthIndex: 1,
-    year: 1,
+    monthIndex: s.monthIndex,
+    year: s.year,
     monthTasks: [],
     tasksCompleted: 0,
     monthRevenue: 0,
@@ -50,15 +62,7 @@ export function appendLog(state, message) {
 }
 
 export function advanceCalendarMonth(state) {
-  let { monthIndex, year } = state.calendar;
-  monthIndex += 1;
-  if (monthIndex > 12) {
-    monthIndex = 1;
-    year += 1;
-  }
-  state.calendar.monthIndex = monthIndex;
-  state.calendar.year = year;
-  return state;
+  return advanceRealCalendarMonth(state);
 }
 
 export function startMonth(state) {
@@ -76,11 +80,24 @@ export function startMonth(state) {
   for (const line of applyBuzzDecayAtMonthStart(state)) {
     appendLog(state, line);
   }
+  for (const line of tickScenarioModifiers(state)) {
+    appendLog(state, line);
+  }
   for (const line of tickLaunchAtMonthStart(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickPreLaunchAtMonthStart(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickAcquisitionsAtMonthStart(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickPublicMarketAtMonthStart(state)) {
     appendLog(state, line);
   }
   dealMonthlyTasks(state);
   dealBoardTasks(state);
+  preparePersonalExpensesForMonth(state);
   return state;
 }
 
@@ -99,6 +116,22 @@ export function endMonth(state) {
   const monthRevenue = state.calendar.monthRevenue ?? 0;
   const growthCampaignsClosed = state.growth?.campaignsThisMonth?.length ?? 0;
   const burn = resolveMonthEndBurn(state);
+  for (const line of recordCeoSalaryForMonth(state)) {
+    appendLog(state, line);
+  }
+  for (const line of settlePersonalExpensesAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
+  for (const line of settleRevenueAdvanceAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
+  for (const line of serviceLoanAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
+  const portfolio = applySubsidiaryMrrPayout(state);
+  for (const line of portfolio.lines ?? []) {
+    appendLog(state, line);
+  }
   onMonthEndSentiment(state, priorMonthRevenue, state.finance?.monthlyRevenue ?? 0);
   let stockDeltaPct = null;
 

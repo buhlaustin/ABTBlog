@@ -7,7 +7,7 @@ const STEPS = [
     id: 'welcome',
     stages: [STAGES.GARAGE],
     title: 'Welcome, founder',
-    body: 'Complete every task on the Desk, then use Close month. Cash flow from tasks is immediate; payroll hits on month close.'
+    body: 'Early game is pre-launch: product tasks raise level (need 4+); marketing raises buzz (need 10+). Track waitlist and pre-sell on the desk meters, then Schedule public launch. Close month when tasks are done.'
   },
   {
     id: 'people',
@@ -31,7 +31,7 @@ const STEPS = [
     id: 'ipo',
     stages: [STAGES.PUBLIC],
     title: 'Public markets',
-    body: 'Stock price updates each month. Stay public to grow the quote, or Step down & cash out on Finance when you are done.'
+    body: 'On Finance: set guidance tone, run buybacks, or a follow-on. Earnings every 3 months swing the quote harder. Beat the whisper each month to extend your streak, then cash out when lockup ends.'
   }
 ];
 

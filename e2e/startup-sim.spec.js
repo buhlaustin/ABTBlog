@@ -81,9 +81,22 @@ test.describe('Startup Simulator', () => {
     await page.locator('#tab-news').click();
     await expect(page.locator('#btn-toggle-news-archive')).toBeVisible();
 
+    await page.locator('#tab-ceo').click();
+    await expect(page.locator('#panel-ceo')).toContainText('CEO salary');
+    await expect(page.locator('#panel-ceo')).toContainText('Personal debits');
+    await expect(page.locator('#panel-ceo')).toContainText('Est. net worth');
+    await expect(page.locator('#panel-ceo')).toContainText('Personal bank');
+    await expect(page.locator('#panel-ceo')).toContainText('Personal bank ledger');
+
     await page.locator('#tab-finance').click();
     await expect(page.locator('#panel-finance')).toContainText('Cap table');
-    await expect(page.locator('#panel-finance')).toContainText('Solo founder mode');
+    await expect(page.locator('#panel-finance')).toContainText('Portfolio MRR');
+
+    await page.locator('#tab-companies').click();
+    await expect(page.locator('#panel-companies')).toContainText('Portfolio MRR');
+    await expect(page.locator('#panel-companies')).toContainText('X Combinator batch');
+    await expect(page.locator('[data-companies-filter="small"]')).toBeVisible();
+    await expect(page.locator('#panel-companies')).toContainText('Synergy stack');
   });
 
   test('mobile viewport: tabs and people table scroll without horizontal page overflow', async ({

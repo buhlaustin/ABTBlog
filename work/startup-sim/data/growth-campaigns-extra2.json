@@ -1,0 +1,404 @@
+{
+  "campaigns": [
+    {
+      "id": "growth-beacons-at-conference",
+      "title": "BLE beacon scavenger hunt",
+      "description": "Attendees hunt badges; your app collects location data politely.",
+      "cost": 4200,
+      "revenue": [3200, 19000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-mastodon-crosspost",
+      "title": "Fediverse cross-post month",
+      "description": "Mirror launches where Twitter refugees still argue about moderation.",
+      "cost": 450,
+      "revenue": [300, 2400],
+      "buzz": 1,
+      "tierMin": 0,
+      "tierMax": 3
+    },
+    {
+      "id": "growth-bluesky-starter-pack",
+      "title": "Bluesky starter pack push",
+      "description": "Curate fifty accounts; hope yours is not the spammy one.",
+      "cost": 1100,
+      "revenue": [800, 5200],
+      "buzz": 2,
+      "tierMin": 0,
+      "tierMax": 3
+    },
+    {
+      "id": "growth-substack-cross-promo",
+      "title": "Substack writer bundle",
+      "description": "Sponsor three niche newsletters with one awkward joint intro.",
+      "cost": 3800,
+      "revenue": [2800, 16000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-whatsapp-community",
+      "title": "WhatsApp power-user community",
+      "description": "Admin-approved groups; support tickets arrive as voice notes.",
+      "cost": 2200,
+      "revenue": [1600, 9800],
+      "buzz": 2,
+      "tierMin": 0,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-telegram-bot-growth",
+      "title": "Telegram bot growth loop",
+      "description": "Notifications, referrals, and one command nobody uses.",
+      "cost": 5500,
+      "revenue": [4200, 26000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-ios-search-ads",
+      "title": "Apple Search Ads flight",
+      "description": "Bid on your category; pay Apple to compete with yourself.",
+      "cost": 28000,
+      "revenue": [21000, 125000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-google-performance-max",
+      "title": "Performance Max experiment",
+      "description": "Black-box bidding; creative assets multiply like rabbits.",
+      "cost": 35000,
+      "revenue": [26000, 155000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-capterra-sponsored",
+      "title": "Capterra sponsored listing",
+      "description": "Buyers compare you in tables you did not design.",
+      "cost": 14000,
+      "revenue": [10500, 62000],
+      "buzz": 1,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-trustradius-review",
+      "title": "TrustRadius review sprint",
+      "description": "Enterprise social proof — longer forms, happier procurement.",
+      "cost": 18000,
+      "revenue": [13000, 78000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-aws-marketplace-credit",
+      "title": "AWS Marketplace credit promo",
+      "description": "Burn down cloud credits while finance pretends it is not discounting.",
+      "cost": 45000,
+      "revenue": [35000, 210000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-azure-cosell",
+      "title": "Azure co-sell motion",
+      "description": "Partner desk introductions; CRM hygiene suddenly matters.",
+      "cost": 62000,
+      "revenue": [48000, 285000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-salesforce-appexchange",
+      "title": "AppExchange launch push",
+      "description": "Listing polish, demo org, and one bad screenshot you fix at midnight.",
+      "cost": 38000,
+      "revenue": [28000, 165000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-zapier-integration-spotlight",
+      "title": "Zapier integration spotlight",
+      "description": "Template zaps that make your product the glue, not the gimmick.",
+      "cost": 12000,
+      "revenue": [9000, 55000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-notion-template-marketplace",
+      "title": "Notion template marketplace drop",
+      "description": "Free templates with premium upsell — productivity cosplay.",
+      "cost": 6500,
+      "revenue": [4800, 29000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-figma-community-file",
+      "title": "Figma community file launch",
+      "description": "Designers duplicate; one becomes a paying team by accident.",
+      "cost": 7200,
+      "revenue": [5500, 32000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-github-stars-campaign",
+      "title": "GitHub stars & OSS launch week",
+      "description": "README badges, release notes, and a Hacker News tab left open.",
+      "cost": 8500,
+      "revenue": [5000, 35000],
+      "buzz": 3,
+      "tierMin": 1,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-stack-overflow-ads",
+      "title": "Stack Overflow display flight",
+      "description": "Reach developers who already hate banner ads.",
+      "cost": 22000,
+      "revenue": [17000, 98000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-devto-series",
+      "title": "DEV.to tutorial series",
+      "description": "Twelve how-tos that rank for problems your rival ignores.",
+      "cost": 4800,
+      "revenue": [3500, 22000],
+      "buzz": 2,
+      "tierMin": 0,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-hackernews-show-hn",
+      "title": "Show HN launch coordination",
+      "description": "Timing, title A/B, and comments you should not argue in.",
+      "cost": 600,
+      "revenue": [400, 8500],
+      "buzz": 3,
+      "tierMin": 0,
+      "tierMax": 3
+    },
+    {
+      "id": "growth-luma-event-series",
+      "title": "Luma event series sponsorship",
+      "description": "City-by-city happy hours with QR codes on napkins.",
+      "cost": 9800,
+      "revenue": [7500, 45000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-partner-certification",
+      "title": "Partner certification program",
+      "description": "Badges, exams, and agencies who fail then retake.",
+      "cost": 55000,
+      "revenue": [42000, 245000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-customer-swag-drop",
+      "title": "Limited-edition customer swag drop",
+      "description": "Hoodies sell out; support tickets ask about shipping.",
+      "cost": 24000,
+      "revenue": [8000, 52000],
+      "buzz": 4,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-podcast-host-own-show",
+      "title": "Branded podcast (season one)",
+      "description": "You become media; guests pitch you their startups.",
+      "cost": 42000,
+      "revenue": [32000, 185000],
+      "buzz": 4,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-cinema-pre-roll-test",
+      "title": "Cinema pre-roll test (select metros)",
+      "description": "Founders see your ad before the superhero post-credits.",
+      "cost": 78000,
+      "revenue": [58000, 340000],
+      "buzz": 4,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-college-recruiting-booth",
+      "title": "Campus career fair circuit",
+      "description": "Future buyers in free t-shirts; brand recall in five years.",
+      "cost": 16000,
+      "revenue": [11000, 68000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-museum-sponsor-wall",
+      "title": "Tech museum sponsor wall",
+      "description": "Plaque next to a historic mainframe nobody reads.",
+      "cost": 95000,
+      "revenue": [45000, 280000],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-charity-auction-lot",
+      "title": "Charity auction CEO lot",
+      "description": "Lunch with founder sold twice; both buyers want discounts.",
+      "cost": 12000,
+      "revenue": [6000, 42000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-wikipedia-neutral-pr",
+      "title": "Neutral point of view PR month",
+      "description": "Sources, citations, and talk-page diplomacy.",
+      "cost": 28000,
+      "revenue": [15000, 88000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-rival-parody-site",
+      "title": "Competitive parody microsite",
+      "description": "Satire landing page — legal reads every joke twice.",
+      "cost": 15000,
+      "revenue": [11000, 72000],
+      "buzz": 4,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-ar-filter-trial",
+      "title": "AR social filter trial",
+      "description": "Branded face filter; three people use it unironically.",
+      "cost": 32000,
+      "revenue": [24000, 140000],
+      "buzz": 4,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-wikipedia-donate-match",
+      "title": "Wikimedia donation match week",
+      "description": "Good karma banner; Jimmy email included.",
+      "cost": 25000,
+      "revenue": [8000, 45000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-internationalization-seo",
+      "title": "Localized SEO landing pages",
+      "description": "Six languages, one awkward idiom per locale.",
+      "cost": 34000,
+      "revenue": [26000, 155000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-field-marketing-sd",
+      "title": "Field marketing blitz (one territory)",
+      "description": "SDR army + dinners; CRM fills with maybe-leads.",
+      "cost": 88000,
+      "revenue": [68000, 395000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-customer-success-youtube",
+      "title": "Customer success YouTube channel",
+      "description": "How-to shorts that reduce tickets and grow subscribers slowly.",
+      "cost": 19000,
+      "revenue": [14000, 82000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-executive-roundtable-series",
+      "title": "Executive roundtable series",
+      "description": "Chatham House rules; everyone still tweets takeaways.",
+      "cost": 72000,
+      "revenue": [55000, 310000],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-dispatch-podcast-ads",
+      "title": "Business podcast mid-roll bundle",
+      "description": "Not founder podcasts — operators who actually buy software.",
+      "cost": 48000,
+      "revenue": [36000, 210000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-super-bowl-local-radio",
+      "title": "Super Bowl local radio mentions",
+      "description": "You cannot afford TV; you can afford traffic reports.",
+      "cost": 65000,
+      "revenue": [48000, 275000],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-ipo-vanity-search",
+      "title": "Ticker symbol vanity search ads",
+      "description": "Retail investors google you; IR holds breath.",
+      "cost": 125000,
+      "revenue": [95000, 520000],
+      "buzz": 4,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-mega-influencer-single",
+      "title": "Single mega-influencer integration",
+      "description": "One celebrity post — budget gone, screenshots forever.",
+      "cost": 420000,
+      "revenue": [320000, 1650000],
+      "buzz": 6,
+      "tierMin": 5,
+      "tierMax": 7
+    }
+  ]
+}

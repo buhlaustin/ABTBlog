@@ -1,0 +1,329 @@
+{
+  "actions": [
+    {
+      "id": "lever-ux-research-incentives",
+      "label": "UX research incentive pool",
+      "focus": "product",
+      "cost": 3200,
+      "buzz": 1,
+      "product": 3,
+      "tierMax": 4,
+      "description": "Gift cards for 15 moderated sessions — watch users stumble live."
+    },
+    {
+      "id": "lever-beta-bug-bounty",
+      "label": "Beta bug bounty week",
+      "focus": "product",
+      "cost": 5500,
+      "buzz": 2,
+      "product": 3,
+      "tierMax": 5,
+      "description": "Pay for repro steps; triage queue becomes a sport."
+    },
+    {
+      "id": "lever-accessibility-audit",
+      "label": "Accessibility audit sprint",
+      "focus": "product",
+      "cost": 8800,
+      "buzz": 1,
+      "product": 3,
+      "tierMin": 1,
+      "tierMax": 6,
+      "description": "WCAG fixes that also help keyboard power users."
+    },
+    {
+      "id": "lever-perf-profiling-week",
+      "label": "Performance profiling week",
+      "focus": "product",
+      "cost": 6200,
+      "buzz": 0,
+      "product": 3,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Flame charts, lazy loads, and one hero metric on the blog."
+    },
+    {
+      "id": "lever-mobile-polish-sprint",
+      "label": "Mobile polish sprint",
+      "focus": "product",
+      "cost": 14000,
+      "buzz": 2,
+      "product": 4,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Responsive gaps closed before App Store reviewers do it for you."
+    },
+    {
+      "id": "lever-interactive-demo-rebuild",
+      "label": "Interactive demo rebuild",
+      "focus": "product",
+      "cost": 11000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Click-through sandbox with fake data that feels real."
+    },
+    {
+      "id": "lever-onboarding-ab-test",
+      "label": "Onboarding A/B experiment",
+      "focus": "product",
+      "cost": 4500,
+      "buzz": 1,
+      "product": 3,
+      "tierMax": 4,
+      "description": "Two flows, one winner — kill the modal maze."
+    },
+    {
+      "id": "lever-self-serve-checkout",
+      "label": "Self-serve checkout unblock",
+      "focus": "product",
+      "cost": 9500,
+      "buzz": 2,
+      "product": 4,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Stripe webhooks, tax fields, and fewer 'talk to sales' dead ends."
+    },
+    {
+      "id": "lever-design-system-v2",
+      "label": "Design system v2 push",
+      "focus": "product",
+      "cost": 18000,
+      "buzz": 1,
+      "product": 4,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Tokens, components, and designers who stop Slack-DMing hex codes."
+    },
+    {
+      "id": "lever-in-app-academy",
+      "label": "In-app academy launch",
+      "focus": "product",
+      "cost": 12000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Micro-lessons that reduce tickets and increase activation."
+    },
+    {
+      "id": "lever-wizard-setup-flow",
+      "label": "Wizard setup flow",
+      "focus": "product",
+      "cost": 7200,
+      "buzz": 1,
+      "product": 3,
+      "tierMax": 5,
+      "description": "Progress bar psychology for first value in ten minutes."
+    },
+    {
+      "id": "lever-plugin-marketplace-beta",
+      "label": "Plugin marketplace beta",
+      "focus": "product",
+      "cost": 22000,
+      "buzz": 3,
+      "product": 4,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Third-party extensions — platform dreams begin."
+    },
+    {
+      "id": "lever-sso-scim-pack",
+      "label": "SSO + SCIM enterprise pack",
+      "focus": "product",
+      "cost": 28000,
+      "buzz": 2,
+      "product": 4,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "IT approves; procurement stops asking about SAML."
+    },
+    {
+      "id": "lever-security-questionnaire-bot",
+      "label": "Security questionnaire automation",
+      "focus": "product",
+      "cost": 8500,
+      "buzz": 1,
+      "product": 2,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "SIG Lite answers prefilled — sales exhales."
+    },
+    {
+      "id": "lever-soc2-readiness",
+      "label": "SOC 2 readiness sprint",
+      "focus": "product",
+      "cost": 45000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Policies, logging, and auditors on speed dial."
+    },
+    {
+      "id": "lever-feature-flag-cleanup",
+      "label": "Feature flag cleanup week",
+      "focus": "product",
+      "cost": 3800,
+      "buzz": 0,
+      "product": 2,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Delete dead branches; deploy fear drops slightly."
+    },
+    {
+      "id": "lever-tech-debt-sprint",
+      "label": "Tech debt paydown sprint",
+      "focus": "product",
+      "cost": 15000,
+      "buzz": 0,
+      "product": 4,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "No flashy launch — just faster builds next month."
+    },
+    {
+      "id": "lever-ai-copilot-prototype",
+      "label": "AI copilot prototype",
+      "focus": "product",
+      "cost": 32000,
+      "buzz": 4,
+      "product": 3,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Demo magic that may become a real feature later."
+    },
+    {
+      "id": "lever-localization-qa",
+      "label": "Localization QA sprint",
+      "focus": "product",
+      "cost": 11000,
+      "buzz": 1,
+      "product": 3,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Native speakers fix strings before EU expansion."
+    },
+    {
+      "id": "lever-offline-mode-spike",
+      "label": "Offline mode spike",
+      "focus": "product",
+      "cost": 9800,
+      "buzz": 1,
+      "product": 3,
+      "tierMin": 2,
+      "tierMax": 5,
+      "description": "Sync conflicts handled — field teams cheer."
+    },
+    {
+      "id": "lever-rate-limit-redesign",
+      "label": "Rate limit & quota redesign",
+      "focus": "product",
+      "cost": 6500,
+      "buzz": 0,
+      "product": 3,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Fair limits that stop the biggest customer from melting API."
+    },
+    {
+      "id": "lever-privacy-dashboard",
+      "label": "Privacy control dashboard",
+      "focus": "product",
+      "cost": 14000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Export, delete, consent — GDPR slides get easier."
+    },
+    {
+      "id": "lever-nps-fix-sprint",
+      "label": "NPS detractor fix sprint",
+      "focus": "product",
+      "cost": 5200,
+      "buzz": 1,
+      "product": 3,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Call every score below 7; ship two fixes they asked for."
+    },
+    {
+      "id": "lever-api-sandbox-tenants",
+      "label": "Prospect API sandboxes",
+      "focus": "product",
+      "cost": 7800,
+      "buzz": 1,
+      "product": 3,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Spin up isolated tenants for evals without touching prod."
+    },
+    {
+      "id": "lever-slack-deep-integration",
+      "label": "Slack deep integration push",
+      "focus": "product",
+      "cost": 6200,
+      "buzz": 2,
+      "product": 3,
+      "tierMax": 5,
+      "description": "Workflow steps where teams already live."
+    },
+    {
+      "id": "lever-customer-playbook-publish",
+      "label": "Customer success playbook",
+      "focus": "product",
+      "cost": 4800,
+      "buzz": 1,
+      "product": 2,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Repeatable onboarding motions — less heroics per account."
+    },
+    {
+      "id": "lever-multi-tenant-audit",
+      "label": "Multi-tenant isolation audit",
+      "focus": "product",
+      "cost": 24000,
+      "buzz": 1,
+      "product": 4,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Pen test for data leaks between customers."
+    },
+    {
+      "id": "lever-roadmap-watch-party",
+      "label": "Roadmap watch party (customers)",
+      "focus": "product",
+      "cost": 3500,
+      "buzz": 3,
+      "product": 2,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Live reveal; chat asks for SSO again."
+    },
+    {
+      "id": "lever-incident-runbook-drill",
+      "label": "Incident runbook drill",
+      "focus": "product",
+      "cost": 4200,
+      "buzz": 0,
+      "product": 2,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Game-day exercise — status page stays green this time."
+    },
+    {
+      "id": "lever-champion-enablement-kit",
+      "label": "Champion enablement kit",
+      "focus": "product",
+      "cost": 6800,
+      "buzz": 2,
+      "product": 2,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Slides and ROI calculator your buyer can forward internally."
+    }
+  ]
+}

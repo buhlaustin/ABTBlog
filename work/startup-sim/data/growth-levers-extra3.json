@@ -1,0 +1,202 @@
+{
+  "actions": [
+    {
+      "id": "lever-growth-hacker-house",
+      "label": "Growth hacker house (1 month)",
+      "focus": "growth",
+      "cost": 28000,
+      "buzz": 4,
+      "product": 1,
+      "rivalEase": 1,
+      "tierMin": 2,
+      "tierMax": 5,
+      "description": "Rent a house, fill it with experiments and instant noodles."
+    },
+    {
+      "id": "lever-street-team-canvass",
+      "label": "Street team canvassing day",
+      "focus": "growth",
+      "cost": 2400,
+      "buzz": 2,
+      "product": 0,
+      "tierMax": 3,
+      "description": "Flyers and QR codes where foot traffic pretends to be ICP."
+    },
+    {
+      "id": "lever-retargeting-creative-refresh",
+      "label": "Retargeting creative refresh",
+      "focus": "growth",
+      "cost": 8500,
+      "buzz": 2,
+      "product": 0,
+      "tierMin": 2,
+      "tierMax": 5,
+      "description": "New angles before ad fatigue sets in."
+    },
+    {
+      "id": "lever-partner-reseller-spiff",
+      "label": "Partner reseller SPIFF month",
+      "focus": "growth",
+      "cost": 35000,
+      "buzz": 2,
+      "product": 0,
+      "tierMin": 3,
+      "tierMax": 6,
+      "description": "Channel reps chase a leaderboard; you chase their pipeline."
+    },
+    {
+      "id": "lever-brand-mascot-debut",
+      "label": "Brand mascot debut",
+      "focus": "brand",
+      "cost": 42000,
+      "buzz": 5,
+      "product": 0,
+      "rivalEase": 2,
+      "tierMin": 3,
+      "tierMax": 6,
+      "description": "Costumed character at events — memorable or nightmare."
+    },
+    {
+      "id": "lever-guerrilla-projection",
+      "label": "Guerrilla building projection",
+      "focus": "brand",
+      "cost": 18000,
+      "buzz": 4,
+      "product": 0,
+      "rivalEase": 2,
+      "tierMin": 2,
+      "tierMax": 5,
+      "description": "Logo on a wall downtown; permits optional."
+    },
+    {
+      "id": "lever-celebrity-cameo-ad",
+      "label": "Celebrity cameo ad read",
+      "focus": "brand",
+      "cost": 95000,
+      "buzz": 5,
+      "product": 0,
+      "tierMin": 4,
+      "tierMax": 7,
+      "description": "One recognizable voice says your product name correctly."
+    },
+    {
+      "id": "lever-growth-loop-audit",
+      "label": "Growth loop audit + fixes",
+      "focus": "growth",
+      "cost": 12000,
+      "buzz": 1,
+      "product": 2,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Consultant maps viral paths; you implement two."
+    },
+    {
+      "id": "lever-seo-parasite-batch-2",
+      "label": "Programmatic SEO page batch",
+      "focus": "growth",
+      "cost": 14000,
+      "buzz": 1,
+      "product": 1,
+      "tierMin": 2,
+      "tierMax": 5,
+      "description": "Hundreds of useful pages — Google decides if useful."
+    },
+    {
+      "id": "lever-community-challenge",
+      "label": "Community challenge month",
+      "focus": "growth",
+      "cost": 6500,
+      "buzz": 3,
+      "product": 1,
+      "tierMax": 4,
+      "description": "Leaderboard, prizes, and UGC you can repost."
+    },
+    {
+      "id": "lever-podcast-sponsor-own-show",
+      "label": "Sponsor adjacent podcast season",
+      "focus": "growth",
+      "cost": 52000,
+      "buzz": 4,
+      "product": 0,
+      "tierMin": 3,
+      "tierMax": 6,
+      "description": "Title sponsor energy without hosting duties."
+    },
+    {
+      "id": "lever-field-event-series",
+      "label": "Field event micro-series",
+      "focus": "growth",
+      "cost": 38000,
+      "buzz": 3,
+      "product": 1,
+      "tierMin": 3,
+      "tierMax": 6,
+      "description": "Breakfast briefings in four cities — same croissants."
+    },
+    {
+      "id": "lever-growth-infra-upgrade",
+      "label": "Growth stack tooling upgrade",
+      "focus": "growth",
+      "cost": 16000,
+      "buzz": 0,
+      "product": 1,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "CDP, attribution, and fewer spreadsheet exports."
+    },
+    {
+      "id": "lever-brand-jingle-test",
+      "label": "Brand jingle test flight",
+      "focus": "brand",
+      "cost": 75000,
+      "buzz": 4,
+      "product": 0,
+      "tierMin": 4,
+      "tierMax": 7,
+      "description": "Earworm audio ads — finance questions sanity."
+    },
+    {
+      "id": "lever-referral-landing-refresh",
+      "label": "Referral landing refresh",
+      "focus": "growth",
+      "cost": 4800,
+      "buzz": 2,
+      "product": 1,
+      "tierMax": 4,
+      "description": "Copy and creative tuned for share links."
+    },
+    {
+      "id": "lever-product-led-sales-assist",
+      "label": "PLG sales-assist overlay",
+      "focus": "product",
+      "cost": 19000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 3,
+      "tierMax": 6,
+      "description": "PQL routing to reps without killing self-serve."
+    },
+    {
+      "id": "lever-usage-based-pricing-test",
+      "label": "Usage-based pricing experiment",
+      "focus": "product",
+      "cost": 11000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Metering UI and finance models in parallel."
+    },
+    {
+      "id": "lever-enterprise-trial-extension",
+      "label": "Enterprise trial extension policy",
+      "focus": "growth",
+      "cost": 3000,
+      "buzz": 1,
+      "product": 1,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Longer evals for big logos — sales loves it."
+    }
+  ]
+}

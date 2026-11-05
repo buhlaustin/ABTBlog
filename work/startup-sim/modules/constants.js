@@ -35,12 +35,31 @@ export function createInitialPublicMarket() {
     ipoMonthIndex: null,
     ipoYear: null,
     priorMonthMrr: 0,
+    priorSharePrice: null,
     priceHistory: [],
     pressHeadline: null,
     pressDek: null,
     monthsPublic: 0,
     lockupMonthsRemaining: 0,
-    guidanceBeatStreak: 0
+    guidanceBeatStreak: 0,
+    guidanceTone: 'inline',
+    whisperRevenueTarget: 0,
+    analystRating: null,
+    analystTarget: null,
+    buybackAuthorized: 0,
+    buybackUsedLifetime: 0,
+    shortInterestPct: 0,
+    lastEarningsMonth: null,
+    earningsSurpriseStreak: 0,
+    high52: null,
+    low52: null,
+    indexMember: false,
+    indexName: null,
+    marketTape: [],
+    institutionalHoldPct: 42,
+    lastSplitTurn: null,
+    lastDividendTurn: null,
+    lastAnalystActionTurn: null
   };
 }
 

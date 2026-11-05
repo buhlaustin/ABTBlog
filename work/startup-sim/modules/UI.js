@@ -1,9 +1,14 @@
 import { formatMoney, stageLabel, getMonthlyTaskSlots } from './constants.js';
+import { formatStateMonth, formatCalendarStamp, realClockNow, sandboxCalendarYearOptions } from './GameCalendar.js';
+import { calendarTurn } from './XC.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
+import { renderCompaniesPanel } from './Acquisitions.js';
 import { renderPeoplePanel } from './Staff.js';
-import { renderSocialPanel } from './Social.js';
-import { renderNewsPanel } from './News.js';
+import { renderCeoPanel } from './Ceo.js';
+import { ceoPersonalCashComp } from './CeoEconomics.js';
+import { renderSocialPanel, markSocialAsRead, syncSocialTabAlert } from './Social.js';
+import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
 import { renderAdvisorPanel } from './Advisor.js';
 import {
   getTaskDef,
@@ -15,7 +20,9 @@ import {
 import { getTaskStage, workspaceLabel, getWorkspaceTier, getArr } from './Workspace.js';
 import { renderBoardPanel } from './Board.js';
 import { hasActiveCrisis } from './Crisis.js';
-import { isPublicCompany, founderStakeValue } from './IPO.js';
+import { hasActiveDecision, renderDeskDecisionBlock } from './DecisionEvents.js';
+import { activeModifierLabels } from './ScenarioEffects.js';
+import { isPublicCompany, founderStakeValue, stockHudChangeLabel } from './IPO.js';
 import { stageIconUrl, applyGameBackdrop } from './Assets.js';
 import { playUiClick } from './Audio.js';
 import { activeTutorialStep, renderTutorialBanner } from './Tutorial.js';
@@ -23,20 +30,34 @@ import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
-import { renderProductActionsPanel } from './ProductActions.js';
-import { sentimentLabel, hasInstitutionalBoard } from './Sentiment.js';
+import { renderProductActionsPanel, sideTaskBankSize } from './ProductActions.js';
+
+const SIDE_TASK_FOCUS_PRODUCT = ['product', 'both'];
+const SIDE_TASK_FOCUS_GROWTH = ['growth', 'brand', 'both'];
+import { sentimentLabel, marketTrustLabel, hasInstitutionalBoard } from './Sentiment.js';
 import { runwayLabel } from './MonthSummary.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
+import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
 import {
   getTaskRevenueMultiplierPreview,
   getCoreTaskRevenueMult,
   getSandboxTuningMult,
-  estimateTaskPayoutBand
+  getRawTaskRevenueMultiplier,
+  estimateTaskPayoutBand,
+  estimateTaskMrrBand,
+  taskRevenueMultHud
 } from './Finance.js';
 import { progressionTierLabel } from './ProgressionEconomy.js';
 import { renderGrowthCampaignsBlock } from './GrowthCampaigns.js';
-import { launchLifecycleActive, launchPhaseLabel } from './LaunchLifecycle.js';
+import {
+  launchLifecycleActive,
+  launchPhaseLabel,
+  PRE_LAUNCH_BUZZ_REQUIRED,
+  PRE_LAUNCH_PRODUCT_REQUIRED,
+  canSchedulePublicLaunch,
+  renderPreLaunchProgressBlock
+} from './LaunchLifecycle.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -87,6 +108,20 @@ export function bindSandboxCashToggle(form) {
     wrap.hidden = !sandbox;
     if (tuning) tuning.hidden = !sandbox;
   };
+
+  const monthSel = document.getElementById('sandbox-start-month');
+  const yearSel = document.getElementById('sandbox-start-year');
+  if (yearSel && !yearSel.options.length) {
+    for (const yr of sandboxCalendarYearOptions()) {
+      const opt = document.createElement('option');
+      opt.value = String(yr);
+      opt.textContent = String(yr);
+      yearSel.appendChild(opt);
+    }
+  }
+  const now = realClockNow();
+  if (monthSel) monthSel.value = String(now.monthIndex);
+  if (yearSel) yearSel.value = String(now.year);
 
   form.addEventListener('change', sync);
   sync();
@@ -148,11 +183,12 @@ export function renderGameHud(state) {
   if (cash) cash.textContent = formatMoney(state.finance.cash);
   if (revenue) revenue.textContent = formatMoney(getArr(state));
   if (month) {
-    month.textContent = `M${state.calendar.monthIndex}, Y${state.calendar.year}`;
+    month.textContent = formatStateMonth(state, 'hud');
   }
   if (mode) {
-    const revMult = getTaskRevenueMultiplierPreview(state);
-    mode.textContent = `${state.mode === 'sandbox' ? 'Sandbox' : 'Career'} · rev×${revMult.toFixed(2)}`;
+    const revHud = taskRevenueMultHud(state);
+    const capTag = revHud.label.includes('capped') ? ' (capped)' : '';
+    mode.textContent = `${state.mode === 'sandbox' ? 'Sandbox' : 'Career'} · rev×${revHud.effective.toFixed(2)}${capTag}`;
   }
   if (mrr) mrr.textContent = formatMoney(state.finance.mrr ?? 0);
   const boardTab = document.getElementById('tab-board');
@@ -168,7 +204,10 @@ export function renderGameHud(state) {
     if (isPublicCompany(state)) {
       const pm = state.publicMarket ?? {};
       stock.hidden = false;
-      stock.textContent = `${pm.ticker ?? '—'} ${formatMoney(pm.sharePrice ?? 0)}`;
+      const ch = stockHudChangeLabel(state);
+      stock.textContent = ch
+        ? `${pm.ticker ?? '—'} ${formatMoney(pm.sharePrice ?? 0)} (${ch})`
+        : `${pm.ticker ?? '—'} ${formatMoney(pm.sharePrice ?? 0)}`;
     } else {
       stock.hidden = true;
     }
@@ -181,6 +220,24 @@ function escapeHtml(s) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+function launchTaskTypeTag(def) {
+  const types = def.types ?? [];
+  const parts = [];
+  if (def.crowdfunding) parts.push('crowdfund');
+  if (types.includes('product') || (def.product ?? 0) > 0) {
+    parts.push(`+${def.product ?? 0} product`);
+  }
+  if (types.includes('marketing') || (def.buzz ?? 0) > 0) {
+    parts.push(`+${def.buzz ?? 0} buzz`);
+  }
+  const mrrBand = estimateTaskMrrBand(def);
+  if (mrrBand) {
+    parts.push(`+${formatMoney(mrrBand.min)}–${formatMoney(mrrBand.max)}/mo MRR`);
+  }
+  if (!parts.length) return '';
+  return ` <span class="task-tag">${parts.join(' · ')}</span>`;
 }
 
 export function renderDeskPanel(state) {
@@ -206,7 +263,13 @@ export function renderDeskPanel(state) {
           if (!def) return '';
           const sel = offer.selected ? 'task-offer selected' : 'task-offer';
           const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
-          const launchTag = def.scheduleLaunch ? ' <span class="task-tag">Launch gate</span>' : '';
+          const launchTag = def.scheduleLaunch
+            ? ` <span class="task-tag">${canSchedulePublicLaunch(state) ? 'Launch gate' : `${PRE_LAUNCH_BUZZ_REQUIRED} buzz · ${PRE_LAUNCH_PRODUCT_REQUIRED} prod`}</span>`
+            : def.xcDemoDay
+              ? ' <span class="task-tag">Demo Day</span>'
+              : def.launchPhase === 'pre_launch'
+                ? launchTaskTypeTag(def)
+                : '';
           return `<article class="${sel}">
             <h3>${escapeHtml(def.title)}${sig}${launchTag}</h3>
             <p>${escapeHtml(def.description)}</p>
@@ -226,15 +289,22 @@ export function renderDeskPanel(state) {
           ? `<button type="button" class="btn btn-primary btn-small" data-complete-task="${escapeHtml(inst.instanceId)}">Complete</button>`
           : '<span class="task-done-label">Done</span>';
       const band = estimateTaskPayoutBand(def, state);
+      const mrrBand = estimateTaskMrrBand(def);
       const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
+      const crowd = def.crowdfunding ? ' <span class="task-tag">Crowdfunding</span>' : '';
       const rival =
         def.rivalPressure && def.rivalPressure < 0
           ? ` · rival heat ${def.rivalPressure}`
           : '';
+      const preHint =
+        def.launchPhase === 'pre_launch' ? ` · ${launchTaskTypeTag(def).replace(/<[^>]+>/g, '').trim()}` : '';
+      const mrrHint = mrrBand
+        ? ` · MRR +${formatMoney(mrrBand.min)}–${formatMoney(mrrBand.max)}/mo`
+        : '';
       return `<article class="${doneClass}">
-        <h3>${escapeHtml(def.title)}${sig}</h3>
+        <h3>${escapeHtml(def.title)}${sig}${crowd}</h3>
         <p>${escapeHtml(def.description)}</p>
-        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${rival}</p>
+        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${mrrHint}${rival}${preHint}</p>
         ${btn}
       </article>`;
     })
@@ -247,12 +317,14 @@ export function renderDeskPanel(state) {
 
   const tutorial = renderTutorialBanner(activeTutorialStep(state));
   const launchBanner = launchLifecycleActive(state)
-    ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — desk offers are from the launch playbook until you graduate (complete post-launch months or leave the garage).</p>`
+    ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — engineering raises product level; marketing raises buzz. Schedule launch at <strong>${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz</strong> and <strong>product ${PRE_LAUNCH_PRODUCT_REQUIRED}+</strong>. Pre-sell revenue is normal desk cash. Graduate after post-launch or leaving the garage.</p>`
     : '';
+  const preLaunchProgress = renderPreLaunchProgressBlock(state);
 
   desk.innerHTML = `
     ${tutorial}
     ${launchBanner}
+    ${preLaunchProgress}
     ${
       catalogError
         ? '<p class="desk-feedback error" role="alert">Tasks did not load — reload the page. You cannot close the month until the desk is full.</p>'
@@ -263,6 +335,12 @@ export function renderDeskPanel(state) {
         ? '<p class="desk-feedback error" role="alert">Crisis on the desk — resolve it before closing the month.</p>'
         : ''
     }
+    ${
+      hasActiveDecision(state)
+        ? '<p class="desk-feedback error" role="alert">Strategic decision pending — pick an option below before closing the month.</p>'
+        : ''
+    }
+    ${renderDeskDecisionBlock(state)}
     <p class="panel-lede">Pick ${slotTarget} tasks from this month’s offers, complete them, then close the month. <span class="fine-print">Shortcuts: 1–9 switch tabs, M close month.</span></p>
     <div class="summary-grid">
       <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slotTarget}</span></div>
@@ -270,7 +348,11 @@ export function renderDeskPanel(state) {
       <div><span class="stat-label">Next gate</span><span class="stat-value">${escapeHtml(ms)}</span></div>
       <div><span class="stat-label">Pending</span><span class="stat-value">${pending.length}</span></div>
       <div><span class="stat-label">Scale era</span><span class="stat-value">${escapeHtml(progressionTierLabel(state))}</span></div>
-      <div><span class="stat-label">Rev. mult</span><span class="stat-value">${getTaskRevenueMultiplierPreview(state).toFixed(2)}×</span></div>
+      ${(() => {
+        const revHud = taskRevenueMultHud(state);
+        const titleAttr = revHud.title ? ` title="${escapeHtml(revHud.title)}"` : '';
+        return `<div><span class="stat-label">${escapeHtml(revHud.label)}</span><span class="stat-value"${titleAttr}>${revHud.effective.toFixed(2)}×</span></div>`;
+      })()}
     </div>
     ${
       lineupOpen
@@ -289,7 +371,7 @@ export function renderDeskPanel(state) {
         .slice(0, 6)
         .map(
           (e) =>
-            `<li><span class="log-when">Y${e.year} M${e.month}</span> ${escapeHtml(e.message)}</li>`
+            `<li><span class="log-when">${escapeHtml(formatCalendarStamp(e.year, e.month))}</span> ${escapeHtml(e.message)}</li>`
         )
         .join('') || '<li class="muted">No events yet.</li>'}</ul>
     </section>
@@ -305,7 +387,9 @@ export const TAB_ORDER = [
   'product',
   'growth',
   'people',
+  'ceo',
   'finance',
+  'companies',
   'board',
   'social',
   'news',
@@ -344,8 +428,14 @@ function renderPanelForTab(tab, state) {
     case 'people':
       renderPeoplePanel(document.getElementById('panel-people'), state);
       break;
+    case 'ceo':
+      renderCeoPanel(document.getElementById('panel-ceo'), state);
+      break;
     case 'finance':
       renderFinancePanel(document.getElementById('panel-finance'), state);
+      break;
+    case 'companies':
+      renderCompaniesPanel(document.getElementById('panel-companies'), state);
       break;
     case 'board':
       renderBoardPanel(document.getElementById('panel-board'), state);
@@ -384,7 +474,13 @@ function activateTab(nav, tab) {
   });
   activeBtn?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' });
   const state = panelStateProvider?.();
-  if (state) renderPanelForTab(tab, state);
+  if (state) {
+    if (tab === 'news') markNewsAsRead(state);
+    if (tab === 'social') markSocialAsRead(state);
+    renderPanelForTab(tab, state);
+    if (tab === 'news') syncNewsTabAlert(state);
+    if (tab === 'social') syncSocialTabAlert(state);
+  }
 }
 
 export function bindTabNavigation() {
@@ -435,6 +531,11 @@ export function bindGameKeyboardShortcuts(getSession, onCloseMonth) {
       }
       return;
     }
+    if (e.key === '0' && !e.altKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      selectTab('advisor');
+      return;
+    }
 
     if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.metaKey && !e.altKey) {
       if (canEndMonth(state)) {
@@ -461,6 +562,8 @@ export function renderAllPanels(state) {
     }
   }
   renderGameHud(state);
+  syncNewsTabAlert(state);
+  syncSocialTabAlert(state);
   renderDeskPanel(state);
   const active = getActiveTabId();
   if (active !== 'desk') {
@@ -481,18 +584,36 @@ export function renderGrowthPanel(container, state) {
 
   const coreMult = getCoreTaskRevenueMult(state);
   const tuneMult = getSandboxTuningMult(state);
-  const totalMult = getTaskRevenueMultiplierPreview(state);
+  const revHud = taskRevenueMultHud(state);
+  const totalMult = revHud.effective;
+  const rawMult = getRawTaskRevenueMultiplier(state);
   const era = progressionTierLabel(state);
   const growthRuns = (state.growth?.campaignsThisMonth ?? []).length;
   const growthSlots = growthCampaignSlots(state);
   const growthLeft = growthCampaignsRemaining(state);
+  const growthSlotLabel = formatMonthlySideTaskLimit(growthSlots);
+  const growthLeftLabel =
+    growthLeft === Infinity ? 'Unlimited' : `${growthLeft}/${growthSlotLabel}`;
+  const capNote = revHud.label.includes('capped')
+    ? ` · uncapped stack ${rawMult.toFixed(1)}× → <strong>${totalMult.toFixed(2)}× cap</strong>`
+    : '';
+  const modLabels = activeModifierLabels(state);
+  const modNote = modLabels.length
+    ? `<p class="fine-print"><strong>Active fallout:</strong> ${modLabels.map((l) => escapeHtml(l)).join(' · ')}</p>`
+    : '';
+  const trustScore = state.sentiment?.score ?? 68;
+  const trustNote = hasInstitutionalBoard(state)
+    ? ''
+    : `<p class="fine-print"><strong>Market trust</strong> ${trustScore} — ${escapeHtml(marketTrustLabel(trustScore))}. Crises and desk decisions move this score; Series A needs at least 32.</p>`;
   const multNote =
     state.mode === 'sandbox' && tuneMult !== 1
-      ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong> · growth slots ${growthLeft}/${growthSlots} left${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
-      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — effective multiplier <strong>${totalMult.toFixed(2)}×</strong>${growthRuns ? ` · ${growthRuns}/${growthSlots} growth slot(s) used` : ` · ${growthLeft}/${growthSlots} growth slot(s) left`}.</p>`;
+      ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong>${capNote} · paid campaigns ${growthLeftLabel}${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
+      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — ${revHud.label.includes('capped') ? 'Rev× (capped)' : 'effective multiplier'} <strong>${totalMult.toFixed(2)}×</strong>${capNote}${growthRuns ? ` · ${growthRuns}/${growthSlotLabel} paid campaign(s) used` : ` · ${growthLeftLabel} paid campaign(s) left`}.</p>`;
 
   container.innerHTML = `
     <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks and paid campaigns below share the same multiplier math.</p>
+    ${trustNote}
+    ${modNote}
     ${multNote}
     <div class="summary-grid">
       <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>
@@ -516,8 +637,15 @@ export function renderGrowthPanel(container, state) {
         ? `<p class="fine-print">Latest board note: ${escapeHtml(lastReason)}</p>`
         : '<p class="fine-print">Desk tasks scale with funding rounds and HQ tier. Paid campaigns below do not use desk slots.</p>'
     }
+    <div id="growth-levers-mount"></div>
     ${renderGrowthCampaignsBlock(state)}
   `;
+  renderProductActionsPanel(document.getElementById('growth-levers-mount'), state, {
+    heading: 'Side growth plays',
+    focusFilter: SIDE_TASK_FOCUS_GROWTH,
+    showLimitHint: false,
+    lede: `Marketing and brand experiments — shares the monthly side-play limit with Product (${sideTaskBankSize(SIDE_TASK_FOCUS_GROWTH)} growth/brand plays in bank).`
+  });
 }
 
 export function renderProductPanel(container, state) {
@@ -548,7 +676,7 @@ export function renderProductPanel(container, state) {
       : '';
 
   container.innerHTML = `
-    <p class="panel-lede">A stronger product makes desk tasks pay better — level up by shipping product work on the desk.</p>
+    <p class="panel-lede">A stronger product makes desk tasks pay better. Buy <strong>product side plays</strong> below (UX sprints, enterprise packs, PLG experiments) — they share a monthly limit with Growth tab plays.</p>
     <div class="summary-grid">
       <div><span class="stat-label">Product level</span><span class="stat-value">${state.product.level ?? 0}</span></div>
       <div><span class="stat-label">Buzz</span><span class="stat-value">${state.product.buzz ?? 0}</span></div>
@@ -557,7 +685,11 @@ export function renderProductPanel(container, state) {
     ${pivotBlock}
     <div id="product-actions-mount"></div>
   `;
-  renderProductActionsPanel(document.getElementById('product-actions-mount'), state);
+  renderProductActionsPanel(document.getElementById('product-actions-mount'), state, {
+    heading: 'Product side plays',
+    focusFilter: SIDE_TASK_FOCUS_PRODUCT,
+    lede: `Ship faster without a desk slot — product-focused buys (${sideTaskBankSize(SIDE_TASK_FOCUS_PRODUCT)} in bank). Limit grows with stage; hub removes the cap.`
+  });
 }
 
 export function renderGameOver(state) {
@@ -571,7 +703,7 @@ export function renderGameOver(state) {
   if (eyebrow) eyebrow.textContent = victory ? 'CEO step-down' : 'Run ended';
   if (title) title.textContent = state.company.name;
   if (body) {
-    const months = (state.calendar.year - 1) * 12 + state.calendar.monthIndex - 1;
+    const months = Math.max(0, calendarTurn(state) - 1);
     if (victory) {
       const e = state.ending;
       body.innerHTML = `
@@ -587,7 +719,11 @@ export function renderGameOver(state) {
             : ''
         }
         <div class="summary-grid gameover-stats">
-          <div><span class="stat-label">Cash-out</span><span class="stat-value">${formatMoney(e.payout)}</span></div>
+          <div><span class="stat-label">Stock cash-out</span><span class="stat-value">${formatMoney(e.payout)}</span></div>
+          <div><span class="stat-label">CEO salary (career)</span><span class="stat-value">${formatMoney(e.ceoSalaryCareer ?? 0)}</span></div>
+          <div><span class="stat-label">Owner draws</span><span class="stat-value">${formatMoney(e.ceoOwnerDraws ?? 0)}</span></div>
+          <div><span class="stat-label">Personal bank</span><span class="stat-value">${formatMoney(e.ceoBankBalance ?? 0)}</span></div>
+          <div><span class="stat-label">Total personal cash</span><span class="stat-value">${formatMoney(e.totalCareerCashComp ?? e.payout)}</span></div>
           <div><span class="stat-label">Share price</span><span class="stat-value">${formatMoney(e.sharePrice)}</span></div>
           <div><span class="stat-label">Founder stake</span><span class="stat-value">${e.founderPct}%</span></div>
           <div><span class="stat-label">Months public</span><span class="stat-value">${e.monthsPublic}</span></div>
@@ -604,6 +740,7 @@ export function renderGameOver(state) {
         }
         <p>${escapeHtml(state.flags.gameOverReason || 'Your run ended.')}</p>
         <p>Lifetime revenue: <strong>${formatMoney(state.finance.lifetimeRevenue)}</strong></p>
+        <p>CEO cash comp this run: <strong>${formatMoney(ceoPersonalCashComp(state))}</strong> (salary + owner draws)</p>
         <p>Months played: <strong>${months}</strong></p>
         ${
           isPublicCompany(state)

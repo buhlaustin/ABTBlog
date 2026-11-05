@@ -1,4 +1,6 @@
 import { STAGES } from './constants.js';
+import { isFundraisingBlockedByScenario } from './ScenarioEffects.js';
+import { convertOutstandingSafesAtSeed } from './FinanceCapital.js';
 import {
   canRaiseSeriesA,
   canRaiseSeriesB,
@@ -7,6 +9,7 @@ import {
   seriesAGateSentiment,
   seriesBGateSentiment
 } from './Sentiment.js';
+import { getSeedRoundTerms, seedRoundTermsNote } from './XC.js';
 
 const FOUNDER_AUTHORIZED = 10_000_000;
 
@@ -21,6 +24,34 @@ export function recalculateCapTablePercentages(capTable) {
 
 export function getFounderRow(state) {
   return state.capTable?.find((r) => r.id === 'founder');
+}
+
+/** Issue new exec shares for ~pct fully-diluted ownership (before the grant). */
+export function grantExecutiveEquity(state, { id, name, pct, holderClass = 'exec' }) {
+  const targetPct = Math.max(0.1, Math.min(15, Number(pct) || 0));
+  if (!state.capTable?.length) {
+    state.capTable = [
+      {
+        id: 'founder',
+        name: 'You (Founder)',
+        shares: FOUNDER_AUTHORIZED,
+        pct: 100,
+        class: 'founder'
+      }
+    ];
+  }
+  const holderId = String(id || `exec-${Date.now()}`);
+  let rows = state.capTable.filter((r) => r.id !== holderId).map((r) => ({ ...r }));
+  const totalBefore = rows.reduce((s, r) => s + (r.shares ?? 0), 0);
+  const grantShares = Math.round(totalBefore * (targetPct / (100 - targetPct)));
+  rows.push({
+    id: holderId,
+    name: String(name || 'Executive'),
+    shares: grantShares,
+    class: holderClass
+  });
+  state.capTable = recalculateCapTablePercentages(rows);
+  return { grantShares, pct: targetPct };
 }
 
 /** Issue XC SAFE: +$500k cash, ~6% fully-diluted to XC holder. */
@@ -80,9 +111,7 @@ export function applySeedRound(state) {
     return { ok: false, reason: 'Seed round already closed.' };
   }
 
-  const preMoney = 12_000_000;
-  const postMoney = 15_000_000;
-  const raised = 3_000_000;
+  const { raised, preMoney, postMoney } = getSeedRoundTerms(state);
 
   let rows = state.capTable.map((r) => ({ ...r }));
   const totalBefore = rows.reduce((s, r) => s + r.shares, 0);
@@ -116,7 +145,8 @@ export function applySeedRound(state) {
   };
   state.flags.seedRoundClosed = true;
   applyFundraiseMomentum(state, 'Seed');
-  return { ok: true, raised, postMoney };
+  const safeLines = convertOutstandingSafesAtSeed(state, postMoney);
+  return { ok: true, raised, postMoney, safeLines };
 }
 
 /** Cap table + instruments shape after seed — no cash or flag checks (sandbox bootstrap). */
@@ -182,8 +212,14 @@ function applyPricedRound(state, config) {
   if (state.flags?.ipoFiled) {
     return { ok: false, reason: 'Already public — no new primary rounds.' };
   }
+  if (isFundraisingBlockedByScenario(state)) {
+    return {
+      ok: false,
+      reason: 'Fundraising frozen — resolve fallout from a recent decision or crisis first.'
+    };
+  }
   const sentiment = state.sentiment?.score ?? 50;
-  if (minSentiment != null && state.flags?.seriesAClosed && sentiment < minSentiment) {
+  if (minSentiment != null && sentiment < minSentiment) {
     return {
       ok: false,
       reason: sentimentBlockMessage ?? `Board sentiment too low (${sentiment}/100) for ${roundName}.`
@@ -257,7 +293,9 @@ export function applySeriesA(state) {
     investorId: 'series-a',
     investorLabel: 'Series A investors',
     requireFlag: 'seedRoundClosed',
-    setFlag: 'seriesAClosed'
+    setFlag: 'seriesAClosed',
+    minSentiment: 32,
+    sentimentBlockMessage: 'Market trust is too low — clean up press and decisions before Series A.'
   });
 }
 
@@ -474,13 +512,17 @@ export function seedRoundPreview(state) {
   }
   const founder = getFounderRow(state);
   const founderPct = founder?.pct ?? 100;
+  const { raised, preMoney, postMoney } = getSeedRoundTerms(state);
+  const dilutionFactor = 1 - raised / postMoney - 0.1 * (1 - raised / postMoney);
+  const founderAfter = Math.round(founderPct * dilutionFactor * 10) / 10;
+  const pitchNote = seedRoundTermsNote(state);
   return {
-    raised: 3_000_000,
-    preMoney: 12_000_000,
-    postMoney: 15_000_000,
+    raised,
+    preMoney,
+    postMoney,
     founderPctNow: founderPct,
-    founderPctAfterApprox: Math.round(founderPct * 0.72 * 10) / 10,
-    note: '~20% to seed investors and 10% ESOP (pro-forma).'
+    founderPctAfterApprox: founderAfter,
+    note: pitchNote ?? '~20% to seed investors and 10% ESOP (pro-forma).'
   };
 }
 

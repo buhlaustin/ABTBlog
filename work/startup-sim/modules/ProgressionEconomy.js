@@ -45,18 +45,16 @@ export function progressionRevenueMult(state) {
   if (state.flags?.seriesFClosed) m *= 1.35;
 
   const tier = getWorkspaceTier(state);
-  if (tier === WORKSPACE_TIER.CAMPUS) m *= 14;
-  if (tier === WORKSPACE_TIER.HUB) m *= 38;
+  if (tier === WORKSPACE_TIER.CAMPUS) m *= 2.5;
+  if (tier === WORKSPACE_TIER.HUB) m *= 4;
 
   if (isPublicCompany(state)) m *= 6;
 
+  /** Flat ARR milestones — no continuous feedback from monthly desk revenue. */
   const arr = getArr(state);
-  if (arr >= 500_000) {
-    m *= 1 + Math.min(12, (arr / 8_000_000) ** 0.55);
-  }
-  if (arr >= 50_000_000) {
-    m *= 1 + Math.min(8, (arr / 120_000_000) ** 0.45);
-  }
+  if (arr >= 1_000_000) m *= 1.05;
+  if (arr >= 10_000_000) m *= 1.08;
+  if (arr >= 100_000_000) m *= 1.1;
 
   return Math.round(m * 100) / 100;
 }

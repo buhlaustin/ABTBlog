@@ -3,19 +3,30 @@ import { createInitialStaff } from './Staff.js';
 import { createInitialSocial } from './Social.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
+import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
 import { recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
 import { createInitialBoard } from './Board.js';
-import { createInitialXcState, calendarTurn } from './XC.js';
+import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart } from './XC.js';
 import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
+import { createInitialAcquisitionsState } from './Acquisitions.js';
 import { createInitialCrisisState } from './Crisis.js';
+import { createInitialDecisionState } from './DecisionEvents.js';
+import { createInitialModifiers } from './ScenarioEffects.js';
 import { createInitialLaunchState } from './LaunchLifecycle.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
 import { syncLifetimeProfit } from './Finance.js';
+import {
+  createInitialCeoState,
+  initializeCeoPersonalFinances,
+  ensureCeoPersonalBank,
+  preparePersonalExpensesForMonth
+} from './CeoEconomics.js';
+import { createInitialCooState, hireCoo, isCooHired } from './Coo.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -26,7 +37,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 15;
+export const SAVE_VERSION = 33;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -61,6 +72,10 @@ export function createInitialState(options) {
   }
 
   const economics = categoryEconomics(category);
+  const calendarStart =
+    mode === 'sandbox' && options.sandboxTuning?.calendarStart
+      ? options.sandboxTuning.calendarStart
+      : realClockNow();
 
   const state = {
     version: SAVE_VERSION,
@@ -79,7 +94,7 @@ export function createInitialState(options) {
     growth: { campaignsThisMonth: [] },
     board: createInitialBoard(),
     stage: STAGES.GARAGE,
-    calendar: createInitialCalendar(),
+    calendar: createInitialCalendar(calendarStart),
     finance: {
       cash: startingCash,
       lifetimeRevenue: 0,
@@ -94,16 +109,28 @@ export function createInitialState(options) {
       instruments: [],
       lastRound: null
     },
+    ceo: {
+      salaryAnnual: 0,
+      careerSalaryPaid: 0,
+      careerOwnerDraws: 0,
+      drawLog: [],
+      salaryPayLog: [],
+      salaryChangeLog: []
+    },
     staff: createInitialStaff(),
     product: { level: 0, buzz: 0, actionsThisMonth: 0 },
     social: createInitialSocial(),
     news: createInitialNews(),
     offices: createInitialOffices(),
     xc: createInitialXcState(),
+    coo: createInitialCooState(),
     advisor: createInitialAdvisor(),
     sentiment: createInitialSentiment(),
-    world: { competitor: createCompetitorForCategory(category.id) },
+    world: { competitor: createCompetitorForCategory(category.id), competitorAcquired: false },
+    acquisitions: createInitialAcquisitionsState(),
     crisis: createInitialCrisisState(),
+    decision: createInitialDecisionState(),
+    modifiers: createInitialModifiers(),
     launch: createInitialLaunchState(),
     meta: {
       runStartedTurn: 1,
@@ -111,7 +138,9 @@ export function createInitialState(options) {
       initialInvestmentCash: startingCash,
       monthsAtIpo: null,
       hofRecorded: false,
-      hofHighlights: []
+      hofHighlights: [],
+      calendarStartYear: calendarStart.year,
+      calendarStartMonth: calendarStart.monthIndex
     },
     publicMarket: createInitialPublicMarket(),
     ending: null,
@@ -154,6 +183,7 @@ export function createInitialState(options) {
   }
 
   applyWorkspaceBurn(state);
+  initializeCeoPersonalFinances(state);
   state.meta.runStartedTurn = calendarTurn(state);
   startMonth(state);
   return state;
@@ -172,11 +202,15 @@ export function normalizeSave(raw) {
       state.staff = createInitialStaff();
     }
     if (!state.social) state.social = createInitialSocial();
+    if (state.social && state.social.unreadFeedCount === undefined) {
+      state.social.unreadFeedCount = 0;
+    }
     if (!state.news) state.news = createInitialNews();
     if (!state.product) state.product = { level: 0, buzz: 0 };
     if (!state.product.buzz && state.product.buzz !== 0) state.product.buzz = 0;
     if (state.product.actionsThisMonth === undefined) state.product.actionsThisMonth = 0;
-    if (!state.calendar) state.calendar = createInitialCalendar();
+    if (!state.calendar) state.calendar = createInitialCalendar(realClockNow());
+    migrateLegacyCalendar(state);
     if (!state.calendar.monthTasks) state.calendar.monthTasks = [];
     if (!state.calendar.log) state.calendar.log = [];
     if (!state.calendar.recentTaskIds) state.calendar.recentTaskIds = [];
@@ -185,7 +219,21 @@ export function normalizeSave(raw) {
       state.calendar.taskLineupConfirmed = (state.calendar.monthTasks?.length ?? 0) > 0;
     }
     if (!state.workspace) state.workspace = createInitialWorkspace();
-    if (state.executives) delete state.executives;
+    if (!state.coo) state.coo = createInitialCooState();
+    if (state.coo.hired === undefined) state.coo.hired = false;
+    if (state.coo.capTableId === undefined) state.coo.capTableId = null;
+    if (state.executives?.roster?.length && !isCooHired(state)) {
+      const legacy = state.executives.roster.find((e) => e.roleTitle === 'COO');
+      if (legacy?.name) {
+        const parts = String(legacy.name).trim().split(/\s+/);
+        hireCoo(state, {
+          firstName: parts[0] ?? 'Jordan',
+          lastName: parts.slice(1).join(' ') || 'Ellis',
+          equityPct: 1.5
+        });
+      }
+    }
+    delete state.executives;
     if (!state.growth) state.growth = { campaignsThisMonth: [] };
     if (!state.growth.campaignsThisMonth) state.growth.campaignsThisMonth = [];
     if (state.workspace && state.workspace.campusOwned === undefined) {
@@ -204,10 +252,37 @@ export function normalizeSave(raw) {
       state.meta.runSeed = Math.floor(Math.random() * 2_147_483_647);
     }
     if (!state.launch) state.launch = createInitialLaunchState();
+    if (state.launch.waitlistSignups == null) state.launch.waitlistSignups = 0;
+    if (state.launch.preSellBooked == null) state.launch.preSellBooked = 0;
+    if (state.launch.marketingTasksDone == null) state.launch.marketingTasksDone = 0;
+    if (state.launch.crowdfundingMrr == null) state.launch.crowdfundingMrr = 0;
+    if (state.launch.crowdfundingCampaigns == null) state.launch.crowdfundingCampaigns = 0;
+    if (state.launch.productTasksDone == null) state.launch.productTasksDone = 0;
     if (!state.board) state.board = createInitialBoard();
     if (state.board.governanceStreak === undefined) state.board.governanceStreak = 0;
     if (state.publicMarket && state.publicMarket.guidanceBeatStreak === undefined) {
       state.publicMarket.guidanceBeatStreak = 0;
+    }
+    if (state.publicMarket) {
+      const pm = state.publicMarket;
+      if (pm.guidanceTone === undefined) pm.guidanceTone = 'inline';
+      if (pm.priorSharePrice === undefined) pm.priorSharePrice = pm.sharePrice ?? null;
+      if (pm.whisperRevenueTarget === undefined) pm.whisperRevenueTarget = 0;
+      if (pm.analystRating === undefined) pm.analystRating = null;
+      if (pm.analystTarget === undefined) pm.analystTarget = null;
+      if (pm.buybackAuthorized === undefined) pm.buybackAuthorized = 0;
+      if (pm.buybackUsedLifetime === undefined) pm.buybackUsedLifetime = 0;
+      if (pm.shortInterestPct === undefined) pm.shortInterestPct = 0;
+      if (pm.earningsSurpriseStreak === undefined) pm.earningsSurpriseStreak = 0;
+      if (pm.high52 === undefined) pm.high52 = pm.sharePrice ?? null;
+      if (pm.low52 === undefined) pm.low52 = pm.sharePrice ?? null;
+      if (pm.indexMember === undefined) pm.indexMember = false;
+      if (pm.indexName === undefined) pm.indexName = 'FTEQ-100';
+      if (!pm.marketTape) pm.marketTape = [];
+      if (pm.institutionalHoldPct === undefined) pm.institutionalHoldPct = 42;
+      if (pm.lastSplitTurn === undefined) pm.lastSplitTurn = null;
+      if (pm.lastDividendTurn === undefined) pm.lastDividendTurn = null;
+      if (pm.lastAnalystActionTurn === undefined) pm.lastAnalystActionTurn = null;
     }
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);
@@ -225,6 +300,47 @@ export function normalizeSave(raw) {
     }
     if (state.finance.mrr === undefined) state.finance.mrr = state.finance.monthlyRevenue ?? 0;
     if (!state.finance.instruments) state.finance.instruments = [];
+    if (!state.finance.loan) {
+      state.finance.loan = {
+        balance: 0,
+        totalDrawn: 0,
+        monthlyPayment: 0,
+        apr: 0.14,
+        creditLimit: 0,
+        drawsThisMonth: 0,
+        lastDrawTurn: null,
+        lastServicedTurn: null,
+        history: [],
+        creditScore: null,
+        refinancedAtSeed: false
+      };
+    } else {
+      if (!state.finance.loan.history) state.finance.loan.history = [];
+      if (state.finance.loan.refinancedAtSeed === undefined) state.finance.loan.refinancedAtSeed = false;
+    }
+    if (!state.finance.rbf) {
+      state.finance.rbf = { active: false, principal: 0, owed: 0, sharePct: 0.12, feeMult: 1.28 };
+    }
+    if (!state.ceo) {
+      state.ceo = createInitialCeoState();
+    } else {
+      if (state.ceo.salaryAnnual === undefined) state.ceo.salaryAnnual = 0;
+      if (state.ceo.careerSalaryPaid === undefined) state.ceo.careerSalaryPaid = 0;
+      if (state.ceo.careerOwnerDraws === undefined) state.ceo.careerOwnerDraws = 0;
+      if (!state.ceo.drawLog) state.ceo.drawLog = [];
+      if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];
+      if (!state.ceo.salaryChangeLog) state.ceo.salaryChangeLog = [];
+      if (!state.ceo.bankLog) state.ceo.bankLog = [];
+      if (state.ceo.personalExpenseScheduled === undefined) state.ceo.personalExpenseScheduled = null;
+      if (state.ceo.lastPersonalExpense === undefined) state.ceo.lastPersonalExpense = null;
+      if (state.ceo.careerPersonalExpensesPaid === undefined) {
+        state.ceo.careerPersonalExpensesPaid = 0;
+      }
+      delete state.ceo.personalBurnMonthly;
+      delete state.ceo.personalBurnCustom;
+    }
+    ensureCeoPersonalBank(state);
+    preparePersonalExpensesForMonth(state);
     if (state.finance.lastRound === undefined) state.finance.lastRound = null;
     if (!state.flags) state.flags = {};
     if (state.flags.gameOver === undefined) state.flags.gameOver = false;
@@ -242,6 +358,8 @@ export function normalizeSave(raw) {
       };
     }
     if (!state.crisis) state.crisis = createInitialCrisisState();
+    if (!state.decision) state.decision = createInitialDecisionState();
+    if (!state.modifiers?.active) state.modifiers = createInitialModifiers();
     if (state.flags.seriesAClosed === undefined) state.flags.seriesAClosed = false;
     if (state.flags.seriesBClosed === undefined) state.flags.seriesBClosed = false;
     if (state.flags.lastDownRound === undefined) state.flags.lastDownRound = false;
@@ -274,6 +392,12 @@ export function normalizeSave(raw) {
     if (state.news && state.news.seedCelebrationShown === undefined) {
       state.news.seedCelebrationShown = false;
     }
+    if (state.news && state.news.unreadCount === undefined) {
+      state.news.unreadCount = 0;
+    }
+    if (state.news && state.news.publishedTurn === undefined) {
+      state.news.publishedTurn = null;
+    }
 
     if (state.flags.xcResidencyComplete === undefined) {
       state.flags.xcResidencyComplete = false;
@@ -295,9 +419,46 @@ export function normalizeSave(raw) {
         state.flags.xcBatchActive = false;
       } else if (!state.xc?.batchStartsTurn) {
         state.xc = state.xc ?? createInitialXcState();
-        state.xc.batchStartsTurn = calendarTurn(state);
+        const batchStart = nextXcBatchStart(state.calendar.year, state.calendar.monthIndex);
+        state.xc.scheduledBatchCode = formatXcBatchCode(batchStart.year, batchStart.monthIndex);
+        state.xc.batchStartsTurn = calendarTurnAt(state, batchStart.year, batchStart.monthIndex);
         state.flags.xcBatchActive = false;
       }
+    }
+    if (state.xc?.batchStartsTurn != null && !state.xc.scheduledBatchCode) {
+      const cal = turnToCalendar(state, state.xc.batchStartsTurn);
+      state.xc.scheduledBatchCode = formatXcBatchCode(cal.year, cal.monthIndex);
+    }
+    if (state.xc?.batchLabel?.startsWith('Batch ') && state.xc.scheduledBatchCode) {
+      state.xc.batchLabel = state.xc.scheduledBatchCode;
+    }
+    if (state.xc && state.xc.demoDayTaskDone === undefined) state.xc.demoDayTaskDone = false;
+    if (state.xc && state.xc.demoDayPitch === undefined) state.xc.demoDayPitch = null;
+    if (state.xc && state.xc.demoDayBoldHit === undefined) state.xc.demoDayBoldHit = null;
+    if (state.xc && state.xc.seedRoundTerms === undefined) state.xc.seedRoundTerms = null;
+    if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
+    if (!state.acquisitions.owned) state.acquisitions.owned = [];
+    if (!state.acquisitions.dealLog) state.acquisitions.dealLog = [];
+    if (state.acquisitions.marketSegment === undefined) state.acquisitions.marketSegment = 'all';
+    if (state.acquisitions.marketPage === undefined) state.acquisitions.marketPage = 0;
+    if (state.acquisitions.lifetimePortfolioRevenue === undefined) {
+      state.acquisitions.lifetimePortfolioRevenue = 0;
+    }
+    if (!state.acquisitions.diligenceReports) state.acquisitions.diligenceReports = {};
+    if (!state.acquisitions.fireSaleIds) state.acquisitions.fireSaleIds = [];
+    if (state.acquisitions.fireSaleTurn === undefined) state.acquisitions.fireSaleTurn = null;
+    if (!state.acquisitions.marketSort) state.acquisitions.marketSort = 'ask';
+    if (state.acquisitions.marketSearch === undefined) state.acquisitions.marketSearch = '';
+    for (const h of state.acquisitions.owned) {
+      if (h.integrationMonthsLeft === undefined) h.integrationMonthsLeft = 0;
+      if (h.purchasePrice === undefined) h.purchasePrice = 0;
+      if (h.lastReinvestTurn === undefined) h.lastReinvestTurn = h.acquiredTurn ?? 1;
+    }
+    if (state.world && state.world.competitorAcquired === undefined) {
+      state.world.competitorAcquired = false;
+    }
+    if (state.finance && state.finance.subsidiaryMrr === undefined) {
+      state.finance.subsidiaryMrr = 0;
     }
     if (!state.accelerators) state.accelerators = { joined: [], activeBoost: null };
     for (const f of ['seriesCClosed', 'seriesDClosed', 'seriesEClosed', 'seriesFClosed']) {

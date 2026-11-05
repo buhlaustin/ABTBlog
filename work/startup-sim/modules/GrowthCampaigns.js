@@ -1,22 +1,41 @@
 import bundled from '../data/growth-campaigns.json' with { type: 'json' };
+import bundledExtra from '../data/growth-campaigns-extra.json' with { type: 'json' };
+import bundledExtra2 from '../data/growth-campaigns-extra2.json' with { type: 'json' };
+import bundledExtra3 from '../data/growth-campaigns-extra3.json' with { type: 'json' };
+import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { type: 'json' };
+import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
-import {
-  recordCashOutflow,
-  getCoreTaskRevenueMult,
-  applySandboxRevenueTuning,
-  getTaskRevenueMultiplierPreview
-} from './Finance.js';
+import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
 import { formatMoney } from './constants.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
+import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
 import { applyCampaignRivalEffects } from './WorldDynamics.js';
 
-let catalog = bundled;
+function mergeCampaignCatalog(base, ...extras) {
+  const campaigns = [...(base?.campaigns ?? [])];
+  const ids = new Set(campaigns.map((c) => c.id));
+  for (const extra of extras) {
+    for (const c of extra?.campaigns ?? []) {
+      if (!ids.has(c.id)) {
+        ids.add(c.id);
+        campaigns.push(c);
+      }
+    }
+  }
+  return { ...base, campaigns };
+}
+
+const bundledExtras = [bundledExtra, bundledExtra2, bundledExtra3, bundledSpaceGrowth, bundledSpaceGrowthExtra];
+
+let catalog = mergeCampaignCatalog(bundled, ...bundledExtras);
 
 export async function loadGrowthCampaigns() {
   try {
     const data = await fetchGameJson('data/growth-campaigns.json');
-    if (Array.isArray(data?.campaigns) && data.campaigns.length) catalog = data;
+    if (Array.isArray(data?.campaigns) && data.campaigns.length) {
+      catalog = mergeCampaignCatalog(data, ...bundledExtras);
+    }
   } catch {
     /* bundled */
   }
@@ -27,8 +46,18 @@ export function getGrowthCampaigns() {
   return catalog.campaigns ?? [];
 }
 
+export function growthCampaignCatalogSize() {
+  return getGrowthCampaigns().length;
+}
+
 function campaignRevenueMult(state) {
-  return applySandboxRevenueTuning(state, getCoreTaskRevenueMult(state));
+  return getTaskRevenueMultiplierPreview(state);
+}
+
+function campaignCategoryAllowed(def, state) {
+  const cats = def?.categories;
+  if (!cats?.length) return true;
+  return cats.includes(state.company?.categoryId);
 }
 
 export function availableCampaigns(state) {
@@ -36,6 +65,7 @@ export function availableCampaigns(state) {
   const used = new Set(state.growth?.campaignsThisMonth ?? []);
   return getGrowthCampaigns().filter(
     (c) =>
+      campaignCategoryAllowed(c, state) &&
       tier >= (c.tierMin ?? 0) &&
       tier <= (c.tierMax ?? 99) &&
       !used.has(c.id)
@@ -46,6 +76,9 @@ export function runGrowthCampaign(state, campaignId) {
   const def = getGrowthCampaigns().find((c) => c.id === campaignId);
   if (!def) return { ok: false, reason: 'Unknown campaign.' };
   const tier = progressionTier(state);
+  if (!campaignCategoryAllowed(def, state)) {
+    return { ok: false, reason: 'Campaign not available for your industry.' };
+  }
   if (tier < (def.tierMin ?? 0) || tier > (def.tierMax ?? 99)) {
     return { ok: false, reason: 'Campaign not unlocked at your current stage.' };
   }
@@ -54,10 +87,10 @@ export function runGrowthCampaign(state, campaignId) {
     return { ok: false, reason: 'Already ran that campaign this month.' };
   }
   const slots = growthCampaignSlots(state);
-  if (state.growth.campaignsThisMonth.length >= slots) {
+  if (Number.isFinite(slots) && state.growth.campaignsThisMonth.length >= slots) {
     return {
       ok: false,
-      reason: `Marketing bandwidth full (${slots} campaign${slots === 1 ? '' : 's'} per month).`
+      reason: `Marketing bandwidth full (${formatMonthlySideTaskLimit(slots)} campaign${slots === 1 ? '' : 's'} per month).`
     };
   }
   const cost = def.cost ?? 0;
@@ -96,12 +129,17 @@ function escapeHtml(s) {
 export function renderGrowthCampaignsBlock(state) {
   const campaigns = availableCampaigns(state);
   if (!campaigns.length) {
-    return '<p class="fine-print">No paid growth plays unlocked yet — close seed and scale ARR for billboards and beyond.</p>';
+    return '<p class="fine-print">No paid growth plays unlocked at your current stage — keep scaling funding tier to unlock more of the campaign bank.</p>';
   }
+  const bankSize = growthCampaignCatalogSize();
   const mult = getTaskRevenueMultiplierPreview(state);
   const slots = growthCampaignSlots(state);
   const remaining = growthCampaignsRemaining(state);
-  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${remaining}/${slots}</strong> remaining (does not use desk tasks).</p>`;
+  const slotLabel =
+    remaining === Infinity
+      ? 'Unlimited'
+      : `${remaining}/${formatMonthlySideTaskLimit(slots)}`;
+  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> plays unlocked (${bankSize} in bank — does not use desk tasks).</p>`;
   const cards = campaigns
     .map((c) => {
       const r0 = Math.round((c.revenue?.[0] ?? 0) * mult * 0.5);

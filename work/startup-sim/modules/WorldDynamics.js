@@ -1,12 +1,17 @@
 import { adjustSentiment } from './Sentiment.js';
 import { bumpCompetitorPressure, easeCompetitorPressure } from './Competitor.js';
-import { isPublicCompany } from './IPO.js';
+import { isPublicCompany, whisperRevenueTarget } from './IPO.js';
+import { launchLifecycleActive } from './LaunchLifecycle.js';
 
 /** Buzz fades unless you keep shipping — caps runaway stacking. */
 export function applyBuzzDecayAtMonthStart(state) {
   const buzz = state.product?.buzz ?? 0;
   if (buzz <= 2) return [];
-  const decay = buzz >= 12 ? 3 : buzz >= 6 ? 2 : 1;
+  let decay = buzz >= 12 ? 3 : buzz >= 6 ? 2 : 1;
+  if (launchLifecycleActive(state) && state.launch?.phase === 'pre_launch') {
+    decay = Math.min(decay, 1);
+    if (buzz <= 4) return [];
+  }
   state.product.buzz = Math.max(0, buzz - decay);
   return [`Market attention cooled — buzz −${decay} (now ${state.product.buzz}).`];
 }
@@ -66,7 +71,8 @@ export function settleBoardGovernance(state) {
 export function scorePublicGuidanceBeat(state, monthRevenue, burn) {
   if (!isPublicCompany(state)) return [];
   if (!state.publicMarket) return [];
-  const target = Math.max(burn * 1.12, (state.finance?.mrr ?? 0) * 0.08);
+  const target = whisperRevenueTarget(state);
+  state.publicMarket.whisperRevenueTarget = target;
   const beat = monthRevenue >= target;
   if (beat) {
     state.publicMarket.guidanceBeatStreak = (state.publicMarket.guidanceBeatStreak ?? 0) + 1;

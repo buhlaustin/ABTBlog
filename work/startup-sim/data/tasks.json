@@ -760,6 +760,9 @@
       "id": "public-investor-day",
       "title": "Investor day webcast",
       "description": "Analysts pretend to understand your TAM.",
+      "types": [
+        "marketing"
+      ],
       "stages": [
         "public"
       ],
@@ -769,12 +772,16 @@
         165000
       ],
       "product": 0,
-      "buzz": 3
+      "buzz": 3,
+      "stockPct": 0.025
     },
     {
       "id": "public-stock-buyback",
       "title": "Announce buyback theater",
       "description": "Board approves returning cash you do not have yet.",
+      "types": [
+        "marketing"
+      ],
       "stages": [
         "public"
       ],
@@ -784,12 +791,16 @@
         95000
       ],
       "product": 0,
-      "buzz": 2
+      "buzz": 2,
+      "stockPct": 0.035
     },
     {
       "id": "public-activist-response",
       "title": "Activist investor response",
       "description": "Open letter, closed door, public tweetstorm.",
+      "types": [
+        "marketing"
+      ],
       "stages": [
         "public"
       ],
@@ -799,12 +810,16 @@
         140000
       ],
       "product": 0,
-      "buzz": 1
+      "buzz": 1,
+      "stockPct": -0.02
     },
     {
       "id": "public-ma-rumor",
       "title": "M&A rumor management",
       "description": "Deny the merger talks you started.",
+      "types": [
+        "sales"
+      ],
       "stages": [
         "public"
       ],
@@ -814,12 +829,17 @@
         220000
       ],
       "product": 0,
-      "buzz": 4
+      "buzz": 4,
+      "stockPct": 0.04
     },
     {
       "id": "public-product-keynote",
       "title": "Product keynote livestream",
       "description": "Demo gods must be appeased.",
+      "types": [
+        "product",
+        "marketing"
+      ],
       "stages": [
         "public"
       ],
@@ -835,6 +855,9 @@
       "id": "public-regulatory-filing",
       "title": "Regulatory filing sprint",
       "description": "Lawyers bill, stock ticks.",
+      "types": [
+        "research"
+      ],
       "stages": [
         "public"
       ],
@@ -8461,7 +8484,7 @@
         "delivery"
       ],
       "title": "WISMO ticket deflection",
-      "description": "Where-is-my-order self-serve.",
+      "description": "Let shoppers track orders without opening a support ticket.",
       "types": [
         "product"
       ],
@@ -9648,7 +9671,7 @@
         "fintech"
       ],
       "title": "Consumer complaint log review",
-      "description": "CFPB-ready responses.",
+      "description": "Log and answer complaints with CFPB-ready wording.",
       "types": [
         "research"
       ],
@@ -14138,7 +14161,7 @@
         "healthtech"
       ],
       "title": "Patient satisfaction survey (HCAHPS-style)",
-      "description": "Benchmark-friendly questions.",
+      "description": "Use benchmark-friendly questions wards can compare.",
       "types": [
         "research"
       ],
@@ -16133,7 +16156,7 @@
         "delivery"
       ],
       "title": "Gift message & packaging upsell",
-      "description": "Margin on ribbons.",
+      "description": "Upsell printed notes and gift wrap for per-order margin.",
       "types": [
         "sales"
       ],
@@ -18413,7 +18436,7 @@
         "gaming-media"
       ],
       "title": "Speedrun category rules page",
-      "description": "Community-approved definitions.",
+      "description": "Publish community-approved rules for each category.",
       "types": [
         "marketing"
       ],

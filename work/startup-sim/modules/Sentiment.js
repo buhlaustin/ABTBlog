@@ -22,9 +22,6 @@ export function clampSentiment(score) {
 }
 
 export function adjustSentiment(state, delta, reason) {
-  if (!hasInstitutionalBoard(state)) {
-    return state.sentiment?.score ?? 68;
-  }
   if (!state.sentiment) state.sentiment = createInitialSentiment();
   const next = clampSentiment(state.sentiment.score + delta);
   state.sentiment.lastDelta = next - state.sentiment.score;
@@ -39,6 +36,15 @@ export function sentimentLabel(score) {
   if (s >= 55) return 'Cautious';
   if (s >= 35) return 'Restless';
   return 'Hostile';
+}
+
+/** Pre-board label for the same 0–100 trust score. */
+export function marketTrustLabel(score) {
+  const s = clampSentiment(score);
+  if (s >= 75) return 'Strong';
+  if (s >= 55) return 'Steady';
+  if (s >= 35) return 'Shaky';
+  return 'Toxic';
 }
 
 export function runwayMonths(state) {

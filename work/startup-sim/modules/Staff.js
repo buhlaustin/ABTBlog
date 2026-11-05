@@ -7,6 +7,8 @@ import {
   salaryTierMult
 } from './Workspace.js';
 import { setGameFeedback } from './GameFeedback.js';
+import { formatCalendarStamp } from './GameCalendar.js';
+import { renderLeadershipOrgChart, cooSalaryMonthly } from './Coo.js';
 
 export const DEPARTMENTS = [
   { id: 'engineering', label: 'Engineering' },
@@ -171,13 +173,14 @@ export function projectStaffEconomics(state) {
   const draft = state.staff?.draftHeadcountByDept ?? emptyHeadcount();
   const payroll = computePayroll(draft, state.stage, state);
   const fixed = workspaceRentMonthly(state);
-  const burn = payroll + fixed;
+  const execPay = cooSalaryMonthly(state);
+  const burn = payroll + fixed + execPay;
   const revenue =
     (state.calendar?.monthRevenue ?? 0) > 0
       ? state.calendar.monthRevenue
       : state.finance?.monthlyRevenue ?? 0;
   const surplus = revenue - burn;
-  return { payroll, burn, revenue, surplus, fixed };
+  return { payroll, burn, revenue, surplus, fixed, execPay };
 }
 
 export function finalizeStaffing(state) {
@@ -230,12 +233,10 @@ export function renderPeoplePanel(container, state) {
   const totalFinal = totalHeadcount(state.staff.headcountByDept);
   const finalizedLabel =
     state.staff.lastFinalizedMonth != null
-      ? `Y${state.staff.lastFinalizedYear} M${state.staff.lastFinalizedMonth}`
+      ? formatCalendarStamp(state.staff.lastFinalizedYear, state.staff.lastFinalizedMonth)
       : 'never';
 
-  const orgMount = hiringAllowed(state)
-    ? ''
-    : '<p class="desk-feedback">You’re in the garage — no employees yet. Hit Finance to lease a small office at $10k ARR.</p>';
+  const orgMount = '';
 
   const rows = visibleDepartments(state.stage, state)
     .map((dept) => {
@@ -257,7 +258,7 @@ export function renderPeoplePanel(container, state) {
   container.innerHTML = `
     ${orgMount}
     <div id="org-chart-mount"></div>
-    <p class="panel-lede">Adjust draft headcount, preview burn vs last month revenue, then <strong>Finalize staffing</strong>. You stay CEO — no separate exec hires.</p>
+    <p class="panel-lede">Hire a named <strong>COO</strong> above (garage onward — up to <strong>10% equity</strong>; in the garage, more equity means less cash, down to <strong>$0/mo</strong> at 10%). Department headcount unlocks after you lease a small office ($10k ARR).</p>
     <div class="table-scroll">
       <table class="data-table">
         <thead><tr><th>Department</th><th>Headcount</th><th>$/head/mo</th><th>Subtotal</th></tr></thead>
@@ -268,6 +269,7 @@ export function renderPeoplePanel(container, state) {
       <div><span class="stat-label">Draft / cap</span><span class="stat-value">${totalDraft} / ${maxHc}</span></div>
       <div><span class="stat-label">Finalized (active)</span><span class="stat-value">${totalFinal}</span></div>
       <div><span class="stat-label">Payroll (draft)</span><span class="stat-value">${formatMoney(econ.payroll)}</span></div>
+      <div><span class="stat-label">COO comp</span><span class="stat-value">${formatMoney(econ.execPay)}</span></div>
       <div><span class="stat-label">Proj. burn</span><span class="stat-value">${formatMoney(econ.burn)}</span></div>
       <div><span class="stat-label">vs last mo. rev.</span><span class="stat-value ${econ.surplus >= 0 ? 'positive' : 'negative'}">${formatMoney(econ.surplus)}</span></div>
       <div><span class="stat-label">Last finalized</span><span class="stat-value">${finalizedLabel}</span></div>
@@ -275,22 +277,7 @@ export function renderPeoplePanel(container, state) {
     <button type="button" class="btn btn-primary" id="btn-finalize-staff" ${hiringAllowed(state) ? '' : 'disabled'}>Finalize staffing</button>
     <p id="people-feedback" class="desk-feedback" hidden></p>
   `;
-  renderCeoOnlyChart(document.getElementById('org-chart-mount'), state);
-}
-
-function renderCeoOnlyChart(container, state) {
-  if (!container) return;
-  const ceoName = [state.company?.ceoFirstName, state.company?.ceoLastName]
-    .filter(Boolean)
-    .join(' ')
-    .trim();
-  const ceoLabel = ceoName || state.company?.name || 'CEO';
-  container.innerHTML = `
-    <h3 class="log-head">Leadership</h3>
-    <div class="org-chart">
-      <div class="org-node org-node-ceo"><span class="org-role">CEO</span><strong>${escapeHtml(ceoLabel)}</strong></div>
-    </div>
-  `;
+  renderLeadershipOrgChart(document.getElementById('org-chart-mount'), state);
 }
 
 export function showPeopleFeedback(message, isError = false) {

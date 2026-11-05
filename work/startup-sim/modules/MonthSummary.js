@@ -1,6 +1,7 @@
 import { formatMoney } from './constants.js';
+import { formatCalendarMonth, formatStateMonth } from './GameCalendar.js';
 import { projectMonthlyBurn } from './Finance.js';
-import { isPublicCompany } from './IPO.js';
+import { isPublicCompany, marketCap } from './IPO.js';
 
 function escapeHtml(s) {
   return String(s)
@@ -23,11 +24,16 @@ export function renderMonthSummaryContent(container, state, summary, headlineTea
   if (!container) return;
   const stockBlock =
     summary.stockDeltaPct != null
-      ? `<div><span class="stat-label">Stock move</span><span class="stat-value">${summary.stockDeltaPct >= 0 ? '+' : ''}${(summary.stockDeltaPct * 100).toFixed(1)}%</span></div>`
+      ? `<div><span class="stat-label">Stock move</span><span class="stat-value">${summary.stockDeltaPct >= 0 ? '+' : ''}${(summary.stockDeltaPct * 100).toFixed(1)}%</span></div>
+      ${
+        isPublicCompany(state)
+          ? `<div><span class="stat-label">${state.publicMarket?.ticker ?? 'Stock'}</span><span class="stat-value">${formatMoney(state.publicMarket?.sharePrice ?? 0)} · cap ${formatMoney(marketCap(state))}</span></div>`
+          : ''
+      }`
       : '';
 
   container.innerHTML = `
-    <p class="eyebrow">Month ${summary.closedMonthIndex}, Year ${summary.closedYear} closed</p>
+    <p class="eyebrow">${escapeHtml(formatCalendarMonth(summary.closedYear, summary.closedMonthIndex))} closed</p>
     <h2 id="month-summary-title" class="month-summary-title">Month-end summary</h2>
     <div class="summary-grid">
       <div><span class="stat-label">Cash</span><span class="stat-value">${formatMoney(summary.cashAfter)}</span></div>
@@ -47,7 +53,7 @@ export function renderMonthSummaryContent(container, state, summary, headlineTea
         ? `<p class="month-summary-headline"><strong>Headlines:</strong> ${escapeHtml(headlineTeaser)}</p>`
         : '<p class="fine-print">Headlines will appear on the News tab.</p>'
     }
-    <p class="fine-print">Now playing Month ${state.calendar.monthIndex}, Year ${state.calendar.year}.</p>
+    <p class="fine-print">Now playing ${escapeHtml(formatStateMonth(state))}.</p>
   `;
 }
 

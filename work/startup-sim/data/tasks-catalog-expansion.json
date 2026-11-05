@@ -1,0 +1,2072 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "catalog-expansion-001",
+      "title": "Shadow five onboarding calls",
+      "description": "Listen where new users stall before they quietly churn.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 650,
+      "revenue": [
+        358,
+        931
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-002",
+      "title": "Patch the signup funnel leak",
+      "description": "Instrument drop-offs and ship two small UX fixes this month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 6800,
+      "revenue": [
+        5440,
+        14960
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-003",
+      "title": "Win back a churned logo",
+      "description": "Founder call, honest retro, and a tight re-pilot scope.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 1550,
+      "revenue": [
+        1318,
+        4481
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-004",
+      "title": "Ship role-based permissions",
+      "description": "Stop enterprise deals dying on “everyone is admin.”",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 14000,
+      "revenue": [
+        14000,
+        30800
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-005",
+      "title": "Publish release notes people read",
+      "description": "Plain language, screenshots, and one customer thank-you.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 14450,
+      "revenue": [
+        5780,
+        15028
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-006",
+      "title": "Run a SOC 2 tabletop",
+      "description": "Pretend the auditor lands Friday; close the scary gaps first.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 2900,
+      "revenue": [
+        1595,
+        4785
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-007",
+      "title": "Offer annual prepay discount",
+      "description": "Trade modest margin for cash up front and firm renewal dates.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 3350,
+      "revenue": [
+        2345,
+        7973
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-008",
+      "title": "Define product-qualified leads",
+      "description": "Give sales one activation threshold everyone trusts.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 7600,
+      "revenue": [
+        6460,
+        16720
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-009",
+      "title": "Host a customer advisory lunch",
+      "description": "Six power users, no deck, one roadmap bet prioritized.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 4250,
+      "revenue": [
+        4250,
+        11050
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-010",
+      "title": "Harden billing webhooks",
+      "description": "Idempotency, retries, and alerts before finance finds duplicates.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 16700,
+      "revenue": [
+        6680,
+        20040
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-011",
+      "title": "Stand up a sandbox tenant",
+      "description": "Let prospects click around without a sales engineer babysitting.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 17150,
+      "revenue": [
+        9433,
+        32072
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-012",
+      "title": "Rewrite the pricing page",
+      "description": "Clarify tiers, limits, and the upgrade path in one scroll.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 5600,
+      "revenue": [
+        3920,
+        8624
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-013",
+      "title": "Cold-email 50 ideal accounts",
+      "description": "Short notes, one concrete outcome, no “synergies” paragraph.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 6050,
+      "revenue": [
+        5143,
+        13372
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-014",
+      "title": "Fix your demo dataset",
+      "description": "Seed believable numbers so pitches do not start with apologies.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 6500,
+      "revenue": [
+        6500,
+        19500
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-015",
+      "title": "Interview churned trial users",
+      "description": "Learn why they bounced before blaming marketing spend.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 6950,
+      "revenue": [
+        2780,
+        9452
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-016",
+      "title": "Ship power-user keyboard shortcuts",
+      "description": "Small surface area, loud delight in niche communities.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 19400,
+      "revenue": [
+        10670,
+        23474
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-017",
+      "title": "Negotiate co-marketing with an integrator",
+      "description": "Shared webinar, joint case study, split the lead list.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 19850,
+      "revenue": [
+        13895,
+        36127
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-018",
+      "title": "Audit third-party script weight",
+      "description": "Drop tags that slow LCP and leak data you should not share.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 8300,
+      "revenue": [
+        7055,
+        21165
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-019",
+      "title": "Launch a public roadmap",
+      "description": "Show what you will build and what you explicitly will not.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 8750,
+      "revenue": [
+        8750,
+        29750
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-020",
+      "title": "Run a pricing sensitivity survey",
+      "description": "Stop guessing ARPU—ask willingness-to-pay with a simple study.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 9200,
+      "revenue": [
+        3680,
+        8096
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-021",
+      "title": "Close the security questionnaire backlog",
+      "description": "Standard answers, evidence links, fewer all-nighters.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 9650,
+      "revenue": [
+        5308,
+        13801
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-022",
+      "title": "Pilot usage-based billing",
+      "description": "Meter one dimension cleanly before rebilling the whole base.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 22100,
+      "revenue": [
+        15470,
+        46410
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-023",
+      "title": "Record a founder AMA livestream",
+      "description": "Raw Q&A beats polished ads for early trust.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 22550,
+      "revenue": [
+        19168,
+        65171
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-024",
+      "title": "Migrate off the flaky cron host",
+      "description": "Move scheduled jobs somewhere observability actually exists.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 11000,
+      "revenue": [
+        11000,
+        24200
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-025",
+      "title": "Build a churn early-warning dashboard",
+      "description": "Leading indicators support can act on this week.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 11450,
+      "revenue": [
+        4580,
+        11908
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-026",
+      "title": "White-glove setup for top accounts",
+      "description": "Concierge onboarding for logos that reference you later.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 11900,
+      "revenue": [
+        6545,
+        19635
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-027",
+      "title": "Ship SSO for Google Workspace",
+      "description": "Remove the IT blocker on mid-market pilots.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 12350,
+      "revenue": [
+        8645,
+        29393
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-028",
+      "title": "Run competitive win-loss calls",
+      "description": "Neutral third party extracts truth sales will not say aloud.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 24800,
+      "revenue": [
+        21080,
+        46376
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-029",
+      "title": "Publish an engineering blog post",
+      "description": "Explain one hard technical choice with receipts.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 25250,
+      "revenue": [
+        25250,
+        65650
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-030",
+      "title": "Tighten API rate limits",
+      "description": "Protect uptime; document limits customers can plan around.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 13700,
+      "revenue": [
+        5480,
+        16440
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-031",
+      "title": "Launch referral credits experiment",
+      "description": "Give both sides something meaningful, not a vanity badge.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 14150,
+      "revenue": [
+        7783,
+        26462
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-032",
+      "title": "Fix mobile layout on checkout",
+      "description": "Half your trials sign up on phones—meet them there.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 14600,
+      "revenue": [
+        10220,
+        22484
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-033",
+      "title": "Schedule exec check-ins for renewals",
+      "description": "Relationship heat before the ninety-day red zone.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 15050,
+      "revenue": [
+        12793,
+        33262
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-034",
+      "title": "Deprecate a legacy feature flag",
+      "description": "Kill zombie code paths before they bite a big customer.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 27500,
+      "revenue": [
+        27500,
+        82500
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-035",
+      "title": "Host a virtual user conference",
+      "description": "One track, customer speakers, recording as evergreen content.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 27950,
+      "revenue": [
+        11180,
+        38012
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-036",
+      "title": "Map F500 procurement steps",
+      "description": "Know legal, InfoSec, and vendor onboarding timelines upfront.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 16400,
+      "revenue": [
+        9020,
+        19844
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-037",
+      "title": "Ship audit logs for admins",
+      "description": "Enterprise buyers ask; have an answer before the RFP.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 16850,
+      "revenue": [
+        11795,
+        30667
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-038",
+      "title": "Rewrite outbound email sequences",
+      "description": "Three emails max, each with a different proof point.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 17300,
+      "revenue": [
+        14705,
+        44115
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-039",
+      "title": "Instrument ad click to activation",
+      "description": "Find the step marketing and product both ignore.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 17750,
+      "revenue": [
+        17750,
+        60350
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-040",
+      "title": "Run a customer bug bash",
+      "description": "Invite power users to break staging; reward findings loudly.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 12200,
+      "revenue": [
+        4880,
+        10736
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-041",
+      "title": "Negotiate cloud commit credits",
+      "description": "Prebuy infra at a discount while growth is still predictable.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 12650,
+      "revenue": [
+        6958,
+        18091
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-042",
+      "title": "Launch a community Slack",
+      "description": "Peer support scales better than founder DMs.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 1100,
+      "revenue": [
+        770,
+        2310
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-043",
+      "title": "Publish SLA and status page",
+      "description": "Transparency buys patience during incidents.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 1550,
+      "revenue": [
+        1318,
+        4481
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-044",
+      "title": "Ship CSV export customers asked for",
+      "description": "Unblock finance and ops workflows this quarter.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 7400,
+      "revenue": [
+        6290,
+        16280
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-045",
+      "title": "Sponsor a niche newsletter",
+      "description": "Highly targeted reach beats generic display ads.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2450,
+      "revenue": [
+        980,
+        2548
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-046",
+      "title": "Automate trial expiration nudges",
+      "description": "Timely emails beat generic “we miss you” blasts.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 14900,
+      "revenue": [
+        8195,
+        24585
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-047",
+      "title": "Conduct an accessibility sweep",
+      "description": "WCAG fixes widen TAM and reduce support tickets.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 15350,
+      "revenue": [
+        10745,
+        36533
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-048",
+      "title": "Run an internal phishing drill",
+      "description": "Train the team before a real breach ruins a deal.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 3800,
+      "revenue": [
+        3230,
+        7106
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-049",
+      "title": "Bundle implementation hours",
+      "description": "Services unlock six-figure ACV faster than software alone.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 4250,
+      "revenue": [
+        4250,
+        11050
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-050",
+      "title": "Consolidate analytics vendors",
+      "description": "One source of truth for product and growth metrics.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 4700,
+      "revenue": [
+        1880,
+        5640
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-051",
+      "title": "Ship webhook retry diagnostics",
+      "description": "Let customers debug dead endpoints without opening tickets.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 5150,
+      "revenue": [
+        2833,
+        9632
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-052",
+      "title": "Launch an annual customer summit",
+      "description": "Fly in top logos; record testimonials on-site.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 17600,
+      "revenue": [
+        12320,
+        27104
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-053",
+      "title": "Rebuild search with synonyms",
+      "description": "Stop zero-result queries from looking like missing features.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 18050,
+      "revenue": [
+        15343,
+        39892
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-054",
+      "title": "Pitch a vertical case study",
+      "description": "One deep industry story beats ten generic logos.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 6500,
+      "revenue": [
+        6500,
+        19500
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-055",
+      "title": "Fix invoice PDF branding",
+      "description": "Small polish signals you are ready for finance teams.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 6950,
+      "revenue": [
+        2780,
+        9452
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-056",
+      "title": "Run an infra cost review",
+      "description": "Right-size instances before margins surprise the board.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 7400,
+      "revenue": [
+        4070,
+        8954
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-057",
+      "title": "Enable SCIM provisioning",
+      "description": "IT pushes users; you stop spreadsheet seat math.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 7850,
+      "revenue": [
+        5495,
+        14287
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-058",
+      "title": "Host developer office hours",
+      "description": "API adoption grows when someone answers live.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 20300,
+      "revenue": [
+        17255,
+        51765
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-059",
+      "title": "Ship guided setup checklist",
+      "description": "Progress-bar onboarding beats a blank dashboard stare.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 20750,
+      "revenue": [
+        20750,
+        70550
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-060",
+      "title": "Test a freemium upgrade nudge",
+      "description": "One well-timed prompt—not ten nag modals.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 9200,
+      "revenue": [
+        3680,
+        8096
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-061",
+      "title": "Map data retention policies",
+      "description": "Align defaults with GDPR and customer contracts.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 9650,
+      "revenue": [
+        5308,
+        13801
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-062",
+      "title": "Launch a reseller pilot",
+      "description": "Let agencies sell you where your team cannot travel.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 10100,
+      "revenue": [
+        7070,
+        21210
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-063",
+      "title": "Refresh employer brand on LinkedIn",
+      "description": "Hiring velocity matters once fundraising slows.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 10550,
+      "revenue": [
+        8968,
+        30491
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-064",
+      "title": "Ship multi-currency checkout",
+      "description": "Stop losing international trials at the payment step.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 23000,
+      "revenue": [
+        23000,
+        50600
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-065",
+      "title": "Template quarterly business reviews",
+      "description": "CSMs show value; renewals get easier to forecast.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 23450,
+      "revenue": [
+        9380,
+        24388
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-066",
+      "title": "Cut support response time",
+      "description": "Macros, triage tiers, and one visible SLA timer.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 11900,
+      "revenue": [
+        6545,
+        19635
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-067",
+      "title": "Build a Salesforce integration",
+      "description": "CRM sync removes “another tab” objections.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 12350,
+      "revenue": [
+        8645,
+        29393
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-068",
+      "title": "Offer a lightweight bug bounty",
+      "description": "Responsible disclosure beats a surprise headline.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 12800,
+      "revenue": [
+        10880,
+        23936
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-069",
+      "title": "Publish an open-source SDK",
+      "description": "Developer love compounds; watch support load while doing it.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 13250,
+      "revenue": [
+        13250,
+        34450
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-070",
+      "title": "Renegotiate payment processor fees",
+      "description": "Basis points matter at volume—ask annually.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 25700,
+      "revenue": [
+        10280,
+        30840
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-071",
+      "title": "Ship dark mode",
+      "description": "Low-effort morale win; screenshots look modern in decks.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 26150,
+      "revenue": [
+        14383,
+        48902
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-072",
+      "title": "Recruit five co-building design partners",
+      "description": "Five logos shape the roadmap; they accept rough edges for influence.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 14600,
+      "revenue": [
+        10220,
+        22484
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-073",
+      "title": "Fix SPF and DKIM for product email",
+      "description": "Land in inbox, not promotions—or worse, spam.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 15050,
+      "revenue": [
+        12793,
+        33262
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-074",
+      "title": "Launch a changelog RSS feed",
+      "description": "Power users subscribe; support repeats fewer “what shipped?” questions.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 15500,
+      "revenue": [
+        15500,
+        46500
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-075",
+      "title": "Instrument the North Star metric",
+      "description": "One chart the whole company argues about productively.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 15950,
+      "revenue": [
+        6380,
+        21692
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-076",
+      "title": "Offer VPC or private deploy",
+      "description": "Unblock regulated buyers even if few take it.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 28400,
+      "revenue": [
+        15620,
+        34364
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-077",
+      "title": "Ship bulk admin actions",
+      "description": "IT admins will not click fifty times to offboard users.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 28850,
+      "revenue": [
+        20195,
+        52507
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-078",
+      "title": "Host a customer hackathon",
+      "description": "New integrations emerge; dev communities notice.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 17300,
+      "revenue": [
+        14705,
+        44115
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-079",
+      "title": "Audit role escalation paths",
+      "description": "Close privilege creep before security review finds it.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 17750,
+      "revenue": [
+        17750,
+        60350
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-080",
+      "title": "Publish an API versioning policy",
+      "description": "Set expectations before breaking changes alienate builders.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 9200,
+      "revenue": [
+        7820,
+        20240
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-081",
+      "title": "Launch customer certification",
+      "description": "Trained admins expand usage inside accounts.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 5200,
+      "revenue": [
+        4420,
+        11440
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-082",
+      "title": "Fix timezone bugs in reporting",
+      "description": "“Yesterday” must mean the same thing globally.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 13100,
+      "revenue": [
+        9170,
+        27510
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-083",
+      "title": "Run a win celebration ritual",
+      "description": "Sales, product, and support hear why deals actually close.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 13550,
+      "revenue": [
+        11518,
+        39161
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-084",
+      "title": "Ship saved views and filters",
+      "description": "Power users organize data; stickiness follows.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 2000,
+      "revenue": [
+        2000,
+        4400
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-085",
+      "title": "Partner with a university pipeline",
+      "description": "Intern hiring beats generic job boards later.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 2450,
+      "revenue": [
+        980,
+        2548
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-086",
+      "title": "Deploy canary releases",
+      "description": "Reduce blast radius when shipping weekly.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 7200,
+      "revenue": [
+        6120,
+        15840
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-087",
+      "title": "Launch a limited beta flag",
+      "description": "Scarcity and feedback from friendly accounts.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3350,
+      "revenue": [
+        2345,
+        7973
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-088",
+      "title": "Rewrite Terms for clarity",
+      "description": "Legal still wins; humans can understand acceptance.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 15800,
+      "revenue": [
+        13430,
+        29546
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-089",
+      "title": "Dedicated Slack for whale accounts",
+      "description": "High-touch without pretending every customer is equal.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 16250,
+      "revenue": [
+        16250,
+        42250
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-090",
+      "title": "Ship print-friendly reports",
+      "description": "Ops teams still export PDFs—stop fighting it.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 4700,
+      "revenue": [
+        1880,
+        5640
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-091",
+      "title": "Renegotiate overlapping SaaS renewals",
+      "description": "Fewer overlapping tools and better bundle pricing with finance.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 5150,
+      "revenue": [
+        2833,
+        9632
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-092",
+      "title": "Publish a public incident postmortem",
+      "description": "Trust recovery after a bad outage week.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 5600,
+      "revenue": [
+        3920,
+        8624
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-093",
+      "title": "Enable custom domains for customers",
+      "description": "White-label credibility for platform plays.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 6050,
+      "revenue": [
+        5143,
+        13372
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-094",
+      "title": "List on a cloud marketplace",
+      "description": "Procurement paths customers already trust.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 18500,
+      "revenue": [
+        18500,
+        55500
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-095",
+      "title": "Fix duplicate CRM contacts",
+      "description": "Hygiene before marketing automation embarrasses you.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 18950,
+      "revenue": [
+        7580,
+        25772
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-096",
+      "title": "Ship scheduled report emails",
+      "description": "Executives get Monday numbers without logging in.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 7400,
+      "revenue": [
+        4070,
+        8954
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-097",
+      "title": "Empathy interviews with support",
+      "description": "Product learns the top tickets that should not exist.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 7850,
+      "revenue": [
+        5495,
+        14287
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-098",
+      "title": "Write a pilot success plan",
+      "description": "Mutual milestones so pilots convert or fail fast clearly.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 8300,
+      "revenue": [
+        7055,
+        21165
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-099",
+      "title": "Executive dashboard PDF export",
+      "description": "Board prep in minutes, not all-nighter slides.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 8750,
+      "revenue": [
+        8750,
+        29750
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-100",
+      "title": "Close books early this month",
+      "description": "Revenue recognition discipline before scale makes it messy.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 21200,
+      "revenue": [
+        8480,
+        18656
+      ],
+      "product": 2,
+      "buzz": 2
+    }
+  ]
+}

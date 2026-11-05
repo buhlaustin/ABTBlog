@@ -1,0 +1,200 @@
+{
+  "actions": [
+    {
+      "id": "lever-linkedin-live-demo",
+      "label": "LinkedIn Live product demo",
+      "cost": 1200,
+      "buzz": 2,
+      "product": 1,
+      "tierMax": 4,
+      "description": "Comments ask for pricing; chat moderator is you."
+    },
+    {
+      "id": "lever-customer-shadow-day",
+      "label": "Customer shadow day",
+      "cost": 3500,
+      "buzz": 1,
+      "product": 3,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Watch power users work; fix three papercuts next sprint."
+    },
+    {
+      "id": "lever-benchmark-report-teaser",
+      "label": "Industry benchmark teaser",
+      "cost": 8800,
+      "buzz": 3,
+      "product": 1,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Gated PDF with charts your sales team will abuse."
+    },
+    {
+      "id": "lever-founder-handwritten-notes",
+      "label": "Founder handwritten thank-you notes",
+      "cost": 400,
+      "buzz": 2,
+      "product": 0,
+      "tierMax": 3,
+      "description": "Twenty cards; one becomes a LinkedIn post about authenticity."
+    },
+    {
+      "id": "lever-api-status-page-brand",
+      "label": "Branded status page & postmortem",
+      "cost": 2200,
+      "buzz": 1,
+      "product": 2,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Transparency theater that actually builds trust."
+    },
+    {
+      "id": "lever-competitor-switch-kit",
+      "label": "Competitor switch kit",
+      "cost": 6500,
+      "buzz": 2,
+      "product": 2,
+      "rivalEase": 1,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Migration guide, scripts, and a discount code named RIVAL."
+    },
+    {
+      "id": "lever-open-source-office-hours",
+      "label": "Open-source office hours",
+      "cost": 900,
+      "buzz": 2,
+      "product": 2,
+      "tierMax": 4,
+      "description": "Discord voice channel; two contributors become hires."
+    },
+    {
+      "id": "lever-pricing-transparency-post",
+      "label": "Pricing transparency blog post",
+      "cost": 1500,
+      "buzz": 3,
+      "product": 0,
+      "tierMax": 4,
+      "description": "Explain the spreadsheet; rivals copy the format."
+    },
+    {
+      "id": "lever-customer-advisory-dinner",
+      "label": "Micro advisory dinner (6 seats)",
+      "cost": 4200,
+      "buzz": 2,
+      "product": 2,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Smaller table, sharper feedback, fewer dietary restrictions."
+    },
+    {
+      "id": "lever-twitch-build-stream",
+      "label": "Twitch build stream marathon",
+      "cost": 2800,
+      "buzz": 3,
+      "product": 1,
+      "rivalEase": 1,
+      "tierMax": 4,
+      "description": "Ship a feature live; chat suggests scope creep."
+    },
+    {
+      "id": "lever-seo-parasite-page",
+      "label": "Alternative-to landing page sprint",
+      "cost": 5200,
+      "buzz": 1,
+      "product": 1,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Polite comparison pages that rank for '[rival] alternative'."
+    },
+    {
+      "id": "lever-internal-demo-day",
+      "label": "Company-wide demo day",
+      "cost": 3800,
+      "buzz": 2,
+      "product": 2,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Every team ships something visible; morale spikes briefly."
+    },
+    {
+      "id": "lever-founder-cold-walk-ins",
+      "label": "Founder cold walk-ins (10 accounts)",
+      "cost": 2400,
+      "buzz": 1,
+      "product": 0,
+      "tierMin": 2,
+      "tierMax": 5,
+      "description": "Show up with donuts; security may not be amused."
+    },
+    {
+      "id": "lever-customer-certification",
+      "label": "Customer certification launch",
+      "cost": 16000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Power users get badges; support load drops a little."
+    },
+    {
+      "id": "lever-press-analyst-day",
+      "label": "Analyst & press day",
+      "cost": 45000,
+      "buzz": 4,
+      "product": 1,
+      "tierMin": 4,
+      "tierMax": 7,
+      "description": "Briefings, demos, and a roadmap slide marked confidential."
+    },
+    {
+      "id": "lever-employee-referral-blitz",
+      "label": "Employee referral blitz month",
+      "cost": 12000,
+      "buzz": 2,
+      "product": 0,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Double referral bonuses; Slack fills with who-you-know."
+    },
+    {
+      "id": "lever-meme-marketing-week",
+      "label": "Meme marketing week",
+      "cost": 1800,
+      "buzz": 4,
+      "product": 0,
+      "rivalEase": 2,
+      "tierMax": 4,
+      "description": "Brand Twitter risks it; legal watches in real time."
+    },
+    {
+      "id": "lever-customer-roadmap-vote",
+      "label": "Public roadmap vote",
+      "cost": 3200,
+      "buzz": 2,
+      "product": 2,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Users pick the next feature; you pick what ships anyway."
+    },
+    {
+      "id": "lever-founder-book-club",
+      "label": "Founder book club for customers",
+      "cost": 1100,
+      "buzz": 2,
+      "product": 1,
+      "tierMax": 4,
+      "description": "One business book; twelve operators; one hot take thread."
+    },
+    {
+      "id": "lever-ipo-thank-you-site",
+      "label": "IPO thank-you microsite",
+      "cost": 85000,
+      "buzz": 5,
+      "product": 0,
+      "tierMin": 7,
+      "tierMax": 7,
+      "description": "Names scroll; employees refresh to find theirs."
+    }
+  ]
+}

@@ -36,9 +36,6 @@ export function tickAcceleratorBoost(state) {
 export function canJoinAccelerator(state, programId) {
   const prog = getAcceleratorPrograms().find((p) => p.id === programId);
   if (!prog) return { ok: false, reason: 'Unknown program.' };
-  if (state.flags?.xcAccepted) {
-    return { ok: false, reason: 'You already committed to X Combinator.' };
-  }
   const joined = state.accelerators?.joined ?? [];
   if (joined.includes(prog.id)) {
     return { ok: false, reason: 'Already joined this program.' };
@@ -99,7 +96,6 @@ function escapeHtml(s) {
 }
 
 export function renderAcceleratorsBlock(state) {
-  if (state.flags?.xcAccepted) return '';
   const joined = new Set(state.accelerators?.joined ?? []);
   const programs = getAcceleratorPrograms().filter((p) => !joined.has(p.id));
   if (!programs.length) return '';
@@ -117,5 +113,8 @@ export function renderAcceleratorsBlock(state) {
     })
     .join('');
 
-  return `<h3 class="log-head">Other accelerators & SAFE paths</h3>${cards}`;
+  const xcNote = state.flags?.xcAccepted
+    ? '<p class="fine-print">You can stack other accelerator SAFEs alongside X Combinator — each program once.</p>'
+    : '';
+  return `<h3 class="log-head">Other accelerators & SAFE paths</h3>${xcNote}${cards}`;
 }

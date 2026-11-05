@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "campaigns": [
+    {
+      "id": "growth-space-launch-webcast-sponsor",
+      "categories": ["space-exploration"],
+      "title": "Launch webcast sponsorship pack",
+      "description": "Host-read segments during your own countdown stream.",
+      "cost": 42000,
+      "revenue": [32000, 185000],
+      "buzz": 4,
+      "tierMin": 2,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-space-astro-conference-booth",
+      "categories": ["space-exploration"],
+      "title": "Astronautical conference booth",
+      "description": "Model rocket on the table; leads scan badges all day.",
+      "cost": 88000,
+      "revenue": [68000, 395000],
+      "buzz": 4,
+      "tierMin": 3,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-space-planetarium-show",
+      "categories": ["space-exploration"],
+      "title": "Planetarium branded show",
+      "description": "School field trips learn your constellation name.",
+      "cost": 35000,
+      "revenue": [22000, 125000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-space-podcast-orbit-weekly",
+      "categories": ["space-exploration"],
+      "title": "Orbit Weekly podcast sponsorship",
+      "description": "Space nerds with disposable income and strong opinions.",
+      "cost": 24000,
+      "revenue": [18000, 105000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-space-mission-naming-contest",
+      "categories": ["space-exploration"],
+      "title": "Public mission naming contest",
+      "description": "UGC names you filter before the press release.",
+      "cost": 18000,
+      "revenue": [14000, 82000],
+      "buzz": 4,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-space-defense-pr-brief",
+      "categories": ["space-exploration"],
+      "title": "Defense space press brief",
+      "description": "Analysts and trade press — no live stream of the factory.",
+      "cost": 65000,
+      "revenue": [48000, 285000],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-space-STEM-classroom-kit",
+      "categories": ["space-exploration"],
+      "title": "STEM classroom kit drop",
+      "description": "Sponsor kits that mention your launch provider API.",
+      "cost": 52000,
+      "revenue": [38000, 220000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-space-ipo-space-track-ad",
+      "categories": ["space-exploration"],
+      "title": "Financial media space-track ad series",
+      "description": "CNBC lower-thirds while the S-1 is hot.",
+      "cost": 420000,
+      "revenue": [320000, 1650000],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    }
+  ],
+  "actions": [
+    {
+      "id": "lever-space-founder-launch-thread",
+      "focus": "growth",
+      "categories": ["space-exploration"],
+      "label": "Founder launch countdown thread",
+      "cost": 1200,
+      "buzz": 3,
+      "product": 0,
+      "rivalEase": 1,
+      "tierMax": 4,
+      "description": "Live-post T-minus updates; SpaceXY fans quote-tweet."
+    },
+    {
+      "id": "lever-space-open-mission-dashboard",
+      "focus": "product",
+      "categories": ["space-exploration"],
+      "label": "Open mission dashboard",
+      "cost": 8500,
+      "buzz": 3,
+      "product": 3,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Public telemetry view — trust and recruiting in one URL."
+    },
+    {
+      "id": "lever-space-customer-payload-workshop",
+      "focus": "product",
+      "categories": ["space-exploration"],
+      "label": "Customer payload workshop",
+      "cost": 14000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Integrators leave with mass budgets and a signed LOI."
+    },
+    {
+      "id": "lever-space-regulator-factory-tour",
+      "focus": "growth",
+      "categories": ["space-exploration"],
+      "label": "Regulator factory tour day",
+      "cost": 22000,
+      "buzz": 2,
+      "product": 1,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Range safety officers see clean rooms, not PowerPoint."
+    },
+    {
+      "id": "lever-space-astronaut-advisory-panel",
+      "focus": "brand",
+      "categories": ["space-exploration"],
+      "label": "Astronaut advisory panel",
+      "cost": 45000,
+      "buzz": 4,
+      "product": 2,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Credibility hire — photos for every deck forever."
+    },
+    {
+      "id": "lever-space-scrub-communication-drill",
+      "focus": "product",
+      "categories": ["space-exploration"],
+      "label": "Scrub communication drill",
+      "cost": 3800,
+      "buzz": 2,
+      "product": 2,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Practice customer emails before SpaceXY sets the narrative."
+    },
+    {
+      "id": "lever-space-ride-share-manifest-teaser",
+      "focus": "growth",
+      "categories": ["space-exploration"],
+      "label": "Rideshare manifest teaser",
+      "cost": 6500,
+      "buzz": 3,
+      "product": 1,
+      "rivalEase": 1,
+      "tierMin": 2,
+      "tierMax": 5,
+      "description": "Announce co-passengers; press compares cadence to SpaceXY."
+    },
+    {
+      "id": "lever-space-orbit-services-sla-publish",
+      "focus": "product",
+      "categories": ["space-exploration"],
+      "label": "Publish orbit services SLA",
+      "cost": 11000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Uptime and response times enterprise procurement can cite."
+    }
+  ]
+}

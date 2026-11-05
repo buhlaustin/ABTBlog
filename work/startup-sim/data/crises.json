@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "crises": [
     {
       "id": "outage",
@@ -13,7 +13,17 @@
         },
         {
           "label": "Quiet fix + apology blog",
-          "effects": { "cash": -3000, "buzz": -2, "sentiment": -3 }
+          "effects": {
+            "cash": -3000,
+            "buzz": -2,
+            "sentiment": -5,
+            "modifier": {
+              "id": "outage-aftermath",
+              "label": "Reliability doubts",
+              "revenueMult": 0.9,
+              "months": 2
+            }
+          }
         }
       ]
     },
@@ -62,7 +72,18 @@
         },
         {
           "label": "Internal memo only",
-          "effects": { "cash": -2000, "buzz": -1, "sentiment": -5 }
+          "effects": {
+            "cash": -2000,
+            "buzz": -1,
+            "sentiment": -5,
+            "modifier": {
+              "id": "data-memo",
+              "label": "Security skepticism",
+              "revenueMult": 0.92,
+              "fundraisingBlocked": true,
+              "months": 1
+            }
+          }
         }
       ]
     },
@@ -166,6 +187,105 @@
         {
           "label": "HR FAQ only",
           "effects": { "cash": -3000, "buzz": -1, "sentiment": -5 }
+        }
+      ]
+    },
+    {
+      "id": "key-customer-renewal",
+      "title": "Anchor customer renewal ultimatum",
+      "description": "Your biggest logo wants 30% off or they walk at renewal.",
+      "weight": 2,
+      "minTier": 3,
+      "choices": [
+        {
+          "label": "Match the discount",
+          "effects": {
+            "cash": -28000,
+            "sentiment": 2,
+            "modifier": {
+              "id": "renewal-discount",
+              "label": "Renewal concessions",
+              "revenueMult": 0.85,
+              "months": 3
+            }
+          }
+        },
+        {
+          "label": "Hold pricing — risk churn",
+          "effects": {
+            "sentiment": -6,
+            "buzz": -2,
+            "competitor": 2,
+            "instantRevenue": -45000
+          }
+        }
+      ]
+    },
+    {
+      "id": "cloud-bill-shock",
+      "title": "Cloud bill shock",
+      "description": "Usage spiked after a viral moment. Finance wants cuts; eng wants headroom.",
+      "weight": 2,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Throttle infra + optimize",
+          "effects": {
+            "cash": -8000,
+            "product": -1,
+            "modifier": {
+              "id": "infra-throttle",
+              "label": "Lean infra mode",
+              "costMult": 0.88,
+              "revenueMult": 0.95,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Eat the bill — keep velocity",
+          "effects": {
+            "cash": -32000,
+            "buzz": 1,
+            "sentiment": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "founder-burnout",
+      "title": "Founder burnout signal",
+      "description": "You have not taken a day off in four months. The team is mirroring your pace.",
+      "weight": 1,
+      "minTier": 1,
+      "choices": [
+        {
+          "label": "Mandatory recharge week",
+          "effects": {
+            "cash": -5000,
+            "sentiment": 4,
+            "modifier": {
+              "id": "recharge",
+              "label": "Sustainable pace",
+              "costMult": 1.05,
+              "revenueMult": 1.06,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Push through — ship anyway",
+          "effects": {
+            "product": 2,
+            "sentiment": -4,
+            "modifier": {
+              "id": "crunch",
+              "label": "Crunch culture",
+              "costMult": 1.12,
+              "revenueMult": 1.08,
+              "months": 2
+            }
+          }
         }
       ]
     }

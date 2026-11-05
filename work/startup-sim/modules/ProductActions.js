@@ -3,68 +3,82 @@ import { recordCashOutflow } from './Finance.js';
 import { setGameFeedback } from './GameFeedback.js';
 import { easeCompetitorPressure } from './Competitor.js';
 import { progressionTier } from './ProgressionEconomy.js';
+import {
+  sideTaskPlaysPerMonth,
+  formatMonthlySideTaskLimit,
+  sideTaskCapacityRemaining,
+  sideTaskLimitHint
+} from './SideTaskProgression.js';
 
-export const PRODUCT_ACTIONS = [
-  {
-    id: 'founder_reddit_ama',
-    label: 'Founder Reddit AMA',
-    cost: 250,
-    buzz: 1,
-    product: 0,
-    rivalEase: 1,
-    tierMax: 2,
-    description: 'Cheap attention — good when you have more time than budget.'
-  },
-  {
-    id: 'community_beta',
-    label: 'Invite-only beta list',
-    cost: 900,
-    buzz: 1,
-    product: 2,
-    tierMax: 3,
-    description: 'Hand-pick early users; product depth over hype.'
-  },
-  {
-    id: 'influencer_micro',
-    label: 'Micro-influencer campaign',
-    cost: 4_500,
-    buzz: 2,
-    product: 0,
-    rivalEase: 1,
-    description: 'Pay creators to talk up your launch — bumps buzz, not product depth.'
-  },
-  {
-    id: 'influencer_mid',
-    label: 'Mid-tier influencer tour',
-    cost: 18_000,
-    buzz: 5,
-    product: 1,
-    description: 'Heavier spend for a coordinated week of sponsored posts.'
-  },
-  {
-    id: 'product_hackathon',
-    label: 'Customer hackathon',
-    cost: 12_000,
-    buzz: 2,
-    product: 3,
-    description: 'Invite power users to build on your API — product level over hype.'
-  },
-  {
-    id: 'brand_stunt',
-    label: 'Publicity stunt',
-    cost: 8_000,
-    buzz: 4,
-    product: 0,
-    rivalEase: 2,
-    description: 'Risky but loud — great for buzz if you can afford the cringe.'
+export { sideTaskPlaysPerMonth, formatMonthlySideTaskLimit, sideTaskLimitHint };
+import { fetchGameJson } from './utils.js';
+import bundledLevers from '../data/growth-levers.json' with { type: 'json' };
+import bundledLeversExtra from '../data/growth-levers-extra.json' with { type: 'json' };
+import bundledLeversExtra2 from '../data/growth-levers-extra2.json' with { type: 'json' };
+import bundledLeversExtra3 from '../data/growth-levers-extra3.json' with { type: 'json' };
+import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { type: 'json' };
+import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json' with { type: 'json' };
+
+function mergeLeverCatalog(base, ...extras) {
+  const actions = [...(base?.actions ?? [])];
+  const ids = new Set(actions.map((a) => a.id));
+  for (const extra of extras) {
+    for (const a of extra?.actions ?? []) {
+      if (!ids.has(a.id)) {
+        ids.add(a.id);
+        actions.push(a);
+      }
+    }
   }
+  return actions;
+}
+
+const bundledLeverExtras = [
+  bundledLeversExtra,
+  bundledLeversExtra2,
+  bundledLeversExtra3,
+  bundledSpaceGrowth,
+  bundledSpaceGrowthExtra
 ];
 
-const ACTIONS_PER_MONTH = 2;
+let leverCatalog = mergeLeverCatalog(bundledLevers, ...bundledLeverExtras);
+
+export async function loadGrowthLevers() {
+  try {
+    const data = await fetchGameJson('data/growth-levers.json');
+    if (Array.isArray(data?.actions) && data.actions.length) {
+      leverCatalog = mergeLeverCatalog({ actions: data.actions }, ...bundledLeverExtras);
+    }
+  } catch {
+    /* bundled */
+  }
+  return leverCatalog;
+}
+
+export function getProductActions() {
+  return leverCatalog;
+}
+
+export function sideTaskFocus(def) {
+  return def?.focus ?? 'both';
+}
+
+export function filterSideTasksByFocus(actions, focusFilter) {
+  if (!focusFilter?.length) return actions;
+  const allowed = new Set(focusFilter);
+  return actions.filter((a) => allowed.has(sideTaskFocus(a)));
+}
+
+export function sideTaskBankSize(focusFilter) {
+  return filterSideTasksByFocus(getProductActions(), focusFilter).length;
+}
+
+/** @deprecated use getProductActions() */
+export const PRODUCT_ACTIONS = leverCatalog;
 
 export function productActionsRemaining(state) {
   const used = state.product?.actionsThisMonth ?? 0;
-  return Math.max(0, ACTIONS_PER_MONTH - used);
+  return sideTaskCapacityRemaining(sideTaskPlaysPerMonth(state), used);
 }
 
 export function resetProductActionsMonth(state) {
@@ -76,17 +90,23 @@ function actionUnlocked(def, state) {
   const tier = progressionTier(state);
   if ((def.tierMin ?? 0) > tier) return false;
   if ((def.tierMax ?? 99) < tier) return false;
+  const cats = def.categories;
+  if (cats?.length && !cats.includes(state.company?.categoryId)) return false;
   return true;
 }
 
 export function runProductAction(state, actionId) {
-  const def = PRODUCT_ACTIONS.find((a) => a.id === actionId);
+  const def = getProductActions().find((a) => a.id === actionId);
   if (!def) return { ok: false, reason: 'Unknown action.' };
   if (!actionUnlocked(def, state)) {
     return { ok: false, reason: 'Not unlocked at your current stage.' };
   }
-  if (productActionsRemaining(state) <= 0) {
-    return { ok: false, reason: `Only ${ACTIONS_PER_MONTH} product plays per month.` };
+  const limit = sideTaskPlaysPerMonth(state);
+  if (Number.isFinite(limit) && productActionsRemaining(state) <= 0) {
+    return {
+      ok: false,
+      reason: `Only ${formatMonthlySideTaskLimit(limit)} side play${limit === 1 ? '' : 's'} per month at your current stage.`
+    };
   }
 
   const cash = state.finance?.cash ?? 0;
@@ -112,23 +132,42 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
-export function renderProductActionsPanel(container, state) {
+export function renderProductActionsPanel(container, state, options = {}) {
   if (!container) return;
+  const limit = sideTaskPlaysPerMonth(state);
   const left = productActionsRemaining(state);
-  const rows = PRODUCT_ACTIONS.filter((a) => actionUnlocked(a, state))
+  const leftLabel =
+    left === Infinity
+      ? 'Unlimited'
+      : `${left}/${formatMonthlySideTaskLimit(limit)}`;
+  const atCap = Number.isFinite(limit) && left <= 0;
+  const heading = options.heading ?? 'Growth levers';
+  const focusFilter = options.focusFilter;
+  const bankSize = sideTaskBankSize(focusFilter);
+  const hint = options.showLimitHint !== false ? `<p class="fine-print">${sideTaskLimitHint(state)}</p>` : '';
+  const lede =
+    options.lede ??
+    `Cash plays outside desk tasks — <strong>${leftLabel}</strong> left this month (${bankSize} in this bank · ${getProductActions().length} total side plays).`;
+  const rows = filterSideTasksByFocus(getProductActions(), focusFilter)
+    .filter((a) => actionUnlocked(a, state))
     .map((a) => {
       const rival = a.rivalEase ? ` · rival heat −${a.rivalEase}` : '';
+      const focusTag =
+        sideTaskFocus(a) !== 'both'
+          ? ` <span class="task-tag">${escapeHtml(sideTaskFocus(a))}</span>`
+          : '';
       return `<div class="finance-action product-action">
-      <p><strong>${escapeHtml(a.label)}</strong> — ${formatMoney(a.cost)}</p>
-      <p class="fine-print">${escapeHtml(a.description)} Buzz +${a.buzz}${a.product ? ` · Product +${a.product}` : ''}${rival}.</p>
-      <button type="button" class="btn btn-primary btn-small" data-product-action="${escapeHtml(a.id)}" ${left <= 0 ? 'disabled title="No product plays left this month"' : ''}>Run campaign</button>
+      <p><strong>${escapeHtml(a.label)}</strong>${focusTag} — ${formatMoney(a.cost)}</p>
+      <p class="fine-print">${escapeHtml(a.description)} Buzz +${a.buzz ?? 0}${a.product ? ` · Product +${a.product}` : ''}${rival}.</p>
+      <button type="button" class="btn btn-primary btn-small" data-product-action="${escapeHtml(a.id)}" ${atCap ? 'disabled title="No side plays left this month"' : ''}>Run play</button>
     </div>`;
     })
     .join('');
 
   container.innerHTML = `
-    <h3 class="log-head">Growth levers</h3>
-    <p class="fine-print">Spend cash outside desk tasks — <strong>${left}/${ACTIONS_PER_MONTH}</strong> plays left this month. Early options unlock before paid Growth campaigns.</p>
+    <h3 class="log-head">${escapeHtml(heading)}</h3>
+    <p class="fine-print">${lede}</p>
+    ${hint}
     ${rows || '<p class="fine-print">More levers unlock as you scale funding stage.</p>'}
     <p id="product-action-feedback" class="desk-feedback" hidden></p>
   `;

@@ -1,4 +1,5 @@
 import { formatMoney } from './constants.js';
+import { formatStateMonth } from './GameCalendar.js';
 import { totalHeadcount } from './Staff.js';
 import { projectMonthlyBurn, founderEquityPct, initialInvestmentCash, founderValuationStake } from './Finance.js';
 import { getWorkspaceTier } from './Workspace.js';
@@ -36,7 +37,7 @@ export function buildNarrativeContext(state) {
     cityOrHub: state.company?.location ?? state.offices?.hubLabel ?? 'undisclosed market',
     workspaceDescription: workspaceLabel,
     fundingStage: FUNDING_PRESS(flags),
-    calendarLabel: `Year ${state.calendar.year}, month ${state.calendar.monthIndex} of the run`,
+    calendarLabel: formatStateMonth(state),
     cash,
     monthlyOverhead: burn,
     runwayMonths: burn > 0 ? Math.round((cash / burn) * 10) / 10 : null,
