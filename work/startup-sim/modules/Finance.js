@@ -18,6 +18,7 @@ import { applyTaskRivalEffects } from './WorldDynamics.js';
 import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 import { loanOverheadMonthly } from './BankLoan.js';
 import { ceoSalaryMonthly } from './CeoEconomics.js';
+import { cooSalaryMonthly } from './Coo.js';
 
 /** Hard caps on desk + growth payout multiplier (after sandbox tuning overlay). */
 export const REV_MULT_CAP_CAREER = 60;
@@ -135,7 +136,14 @@ export function projectMonthlyBurn(state) {
   const payroll = computePayroll(headcount, state.stage, state);
   let fixed = workspaceRentMonthly(state);
   fixed = Math.round(fixed * hubCostMult(state));
-  return payroll + fixed + satelliteRent(state) + loanOverheadMonthly(state) + ceoSalaryMonthly(state);
+  return (
+    payroll +
+    fixed +
+    satelliteRent(state) +
+    loanOverheadMonthly(state) +
+    ceoSalaryMonthly(state) +
+    cooSalaryMonthly(state)
+  );
 }
 
 function sandboxMult(state) {

@@ -26,6 +26,34 @@ export function getFounderRow(state) {
   return state.capTable?.find((r) => r.id === 'founder');
 }
 
+/** Issue new exec shares for ~pct fully-diluted ownership (before the grant). */
+export function grantExecutiveEquity(state, { id, name, pct, holderClass = 'exec' }) {
+  const targetPct = Math.max(0.1, Math.min(15, Number(pct) || 0));
+  if (!state.capTable?.length) {
+    state.capTable = [
+      {
+        id: 'founder',
+        name: 'You (Founder)',
+        shares: FOUNDER_AUTHORIZED,
+        pct: 100,
+        class: 'founder'
+      }
+    ];
+  }
+  const holderId = String(id || `exec-${Date.now()}`);
+  let rows = state.capTable.filter((r) => r.id !== holderId).map((r) => ({ ...r }));
+  const totalBefore = rows.reduce((s, r) => s + (r.shares ?? 0), 0);
+  const grantShares = Math.round(totalBefore * (targetPct / (100 - targetPct)));
+  rows.push({
+    id: holderId,
+    name: String(name || 'Executive'),
+    shares: grantShares,
+    class: holderClass
+  });
+  state.capTable = recalculateCapTablePercentages(rows);
+  return { grantShares, pct: targetPct };
+}
+
 /** Issue XC SAFE: +$500k cash, ~6% fully-diluted to XC holder. */
 export function applyXCSafe(state) {
   if (state.flags?.xcAccepted) {

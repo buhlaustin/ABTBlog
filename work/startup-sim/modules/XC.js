@@ -3,6 +3,7 @@ import { STAGES, formatMoney } from './constants.js';
 import { applyScenarioEffects } from './ScenarioEffects.js';
 import { applyXCSafe } from './CapTable.js';
 import { restorePostXcWorkspace } from './Workspace.js';
+import { syncCooSalaryToWorkspace } from './Coo.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import bundledInterview from '../data/xc-interview.json' with { type: 'json' };
 import {
@@ -294,6 +295,7 @@ export function tickXcResidency(state) {
     state.product.buzz = (state.product.buzz ?? 0) + 3;
     state.product.level = (state.product.level ?? 0) + 2;
     restorePostXcWorkspace(state);
+    syncCooSalaryToWorkspace(state);
     lines.push('Batch finished — alumni boost active for 8 months. Close seed when you have a small office.');
   }
   return lines;

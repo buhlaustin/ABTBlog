@@ -900,6 +900,29 @@ if (!failed) {
   }
 }
 
+const { hireCoo, isCooHired, cooSalaryMonthly } = await import(
+  `file://${join(sim, 'modules/Coo.js')}`
+);
+const { getFounderRow } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
+const garageState = createInitialState({
+  companyName: 'Garage COO',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+const hire = hireCoo(garageState, { firstName: 'Riley', lastName: 'Chen', equityPct: 2 });
+if (!hire.ok || !isCooHired(garageState)) {
+  console.error(`FAIL: garage COO hire: ${hire.reason ?? 'unknown'}`);
+  failed = true;
+} else {
+  const founderBefore = getFounderRow(garageState)?.pct ?? 100;
+  if (founderBefore >= 99 || cooSalaryMonthly(garageState) < 7000) {
+    console.error(`FAIL: COO equity/salary founder=${founderBefore} sal=${cooSalaryMonthly(garageState)}`);
+    failed = true;
+  } else {
+    console.log('OK: named COO from garage with equity on cap table');
+  }
+}
+
 const calState = createInitialState({ companyName: 'Cal Co', categoryId: 'b2b-saas', mode: 'career' });
 if (!isRealCalendarYear(calState.calendar.year)) {
   console.error('FAIL: career should start on real calendar year');

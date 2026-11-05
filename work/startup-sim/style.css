@@ -338,6 +338,19 @@ h1 {
   box-shadow: 0 0 0 1px var(--accent, #3b82f6);
 }
 
+.coo-hire-panel .coo-name-row,
+.coo-hire-panel .coo-equity-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.coo-hire-panel input[type='text'] {
+  min-width: 8rem;
+}
+
 .org-chart {
   display: flex;
   flex-direction: column;

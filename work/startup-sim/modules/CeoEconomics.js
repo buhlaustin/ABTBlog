@@ -1,4 +1,4 @@
-import { formatMoney } from './constants.js';
+import { STAGES, formatMoney } from './constants.js';
 import { recordCashOutflow, founderValuationStake, founderEquityPct, projectMonthlyBurn } from './Finance.js';
 import { founderStakeValue, isPublicCompany, canCashOut } from './IPO.js';
 import { getFounderRow } from './CapTable.js';

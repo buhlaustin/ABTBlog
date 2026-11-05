@@ -72,6 +72,7 @@ import {
   showFinanceFeedback
 } from './modules/Fundraising.js';
 import { setCeoSalaryAnnual, takeOwnerDraw } from './modules/Ceo.js';
+import { hireCoo, releaseCoo, syncCooSalaryToWorkspace } from './modules/Coo.js';
 import { loadAccelerators } from './modules/Accelerators.js';
 import { onLayoffSentiment } from './modules/Sentiment.js';
 import {
@@ -859,6 +860,7 @@ function bindGameInteractions() {
       const result = purchaseWorkspaceTier(sessionState, tier);
       if (!result.ok) showOfficesFeedback(result.reason, true);
       else {
+        syncCooSalaryToWorkspace(sessionState);
         appendLog(sessionState, `Leased ${tier} office — rent added to monthly burn.`);
         showOfficesFeedback('Office leased.');
         syncStageFromProgress(sessionState);
@@ -946,6 +948,33 @@ function bindGameInteractions() {
 
     if (e.target.id === 'btn-finalize-staff') {
       handleFinalizeStaff();
+      return;
+    }
+    if (e.target.id === 'btn-hire-coo' && sessionState) {
+      const first = document.getElementById('coo-first-name')?.value;
+      const last = document.getElementById('coo-last-name')?.value;
+      const equity = document.getElementById('coo-equity-pct')?.value;
+      const result = hireCoo(sessionState, {
+        firstName: first,
+        lastName: last,
+        equityPct: equity
+      });
+      if (!result.ok) showPeopleFeedback(result.reason || 'Could not hire COO.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showPeopleFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-release-coo' && sessionState) {
+      const result = releaseCoo(sessionState);
+      if (!result.ok) showPeopleFeedback(result.reason || 'Could not release COO.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showPeopleFeedback(result.summary);
+      }
+      refresh();
       return;
     }
     if (e.target.id === 'btn-xc-apply') {

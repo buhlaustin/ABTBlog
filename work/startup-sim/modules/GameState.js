@@ -26,6 +26,7 @@ import {
   ensureCeoPersonalBank,
   preparePersonalExpensesForMonth
 } from './CeoEconomics.js';
+import { createInitialCooState, hireCoo, isCooHired } from './Coo.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -36,7 +37,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 32;
+export const SAVE_VERSION = 33;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -122,6 +123,7 @@ export function createInitialState(options) {
     news: createInitialNews(),
     offices: createInitialOffices(),
     xc: createInitialXcState(),
+    coo: createInitialCooState(),
     advisor: createInitialAdvisor(),
     sentiment: createInitialSentiment(),
     world: { competitor: createCompetitorForCategory(category.id), competitorAcquired: false },
@@ -217,7 +219,21 @@ export function normalizeSave(raw) {
       state.calendar.taskLineupConfirmed = (state.calendar.monthTasks?.length ?? 0) > 0;
     }
     if (!state.workspace) state.workspace = createInitialWorkspace();
-    if (state.executives) delete state.executives;
+    if (!state.coo) state.coo = createInitialCooState();
+    if (state.coo.hired === undefined) state.coo.hired = false;
+    if (state.coo.capTableId === undefined) state.coo.capTableId = null;
+    if (state.executives?.roster?.length && !isCooHired(state)) {
+      const legacy = state.executives.roster.find((e) => e.roleTitle === 'COO');
+      if (legacy?.name) {
+        const parts = String(legacy.name).trim().split(/\s+/);
+        hireCoo(state, {
+          firstName: parts[0] ?? 'Jordan',
+          lastName: parts.slice(1).join(' ') || 'Ellis',
+          equityPct: 1.5
+        });
+      }
+    }
+    delete state.executives;
     if (!state.growth) state.growth = { campaignsThisMonth: [] };
     if (!state.growth.campaignsThisMonth) state.growth.campaignsThisMonth = [];
     if (state.workspace && state.workspace.campusOwned === undefined) {
