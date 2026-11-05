@@ -10,7 +10,12 @@ import { ceoSalaryMonthly } from './CeoEconomics.js';
 import { cooSalaryMonthly } from './Coo.js';
 import { adjustSentiment } from './Sentiment.js';
 import { easeCompetitorPressure } from './Competitor.js';
-import { expandEmployeeOptionPool, getOptionPoolRow } from './CapTable.js';
+import {
+  expandEmployeeOptionPool,
+  getOptionPoolRow,
+  previewOptionPoolExpansion,
+  totalOutstandingShares
+} from './CapTable.js';
 import { calendarTurn } from './GameCalendar.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { panelStatCard, escapeHtml as panelEscapeHtml } from './PanelChrome.js';
@@ -547,28 +552,58 @@ export function renderOptionPoolPanel(container, state) {
   ensurePeoplePrograms(state);
   const poolRow = getOptionPoolRow(state);
   const poolExpanded = state.staff.optionPoolExpandedThisMonth;
+  const seedClosed = Boolean(state.flags?.seedRoundClosed);
+  const totalOut = totalOutstandingShares(state);
+  const sentiment = state.sentiment?.score ?? 68;
   const poolButtons = OPTION_POOL_EXPAND_PCTS.map((pct) => {
-    const disabled = poolExpanded ? ' disabled' : '';
-    return `<button type="button" class="btn btn-primary btn-small" data-expand-option-pool="${pct}"${disabled}>Expand +${pct}% FD</button>`;
+    const disabled = poolExpanded || !seedClosed ? ' disabled' : '';
+    const preview = seedClosed ? previewOptionPoolExpansion(state, pct) : null;
+    const shareHint = preview
+      ? ` · +${preview.sharesAdded.toLocaleString()} sh`
+      : !seedClosed
+        ? ' · close seed first'
+        : '';
+    const fdHint = preview ? ` → ${preview.poolPctAfter}% FD` : '';
+    return `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-expand-option-pool="${pct}"${disabled} title="Adds ${pct}% of current pool shares; dilutes all holders">${pct}% pool${shareHint}${fdHint}</button>`;
   }).join('');
   const poolHistory = (state.staff.optionPoolLog ?? [])
     .slice(-6)
     .reverse()
     .map(
       (e) =>
-        `<li>+${e.pctPoints}% (${(e.sharesAdded ?? 0).toLocaleString()} shares) · ${escapeHtml(formatCalendarStamp(e.year, e.month))}</li>`
+        `<li>+${e.pctPoints}% pool (${(e.sharesAdded ?? 0).toLocaleString()} shares) · ${escapeHtml(formatCalendarStamp(e.year, e.month))}</li>`
     )
     .join('');
 
+  const seedGate = !seedClosed
+    ? `<div class="finance-alert finance-alert--tax" role="alert">Close <strong>seed</strong> on Finance to create the employee option pool.</div>`
+    : '';
+
   container.innerHTML = `
     <section class="finance-section people-equity-section">
+      <p class="fine-print people-benefits-lede">Board-approved ESOP top-ups without a priced round. Each choice adds that percent of <strong>current pool shares</strong> (not a full cap-table recap), so post-IPO numbers stay readable. <strong>One refresh per month</strong> — nicks board approval slightly.</p>
       <div class="finance-kpi-row people-kpi-row">
-        ${panelStatCard('Option pool', poolRow ? `${poolRow.pct}%` : '—', { hero: true })}
+        ${panelStatCard('Pool (FD)', poolRow ? `${poolRow.pct}%` : '—', { hero: true })}
         ${panelStatCard('Pool shares', poolRow ? (poolRow.shares ?? 0).toLocaleString() : '—')}
-        ${panelStatCard('This month', poolExpanded ? 'Expanded' : 'Available')}
+        ${panelStatCard('Outstanding', totalOut.toLocaleString())}
+        ${panelStatCard('Board approval', `${sentiment}/100`)}
       </div>
-      <p class="fine-print">Refresh ESOP without a priced round — dilutes all holders proportionally. One expansion per month.</p>
-      <div class="benefits-preset-row">${poolButtons}</div>
+      <div class="growth-channel-compare people-benefits-compare" role="note">
+        <div class="growth-channel-card growth-channel-card--side">
+          <p class="growth-channel-title"><span class="growth-channel-badge">Top-up</span></p>
+          <p class="fine-print">Grow the pool by 2–15% of its current size — modest dilution, no investor negotiation.</p>
+        </div>
+        <div class="growth-channel-card growth-channel-card--paid">
+          <p class="growth-channel-title"><span class="growth-channel-badge growth-channel-badge--paid">Priced round</span></p>
+          <p class="fine-print">Seed and Series rounds on Finance set the big ESOP slices; use this tab for monthly refreshes between raises.</p>
+        </div>
+      </div>
+      ${seedGate}
+      <div class="finance-section-head">
+        <h3 class="finance-section-title">Refresh option pool</h3>
+        <span class="growth-channel-badge growth-channel-badge--inline">${poolExpanded ? 'Used this month' : '1× / month'}</span>
+      </div>
+      <div class="benefits-preset-row people-pool-expand-row">${poolButtons}</div>
       ${
         poolHistory
           ? `<details class="finance-details"><summary>Recent pool refreshes</summary><ul class="desk-log-list">${poolHistory}</ul></details>`

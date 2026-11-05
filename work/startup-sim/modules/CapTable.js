@@ -744,7 +744,57 @@ export function getOptionPoolRow(state) {
   return state.capTable?.find((r) => r.id === ESOP_ROW_ID) ?? null;
 }
 
-/** Add pctPoints of fully-diluted shares to the ESOP (e.g. 5 → +5% FD). */
+/** Insider shares only — public float should not inflate monthly pool top-ups. */
+export function insiderOutstandingShares(rows) {
+  return (rows ?? [])
+    .filter((r) => r.id !== PUBLIC_FLOAT_ROW_ID)
+    .reduce((s, r) => s + (r.shares ?? 0), 0);
+}
+
+/**
+ * Shares to add for a pool top-up: pctPoints % of current pool size (e.g. 5 → +5% more pool shares).
+ * Small fallback slice of insider FD if the pool row is empty.
+ */
+export function sharesForOptionPoolTopUp(rows, poolShares, pctPoints) {
+  const pct = Number(pctPoints) / 100;
+  if (!Number.isFinite(pct) || pct <= 0 || pct >= 0.5) return 0;
+  const pool = Math.max(0, Number(poolShares) || 0);
+  if (pool > 0) {
+    return Math.max(1, Math.round(pool * pct));
+  }
+  const insider = insiderOutstandingShares(rows);
+  if (insider <= 0) return 0;
+  return Math.max(1, Math.round(insider * (pct / 20)));
+}
+
+/** Preview a monthly pool refresh before mutating cap table. */
+export function previewOptionPoolExpansion(state, pctPoints) {
+  const pct = Number(pctPoints) / 100;
+  if (!Number.isFinite(pct) || pct <= 0 || pct >= 0.5) return null;
+  const rows = state.capTable ?? [];
+  if (!rows.length) return null;
+  const poolRow = getOptionPoolRow(state);
+  const poolShares = poolRow?.shares ?? 0;
+  const totalBefore = rows.reduce((s, r) => s + (r.shares ?? 0), 0);
+  if (totalBefore <= 0) return null;
+  const sharesAdded = sharesForOptionPoolTopUp(rows, poolShares, pctPoints);
+  if (sharesAdded <= 0) return null;
+  const poolAfter = poolShares + sharesAdded;
+  const totalAfter = totalBefore + sharesAdded;
+  const poolPctBefore = Math.round((poolShares / totalBefore) * 1000) / 10;
+  const poolPctAfter = Math.round((poolAfter / totalAfter) * 1000) / 10;
+  return {
+    pctPoints: Number(pctPoints),
+    sharesAdded,
+    poolSharesBefore: poolShares,
+    poolPctBefore,
+    poolPctAfter,
+    totalOutstandingBefore: totalBefore,
+    totalOutstandingAfter: totalAfter
+  };
+}
+
+/** Add pctPoints percent of current pool shares (monthly board refresh — not a full FD recap). */
 export function expandEmployeeOptionPool(state, pctPoints) {
   const pct = Number(pctPoints) / 100;
   if (!Number.isFinite(pct) || pct <= 0 || pct >= 0.5) {
@@ -757,6 +807,9 @@ export function expandEmployeeOptionPool(state, pctPoints) {
     return { ok: false, reason: 'Close seed first — the employee option pool is created at seed.' };
   }
 
+  const preview = previewOptionPoolExpansion(state, pctPoints);
+  if (!preview) return { ok: false, reason: 'Could not compute pool expansion.' };
+
   const rows = state.capTable.map((r) => ({ ...r }));
   let row = rows.find((r) => r.id === ESOP_ROW_ID);
   if (!row) {
@@ -768,19 +821,17 @@ export function expandEmployeeOptionPool(state, pctPoints) {
     };
     rows.push(row);
   }
-  const total = rows.reduce((s, r) => s + (r.shares ?? 0), 0);
-  if (total <= 0) return { ok: false, reason: 'Cap table has no outstanding shares.' };
-
-  const additional = Math.max(1, Math.round(total * (pct / (1 - pct))));
-  row.shares = (row.shares ?? 0) + additional;
+  row.shares = (row.shares ?? 0) + preview.sharesAdded;
   state.capTable = recalculateCapTablePercentages(rows);
 
   return {
     ok: true,
-    pctPoints: Number(pctPoints),
-    sharesAdded: additional,
+    pctPoints: preview.pctPoints,
+    sharesAdded: preview.sharesAdded,
     poolPct: row.pct,
-    poolShares: row.shares
+    poolShares: row.shares,
+    poolPctBefore: preview.poolPctBefore,
+    poolPctAfter: preview.poolPctAfter
   };
 }
 

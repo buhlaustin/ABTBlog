@@ -1139,7 +1139,7 @@ function bindGameInteractions() {
       else {
         appendLog(
           sessionState,
-          `Cap table: option pool +${result.pctPoints}% FD (${(result.sharesAdded ?? 0).toLocaleString()} shares, now ${result.poolPct}%).`
+          `Cap table: option pool +${result.pctPoints}% (${(result.sharesAdded ?? 0).toLocaleString()} shares, now ${result.poolPct}% FD).`
         );
         showPeopleFeedback(`Option pool expanded +${result.pctPoints}% (now ${result.poolPct}%).`);
       }

@@ -1535,11 +1535,18 @@ poolState.flags.seedRoundClosed = true;
 applySeedCapTableSnapshot(poolState);
 const before = poolState.capTable.find((r) => r.id === 'esop')?.shares ?? 0;
 const expand = expandEmployeeOptionPool(poolState, 5);
-if (!expand.ok || (poolState.capTable.find((r) => r.id === 'esop')?.shares ?? 0) <= before) {
-  console.error(`FAIL: option pool expand: ${expand.reason ?? 'no shares added'}`);
+const expectedTopUp = Math.max(1, Math.round(before * 0.05));
+if (
+  !expand.ok ||
+  (poolState.capTable.find((r) => r.id === 'esop')?.shares ?? 0) !== before + expectedTopUp ||
+  expand.sharesAdded !== expectedTopUp
+) {
+  console.error(
+    `FAIL: option pool expand: ${expand.reason ?? `expected +${expectedTopUp}, got ${expand.sharesAdded ?? 0}`}`
+  );
   failed = true;
 } else {
-  console.log(`OK: option pool expand +5% (${expand.sharesAdded} shares)`);
+  console.log(`OK: option pool expand +5% of pool (${expand.sharesAdded} shares)`);
 }
 
 const calState = createInitialState({ companyName: 'Cal Co', categoryId: 'b2b-saas', mode: 'career' });
