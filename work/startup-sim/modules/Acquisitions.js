@@ -266,6 +266,89 @@ export function subsidiarySalePrice(state, holding, company) {
   return Math.round(core + invested * 0.82);
 }
 
+/** Implied equity value for reinvestment sizing (exit mark, not purchase price). */
+export function subsidiaryImpliedValue(state, holding, company) {
+  return subsidiarySalePrice(state, holding, company);
+}
+
+export const REINVEST_PROGRAMS = [
+  {
+    id: 'product',
+    label: 'Product & engineering',
+    blurb: 'Ship roadmap, pay down tech debt, lift unit economics.',
+    healthFactor: 1.15,
+    integrationMonths: 0
+  },
+  {
+    id: 'gtm',
+    label: 'GTM expansion',
+    blurb: 'Sales pods, demand gen, and channel programs.',
+    healthFactor: 1.05,
+    integrationMonths: 0
+  },
+  {
+    id: 'integration',
+    label: 'Integration sprint',
+    blurb: 'PMO, systems migration, and synergy capture.',
+    healthFactor: 0.75,
+    integrationMonths: 1
+  },
+  {
+    id: 'operations',
+    label: 'Ops & retention',
+    blurb: 'CS coverage, billing ops, and margin hygiene.',
+    healthFactor: 1.0,
+    integrationMonths: 0
+  }
+];
+
+function reinvestProgram(id) {
+  return REINVEST_PROGRAMS.find((p) => p.id === id) ?? REINVEST_PROGRAMS[0];
+}
+
+/** Cash required to deploy `pct`% of subsidiary implied value (0.5–25). */
+export function computeReinvestQuote(state, targetId, pctOfValue, programId = 'product') {
+  ensureAcquisitions(state);
+  const holding = state.acquisitions.owned.find((h) => h.id === targetId);
+  if (!holding) return { ok: false, reason: 'You do not own that company.' };
+  const company = catalog.find((c) => c.id === targetId);
+  if (!company) return { ok: false, reason: 'Unknown subsidiary.' };
+
+  const pct = Number(pctOfValue);
+  if (!Number.isFinite(pct) || pct < 0.5 || pct > 25) {
+    return { ok: false, reason: 'Choose 0.5%–25% of subsidiary value.' };
+  }
+
+  const impliedValue = subsidiaryImpliedValue(state, holding, company);
+  let amount = Math.round((impliedValue * pct) / 100);
+  const floor = Math.max(5_000, Math.round(impliedValue * 0.002));
+  if (amount < floor) amount = floor;
+
+  const cash = state.finance?.cash ?? 0;
+  if (cash < amount) {
+    return {
+      ok: false,
+      reason: `Need ${formatMoney(amount)} cash (${pct}% of ~${formatMoney(impliedValue)} value).`
+    };
+  }
+
+  const program = reinvestProgram(programId);
+  const healthDelta = (amount / Math.max(impliedValue, 1)) * 0.42 * program.healthFactor;
+  const projectedHealth = Math.min(2.2, holdingHealth(holding) + healthDelta);
+
+  return {
+    ok: true,
+    company,
+    holding,
+    program,
+    pctOfValue: pct,
+    impliedValue,
+    amount,
+    projectedHealth,
+    integrationSkip: program.integrationMonths
+  };
+}
+
 function pushDealLog(state, entry) {
   ensureAcquisitions(state);
   state.acquisitions.dealLog.unshift({
@@ -421,39 +504,43 @@ export function purchaseTarget(state, targetId) {
   return { ok: true, company, price, mrr, integrationMonthsLeft };
 }
 
-export function reinvestInSubsidiary(state, targetId, amountRaw) {
-  const amount = Math.round(Number(amountRaw) || 0);
-  if (amount < 5000) return { ok: false, reason: 'Minimum reinvestment is $5,000.' };
-  if ((state.finance?.cash ?? 0) < amount) {
-    return { ok: false, reason: 'Not enough cash.' };
-  }
-  ensureAcquisitions(state);
-  const holding = state.acquisitions.owned.find((h) => h.id === targetId);
-  if (!holding) return { ok: false, reason: 'You do not own that company.' };
-  const company = catalog.find((c) => c.id === targetId);
-  if (!company) return { ok: false, reason: 'Unknown subsidiary.' };
+/** Deploy capital as a % of implied subsidiary value (see computeReinvestQuote). */
+export function reinvestInSubsidiary(state, targetId, options = {}) {
+  const pct = options.pctOfValue ?? options.pct;
+  const programId = options.program ?? options.programId ?? 'product';
+  const quote = computeReinvestQuote(state, targetId, pct, programId);
+  if (!quote.ok) return quote;
 
+  const { company, holding, amount, program, impliedValue } = quote;
   state.finance.cash -= amount;
   recordCashOutflow(state, amount, 'acquisition-reinvest');
   holding.investedTotal = (holding.investedTotal ?? 0) + amount;
   holding.lastReinvestTurn = calendarTurn(state);
-  const delta = (amount / company.basePrice) * 0.35;
+  holding.lastReinvestProgram = program.id;
+
+  const delta = (amount / Math.max(impliedValue, 1)) * 0.42 * program.healthFactor;
   holding.health = holdingHealth(holding) + delta;
-  if (holding.integrationMonthsLeft > 0) {
-    holding.integrationMonthsLeft = Math.max(0, holding.integrationMonthsLeft - 1);
+  if (holding.integrationMonthsLeft > 0 && program.integrationMonths > 0) {
+    holding.integrationMonthsLeft = Math.max(
+      0,
+      holding.integrationMonthsLeft - program.integrationMonths
+    );
   }
 
   pushDealLog(state, {
     kind: 'reinvest',
     name: company.isRival ? state.world?.competitor?.name ?? company.name : company.name,
     amount,
-    detail: `Health ${holdingHealth(holding).toFixed(2)}×`
+    detail: `${program.label} · ${quote.pctOfValue}% of ${formatMoney(impliedValue)} · health ${holdingHealth(holding).toFixed(2)}×`
   });
 
   return {
     ok: true,
     company,
     amount,
+    pctOfValue: quote.pctOfValue,
+    impliedValue,
+    program,
     health: holdingHealth(holding),
     mrr: subsidiaryMrr(state, holding, company)
   };
@@ -606,15 +693,37 @@ export function renderCompaniesPanel(container, state) {
         categorySynergyMult(state, co) > 1
           ? `<span class="tag tag-synergy">${cat === state.company?.categoryId ? 'Vertical fit' : 'Rival lock-in'}</span>`
           : '';
+      const pct2 = Math.round(exit * 0.02);
+      const pct5 = Math.round(exit * 0.05);
+      const pct10 = Math.round(exit * 0.1);
+      const defaultProgram = reinvestProgram(h.lastReinvestProgram ?? 'product');
+      const programOptions = REINVEST_PROGRAMS.map(
+        (p) =>
+          `<option value="${escapeHtml(p.id)}"${defaultProgram.id === p.id ? ' selected' : ''}>${escapeHtml(p.label)}</option>`
+      ).join('');
       return `<tr>
         <td><strong>${escapeHtml(name)}</strong> ${syn}<br><span class="fine-print">${escapeHtml(segmentLabel(co.segment))} · health ${holdingHealth(h).toFixed(2)}×</span><br>${integrationBar(h)}</td>
         <td class="num">${formatMoney(mrr)}/mo</td>
         <td class="num">${formatMoney(costBasis)}</td>
         <td class="num">${formatMoney(exit)}<br><span class="fine-print">${roi >= 0 ? '+' : ''}${roi.toFixed(0)}% vs basis${holdBonus ? ` · +${holdBonus}% hold` : ''}</span></td>
-        <td class="num companies-actions">
-          <button type="button" class="btn btn-small" data-acquisition-reinvest="${escapeHtml(co.id)}" data-acquisition-reinvest-amt="25000">+$25k</button>
-          <button type="button" class="btn btn-small" data-acquisition-reinvest="${escapeHtml(co.id)}" data-acquisition-reinvest-amt="100000">+$100k</button>
-          <button type="button" class="btn btn-small" data-acquisition-reinvest="${escapeHtml(co.id)}">Custom</button>
+        <td class="companies-reinvest-cell">
+          <details class="reinvest-panel">
+            <summary class="btn btn-small">Allocate capital</summary>
+            <p class="fine-print">Implied value <strong>${formatMoney(exit)}</strong> — deploy a % back into the business (not a flat $100k check).</p>
+            <label class="visually-hidden" for="reinvest-program-${escapeHtml(co.id)}">Program</label>
+            <select id="reinvest-program-${escapeHtml(co.id)}" class="reinvest-program-select" data-reinvest-program-for="${escapeHtml(co.id)}">${programOptions}</select>
+            <p class="fine-print reinvest-program-blurb" data-reinvest-blurb-for="${escapeHtml(co.id)}">${escapeHtml(defaultProgram.blurb)}</p>
+            <div class="reinvest-pct-row">
+              <button type="button" class="btn btn-ghost btn-small" data-acquisition-reinvest-pick="${escapeHtml(co.id)}" data-reinvest-pct="2" title="2% of value">2% · ${formatMoney(pct2)}</button>
+              <button type="button" class="btn btn-ghost btn-small" data-acquisition-reinvest-pick="${escapeHtml(co.id)}" data-reinvest-pct="5">5% · ${formatMoney(pct5)}</button>
+              <button type="button" class="btn btn-ghost btn-small" data-acquisition-reinvest-pick="${escapeHtml(co.id)}" data-reinvest-pct="10">10% · ${formatMoney(pct10)}</button>
+            </div>
+            <div class="name-row reinvest-custom-row">
+              <label class="fine-print" for="reinvest-pct-${escapeHtml(co.id)}">Custom %</label>
+              <input id="reinvest-pct-${escapeHtml(co.id)}" type="number" min="0.5" max="25" step="0.5" value="3" class="reinvest-pct-input" data-reinvest-pct-input="${escapeHtml(co.id)}">
+              <button type="button" class="btn btn-primary btn-small" data-acquisition-reinvest-submit="${escapeHtml(co.id)}">Deploy capital</button>
+            </div>
+          </details>
           <button type="button" class="btn btn-small btn-danger" data-acquisition-sell="${escapeHtml(co.id)}">Sell</button>
         </td>
       </tr>`;
@@ -673,7 +782,7 @@ export function renderCompaniesPanel(container, state) {
       : '';
 
   container.innerHTML = `
-    <p class="panel-lede">Build a roll-up: buy operators for recurring MRR, reinvest to raise health and exit value, or sell when the market pays a premium.</p>
+    <p class="panel-lede">Build a roll-up: buy operators for recurring MRR, then <strong>allocate capital</strong> as a % of each subsidiary&apos;s implied value (program + confirm — not flat $25k/$100k buttons).</p>
     ${lockNote}
     ${rivalNote}
     <p class="companies-brief fine-print" role="status"><strong>Market brief:</strong> ${escapeHtml(marketBrief(state))}</p>

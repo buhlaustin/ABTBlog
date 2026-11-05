@@ -23,7 +23,7 @@ const dataAttrs = new Set();
 for (const { text } of sources) {
   for (const m of text.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) btnIds.add(m[1]);
   for (const m of text.matchAll(/\bid='(btn-[a-z0-9-]+)'/g)) btnIds.add(m[1]);
-  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action)/g)) {
+  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest-pick|acquisition-reinvest-submit|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action)/g)) {
     dataAttrs.add(m[1]);
   }
 }
@@ -67,7 +67,8 @@ const dataPatterns = {
   'decision-choice': "closest('[data-decision-choice]')",
   'acquisition-buy': "closest('[data-acquisition-buy]')",
   'acquisition-sell': "closest('[data-acquisition-sell]')",
-  'acquisition-reinvest': "closest('[data-acquisition-reinvest]')",
+  'acquisition-reinvest-pick': "closest('[data-acquisition-reinvest-pick]')",
+  'acquisition-reinvest-submit': "closest('[data-acquisition-reinvest-submit]')",
   'companies-filter': "closest('[data-companies-filter]')",
   'companies-page': "closest('[data-companies-page]')",
   'companies-sort': "closest('[data-companies-sort]')",

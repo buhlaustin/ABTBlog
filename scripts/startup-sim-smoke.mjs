@@ -779,7 +779,10 @@ const {
   getAcquisitionCatalog,
   purchaseTarget,
   totalSubsidiaryMrr,
-  applySubsidiaryMrrPayout
+  applySubsidiaryMrrPayout,
+  computeReinvestQuote,
+  reinvestInSubsidiary,
+  subsidiarySalePrice
 } = await import(`file://${join(sim, 'modules/Acquisitions.js')}`);
 await preloadAcquisitionCatalog();
 if (getAcquisitionCatalog().length !== 99) {
@@ -808,6 +811,30 @@ if (!buy.ok) {
     failed = true;
   } else {
     console.log(`OK: acquisition + portfolio MRR (${formatMoney(totalSubsidiaryMrr(acqState))}/mo)`);
+  }
+  const holding = acqState.acquisitions.owned[0];
+  const implied = subsidiarySalePrice(acqState, holding, small);
+  const quote5 = computeReinvestQuote(acqState, small.id, 5, 'product');
+  if (!quote5.ok) {
+    console.error(`FAIL: reinvest quote: ${quote5.reason}`);
+    failed = true;
+  } else {
+    const expected = Math.round(implied * 0.05);
+    const tol = Math.max(5000, Math.round(implied * 0.002));
+    if (Math.abs(quote5.amount - expected) > tol && quote5.amount !== Math.max(expected, tol)) {
+      console.error(
+        `FAIL: reinvest 5% should scale with implied value (~${formatMoney(expected)}), got ${formatMoney(quote5.amount)}`
+      );
+      failed = true;
+    } else {
+      const rein = reinvestInSubsidiary(acqState, small.id, { pctOfValue: 2, program: 'gtm' });
+      if (!rein.ok || rein.pctOfValue !== 2) {
+        console.error(`FAIL: pct-based reinvest: ${rein.reason ?? 'bad result'}`);
+        failed = true;
+      } else {
+        console.log(`OK: portfolio reinvest scales with value (${formatMoney(rein.amount)} for 2%)`);
+      }
+    }
   }
 }
 

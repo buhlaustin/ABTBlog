@@ -142,6 +142,8 @@ import {
   purchaseTarget,
   sellSubsidiary,
   reinvestInSubsidiary,
+  computeReinvestQuote,
+  REINVEST_PROGRAMS,
   preloadAcquisitionCatalog,
   showCompaniesFeedback,
   setCompaniesMarketFilter,
@@ -757,14 +759,41 @@ function handleAcquisitionSell(id) {
   refresh();
 }
 
-function handleAcquisitionReinvest(id, presetAmount) {
+function reinvestProgramIdForSubsidiary(id) {
+  const select = document.querySelector(`[data-reinvest-program-for="${CSS.escape(id)}"]`);
+  return select?.value ?? 'product';
+}
+
+function reinvestPctForSubsidiary(id) {
+  const input = document.querySelector(`[data-reinvest-pct-input="${CSS.escape(id)}"]`);
+  const raw = input?.value;
+  const pct = Number(raw);
+  return Number.isFinite(pct) ? pct : 3;
+}
+
+function handleAcquisitionReinvestSubmit(id) {
   if (!sessionState) return;
-  let raw = presetAmount;
-  if (raw == null) {
-    raw = window.prompt('Reinvest cash into this subsidiary (min $5,000):', '25000');
-    if (raw == null) return;
+  const programId = reinvestProgramIdForSubsidiary(id);
+  const pct = reinvestPctForSubsidiary(id);
+  const quote = computeReinvestQuote(sessionState, id, pct, programId);
+  if (!quote.ok) {
+    showCompaniesFeedback(quote.reason || 'Could not quote deployment.', true);
+    refresh();
+    return;
   }
-  const result = reinvestInSubsidiary(sessionState, id, raw);
+  const { company, program, amount, impliedValue, projectedHealth } = quote;
+  const name = company.isRival
+    ? sessionState.world?.competitor?.name ?? company.name
+    : company.name;
+  const ok = window.confirm(
+    `Deploy ${formatMoney(amount)} (${pct}% of ~${formatMoney(impliedValue)} value) into ${name}?\n\n` +
+      `Program: ${program.label}\n` +
+      `${program.blurb}\n\n` +
+      `Projected health: ~${projectedHealth.toFixed(2)}×`
+  );
+  if (!ok) return;
+
+  const result = reinvestInSubsidiary(sessionState, id, { pctOfValue: pct, program: programId });
   if (!result.ok) {
     showCompaniesFeedback(result.reason || 'Reinvestment failed.', true);
     refresh();
@@ -772,10 +801,19 @@ function handleAcquisitionReinvest(id, presetAmount) {
   }
   appendLog(
     sessionState,
-    `Reinvested ${formatMoney(result.amount)} — health ${result.health.toFixed(2)}×, MRR ${formatMoney(result.mrr)}/mo.`
+    `Allocated ${formatMoney(result.amount)} (${result.pctOfValue}% of value) to ${name} — ${result.program.label}; health ${result.health.toFixed(2)}×, MRR ${formatMoney(result.mrr)}/mo.`
   );
-  showCompaniesFeedback(`Reinvested ${formatMoney(result.amount)} — MRR now ${formatMoney(result.mrr)}/mo.`);
+  showCompaniesFeedback(
+    `Deployed ${formatMoney(result.amount)} via ${result.program.label} — MRR now ${formatMoney(result.mrr)}/mo.`
+  );
   refresh();
+}
+
+function handleReinvestProgramChange(selectEl) {
+  const id = selectEl.getAttribute('data-reinvest-program-for');
+  const program = REINVEST_PROGRAMS.find((p) => p.id === selectEl.value);
+  const blurb = document.querySelector(`[data-reinvest-blurb-for="${CSS.escape(id)}"]`);
+  if (blurb && program) blurb.textContent = program.blurb;
 }
 
 function handleSelectHub() {
@@ -1164,13 +1202,17 @@ function bindGameInteractions() {
       handleAcquisitionSell(acqSell.getAttribute('data-acquisition-sell'));
       return;
     }
-    const acqReinvest = e.target.closest('[data-acquisition-reinvest]');
-    if (acqReinvest) {
-      const amt = acqReinvest.getAttribute('data-acquisition-reinvest-amt');
-      handleAcquisitionReinvest(
-        acqReinvest.getAttribute('data-acquisition-reinvest'),
-        amt != null ? Number(amt) : null
-      );
+    const acqReinvestPick = e.target.closest('[data-acquisition-reinvest-pick]');
+    if (acqReinvestPick) {
+      const id = acqReinvestPick.getAttribute('data-acquisition-reinvest-pick');
+      const pct = acqReinvestPick.getAttribute('data-reinvest-pct');
+      const input = document.querySelector(`[data-reinvest-pct-input="${CSS.escape(id)}"]`);
+      if (input && pct != null) input.value = pct;
+      return;
+    }
+    const acqReinvestSubmit = e.target.closest('[data-acquisition-reinvest-submit]');
+    if (acqReinvestSubmit) {
+      handleAcquisitionReinvestSubmit(acqReinvestSubmit.getAttribute('data-acquisition-reinvest-submit'));
       return;
     }
     const filterBtn = e.target.closest('[data-companies-filter]');
@@ -1300,6 +1342,10 @@ function bindGameInteractions() {
   });
 
   app?.addEventListener('change', (e) => {
+    if (e.target.matches('[data-reinvest-program-for]')) {
+      handleReinvestProgramChange(e.target);
+      return;
+    }
     if (e.target.id === 'coo-equity-pct' && sessionState) {
       const tier = e.target.getAttribute('data-workspace-tier') ?? sessionState.workspace?.tier ?? 'garage';
       const equity = Number(e.target.value);
