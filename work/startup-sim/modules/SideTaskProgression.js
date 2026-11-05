@@ -8,7 +8,9 @@ export function isHubUnlimitedSideTasks(state) {
 /** Cash product/growth levers per month (shared counter). Unlimited at worldwide hub. */
 export function sideTaskPlaysPerMonth(state) {
   if (isHubUnlimitedSideTasks(state)) return Infinity;
-  return computeSideTaskPlays(state);
+  const plays = computeSideTaskPlays(state);
+  const campaignCeiling = Math.max(growthCampaignSlots(state), 2);
+  return Math.min(plays, campaignCeiling);
 }
 
 function computeSideTaskPlays(state) {
@@ -71,5 +73,5 @@ export function sideTaskLimitHint(state) {
   const tier = progressionTier(state);
   const plays = sideTaskPlaysPerMonth(state);
   const campaigns = growthCampaignSlots(state);
-  return `Limits scale with funding tier (${tier}), product level, buzz, HQ tier, and headcount — now ${plays} lever play${plays === 1 ? '' : 's'} and ${campaigns} paid campaign${campaigns === 1 ? '' : 's'} per month. Hub city removes the cap.`;
+  return `Separate monthly meters — side plays capped at the same slot ceiling as paid campaigns (tier ${tier}: up to ${plays} side play${plays === 1 ? '' : 's'} and ${campaigns} paid campaign${campaigns === 1 ? '' : 's'} this month). Hub city removes both caps.`;
 }

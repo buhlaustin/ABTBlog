@@ -1284,6 +1284,10 @@ if (scaledPlays <= earlyPlays || scaledCampaigns < 3) {
   console.error(`FAIL: side limits should scale (${earlyPlays}→${scaledPlays}, campaigns ${scaledCampaigns})`);
   failed = true;
 }
+if (scaledPlays > scaledCampaigns) {
+  console.error(`FAIL: side plays should be capped at campaign ceiling (${scaledPlays} > ${scaledCampaigns})`);
+  failed = true;
+}
 const hubState = createInitialState({ companyName: 'Hub Side', categoryId: 'b2b-saas', mode: 'career' });
 hubState.workspace.tier = WORKSPACE_TIER.HUB;
 hubState.offices = { ...(hubState.offices ?? {}), hubId: 'test-hub' };

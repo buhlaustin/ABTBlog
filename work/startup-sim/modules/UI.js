@@ -36,7 +36,9 @@ import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
 import {
   renderProductActionsPanel,
   sideTaskBankSize,
-  canBuyAllRemainingSideTasks
+  canBuyAllRemainingSideTasks,
+  productActionsRemaining,
+  sideTaskPlaysPerMonth
 } from './ProductActions.js';
 import {
   renderGrowthCampaignsBlock,
@@ -572,6 +574,18 @@ export function renderAllPanels(state) {
   paintGameFeedback();
 }
 
+function growthStatCard(label, value, { hero = false, id = null } = {}) {
+  const classes = ['finance-stat-card'];
+  if (hero) classes.push('finance-stat-card--hero');
+  const idAttr = id ? ` id="${escapeHtml(id)}"` : '';
+  return `<div class="${classes.join(' ')}"><span class="finance-stat-label">${escapeHtml(label)}</span><span class="finance-stat-value"${idAttr}>${value}</span></div>`;
+}
+
+function growthSlotLabel(remaining, limit) {
+  if (remaining === Infinity || !Number.isFinite(limit)) return 'Unlimited';
+  return `${remaining}/${formatMonthlySideTaskLimit(limit)}`;
+}
+
 export function renderGrowthPanel(container, state) {
   if (!container) return;
   const rival = state.world?.competitor;
@@ -591,24 +605,25 @@ export function renderGrowthPanel(container, state) {
   const growthRuns = (state.growth?.campaignsThisMonth ?? []).length;
   const growthSlots = growthCampaignSlots(state);
   const growthLeft = growthCampaignsRemaining(state);
-  const growthSlotLabel = formatMonthlySideTaskLimit(growthSlots);
-  const growthLeftLabel =
-    growthLeft === Infinity ? 'Unlimited' : `${growthLeft}/${growthSlotLabel}`;
-  const capNote = revHud.label.includes('capped')
-    ? ` · uncapped stack ${rawMult.toFixed(1)}× → <strong>${totalMult.toFixed(2)}× cap</strong>`
-    : '';
+  const sideSlots = sideTaskPlaysPerMonth(state);
+  const sideLeft = productActionsRemaining(state);
+  const sideUsed = state.product?.actionsThisMonth ?? 0;
+  const sideSlotDisplay = growthSlotLabel(sideLeft, sideSlots);
+  const campaignSlotDisplay = growthSlotLabel(growthLeft, growthSlots);
+  const multChip =
+    state.mode === 'sandbox' && tuneMult !== 1
+      ? `${escapeHtml(era)} · desk &amp; growth ${coreMult.toFixed(2)}× × sandbox ${tuneMult.toFixed(2)}× = ${totalMult.toFixed(2)}×`
+      : `${escapeHtml(era)} · ${revHud.label.includes('capped') ? 'Rev× capped' : 'Rev×'} ${totalMult.toFixed(2)}×${
+          revHud.label.includes('capped') ? ` (stack ${rawMult.toFixed(1)}×)` : ''
+        }`;
   const modLabels = activeModifierLabels(state);
   const modNote = modLabels.length
-    ? `<p class="fine-print"><strong>Active fallout:</strong> ${modLabels.map((l) => escapeHtml(l)).join(' · ')}</p>`
+    ? `<div class="finance-alert"><strong>Active fallout:</strong> ${modLabels.map((l) => escapeHtml(l)).join(' · ')}</div>`
     : '';
   const trustScore = state.sentiment?.score ?? 68;
   const trustNote = hasInstitutionalBoard(state)
     ? ''
     : `<p class="fine-print"><strong>Market trust</strong> ${trustScore} — ${escapeHtml(marketTrustLabel(trustScore))}. Crises and desk decisions move this score; Series A needs at least 32.</p>`;
-  const multNote =
-    state.mode === 'sandbox' && tuneMult !== 1
-      ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong>${capNote} · paid campaigns ${growthLeftLabel}${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
-      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — ${revHud.label.includes('capped') ? 'Rev× (capped)' : 'effective multiplier'} <strong>${totalMult.toFixed(2)}×</strong>${capNote}${growthRuns ? ` · ${growthRuns}/${growthSlotLabel} paid campaign(s) used` : ` · ${growthLeftLabel} paid campaign(s) left`}.</p>`;
 
   const pivotAllowed = canPivot(state);
   const categories = getCategoriesSync();
@@ -636,22 +651,9 @@ export function renderGrowthPanel(container, state) {
   const sideBank = sideTaskBankSize(SIDE_TASK_FOCUS_ALL);
   const productLevel = state.product?.level ?? 0;
 
-  container.innerHTML = `
-    <p class="panel-lede">Growth hub for ${escapeHtml(state.company.categoryLabel)} — side plays and paid campaigns share progression multipliers with desk tasks.</p>
-    <div class="growth-traction-stats summary-grid" aria-label="Product traction">
-      <div><span class="stat-label">Product level</span><span class="stat-value" id="growth-stat-product-level">${productLevel}</span></div>
-      <div><span class="stat-label">Buzz</span><span class="stat-value" id="growth-stat-buzz">${buzz}</span></div>
-      <div><span class="stat-label">Industry</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
-    </div>
-    <div class="growth-buy-all-bar finance-action">
-      <button type="button" class="btn btn-primary btn-small" data-buy-all-side${sideBuyAllDisabled}>Buy all side plays</button>
-      <button type="button" class="btn btn-primary btn-small" data-buy-all-growth${paidBuyAllDisabled}>Buy all paid campaigns</button>
-      <p class="fine-print">Runs every affordable unlocked play until monthly slots or cash run out (${sideBank} side plays in bank).</p>
-    </div>
-    ${trustNote}
-    ${modNote}
-    ${multNote}
-    <div class="summary-grid">
+  const contextDetails = `<details class="finance-details growth-context-details">
+    <summary>Market context &amp; desk</summary>
+    <div class="summary-grid growth-context-grid">
       <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>
       <div><span class="stat-label">Heat</span><span class="stat-value">${pressure}/5</span></div>
       <div><span class="stat-label">Rev. modifier</span><span class="stat-value">${(revMult * 100).toFixed(0)}%</span></div>
@@ -661,32 +663,73 @@ export function renderGrowthPanel(container, state) {
           : `<div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(runwayLabel(state))}</span></div>`
       }
       <div><span class="stat-label">Desk tasks left</span><span class="stat-value">${pendingDesk}</span></div>
+      <div><span class="stat-label">Industry</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
     </div>
     ${
       !hasInstitutionalBoard(state)
         ? `<p class="fine-print">${escapeHtml(runwayDetail(state))}</p>`
         : ''
     }
-    ${pivotBlock}
     ${
       rival
-        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Strong revenue months, marketing desk tasks, and growth campaigns cool heat. Buzz decays each month — keep shipping.</p>`
+        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Marketing desk tasks and growth campaigns cool rival heat. Buzz decays each month.</p>`
         : ''
     }
     ${
       hasInstitutionalBoard(state) && lastReason
         ? `<p class="fine-print">Latest board note: ${escapeHtml(lastReason)}</p>`
-        : '<p class="fine-print">Desk tasks scale with funding rounds and HQ tier. Side plays and paid campaigns below do not use desk slots.</p>'
+        : '<p class="fine-print">Desk tasks use monthly desk slots. Side plays and paid campaigns below do not.</p>'
     }
-    <div id="growth-levers-mount"></div>
-    ${renderGrowthCampaignsBlock(state)}
+  </details>`;
+
+  container.innerHTML = `
+    <div class="growth-panel finance-panel">
+      <div class="finance-hero">
+        <p class="panel-lede">Growth for ${escapeHtml(state.company.categoryLabel)} — two cash channels outside desk tasks, both scaled by the same Rev× multiplier.</p>
+        <p class="finance-mult-chip">${multChip}</p>
+      </div>
+      <div class="finance-kpi-row growth-kpi-row" aria-label="Traction and monthly limits">
+        ${growthStatCard('Product level', String(productLevel), { hero: true, id: 'growth-stat-product-level' })}
+        ${growthStatCard('Buzz', String(buzz), { id: 'growth-stat-buzz' })}
+        ${growthStatCard('Side plays left', sideSlotDisplay, { id: 'growth-stat-side-slots' })}
+        ${growthStatCard('Campaigns left', campaignSlotDisplay)}
+        ${growthStatCard('Rev× on payouts', `${totalMult.toFixed(2)}×`)}
+      </div>
+      <div class="growth-channel-compare" role="note">
+        <div class="growth-channel-card growth-channel-card--side">
+          <p class="growth-channel-title"><span class="growth-channel-badge">Side plays</span></p>
+          <p class="fine-print">Cheaper levers for <strong>buzz</strong> and <strong>product</strong>. Pick any unlocked play from the bank (${sideBank} in roster). Uses the side-play meter — capped at the same monthly ceiling as campaigns.</p>
+          <button type="button" class="btn btn-primary btn-small" data-buy-all-side${sideBuyAllDisabled}>Buy all side plays</button>
+        </div>
+        <div class="growth-channel-card growth-channel-card--paid">
+          <p class="growth-channel-title"><span class="growth-channel-badge">Paid campaigns</span></p>
+          <p class="fine-print">Larger spends for <strong>revenue book</strong> (and buzz). Rotating monthly roster with a 12-month cooldown. Uses the campaign meter${growthRuns ? ` — ${growthRuns} launched this month` : ''}.</p>
+          <button type="button" class="btn btn-primary btn-small" data-buy-all-growth${paidBuyAllDisabled}>Buy all paid campaigns</button>
+        </div>
+      </div>
+      ${trustNote}
+      ${modNote}
+      ${contextDetails}
+      ${pivotBlock}
+      <div id="growth-levers-mount"></div>
+      <div id="growth-campaigns-mount"></div>
+    </div>
   `;
   renderProductActionsPanel(document.getElementById('growth-levers-mount'), state, {
-    heading: 'Side growth plays',
+    heading: 'Side plays',
     focusFilter: SIDE_TASK_FOCUS_ALL,
     showLimitHint: true,
-    lede: `Marketing, brand, and product experiments outside desk tasks — <strong>${sideBank}</strong> plays in bank, one shared monthly limit.`
+    variant: 'growth-side',
+    slotLabel: sideSlotDisplay,
+    usedThisMonth: sideUsed
   });
+  const campaignsMount = document.getElementById('growth-campaigns-mount');
+  if (campaignsMount) {
+    campaignsMount.innerHTML = renderGrowthCampaignsBlock(state, {
+      slotLabel: campaignSlotDisplay,
+      launchedThisMonth: growthRuns
+    });
+  }
 }
 
 export function renderGameOver(state) {

@@ -950,34 +950,89 @@ h1 {
   margin: 0.35rem 0 0.85rem;
 }
 
-.growth-traction-stats {
-  margin: 0.65rem 0 0.75rem;
-  padding: 0.55rem 0.65rem;
-  border: 1px solid var(--accent-dim);
-  border-radius: 0.55rem;
-  background: rgba(96, 165, 250, 0.08);
+.growth-panel .growth-kpi-row {
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
 }
 
-.growth-traction-stats .stat-value {
-  font-size: 1.05rem;
+.growth-channel-compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.65rem;
+}
+
+.growth-channel-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  align-items: flex-start;
+}
+
+.growth-channel-card--side {
+  border-color: rgba(74, 222, 128, 0.35);
+  background: rgba(74, 222, 128, 0.06);
+}
+
+.growth-channel-card--paid {
+  border-color: rgba(91, 156, 255, 0.4);
+  background: rgba(91, 156, 255, 0.08);
+}
+
+.growth-channel-title {
+  margin: 0;
+}
+
+.growth-channel-badge {
+  display: inline-block;
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(74, 222, 128, 0.45);
+  color: #86efac;
+  background: rgba(74, 222, 128, 0.12);
 }
 
-.growth-buy-all-bar {
+.growth-channel-badge--paid {
+  border-color: rgba(91, 156, 255, 0.45);
+  color: #93c5fd;
+  background: rgba(91, 156, 255, 0.12);
+}
+
+.growth-channel-badge--inline {
+  font-size: 0.68rem;
+}
+
+.growth-section-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 0.65rem;
-  margin: 0.75rem 0 1rem;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 0.55rem;
-  background: rgba(0, 0, 0, 0.12);
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+  margin-bottom: 0.35rem;
 }
 
-.growth-buy-all-bar .fine-print {
-  flex: 1 1 12rem;
-  margin: 0;
+.growth-channel-section {
+  margin-top: 0.25rem;
+}
+
+.growth-play-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.growth-context-details .growth-context-grid {
+  margin: 0.5rem 0 0.65rem;
+}
+
+.growth-context-details .fine-print {
+  margin-top: 0;
 }
 
 .companies-reinvest-cell {
