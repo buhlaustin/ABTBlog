@@ -52,31 +52,16 @@ if (!failed) {
   console.log('OK: monthly offers unique (no duplicate options per month)');
 }
 
-const placeholderTasks = getTaskDefinitions().filter(
-  (t) =>
-    /\(cycle \d+\)/i.test(t.title ?? '') ||
-    (t.description ?? '').includes('keeps the rotating catalog') ||
-    (t.description ?? '').includes('desk play #')
-);
-if (placeholderTasks.length) {
-  console.error(`FAIL: ${placeholderTasks.length} desk tasks still use placeholder catalog copy`);
+const { auditTaskCatalog } = await import(`file://${join(sim, 'modules/TaskCatalogAudit.js')}`);
+const catalogAudit = auditTaskCatalog(getTaskDefinitions());
+if (!catalogAudit.ok) {
+  console.error(`FAIL: task catalog audit (${catalogAudit.issues.length} issues on ${catalogAudit.taskCount} tasks)`);
+  catalogAudit.issues.slice(0, 12).forEach((issue) => {
+    console.error(`  ${issue.code} ${issue.taskId ?? issue.id}: ${issue.message}`);
+  });
   failed = true;
-} else if (!failed) {
-  console.log('OK: no placeholder catalog-expansion copy in merged tasks');
-}
-
-const titleCounts = new Map();
-for (const t of getTaskDefinitions()) {
-  const key = (t.title ?? '').trim().toLowerCase();
-  if (!key) continue;
-  titleCounts.set(key, (titleCounts.get(key) ?? 0) + 1);
-}
-const dupTitles = [...titleCounts.entries()].filter(([, n]) => n > 1);
-if (dupTitles.length) {
-  console.error(`FAIL: duplicate task titles in catalog (${dupTitles.length}), e.g. ${dupTitles[0][0]}`);
-  failed = true;
-} else if (!failed) {
-  console.log('OK: task titles unique across merged catalog');
+} else {
+  console.log(`OK: all ${catalogAudit.taskCount} desk tasks pass catalog audit (schema + copy bar)`);
 }
 
 function categoryAllowed(task, categoryId) {

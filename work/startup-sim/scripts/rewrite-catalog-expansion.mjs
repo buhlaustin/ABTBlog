@@ -296,8 +296,8 @@ const COPY = [
     description: 'Low-effort morale win; screenshots look modern in decks.'
   },
   {
-    title: 'Run a design partner program',
-    description: 'Five logos co-build; they accept imperfection for influence.'
+    title: 'Recruit five co-building design partners',
+    description: 'Five logos shape the roadmap; they accept rough edges for influence.'
   },
   {
     title: 'Fix SPF and DKIM for product email',
@@ -372,8 +372,8 @@ const COPY = [
     description: 'Ops teams still export PDFs—stop fighting it.'
   },
   {
-    title: 'Run a vendor consolidation pass',
-    description: 'Fewer SaaS renewals, better negotiated bundles.'
+    title: 'Renegotiate overlapping SaaS renewals',
+    description: 'Fewer overlapping tools and better bundle pricing with finance.'
   },
   {
     title: 'Publish a public incident postmortem',

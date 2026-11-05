@@ -1470,8 +1470,8 @@
     },
     {
       "id": "catalog-expansion-072",
-      "title": "Run a design partner program",
-      "description": "Five logos co-build; they accept imperfection for influence.",
+      "title": "Recruit five co-building design partners",
+      "description": "Five logos shape the roadmap; they accept rough edges for influence.",
       "types": [
         "product"
       ],
@@ -1863,8 +1863,8 @@
     },
     {
       "id": "catalog-expansion-091",
-      "title": "Run a vendor consolidation pass",
-      "description": "Fewer SaaS renewals, better negotiated bundles.",
+      "title": "Renegotiate overlapping SaaS renewals",
+      "description": "Fewer overlapping tools and better bundle pricing with finance.",
       "types": [
         "research"
       ],
