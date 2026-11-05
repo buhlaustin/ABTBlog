@@ -1,5 +1,6 @@
 /** Hand-authored category desk tasks — full economics and stage gates. */
 import { packCategoryTasks } from './startup-sim-task-seeds.mjs';
+import { EDTECH_AUTHORED_ITEMS } from './startup-sim-edtech.mjs';
 
 function authoredPack(categoryId, items) {
   return packCategoryTasks(
@@ -108,6 +109,8 @@ export const HAND_AUTHORED = {
       buzz: 1
     }
   ]),
+
+  edtech: authoredPack('edtech', EDTECH_AUTHORED_ITEMS),
 
   healthtech: authoredPack('healthtech', [
     {

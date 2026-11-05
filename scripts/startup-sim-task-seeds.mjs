@@ -1,5 +1,7 @@
 /** Category-specific desk task seeds — expanded by generate-startup-sim-tasks.mjs */
 
+import { EDTECH_SEED_ITEMS } from './startup-sim-edtech.mjs';
+
 export const CATEGORY_IDS = [
   'b2b-saas',
   'consumer-social',
@@ -9,6 +11,7 @@ export const CATEGORY_IDS = [
   'ai-tools',
   'hardware',
   'healthtech',
+  'edtech',
   'climate',
   'gaming-media'
 ];
@@ -110,5 +113,7 @@ export const SEEDS = {
     { title: 'Medical device data ingest', description: 'BLE streams into workflows clinicians trust.', types: ['product'], stages: ['post_xc'], tierMin: 4, tierMax: 6, cost: 29000, revenue: [65000, 340000], product: 3, buzz: 1 },
     { title: 'Health system innovation lab pitch', description: 'Pilot inside a flagship hospital brand.', types: ['sales'], stages: ['post_xc', 'public'], tierMin: 4, tierMax: 7, cost: 18000, revenue: [110000, 520000], product: 1, buzz: 3 },
     { title: 'PHI encryption at rest review', description: 'Keys, KMS, and backup tapes accounted for.', types: ['product'], stages: ['office', 'post_xc'], tierMin: 2, tierMax: 4, cost: 7800, revenue: [12000, 72000], product: 2, buzz: 0 }
-  ])
+  ]),
+
+  edtech: packCategoryTasks('edtech', EDTECH_SEED_ITEMS)
 };

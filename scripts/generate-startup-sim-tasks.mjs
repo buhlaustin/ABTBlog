@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { SEEDS, packCategoryTasks } from './startup-sim-task-seeds.mjs';
 import { EXTRA_ROWS } from './startup-sim-category-extra.mjs';
 import { HAND_AUTHORED } from './startup-sim-task-seeds-authored.mjs';
+import { EDTECH_BULK_ROWS } from './startup-sim-edtech.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const path = join(root, 'work/startup-sim/data/tasks.json');
@@ -257,6 +258,7 @@ const BULK = {
     ['Failure mode effects analysis', 'FMEA before mass production.', 'research'],
     ['On-device ML accelerator', 'Edge inference within watt budget.', 'product']
   ]),
+  edtech: categoryBlock('edtech', 'Education software (EdTech)', EDTECH_BULK_ROWS),
   climate: categoryBlock('climate', 'Climate & energy', [
     ['Grid interconnect study', 'Utility timelines in plain English.', 'research'],
     ['PPA term sheet workshop', 'Power purchase math that closes.', 'sales'],

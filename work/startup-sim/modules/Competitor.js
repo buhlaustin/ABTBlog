@@ -9,6 +9,7 @@ const RIVALS = {
   'ai-tools': { name: 'Promptly AI', product: 'wrapper GPTs' },
   hardware: { name: 'BrickWorks', product: 'overengineered gadgets' },
   healthtech: { name: 'MediMesh', product: 'HIPAA PDFs' },
+  edtech: { name: 'LessonLoop', product: 'yet another LMS' },
   climate: { name: 'GreenStack', product: 'carbon dashboards' },
   'gaming-media': { name: 'LootLoop', product: 'battle passes' }
 };

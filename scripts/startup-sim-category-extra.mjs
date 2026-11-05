@@ -1,5 +1,7 @@
 /** +20 desk tasks per vertical — merged by generate-startup-sim-tasks.mjs */
 
+import { EDTECH_EXTRA_ROWS } from './startup-sim-edtech.mjs';
+
 export const EXTRA_ROWS = {
   'b2b-saas': [
     ['CPQ rules engine rollout', 'Quotes that sales cannot underprice by accident.', 'product'],
@@ -45,6 +47,7 @@ export const EXTRA_ROWS = {
     ['Pharmacy benefits carve-out analysis', 'Formulary math for employers.', 'research'],
     ['Patient family portal access', 'Caregiver proxies with scoped rights.', 'product']
   ],
+  edtech: EDTECH_EXTRA_ROWS,
   'consumer-social': [
     ['Algorithm explainability panel', 'Why you saw that post — in UI.', 'product'],
     ['Creator monetization tiers', 'Subscriptions vs tips vs ads.', 'sales'],

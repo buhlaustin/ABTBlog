@@ -2,51 +2,78 @@
   {
     "id": "b2b-saas",
     "label": "B2B business software",
-    "blurb": "Software sold to companies — sales cycles, contracts, and SOC 2 questionnaires."
+    "blurb": "Software sold to companies — sales cycles, contracts, and SOC 2 questionnaires.",
+    "defaultACV": 12000,
+    "salesCycleWeeks": 8
   },
   {
     "id": "consumer-social",
     "label": "Social media",
-    "blurb": "Consumer apps — feeds, creators, DMs, moderation, and App Store growth."
+    "blurb": "Consumer apps — feeds, creators, DMs, moderation, and App Store growth.",
+    "defaultACV": 0,
+    "salesCycleWeeks": 0
   },
   {
     "id": "marketplace",
     "label": "Marketplace & gig apps",
-    "blurb": "Two-sided platforms — Uber-style matching, trust & safety, and take rates."
+    "blurb": "Two-sided platforms — Uber-style matching, trust & safety, and take rates.",
+    "defaultACV": 2400,
+    "salesCycleWeeks": 4
   },
   {
     "id": "delivery",
     "label": "Food & package delivery",
-    "blurb": "Last-mile logistics — drivers, dispatch, and thin margins at scale."
+    "blurb": "Last-mile logistics — drivers, dispatch, and thin margins at scale.",
+    "defaultACV": 1800,
+    "salesCycleWeeks": 2
   },
   {
     "id": "fintech",
     "label": "Banking & fintech",
-    "blurb": "Money movement — cards, compliance, and partnerships with banks."
+    "blurb": "Money movement — cards, compliance, and partnerships with banks.",
+    "defaultACV": 8000,
+    "salesCycleWeeks": 12
   },
   {
     "id": "ai-tools",
     "label": "AI apps",
-    "blurb": "Models in production — evals, GPU bills, and enterprise AI buyers."
+    "blurb": "Models in production — evals, GPU bills, and enterprise AI buyers.",
+    "defaultACV": 15000,
+    "salesCycleWeeks": 6
   },
   {
     "id": "hardware",
     "label": "Hardware & gadgets",
-    "blurb": "Physical products — manufacturing, firmware, and retail shelves."
+    "blurb": "Physical products — manufacturing, firmware, and retail shelves.",
+    "defaultACV": 50000,
+    "salesCycleWeeks": 16
   },
   {
     "id": "healthtech",
     "label": "Healthcare software",
-    "blurb": "Hospitals and clinics — HIPAA, EHR integrations, and clinical pilots."
+    "blurb": "Hospitals and clinics — HIPAA, EHR integrations, and clinical pilots.",
+    "defaultACV": 25000,
+    "salesCycleWeeks": 14
+  },
+  {
+    "id": "edtech",
+    "label": "Education software (EdTech)",
+    "blurb": "Schools and universities — FERPA, rostering, curriculum, and district sales.",
+    "defaultACV": 14000,
+    "salesCycleWeeks": 16
   },
   {
     "id": "climate",
     "label": "Clean energy",
-    "blurb": "Climate tech — permits, long sales cycles, and project finance."
+    "blurb": "Climate tech — permits, long sales cycles, and project finance.",
+    "defaultACV": 40000,
+    "salesCycleWeeks": 20
   },
   {
     "id": "gaming-media",
     "label": "Video games & streaming",
-    "blurb": "Games and entertainment — live ops, platforms, and content deals."
+    "blurb": "Games and entertainment — live ops, platforms, and content deals.",
+    "defaultACV": 6000,
+    "salesCycleWeeks": 6
   }
 ]
