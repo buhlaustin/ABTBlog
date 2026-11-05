@@ -98,25 +98,30 @@
             <option value="office">Small office</option>
             <option value="post_xc">Post-XC hub (seed closed)</option>
           </select>
-          <label for="sandbox-start-month">Starting calendar month</label>
-          <div class="name-row">
-            <select id="sandbox-start-month" name="sandboxStartMonth" aria-label="Starting month">
-              <option value="1">January</option>
-              <option value="2">February</option>
-              <option value="3">March</option>
-              <option value="4">April</option>
-              <option value="5">May</option>
-              <option value="6">June</option>
-              <option value="7">July</option>
-              <option value="8">August</option>
-              <option value="9">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
-            </select>
-            <input id="sandbox-start-year" name="sandboxStartYear" type="number" inputmode="numeric" aria-label="Starting year" required>
+          <div class="name-row sandbox-calendar-row">
+            <div class="sandbox-calendar-field">
+              <label for="sandbox-start-month">Starting month</label>
+              <select id="sandbox-start-month" name="sandboxStartMonth">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </div>
+            <div class="sandbox-calendar-field">
+              <label for="sandbox-start-year">Starting year</label>
+              <select id="sandbox-start-year" name="sandboxStartYear"></select>
+            </div>
           </div>
-          <p class="fine-print">Career mode always starts in the current real-world month. Sandbox year can be any integer from 1 through 999,999.</p>
+          <p class="fine-print">Career always starts in the current real-world month. Sandbox can pick any month from 30 years ago through 5 years ahead.</p>
           <label for="sandbox-ipo-gate">IPO ARR gate</label>
           <select id="sandbox-ipo-gate" name="sandboxIpoGate">
             <option value="1000000000">$1B ARR (Career default)</option>

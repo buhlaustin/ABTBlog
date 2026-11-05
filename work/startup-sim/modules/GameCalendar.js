@@ -40,22 +40,22 @@ export function isRealCalendarYear(year) {
   return Number(year) >= 2000;
 }
 
-/** Sandbox start year: wide range; month math stays in safe integers. */
-export const SANDBOX_CALENDAR_YEAR_MIN = 1;
-export const SANDBOX_CALENDAR_YEAR_MAX = 999_999;
+/** Sandbox setup: years relative to real-world clock (dropdown only). */
+export const SANDBOX_CALENDAR_YEAR_PAST = 30;
+export const SANDBOX_CALENDAR_YEAR_FUTURE = 5;
 
-export function isValidSandboxCalendarYear(year) {
-  const y = Number(year);
-  return Number.isInteger(y) && y >= SANDBOX_CALENDAR_YEAR_MIN && y <= SANDBOX_CALENDAR_YEAR_MAX;
+export function sandboxCalendarYearOptions(now = realClockNow()) {
+  const y = now.year;
+  const out = [];
+  for (let yr = y - SANDBOX_CALENDAR_YEAR_PAST; yr <= y + SANDBOX_CALENDAR_YEAR_FUTURE; yr += 1) {
+    out.push(yr);
+  }
+  return out;
 }
 
-export function clampSandboxCalendarYear(year) {
+export function isSandboxSetupCalendarYear(year, now = realClockNow()) {
   const y = Number(year);
-  if (!Number.isFinite(y)) return realClockNow().year;
-  return Math.min(
-    SANDBOX_CALENDAR_YEAR_MAX,
-    Math.max(SANDBOX_CALENDAR_YEAR_MIN, Math.round(y))
-  );
+  return sandboxCalendarYearOptions(now).includes(y);
 }
 
 export function addCalendarMonths(year, monthIndex, delta) {
@@ -123,7 +123,7 @@ export function formatCalendarStamp(year, monthIndex, style = 'short') {
 function isValidCalendarStartPick(pick) {
   return (
     pick &&
-    isValidSandboxCalendarYear(pick.year) &&
+    isSandboxSetupCalendarYear(pick.year) &&
     pick.monthIndex >= 1 &&
     pick.monthIndex <= 12
   );
