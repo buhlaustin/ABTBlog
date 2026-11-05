@@ -812,6 +812,19 @@ h1 {
   min-width: 6.5rem;
 }
 
+.growth-traction-stats {
+  margin: 0.65rem 0 0.75rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--accent-dim);
+  border-radius: 0.55rem;
+  background: rgba(96, 165, 250, 0.08);
+}
+
+.growth-traction-stats .stat-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
 .growth-buy-all-bar {
   display: flex;
   flex-wrap: wrap;

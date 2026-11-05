@@ -634,9 +634,15 @@ export function renderGrowthPanel(container, state) {
   const sideBuyAllDisabled = canBuyAllRemainingSideTasks(state, SIDE_TASK_FOCUS_ALL) ? '' : ' disabled';
   const paidBuyAllDisabled = canBuyAllRemainingGrowthCampaigns(state) ? '' : ' disabled';
   const sideBank = sideTaskBankSize(SIDE_TASK_FOCUS_ALL);
+  const productLevel = state.product?.level ?? 0;
 
   container.innerHTML = `
-    <p class="panel-lede">Growth hub for ${escapeHtml(state.company.categoryLabel)} — side plays and paid campaigns share progression multipliers with desk tasks. Product level and buzz still come from desk work, side plays, and campaigns.</p>
+    <p class="panel-lede">Growth hub for ${escapeHtml(state.company.categoryLabel)} — side plays and paid campaigns share progression multipliers with desk tasks.</p>
+    <div class="growth-traction-stats summary-grid" aria-label="Product traction">
+      <div><span class="stat-label">Product level</span><span class="stat-value" id="growth-stat-product-level">${productLevel}</span></div>
+      <div><span class="stat-label">Buzz</span><span class="stat-value" id="growth-stat-buzz">${buzz}</span></div>
+      <div><span class="stat-label">Industry</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
+    </div>
     <div class="growth-buy-all-bar finance-action">
       <button type="button" class="btn btn-primary btn-small" data-buy-all-side${sideBuyAllDisabled}>Buy all side plays</button>
       <button type="button" class="btn btn-primary btn-small" data-buy-all-growth${paidBuyAllDisabled}>Buy all paid campaigns</button>
@@ -646,9 +652,6 @@ export function renderGrowthPanel(container, state) {
     ${modNote}
     ${multNote}
     <div class="summary-grid">
-      <div><span class="stat-label">Product level</span><span class="stat-value">${state.product?.level ?? 0}</span></div>
-      <div><span class="stat-label">Buzz</span><span class="stat-value">${buzz}</span></div>
-      <div><span class="stat-label">Industry</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
       <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>
       <div><span class="stat-label">Heat</span><span class="stat-value">${pressure}/5</span></div>
       <div><span class="stat-label">Rev. modifier</span><span class="stat-value">${(revMult * 100).toFixed(0)}%</span></div>

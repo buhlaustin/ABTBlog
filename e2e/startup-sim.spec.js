@@ -72,6 +72,10 @@ test.describe('Startup Simulator', () => {
     await expect(page.locator('#tab-board')).toBeHidden();
 
     await page.locator('#tab-growth').click();
+    await expect(page.locator('#growth-stat-product-level')).toBeVisible();
+    await expect(page.locator('#growth-stat-buzz')).toBeVisible();
+    await expect(page.locator('#panel-growth')).toContainText('Product level');
+    await expect(page.locator('#panel-growth')).toContainText('Buzz');
     await expect(page.locator('#panel-growth')).toContainText('Rival');
     await expect(page.locator('#panel-growth')).toContainText('Runway');
 
