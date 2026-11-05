@@ -7,11 +7,32 @@ import { easeCompetitorPressure, bumpCompetitorPressure } from './Competitor.js'
 import { setGameFeedback } from './GameFeedback.js';
 import bundled from '../data/acquisition-targets.json' with { type: 'json' };
 
+const MARKET_PAGE_SIZE = 18;
+const CATEGORY_IDS = [
+  'b2b-saas',
+  'consumer-social',
+  'marketplace',
+  'delivery',
+  'fintech',
+  'ai-tools',
+  'hardware',
+  'healthtech',
+  'edtech',
+  'climate',
+  'gaming-media'
+];
+
 let catalog = bundled.companies ?? [];
 let hydrated = false;
 
 export function createInitialAcquisitionsState() {
-  return { owned: [] };
+  return {
+    owned: [],
+    marketSegment: 'all',
+    marketPage: 0,
+    lifetimePortfolioRevenue: 0,
+    dealLog: []
+  };
 }
 
 async function loadCatalog() {
@@ -47,6 +68,14 @@ export function acquisitionsUnlocked(state) {
   return Boolean(state.flags?.xcResidencyComplete);
 }
 
+function ensureAcquisitions(state) {
+  if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
+  if (!state.acquisitions.owned) state.acquisitions.owned = [];
+  if (!state.acquisitions.dealLog) state.acquisitions.dealLog = [];
+  if (!state.acquisitions.marketSegment) state.acquisitions.marketSegment = 'all';
+  if (state.acquisitions.marketPage == null) state.acquisitions.marketPage = 0;
+}
+
 function ownedIds(state) {
   return new Set((state.acquisitions?.owned ?? []).map((h) => h.id));
 }
@@ -56,24 +85,70 @@ export function isTargetVisible(state, company) {
   return true;
 }
 
-/** Ask price swings monthly with run seed and progression. */
+export function inferredMarketCategory(state, company) {
+  if (company.rivalCategory) return company.rivalCategory;
+  if (company.marketCategory) return company.marketCategory;
+  const seed = state.meta?.runSeed ?? 1;
+  const idx = Math.floor(hash01(seed, company.id, 17) * CATEGORY_IDS.length);
+  return CATEGORY_IDS[idx] ?? 'b2b-saas';
+}
+
+export function categorySynergyMult(state, company) {
+  const player = state.company?.categoryId;
+  if (!player) return 1;
+  if (company.isRival && company.rivalCategory === player) return 1.1;
+  if (inferredMarketCategory(state, company) === player) return 1.06;
+  return 1;
+}
+
+export function portfolioSynergyMult(state) {
+  const n = state.acquisitions?.owned?.length ?? 0;
+  return 1 + Math.min(0.2, n * 0.025);
+}
+
+function integrationMonthsForSegment(segment, isRival) {
+  if (isRival) return 3;
+  if (segment === 'enterprise') return 2;
+  if (segment === 'mid') return 1;
+  return 0;
+}
+
+function integrationMrrFactor(holding) {
+  const left = Math.max(0, holding.integrationMonthsLeft ?? 0);
+  if (left === 0) return 1;
+  if (left === 1) return 0.78;
+  if (left === 2) return 0.55;
+  return 0.4;
+}
+
 export function targetAskPrice(state, company) {
   if (ownedIds(state).has(company.id)) return null;
   const turn = calendarTurn(state);
   const seed = state.meta?.runSeed ?? 1;
   const vol = 0.82 + hash01(seed, company.id, turn) * 0.38;
   const tierBoost = 1 + progressionTier(state) * 0.035;
-  return Math.round(company.basePrice * vol * tierBoost);
+  const synergyDiscount =
+    categorySynergyMult(state, company) > 1 ? 0.97 : 1;
+  return Math.round(company.basePrice * vol * tierBoost * synergyDiscount);
+}
+
+export function fairValueEstimate(state, company) {
+  const annual = Math.max(1, company.baseMrr * 12);
+  const multiple = company.segment === 'enterprise' ? 14 : company.segment === 'mid' ? 9 : 5.5;
+  const synergy = categorySynergyMult(state, company);
+  return Math.round(annual * multiple * synergy);
 }
 
 export function marketPriceLabel(state, company) {
   const ask = targetAskPrice(state, company);
-  if (ask == null) return 'Owned';
+  if (ask == null) return { ask: null, trend: 'owned' };
   const seed = state.meta?.runSeed ?? 1;
   const turn = calendarTurn(state);
   const vol = 0.82 + hash01(seed, company.id, turn) * 0.38;
   const trend = vol >= 1.02 ? 'hot' : vol <= 0.92 ? 'soft' : 'fair';
-  return { ask, trend };
+  const fair = fairValueEstimate(state, company);
+  const vsFair = ask <= fair * 0.92 ? ' bargain' : ask >= fair * 1.08 ? ' premium' : '';
+  return { ask, trend, fair, vsFair };
 }
 
 function holdingHealth(holding) {
@@ -82,7 +157,8 @@ function holdingHealth(holding) {
 
 export function subsidiaryMrr(state, holding, company) {
   if (!company) return 0;
-  return Math.max(0, Math.round(company.baseMrr * holdingHealth(holding)));
+  const base = company.baseMrr * holdingHealth(holding) * integrationMrrFactor(holding);
+  return Math.max(0, Math.round(base * categorySynergyMult(state, company)));
 }
 
 export function totalSubsidiaryMrr(state) {
@@ -92,7 +168,23 @@ export function totalSubsidiaryMrr(state) {
     const def = catalog.find((c) => c.id === h.id);
     if (def) sum += subsidiaryMrr(state, h, def);
   }
+  return Math.round(sum * portfolioSynergyMult(state));
+}
+
+export function portfolioExitValue(state) {
+  let sum = 0;
+  for (const h of state.acquisitions?.owned ?? []) {
+    const def = catalog.find((c) => c.id === h.id);
+    if (def) sum += subsidiarySalePrice(state, h, def);
+  }
   return sum;
+}
+
+export function portfolioInvestedTotal(state) {
+  return (state.acquisitions?.owned ?? []).reduce(
+    (acc, h) => acc + (h.purchasePrice ?? 0) + (h.investedTotal ?? 0),
+    0
+  );
 }
 
 export function subsidiarySalePrice(state, holding, company) {
@@ -101,15 +193,51 @@ export function subsidiarySalePrice(state, holding, company) {
   const vol = 0.88 + hash01(seed, `${company.id}-exit`, turn) * 0.28;
   const health = holdingHealth(holding);
   const invested = holding.investedTotal ?? 0;
-  const core = company.basePrice * health * vol;
+  const core = company.basePrice * health * vol * categorySynergyMult(state, company);
   return Math.round(core + invested * 0.82);
+}
+
+function pushDealLog(state, entry) {
+  ensureAcquisitions(state);
+  state.acquisitions.dealLog.unshift({
+    turn: calendarTurn(state),
+    year: state.calendar.year,
+    month: state.calendar.monthIndex,
+    ...entry
+  });
+  state.acquisitions.dealLog = state.acquisitions.dealLog.slice(0, 12);
+}
+
+export function setCompaniesMarketFilter(state, segment) {
+  ensureAcquisitions(state);
+  state.acquisitions.marketSegment = segment || 'all';
+  state.acquisitions.marketPage = 0;
+}
+
+export function setCompaniesMarketPage(state, delta) {
+  ensureAcquisitions(state);
+  const maxPage = Math.max(0, Math.ceil(filteredMarketTargets(state).length / MARKET_PAGE_SIZE) - 1);
+  const next = (state.acquisitions.marketPage ?? 0) + delta;
+  state.acquisitions.marketPage = Math.max(0, Math.min(maxPage, next));
+}
+
+function filteredMarketTargets(state) {
+  const seg = state.acquisitions?.marketSegment ?? 'all';
+  return catalog
+    .filter((c) => isTargetVisible(state, c) && !ownedIds(state).has(c.id))
+    .filter((c) => {
+      if (seg === 'all') return true;
+      if (seg === 'rival') return c.isRival;
+      return c.segment === seg;
+    })
+    .sort((a, b) => targetAskPrice(state, b) - targetAskPrice(state, a));
 }
 
 export function purchaseTarget(state, targetId) {
   if (!acquisitionsUnlocked(state)) {
     return { ok: false, reason: 'Finish your X Combinator batch before buying companies.' };
   }
-  if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
+  ensureAcquisitions(state);
   const company = catalog.find((c) => c.id === targetId);
   if (!company) return { ok: false, reason: 'Company not on the market.' };
   if (!isTargetVisible(state, company)) return { ok: false, reason: 'That target is not in your market.' };
@@ -122,12 +250,17 @@ export function purchaseTarget(state, targetId) {
 
   state.finance.cash -= price;
   recordCashOutflow(state, price, 'acquisition');
-  state.acquisitions.owned.push({
+  const integrationMonthsLeft = integrationMonthsForSegment(company.segment, company.isRival);
+  const holding = {
     id: company.id,
     acquiredTurn: calendarTurn(state),
+    purchasePrice: price,
     health: 1,
-    investedTotal: 0
-  });
+    investedTotal: 0,
+    integrationMonthsLeft,
+    lastReinvestTurn: calendarTurn(state)
+  };
+  state.acquisitions.owned.push(holding);
 
   if (company.isRival) {
     state.world.competitorAcquired = true;
@@ -135,8 +268,16 @@ export function purchaseTarget(state, targetId) {
     easeCompetitorPressure(state, 5);
   }
 
-  const mrr = subsidiaryMrr(state, state.acquisitions.owned.at(-1), company);
-  return { ok: true, company, price, mrr };
+  const mrr = subsidiaryMrr(state, holding, company);
+  pushDealLog(state, {
+    kind: 'buy',
+    name: company.isRival ? state.world?.competitor?.name ?? company.name : company.name,
+    amount: price,
+    detail: integrationMonthsLeft
+      ? `Integration ${integrationMonthsLeft} mo to full MRR`
+      : 'Fully integrated'
+  });
+  return { ok: true, company, price, mrr, integrationMonthsLeft };
 }
 
 export function reinvestInSubsidiary(state, targetId, amountRaw) {
@@ -145,7 +286,8 @@ export function reinvestInSubsidiary(state, targetId, amountRaw) {
   if ((state.finance?.cash ?? 0) < amount) {
     return { ok: false, reason: 'Not enough cash.' };
   }
-  const holding = state.acquisitions?.owned?.find((h) => h.id === targetId);
+  ensureAcquisitions(state);
+  const holding = state.acquisitions.owned.find((h) => h.id === targetId);
   if (!holding) return { ok: false, reason: 'You do not own that company.' };
   const company = catalog.find((c) => c.id === targetId);
   if (!company) return { ok: false, reason: 'Unknown subsidiary.' };
@@ -153,8 +295,19 @@ export function reinvestInSubsidiary(state, targetId, amountRaw) {
   state.finance.cash -= amount;
   recordCashOutflow(state, amount, 'acquisition-reinvest');
   holding.investedTotal = (holding.investedTotal ?? 0) + amount;
+  holding.lastReinvestTurn = calendarTurn(state);
   const delta = (amount / company.basePrice) * 0.35;
   holding.health = holdingHealth(holding) + delta;
+  if (holding.integrationMonthsLeft > 0) {
+    holding.integrationMonthsLeft = Math.max(0, holding.integrationMonthsLeft - 1);
+  }
+
+  pushDealLog(state, {
+    kind: 'reinvest',
+    name: company.isRival ? state.world?.competitor?.name ?? company.name : company.name,
+    amount,
+    detail: `Health ${holdingHealth(holding).toFixed(2)}×`
+  });
 
   return {
     ok: true,
@@ -166,7 +319,8 @@ export function reinvestInSubsidiary(state, targetId, amountRaw) {
 }
 
 export function sellSubsidiary(state, targetId) {
-  const idx = state.acquisitions?.owned?.findIndex((h) => h.id === targetId) ?? -1;
+  ensureAcquisitions(state);
+  const idx = state.acquisitions.owned.findIndex((h) => h.id === targetId);
   if (idx < 0) return { ok: false, reason: 'You do not own that company.' };
   const holding = state.acquisitions.owned[idx];
   const company = catalog.find((c) => c.id === targetId);
@@ -182,19 +336,54 @@ export function sellSubsidiary(state, targetId) {
     bumpCompetitorPressure(state, 2);
   }
 
+  pushDealLog(state, {
+    kind: 'sell',
+    name: company.isRival ? state.world?.competitor?.name ?? company.name : company.name,
+    amount: proceeds,
+    detail: 'Exit'
+  });
+
   return { ok: true, company, proceeds };
 }
 
-/** Permanent monthly cash from portfolio — called at month close. */
+/** Month-start: integration countdown + neglect decay. */
+export function tickAcquisitionsAtMonthStart(state) {
+  if (!state.acquisitions?.owned?.length) return [];
+  const lines = [];
+  const turn = calendarTurn(state);
+  for (const h of state.acquisitions.owned) {
+    const def = catalog.find((c) => c.id === h.id);
+    if (!def) continue;
+    const name = def.isRival ? state.world?.competitor?.name ?? def.name : def.name;
+    if ((h.integrationMonthsLeft ?? 0) > 0) {
+      h.integrationMonthsLeft -= 1;
+      if (h.integrationMonthsLeft === 0) {
+        lines.push(`${name} integration complete — full portfolio MRR online.`);
+      }
+    }
+    const sinceReinvest = turn - (h.lastReinvestTurn ?? h.acquiredTurn ?? turn);
+    if (sinceReinvest >= 8 && holdingHealth(h) > 0.6) {
+      h.health = holdingHealth(h) - 0.025;
+      if (sinceReinvest === 8) {
+        lines.push(`${name} needs operator attention — MRR softens without reinvestment.`);
+      }
+    }
+  }
+  return lines;
+}
+
 export function applySubsidiaryMrrPayout(state) {
   const total = totalSubsidiaryMrr(state);
   if (!total) return { total: 0, lines: [] };
   state.finance.cash += total;
   state.finance.lifetimeRevenue = (state.finance.lifetimeRevenue ?? 0) + total;
   state.finance.subsidiaryMrr = total;
+  ensureAcquisitions(state);
+  state.acquisitions.lifetimePortfolioRevenue =
+    (state.acquisitions.lifetimePortfolioRevenue ?? 0) + total;
   return {
     total,
-    lines: [`Portfolio MRR: +${formatMoney(total)} from subsidiaries.`]
+    lines: [`Portfolio MRR: +${formatMoney(total)} from subsidiaries (incl. synergy).`]
   };
 }
 
@@ -211,11 +400,42 @@ function segmentLabel(segment) {
   return 'Small';
 }
 
+function trendBadge(trend) {
+  if (trend === 'hot') return '<span class="tag tag-hot">Hot</span>';
+  if (trend === 'soft') return '<span class="tag tag-soft">Soft</span>';
+  return '<span class="tag tag-fair">Fair</span>';
+}
+
+function integrationBar(holding) {
+  const left = holding.integrationMonthsLeft ?? 0;
+  if (left <= 0) return '<span class="fine-print">Integrated</span>';
+  const pct = Math.round(integrationMrrFactor(holding) * 100);
+  return `<span class="integration-bar" title="${left} month(s) to full MRR"><span style="width:${pct}%"></span></span> <span class="fine-print">${pct}% MRR · ${left} mo left</span>`;
+}
+
+function displayName(state, company) {
+  return company.isRival ? state.world?.competitor?.name ?? company.name : company.name;
+}
+
 export function renderCompaniesPanel(container, state) {
   if (!container) return;
+  ensureAcquisitions(state);
   const unlocked = acquisitionsUnlocked(state);
   const portfolioMrr = totalSubsidiaryMrr(state);
-  const owned = state.acquisitions?.owned ?? [];
+  const owned = state.acquisitions.owned;
+  const exitVal = portfolioExitValue(state);
+  const invested = portfolioInvestedTotal(state);
+  const synergy = portfolioSynergyMult(state);
+  const lifetime = state.acquisitions.lifetimePortfolioRevenue ?? 0;
+  const cash = state.finance?.cash ?? 0;
+  const filter = state.acquisitions.marketSegment ?? 'all';
+  const marketAll = filteredMarketTargets(state);
+  const page = state.acquisitions.marketPage ?? 0;
+  const pageSlice = marketAll.slice(page * MARKET_PAGE_SIZE, (page + 1) * MARKET_PAGE_SIZE);
+  const maxPage = Math.max(0, Math.ceil(marketAll.length / MARKET_PAGE_SIZE) - 1);
+
+  const filterBtn = (id, label) =>
+    `<button type="button" class="companies-filter ${filter === id ? 'active' : ''}" data-companies-filter="${id}">${label}</button>`;
 
   const ownedRows = owned
     .map((h) => {
@@ -223,65 +443,120 @@ export function renderCompaniesPanel(container, state) {
       if (!co) return '';
       const mrr = subsidiaryMrr(state, h, co);
       const exit = subsidiarySalePrice(state, h, co);
-      const displayName = co.isRival ? (state.world?.competitor?.name ?? co.name) : co.name;
+      const name = displayName(state, co);
+      const costBasis = (h.purchasePrice ?? 0) + (h.investedTotal ?? 0);
+      const roi = costBasis > 0 ? ((exit - costBasis) / costBasis) * 100 : 0;
+      const cat = inferredMarketCategory(state, co);
+      const syn =
+        categorySynergyMult(state, co) > 1
+          ? `<span class="tag tag-synergy">${cat === state.company?.categoryId ? 'Vertical fit' : 'Rival lock-in'}</span>`
+          : '';
       return `<tr>
-        <td><strong>${escapeHtml(displayName)}</strong>${co.isRival ? ' <span class="fine-print">(rival)</span>' : ''}<br><span class="fine-print">${escapeHtml(segmentLabel(co.segment))} · health ${holdingHealth(h).toFixed(2)}×</span></td>
+        <td><strong>${escapeHtml(name)}</strong> ${syn}<br><span class="fine-print">${escapeHtml(segmentLabel(co.segment))} · health ${holdingHealth(h).toFixed(2)}×</span><br>${integrationBar(h)}</td>
         <td class="num">${formatMoney(mrr)}/mo</td>
-        <td class="num">${formatMoney(h.investedTotal ?? 0)}</td>
-        <td class="num">${formatMoney(exit)}</td>
-        <td class="num">
-          <button type="button" class="btn btn-small" data-acquisition-reinvest="${escapeHtml(co.id)}">Reinvest</button>
+        <td class="num">${formatMoney(costBasis)}</td>
+        <td class="num">${formatMoney(exit)}<br><span class="fine-print">${roi >= 0 ? '+' : ''}${roi.toFixed(0)}% vs basis</span></td>
+        <td class="num companies-actions">
+          <button type="button" class="btn btn-small" data-acquisition-reinvest="${escapeHtml(co.id)}" data-acquisition-reinvest-amt="25000">+$25k</button>
+          <button type="button" class="btn btn-small" data-acquisition-reinvest="${escapeHtml(co.id)}" data-acquisition-reinvest-amt="100000">+$100k</button>
+          <button type="button" class="btn btn-small" data-acquisition-reinvest="${escapeHtml(co.id)}">Custom</button>
           <button type="button" class="btn btn-small btn-danger" data-acquisition-sell="${escapeHtml(co.id)}">Sell</button>
         </td>
       </tr>`;
     })
     .join('');
 
-  const marketRows = catalog
-    .filter((c) => isTargetVisible(state, c) && !ownedIds(state).has(c.id))
+  const marketRows = pageSlice
     .map((co) => {
-      const { ask, trend } = marketPriceLabel(state, co);
-      const displayName = co.isRival ? (state.world?.competitor?.name ?? co.name) : co.name;
-      const trendNote =
-        trend === 'hot' ? ' · sellers market' : trend === 'soft' ? ' · soft ask' : '';
-      const canAfford = (state.finance?.cash ?? 0) >= ask;
+      const { ask, trend, fair, vsFair } = marketPriceLabel(state, co);
+      const name = displayName(state, co);
+      const multiple = co.baseMrr > 0 ? (ask / (co.baseMrr * 12)).toFixed(1) : '—';
+      const cat = inferredMarketCategory(state, co);
+      const fit =
+        categorySynergyMult(state, co) > 1
+          ? `<span class="tag tag-synergy">Fits ${escapeHtml(state.company?.categoryLabel ?? 'your vertical')}</span>`
+          : `<span class="fine-print">${escapeHtml(cat.replace(/-/g, ' '))}</span>`;
+      const canAfford = cash >= ask;
       return `<tr>
-        <td><strong>${escapeHtml(displayName)}</strong>${co.isRival ? ' <span class="fine-print">(your rival)</span>' : ''}<br><span class="fine-print">${escapeHtml(co.description)}</span></td>
+        <td><strong>${escapeHtml(name)}</strong>${co.isRival ? ' <span class="tag tag-rival">Rival</span>' : ''}<br><span class="fine-print">${escapeHtml(co.description)}</span><br>${fit}</td>
         <td>${escapeHtml(segmentLabel(co.segment))}</td>
         <td class="num">${formatMoney(co.baseMrr)}/mo</td>
-        <td class="num">${formatMoney(ask)}${trendNote}</td>
+        <td class="num">${formatMoney(ask)} ${trendBadge(trend)}<br><span class="fine-print">Fair ~${formatMoney(fair)}${escapeHtml(vsFair ?? '')} · ${multiple}× rev</span></td>
         <td class="num"><button type="button" class="btn btn-primary btn-small" data-acquisition-buy="${escapeHtml(co.id)}" ${canAfford ? '' : 'disabled'}>Acquire</button></td>
       </tr>`;
     })
+    .join('');
+
+  const dealRows = (state.acquisitions.dealLog ?? [])
+    .slice(0, 6)
+    .map(
+      (d) =>
+        `<li><strong>Y${d.year} M${d.month}</strong> ${escapeHtml(d.kind)} ${escapeHtml(d.name)} — ${formatMoney(d.amount)} <span class="fine-print">${escapeHtml(d.detail ?? '')}</span></li>`
+    )
     .join('');
 
   const lockNote = unlocked
     ? ''
     : `<p class="desk-feedback error" role="alert">Complete your X Combinator batch to unlock acquisitions.</p>`;
 
+  const rivalNote = state.world?.competitorAcquired
+    ? `<p class="fine-print"><strong>Rival absorbed</strong> — competitor revenue drag removed.</p>`
+    : state.world?.competitor
+      ? `<p class="fine-print"><strong>Strategic target:</strong> acquiring ${escapeHtml(state.world.competitor.name)} removes rival pressure and adds enterprise MRR (3-month integration).</p>`
+      : '';
+
   container.innerHTML = `
-    <p class="panel-lede">Buy companies for permanent portfolio MRR. Prices move each month; reinvest to raise health, MRR, and exit value.</p>
+    <p class="panel-lede">Build a roll-up: buy operators for recurring MRR, reinvest to raise health and exit value, or sell when the market pays a premium.</p>
     ${lockNote}
-    <p class="fine-print"><strong>Portfolio MRR:</strong> ${formatMoney(portfolioMrr)}/mo from ${owned.length} subsidiary${owned.length === 1 ? '' : 'ies'}. Paid automatically when you close each month.</p>
+    ${rivalNote}
+    <div class="companies-summary summary-grid">
+      <div><span class="stat-label">Portfolio MRR</span><span class="stat-value">${formatMoney(portfolioMrr)}/mo</span></div>
+      <div><span class="stat-label">Synergy stack</span><span class="stat-value">${((synergy - 1) * 100).toFixed(1)}%</span></div>
+      <div><span class="stat-label">Est. exit value</span><span class="stat-value">${formatMoney(exitVal)}</span></div>
+      <div><span class="stat-label">Cost basis</span><span class="stat-value">${formatMoney(invested)}</span></div>
+      <div><span class="stat-label">Lifetime portfolio income</span><span class="stat-value">${formatMoney(lifetime)}</span></div>
+      <div><span class="stat-label">Dry powder</span><span class="stat-value">${formatMoney(cash)}</span></div>
+    </div>
     <section class="acquisitions-section">
-      <h3 class="panel-subtitle">Your companies</h3>
+      <h3 class="panel-subtitle">Your portfolio (${owned.length})</h3>
       ${
         owned.length
           ? `<div class="table-scroll"><table class="data-table acquisitions-table">
-        <thead><tr><th>Company</th><th>MRR</th><th>Reinvested</th><th>Est. exit</th><th></th></tr></thead>
+        <thead><tr><th>Company</th><th>MRR</th><th>Basis</th><th>Est. exit</th><th>Operate</th></tr></thead>
         <tbody>${ownedRows}</tbody>
       </table></div>`
-          : '<p class="fine-print">No acquisitions yet — browse the market below.</p>'
+          : '<p class="fine-print">No acquisitions yet — filter the market below and close your first bolt-on.</p>'
       }
     </section>
+    ${
+      dealRows
+        ? `<section class="acquisitions-section"><h3 class="panel-subtitle">Recent deals</h3><ul class="companies-deal-log">${dealRows}</ul></section>`
+        : ''
+    }
     <section class="acquisitions-section">
-      <h3 class="panel-subtitle">Market (${catalog.filter((c) => isTargetVisible(state, c)).length} targets)</h3>
+      <h3 class="panel-subtitle">Market</h3>
+      <nav class="companies-filters" aria-label="Filter acquisition targets">
+        ${filterBtn('all', 'All')}
+        ${filterBtn('small', 'Small')}
+        ${filterBtn('mid', 'Mid')}
+        ${filterBtn('enterprise', 'Enterprise')}
+        ${filterBtn('rival', 'Rival')}
+      </nav>
+      <p class="fine-print">${marketAll.length} targets · prices refresh each month · reinvest accelerates integration</p>
       <div class="table-scroll"><table class="data-table acquisitions-table">
-        <thead><tr><th>Target</th><th>Size</th><th>Base MRR</th><th>Ask (dynamic)</th><th></th></tr></thead>
-        <tbody>${marketRows || '<tr><td colspan="5">Everything on the market is yours.</td></tr>'}</tbody>
+        <thead><tr><th>Target</th><th>Size</th><th>Base MRR</th><th>Ask</th><th></th></tr></thead>
+        <tbody>${marketRows || '<tr><td colspan="5">No targets in this filter.</td></tr>'}</tbody>
       </table></div>
+      ${
+        maxPage > 0
+          ? `<div class="companies-pager">
+        <button type="button" class="btn btn-small" data-companies-page="prev" ${page <= 0 ? 'disabled' : ''}>Prev</button>
+        <span class="fine-print">Page ${page + 1} / ${maxPage + 1}</span>
+        <button type="button" class="btn btn-small" data-companies-page="next" ${page >= maxPage ? 'disabled' : ''}>Next</button>
+      </div>`
+          : ''
+      }
     </section>
-    <p id="companies-feedback" class="desk-feedback" hidden></p>
   `;
 }
 

@@ -655,6 +655,102 @@ h1 {
   transition: width 0.2s ease;
 }
 
+.companies-summary {
+  margin: 1rem 0 1.25rem;
+}
+
+.companies-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.companies-filter {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.companies-filter.active {
+  border-color: var(--accent, #60a5fa);
+  background: rgba(96, 165, 250, 0.12);
+}
+
+.companies-pager {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.companies-deal-log {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+}
+
+.companies-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 6.5rem;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  margin-left: 0.25rem;
+  vertical-align: middle;
+}
+
+.tag-hot {
+  background: rgba(248, 113, 113, 0.2);
+  color: #fecaca;
+}
+
+.tag-soft {
+  background: rgba(52, 211, 153, 0.15);
+  color: #a7f3d0;
+}
+
+.tag-fair {
+  background: rgba(148, 163, 184, 0.15);
+}
+
+.tag-synergy {
+  background: rgba(96, 165, 250, 0.15);
+  color: #bfdbfe;
+}
+
+.tag-rival {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fde68a;
+}
+
+.integration-bar {
+  display: inline-block;
+  width: 4.5rem;
+  height: 0.35rem;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  vertical-align: middle;
+  margin-right: 0.35rem;
+}
+
+.integration-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #fbbf24, #34d399);
+}
+
 .acquisitions-section {
   margin: 1.25rem 0;
 }

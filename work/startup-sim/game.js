@@ -104,7 +104,9 @@ import {
   sellSubsidiary,
   reinvestInSubsidiary,
   preloadAcquisitionCatalog,
-  showCompaniesFeedback
+  showCompaniesFeedback,
+  setCompaniesMarketFilter,
+  setCompaniesMarketPage
 } from './modules/Acquisitions.js';
 import { openMonthSummaryDialog, updateMonthSummaryHeadline } from './modules/MonthSummary.js';
 import { copyRunExportToClipboard } from './modules/RunExport.js';
@@ -665,10 +667,13 @@ function handleAcquisitionSell(id) {
   refresh();
 }
 
-function handleAcquisitionReinvest(id) {
+function handleAcquisitionReinvest(id, presetAmount) {
   if (!sessionState) return;
-  const raw = window.prompt('Reinvest cash into this subsidiary (min $5,000):', '25000');
-  if (raw == null) return;
+  let raw = presetAmount;
+  if (raw == null) {
+    raw = window.prompt('Reinvest cash into this subsidiary (min $5,000):', '25000');
+    if (raw == null) return;
+  }
   const result = reinvestInSubsidiary(sessionState, id, raw);
   if (!result.ok) {
     showCompaniesFeedback(result.reason || 'Reinvestment failed.', true);
@@ -927,7 +932,24 @@ function bindGameInteractions() {
     }
     const acqReinvest = e.target.closest('[data-acquisition-reinvest]');
     if (acqReinvest) {
-      handleAcquisitionReinvest(acqReinvest.getAttribute('data-acquisition-reinvest'));
+      const amt = acqReinvest.getAttribute('data-acquisition-reinvest-amt');
+      handleAcquisitionReinvest(
+        acqReinvest.getAttribute('data-acquisition-reinvest'),
+        amt != null ? Number(amt) : null
+      );
+      return;
+    }
+    const filterBtn = e.target.closest('[data-companies-filter]');
+    if (filterBtn && sessionState) {
+      setCompaniesMarketFilter(sessionState, filterBtn.getAttribute('data-companies-filter'));
+      refresh();
+      return;
+    }
+    const pageBtn = e.target.closest('[data-companies-page]');
+    if (pageBtn && sessionState) {
+      const dir = pageBtn.getAttribute('data-companies-page');
+      setCompaniesMarketPage(sessionState, dir === 'next' ? 1 : -1);
+      refresh();
       return;
     }
     if (e.target.id === 'btn-file-ipo') {

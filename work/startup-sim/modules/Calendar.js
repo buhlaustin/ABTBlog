@@ -24,7 +24,7 @@ import {
   scorePublicGuidanceBeat
 } from './WorldDynamics.js';
 import { tickScenarioModifiers } from './ScenarioEffects.js';
-import { applySubsidiaryMrrPayout } from './Acquisitions.js';
+import { applySubsidiaryMrrPayout, tickAcquisitionsAtMonthStart } from './Acquisitions.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -82,6 +82,9 @@ export function startMonth(state) {
     appendLog(state, line);
   }
   for (const line of tickLaunchAtMonthStart(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickAcquisitionsAtMonthStart(state)) {
     appendLog(state, line);
   }
   dealMonthlyTasks(state);

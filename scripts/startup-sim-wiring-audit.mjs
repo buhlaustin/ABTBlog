@@ -23,7 +23,7 @@ const dataAttrs = new Set();
 for (const { text } of sources) {
   for (const m of text.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) btnIds.add(m[1]);
   for (const m of text.matchAll(/\bid='(btn-[a-z0-9-]+)'/g)) btnIds.add(m[1]);
-  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action)/g)) {
+  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest|companies-filter|companies-page|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action)/g)) {
     dataAttrs.add(m[1]);
   }
 }
@@ -68,6 +68,8 @@ const dataPatterns = {
   'acquisition-buy': "closest('[data-acquisition-buy]')",
   'acquisition-sell': "closest('[data-acquisition-sell]')",
   'acquisition-reinvest': "closest('[data-acquisition-reinvest]')",
+  'companies-filter': "closest('[data-companies-filter]')",
+  'companies-page': "closest('[data-companies-page]')",
   'social-tab': "closest('[data-social-tab]')",
   'staff-input': "closest('[data-staff-input]')",
   'tutorial-id': 'btn-dismiss-tutorial',

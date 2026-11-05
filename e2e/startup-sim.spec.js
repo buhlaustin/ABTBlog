@@ -88,6 +88,8 @@ test.describe('Startup Simulator', () => {
     await page.locator('#tab-companies').click();
     await expect(page.locator('#panel-companies')).toContainText('Portfolio MRR');
     await expect(page.locator('#panel-companies')).toContainText('X Combinator batch');
+    await expect(page.locator('[data-companies-filter="small"]')).toBeVisible();
+    await expect(page.locator('#panel-companies')).toContainText('Synergy stack');
   });
 
   test('mobile viewport: tabs and people table scroll without horizontal page overflow', async ({
