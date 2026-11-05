@@ -1,4 +1,4 @@
-import { STAGES } from './constants.js';
+import { STAGES, formatMoney } from './constants.js';
 import { advanceRealCalendarMonth, realClockNow } from './GameCalendar.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
@@ -137,7 +137,7 @@ export function endMonth(state) {
 
   appendLog(
     state,
-    `Month closed: ${state.calendar.tasksCompleted} tasks, ${formatLogMoney(state.calendar.monthRevenue)} revenue, ${formatLogMoney(burn)} overhead.`
+    `Month closed: ${state.calendar.tasksCompleted} tasks, ${formatMoney(state.calendar.monthRevenue)} revenue, ${formatMoney(burn)} overhead.`
   );
 
   for (const line of settleBoardGovernance(state)) {
@@ -230,12 +230,6 @@ export function endMonth(state) {
       arrAfter: state.finance.arr ?? 0
     }
   };
-}
-
-function formatLogMoney(n) {
-  const v = Number(n) || 0;
-  if (v >= 1000) return `$${(v / 1000).toFixed(1)}k`;
-  return `$${Math.round(v)}`;
 }
 
 /** Complete a counted task instance. */

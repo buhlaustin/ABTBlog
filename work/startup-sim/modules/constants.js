@@ -63,16 +63,30 @@ export function createInitialPublicMarket() {
   };
 }
 
+function formatCompactDollars(value, divisor, minFraction, maxFraction, suffix) {
+  const n = value / divisor;
+  const formatted = Math.abs(n).toLocaleString(undefined, {
+    minimumFractionDigits: minFraction,
+    maximumFractionDigits: maxFraction
+  });
+  return n < 0 ? `-$${formatted}${suffix}` : `$${formatted}${suffix}`;
+}
+
 export function formatMoney(n) {
   const v = Number(n) || 0;
-  if (Math.abs(v) >= 1_000_000_000) {
-    return `$${(v / 1_000_000_000).toFixed(2)}B`;
+  const abs = Math.abs(v);
+  const signed = v < 0 ? -abs : abs;
+  if (abs >= 1_000_000_000_000) {
+    return formatCompactDollars(signed, 1_000_000_000_000, 2, 2, 'T');
   }
-  if (Math.abs(v) >= 1_000_000) {
-    return `$${(v / 1_000_000).toFixed(2)}M`;
+  if (abs >= 1_000_000_000) {
+    return formatCompactDollars(signed, 1_000_000_000, 2, 2, 'B');
   }
-  if (Math.abs(v) >= 1_000) {
-    return `$${(v / 1_000).toFixed(1)}k`;
+  if (abs >= 1_000_000) {
+    return formatCompactDollars(signed, 1_000_000, 2, 2, 'M');
+  }
+  if (abs >= 1_000) {
+    return formatCompactDollars(signed, 1_000, 1, 1, 'k');
   }
   return `$${Math.round(v).toLocaleString()}`;
 }
