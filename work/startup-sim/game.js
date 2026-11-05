@@ -950,6 +950,28 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const salPreset = e.target.closest('[data-ceo-salary-preset]');
+    if (salPreset && sessionState) {
+      const result = setCeoSalaryAnnual(sessionState, salPreset.getAttribute('data-ceo-salary-preset'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Invalid salary.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-ceo-draw-custom' && sessionState) {
+      const input = document.getElementById('ceo-draw-input');
+      const result = takeOwnerDraw(sessionState, input?.value);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Draw failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     const drawBtn = e.target.closest('[data-owner-draw]');
     if (drawBtn && sessionState) {
       const result = takeOwnerDraw(sessionState, drawBtn.getAttribute('data-owner-draw'));

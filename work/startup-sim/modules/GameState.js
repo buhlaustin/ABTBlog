@@ -30,7 +30,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 25;
+export const SAVE_VERSION = 26;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -98,7 +98,14 @@ export function createInitialState(options) {
       instruments: [],
       lastRound: null
     },
-    ceo: { salaryAnnual: 0, careerSalaryPaid: 0, careerOwnerDraws: 0, drawLog: [] },
+    ceo: {
+      salaryAnnual: 0,
+      careerSalaryPaid: 0,
+      careerOwnerDraws: 0,
+      drawLog: [],
+      salaryPayLog: [],
+      salaryChangeLog: []
+    },
     staff: createInitialStaff(),
     product: { level: 0, buzz: 0, actionsThisMonth: 0 },
     social: createInitialSocial(),
@@ -289,6 +296,8 @@ export function normalizeSave(raw) {
       if (state.ceo.careerSalaryPaid === undefined) state.ceo.careerSalaryPaid = 0;
       if (state.ceo.careerOwnerDraws === undefined) state.ceo.careerOwnerDraws = 0;
       if (!state.ceo.drawLog) state.ceo.drawLog = [];
+      if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];
+      if (!state.ceo.salaryChangeLog) state.ceo.salaryChangeLog = [];
     }
     if (state.finance.lastRound === undefined) state.finance.lastRound = null;
     if (!state.flags) state.flags = {};

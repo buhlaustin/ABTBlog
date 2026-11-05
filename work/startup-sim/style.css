@@ -469,6 +469,62 @@ h1 {
   min-width: 0;
 }
 
+.ceo-wealth-bar {
+  display: flex;
+  height: 0.65rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--border, rgba(255, 255, 255, 0.12));
+  margin: 0.5rem 0 0.75rem;
+}
+
+.ceo-wealth-seg {
+  min-width: 2px;
+  transition: width 0.2s ease;
+}
+
+.ceo-wealth-equity {
+  background: #6366f1;
+}
+
+.ceo-wealth-salary {
+  background: #22c55e;
+}
+
+.ceo-wealth-draws {
+  background: #f59e0b;
+}
+
+.ceo-wealth-legend {
+  margin-bottom: 1rem;
+}
+
+.ceo-dot {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+}
+
+.ceo-dot-equity {
+  background: #6366f1;
+}
+
+.ceo-dot-salary {
+  background: #22c55e;
+}
+
+.ceo-dot-draws {
+  background: #f59e0b;
+}
+
+.ceo-salary-row input[type='number'] {
+  flex: 1;
+  min-width: 0;
+}
+
 .stat-value.positive {
   color: var(--success);
 }

@@ -695,9 +695,15 @@ if (!rbf.ok) {
   console.error('FAIL: revenue advance owed');
   failed = true;
 }
-const { setCeoSalaryAnnual, takeOwnerDraw, ceoSalaryMonthly, recordCeoSalaryForMonth } = await import(
-  `file://${join(sim, 'modules/CeoEconomics.js')}`
-);
+const {
+  setCeoSalaryAnnual,
+  takeOwnerDraw,
+  ceoSalaryMonthly,
+  recordCeoSalaryForMonth,
+  wealthMix,
+  buildCompLedger,
+  suggestedCeoSalaryBand
+} = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
 const { projectMonthlyBurn } = await import(`file://${join(sim, 'modules/Finance.js')}`);
 const ceoState = createInitialState({ companyName: 'CEO Pay Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 const sal = setCeoSalaryAnnual(ceoState, 120_000);
@@ -723,6 +729,18 @@ if (!failed) {
   recordCeoSalaryForMonth(ceoState);
   if (ceoState.ceo.careerSalaryPaid !== 10_000) {
     console.error('FAIL: career salary accrual');
+    failed = true;
+  } else if (!ceoState.ceo.salaryPayLog?.length) {
+    console.error('FAIL: salary pay log');
+    failed = true;
+  } else if (!buildCompLedger(ceoState).length) {
+    console.error('FAIL: comp ledger');
+    failed = true;
+  } else if (!suggestedCeoSalaryBand(ceoState).presets?.length) {
+    console.error('FAIL: salary band');
+    failed = true;
+  } else if (wealthMix(ceoState).salary <= 0) {
+    console.error('FAIL: wealth mix');
     failed = true;
   }
 }
