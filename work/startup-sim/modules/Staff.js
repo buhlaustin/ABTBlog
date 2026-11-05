@@ -9,6 +9,7 @@ import {
 import { setGameFeedback } from './GameFeedback.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { renderLeadershipOrgChart, cooSalaryMonthly } from './Coo.js';
+import { panelStatCard } from './PanelChrome.js';
 
 export const DEPARTMENTS = [
   { id: 'engineering', label: 'Engineering' },
@@ -260,26 +261,33 @@ export function renderPeopleStaffingPanel(container, state) {
     .join('');
 
   container.innerHTML = `
-    ${orgMount}
-    <div id="org-chart-mount"></div>
-    <p class="panel-lede">Hire a named <strong>COO</strong> above (garage onward — up to <strong>10% equity</strong>; in the garage, more equity means less cash, down to <strong>$0/mo</strong> at 10%). Department headcount unlocks after you lease a small office ($10k ARR).${state.mode === 'sandbox' ? ' <strong>Sandbox</strong> raises the company headcount cap to <strong>10,000</strong> — staffing also scales your sandbox rev× ceiling.' : ''}</p>
-    <div class="table-scroll">
-      <table class="data-table">
-        <thead><tr><th>Department</th><th>Headcount</th><th>$/head/mo</th><th>Subtotal</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-    <div class="summary-grid">
-      <div><span class="stat-label">Draft / cap</span><span class="stat-value">${totalDraft} / ${maxHc}</span></div>
-      <div><span class="stat-label">Finalized (active)</span><span class="stat-value">${totalFinal}</span></div>
-      <div><span class="stat-label">Payroll (draft)</span><span class="stat-value">${formatMoney(econ.payroll)}</span></div>
-      <div><span class="stat-label">COO comp</span><span class="stat-value">${formatMoney(econ.execPay)}</span></div>
-      <div><span class="stat-label">Proj. burn</span><span class="stat-value">${formatMoney(econ.burn)}</span></div>
-      <div><span class="stat-label">vs last mo. rev.</span><span class="stat-value ${econ.surplus >= 0 ? 'positive' : 'negative'}">${formatMoney(econ.surplus)}</span></div>
-      <div><span class="stat-label">Last finalized</span><span class="stat-value">${finalizedLabel}</span></div>
-    </div>
-    <button type="button" class="btn btn-primary" id="btn-finalize-staff" ${hiringAllowed(state) ? '' : 'disabled'}>Finalize staffing</button>
-    <p id="people-feedback" class="desk-feedback" hidden></p>
+    <section class="finance-section people-staffing-section">
+      ${orgMount}
+      <div id="org-chart-mount"></div>
+      <p class="fine-print">Hire a named <strong>COO</strong> in the org chart (garage onward). Department headcount unlocks after a small office ($10k ARR).${state.mode === 'sandbox' ? ' Sandbox cap <strong>10,000</strong> headcount.' : ''}</p>
+      <div class="finance-kpi-row people-kpi-row">
+        ${panelStatCard('Draft / cap', `${totalDraft} / ${maxHc}`, { hero: true })}
+        ${panelStatCard('Active HC', String(totalFinal))}
+        ${panelStatCard('Payroll (draft)', formatMoney(econ.payroll))}
+        ${panelStatCard('Proj. burn', formatMoney(econ.burn))}
+        ${panelStatCard('vs last rev.', formatMoney(econ.surplus), { tone: econ.surplus >= 0 ? 'pos' : 'neg' })}
+      </div>
+      <details class="finance-details">
+        <summary>COO comp &amp; finalize history</summary>
+        <p class="fine-print">COO comp ${formatMoney(econ.execPay)}/mo · Last finalized ${escapeHtml(finalizedLabel)}</p>
+      </details>
+      <h3 class="finance-section-title">Department headcount</h3>
+      <div class="table-scroll finance-cap-scroll">
+        <table class="data-table">
+          <thead><tr><th>Department</th><th>Headcount</th><th>$/head/mo</th><th>Subtotal</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="desk-actions">
+        <button type="button" class="btn btn-primary" id="btn-finalize-staff" ${hiringAllowed(state) ? '' : 'disabled'}>Finalize staffing</button>
+        <p id="people-feedback" class="desk-feedback" hidden></p>
+      </div>
+    </section>
   `;
   renderLeadershipOrgChart(document.getElementById('org-chart-mount'), state);
 }

@@ -13,6 +13,7 @@ import {
 import { progressionTier } from './ProgressionEconomy.js';
 import { isPublicCompany, applyStockPctMove } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
+import { panelStatCard, escapeHtml as panelEscapeHtml } from './PanelChrome.js';
 
 let boardCatalog = bundledBoard;
 
@@ -316,18 +317,19 @@ function renderApprovalMeter(score) {
 }
 
 function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return panelEscapeHtml(s);
 }
 
 export function renderBoardPanel(container, state) {
   if (!container) return;
   if (!hasInstitutionalBoard(state)) {
     container.innerHTML = `
-      <p class="panel-lede">No board yet — you're still running solo.</p>
-      <p class="fine-print">Garage and seed-stage founders usually answer to themselves. When you close <strong>Series A</strong> on the Finance tab, a lead investor takes a seat and optional board prep unlocks here.</p>
+      <div class="board-panel finance-panel">
+        <div class="finance-hero">
+          <p class="panel-lede">No board yet — you're still running solo.</p>
+        </div>
+        <div class="finance-alert">Close <strong>Series A</strong> on Finance to seat a lead investor and unlock board prep here.</div>
+      </div>
     `;
     return;
   }
@@ -400,41 +402,50 @@ export function renderBoardPanel(container, state) {
     : '<p class="fine-print">Approval history fills in as the board reacts to your month.</p>';
 
   container.innerHTML = `
-    <p class="panel-lede">Board governance — optional prep each month (not desk slots). Approval is <strong>${snap.label}</strong>.</p>
-
-    <div class="board-dashboard capital-stack" role="region" aria-label="Board approval">
-      <div class="board-dashboard-head">
-        <p class="prelaunch-progress-title"><strong>Board approval</strong></p>
-        ${renderApprovalMeter(snap.approval)}
+    <div class="board-panel finance-panel">
+      <div class="finance-hero">
+        <p class="panel-lede">Board governance — optional prep each month (not desk slots). Mood: <strong>${escapeHtml(snap.label)}</strong>.</p>
       </div>
-      <p class="fine-print">${snap.lastReason ? `Latest: ${escapeHtml(snap.lastReason)}` : 'Complete prep tasks to build trust before priced rounds.'}</p>
-      <div class="summary-grid">
-        <div><span class="stat-label">Governance streak</span><span class="stat-value">${snap.streak} mo</span></div>
-        <div><span class="stat-label">Prep this month</span><span class="stat-value">${snap.tasksDone}/${snap.tasksTotal}</span></div>
-        <div><span class="stat-label">ARR</span><span class="stat-value">${formatMoney(snap.arr)}</span></div>
-        <div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(snap.runwayLabel)}</span></div>
-        <div><span class="stat-label">Rival heat</span><span class="stat-value">${snap.rivalHeat}/5</span></div>
-        <div><span class="stat-label">Meetings (career)</span><span class="stat-value">${state.board?.meetingsHeld ?? 0}</span></div>
-        ${gateRows}
+      <div class="board-dashboard capital-stack" role="region" aria-label="Board approval">
+        <div class="board-dashboard-head">
+          <p class="prelaunch-progress-title"><strong>Board approval</strong></p>
+          ${renderApprovalMeter(snap.approval)}
+        </div>
+        <p class="fine-print">${snap.lastReason ? `Latest: ${escapeHtml(snap.lastReason)}` : 'Complete prep tasks to build trust before priced rounds.'}</p>
       </div>
-      <p class="fine-print">${escapeHtml(snap.runwayDetail)} · Skip <em>all</em> prep in a month → −4 approval and rival heat.</p>
+      <div class="finance-kpi-row board-kpi-row">
+        ${panelStatCard('Approval', `${snap.approval}/100`, { hero: true, tone: snap.approval >= 75 ? 'pos' : snap.approval < 35 ? 'neg' : null })}
+        ${panelStatCard('Prep done', `${snap.tasksDone}/${snap.tasksTotal}`)}
+        ${panelStatCard('Streak', `${snap.streak} mo`)}
+        ${panelStatCard('ARR', formatMoney(snap.arr))}
+        ${panelStatCard('Runway', escapeHtml(snap.runwayLabel))}
+      </div>
+      <details class="finance-details board-gates-details">
+        <summary>Rival heat, gates &amp; meetings</summary>
+        <div class="summary-grid board-context-grid">
+          <div><span class="stat-label">Rival heat</span><span class="stat-value">${snap.rivalHeat}/5</span></div>
+          <div><span class="stat-label">Meetings (career)</span><span class="stat-value">${state.board?.meetingsHeld ?? 0}</span></div>
+          ${gateRows}
+        </div>
+        <p class="fine-print">${escapeHtml(snap.runwayDetail)} · Skip <em>all</em> prep in a month → −4 approval and rival heat.</p>
+      </details>
+      ${mandateBlock}
+      <section class="finance-section">
+        <h3 class="finance-section-title">Board roster</h3>
+        <div class="table-scroll finance-cap-scroll">
+          <table class="data-table board-roster-table">
+            <thead><tr><th>Director</th><th>Seat</th><th>Since</th></tr></thead>
+            <tbody>${rosterRows}</tbody>
+          </table>
+        </div>
+        <p class="fine-print">Committees: Audit, Comp, Governance — tags on tasks show who cares.</p>
+      </section>
+      <section class="finance-section">
+        <h3 class="finance-section-title">This month’s board prep</h3>
+        <div class="task-list">${cards || '<div class="tab-placeholder">New board tasks appear each month.</div>'}</div>
+      </section>
+      <details class="finance-details board-history-details"><summary>Approval history</summary>${historyList}</details>
     </div>
-
-    ${mandateBlock}
-
-    <h3 class="log-head">Board roster</h3>
-    <div class="table-scroll">
-      <table class="data-table board-roster-table">
-        <thead><tr><th>Director</th><th>Seat</th><th>Since</th></tr></thead>
-        <tbody>${rosterRows}</tbody>
-      </table>
-    </div>
-    <p class="fine-print">Committees: <strong>Audit</strong> (controls), <strong>Comp</strong> (pay & options), <strong>Governance</strong> (deck & strategy). Tags on tasks show who cares.</p>
-
-    <h3 class="log-head">This month’s board prep</h3>
-    <div class="task-list">${cards || '<div class="tab-placeholder">New board tasks appear each month.</div>'}</div>
-
-    <details class="board-history-details"><summary>Approval history</summary>${historyList}</details>
   `;
 }
 

@@ -33,6 +33,7 @@ import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
+import { panelStatCard } from './PanelChrome.js';
 import {
   renderProductActionsPanel,
   sideTaskBankSize,
@@ -340,64 +341,78 @@ export function renderDeskPanel(state) {
     : '';
   const preLaunchProgress = renderPreLaunchProgressBlock(state);
 
+  const revHud = taskRevenueMultHud(state);
+  const era = estimateEraRevenuePotential(state);
+  const eraChip = `Desk ${formatMoney(era.desk[0])}–${formatMoney(era.desk[1])} · growth ${formatMoney(era.growth[0])}–${formatMoney(era.growth[1])} at ${era.mult.toFixed(2)}×`;
+  const revMultTitle = revHud.title ? ` title="${escapeHtml(revHud.title)}"` : '';
+
   desk.innerHTML = `
-    ${tutorial}
-    ${launchBanner}
-    ${preLaunchProgress}
-    ${
-      catalogError
-        ? '<p class="desk-feedback error" role="alert">Tasks did not load — reload the page. You cannot close the month until the desk is full.</p>'
-        : ''
-    }
-    ${
-      hasActiveCrisis(state)
-        ? '<p class="desk-feedback error" role="alert">Crisis on the desk — resolve it before closing the month.</p>'
-        : ''
-    }
-    ${
-      hasActiveDecision(state)
-        ? '<p class="desk-feedback error" role="alert">Strategic decision pending — pick an option below before closing the month.</p>'
-        : ''
-    }
-    ${renderDeskDecisionBlock(state)}
-    <p class="panel-lede">Pick ${slotTarget} tasks from this month’s offers, complete them, then close the month. <span class="fine-print">Shortcuts: 1–9 switch tabs, M close month.</span></p>
-    <div class="summary-grid">
-      <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slotTarget}</span></div>
-      <div><span class="stat-label">This month</span><span class="stat-value">+${formatMoney(monthRev)} / -${formatMoney(monthSpend)}</span></div>
-      <div><span class="stat-label">Next gate</span><span class="stat-value">${escapeHtml(ms)}</span></div>
-      <div><span class="stat-label">Pending</span><span class="stat-value">${pending.length}</span></div>
-      <div><span class="stat-label">Scale era</span><span class="stat-value">${escapeHtml(progressionTierLabel(state))}</span></div>
-      ${(() => {
-        const revHud = taskRevenueMultHud(state);
-        const titleAttr = revHud.title ? ` title="${escapeHtml(revHud.title)}"` : '';
-        return `<div><span class="stat-label">${escapeHtml(revHud.label)}</span><span class="stat-value"${titleAttr}>${revHud.effective.toFixed(2)}×</span></div>`;
-      })()}
+    <div class="desk-panel finance-panel">
+      ${tutorial}
+      ${launchBanner}
+      ${preLaunchProgress}
+      ${
+        catalogError
+          ? '<div class="finance-alert" role="alert">Tasks did not load — reload the page. You cannot close the month until the desk is full.</div>'
+          : ''
+      }
+      ${
+        hasActiveCrisis(state)
+          ? '<div class="finance-alert" role="alert">Crisis on the desk — resolve it before closing the month.</div>'
+          : ''
+      }
+      ${
+        hasActiveDecision(state)
+          ? '<div class="finance-alert" role="alert">Strategic decision pending — pick an option below before closing the month.</div>'
+          : ''
+      }
+      ${renderDeskDecisionBlock(state)}
+      <div class="finance-hero desk-hero">
+        <p class="panel-lede">Pick ${slotTarget} tasks from this month’s offers, complete them, then close the month. <span class="fine-print">Shortcuts: 1–9 switch tabs, M close month.</span></p>
+        <p class="finance-mult-chip">${escapeHtml(eraChip)}</p>
+      </div>
+      <div class="finance-kpi-row desk-kpi-row" aria-label="Desk progress">
+        ${panelStatCard('Tasks done', `${done} / ${slotTarget}`, { hero: true })}
+        ${panelStatCard('Pending', String(pending.length))}
+        ${panelStatCard('Month revenue', `+${formatMoney(monthRev)}`, { tone: 'pos' })}
+        ${panelStatCard('Month spend', `−${formatMoney(monthSpend)}`, { tone: monthSpend > 0 ? 'neg' : null })}
+        ${panelStatCard(revHud.label, `${revHud.effective.toFixed(2)}×`)}
+      </div>
+      <details class="finance-details desk-gate-details">
+        <summary>Next gate &amp; scale era</summary>
+        <p class="fine-print"><strong>Next gate:</strong> ${escapeHtml(ms)} · <strong>Era:</strong> ${escapeHtml(progressionTierLabel(state))}<span class="desk-rev-mult-hint"${revMultTitle}> · ${escapeHtml(revHud.label)} ${revHud.effective.toFixed(2)}×</span></p>
+      </details>
+      ${
+        lineupOpen
+          ? `<section class="finance-section desk-offers-section">
+          <div class="finance-section-head">
+            <h3 class="finance-section-title">This month’s offers</h3>
+            <span class="growth-channel-badge growth-channel-badge--inline">${selectedOfferCount(state)} / ${slotTarget} selected</span>
+          </div>
+          <div class="task-list">${offerCards}</div>
+          <button type="button" id="btn-confirm-task-lineup" class="btn btn-primary btn-small" ${selectedOfferCount(state) === slotTarget ? '' : 'disabled'}>Lock desk lineup</button>
+        </section>`
+          : ''
+      }
+      <section class="finance-section desk-tasks-section">
+        <h3 class="finance-section-title">Active desk</h3>
+        <div class="task-list">${taskCards || (lineupOpen ? '<div class="tab-placeholder">Lock your lineup to start working tasks.</div>' : '<div class="tab-placeholder">No tasks dealt.</div>')}</div>
+      </section>
+      <div class="desk-actions finance-action desk-close-bar">
+        <button type="button" id="btn-end-month" class="btn btn-primary" ${endDisabled ? 'disabled' : ''} title="${endDisabled ? 'Finish remaining tasks first' : 'Apply overhead and start next month'}">Close month</button>
+        <p id="desk-feedback" class="desk-feedback" hidden></p>
+      </div>
+      <details class="finance-details desk-log-details">
+        <summary>Recent log</summary>
+        <ul class="desk-log-list">${(state.calendar.log ?? [])
+          .slice(0, 6)
+          .map(
+            (e) =>
+              `<li><span class="log-when">${escapeHtml(formatCalendarStamp(e.year, e.month))}</span> ${escapeHtml(e.message)}</li>`
+          )
+          .join('') || '<li class="muted">No events yet.</li>'}</ul>
+      </details>
     </div>
-    ${(() => {
-      const era = estimateEraRevenuePotential(state);
-      return `<p class="fine-print">This era: native desk <strong>${formatMoney(era.desk[0])}–${formatMoney(era.desk[1])}</strong> · growth <strong>${formatMoney(era.growth[0])}–${formatMoney(era.growth[1])}</strong> per play at ${era.mult.toFixed(2)}× (shared early tasks scale up automatically).</p>`;
-    })()}
-    ${
-      lineupOpen
-        ? `<section class="task-offers"><h3 class="log-head">This month’s offers (${selectedOfferCount(state)} / ${slotTarget} selected)</h3><div class="task-list">${offerCards}</div>
-        <button type="button" id="btn-confirm-task-lineup" class="btn btn-primary btn-small" ${selectedOfferCount(state) === slotTarget ? '' : 'disabled'}>Lock desk lineup</button></section>`
-        : ''
-    }
-    <div class="task-list">${taskCards || (lineupOpen ? '<div class="tab-placeholder">Lock your lineup to start working tasks.</div>' : '<div class="tab-placeholder">No tasks dealt.</div>')}</div>
-    <div class="desk-actions">
-      <button type="button" id="btn-end-month" class="btn btn-primary" ${endDisabled ? 'disabled' : ''} title="${endDisabled ? 'Finish remaining tasks first' : 'Apply overhead and start next month'}">Close month</button>
-      <p id="desk-feedback" class="desk-feedback" hidden></p>
-    </div>
-    <section class="month-log">
-      <h3 class="log-head">Recent log</h3>
-      <ul>${(state.calendar.log ?? [])
-        .slice(0, 6)
-        .map(
-          (e) =>
-            `<li><span class="log-when">${escapeHtml(formatCalendarStamp(e.year, e.month))}</span> ${escapeHtml(e.message)}</li>`
-        )
-        .join('') || '<li class="muted">No events yet.</li>'}</ul>
-    </section>
   `;
 }
 
@@ -695,6 +710,14 @@ export function renderGrowthPanel(container, state) {
         ${growthStatCard('Campaigns left', campaignSlotDisplay)}
         ${growthStatCard('Rev× on payouts', `${totalMult.toFixed(2)}×`)}
       </div>
+      <p class="fine-print growth-context-visible">
+        <strong>Rival</strong> ${escapeHtml(rival?.name ?? '—')} · heat ${pressure}/5 ·
+        ${
+          hasInstitutionalBoard(state)
+            ? `<strong>Board</strong> ${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}`
+            : `<strong>Runway</strong> ${escapeHtml(runwayLabel(state))}`
+        }
+      </p>
       <div class="growth-channel-compare" role="note">
         <div class="growth-channel-card growth-channel-card--side">
           <p class="growth-channel-title"><span class="growth-channel-badge">Side plays</span></p>

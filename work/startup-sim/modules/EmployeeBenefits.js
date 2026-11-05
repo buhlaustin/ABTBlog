@@ -13,6 +13,7 @@ import { easeCompetitorPressure } from './Competitor.js';
 import { expandEmployeeOptionPool, getOptionPoolRow } from './CapTable.js';
 import { calendarTurn } from './GameCalendar.js';
 import { formatCalendarStamp } from './GameCalendar.js';
+import { panelStatCard, escapeHtml as panelEscapeHtml } from './PanelChrome.js';
 
 export const COMPANY_BONUS_PCTS = [2, 5, 10, 20];
 
@@ -249,10 +250,7 @@ export function setPeopleSection(state, section) {
 }
 
 function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return panelEscapeHtml(s);
 }
 
 export function renderEmployeeBenefitsPanel(container, state) {
@@ -290,21 +288,27 @@ export function renderEmployeeBenefitsPanel(container, state) {
   }).join('');
 
   container.innerHTML = `
-    <p class="panel-lede">Perks and morale spend — not health insurance. Bonuses use <strong>one month&apos;s salary mass</strong> (payroll + CEO + COO). CEO&apos;s share deposits to the <strong>CEO tab</strong> bank ledger.</p>
-    <div class="summary-grid">
-      <div><span class="stat-label">Salary mass / mo</span><span class="stat-value">${formatMoney(mass.total)}</span></div>
-      <div><span class="stat-label">Payroll</span><span class="stat-value">${formatMoney(mass.payroll)}</span></div>
-      <div><span class="stat-label">CEO + COO</span><span class="stat-value">${formatMoney(mass.ceo + mass.coo)}</span></div>
-      <div><span class="stat-label">Headcount</span><span class="stat-value">${mass.headcount}</span></div>
-    </div>
-    <h3 class="log-head">Company bonus</h3>
-    <p class="fine-print">${bonusDone != null ? `Paid <strong>${bonusDone}%</strong> bonus this month.` : 'One bonus per month — includes CEO in the pool.'}</p>
-    <div class="benefits-preset-row">${bonusButtons}</div>
-    <h3 class="log-head">Offsites</h3>
-    <p class="fine-print">${offsiteDone ? `Booked <strong>${escapeHtml(OFFSITE_PROGRAMS.find((p) => p.id === offsiteDone)?.label ?? offsiteDone)}</strong> this month.` : 'One offsite per month.'}</p>
-    ${offsiteCards}
-    <h3 class="log-head">Quick perks</h3>
-    ${perkCards}
+    <section class="finance-section people-benefits-section">
+      <div class="finance-kpi-row people-kpi-row">
+        ${panelStatCard('Salary mass / mo', formatMoney(mass.total), { hero: true })}
+        ${panelStatCard('Payroll', formatMoney(mass.payroll))}
+        ${panelStatCard('CEO + COO', formatMoney(mass.ceo + mass.coo))}
+        ${panelStatCard('Headcount', String(mass.headcount))}
+      </div>
+      <div class="finance-section-head">
+        <h3 class="finance-section-title">Company bonus</h3>
+        <span class="growth-channel-badge growth-channel-badge--inline">${bonusDone != null ? `${bonusDone}% paid` : '1× / month'}</span>
+      </div>
+      <p class="fine-print">Uses one month&apos;s salary mass — CEO share goes to the CEO tab bank.</p>
+      <div class="benefits-preset-row">${bonusButtons}</div>
+      <div class="finance-section-head">
+        <h3 class="finance-section-title">Offsites</h3>
+        <span class="growth-channel-badge growth-channel-badge--inline">${offsiteDone ? 'Booked' : '1× / month'}</span>
+      </div>
+      <div class="growth-play-list">${offsiteCards}</div>
+      <h3 class="finance-section-title">Quick perks</h3>
+      <div class="growth-play-list">${perkCards}</div>
+    </section>
   `;
 }
 
@@ -316,12 +320,17 @@ export function renderPeoplePanel(container, state) {
     `<button type="button" class="${section === id ? 'active' : ''}" data-people-tab="${id}">${label}</button>`;
 
   container.innerHTML = `
-    <nav class="people-subtabs" aria-label="People sections">
-      ${tab('staffing', 'Staffing')}
-      ${tab('benefits', 'Employee perks')}
-      ${tab('equity', 'Option pool')}
-    </nav>
-    <div id="people-section-mount"></div>
+    <div class="people-panel finance-panel">
+      <div class="finance-hero">
+        <p class="panel-lede">Headcount, perks, and option pool — payroll finalizes when you close the month on the Desk.</p>
+      </div>
+      <nav class="people-subtabs" aria-label="People sections">
+        ${tab('staffing', 'Staffing')}
+        ${tab('benefits', 'Employee perks')}
+        ${tab('equity', 'Option pool')}
+      </nav>
+      <div id="people-section-mount"></div>
+    </div>
   `;
 
   const mount = document.getElementById('people-section-mount');
@@ -349,14 +358,19 @@ export function renderOptionPoolPanel(container, state) {
     .join('');
 
   container.innerHTML = `
-    <p class="panel-lede">Refresh the employee option pool without a priced round — board consent assumed. Dilutes all holders proportionally.</p>
-    <div class="summary-grid">
-      <div><span class="stat-label">Option pool</span><span class="stat-value">${poolRow ? `${poolRow.pct}%` : '—'}</span></div>
-      <div><span class="stat-label">Pool shares</span><span class="stat-value">${poolRow ? (poolRow.shares ?? 0).toLocaleString() : '—'}</span></div>
-      <div><span class="stat-label">This month</span><span class="stat-value">${poolExpanded ? 'Expanded' : 'Available'}</span></div>
-    </div>
-    <div class="benefits-preset-row">${poolButtons}</div>
-    <p class="fine-print">One expansion per month · seed creates the initial ~10% ESOP.</p>
-    ${poolHistory ? `<ul class="fine-print">${poolHistory}</ul>` : '<p class="fine-print">No pool refreshes yet.</p>'}
+    <section class="finance-section people-equity-section">
+      <div class="finance-kpi-row people-kpi-row">
+        ${panelStatCard('Option pool', poolRow ? `${poolRow.pct}%` : '—', { hero: true })}
+        ${panelStatCard('Pool shares', poolRow ? (poolRow.shares ?? 0).toLocaleString() : '—')}
+        ${panelStatCard('This month', poolExpanded ? 'Expanded' : 'Available')}
+      </div>
+      <p class="fine-print">Refresh ESOP without a priced round — dilutes all holders proportionally. One expansion per month.</p>
+      <div class="benefits-preset-row">${poolButtons}</div>
+      ${
+        poolHistory
+          ? `<details class="finance-details"><summary>Recent pool refreshes</summary><ul class="desk-log-list">${poolHistory}</ul></details>`
+          : '<p class="fine-print">No pool refreshes yet.</p>'
+      }
+    </section>
   `;
 }

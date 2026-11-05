@@ -1042,6 +1042,69 @@ h1 {
   line-height: 1.45;
 }
 
+.desk-panel,
+.people-panel,
+.board-panel,
+.news-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.desk-kpi-row,
+.people-kpi-row,
+.board-kpi-row,
+.news-kpi-row {
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+}
+
+.desk-close-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.desk-log-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+}
+
+.growth-context-visible {
+  margin: -0.35rem 0 0;
+}
+
+.news-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.news-feed-section .news-article {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.news-archive-section .news-archive-block {
+  margin-bottom: 0.85rem;
+}
+
+.board-context-grid {
+  margin: 0.5rem 0 0.65rem;
+}
+
+.crisis-panel {
+  border: 1px solid rgba(248, 113, 113, 0.45);
+  border-radius: 0.75rem;
+  padding: 1rem 1.1rem;
+  background: rgba(248, 113, 113, 0.08);
+}
+
 .companies-reinvest-cell {
   display: flex;
   flex-direction: column;

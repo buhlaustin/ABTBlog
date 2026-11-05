@@ -100,10 +100,11 @@ export function renderCrisisPanel(container, state) {
     .join('');
 
   container.innerHTML = `
+    <div class="finance-alert" role="alert"><strong>Crisis</strong> — resolve before closing the month.</div>
     <p class="eyebrow">Crisis card</p>
     <h2>${escapeHtml(active.title)}</h2>
     <p class="lede">${escapeHtml(active.description)}</p>
     <div class="crisis-actions">${buttons}</div>
-    <p class="fine-print">Pick a path before you close the month — choices change cash, trust, desk revenue, and rival heat.</p>
+    <p class="fine-print">Choices change cash, trust, desk revenue, and rival heat.</p>
   `;
 }
