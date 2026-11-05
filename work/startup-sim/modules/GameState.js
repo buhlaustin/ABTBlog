@@ -286,6 +286,10 @@ export function normalizeSave(raw) {
       if (pm.lastSplitTurn === undefined) pm.lastSplitTurn = null;
       if (pm.lastDividendTurn === undefined) pm.lastDividendTurn = null;
       if (pm.lastAnalystActionTurn === undefined) pm.lastAnalystActionTurn = null;
+      if (pm.fundamentalPrice === undefined) pm.fundamentalPrice = null;
+      if (pm.priceSalesMultiple === undefined) pm.priceSalesMultiple = null;
+      if (pm.lastMonthDeltaPct === undefined) pm.lastMonthDeltaPct = null;
+      if (!pm.lastTickDrivers) pm.lastTickDrivers = [];
     }
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);

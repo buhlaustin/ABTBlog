@@ -59,7 +59,11 @@ export function createInitialPublicMarket() {
     institutionalHoldPct: 42,
     lastSplitTurn: null,
     lastDividendTurn: null,
-    lastAnalystActionTurn: null
+    lastAnalystActionTurn: null,
+    fundamentalPrice: null,
+    priceSalesMultiple: null,
+    lastMonthDeltaPct: null,
+    lastTickDrivers: []
   };
 }
 

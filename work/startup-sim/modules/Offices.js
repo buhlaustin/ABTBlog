@@ -146,6 +146,7 @@ function escapeHtml(s) {
 function workspacePurchaseBlock(state) {
   const arr = getArr(state);
   const tier = getWorkspaceTier(state);
+  const atHub = Boolean(state.offices?.hubId) || tier === WORKSPACE_TIER.HUB;
   const tiers = [
     { id: WORKSPACE_TIER.SMALL, label: 'Small office', rent: '$2k/mo', gate: ARR_GATES.SMALL_OFFICE, cap: 4 },
     { id: WORKSPACE_TIER.MEDIUM, label: 'Medium office', rent: '$5k/mo', gate: ARR_GATES.MEDIUM_OFFICE, cap: 12 },
@@ -158,20 +159,28 @@ function workspacePurchaseBlock(state) {
       cap: 100
     }
   ];
-  const buttons = tiers
-    .map((t) => {
-      const can = canPurchaseTier(state, t.id);
-      const disabled = !can.ok ? 'disabled' : '';
-      const title = can.ok ? '' : ` title="${escapeHtml(can.reason)}"`;
-      return `<button type="button" class="btn btn-ghost btn-small" data-purchase-workspace="${t.id}" ${disabled}${title}>${escapeHtml(t.label)} · ${t.rent} · ${t.cap} seats</button>`;
-    })
-    .join('');
+  const buttons = atHub
+    ? ''
+    : tiers
+        .map((t) => {
+          const can = canPurchaseTier(state, t.id);
+          const disabled = !can.ok ? 'disabled' : '';
+          const title = can.ok ? '' : ` title="${escapeHtml(can.reason)}"`;
+          return `<button type="button" class="btn btn-ghost btn-small" data-purchase-workspace="${t.id}" ${disabled}${title}>${escapeHtml(t.label)} · ${t.rent} · ${t.cap} seats</button>`;
+        })
+        .join('');
+
+  const hubNote = atHub
+    ? `<p class="fine-print">Worldwide hub HQ — add satellite offices below. Earlier office tiers are no longer listed here.</p>`
+    : `<p class="fine-print">Offices are purchased at ARR gates; rent rolls into monthly burn. Garage has no hires.</p>`;
+
+  const purchaseRow = buttons ? `<div class="workspace-purchase-row">${buttons}</div>` : '';
 
   return `
     <div class="finance-action">
       <p><strong>Workspace</strong> — ${escapeHtml(workspaceLabel(tier))} · rent ${formatMoney(workspaceRentMonthly(state))}/mo · ARR ${formatMoney(arr)}</p>
-      <p class="fine-print">Offices are purchased at ARR gates; rent rolls into monthly burn. Garage has no hires.</p>
-      <div class="workspace-purchase-row">${buttons}</div>
+      ${hubNote}
+      ${purchaseRow}
     </div>`;
 }
 
