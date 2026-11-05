@@ -214,9 +214,10 @@ export function normalizeSave(raw) {
     }
     if (!state.company.ceoFirstName) state.company.ceoFirstName = 'Founder';
     if (state.company.ceoLastName === undefined) state.company.ceoLastName = '';
-    if (!state.company.economics) {
+    {
       const cat = getCategoryById(state.company?.categoryId);
       if (!cat) return null;
+      state.company.categoryLabel = cat.label;
       state.company.economics = categoryEconomics(cat);
     }
     if (!state.finance.fixedCostsMonthly) {

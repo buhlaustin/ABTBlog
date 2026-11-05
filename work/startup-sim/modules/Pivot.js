@@ -17,9 +17,9 @@ export function applyPivot(state, newCategoryId) {
   }
 
   const cat = getCategoryById(newCategoryId, getCategoriesSync());
-  if (!cat) return { ok: false, reason: 'Pick a category from the list.' };
+  if (!cat) return { ok: false, reason: 'Pick an industry from the list.' };
   if (cat.id === state.company.categoryId) {
-    return { ok: false, reason: 'Pick a different category than your current positioning.' };
+    return { ok: false, reason: 'Pick a different industry than you are in now.' };
   }
 
   const oldLabel = state.company.categoryLabel;
@@ -38,7 +38,7 @@ export function applyPivot(state, newCategoryId) {
     id: `pivot-${Date.now()}`,
     headline: `${state.company.name} pivots from ${oldLabel} to ${cat.label}`,
     dek: 'Same team, new pitch deck, fresh buzz penalty.',
-    body: `The Financier Times notes the repositioning. ProNet commentators debate whether it is vision or panic. Your Desk tasks will skew toward the new category next month.`,
+    body: `The Financier Times notes the repositioning. ProNet commentators debate whether it is vision or panic. Your Desk tasks will skew toward the new industry next month.`,
     source: 'The Financier Times',
     date: `Y${state.calendar.year} M${state.calendar.monthIndex}`
   };

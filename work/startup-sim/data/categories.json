@@ -1,12 +1,52 @@
 [
-  { "id": "b2b-saas", "label": "B2B SaaS", "defaultACV": 12000, "salesCycleWeeks": 8 },
-  { "id": "consumer-social", "label": "Consumer social", "defaultACV": 0, "salesCycleWeeks": 0 },
-  { "id": "marketplace", "label": "Marketplace / gig economy", "defaultACV": 2400, "salesCycleWeeks": 4 },
-  { "id": "delivery", "label": "Delivery & logistics", "defaultACV": 1800, "salesCycleWeeks": 2 },
-  { "id": "fintech", "label": "Fintech", "defaultACV": 8000, "salesCycleWeeks": 12 },
-  { "id": "ai-tools", "label": "AI tools", "defaultACV": 15000, "salesCycleWeeks": 6 },
-  { "id": "hardware", "label": "Hardware + software", "defaultACV": 50000, "salesCycleWeeks": 16 },
-  { "id": "healthtech", "label": "Healthtech", "defaultACV": 25000, "salesCycleWeeks": 14 },
-  { "id": "climate", "label": "Climate & energy", "defaultACV": 40000, "salesCycleWeeks": 20 },
-  { "id": "gaming-media", "label": "Gaming & media", "defaultACV": 6000, "salesCycleWeeks": 6 }
+  {
+    "id": "b2b-saas",
+    "label": "B2B business software",
+    "blurb": "Software sold to companies — sales cycles, contracts, and SOC 2 questionnaires."
+  },
+  {
+    "id": "consumer-social",
+    "label": "Social media",
+    "blurb": "Consumer apps — feeds, creators, DMs, moderation, and App Store growth."
+  },
+  {
+    "id": "marketplace",
+    "label": "Marketplace & gig apps",
+    "blurb": "Two-sided platforms — Uber-style matching, trust & safety, and take rates."
+  },
+  {
+    "id": "delivery",
+    "label": "Food & package delivery",
+    "blurb": "Last-mile logistics — drivers, dispatch, and thin margins at scale."
+  },
+  {
+    "id": "fintech",
+    "label": "Banking & fintech",
+    "blurb": "Money movement — cards, compliance, and partnerships with banks."
+  },
+  {
+    "id": "ai-tools",
+    "label": "AI apps",
+    "blurb": "Models in production — evals, GPU bills, and enterprise AI buyers."
+  },
+  {
+    "id": "hardware",
+    "label": "Hardware & gadgets",
+    "blurb": "Physical products — manufacturing, firmware, and retail shelves."
+  },
+  {
+    "id": "healthtech",
+    "label": "Healthcare software",
+    "blurb": "Hospitals and clinics — HIPAA, EHR integrations, and clinical pilots."
+  },
+  {
+    "id": "climate",
+    "label": "Clean energy",
+    "blurb": "Climate tech — permits, long sales cycles, and project finance."
+  },
+  {
+    "id": "gaming-media",
+    "label": "Video games & streaming",
+    "blurb": "Games and entertainment — live ops, platforms, and content deals."
+  }
 ]

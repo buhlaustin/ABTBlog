@@ -68,6 +68,7 @@ export function populateCategorySelect(selectEl, categories) {
     const opt = document.createElement('option');
     opt.value = cat.id;
     opt.textContent = cat.label;
+    if (cat.blurb) opt.title = cat.blurb;
     selectEl.appendChild(opt);
   }
   if (categories.length > 0) {
@@ -534,7 +535,7 @@ export function renderProductPanel(container, state) {
   const pivotBlock = pivotAllowed
     ? `<form id="pivot-form" class="setup-form finance-action">
         <p><strong>One-time pivot</strong> — reposition the company (buzz hit${hasInstitutionalBoard(state) ? '; board approval drops if you have a board' : ''}).</p>
-        <label for="pivot-category">New category</label>
+        <label for="pivot-category">New industry</label>
         <select id="pivot-category" name="pivotCategory" required>
           <option value="" disabled selected>Choose new positioning…</option>
           ${options}
@@ -551,7 +552,7 @@ export function renderProductPanel(container, state) {
     <div class="summary-grid">
       <div><span class="stat-label">Product level</span><span class="stat-value">${state.product.level ?? 0}</span></div>
       <div><span class="stat-label">Buzz</span><span class="stat-value">${state.product.buzz ?? 0}</span></div>
-      <div><span class="stat-label">Category</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
+      <div><span class="stat-label">Industry</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
     </div>
     ${pivotBlock}
     <div id="product-actions-mount"></div>

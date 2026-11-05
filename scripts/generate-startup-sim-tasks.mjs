@@ -52,7 +52,7 @@ function categoryBlock(categoryId, label, rows) {
 }
 
 const BULK = {
-  'consumer-social': categoryBlock('consumer-social', 'Consumer social', [
+  'consumer-social': categoryBlock('consumer-social', 'Social media', [
     ['Invite-only beta codes', 'Scarcity mechanics and referral links that feel exclusive.', 'marketing'],
     ['Creator seed program', 'Pay early creators in credits before you have revenue.', 'marketing'],
     ['Feed ranking experiment', 'A/B the algorithm until time-on-app moves.', 'product'],
@@ -189,7 +189,7 @@ const BULK = {
     ['Consumer complaint log review', 'CFPB-ready responses.', 'research'],
     ['FX spread transparency test', 'Show fees before users swap.', 'product']
   ]),
-  'ai-tools': categoryBlock('ai-tools', 'AI tools', [
+  'ai-tools': categoryBlock('ai-tools', 'AI apps', [
     ['Eval harness v1', 'Golden sets before you ship model changes.', 'product'],
     ['Prompt library cleanup', 'Version prompts like code.', 'product'],
     ['RAG pipeline hardening', 'Chunking that respects semantics.', 'product'],
@@ -291,7 +291,7 @@ const BULK = {
     ['Energy audit sales playbook', 'Close retrofits, not just audits.', 'sales'],
     ['Thermal storage pilot site', 'Molten salt or ice — pick your sci-fi.', 'product']
   ]),
-  'gaming-media': categoryBlock('gaming-media', 'Gaming & media', [
+  'gaming-media': categoryBlock('gaming-media', 'Video games & streaming', [
     ['Battle pass season design', 'Rewards grind that feels fair.', 'product'],
     ['Live ops calendar', 'Events spaced so devs sleep.', 'product'],
     ['Anti-cheat telemetry', 'Detect aimbots without false bans.', 'product'],
