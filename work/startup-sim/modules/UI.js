@@ -38,6 +38,7 @@ import { sentimentLabel, marketTrustLabel, hasInstitutionalBoard } from './Senti
 import { runwayLabel } from './MonthSummary.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
+import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
 import {
   getTaskRevenueMultiplierPreview,
   getCoreTaskRevenueMult,
@@ -590,6 +591,9 @@ export function renderGrowthPanel(container, state) {
   const growthRuns = (state.growth?.campaignsThisMonth ?? []).length;
   const growthSlots = growthCampaignSlots(state);
   const growthLeft = growthCampaignsRemaining(state);
+  const growthSlotLabel = formatMonthlySideTaskLimit(growthSlots);
+  const growthLeftLabel =
+    growthLeft === Infinity ? 'Unlimited' : `${growthLeft}/${growthSlotLabel}`;
   const capNote = revHud.label.includes('capped')
     ? ` · uncapped stack ${rawMult.toFixed(1)}× → <strong>${totalMult.toFixed(2)}× cap</strong>`
     : '';
@@ -603,8 +607,8 @@ export function renderGrowthPanel(container, state) {
     : `<p class="fine-print"><strong>Market trust</strong> ${trustScore} — ${escapeHtml(marketTrustLabel(trustScore))}. Crises and desk decisions move this score; Series A needs at least 32.</p>`;
   const multNote =
     state.mode === 'sandbox' && tuneMult !== 1
-      ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong>${capNote} · growth slots ${growthLeft}/${growthSlots} left${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
-      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — ${revHud.label.includes('capped') ? 'Rev× (capped)' : 'effective multiplier'} <strong>${totalMult.toFixed(2)}×</strong>${capNote}${growthRuns ? ` · ${growthRuns}/${growthSlots} growth slot(s) used` : ` · ${growthLeft}/${growthSlots} growth slot(s) left`}.</p>`;
+      ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong>${capNote} · paid campaigns ${growthLeftLabel}${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
+      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — ${revHud.label.includes('capped') ? 'Rev× (capped)' : 'effective multiplier'} <strong>${totalMult.toFixed(2)}×</strong>${capNote}${growthRuns ? ` · ${growthRuns}/${growthSlotLabel} paid campaign(s) used` : ` · ${growthLeftLabel} paid campaign(s) left`}.</p>`;
 
   container.innerHTML = `
     <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks and paid campaigns below share the same multiplier math.</p>
@@ -639,7 +643,8 @@ export function renderGrowthPanel(container, state) {
   renderProductActionsPanel(document.getElementById('growth-levers-mount'), state, {
     heading: 'Side growth plays',
     focusFilter: SIDE_TASK_FOCUS_GROWTH,
-    lede: `Marketing and brand experiments — shares the monthly side-task limit with Product (${sideTaskBankSize(SIDE_TASK_FOCUS_GROWTH)} growth/brand plays in bank).`
+    showLimitHint: false,
+    lede: `Marketing and brand experiments — shares the monthly side-play limit with Product (${sideTaskBankSize(SIDE_TASK_FOCUS_GROWTH)} growth/brand plays in bank).`
   });
 }
 
@@ -683,7 +688,7 @@ export function renderProductPanel(container, state) {
   renderProductActionsPanel(document.getElementById('product-actions-mount'), state, {
     heading: 'Product side plays',
     focusFilter: SIDE_TASK_FOCUS_PRODUCT,
-    lede: `Ship faster without a desk slot — product-focused buys (${sideTaskBankSize(SIDE_TASK_FOCUS_PRODUCT)} in bank).`
+    lede: `Ship faster without a desk slot — product-focused buys (${sideTaskBankSize(SIDE_TASK_FOCUS_PRODUCT)} in bank). Limit grows with stage; hub removes the cap.`
   });
 }
 

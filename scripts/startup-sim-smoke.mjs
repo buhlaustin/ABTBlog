@@ -968,9 +968,43 @@ if (!hireMax.ok || cooSalaryMonthly(garageZero) !== 0) {
 const { growthCampaignCatalogSize } = await import(
   `file://${join(sim, 'modules/GrowthCampaigns.js')}`
 );
-const { getProductActions, sideTaskBankSize } = await import(
+const { getProductActions, sideTaskBankSize, sideTaskPlaysPerMonth } = await import(
   `file://${join(sim, 'modules/ProductActions.js')}`
 );
+const { growthCampaignSlots } = await import(
+  `file://${join(sim, 'modules/SideTaskProgression.js')}`
+);
+const earlySide = createInitialState({ companyName: 'Side Cap', categoryId: 'b2b-saas', mode: 'career' });
+const earlyPlays = sideTaskPlaysPerMonth(earlySide);
+if (earlyPlays < 2) {
+  console.error(`FAIL: early side plays expected >=2 got ${earlyPlays}`);
+  failed = true;
+}
+earlySide.flags.seedRoundClosed = true;
+earlySide.flags.seriesAClosed = true;
+earlySide.flags.seriesBClosed = true;
+earlySide.product.level = 12;
+earlySide.product.buzz = 24;
+earlySide.staff.headcountByDept = { marketing: 16, product: 8, engineering: 12 };
+const scaledPlays = sideTaskPlaysPerMonth(earlySide);
+const scaledCampaigns = growthCampaignSlots(earlySide);
+if (scaledPlays <= earlyPlays || scaledCampaigns < 3) {
+  console.error(`FAIL: side limits should scale (${earlyPlays}→${scaledPlays}, campaigns ${scaledCampaigns})`);
+  failed = true;
+}
+const hubState = createInitialState({ companyName: 'Hub Side', categoryId: 'b2b-saas', mode: 'career' });
+hubState.workspace.tier = WORKSPACE_TIER.HUB;
+hubState.offices = { ...(hubState.offices ?? {}), hubId: 'test-hub' };
+if (
+  sideTaskPlaysPerMonth(hubState) !== Infinity ||
+  growthCampaignSlots(hubState) !== Infinity
+) {
+  console.error('FAIL: hub workspace should grant unlimited side tasks');
+  failed = true;
+} else {
+  console.log(`OK: dynamic side limits (${earlyPlays}→${scaledPlays} plays, hub unlimited)`);
+}
+
 const productSideBank = sideTaskBankSize(['product', 'both']);
 if (growthCampaignCatalogSize() < 130) {
   console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()})`);

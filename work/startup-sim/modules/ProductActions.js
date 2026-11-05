@@ -3,6 +3,14 @@ import { recordCashOutflow } from './Finance.js';
 import { setGameFeedback } from './GameFeedback.js';
 import { easeCompetitorPressure } from './Competitor.js';
 import { progressionTier } from './ProgressionEconomy.js';
+import {
+  sideTaskPlaysPerMonth,
+  formatMonthlySideTaskLimit,
+  sideTaskCapacityRemaining,
+  sideTaskLimitHint
+} from './SideTaskProgression.js';
+
+export { sideTaskPlaysPerMonth, formatMonthlySideTaskLimit, sideTaskLimitHint };
 import { fetchGameJson } from './utils.js';
 import bundledLevers from '../data/growth-levers.json' with { type: 'json' };
 import bundledLeversExtra from '../data/growth-levers-extra.json' with { type: 'json' };
@@ -60,16 +68,9 @@ export function sideTaskBankSize(focusFilter) {
 /** @deprecated use getProductActions() */
 export const PRODUCT_ACTIONS = leverCatalog;
 
-function actionsPerMonth(state) {
-  const tier = progressionTier(state);
-  if (tier >= 5) return 4;
-  if (tier >= 3) return 3;
-  return 2;
-}
-
 export function productActionsRemaining(state) {
   const used = state.product?.actionsThisMonth ?? 0;
-  return Math.max(0, actionsPerMonth(state) - used);
+  return sideTaskCapacityRemaining(sideTaskPlaysPerMonth(state), used);
 }
 
 export function resetProductActionsMonth(state) {
@@ -90,9 +91,12 @@ export function runProductAction(state, actionId) {
   if (!actionUnlocked(def, state)) {
     return { ok: false, reason: 'Not unlocked at your current stage.' };
   }
-  const limit = actionsPerMonth(state);
-  if (productActionsRemaining(state) <= 0) {
-    return { ok: false, reason: `Only ${limit} growth lever play${limit === 1 ? '' : 's'} per month.` };
+  const limit = sideTaskPlaysPerMonth(state);
+  if (Number.isFinite(limit) && productActionsRemaining(state) <= 0) {
+    return {
+      ok: false,
+      reason: `Only ${formatMonthlySideTaskLimit(limit)} side play${limit === 1 ? '' : 's'} per month at your current stage.`
+    };
   }
 
   const cash = state.finance?.cash ?? 0;
@@ -120,14 +124,20 @@ function escapeHtml(s) {
 
 export function renderProductActionsPanel(container, state, options = {}) {
   if (!container) return;
+  const limit = sideTaskPlaysPerMonth(state);
   const left = productActionsRemaining(state);
-  const limit = actionsPerMonth(state);
+  const leftLabel =
+    left === Infinity
+      ? 'Unlimited'
+      : `${left}/${formatMonthlySideTaskLimit(limit)}`;
+  const atCap = Number.isFinite(limit) && left <= 0;
   const heading = options.heading ?? 'Growth levers';
   const focusFilter = options.focusFilter;
   const bankSize = sideTaskBankSize(focusFilter);
+  const hint = options.showLimitHint !== false ? `<p class="fine-print">${sideTaskLimitHint(state)}</p>` : '';
   const lede =
     options.lede ??
-    `Cash plays outside desk tasks — <strong>${left}/${limit}</strong> left this month (${bankSize} in this bank · ${getProductActions().length} total side plays).`;
+    `Cash plays outside desk tasks — <strong>${leftLabel}</strong> left this month (${bankSize} in this bank · ${getProductActions().length} total side plays).`;
   const rows = filterSideTasksByFocus(getProductActions(), focusFilter)
     .filter((a) => actionUnlocked(a, state))
     .map((a) => {
@@ -139,7 +149,7 @@ export function renderProductActionsPanel(container, state, options = {}) {
       return `<div class="finance-action product-action">
       <p><strong>${escapeHtml(a.label)}</strong>${focusTag} — ${formatMoney(a.cost)}</p>
       <p class="fine-print">${escapeHtml(a.description)} Buzz +${a.buzz ?? 0}${a.product ? ` · Product +${a.product}` : ''}${rival}.</p>
-      <button type="button" class="btn btn-primary btn-small" data-product-action="${escapeHtml(a.id)}" ${left <= 0 ? 'disabled title="No growth lever plays left this month"' : ''}>Run play</button>
+      <button type="button" class="btn btn-primary btn-small" data-product-action="${escapeHtml(a.id)}" ${atCap ? 'disabled title="No side plays left this month"' : ''}>Run play</button>
     </div>`;
     })
     .join('');
@@ -147,6 +157,7 @@ export function renderProductActionsPanel(container, state, options = {}) {
   container.innerHTML = `
     <h3 class="log-head">${escapeHtml(heading)}</h3>
     <p class="fine-print">${lede}</p>
+    ${hint}
     ${rows || '<p class="fine-print">More levers unlock as you scale funding stage.</p>'}
     <p id="product-action-feedback" class="desk-feedback" hidden></p>
   `;

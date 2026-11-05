@@ -7,6 +7,7 @@ import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
 import { formatMoney } from './constants.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
+import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
 import { applyCampaignRivalEffects } from './WorldDynamics.js';
 
 function mergeCampaignCatalog(base, ...extras) {
@@ -74,10 +75,10 @@ export function runGrowthCampaign(state, campaignId) {
     return { ok: false, reason: 'Already ran that campaign this month.' };
   }
   const slots = growthCampaignSlots(state);
-  if (state.growth.campaignsThisMonth.length >= slots) {
+  if (Number.isFinite(slots) && state.growth.campaignsThisMonth.length >= slots) {
     return {
       ok: false,
-      reason: `Marketing bandwidth full (${slots} campaign${slots === 1 ? '' : 's'} per month).`
+      reason: `Marketing bandwidth full (${formatMonthlySideTaskLimit(slots)} campaign${slots === 1 ? '' : 's'} per month).`
     };
   }
   const cost = def.cost ?? 0;
@@ -122,7 +123,11 @@ export function renderGrowthCampaignsBlock(state) {
   const mult = getTaskRevenueMultiplierPreview(state);
   const slots = growthCampaignSlots(state);
   const remaining = growthCampaignsRemaining(state);
-  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${remaining}/${slots}</strong> remaining · <strong>${campaigns.length}</strong> plays unlocked (${bankSize} in bank — does not use desk tasks).</p>`;
+  const slotLabel =
+    remaining === Infinity
+      ? 'Unlimited'
+      : `${remaining}/${formatMonthlySideTaskLimit(slots)}`;
+  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> plays unlocked (${bankSize} in bank — does not use desk tasks).</p>`;
   const cards = campaigns
     .map((c) => {
       const r0 = Math.round((c.revenue?.[0] ?? 0) * mult * 0.5);
