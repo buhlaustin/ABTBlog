@@ -19,10 +19,12 @@ import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 import { loanOverheadMonthly } from './BankLoan.js';
 import { ceoSalaryMonthly } from './CeoEconomics.js';
 import { cooSalaryMonthly } from './Coo.js';
+import { totalHeadcount } from './Staff.js';
 
 /** Hard caps on desk + growth payout multiplier (after sandbox tuning overlay). */
 export const REV_MULT_CAP_CAREER = 60;
-export const REV_MULT_CAP_SANDBOX = 240;
+export const REV_MULT_CAP_SANDBOX = 800;
+export const SANDBOX_WORKFORCE_HEADCOUNT_FULL = 10_000;
 
 /** Legacy alias — progression stack replaces seed-only scaling. */
 export function scalingRevenueMult(state) {
@@ -82,7 +84,12 @@ export function getSandboxTuningMult(state) {
 }
 
 export function getTaskRevenueCap(state) {
-  return state.mode === 'sandbox' ? REV_MULT_CAP_SANDBOX : REV_MULT_CAP_CAREER;
+  if (state.mode !== 'sandbox') return REV_MULT_CAP_CAREER;
+  const hc = totalHeadcount(state.staff?.headcountByDept);
+  const scale = Math.min(1, hc / SANDBOX_WORKFORCE_HEADCOUNT_FULL);
+  /** 30% of cap at zero headcount → 100% at 10k employees (sandbox only). */
+  const workforceScale = 0.3 + scale * 0.7;
+  return Math.round(REV_MULT_CAP_SANDBOX * workforceScale * 100) / 100;
 }
 
 /** Core × sandbox tuning, before global cap. */
@@ -109,16 +116,26 @@ export function taskRevenueMultHud(state) {
   const effective = getTaskRevenueMultiplierPreview(state);
   const raw = getRawTaskRevenueMultiplier(state);
   const cap = getTaskRevenueCap(state);
+  const workforceNote =
+    state.mode === 'sandbox'
+      ? ` Sandbox workforce cap ${cap}× (scales to ${REV_MULT_CAP_SANDBOX}× at ${SANDBOX_WORKFORCE_HEADCOUNT_FULL.toLocaleString()} staff).`
+      : '';
   if (isTaskRevenueMultCapped(state)) {
     return {
       effective,
       raw,
       cap,
       label: 'Rev× (capped)',
-      title: `Uncapped stack ${raw.toFixed(1)}× — payouts use ${cap}× max`
+      title: `Uncapped stack ${raw.toFixed(1)}× — payouts use ${cap}× max.${workforceNote}`
     };
   }
-  return { effective, raw, cap, label: 'Rev. mult', title: '' };
+  return {
+    effective,
+    raw,
+    cap,
+    label: 'Rev. mult',
+    title: workforceNote.trim()
+  };
 }
 
 /** Rough desk payout range at current mult (before per-task headcount roll variance). */

@@ -39,7 +39,7 @@ export function growthCampaignSlots(state) {
   let slots = 1 + Math.max(0, tier - 1);
   if (tier >= 3) slots += 1;
   if (tier >= 5) slots += 1;
-  if (tier >= 7) slots += 1;
+  if (tier >= 7) slots += 3;
 
   slots += Math.floor((state.product?.buzz ?? 0) / 20);
 

@@ -268,6 +268,10 @@ export function renderDeskPanel(state) {
           if (!def) return '';
           const sel = offer.selected ? 'task-offer selected' : 'task-offer';
           const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
+          const whale =
+            def.whale || (def.revenue?.[1] ?? 0) >= 1_000_000_000
+              ? ' <span class="task-tag">Whale</span>'
+              : '';
           const launchTag = def.scheduleLaunch
             ? ` <span class="task-tag">${canSchedulePublicLaunch(state) ? 'Launch gate' : `${PRE_LAUNCH_BUZZ_REQUIRED} buzz · ${PRE_LAUNCH_PRODUCT_REQUIRED} prod`}</span>`
             : def.xcDemoDay
@@ -276,7 +280,7 @@ export function renderDeskPanel(state) {
                 ? launchTaskTypeTag(def)
                 : '';
           return `<article class="${sel}">
-            <h3>${escapeHtml(def.title)}${sig}${launchTag}</h3>
+            <h3>${escapeHtml(def.title)}${sig}${whale}${launchTag}</h3>
             <p>${escapeHtml(def.description)}</p>
             <button type="button" class="btn btn-ghost btn-small" data-toggle-task-offer="${escapeHtml(offer.offerId)}">${offer.selected ? 'Selected' : 'Select'}</button>
           </article>`;
@@ -296,6 +300,10 @@ export function renderDeskPanel(state) {
       const band = estimateTaskPayoutBand(def, state);
       const mrrBand = estimateTaskMrrBand(def);
       const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
+      const whale =
+        def.whale || (def.revenue?.[1] ?? 0) >= 1_000_000_000
+          ? ' <span class="task-tag">Whale</span>'
+          : '';
       const crowd = def.crowdfunding ? ' <span class="task-tag">Crowdfunding</span>' : '';
       const rival =
         def.rivalPressure && def.rivalPressure < 0
@@ -307,9 +315,9 @@ export function renderDeskPanel(state) {
         ? ` · MRR +${formatMoney(mrrBand.min)}–${formatMoney(mrrBand.max)}/mo`
         : '';
       return `<article class="${doneClass}">
-        <h3>${escapeHtml(def.title)}${sig}${crowd}</h3>
+        <h3>${escapeHtml(def.title)}${sig}${whale}${crowd}</h3>
         <p>${escapeHtml(def.description)}</p>
-        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${mrrHint}${rival}${preHint}</p>
+        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${mrrHint}${rival}${preHint}${def.stockPct && isPublicCompany(state) ? ` · stock ${def.stockPct > 0 ? '+' : ''}${Math.round(Number(def.stockPct) * 100)}%` : ''}</p>
         ${btn}
       </article>`;
     })

@@ -13,7 +13,8 @@ import {
   seriesDPreview,
   seriesEPreview,
   seriesFPreview,
-  renderCapTableRows
+  renderCapTableRows,
+  renderCapTableSummary
 } from './CapTable.js';
 import {
   renderFinanceSummary,
@@ -335,6 +336,7 @@ export function renderFinancePanel(container, state) {
         <tbody>${renderCapTableRows(state) || '<tr><td colspan="4">Empty</td></tr>'}</tbody>
       </table>
     </div>
+    ${renderCapTableSummary(state)}
     ${
       instruments
         ? `<h3 class="log-head">Instruments</h3><ul class="instrument-list">${instruments}</ul>`

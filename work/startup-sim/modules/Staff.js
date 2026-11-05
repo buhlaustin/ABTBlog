@@ -258,7 +258,7 @@ export function renderPeoplePanel(container, state) {
   container.innerHTML = `
     ${orgMount}
     <div id="org-chart-mount"></div>
-    <p class="panel-lede">Hire a named <strong>COO</strong> above (garage onward — up to <strong>10% equity</strong>; in the garage, more equity means less cash, down to <strong>$0/mo</strong> at 10%). Department headcount unlocks after you lease a small office ($10k ARR).</p>
+    <p class="panel-lede">Hire a named <strong>COO</strong> above (garage onward — up to <strong>10% equity</strong>; in the garage, more equity means less cash, down to <strong>$0/mo</strong> at 10%). Department headcount unlocks after you lease a small office ($10k ARR).${state.mode === 'sandbox' ? ' <strong>Sandbox</strong> raises the company headcount cap to <strong>10,000</strong> — staffing also scales your sandbox rev× ceiling.' : ''}</p>
     <div class="table-scroll">
       <table class="data-table">
         <thead><tr><th>Department</th><th>Headcount</th><th>$/head/mo</th><th>Subtotal</th></tr></thead>

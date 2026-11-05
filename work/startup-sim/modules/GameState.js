@@ -4,7 +4,7 @@ import { createInitialSocial } from './Social.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
-import { recalculateCapTablePercentages } from './CapTable.js';
+import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
 import { createInitialBoard } from './Board.js';
@@ -91,7 +91,7 @@ export function createInitialState(options) {
       economics
     },
     workspace: createInitialWorkspace(),
-    growth: { campaignsThisMonth: [] },
+    growth: { campaignsThisMonth: [], monthCampaignOffers: [], recentCampaignIds: [] },
     board: createInitialBoard(),
     stage: STAGES.GARAGE,
     calendar: createInitialCalendar(calendarStart),
@@ -236,6 +236,8 @@ export function normalizeSave(raw) {
     delete state.executives;
     if (!state.growth) state.growth = { campaignsThisMonth: [] };
     if (!state.growth.campaignsThisMonth) state.growth.campaignsThisMonth = [];
+    if (!state.growth.recentCampaignIds) state.growth.recentCampaignIds = [];
+    if (!state.growth.monthCampaignOffers) state.growth.monthCampaignOffers = [];
     if (state.workspace && state.workspace.campusOwned === undefined) {
       state.workspace.campusOwned = getWorkspaceTier(state) === 'campus';
     }
@@ -477,6 +479,7 @@ export function normalizeSave(raw) {
       ];
     } else {
       recalculateCapTablePercentages(state.capTable);
+      migratePublicFloatCapTable(state);
     }
 
     if (state.stage === STAGES.OFFICE && state.workspace?.tier === 'garage') {

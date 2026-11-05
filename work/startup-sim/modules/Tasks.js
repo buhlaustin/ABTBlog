@@ -9,6 +9,7 @@ import bundledLaunchCrowd from '../data/launch-crowdfunding-tasks.json' with { t
 import bundledSpaceExploration from '../data/space-exploration-tasks.json' with { type: 'json' };
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
 import bundledCatalogExpansion from '../data/tasks-catalog-expansion.json' with { type: 'json' };
+import bundledPublicLate from '../data/tasks-public-late-game.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
@@ -79,11 +80,17 @@ function mergeCatalogExpansion(base) {
   return mergeTaskPack(base, bundledCatalogExpansion?.tasks ?? []);
 }
 
+function mergePublicLateGameTasks(base) {
+  return mergeTaskPack(base, bundledPublicLate?.tasks ?? []);
+}
+
 function mergeCatalog(base) {
   return mergeXcDemoDayTasks(
     mergePostXcPreSeedTasks(
       mergeLaunchTasks(
-        mergeSpaceExplorationTasks(mergeCatalogExpansion(mergeSignatureTasks(base)))
+        mergeSpaceExplorationTasks(
+          mergePublicLateGameTasks(mergeCatalogExpansion(mergeSignatureTasks(base)))
+        )
       )
     )
   );
@@ -331,6 +338,16 @@ export function dealMonthlyTasks(state) {
   if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
     const demo = pool.find((t) => t.id === XC_DEMO_DAY_TASK_ID);
     if (demo) offered = mergeUniqueTaskOffers(offered, demo, offerCount);
+  }
+  if (progressionTier(state) >= 7) {
+    const whales = pool.filter((t) => t.whale || (t.revenue?.[1] ?? 0) >= 1_000_000_000);
+    if (whales.length) {
+      const injectCount = Math.random() < 0.45 ? 2 : 1;
+      for (let w = 0; w < injectCount; w += 1) {
+        const pick = shuffle(whales)[0];
+        if (pick) offered = mergeUniqueTaskOffers(offered, pick, offerCount);
+      }
+    }
   }
   if (!launchLifecycleActive(state)) {
     const sigPool = pool.filter((t) => t.signature);

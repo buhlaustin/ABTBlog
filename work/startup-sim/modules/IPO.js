@@ -2,18 +2,20 @@ import { STAGES, formatMoney, createInitialPublicMarket } from './constants.js';
 import { getEffectiveIpoGate } from './SandboxTuning.js';
 import { getArr } from './Workspace.js';
 import { calendarTurn } from './XC.js';
-import { getFounderRow } from './CapTable.js';
+import {
+  ensurePublicFloatOnCapTable,
+  getFounderRow,
+  issueFollowOnShares,
+  retirePublicFloatShares,
+  targetIpoSharePrice,
+  totalOutstandingShares
+} from './CapTable.js';
 import { ceoEndgameCompSnapshot, depositStockCashOutToPersonalBank } from './CeoEconomics.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 import { recordCashOutflow } from './Finance.js';
 import { totalSubsidiaryMrr } from './Acquisitions.js';
-
-function totalOutstandingShares(state) {
-  const total = (state.capTable ?? []).reduce((s, r) => s + (r.shares ?? 0), 0);
-  return total > 0 ? total : 10_000_000;
-}
 
 function deriveTicker(companyName) {
   const letters = String(companyName || 'CO')
@@ -65,8 +67,8 @@ export function fileIpo(state) {
   }
 
   const valuation = computeIpoValuation(state);
-  const shares = totalOutstandingShares(state);
-  const ipoPrice = Math.max(1, Math.round((valuation / shares) * 100) / 100);
+  const ipoPrice = targetIpoSharePrice(state, valuation);
+  const shares = ensurePublicFloatOnCapTable(state, valuation, ipoPrice);
   const pop = 1.08 + Math.random() * 0.12;
   const openPrice = Math.round(ipoPrice * pop * 100) / 100;
 
@@ -95,7 +97,7 @@ export function fileIpo(state) {
   pushMarketTape(state, `Listed at ${formatMoney(openPrice)} — opening pop ${Math.round((pop - 1) * 100)}%.`);
   refreshAnalystCoverage(state, { force: true });
 
-  state.finance.valuation = Math.round(openPrice * shares);
+  state.finance.valuation = Math.round(openPrice * totalOutstandingShares(state));
   state.flags.ipoFiled = true;
   state.stage = STAGES.PUBLIC;
   state.finance.fixedCostsMonthly = 6_500;
@@ -242,6 +244,8 @@ export function executeStockBuyback(state, amount) {
   recordCashOutflow(state, spend, 'buyback');
   pm.buybackAuthorized = authorized - spend;
   pm.buybackUsedLifetime = (pm.buybackUsedLifetime ?? 0) + spend;
+  const price = pm.sharePrice ?? pm.ipoPrice ?? 1;
+  retirePublicFloatShares(state, spend / Math.max(price, 0.01));
   const pct = Math.min(0.09, spend / Math.max(marketCap(state), 1) * 2.5);
   applyStockPctMove(state, pct);
   pm.shortInterestPct = Math.max(1, (pm.shortInterestPct ?? 5) - 1);
@@ -270,9 +274,7 @@ export function fileFollowOnOffering(state) {
   state.finance.cash = (state.finance.cash ?? 0) + raise;
   state.finance.lifetimeRevenue += raise;
   const dilutionPct = 0.025;
-  for (const row of state.capTable ?? []) {
-    if (row.shares) row.shares = Math.round(row.shares * (1 - dilutionPct));
-  }
+  issueFollowOnShares(state, dilutionPct);
   applyStockPctMove(state, -0.05);
   pm.buybackAuthorized = (pm.buybackAuthorized ?? 0) + Math.round(raise * 0.15);
   pushMarketTape(state, `Follow-on priced — ${formatMoney(raise)} primary.`);
@@ -634,7 +636,7 @@ export function renderIpoPanel(container, state) {
     const tone = pm.guidanceTone ?? 'inline';
     const earningsSoon = (pm.monthsPublic ?? 0) % 3 === 2;
     block = `<div class="finance-action ipo-action stock-panel">
-      <p class="stock-headline"><strong>${escapeHtml(pm.ticker ?? '—')}</strong> · ${formatMoney(pm.sharePrice ?? 0)}/share · Mkt cap ${formatMoney(cap)}</p>
+      <p class="stock-headline"><strong>${escapeHtml(pm.ticker ?? '—')}</strong> · ${formatMoney(pm.sharePrice ?? 0)}/share · Mkt cap ${formatMoney(cap)} · ${totalOutstandingShares(state).toLocaleString()} sh</p>
       ${renderStockSparkline(pm.priceHistory)}
       <div class="summary-grid stock-stats">
         <div><span class="stat-label">IPO</span><span class="stat-value">${formatMoney(pm.ipoPrice ?? 0)}</span></div>
