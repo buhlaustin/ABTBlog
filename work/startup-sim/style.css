@@ -727,6 +727,34 @@ h1 {
   min-width: 6.5rem;
 }
 
+.stock-panel .stock-headline {
+  margin-bottom: 0.35rem;
+}
+
+.stock-sparkline {
+  display: block;
+  margin: 0.25rem 0 0.75rem;
+  opacity: 0.85;
+  color: var(--accent, #60a5fa);
+}
+
+.stock-stats {
+  margin: 0.5rem 0;
+}
+
+.stock-guidance-row,
+.stock-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.5rem 0;
+}
+
+.stock-guidance-row .stat-label {
+  margin-right: 0.25rem;
+}
+
 .tag {
   display: inline-block;
   font-size: 0.72rem;

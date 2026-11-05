@@ -18,7 +18,7 @@ import { renderBoardPanel } from './Board.js';
 import { hasActiveCrisis } from './Crisis.js';
 import { hasActiveDecision, renderDeskDecisionBlock } from './DecisionEvents.js';
 import { activeModifierLabels } from './ScenarioEffects.js';
-import { isPublicCompany, founderStakeValue } from './IPO.js';
+import { isPublicCompany, founderStakeValue, stockHudChangeLabel } from './IPO.js';
 import { stageIconUrl, applyGameBackdrop } from './Assets.js';
 import { playUiClick } from './Audio.js';
 import { activeTutorialStep, renderTutorialBanner } from './Tutorial.js';
@@ -174,7 +174,10 @@ export function renderGameHud(state) {
     if (isPublicCompany(state)) {
       const pm = state.publicMarket ?? {};
       stock.hidden = false;
-      stock.textContent = `${pm.ticker ?? '—'} ${formatMoney(pm.sharePrice ?? 0)}`;
+      const ch = stockHudChangeLabel(state);
+      stock.textContent = ch
+        ? `${pm.ticker ?? '—'} ${formatMoney(pm.sharePrice ?? 0)} (${ch})`
+        : `${pm.ticker ?? '—'} ${formatMoney(pm.sharePrice ?? 0)}`;
     } else {
       stock.hidden = true;
     }

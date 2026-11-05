@@ -29,7 +29,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 19;
+export const SAVE_VERSION = 20;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -217,6 +217,18 @@ export function normalizeSave(raw) {
     if (state.board.governanceStreak === undefined) state.board.governanceStreak = 0;
     if (state.publicMarket && state.publicMarket.guidanceBeatStreak === undefined) {
       state.publicMarket.guidanceBeatStreak = 0;
+    }
+    if (state.publicMarket) {
+      const pm = state.publicMarket;
+      if (pm.guidanceTone === undefined) pm.guidanceTone = 'inline';
+      if (pm.priorSharePrice === undefined) pm.priorSharePrice = pm.sharePrice ?? null;
+      if (pm.whisperRevenueTarget === undefined) pm.whisperRevenueTarget = 0;
+      if (pm.analystRating === undefined) pm.analystRating = null;
+      if (pm.analystTarget === undefined) pm.analystTarget = null;
+      if (pm.buybackAuthorized === undefined) pm.buybackAuthorized = 0;
+      if (pm.buybackUsedLifetime === undefined) pm.buybackUsedLifetime = 0;
+      if (pm.shortInterestPct === undefined) pm.shortInterestPct = 0;
+      if (pm.earningsSurpriseStreak === undefined) pm.earningsSurpriseStreak = 0;
     }
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);

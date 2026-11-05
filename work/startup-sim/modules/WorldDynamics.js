@@ -1,6 +1,6 @@
 import { adjustSentiment } from './Sentiment.js';
 import { bumpCompetitorPressure, easeCompetitorPressure } from './Competitor.js';
-import { isPublicCompany } from './IPO.js';
+import { isPublicCompany, whisperRevenueTarget } from './IPO.js';
 
 /** Buzz fades unless you keep shipping — caps runaway stacking. */
 export function applyBuzzDecayAtMonthStart(state) {
@@ -66,7 +66,8 @@ export function settleBoardGovernance(state) {
 export function scorePublicGuidanceBeat(state, monthRevenue, burn) {
   if (!isPublicCompany(state)) return [];
   if (!state.publicMarket) return [];
-  const target = Math.max(burn * 1.12, (state.finance?.mrr ?? 0) * 0.08);
+  const target = whisperRevenueTarget(state);
+  state.publicMarket.whisperRevenueTarget = target;
   const beat = monthRevenue >= target;
   if (beat) {
     state.publicMarket.guidanceBeatStreak = (state.publicMarket.guidanceBeatStreak ?? 0) + 1;

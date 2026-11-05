@@ -1,6 +1,6 @@
 import { formatMoney } from './constants.js';
 import { projectMonthlyBurn } from './Finance.js';
-import { isPublicCompany } from './IPO.js';
+import { isPublicCompany, marketCap } from './IPO.js';
 
 function escapeHtml(s) {
   return String(s)
@@ -23,7 +23,12 @@ export function renderMonthSummaryContent(container, state, summary, headlineTea
   if (!container) return;
   const stockBlock =
     summary.stockDeltaPct != null
-      ? `<div><span class="stat-label">Stock move</span><span class="stat-value">${summary.stockDeltaPct >= 0 ? '+' : ''}${(summary.stockDeltaPct * 100).toFixed(1)}%</span></div>`
+      ? `<div><span class="stat-label">Stock move</span><span class="stat-value">${summary.stockDeltaPct >= 0 ? '+' : ''}${(summary.stockDeltaPct * 100).toFixed(1)}%</span></div>
+      ${
+        isPublicCompany(state)
+          ? `<div><span class="stat-label">${state.publicMarket?.ticker ?? 'Stock'}</span><span class="stat-value">${formatMoney(state.publicMarket?.sharePrice ?? 0)} · cap ${formatMoney(marketCap(state))}</span></div>`
+          : ''
+      }`
       : '';
 
   container.innerHTML = `

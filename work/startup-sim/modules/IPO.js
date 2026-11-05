@@ -5,6 +5,8 @@ import { calendarTurn } from './XC.js';
 import { getFounderRow } from './CapTable.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
+import { recordCashOutflow } from './Finance.js';
+import { totalSubsidiaryMrr } from './Acquisitions.js';
 
 function totalOutstandingShares(state) {
   const total = (state.capTable ?? []).reduce((s, r) => s + (r.shares ?? 0), 0);
@@ -76,6 +78,13 @@ export function fileIpo(state) {
   state.publicMarket.priceHistory = [{ month: state.calendar.monthIndex, year: state.calendar.year, price: openPrice }];
   state.publicMarket.monthsPublic = 0;
   state.publicMarket.lockupMonthsRemaining = 1;
+  state.publicMarket.guidanceTone = 'inline';
+  state.publicMarket.whisperRevenueTarget = whisperRevenueTarget(state);
+  state.publicMarket.priorSharePrice = openPrice;
+  state.publicMarket.buybackAuthorized = Math.round(valuation * 0.02);
+  state.publicMarket.buybackUsedLifetime = 0;
+  state.publicMarket.shortInterestPct = 4 + Math.floor(Math.random() * 6);
+  refreshAnalystCoverage(state, { force: true });
 
   state.finance.valuation = Math.round(openPrice * shares);
   state.flags.ipoFiled = true;
@@ -94,12 +103,168 @@ export function founderStakeValue(state) {
   return Math.round(shares * price);
 }
 
+export function marketCap(state) {
+  if (!isPublicCompany(state)) return 0;
+  const shares = totalOutstandingShares(state);
+  const price = state.publicMarket?.sharePrice ?? 0;
+  return Math.round(shares * price);
+}
+
+function guidanceToneMult(tone) {
+  if (tone === 'sandbag') return 0.88;
+  if (tone === 'aggressive') return 1.14;
+  return 1;
+}
+
+/** Street whisper for the month — used by guidance scoring. */
+export function whisperRevenueTarget(state) {
+  const mrr = state.finance?.mrr ?? 0;
+  const burn = state.finance?.monthlyBurn ?? 0;
+  const tone = state.publicMarket?.guidanceTone ?? 'inline';
+  const base = Math.max(burn * 1.12, mrr * 0.08);
+  return Math.round(base * guidanceToneMult(tone));
+}
+
+function priceFloor(state, price) {
+  const pm = state.publicMarket ?? {};
+  return (pm.ipoPrice ?? price) * 0.15;
+}
+
+function pushPriceHistory(state, price) {
+  const pm = state.publicMarket;
+  pm.priceHistory = (pm.priceHistory ?? []).concat({
+    month: state.calendar.monthIndex,
+    year: state.calendar.year,
+    price
+  });
+  pm.priceHistory = pm.priceHistory.slice(-36);
+  const shares = totalOutstandingShares(state);
+  state.finance.valuation = Math.round(price * shares);
+}
+
+/** Instant move (crises, desk, buybacks). Returns new price. */
+export function applyStockPctMove(state, pct) {
+  if (!isPublicCompany(state) || state.flags?.cashedOut || !pct) return null;
+  const pm = state.publicMarket;
+  const price = pm.sharePrice ?? pm.ipoPrice ?? 1;
+  const next = Math.max(priceFloor(state, price), Math.round(price * (1 + Number(pct)) * 100) / 100);
+  pm.priorSharePrice = price;
+  pm.sharePrice = next;
+  pushPriceHistory(state, next);
+  refreshAnalystCoverage(state);
+  return next;
+}
+
+export function refreshAnalystCoverage(state, opts = {}) {
+  if (!isPublicCompany(state)) return;
+  const pm = state.publicMarket;
+  const price = pm.sharePrice ?? pm.ipoPrice ?? 1;
+  const target = pm.analystTarget ?? price * 1.08;
+  if (opts.force || !pm.analystTarget) {
+    pm.analystTarget = Math.round(price * (1.05 + Math.random() * 0.12) * 100) / 100;
+  } else {
+    pm.analystTarget = Math.round((target * 0.65 + price * 1.1) * 100) / 100;
+  }
+  const upside = (pm.analystTarget - price) / Math.max(price, 0.01);
+  if (upside > 0.12) pm.analystRating = 'Outperform';
+  else if (upside > 0.04) pm.analystRating = 'Buy';
+  else if (upside > -0.06) pm.analystRating = 'Hold';
+  else pm.analystRating = 'Underperform';
+  const streak = pm.guidanceBeatStreak ?? 0;
+  if (streak >= 3 && pm.analystRating === 'Hold') pm.analystRating = 'Buy';
+  if (streak === 0 && pm.analystRating === 'Buy') pm.analystRating = 'Hold';
+}
+
+export function setPublicGuidanceTone(state, tone) {
+  if (!isPublicCompany(state)) return { ok: false, reason: 'List first.' };
+  const allowed = ['sandbag', 'inline', 'aggressive'];
+  if (!allowed.includes(tone)) return { ok: false, reason: 'Unknown guidance tone.' };
+  state.publicMarket.guidanceTone = tone;
+  state.publicMarket.whisperRevenueTarget = whisperRevenueTarget(state);
+  const labels = { sandbag: 'Conservative guide', inline: 'Inline guide', aggressive: 'Aggressive guide' };
+  return { ok: true, summary: `${labels[tone]} — whisper ${formatMoney(state.publicMarket.whisperRevenueTarget)}/mo.` };
+}
+
+const BUYBACK_MIN = 50_000;
+
+export function executeStockBuyback(state, amount) {
+  if (!isPublicCompany(state)) return { ok: false, reason: 'Buybacks unlock after IPO.' };
+  const pm = state.publicMarket;
+  const authorized = pm.buybackAuthorized ?? 0;
+  const spend = Math.round(Number(amount) || 0);
+  if (spend < BUYBACK_MIN) {
+    return { ok: false, reason: `Minimum buyback ${formatMoney(BUYBACK_MIN)}.` };
+  }
+  if (spend > authorized) {
+    return { ok: false, reason: `Only ${formatMoney(authorized)} left on the authorization.` };
+  }
+  if ((state.finance?.cash ?? 0) < spend) {
+    return { ok: false, reason: 'Not enough cash on the balance sheet.' };
+  }
+  state.finance.cash -= spend;
+  recordCashOutflow(state, spend, 'buyback');
+  pm.buybackAuthorized = authorized - spend;
+  pm.buybackUsedLifetime = (pm.buybackUsedLifetime ?? 0) + spend;
+  const pct = Math.min(0.09, spend / Math.max(marketCap(state), 1) * 2.5);
+  applyStockPctMove(state, pct);
+  pm.shortInterestPct = Math.max(1, (pm.shortInterestPct ?? 5) - 1);
+  return {
+    ok: true,
+    spend,
+    pct,
+    summary: `Repurchased ${formatMoney(spend)} — stock ${pct >= 0 ? '+' : ''}${(pct * 100).toFixed(1)}%.`
+  };
+}
+
+export function fileFollowOnOffering(state) {
+  if (!isPublicCompany(state)) return { ok: false, reason: 'Follow-on unlocks after IPO.' };
+  const pm = state.publicMarket;
+  if ((pm.monthsPublic ?? 0) < 3) {
+    return { ok: false, reason: 'Wait at least 3 months after listing.' };
+  }
+  const turn = calendarTurn(state);
+  if (pm.lastFollowOnTurn === turn) {
+    return { ok: false, reason: 'One follow-on per month.' };
+  }
+  const raise = Math.round(marketCap(state) * 0.04);
+  if (raise < 100_000) return { ok: false, reason: 'Market cap too small for a follow-on.' };
+  pm.lastFollowOnTurn = turn;
+  state.finance.cash = (state.finance.cash ?? 0) + raise;
+  state.finance.lifetimeRevenue += raise;
+  const dilutionPct = 0.025;
+  for (const row of state.capTable ?? []) {
+    if (row.shares) row.shares = Math.round(row.shares * (1 - dilutionPct));
+  }
+  applyStockPctMove(state, -0.05);
+  pm.buybackAuthorized = (pm.buybackAuthorized ?? 0) + Math.round(raise * 0.15);
+  return {
+    ok: true,
+    raise,
+    summary: `Follow-on raised ${formatMoney(raise)} — stock −5%, cap table −2.5%.`
+  };
+}
+
+function portfolioConglomerateBonus(state) {
+  const subMrr = totalSubsidiaryMrr(state);
+  const core = state.finance?.mrr ?? 0;
+  if (subMrr <= 0) return 0;
+  const mix = subMrr / Math.max(core + subMrr, 1);
+  return Math.min(0.025, mix * 0.04);
+}
+
+function isEarningsMonth(state) {
+  const pm = state.publicMarket;
+  const m = pm.monthsPublic ?? 0;
+  return m > 0 && m % 3 === 0;
+}
+
 /** Monthly stock tick — call after month-end burn, before advancing calendar. */
 export function tickPublicMarket(state) {
   if (!isPublicCompany(state) || state.flags?.cashedOut) return { deltaPct: 0, lines: [] };
 
   const pm = state.publicMarket;
   const price = pm.sharePrice ?? pm.ipoPrice ?? 1;
+  pm.priorSharePrice = price;
   const mrr = state.finance?.mrr ?? 0;
   const prior = pm.priorMonthMrr ?? mrr;
   pm.priorMonthMrr = mrr;
@@ -118,27 +283,68 @@ export function tickPublicMarket(state) {
   const noise = (Math.random() - 0.5) * 0.1;
   const sentiment = readNewsSentiment(state);
   const guidanceBeat = Math.min(0.06, (pm.guidanceBeatStreak ?? 0) * 0.012);
+  const rivalHeat = Math.min(0.03, (state.world?.competitor?.pressure ?? 0) * 0.004);
+  const conglomerate = portfolioConglomerateBonus(state);
+  const shortDrag = ((pm.shortInterestPct ?? 0) / 100) * 0.015;
 
-  const deltaPct = growth * 0.35 + runwayStress + buzz + noise + sentiment + guidanceBeat;
-  const floor = (pm.ipoPrice ?? price) * 0.15;
+  let deltaPct =
+    growth * 0.35 + runwayStress + buzz + noise + sentiment + guidanceBeat + conglomerate - rivalHeat - shortDrag;
+  const lines = [];
+  if (isEarningsMonth(state)) {
+    deltaPct *= 1.55;
+    pm.lastEarningsMonth = `${state.calendar.year}-${state.calendar.monthIndex}`;
+    if ((pm.guidanceBeatStreak ?? 0) >= 2) {
+      pm.earningsSurpriseStreak = (pm.earningsSurpriseStreak ?? 0) + 1;
+      lines.push('Earnings call: beat-and-raise tone lifted the after-hours quote.');
+    } else {
+      pm.earningsSurpriseStreak = 0;
+      lines.push('Earnings call: traders debated guidance more than the slide deck.');
+    }
+    pm.buybackAuthorized = (pm.buybackAuthorized ?? 0) + Math.round(marketCap(state) * 0.008);
+  }
+
+  const floor = priceFloor(state, price);
   const next = Math.max(floor, Math.round(price * (1 + deltaPct) * 100) / 100);
 
   pm.sharePrice = next;
   pm.monthsPublic = (pm.monthsPublic ?? 0) + 1;
-  pm.priceHistory = (pm.priceHistory ?? []).concat({
-    month: state.calendar.monthIndex,
-    year: state.calendar.year,
-    price: next
-  });
-  pm.priceHistory = pm.priceHistory.slice(-36);
+  pushPriceHistory(state, next);
+  pm.whisperRevenueTarget = whisperRevenueTarget(state);
+  refreshAnalystCoverage(state);
 
-  const shares = totalOutstandingShares(state);
-  state.finance.valuation = Math.round(next * shares);
-
-  const lines = [
+  lines.unshift(
     `Stock (${pm.ticker}) ${deltaPct >= 0 ? '+' : ''}${(deltaPct * 100).toFixed(1)}% → ${formatMoney(next)}/share.`
-  ];
+  );
   return { deltaPct, lines };
+}
+
+export function stockHudChangeLabel(state) {
+  if (!isPublicCompany(state)) return '';
+  const pm = state.publicMarket ?? {};
+  const cur = pm.sharePrice ?? 0;
+  const prev = pm.priorSharePrice ?? pm.ipoPrice ?? cur;
+  if (!prev) return '';
+  const pct = ((cur - prev) / prev) * 100;
+  return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`;
+}
+
+function renderStockSparkline(history) {
+  const pts = (history ?? []).slice(-12);
+  if (pts.length < 2) return '';
+  const prices = pts.map((p) => p.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const span = Math.max(max - min, 0.01);
+  const w = 220;
+  const h = 48;
+  const coords = prices
+    .map((p, i) => {
+      const x = (i / (prices.length - 1)) * w;
+      const y = h - ((p - min) / span) * (h - 4) - 2;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+  return `<svg class="stock-sparkline" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><polyline fill="none" stroke="currentColor" stroke-width="2" points="${coords}" /></svg>`;
 }
 
 function readNewsSentiment(state) {
@@ -267,11 +473,35 @@ export function renderIpoPanel(container, state) {
       <button type="button" class="btn btn-primary btn-small" id="btn-file-ipo">File IPO</button>
     </div>`;
   } else if (isPublicCompany(state) && !state.flags?.cashedOut) {
+    if (!state.publicMarket?.analystRating) refreshAnalystCoverage(state);
     const pm = state.publicMarket ?? {};
     const stake = founderStakeValue(state);
-    block = `<div class="finance-action ipo-action">
-      <p><strong>${escapeHtml(pm.ticker ?? '—')}</strong> · ${formatMoney(pm.sharePrice ?? 0)}/share</p>
-      <p class="fine-print">IPO ${formatMoney(pm.ipoPrice ?? 0)} · Founder stake ≈ ${formatMoney(stake)} · ${pm.monthsPublic ?? 0} month(s) public</p>
+    const cap = marketCap(state);
+    const tone = pm.guidanceTone ?? 'inline';
+    const earningsSoon = (pm.monthsPublic ?? 0) % 3 === 2;
+    block = `<div class="finance-action ipo-action stock-panel">
+      <p class="stock-headline"><strong>${escapeHtml(pm.ticker ?? '—')}</strong> · ${formatMoney(pm.sharePrice ?? 0)}/share · Mkt cap ${formatMoney(cap)}</p>
+      ${renderStockSparkline(pm.priceHistory)}
+      <div class="summary-grid stock-stats">
+        <div><span class="stat-label">IPO</span><span class="stat-value">${formatMoney(pm.ipoPrice ?? 0)}</span></div>
+        <div><span class="stat-label">Analyst</span><span class="stat-value">${escapeHtml(pm.analystRating ?? '—')} · ${formatMoney(pm.analystTarget ?? 0)} PT</span></div>
+        <div><span class="stat-label">Whisper</span><span class="stat-value">${formatMoney(pm.whisperRevenueTarget ?? 0)}/mo</span></div>
+        <div><span class="stat-label">Beat streak</span><span class="stat-value">${pm.guidanceBeatStreak ?? 0}</span></div>
+        <div><span class="stat-label">Short interest</span><span class="stat-value">${pm.shortInterestPct ?? 0}%</span></div>
+        <div><span class="stat-label">Founder stake</span><span class="stat-value">${formatMoney(stake)}</span></div>
+      </div>
+      <p class="fine-print">${pm.monthsPublic ?? 0} month(s) public${earningsSoon ? ' · earnings next month' : ''} · buyback auth ${formatMoney(pm.buybackAuthorized ?? 0)}</p>
+      <div class="stock-guidance-row">
+        <span class="stat-label">Guidance tone</span>
+        <button type="button" class="btn btn-small companies-filter${tone === 'sandbag' ? ' active' : ''}" data-stock-guidance="sandbag">Sandbag</button>
+        <button type="button" class="btn btn-small companies-filter${tone === 'inline' ? ' active' : ''}" data-stock-guidance="inline">Inline</button>
+        <button type="button" class="btn btn-small companies-filter${tone === 'aggressive' ? ' active' : ''}" data-stock-guidance="aggressive">Guide high</button>
+      </div>
+      <div class="stock-actions">
+        <button type="button" class="btn btn-small" data-stock-buyback="250000">Buyback $250k</button>
+        <button type="button" class="btn btn-small" data-stock-buyback="1000000">Buyback $1M</button>
+        <button type="button" class="btn btn-small" data-stock-follow-on>Follow-on offering</button>
+      </div>
       ${
         pm.pressHeadline
           ? `<blockquote class="ipo-press"><strong>${escapeHtml(pm.pressHeadline)}</strong><br>${escapeHtml(pm.pressDek || '')}</blockquote>`

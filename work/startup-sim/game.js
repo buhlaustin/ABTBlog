@@ -32,7 +32,15 @@ import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js
 import { onScheduleLaunchTaskCompleted } from './modules/LaunchLifecycle.js';
 import { formatMoney } from './modules/GameState.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './modules/Progression.js';
-import { fileIpo, fetchIpoPress, cashOut } from './modules/IPO.js';
+import {
+  fileIpo,
+  fetchIpoPress,
+  cashOut,
+  applyStockPctMove,
+  setPublicGuidanceTone,
+  executeStockBuyback,
+  fileFollowOnOffering
+} from './modules/IPO.js';
 import {
   adjustDraftHeadcount,
   setDraftHeadcount,
@@ -265,6 +273,14 @@ function handleCompleteTask(instanceId) {
   const { cost, revenue } = applyTaskOutcome(sessionState, def, rolled);
   const result = completeTaskInstance(sessionState, instanceId, def, rolled);
   if (!result.ok) return;
+
+  if (def.stockPct) {
+    applyStockPctMove(sessionState, def.stockPct);
+    appendLog(
+      sessionState,
+      `Street reaction: stock ${def.stockPct > 0 ? '+' : ''}${Math.round(Number(def.stockPct) * 100)}%.`
+    );
+  }
 
   appendLog(
     sessionState,
@@ -978,6 +994,38 @@ function bindGameInteractions() {
     }
     if (e.target.id === 'btn-cash-out') {
       handleCashOut();
+      return;
+    }
+    const guidanceBtn = e.target.closest('[data-stock-guidance]');
+    if (guidanceBtn && sessionState) {
+      const result = setPublicGuidanceTone(sessionState, guidanceBtn.getAttribute('data-stock-guidance'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Could not set guidance.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const buybackBtn = e.target.closest('[data-stock-buyback]');
+    if (buybackBtn && sessionState) {
+      const result = executeStockBuyback(sessionState, buybackBtn.getAttribute('data-stock-buyback'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Buyback failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.closest('[data-stock-follow-on]') && sessionState) {
+      const result = fileFollowOnOffering(sessionState);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Follow-on blocked.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
       return;
     }
     if (e.target.id === 'btn-select-hub') {

@@ -769,7 +769,8 @@
         165000
       ],
       "product": 0,
-      "buzz": 3
+      "buzz": 3,
+      "stockPct": 0.025
     },
     {
       "id": "public-stock-buyback",
@@ -784,7 +785,8 @@
         95000
       ],
       "product": 0,
-      "buzz": 2
+      "buzz": 2,
+      "stockPct": 0.035
     },
     {
       "id": "public-activist-response",
@@ -799,7 +801,8 @@
         140000
       ],
       "product": 0,
-      "buzz": 1
+      "buzz": 1,
+      "stockPct": -0.02
     },
     {
       "id": "public-ma-rumor",
@@ -814,7 +817,8 @@
         220000
       ],
       "product": 0,
-      "buzz": 4
+      "buzz": 4,
+      "stockPct": 0.04
     },
     {
       "id": "public-product-keynote",

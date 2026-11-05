@@ -1,7 +1,7 @@
 import { formatMoney } from './constants.js';
 import { adjustSentiment } from './Sentiment.js';
 import { bumpCompetitorPressure, easeCompetitorPressure } from './Competitor.js';
-import { isPublicCompany } from './IPO.js';
+import { applyStockPctMove } from './IPO.js';
 import { recordCashOutflow } from './Finance.js';
 import { totalHeadcount } from './Staff.js';
 
@@ -146,12 +146,11 @@ export function applyScenarioEffects(state, fx, context = {}) {
     lines.push(`${mod.label} for ${mod.monthsLeft} mo${parts.length ? ` (${parts.join(', ')})` : ''}.`);
   }
 
-  if (isPublicCompany(state) && fx.stockPct) {
-    const pm = state.publicMarket;
-    const price = pm.sharePrice ?? pm.ipoPrice ?? 1;
-    const next = Math.max((pm.ipoPrice ?? price) * 0.2, price * (1 + Number(fx.stockPct)));
-    pm.sharePrice = Math.round(next * 100) / 100;
-    lines.push(`Stock ${fx.stockPct > 0 ? '+' : ''}${Math.round(Number(fx.stockPct) * 100)}%.`);
+  if (fx.stockPct) {
+    const next = applyStockPctMove(state, fx.stockPct);
+    if (next != null) {
+      lines.push(`Stock ${fx.stockPct > 0 ? '+' : ''}${Math.round(Number(fx.stockPct) * 100)}%.`);
+    }
   }
 
   return lines;

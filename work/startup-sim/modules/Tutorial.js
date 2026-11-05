@@ -31,7 +31,7 @@ const STEPS = [
     id: 'ipo',
     stages: [STAGES.PUBLIC],
     title: 'Public markets',
-    body: 'Stock price updates each month. Stay public to grow the quote, or Step down & cash out on Finance when you are done.'
+    body: 'On Finance: set guidance tone, run buybacks, or a follow-on. Earnings every 3 months swing the quote harder. Beat the whisper each month to extend your streak, then cash out when lockup ends.'
   }
 ];
 

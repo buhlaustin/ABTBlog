@@ -528,4 +528,43 @@ if (!buy.ok) {
   }
 }
 
+const { STAGES: ST } = await import(`file://${join(sim, 'modules/constants.js')}`);
+const {
+  fileIpo,
+  tickPublicMarket,
+  setPublicGuidanceTone,
+  executeStockBuyback,
+  whisperRevenueTarget
+} = await import(`file://${join(sim, 'modules/IPO.js')}`);
+const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+pub.stage = ST.PUBLIC;
+pub.flags.seedRoundClosed = true;
+pub.flags.ipoUnlocked = true;
+pub.finance.mrr = 5_000_000;
+pub.finance.monthlyBurn = 400_000;
+pub.finance.cash = 50_000_000;
+const ipo = fileIpo(pub);
+if (!ipo.ok) {
+  console.error(`FAIL: fileIpo smoke: ${ipo.reason}`);
+  failed = true;
+} else {
+  const tone = setPublicGuidanceTone(pub, 'aggressive');
+  if (!tone.ok || whisperRevenueTarget(pub) <= 0) {
+    console.error('FAIL: public guidance / whisper target');
+    failed = true;
+  }
+  const tick = tickPublicMarket(pub);
+  if (!pub.publicMarket.sharePrice || tick.deltaPct == null) {
+    console.error('FAIL: tickPublicMarket');
+    failed = true;
+  }
+  const bb = executeStockBuyback(pub, 250_000);
+  if (!bb.ok) {
+    console.error(`FAIL: buyback smoke: ${bb.reason}`);
+    failed = true;
+  } else {
+    console.log('OK: late-game public market (IPO, guidance, tick, buyback)');
+  }
+}
+
 process.exit(failed ? 1 : 0);
