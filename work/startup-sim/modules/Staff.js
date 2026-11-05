@@ -473,7 +473,13 @@ export function renderPeopleStaffingPanel(container, state) {
         <summary>COO comp &amp; finalize history</summary>
         <p class="fine-print">COO comp ${formatMoney(econ.execPay)}/mo · Last finalized ${escapeHtml(finalizedLabel)}</p>
       </details>
-      <h3 class="finance-section-title">Department headcount</h3>
+      <div class="people-staff-auto-row">
+        <h3 class="finance-section-title">Department headcount</h3>
+        <div class="stock-actions people-staff-auto-actions">
+          <button type="button" class="btn btn-ghost btn-small" id="btn-staff-auto-increase" ${hiringAllowed(state) ? '' : 'disabled'} title="Suggest hires from runway, cap, and monthly headroom">Increase headcount (auto)</button>
+          <button type="button" class="btn btn-ghost btn-small" id="btn-staff-auto-decrease" ${hiringAllowed(state) && totalDraft > 0 ? '' : 'disabled'} title="Trim roles when burn outpaces revenue or runway is tight">Decrease headcount (auto)</button>
+        </div>
+      </div>
       <div class="table-scroll finance-cap-scroll">
         <table class="data-table">
           <thead><tr><th>Department</th><th>Headcount</th><th>$/head/mo</th><th>Subtotal</th></tr></thead>

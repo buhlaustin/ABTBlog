@@ -1942,6 +1942,22 @@ h1 {
   gap: 0.35rem 0.75rem;
 }
 
+.people-staff-auto-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+}
+
+.people-staff-auto-row .finance-section-title {
+  margin: 0;
+}
+
+.people-staff-auto-actions {
+  margin: 0;
+}
+
 .finance-section-title {
   margin: 0;
   font-size: 0.72rem;

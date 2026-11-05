@@ -1794,7 +1794,8 @@ const {
   emptyHeadcount,
   visibleDepartments,
   isDepartmentUnlocked,
-  migrateStaffHeadcount
+  migrateStaffHeadcount,
+  totalHeadcount
 } = await import(`file://${join(sim, 'modules/Staff.js')}`);
 const { sellCeoHome, purchaseCeoHomeCash, purchaseCeoHomeMortgage, prepayCeoMortgage } =
   await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
@@ -1862,6 +1863,39 @@ if (!bought.ok) {
       }
     }
   }
+}
+
+const { heuristicStaffingPlan, applyStaffingDraftPlan } = await import(
+  `file://${join(sim, 'modules/StaffingPlanner.js')}`
+);
+const staffPlanState = createInitialState({ companyName: 'StaffPlan Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+staffPlanState.workspace.tier = WORKSPACE_TIER.SMALL;
+staffPlanState.stage = STAGES.OFFICE;
+staffPlanState.finance.cash = 500_000;
+staffPlanState.calendar.monthRevenue = 80_000;
+staffPlanState.staff.draftHeadcountByDept = { ...emptyHeadcount(), engineering: 2, sales: 1, product: 1 };
+staffPlanState.staff.headcountByDept = { ...staffPlanState.staff.draftHeadcountByDept };
+const growPlan = heuristicStaffingPlan(staffPlanState, 'increase');
+if (!growPlan.ok || totalHeadcount(growPlan.headcountByDept) <= 4) {
+  console.error(`FAIL: staffing increase heuristic: ${growPlan.reason ?? 'no growth'}`);
+  failed = true;
+} else {
+  applyStaffingDraftPlan(staffPlanState, growPlan.headcountByDept);
+  console.log(`OK: staffing auto-increase (${totalHeadcount(staffPlanState.staff.draftHeadcountByDept)} draft HC)`);
+}
+
+const shrinkState = createInitialState({ companyName: 'StaffCut Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+shrinkState.workspace.tier = WORKSPACE_TIER.SMALL;
+shrinkState.stage = STAGES.OFFICE;
+shrinkState.calendar.monthRevenue = 5_000;
+shrinkState.staff.draftHeadcountByDept = { ...emptyHeadcount(), engineering: 8, sales: 6, marketing: 4, support: 3 };
+const shrinkPlan = heuristicStaffingPlan(shrinkState, 'decrease');
+const priorShrink = totalHeadcount(shrinkState.staff.draftHeadcountByDept);
+if (!shrinkPlan.ok || totalHeadcount(shrinkPlan.headcountByDept) >= priorShrink) {
+  console.error(`FAIL: staffing decrease heuristic: ${shrinkPlan.reason ?? 'no cuts'}`);
+  failed = true;
+} else {
+  console.log(`OK: staffing auto-decrease (${priorShrink} → ${totalHeadcount(shrinkPlan.headcountByDept)} suggested)`);
 }
 
 if (DEPARTMENTS.length < 15) {

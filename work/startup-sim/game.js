@@ -72,6 +72,7 @@ import {
   finalizeStaffing,
   showPeopleFeedback
 } from './modules/Staff.js';
+import { autoAdjustStaffingHeadcount } from './modules/StaffingPlanner.js';
 import {
   payCompanyWideBonus,
   setCompanyBonusAnnualMode,
@@ -554,6 +555,23 @@ function handleFinalizeStaff() {
   }
   appendLog(sessionState, 'Staffing plan finalized for payroll.');
   showPeopleFeedback('Staffing finalized — month-end payroll uses these counts.');
+  refresh();
+}
+
+async function handleAutoStaffing(direction) {
+  if (!sessionState || sessionState.flags?.gameOver) return;
+  showPeopleFeedback(
+    shouldUseNarrativeAi() ? 'Planning headcount with AI…' : 'Calculating headcount from runway and cap…'
+  );
+  const result = await autoAdjustStaffingHeadcount(sessionState, direction);
+  if (!result.ok) {
+    showPeopleFeedback(result.reason || 'Could not adjust staffing.', true);
+    refresh();
+    return;
+  }
+  appendLog(sessionState, result.summary);
+  showPeopleFeedback(`${result.summary} Review draft counts, then finalize.`);
+  playUiClick();
   refresh();
 }
 
@@ -1228,6 +1246,14 @@ function bindGameInteractions() {
 
     if (e.target.id === 'btn-finalize-staff') {
       handleFinalizeStaff();
+      return;
+    }
+    if (e.target.id === 'btn-staff-auto-increase') {
+      void handleAutoStaffing('increase');
+      return;
+    }
+    if (e.target.id === 'btn-staff-auto-decrease') {
+      void handleAutoStaffing('decrease');
       return;
     }
     if (e.target.id === 'btn-hire-coo' && sessionState) {
