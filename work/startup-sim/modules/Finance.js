@@ -116,16 +116,26 @@ export function taskRevenueMultHud(state) {
   const effective = getTaskRevenueMultiplierPreview(state);
   const raw = getRawTaskRevenueMultiplier(state);
   const cap = getTaskRevenueCap(state);
+  const workforceNote =
+    state.mode === 'sandbox'
+      ? ` Sandbox workforce cap ${cap}× (scales to ${REV_MULT_CAP_SANDBOX}× at ${SANDBOX_WORKFORCE_HEADCOUNT_FULL.toLocaleString()} staff).`
+      : '';
   if (isTaskRevenueMultCapped(state)) {
     return {
       effective,
       raw,
       cap,
       label: 'Rev× (capped)',
-      title: `Uncapped stack ${raw.toFixed(1)}× — payouts use ${cap}× max`
+      title: `Uncapped stack ${raw.toFixed(1)}× — payouts use ${cap}× max.${workforceNote}`
     };
   }
-  return { effective, raw, cap, label: 'Rev. mult', title: '' };
+  return {
+    effective,
+    raw,
+    cap,
+    label: 'Rev. mult',
+    title: workforceNote.trim()
+  };
 }
 
 /** Rough desk payout range at current mult (before per-task headcount roll variance). */

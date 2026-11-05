@@ -10,6 +10,27 @@ const outPath = join(
   '../data/growth-campaigns-public-late.json'
 );
 
+const whaleChannels = [
+  'CNBC takeover week',
+  'Times Square domination',
+  'global CFO roadshow',
+  'institutional ETF push',
+  'sovereign wealth tour',
+  'Olympics sponsorship bloc',
+  'F1 title partnership',
+  'Super Bowl halftime adjacency',
+  'Davos pavilion blitz',
+  'NYSE bell tour'
+];
+
+const midChannels = [
+  'podcast network buy',
+  'creator marketplace burst',
+  'retail media coop',
+  'campus ambassador wave',
+  'partner co-marketing grid'
+];
+
 const campaigns = [];
 
 for (let i = 1; i <= 200; i += 1) {
@@ -34,11 +55,13 @@ for (let i = 1; i <= 200; i += 1) {
     }
   }
 
+  const channel = isWhale
+    ? whaleChannels[i % whaleChannels.length]
+    : midChannels[i % midChannels.length];
+
   campaigns.push({
     id: `growth-public-late-${n}`,
-    title: isWhale
-      ? `Public growth whale #${i}: institutional demand gen`
-      : `Scaled growth play #${i}: performance + brand`,
+    title: isWhale ? `${channel} (${i})` : `${channel} — wave ${i}`,
     description: isWhale
       ? 'Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.'
       : 'Mid/late growth lever with spend that scales with your funding era.',
@@ -47,7 +70,12 @@ for (let i = 1; i <= 200; i += 1) {
     buzz: isWhale ? 4 + (i % 3) : 2 + (i % 3),
     tierMin,
     tierMax,
-    ...(isWhale ? { whale: true } : {})
+    ...(isWhale
+      ? {
+          whale: true,
+          stockPct: Number((0.006 + (i % 6) * 0.003).toFixed(3))
+        }
+      : {})
   });
 }
 

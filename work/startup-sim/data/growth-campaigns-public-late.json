@@ -2,7 +2,7 @@
   "campaigns": [
     {
       "id": "growth-public-late-001",
-      "title": "Public growth whale #1: institutional demand gen",
+      "title": "Times Square domination (1)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 1250000,
       "revenue": [
@@ -12,11 +12,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-002",
-      "title": "Public growth whale #2: institutional demand gen",
+      "title": "global CFO roadshow (2)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 1700000,
       "revenue": [
@@ -26,11 +27,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-003",
-      "title": "Public growth whale #3: institutional demand gen",
+      "title": "institutional ETF push (3)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 2150000,
       "revenue": [
@@ -40,11 +42,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-004",
-      "title": "Public growth whale #4: institutional demand gen",
+      "title": "sovereign wealth tour (4)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 2600000,
       "revenue": [
@@ -54,11 +57,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-005",
-      "title": "Public growth whale #5: institutional demand gen",
+      "title": "Olympics sponsorship bloc (5)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3050000,
       "revenue": [
@@ -68,11 +72,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-006",
-      "title": "Public growth whale #6: institutional demand gen",
+      "title": "F1 title partnership (6)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3500000,
       "revenue": [
@@ -82,11 +87,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-007",
-      "title": "Public growth whale #7: institutional demand gen",
+      "title": "Super Bowl halftime adjacency (7)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3950000,
       "revenue": [
@@ -96,11 +102,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-008",
-      "title": "Public growth whale #8: institutional demand gen",
+      "title": "Davos pavilion blitz (8)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 4400000,
       "revenue": [
@@ -110,11 +117,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-009",
-      "title": "Public growth whale #9: institutional demand gen",
+      "title": "NYSE bell tour (9)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 4850000,
       "revenue": [
@@ -124,11 +132,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-010",
-      "title": "Public growth whale #10: institutional demand gen",
+      "title": "CNBC takeover week (10)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 5300000,
       "revenue": [
@@ -138,11 +147,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-011",
-      "title": "Public growth whale #11: institutional demand gen",
+      "title": "Times Square domination (11)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 5750000,
       "revenue": [
@@ -152,11 +162,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-012",
-      "title": "Public growth whale #12: institutional demand gen",
+      "title": "global CFO roadshow (12)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 6200000,
       "revenue": [
@@ -166,11 +177,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-013",
-      "title": "Public growth whale #13: institutional demand gen",
+      "title": "institutional ETF push (13)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 6650000,
       "revenue": [
@@ -180,11 +192,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-014",
-      "title": "Public growth whale #14: institutional demand gen",
+      "title": "sovereign wealth tour (14)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 7100000,
       "revenue": [
@@ -194,11 +207,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-015",
-      "title": "Public growth whale #15: institutional demand gen",
+      "title": "Olympics sponsorship bloc (15)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 7550000,
       "revenue": [
@@ -208,11 +222,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-016",
-      "title": "Public growth whale #16: institutional demand gen",
+      "title": "F1 title partnership (16)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8000000,
       "revenue": [
@@ -222,11 +237,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-017",
-      "title": "Public growth whale #17: institutional demand gen",
+      "title": "Super Bowl halftime adjacency (17)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8450000,
       "revenue": [
@@ -236,11 +252,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-018",
-      "title": "Public growth whale #18: institutional demand gen",
+      "title": "Davos pavilion blitz (18)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8900000,
       "revenue": [
@@ -250,11 +267,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-019",
-      "title": "Public growth whale #19: institutional demand gen",
+      "title": "NYSE bell tour (19)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 9350000,
       "revenue": [
@@ -264,11 +282,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-020",
-      "title": "Public growth whale #20: institutional demand gen",
+      "title": "CNBC takeover week (20)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 800000,
       "revenue": [
@@ -278,11 +297,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-021",
-      "title": "Public growth whale #21: institutional demand gen",
+      "title": "Times Square domination (21)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 1250000,
       "revenue": [
@@ -292,11 +312,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-022",
-      "title": "Public growth whale #22: institutional demand gen",
+      "title": "global CFO roadshow (22)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 1700000,
       "revenue": [
@@ -306,11 +327,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-023",
-      "title": "Public growth whale #23: institutional demand gen",
+      "title": "institutional ETF push (23)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 2150000,
       "revenue": [
@@ -320,11 +342,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-024",
-      "title": "Public growth whale #24: institutional demand gen",
+      "title": "sovereign wealth tour (24)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 2600000,
       "revenue": [
@@ -334,11 +357,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-025",
-      "title": "Public growth whale #25: institutional demand gen",
+      "title": "Olympics sponsorship bloc (25)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3050000,
       "revenue": [
@@ -348,11 +372,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-026",
-      "title": "Public growth whale #26: institutional demand gen",
+      "title": "F1 title partnership (26)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3500000,
       "revenue": [
@@ -362,11 +387,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-027",
-      "title": "Public growth whale #27: institutional demand gen",
+      "title": "Super Bowl halftime adjacency (27)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3950000,
       "revenue": [
@@ -376,11 +402,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-028",
-      "title": "Public growth whale #28: institutional demand gen",
+      "title": "Davos pavilion blitz (28)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 4400000,
       "revenue": [
@@ -390,11 +417,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-029",
-      "title": "Public growth whale #29: institutional demand gen",
+      "title": "NYSE bell tour (29)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 4850000,
       "revenue": [
@@ -404,11 +432,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-030",
-      "title": "Public growth whale #30: institutional demand gen",
+      "title": "CNBC takeover week (30)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 5300000,
       "revenue": [
@@ -418,11 +447,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-031",
-      "title": "Public growth whale #31: institutional demand gen",
+      "title": "Times Square domination (31)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 5750000,
       "revenue": [
@@ -432,11 +462,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-032",
-      "title": "Public growth whale #32: institutional demand gen",
+      "title": "global CFO roadshow (32)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 6200000,
       "revenue": [
@@ -446,11 +477,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-033",
-      "title": "Public growth whale #33: institutional demand gen",
+      "title": "institutional ETF push (33)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 6650000,
       "revenue": [
@@ -460,11 +492,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-034",
-      "title": "Public growth whale #34: institutional demand gen",
+      "title": "sovereign wealth tour (34)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 7100000,
       "revenue": [
@@ -474,11 +507,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-035",
-      "title": "Public growth whale #35: institutional demand gen",
+      "title": "Olympics sponsorship bloc (35)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 7550000,
       "revenue": [
@@ -488,11 +522,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-036",
-      "title": "Public growth whale #36: institutional demand gen",
+      "title": "F1 title partnership (36)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8000000,
       "revenue": [
@@ -502,11 +537,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-037",
-      "title": "Public growth whale #37: institutional demand gen",
+      "title": "Super Bowl halftime adjacency (37)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8450000,
       "revenue": [
@@ -516,11 +552,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-038",
-      "title": "Public growth whale #38: institutional demand gen",
+      "title": "Davos pavilion blitz (38)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8900000,
       "revenue": [
@@ -530,11 +567,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-039",
-      "title": "Public growth whale #39: institutional demand gen",
+      "title": "NYSE bell tour (39)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 9350000,
       "revenue": [
@@ -544,11 +582,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-040",
-      "title": "Public growth whale #40: institutional demand gen",
+      "title": "CNBC takeover week (40)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 800000,
       "revenue": [
@@ -558,11 +597,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-041",
-      "title": "Public growth whale #41: institutional demand gen",
+      "title": "Times Square domination (41)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 1250000,
       "revenue": [
@@ -572,11 +612,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-042",
-      "title": "Public growth whale #42: institutional demand gen",
+      "title": "global CFO roadshow (42)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 1700000,
       "revenue": [
@@ -586,11 +627,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-043",
-      "title": "Public growth whale #43: institutional demand gen",
+      "title": "institutional ETF push (43)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 2150000,
       "revenue": [
@@ -600,11 +642,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-044",
-      "title": "Public growth whale #44: institutional demand gen",
+      "title": "sovereign wealth tour (44)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 2600000,
       "revenue": [
@@ -614,11 +657,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-045",
-      "title": "Public growth whale #45: institutional demand gen",
+      "title": "Olympics sponsorship bloc (45)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3050000,
       "revenue": [
@@ -628,11 +672,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-046",
-      "title": "Public growth whale #46: institutional demand gen",
+      "title": "F1 title partnership (46)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3500000,
       "revenue": [
@@ -642,11 +687,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-047",
-      "title": "Public growth whale #47: institutional demand gen",
+      "title": "Super Bowl halftime adjacency (47)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3950000,
       "revenue": [
@@ -656,11 +702,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-048",
-      "title": "Public growth whale #48: institutional demand gen",
+      "title": "Davos pavilion blitz (48)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 4400000,
       "revenue": [
@@ -670,11 +717,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-049",
-      "title": "Public growth whale #49: institutional demand gen",
+      "title": "NYSE bell tour (49)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 4850000,
       "revenue": [
@@ -684,11 +732,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-050",
-      "title": "Public growth whale #50: institutional demand gen",
+      "title": "CNBC takeover week (50)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 5300000,
       "revenue": [
@@ -698,11 +747,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-051",
-      "title": "Public growth whale #51: institutional demand gen",
+      "title": "Times Square domination (51)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 5750000,
       "revenue": [
@@ -712,11 +762,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-052",
-      "title": "Public growth whale #52: institutional demand gen",
+      "title": "global CFO roadshow (52)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 6200000,
       "revenue": [
@@ -726,11 +777,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-053",
-      "title": "Public growth whale #53: institutional demand gen",
+      "title": "institutional ETF push (53)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 6650000,
       "revenue": [
@@ -740,11 +792,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-054",
-      "title": "Public growth whale #54: institutional demand gen",
+      "title": "sovereign wealth tour (54)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 7100000,
       "revenue": [
@@ -754,11 +807,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-055",
-      "title": "Public growth whale #55: institutional demand gen",
+      "title": "Olympics sponsorship bloc (55)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 7550000,
       "revenue": [
@@ -768,11 +822,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-056",
-      "title": "Public growth whale #56: institutional demand gen",
+      "title": "F1 title partnership (56)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8000000,
       "revenue": [
@@ -782,11 +837,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-057",
-      "title": "Public growth whale #57: institutional demand gen",
+      "title": "Super Bowl halftime adjacency (57)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8450000,
       "revenue": [
@@ -796,11 +852,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-058",
-      "title": "Public growth whale #58: institutional demand gen",
+      "title": "Davos pavilion blitz (58)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8900000,
       "revenue": [
@@ -810,11 +867,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-059",
-      "title": "Public growth whale #59: institutional demand gen",
+      "title": "NYSE bell tour (59)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 9350000,
       "revenue": [
@@ -824,11 +882,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-060",
-      "title": "Public growth whale #60: institutional demand gen",
+      "title": "CNBC takeover week (60)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 800000,
       "revenue": [
@@ -838,11 +897,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-061",
-      "title": "Public growth whale #61: institutional demand gen",
+      "title": "Times Square domination (61)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 1250000,
       "revenue": [
@@ -852,11 +912,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-062",
-      "title": "Public growth whale #62: institutional demand gen",
+      "title": "global CFO roadshow (62)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 1700000,
       "revenue": [
@@ -866,11 +927,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-063",
-      "title": "Public growth whale #63: institutional demand gen",
+      "title": "institutional ETF push (63)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 2150000,
       "revenue": [
@@ -880,11 +942,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-064",
-      "title": "Public growth whale #64: institutional demand gen",
+      "title": "sovereign wealth tour (64)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 2600000,
       "revenue": [
@@ -894,11 +957,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-065",
-      "title": "Public growth whale #65: institutional demand gen",
+      "title": "Olympics sponsorship bloc (65)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3050000,
       "revenue": [
@@ -908,11 +972,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-066",
-      "title": "Public growth whale #66: institutional demand gen",
+      "title": "F1 title partnership (66)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3500000,
       "revenue": [
@@ -922,11 +987,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-067",
-      "title": "Public growth whale #67: institutional demand gen",
+      "title": "Super Bowl halftime adjacency (67)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3950000,
       "revenue": [
@@ -936,11 +1002,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-068",
-      "title": "Public growth whale #68: institutional demand gen",
+      "title": "Davos pavilion blitz (68)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 4400000,
       "revenue": [
@@ -950,11 +1017,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-069",
-      "title": "Public growth whale #69: institutional demand gen",
+      "title": "NYSE bell tour (69)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 4850000,
       "revenue": [
@@ -964,11 +1032,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-070",
-      "title": "Public growth whale #70: institutional demand gen",
+      "title": "CNBC takeover week (70)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 5300000,
       "revenue": [
@@ -978,11 +1047,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-071",
-      "title": "Public growth whale #71: institutional demand gen",
+      "title": "Times Square domination (71)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 5750000,
       "revenue": [
@@ -992,11 +1062,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-072",
-      "title": "Public growth whale #72: institutional demand gen",
+      "title": "global CFO roadshow (72)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 6200000,
       "revenue": [
@@ -1006,11 +1077,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-073",
-      "title": "Public growth whale #73: institutional demand gen",
+      "title": "institutional ETF push (73)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 6650000,
       "revenue": [
@@ -1020,11 +1092,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-074",
-      "title": "Public growth whale #74: institutional demand gen",
+      "title": "sovereign wealth tour (74)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 7100000,
       "revenue": [
@@ -1034,11 +1107,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-075",
-      "title": "Public growth whale #75: institutional demand gen",
+      "title": "Olympics sponsorship bloc (75)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 7550000,
       "revenue": [
@@ -1048,11 +1122,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-076",
-      "title": "Public growth whale #76: institutional demand gen",
+      "title": "F1 title partnership (76)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8000000,
       "revenue": [
@@ -1062,11 +1137,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-077",
-      "title": "Public growth whale #77: institutional demand gen",
+      "title": "Super Bowl halftime adjacency (77)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8450000,
       "revenue": [
@@ -1076,11 +1152,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-078",
-      "title": "Public growth whale #78: institutional demand gen",
+      "title": "Davos pavilion blitz (78)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 8900000,
       "revenue": [
@@ -1090,11 +1167,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-079",
-      "title": "Public growth whale #79: institutional demand gen",
+      "title": "NYSE bell tour (79)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 9350000,
       "revenue": [
@@ -1104,11 +1182,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-080",
-      "title": "Public growth whale #80: institutional demand gen",
+      "title": "CNBC takeover week (80)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 800000,
       "revenue": [
@@ -1118,11 +1197,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-081",
-      "title": "Public growth whale #81: institutional demand gen",
+      "title": "Times Square domination (81)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 1250000,
       "revenue": [
@@ -1132,11 +1212,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-082",
-      "title": "Public growth whale #82: institutional demand gen",
+      "title": "global CFO roadshow (82)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 1700000,
       "revenue": [
@@ -1146,11 +1227,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-083",
-      "title": "Public growth whale #83: institutional demand gen",
+      "title": "institutional ETF push (83)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 2150000,
       "revenue": [
@@ -1160,11 +1242,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-084",
-      "title": "Public growth whale #84: institutional demand gen",
+      "title": "sovereign wealth tour (84)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 2600000,
       "revenue": [
@@ -1174,11 +1257,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-085",
-      "title": "Public growth whale #85: institutional demand gen",
+      "title": "Olympics sponsorship bloc (85)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3050000,
       "revenue": [
@@ -1188,11 +1272,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.009
     },
     {
       "id": "growth-public-late-086",
-      "title": "Public growth whale #86: institutional demand gen",
+      "title": "F1 title partnership (86)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3500000,
       "revenue": [
@@ -1202,11 +1287,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.012
     },
     {
       "id": "growth-public-late-087",
-      "title": "Public growth whale #87: institutional demand gen",
+      "title": "Super Bowl halftime adjacency (87)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 3950000,
       "revenue": [
@@ -1216,11 +1302,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.015
     },
     {
       "id": "growth-public-late-088",
-      "title": "Public growth whale #88: institutional demand gen",
+      "title": "Davos pavilion blitz (88)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 4400000,
       "revenue": [
@@ -1230,11 +1317,12 @@
       "buzz": 5,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.018
     },
     {
       "id": "growth-public-late-089",
-      "title": "Public growth whale #89: institutional demand gen",
+      "title": "NYSE bell tour (89)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 4850000,
       "revenue": [
@@ -1244,11 +1332,12 @@
       "buzz": 6,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.021
     },
     {
       "id": "growth-public-late-090",
-      "title": "Public growth whale #90: institutional demand gen",
+      "title": "CNBC takeover week (90)",
       "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
       "cost": 5300000,
       "revenue": [
@@ -1258,11 +1347,12 @@
       "buzz": 4,
       "tierMin": 7,
       "tierMax": 7,
-      "whale": true
+      "whale": true,
+      "stockPct": 0.006
     },
     {
       "id": "growth-public-late-091",
-      "title": "Scaled growth play #91: performance + brand",
+      "title": "creator marketplace burst — wave 91",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 58000,
       "revenue": [
@@ -1275,7 +1365,7 @@
     },
     {
       "id": "growth-public-late-092",
-      "title": "Scaled growth play #92: performance + brand",
+      "title": "retail media coop — wave 92",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 76000,
       "revenue": [
@@ -1288,7 +1378,7 @@
     },
     {
       "id": "growth-public-late-093",
-      "title": "Scaled growth play #93: performance + brand",
+      "title": "campus ambassador wave — wave 93",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 94000,
       "revenue": [
@@ -1301,7 +1391,7 @@
     },
     {
       "id": "growth-public-late-094",
-      "title": "Scaled growth play #94: performance + brand",
+      "title": "partner co-marketing grid — wave 94",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 112000,
       "revenue": [
@@ -1314,7 +1404,7 @@
     },
     {
       "id": "growth-public-late-095",
-      "title": "Scaled growth play #95: performance + brand",
+      "title": "podcast network buy — wave 95",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 130000,
       "revenue": [
@@ -1327,7 +1417,7 @@
     },
     {
       "id": "growth-public-late-096",
-      "title": "Scaled growth play #96: performance + brand",
+      "title": "creator marketplace burst — wave 96",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 148000,
       "revenue": [
@@ -1340,7 +1430,7 @@
     },
     {
       "id": "growth-public-late-097",
-      "title": "Scaled growth play #97: performance + brand",
+      "title": "retail media coop — wave 97",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 166000,
       "revenue": [
@@ -1353,7 +1443,7 @@
     },
     {
       "id": "growth-public-late-098",
-      "title": "Scaled growth play #98: performance + brand",
+      "title": "campus ambassador wave — wave 98",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 184000,
       "revenue": [
@@ -1366,7 +1456,7 @@
     },
     {
       "id": "growth-public-late-099",
-      "title": "Scaled growth play #99: performance + brand",
+      "title": "partner co-marketing grid — wave 99",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 202000,
       "revenue": [
@@ -1379,7 +1469,7 @@
     },
     {
       "id": "growth-public-late-100",
-      "title": "Scaled growth play #100: performance + brand",
+      "title": "podcast network buy — wave 100",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 220000,
       "revenue": [
@@ -1392,7 +1482,7 @@
     },
     {
       "id": "growth-public-late-101",
-      "title": "Scaled growth play #101: performance + brand",
+      "title": "creator marketplace burst — wave 101",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 238000,
       "revenue": [
@@ -1405,7 +1495,7 @@
     },
     {
       "id": "growth-public-late-102",
-      "title": "Scaled growth play #102: performance + brand",
+      "title": "retail media coop — wave 102",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 256000,
       "revenue": [
@@ -1418,7 +1508,7 @@
     },
     {
       "id": "growth-public-late-103",
-      "title": "Scaled growth play #103: performance + brand",
+      "title": "campus ambassador wave — wave 103",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 274000,
       "revenue": [
@@ -1431,7 +1521,7 @@
     },
     {
       "id": "growth-public-late-104",
-      "title": "Scaled growth play #104: performance + brand",
+      "title": "partner co-marketing grid — wave 104",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 292000,
       "revenue": [
@@ -1444,7 +1534,7 @@
     },
     {
       "id": "growth-public-late-105",
-      "title": "Scaled growth play #105: performance + brand",
+      "title": "podcast network buy — wave 105",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 40000,
       "revenue": [
@@ -1457,7 +1547,7 @@
     },
     {
       "id": "growth-public-late-106",
-      "title": "Scaled growth play #106: performance + brand",
+      "title": "creator marketplace burst — wave 106",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 58000,
       "revenue": [
@@ -1470,7 +1560,7 @@
     },
     {
       "id": "growth-public-late-107",
-      "title": "Scaled growth play #107: performance + brand",
+      "title": "retail media coop — wave 107",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 76000,
       "revenue": [
@@ -1483,7 +1573,7 @@
     },
     {
       "id": "growth-public-late-108",
-      "title": "Scaled growth play #108: performance + brand",
+      "title": "campus ambassador wave — wave 108",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 94000,
       "revenue": [
@@ -1496,7 +1586,7 @@
     },
     {
       "id": "growth-public-late-109",
-      "title": "Scaled growth play #109: performance + brand",
+      "title": "partner co-marketing grid — wave 109",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 112000,
       "revenue": [
@@ -1509,7 +1599,7 @@
     },
     {
       "id": "growth-public-late-110",
-      "title": "Scaled growth play #110: performance + brand",
+      "title": "podcast network buy — wave 110",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 130000,
       "revenue": [
@@ -1522,7 +1612,7 @@
     },
     {
       "id": "growth-public-late-111",
-      "title": "Scaled growth play #111: performance + brand",
+      "title": "creator marketplace burst — wave 111",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 148000,
       "revenue": [
@@ -1535,7 +1625,7 @@
     },
     {
       "id": "growth-public-late-112",
-      "title": "Scaled growth play #112: performance + brand",
+      "title": "retail media coop — wave 112",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 166000,
       "revenue": [
@@ -1548,7 +1638,7 @@
     },
     {
       "id": "growth-public-late-113",
-      "title": "Scaled growth play #113: performance + brand",
+      "title": "campus ambassador wave — wave 113",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 184000,
       "revenue": [
@@ -1561,7 +1651,7 @@
     },
     {
       "id": "growth-public-late-114",
-      "title": "Scaled growth play #114: performance + brand",
+      "title": "partner co-marketing grid — wave 114",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 202000,
       "revenue": [
@@ -1574,7 +1664,7 @@
     },
     {
       "id": "growth-public-late-115",
-      "title": "Scaled growth play #115: performance + brand",
+      "title": "podcast network buy — wave 115",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 220000,
       "revenue": [
@@ -1587,7 +1677,7 @@
     },
     {
       "id": "growth-public-late-116",
-      "title": "Scaled growth play #116: performance + brand",
+      "title": "creator marketplace burst — wave 116",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 238000,
       "revenue": [
@@ -1600,7 +1690,7 @@
     },
     {
       "id": "growth-public-late-117",
-      "title": "Scaled growth play #117: performance + brand",
+      "title": "retail media coop — wave 117",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 256000,
       "revenue": [
@@ -1613,7 +1703,7 @@
     },
     {
       "id": "growth-public-late-118",
-      "title": "Scaled growth play #118: performance + brand",
+      "title": "campus ambassador wave — wave 118",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 274000,
       "revenue": [
@@ -1626,7 +1716,7 @@
     },
     {
       "id": "growth-public-late-119",
-      "title": "Scaled growth play #119: performance + brand",
+      "title": "partner co-marketing grid — wave 119",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 292000,
       "revenue": [
@@ -1639,7 +1729,7 @@
     },
     {
       "id": "growth-public-late-120",
-      "title": "Scaled growth play #120: performance + brand",
+      "title": "podcast network buy — wave 120",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 40000,
       "revenue": [
@@ -1652,7 +1742,7 @@
     },
     {
       "id": "growth-public-late-121",
-      "title": "Scaled growth play #121: performance + brand",
+      "title": "creator marketplace burst — wave 121",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 58000,
       "revenue": [
@@ -1665,7 +1755,7 @@
     },
     {
       "id": "growth-public-late-122",
-      "title": "Scaled growth play #122: performance + brand",
+      "title": "retail media coop — wave 122",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 76000,
       "revenue": [
@@ -1678,7 +1768,7 @@
     },
     {
       "id": "growth-public-late-123",
-      "title": "Scaled growth play #123: performance + brand",
+      "title": "campus ambassador wave — wave 123",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 94000,
       "revenue": [
@@ -1691,7 +1781,7 @@
     },
     {
       "id": "growth-public-late-124",
-      "title": "Scaled growth play #124: performance + brand",
+      "title": "partner co-marketing grid — wave 124",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 112000,
       "revenue": [
@@ -1704,7 +1794,7 @@
     },
     {
       "id": "growth-public-late-125",
-      "title": "Scaled growth play #125: performance + brand",
+      "title": "podcast network buy — wave 125",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 130000,
       "revenue": [
@@ -1717,7 +1807,7 @@
     },
     {
       "id": "growth-public-late-126",
-      "title": "Scaled growth play #126: performance + brand",
+      "title": "creator marketplace burst — wave 126",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 148000,
       "revenue": [
@@ -1730,7 +1820,7 @@
     },
     {
       "id": "growth-public-late-127",
-      "title": "Scaled growth play #127: performance + brand",
+      "title": "retail media coop — wave 127",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 166000,
       "revenue": [
@@ -1743,7 +1833,7 @@
     },
     {
       "id": "growth-public-late-128",
-      "title": "Scaled growth play #128: performance + brand",
+      "title": "campus ambassador wave — wave 128",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 184000,
       "revenue": [
@@ -1756,7 +1846,7 @@
     },
     {
       "id": "growth-public-late-129",
-      "title": "Scaled growth play #129: performance + brand",
+      "title": "partner co-marketing grid — wave 129",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 202000,
       "revenue": [
@@ -1769,7 +1859,7 @@
     },
     {
       "id": "growth-public-late-130",
-      "title": "Scaled growth play #130: performance + brand",
+      "title": "podcast network buy — wave 130",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 220000,
       "revenue": [
@@ -1782,7 +1872,7 @@
     },
     {
       "id": "growth-public-late-131",
-      "title": "Scaled growth play #131: performance + brand",
+      "title": "creator marketplace burst — wave 131",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 238000,
       "revenue": [
@@ -1795,7 +1885,7 @@
     },
     {
       "id": "growth-public-late-132",
-      "title": "Scaled growth play #132: performance + brand",
+      "title": "retail media coop — wave 132",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 256000,
       "revenue": [
@@ -1808,7 +1898,7 @@
     },
     {
       "id": "growth-public-late-133",
-      "title": "Scaled growth play #133: performance + brand",
+      "title": "campus ambassador wave — wave 133",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 274000,
       "revenue": [
@@ -1821,7 +1911,7 @@
     },
     {
       "id": "growth-public-late-134",
-      "title": "Scaled growth play #134: performance + brand",
+      "title": "partner co-marketing grid — wave 134",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 292000,
       "revenue": [
@@ -1834,7 +1924,7 @@
     },
     {
       "id": "growth-public-late-135",
-      "title": "Scaled growth play #135: performance + brand",
+      "title": "podcast network buy — wave 135",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 40000,
       "revenue": [
@@ -1847,7 +1937,7 @@
     },
     {
       "id": "growth-public-late-136",
-      "title": "Scaled growth play #136: performance + brand",
+      "title": "creator marketplace burst — wave 136",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 58000,
       "revenue": [
@@ -1860,7 +1950,7 @@
     },
     {
       "id": "growth-public-late-137",
-      "title": "Scaled growth play #137: performance + brand",
+      "title": "retail media coop — wave 137",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 76000,
       "revenue": [
@@ -1873,7 +1963,7 @@
     },
     {
       "id": "growth-public-late-138",
-      "title": "Scaled growth play #138: performance + brand",
+      "title": "campus ambassador wave — wave 138",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 94000,
       "revenue": [
@@ -1886,7 +1976,7 @@
     },
     {
       "id": "growth-public-late-139",
-      "title": "Scaled growth play #139: performance + brand",
+      "title": "partner co-marketing grid — wave 139",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 112000,
       "revenue": [
@@ -1899,7 +1989,7 @@
     },
     {
       "id": "growth-public-late-140",
-      "title": "Scaled growth play #140: performance + brand",
+      "title": "podcast network buy — wave 140",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 130000,
       "revenue": [
@@ -1912,7 +2002,7 @@
     },
     {
       "id": "growth-public-late-141",
-      "title": "Scaled growth play #141: performance + brand",
+      "title": "creator marketplace burst — wave 141",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 148000,
       "revenue": [
@@ -1925,7 +2015,7 @@
     },
     {
       "id": "growth-public-late-142",
-      "title": "Scaled growth play #142: performance + brand",
+      "title": "retail media coop — wave 142",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 166000,
       "revenue": [
@@ -1938,7 +2028,7 @@
     },
     {
       "id": "growth-public-late-143",
-      "title": "Scaled growth play #143: performance + brand",
+      "title": "campus ambassador wave — wave 143",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 184000,
       "revenue": [
@@ -1951,7 +2041,7 @@
     },
     {
       "id": "growth-public-late-144",
-      "title": "Scaled growth play #144: performance + brand",
+      "title": "partner co-marketing grid — wave 144",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 202000,
       "revenue": [
@@ -1964,7 +2054,7 @@
     },
     {
       "id": "growth-public-late-145",
-      "title": "Scaled growth play #145: performance + brand",
+      "title": "podcast network buy — wave 145",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 220000,
       "revenue": [
@@ -1977,7 +2067,7 @@
     },
     {
       "id": "growth-public-late-146",
-      "title": "Scaled growth play #146: performance + brand",
+      "title": "creator marketplace burst — wave 146",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 238000,
       "revenue": [
@@ -1990,7 +2080,7 @@
     },
     {
       "id": "growth-public-late-147",
-      "title": "Scaled growth play #147: performance + brand",
+      "title": "retail media coop — wave 147",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 256000,
       "revenue": [
@@ -2003,7 +2093,7 @@
     },
     {
       "id": "growth-public-late-148",
-      "title": "Scaled growth play #148: performance + brand",
+      "title": "campus ambassador wave — wave 148",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 274000,
       "revenue": [
@@ -2016,7 +2106,7 @@
     },
     {
       "id": "growth-public-late-149",
-      "title": "Scaled growth play #149: performance + brand",
+      "title": "partner co-marketing grid — wave 149",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 292000,
       "revenue": [
@@ -2029,7 +2119,7 @@
     },
     {
       "id": "growth-public-late-150",
-      "title": "Scaled growth play #150: performance + brand",
+      "title": "podcast network buy — wave 150",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 40000,
       "revenue": [
@@ -2042,7 +2132,7 @@
     },
     {
       "id": "growth-public-late-151",
-      "title": "Scaled growth play #151: performance + brand",
+      "title": "creator marketplace burst — wave 151",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 58000,
       "revenue": [
@@ -2055,7 +2145,7 @@
     },
     {
       "id": "growth-public-late-152",
-      "title": "Scaled growth play #152: performance + brand",
+      "title": "retail media coop — wave 152",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 76000,
       "revenue": [
@@ -2068,7 +2158,7 @@
     },
     {
       "id": "growth-public-late-153",
-      "title": "Scaled growth play #153: performance + brand",
+      "title": "campus ambassador wave — wave 153",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 94000,
       "revenue": [
@@ -2081,7 +2171,7 @@
     },
     {
       "id": "growth-public-late-154",
-      "title": "Scaled growth play #154: performance + brand",
+      "title": "partner co-marketing grid — wave 154",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 112000,
       "revenue": [
@@ -2094,7 +2184,7 @@
     },
     {
       "id": "growth-public-late-155",
-      "title": "Scaled growth play #155: performance + brand",
+      "title": "podcast network buy — wave 155",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 130000,
       "revenue": [
@@ -2107,7 +2197,7 @@
     },
     {
       "id": "growth-public-late-156",
-      "title": "Scaled growth play #156: performance + brand",
+      "title": "creator marketplace burst — wave 156",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 148000,
       "revenue": [
@@ -2120,7 +2210,7 @@
     },
     {
       "id": "growth-public-late-157",
-      "title": "Scaled growth play #157: performance + brand",
+      "title": "retail media coop — wave 157",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 166000,
       "revenue": [
@@ -2133,7 +2223,7 @@
     },
     {
       "id": "growth-public-late-158",
-      "title": "Scaled growth play #158: performance + brand",
+      "title": "campus ambassador wave — wave 158",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 184000,
       "revenue": [
@@ -2146,7 +2236,7 @@
     },
     {
       "id": "growth-public-late-159",
-      "title": "Scaled growth play #159: performance + brand",
+      "title": "partner co-marketing grid — wave 159",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 202000,
       "revenue": [
@@ -2159,7 +2249,7 @@
     },
     {
       "id": "growth-public-late-160",
-      "title": "Scaled growth play #160: performance + brand",
+      "title": "podcast network buy — wave 160",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 220000,
       "revenue": [
@@ -2172,7 +2262,7 @@
     },
     {
       "id": "growth-public-late-161",
-      "title": "Scaled growth play #161: performance + brand",
+      "title": "creator marketplace burst — wave 161",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 238000,
       "revenue": [
@@ -2185,7 +2275,7 @@
     },
     {
       "id": "growth-public-late-162",
-      "title": "Scaled growth play #162: performance + brand",
+      "title": "retail media coop — wave 162",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 256000,
       "revenue": [
@@ -2198,7 +2288,7 @@
     },
     {
       "id": "growth-public-late-163",
-      "title": "Scaled growth play #163: performance + brand",
+      "title": "campus ambassador wave — wave 163",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 274000,
       "revenue": [
@@ -2211,7 +2301,7 @@
     },
     {
       "id": "growth-public-late-164",
-      "title": "Scaled growth play #164: performance + brand",
+      "title": "partner co-marketing grid — wave 164",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 292000,
       "revenue": [
@@ -2224,7 +2314,7 @@
     },
     {
       "id": "growth-public-late-165",
-      "title": "Scaled growth play #165: performance + brand",
+      "title": "podcast network buy — wave 165",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 40000,
       "revenue": [
@@ -2237,7 +2327,7 @@
     },
     {
       "id": "growth-public-late-166",
-      "title": "Scaled growth play #166: performance + brand",
+      "title": "creator marketplace burst — wave 166",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 58000,
       "revenue": [
@@ -2250,7 +2340,7 @@
     },
     {
       "id": "growth-public-late-167",
-      "title": "Scaled growth play #167: performance + brand",
+      "title": "retail media coop — wave 167",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 76000,
       "revenue": [
@@ -2263,7 +2353,7 @@
     },
     {
       "id": "growth-public-late-168",
-      "title": "Scaled growth play #168: performance + brand",
+      "title": "campus ambassador wave — wave 168",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 94000,
       "revenue": [
@@ -2276,7 +2366,7 @@
     },
     {
       "id": "growth-public-late-169",
-      "title": "Scaled growth play #169: performance + brand",
+      "title": "partner co-marketing grid — wave 169",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 112000,
       "revenue": [
@@ -2289,7 +2379,7 @@
     },
     {
       "id": "growth-public-late-170",
-      "title": "Scaled growth play #170: performance + brand",
+      "title": "podcast network buy — wave 170",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 130000,
       "revenue": [
@@ -2302,7 +2392,7 @@
     },
     {
       "id": "growth-public-late-171",
-      "title": "Scaled growth play #171: performance + brand",
+      "title": "creator marketplace burst — wave 171",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 148000,
       "revenue": [
@@ -2315,7 +2405,7 @@
     },
     {
       "id": "growth-public-late-172",
-      "title": "Scaled growth play #172: performance + brand",
+      "title": "retail media coop — wave 172",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 166000,
       "revenue": [
@@ -2328,7 +2418,7 @@
     },
     {
       "id": "growth-public-late-173",
-      "title": "Scaled growth play #173: performance + brand",
+      "title": "campus ambassador wave — wave 173",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 184000,
       "revenue": [
@@ -2341,7 +2431,7 @@
     },
     {
       "id": "growth-public-late-174",
-      "title": "Scaled growth play #174: performance + brand",
+      "title": "partner co-marketing grid — wave 174",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 202000,
       "revenue": [
@@ -2354,7 +2444,7 @@
     },
     {
       "id": "growth-public-late-175",
-      "title": "Scaled growth play #175: performance + brand",
+      "title": "podcast network buy — wave 175",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 220000,
       "revenue": [
@@ -2367,7 +2457,7 @@
     },
     {
       "id": "growth-public-late-176",
-      "title": "Scaled growth play #176: performance + brand",
+      "title": "creator marketplace burst — wave 176",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 238000,
       "revenue": [
@@ -2380,7 +2470,7 @@
     },
     {
       "id": "growth-public-late-177",
-      "title": "Scaled growth play #177: performance + brand",
+      "title": "retail media coop — wave 177",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 256000,
       "revenue": [
@@ -2393,7 +2483,7 @@
     },
     {
       "id": "growth-public-late-178",
-      "title": "Scaled growth play #178: performance + brand",
+      "title": "campus ambassador wave — wave 178",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 274000,
       "revenue": [
@@ -2406,7 +2496,7 @@
     },
     {
       "id": "growth-public-late-179",
-      "title": "Scaled growth play #179: performance + brand",
+      "title": "partner co-marketing grid — wave 179",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 292000,
       "revenue": [
@@ -2419,7 +2509,7 @@
     },
     {
       "id": "growth-public-late-180",
-      "title": "Scaled growth play #180: performance + brand",
+      "title": "podcast network buy — wave 180",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 40000,
       "revenue": [
@@ -2432,7 +2522,7 @@
     },
     {
       "id": "growth-public-late-181",
-      "title": "Scaled growth play #181: performance + brand",
+      "title": "creator marketplace burst — wave 181",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 58000,
       "revenue": [
@@ -2445,7 +2535,7 @@
     },
     {
       "id": "growth-public-late-182",
-      "title": "Scaled growth play #182: performance + brand",
+      "title": "retail media coop — wave 182",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 76000,
       "revenue": [
@@ -2458,7 +2548,7 @@
     },
     {
       "id": "growth-public-late-183",
-      "title": "Scaled growth play #183: performance + brand",
+      "title": "campus ambassador wave — wave 183",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 94000,
       "revenue": [
@@ -2471,7 +2561,7 @@
     },
     {
       "id": "growth-public-late-184",
-      "title": "Scaled growth play #184: performance + brand",
+      "title": "partner co-marketing grid — wave 184",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 112000,
       "revenue": [
@@ -2484,7 +2574,7 @@
     },
     {
       "id": "growth-public-late-185",
-      "title": "Scaled growth play #185: performance + brand",
+      "title": "podcast network buy — wave 185",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 130000,
       "revenue": [
@@ -2497,7 +2587,7 @@
     },
     {
       "id": "growth-public-late-186",
-      "title": "Scaled growth play #186: performance + brand",
+      "title": "creator marketplace burst — wave 186",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 148000,
       "revenue": [
@@ -2510,7 +2600,7 @@
     },
     {
       "id": "growth-public-late-187",
-      "title": "Scaled growth play #187: performance + brand",
+      "title": "retail media coop — wave 187",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 166000,
       "revenue": [
@@ -2523,7 +2613,7 @@
     },
     {
       "id": "growth-public-late-188",
-      "title": "Scaled growth play #188: performance + brand",
+      "title": "campus ambassador wave — wave 188",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 184000,
       "revenue": [
@@ -2536,7 +2626,7 @@
     },
     {
       "id": "growth-public-late-189",
-      "title": "Scaled growth play #189: performance + brand",
+      "title": "partner co-marketing grid — wave 189",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 202000,
       "revenue": [
@@ -2549,7 +2639,7 @@
     },
     {
       "id": "growth-public-late-190",
-      "title": "Scaled growth play #190: performance + brand",
+      "title": "podcast network buy — wave 190",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 220000,
       "revenue": [
@@ -2562,7 +2652,7 @@
     },
     {
       "id": "growth-public-late-191",
-      "title": "Scaled growth play #191: performance + brand",
+      "title": "creator marketplace burst — wave 191",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 238000,
       "revenue": [
@@ -2575,7 +2665,7 @@
     },
     {
       "id": "growth-public-late-192",
-      "title": "Scaled growth play #192: performance + brand",
+      "title": "retail media coop — wave 192",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 256000,
       "revenue": [
@@ -2588,7 +2678,7 @@
     },
     {
       "id": "growth-public-late-193",
-      "title": "Scaled growth play #193: performance + brand",
+      "title": "campus ambassador wave — wave 193",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 274000,
       "revenue": [
@@ -2601,7 +2691,7 @@
     },
     {
       "id": "growth-public-late-194",
-      "title": "Scaled growth play #194: performance + brand",
+      "title": "partner co-marketing grid — wave 194",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 292000,
       "revenue": [
@@ -2614,7 +2704,7 @@
     },
     {
       "id": "growth-public-late-195",
-      "title": "Scaled growth play #195: performance + brand",
+      "title": "podcast network buy — wave 195",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 40000,
       "revenue": [
@@ -2627,7 +2717,7 @@
     },
     {
       "id": "growth-public-late-196",
-      "title": "Scaled growth play #196: performance + brand",
+      "title": "creator marketplace burst — wave 196",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 58000,
       "revenue": [
@@ -2640,7 +2730,7 @@
     },
     {
       "id": "growth-public-late-197",
-      "title": "Scaled growth play #197: performance + brand",
+      "title": "retail media coop — wave 197",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 76000,
       "revenue": [
@@ -2653,7 +2743,7 @@
     },
     {
       "id": "growth-public-late-198",
-      "title": "Scaled growth play #198: performance + brand",
+      "title": "campus ambassador wave — wave 198",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 94000,
       "revenue": [
@@ -2666,7 +2756,7 @@
     },
     {
       "id": "growth-public-late-199",
-      "title": "Scaled growth play #199: performance + brand",
+      "title": "partner co-marketing grid — wave 199",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 112000,
       "revenue": [
@@ -2679,7 +2769,7 @@
     },
     {
       "id": "growth-public-late-200",
-      "title": "Scaled growth play #200: performance + brand",
+      "title": "podcast network buy — wave 200",
       "description": "Mid/late growth lever with spend that scales with your funding era.",
       "cost": 130000,
       "revenue": [

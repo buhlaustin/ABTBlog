@@ -1,4 +1,4 @@
-import { STAGES } from './constants.js';
+import { STAGES, formatMoney } from './constants.js';
 import { getArr } from './Workspace.js';
 
 export const PUBLIC_FLOAT_ROW_ID = 'public-float';
@@ -610,11 +610,37 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
+export function totalOutstandingShares(state) {
+  const total = (state.capTable ?? []).reduce((s, r) => s + (r.shares ?? 0), 0);
+  return total > 0 ? total : 10_000_000;
+}
+
 export function renderCapTableRows(state) {
-  return (state.capTable ?? [])
-    .map(
-      (r) =>
-        `<tr><td>${escapeHtml(r.name)}</td><td class="num">${(r.shares ?? 0).toLocaleString()}</td><td class="num">${r.pct ?? 0}%</td><td>${escapeHtml(r.class ?? '—')}</td></tr>`
-    )
+  const rows = [...(state.capTable ?? [])].sort((a, b) => {
+    if (a.id === PUBLIC_FLOAT_ROW_ID) return 1;
+    if (b.id === PUBLIC_FLOAT_ROW_ID) return -1;
+    return (b.shares ?? 0) - (a.shares ?? 0);
+  });
+  return rows
+    .map((r) => {
+      const rowClass = r.id === PUBLIC_FLOAT_ROW_ID ? ' class="cap-row-public"' : '';
+      return `<tr${rowClass}><td>${escapeHtml(r.name)}</td><td class="num">${(r.shares ?? 0).toLocaleString()}</td><td class="num">${r.pct ?? 0}%</td><td>${escapeHtml(r.class ?? '—')}</td></tr>`;
+    })
     .join('');
+}
+
+export function renderCapTableSummary(state) {
+  const total = totalOutstandingShares(state);
+  const floatRow = state.capTable?.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
+  const price = state.publicMarket?.sharePrice;
+  const implied =
+    price && total > 0 ? Math.round(price * total) : state.finance?.valuation ?? null;
+  const parts = [`<strong>${total.toLocaleString()}</strong> shares outstanding`];
+  if (floatRow) {
+    parts.push(`public float <strong>${floatRow.pct ?? 0}%</strong>`);
+  }
+  if (implied && price) {
+    parts.push(`implied mkt cap ${formatMoney(implied)} at ${formatMoney(price)}/sh`);
+  }
+  return `<p class="fine-print cap-table-summary">${parts.join(' · ')}</p>`;
 }

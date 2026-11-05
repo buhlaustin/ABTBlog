@@ -12,6 +12,7 @@ import { formatMoney } from './constants.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
 import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
 import { applyCampaignRivalEffects } from './WorldDynamics.js';
+import { applyStockPctMove, isPublicCompany } from './IPO.js';
 
 function mergeCampaignCatalog(base, ...extras) {
   const campaigns = [...(base?.campaigns ?? [])];
@@ -41,6 +42,10 @@ export const GROWTH_CAMPAIGN_COOLDOWN_MONTHS = 12;
 
 /** Paid growth plays offered on the Growth tab each month (from the full bank). */
 export const GROWTH_MONTHLY_OFFER_COUNT = 22;
+
+export function growthMonthlyOfferCount(state) {
+  return progressionTier(state) >= 7 ? 28 : GROWTH_MONTHLY_OFFER_COUNT;
+}
 
 function shuffle(arr) {
   const a = [...arr];
@@ -105,7 +110,8 @@ export function refreshGrowthCampaignOffers(state) {
   if (!state.growth) state.growth = { campaignsThisMonth: [] };
   const pool = eligibleCampaignPool(state);
   const recent = state.growth.recentCampaignIds ?? [];
-  let offers = pickMonthlyCampaignDefs(pool, GROWTH_MONTHLY_OFFER_COUNT, recent);
+  const offerCount = growthMonthlyOfferCount(state);
+  let offers = pickMonthlyCampaignDefs(pool, offerCount, recent);
 
   if (progressionTier(state) >= 7) {
     const recentSet = new Set(recent);
@@ -118,13 +124,24 @@ export function refreshGrowthCampaignOffers(state) {
       const injectCount = Math.random() < 0.5 ? 2 : 1;
       for (let w = 0; w < injectCount; w += 1) {
         const pick = shuffle(whales)[0];
-        if (pick) offers = mergeUniqueCampaignOffers(offers, pick, GROWTH_MONTHLY_OFFER_COUNT);
+        if (pick) offers = mergeUniqueCampaignOffers(offers, pick, offerCount);
       }
     }
   }
 
   state.growth.monthCampaignOffers = offers.map((c) => c.id);
+  state.growth.lastRosterWhaleCount = offers.filter(
+    (c) => c.whale || (c.revenue?.[1] ?? 0) >= 500_000_000
+  ).length;
   return offers;
+}
+
+/** One-line log when the monthly growth roster refreshes. */
+export function growthRosterRefreshLine(state) {
+  const ids = state.growth?.monthCampaignOffers ?? [];
+  const whales = state.growth?.lastRosterWhaleCount ?? 0;
+  if (!ids.length) return 'Growth roster: no paid plays unlocked this month.';
+  return `Growth roster: ${ids.length} paid play${ids.length === 1 ? '' : 's'} available${whales ? ` (${whales} whale-scale)` : ''}.`;
 }
 
 let catalog = mergeCampaignCatalog(bundled, ...bundledExtras);
@@ -216,6 +233,9 @@ export function runGrowthCampaign(state, campaignId) {
     -GROWTH_MONTHLY_OFFER_COUNT * GROWTH_CAMPAIGN_COOLDOWN_MONTHS
   );
   applyCampaignRivalEffects(state, def);
+  if (isPublicCompany(state) && def.stockPct) {
+    applyStockPctMove(state, def.stockPct);
+  }
 
   return { ok: true, def, cost, revenue };
 }
@@ -237,7 +257,7 @@ export function runAllRemainingGrowthCampaigns(state) {
     const cash = state.finance.cash ?? 0;
     const affordable = campaigns
       .filter((c) => cash >= (c.cost ?? 0))
-      .sort((a, b) => (a.cost ?? 0) - (b.cost ?? 0));
+      .sort((a, b) => (b.revenue?.[1] ?? 0) - (a.revenue?.[1] ?? 0));
     if (!affordable.length) break;
 
     const result = runGrowthCampaign(state, affordable[0].id);
@@ -308,13 +328,22 @@ export function renderGrowthCampaignsBlock(state) {
   const rosterSize = state.growth?.monthCampaignOffers?.length ?? campaigns.length;
   const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> on this month&apos;s roster (${rosterSize} offered, ${bankSize} in bank, ${GROWTH_CAMPAIGN_COOLDOWN_MONTHS}-month cooldown — does not use desk tasks).</p>
     <p class="finance-action"><button type="button" class="btn btn-primary btn-small" data-buy-all-growth${buyAllDisabled}>Buy all remaining</button> <span class="fine-print">Runs every affordable unlocked play until slots or cash run out.</span></p>`;
-  const cards = campaigns
+  const sorted = [...campaigns].sort((a, b) => (b.revenue?.[1] ?? 0) - (a.revenue?.[1] ?? 0));
+  const cards = sorted
     .map((c) => {
       const r0 = Math.round((c.revenue?.[0] ?? 0) * mult * 0.5);
       const r1 = Math.round((c.revenue?.[1] ?? 0) * mult);
+      const whaleTag =
+        c.whale || (c.revenue?.[1] ?? 0) >= 500_000_000
+          ? ' <span class="task-tag">Whale</span>'
+          : '';
+      const stockHint =
+        c.stockPct && isPublicCompany(state)
+          ? ` · stock ${c.stockPct > 0 ? '+' : ''}${Math.round(Number(c.stockPct) * 100)}%`
+          : '';
       return `<div class="finance-action">
-        <p><strong>${escapeHtml(c.title)}</strong> — ${escapeHtml(c.description)}</p>
-        <p class="fine-print">Cost ${formatMoney(c.cost)} · typical book ${formatMoney(r0)}–${formatMoney(r1)} at ${mult.toFixed(2)}× · buzz +${c.buzz ?? 0} · no desk slot</p>
+        <p><strong>${escapeHtml(c.title)}</strong>${whaleTag} — ${escapeHtml(c.description)}</p>
+        <p class="fine-print">Cost ${formatMoney(c.cost)} · typical book ${formatMoney(r0)}–${formatMoney(r1)} at ${mult.toFixed(2)}× · buzz +${c.buzz ?? 0}${stockHint} · no desk slot</p>
         <button type="button" class="btn btn-ghost btn-small" data-run-growth="${escapeHtml(c.id)}">Launch</button>
       </div>`;
     })

@@ -1080,6 +1080,7 @@ if (!hireMax.ok || cooSalaryMonthly(garageZero) !== 0) {
 const {
   growthCampaignCatalogSize,
   GROWTH_MONTHLY_OFFER_COUNT,
+  growthMonthlyOfferCount,
   refreshGrowthCampaignOffers,
   availableCampaigns,
   runGrowthCampaign,
@@ -1158,8 +1159,9 @@ growthRosterState.stage = STAGES.PUBLIC;
 growthRosterState.finance.cash = 50_000_000_000;
 resetGrowthCampaignsMonth(growthRosterState);
 const roster = growthRosterState.growth.monthCampaignOffers ?? [];
-if (roster.length < 1 || roster.length > GROWTH_MONTHLY_OFFER_COUNT) {
-  console.error(`FAIL: growth monthly roster size ${roster.length}`);
+const expectedOffers = growthMonthlyOfferCount(growthRosterState);
+if (roster.length < 1 || roster.length > expectedOffers) {
+  console.error(`FAIL: growth monthly roster size ${roster.length} (max ${expectedOffers})`);
   failed = true;
 } else {
   const whales = availableCampaigns(growthRosterState).filter(

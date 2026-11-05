@@ -603,6 +603,10 @@ h1 {
   text-align: right;
 }
 
+.data-table tr.cap-row-public td {
+  color: var(--accent, #5b8def);
+}
+
 .game-flash {
   flex: 1 1 100%;
   margin: 0 0 0.35rem;

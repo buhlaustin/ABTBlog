@@ -7,7 +7,8 @@ import {
   getFounderRow,
   issueFollowOnShares,
   retirePublicFloatShares,
-  targetIpoSharePrice
+  targetIpoSharePrice,
+  totalOutstandingShares
 } from './CapTable.js';
 import { ceoEndgameCompSnapshot, depositStockCashOutToPersonalBank } from './CeoEconomics.js';
 import { formatCalendarStamp } from './GameCalendar.js';
@@ -15,11 +16,6 @@ import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 import { recordCashOutflow } from './Finance.js';
 import { totalSubsidiaryMrr } from './Acquisitions.js';
-
-function totalOutstandingShares(state) {
-  const total = (state.capTable ?? []).reduce((s, r) => s + (r.shares ?? 0), 0);
-  return total > 0 ? total : 10_000_000;
-}
 
 function deriveTicker(companyName) {
   const letters = String(companyName || 'CO')
@@ -640,7 +636,7 @@ export function renderIpoPanel(container, state) {
     const tone = pm.guidanceTone ?? 'inline';
     const earningsSoon = (pm.monthsPublic ?? 0) % 3 === 2;
     block = `<div class="finance-action ipo-action stock-panel">
-      <p class="stock-headline"><strong>${escapeHtml(pm.ticker ?? '—')}</strong> · ${formatMoney(pm.sharePrice ?? 0)}/share · Mkt cap ${formatMoney(cap)}</p>
+      <p class="stock-headline"><strong>${escapeHtml(pm.ticker ?? '—')}</strong> · ${formatMoney(pm.sharePrice ?? 0)}/share · Mkt cap ${formatMoney(cap)} · ${totalOutstandingShares(state).toLocaleString()} sh</p>
       ${renderStockSparkline(pm.priceHistory)}
       <div class="summary-grid stock-stats">
         <div><span class="stat-label">IPO</span><span class="stat-value">${formatMoney(pm.ipoPrice ?? 0)}</span></div>
