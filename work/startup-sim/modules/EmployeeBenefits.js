@@ -14,7 +14,7 @@ import { expandEmployeeOptionPool, getOptionPoolRow } from './CapTable.js';
 import { calendarTurn } from './GameCalendar.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { panelStatCard, escapeHtml as panelEscapeHtml } from './PanelChrome.js';
-import { progressionTier } from './ProgressionEconomy.js';
+import { meetsProgressionTierMin } from './ProgressionEconomy.js';
 
 export const COMPANY_BONUS_PCTS = [2, 5, 10, 20];
 
@@ -336,8 +336,7 @@ export function conductEmployeeOffsite(state, programId) {
 }
 
 function perkUnlocked(perk, state) {
-  const tier = progressionTier(state);
-  return tier >= (perk.tierMin ?? 0);
+  return meetsProgressionTierMin(state, perk.tierMin ?? 0);
 }
 
 export function runExtraEmployeePerk(state, perkId) {
@@ -414,7 +413,7 @@ function renderPerkCard(p, state, perksDone) {
   const cash = state.finance?.cash ?? 0;
   const disabled = !unlocked || used || cash < p.cost ? ' disabled' : '';
   const title = !unlocked
-    ? ' title="Unlocks at a later funding stage"'
+    ? ' title="Unlocks at Series B or later — or IPO after Series A without a B raise"'
     : used
       ? ' title="Already ran this month"'
       : cash < p.cost

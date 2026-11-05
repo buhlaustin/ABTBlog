@@ -1504,6 +1504,32 @@ if (EXTRA_PERKS.length < 15) {
     console.log(`OK: employee perks catalog (${EXTRA_PERKS.length}) + hackathon run`);
   }
 }
+const { skippedSeriesBToIpo, meetsProgressionTierMin } = await import(
+  `file://${join(sim, 'modules/ProgressionEconomy.js')}`
+);
+const skipBIpoState = createInitialState({
+  companyName: 'SkipBCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 500_000
+});
+skipBIpoState.flags.seedRoundClosed = true;
+skipBIpoState.flags.seriesAClosed = true;
+skipBIpoState.flags.ipoFiled = true;
+skipBIpoState.stage = STAGES.PUBLIC;
+skipBIpoState.finance.cash = 500_000;
+if (!skippedSeriesBToIpo(skipBIpoState) || !meetsProgressionTierMin(skipBIpoState, 4)) {
+  console.error('FAIL: Series A → IPO without B should satisfy Series B+ unlock tier');
+  failed = true;
+} else {
+  const family = runExtraEmployeePerk(skipBIpoState, 'family-stipend');
+  if (!family.ok) {
+    console.error(`FAIL: family stipend after skip-B IPO: ${family.reason ?? 'blocked'}`);
+    failed = true;
+  } else {
+    console.log('OK: Series B+ perks unlock on IPO after Series A (no B raise)');
+  }
+}
 const poolState = createInitialState({ companyName: 'PoolCo', categoryId: 'b2b-saas', mode: 'career' });
 poolState.flags.seedRoundClosed = true;
 applySeedCapTableSnapshot(poolState);

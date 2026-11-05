@@ -2,7 +2,7 @@ import { formatMoney } from './constants.js';
 import { recordCashOutflow } from './Finance.js';
 import { setGameFeedback } from './GameFeedback.js';
 import { easeCompetitorPressure } from './Competitor.js';
-import { progressionTier } from './ProgressionEconomy.js';
+import { progressionTierForUnlocks } from './ProgressionEconomy.js';
 import {
   sideTaskPlaysPerMonth,
   formatMonthlySideTaskLimit,
@@ -87,7 +87,7 @@ export function resetProductActionsMonth(state) {
 }
 
 function actionUnlocked(def, state) {
-  const tier = progressionTier(state);
+  const tier = progressionTierForUnlocks(state);
   if ((def.tierMin ?? 0) > tier) return false;
   if ((def.tierMax ?? 99) < tier) return false;
   const cats = def.categories;

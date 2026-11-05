@@ -1,7 +1,7 @@
 import { fetchGameJson } from './utils.js';
 import { STAGES, getMonthlyTaskSlots, getMonthlyTaskOfferCount } from './constants.js';
 import { getTaskStage } from './Workspace.js';
-import { progressionTier } from './ProgressionEconomy.js';
+import { progressionTierForUnlocks } from './ProgressionEconomy.js';
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
 import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
@@ -301,7 +301,7 @@ function inferredTierBand(task) {
 }
 
 function taskTierAllowed(task, state) {
-  const tier = progressionTier(state);
+  const tier = progressionTierForUnlocks(state);
   const { min, max } = inferredTierBand(task);
   return tier >= min && tier <= max;
 }

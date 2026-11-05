@@ -6,7 +6,7 @@ import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { ty
 import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json' with { type: 'json' };
 import bundledPublicLate from '../data/growth-campaigns-public-late.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
-import { progressionTier } from './ProgressionEconomy.js';
+import { progressionTier, progressionTierForUnlocks } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
 import { accrueFiscalRevenue } from './CorporateTax.js';
 import { eraBaseRevenueScaleForCampaign } from './ProgressionEconomy.js';
@@ -99,7 +99,7 @@ function mergeUniqueCampaignOffers(offered, def, offerCount) {
 }
 
 function eligibleCampaignPool(state) {
-  const tier = progressionTier(state);
+  const tier = progressionTierForUnlocks(state);
   return getGrowthCampaigns().filter(
     (c) =>
       campaignCategoryAllowed(c, state) &&
@@ -172,7 +172,7 @@ export function availableCampaigns(state) {
 export function runGrowthCampaign(state, campaignId) {
   const def = getGrowthCampaigns().find((c) => c.id === campaignId);
   if (!def) return { ok: false, reason: 'Unknown campaign.' };
-  const tier = progressionTier(state);
+  const tier = progressionTierForUnlocks(state);
   if (!campaignCategoryAllowed(def, state)) {
     return { ok: false, reason: 'Campaign not available for your industry.' };
   }
