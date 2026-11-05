@@ -17,14 +17,18 @@ import {
   runAllRemainingGrowthCampaigns,
   loadGrowthCampaigns
 } from './modules/GrowthCampaigns.js';
-import { loadGrowthLevers } from './modules/ProductActions.js';
 import { openGrowthCampaignOutcomeDialog } from './modules/GrowthOutcome.js';
 import {
   getCoreTaskRevenueMult,
   getSandboxTuningMult,
   getTaskRevenueMultiplierPreview
 } from './modules/Finance.js';
-import { runProductAction, showProductActionFeedback } from './modules/ProductActions.js';
+import {
+  loadGrowthLevers,
+  runProductAction,
+  runAllRemainingSideTasks,
+  showProductActionFeedback
+} from './modules/ProductActions.js';
 import {
   initNarrativeApiUrl,
   isNarrativeApiEnabled,
@@ -867,6 +871,25 @@ function bindGameInteractions() {
         showOfficesFeedback('Office leased.');
         syncStageFromProgress(sessionState);
       }
+      refresh();
+      return;
+    }
+
+    const buyAllSideBtn = e.target.closest('[data-buy-all-side]');
+    if (buyAllSideBtn && sessionState) {
+      const result = runAllRemainingSideTasks(sessionState, ['product', 'growth', 'brand', 'both']);
+      if (!result.ok) {
+        setGameFeedback(result.reason || 'Could not buy side plays.', true);
+        refresh();
+        return;
+      }
+      appendLog(
+        sessionState,
+        `Growth: ran ${result.count} side play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}.`
+      );
+      setGameFeedback(
+        `Ran ${result.count} side play${result.count === 1 ? '' : 's'} (buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}).`
+      );
       refresh();
       return;
     }

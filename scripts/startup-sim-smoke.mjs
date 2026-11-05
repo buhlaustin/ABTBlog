@@ -1302,6 +1302,30 @@ if (growthCampaignCatalogSize() < 270) {
   );
 }
 
+const { runAllRemainingSideTasks, canBuyAllRemainingSideTasks } = await import(
+  `file://${join(sim, 'modules/ProductActions.js')}`
+);
+const sideBulk = createInitialState({
+  companyName: 'SideBulk',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 500_000
+});
+sideBulk.flags.xcResidencyComplete = true;
+sideBulk.flags.seedRoundClosed = true;
+if (!canBuyAllRemainingSideTasks(sideBulk, ['product', 'growth', 'brand', 'both'])) {
+  console.error('FAIL: sandbox should allow buy-all side plays');
+  failed = true;
+} else {
+  const bulk = runAllRemainingSideTasks(sideBulk, ['product', 'growth', 'brand', 'both']);
+  if (!bulk.ok || bulk.count < 1) {
+    console.error(`FAIL: buy-all side plays: ${bulk.reason ?? 'empty'}`);
+    failed = true;
+  } else {
+    console.log(`OK: buy-all side plays (${bulk.count} runs)`);
+  }
+}
+
 const calState = createInitialState({ companyName: 'Cal Co', categoryId: 'b2b-saas', mode: 'career' });
 if (!isRealCalendarYear(calState.calendar.year)) {
   console.error('FAIL: career should start on real calendar year');

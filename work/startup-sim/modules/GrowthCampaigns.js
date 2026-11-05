@@ -308,10 +308,8 @@ export function renderGrowthCampaignsBlock(state) {
     remaining === Infinity
       ? 'Unlimited'
       : `${remaining}/${formatMonthlySideTaskLimit(slots)}`;
-  const buyAllDisabled = canBuyAllRemainingGrowthCampaigns(state) ? '' : ' disabled';
   const rosterSize = state.growth?.monthCampaignOffers?.length ?? campaigns.length;
-  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> on this month&apos;s roster (${rosterSize} offered, ${bankSize} in bank, ${GROWTH_CAMPAIGN_COOLDOWN_MONTHS}-month cooldown — does not use desk tasks).</p>
-    <p class="finance-action"><button type="button" class="btn btn-primary btn-small" data-buy-all-growth${buyAllDisabled}>Buy all remaining</button> <span class="fine-print">Runs every affordable unlocked play until slots or cash run out.</span></p>`;
+  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> on this month&apos;s roster (${rosterSize} offered, ${bankSize} in bank, ${GROWTH_CAMPAIGN_COOLDOWN_MONTHS}-month cooldown — does not use desk tasks).</p>`;
   const sorted = [...campaigns].sort((a, b) => (b.revenue?.[1] ?? 0) - (a.revenue?.[1] ?? 0));
   const cards = sorted
     .map((c) => {
@@ -332,5 +330,5 @@ export function renderGrowthCampaignsBlock(state) {
       </div>`;
     })
     .join('');
-  return `${slotNote}<h3 class="log-head">Paid growth (Growth tab)</h3>${cards}`;
+  return `${slotNote}<h3 class="log-head">Paid growth campaigns</h3>${cards}`;
 }

@@ -134,7 +134,6 @@ test.describe('Startup Simulator', () => {
 
     const tabIds = [
       'desk',
-      'product',
       'growth',
       'people',
       'ceo',

@@ -812,6 +812,23 @@ h1 {
   min-width: 6.5rem;
 }
 
+.growth-buy-all-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.65rem;
+  margin: 0.75rem 0 1rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.growth-buy-all-bar .fine-print {
+  flex: 1 1 12rem;
+  margin: 0;
+}
+
 .companies-reinvest-cell {
   display: flex;
   flex-direction: column;
