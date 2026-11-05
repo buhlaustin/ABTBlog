@@ -1,0 +1,237 @@
+{
+  "version": 1,
+  "actions": [
+    {
+      "id": "founder_reddit_ama",
+      "label": "Founder Reddit AMA",
+      "cost": 250,
+      "buzz": 1,
+      "product": 0,
+      "rivalEase": 1,
+      "tierMax": 2,
+      "description": "Cheap attention — good when you have more time than budget."
+    },
+    {
+      "id": "community_beta",
+      "label": "Invite-only beta list",
+      "cost": 900,
+      "buzz": 1,
+      "product": 2,
+      "tierMax": 3,
+      "description": "Hand-pick early users; product depth over hype."
+    },
+    {
+      "id": "influencer_micro",
+      "label": "Micro-influencer campaign",
+      "cost": 4500,
+      "buzz": 2,
+      "product": 0,
+      "rivalEase": 1,
+      "description": "Pay creators to talk up your launch — bumps buzz, not product depth."
+    },
+    {
+      "id": "influencer_mid",
+      "label": "Mid-tier influencer tour",
+      "cost": 18000,
+      "buzz": 5,
+      "product": 1,
+      "tierMin": 2,
+      "tierMax": 5,
+      "description": "Heavier spend for a coordinated week of sponsored posts."
+    },
+    {
+      "id": "product_hackathon",
+      "label": "Customer hackathon",
+      "cost": 12000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Invite power users to build on your API — product level over hype."
+    },
+    {
+      "id": "brand_stunt",
+      "label": "Publicity stunt",
+      "cost": 8000,
+      "buzz": 4,
+      "product": 0,
+      "rivalEase": 2,
+      "description": "Risky but loud — great for buzz if you can afford the cringe."
+    },
+    {
+      "id": "lever-founder-pod-tour",
+      "label": "Founder podcast tour",
+      "cost": 1500,
+      "buzz": 2,
+      "product": 0,
+      "rivalEase": 1,
+      "tierMax": 4,
+      "description": "Three guest spots repeating the same origin story with new adjectives."
+    },
+    {
+      "id": "lever-twitter-spaces",
+      "label": "Twitter/X Spaces series",
+      "cost": 800,
+      "buzz": 2,
+      "product": 1,
+      "tierMax": 3,
+      "description": "Weekly audio rooms — half listeners, half lurkers."
+    },
+    {
+      "id": "lever-template-gallery",
+      "label": "Free template gallery launch",
+      "cost": 3500,
+      "buzz": 1,
+      "product": 2,
+      "tierMax": 4,
+      "description": "Notion/Figma templates that funnel to your signup."
+    },
+    {
+      "id": "lever-customer-dinner",
+      "label": "Customer dinner (12 seats)",
+      "cost": 6500,
+      "buzz": 2,
+      "product": 1,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Expensive food; honest feedback between courses."
+    },
+    {
+      "id": "lever-roast-my-product",
+      "label": "Roast my product livestream",
+      "cost": 2000,
+      "buzz": 3,
+      "product": 2,
+      "rivalEase": 1,
+      "tierMax": 4,
+      "description": "Public UX critique — painful, useful, clip-worthy."
+    },
+    {
+      "id": "lever-changelog-video",
+      "label": "Changelog video series",
+      "cost": 4200,
+      "buzz": 2,
+      "product": 2,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Ship notes people might actually watch."
+    },
+    {
+      "id": "lever-partner-webinar",
+      "label": "Partner webinar takeover",
+      "cost": 9500,
+      "buzz": 2,
+      "product": 1,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Borrow their audience; share leads awkwardly."
+    },
+    {
+      "id": "lever-viral-waitlist",
+      "label": "Viral waitlist mechanic",
+      "cost": 2800,
+      "buzz": 3,
+      "product": 0,
+      "tierMax": 3,
+      "description": "Referral queue jumps — ethics optional."
+    },
+    {
+      "id": "lever-press-release-wire",
+      "label": "Press release wire blast",
+      "cost": 1200,
+      "buzz": 1,
+      "product": 0,
+      "tierMax": 4,
+      "description": "Everyone's inbox ignores it; one trade blog might bite."
+    },
+    {
+      "id": "lever-user-generated-content",
+      "label": "UGC contest month",
+      "cost": 7500,
+      "buzz": 4,
+      "product": 1,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Prizes for the best customer video — legal reviews every entry."
+    },
+    {
+      "id": "lever-executive-byline",
+      "label": "Executive byline placement",
+      "cost": 5500,
+      "buzz": 2,
+      "product": 0,
+      "tierMin": 2,
+      "tierMax": 7,
+      "description": "Ghostwritten Forbes Council energy without the council."
+    },
+    {
+      "id": "lever-customer-advisory",
+      "label": "Customer advisory board launch",
+      "cost": 14000,
+      "buzz": 2,
+      "product": 3,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Twelve advisors, quarterly dinner, roadmap input."
+    },
+    {
+      "id": "lever-open-office-hours",
+      "label": "Public office hours",
+      "cost": 500,
+      "buzz": 1,
+      "product": 1,
+      "tierMax": 2,
+      "description": "Zoom link on Twitter; four strangers and one power user show up."
+    },
+    {
+      "id": "lever-category-newsletter",
+      "label": "Category newsletter sponsorship",
+      "cost": 6200,
+      "buzz": 2,
+      "product": 0,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Single placement above the fold in a niche digest."
+    },
+    {
+      "id": "lever-annual-report-viral",
+      "label": "Spicy annual metrics report",
+      "cost": 11000,
+      "buzz": 4,
+      "product": 1,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Transparent numbers designed to be screenshot on LinkedIn."
+    },
+    {
+      "id": "lever-charity-hackathon",
+      "label": "Charity hackathon sponsor",
+      "cost": 22000,
+      "buzz": 3,
+      "product": 2,
+      "rivalEase": 2,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Goodwill, GitHub stars, and one heartwarming blog post."
+    },
+    {
+      "id": "lever-docs-seo-sprint",
+      "label": "Documentation SEO sprint",
+      "cost": 4800,
+      "buzz": 1,
+      "product": 2,
+      "tierMin": 1,
+      "tierMax": 5,
+      "description": "Tutorial pages targeting long-tail problems you actually solve."
+    },
+    {
+      "id": "lever-founder-vlog",
+      "label": "Founder vlog month",
+      "cost": 1800,
+      "buzz": 2,
+      "product": 0,
+      "tierMax": 3,
+      "description": "Building in public with better lighting than revenue."
+    }
+  ]
+}

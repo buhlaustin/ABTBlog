@@ -13,6 +13,7 @@ import { completeBoardTask } from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
 import { runGrowthCampaign, loadGrowthCampaigns } from './modules/GrowthCampaigns.js';
+import { loadGrowthLevers } from './modules/ProductActions.js';
 import { openGrowthCampaignOutcomeDialog } from './modules/GrowthOutcome.js';
 import {
   getCoreTaskRevenueMult,
@@ -1510,6 +1511,7 @@ async function init() {
         loadHubData(),
         loadAccelerators(),
         loadGrowthCampaigns(),
+        loadGrowthLevers(),
         loadAssetManifest(),
         initNarrativeApiUrl(),
         preloadCrisisCatalog(),

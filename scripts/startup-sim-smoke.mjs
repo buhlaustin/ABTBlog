@@ -923,6 +923,20 @@ if (!hire.ok || !isCooHired(garageState)) {
   }
 }
 
+const { growthCampaignCatalogSize } = await import(
+  `file://${join(sim, 'modules/GrowthCampaigns.js')}`
+);
+const { getProductActions } = await import(`file://${join(sim, 'modules/ProductActions.js')}`);
+if (growthCampaignCatalogSize() < 55) {
+  console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()})`);
+  failed = true;
+} else if (getProductActions().length < 20) {
+  console.error(`FAIL: growth lever bank too small (${getProductActions().length})`);
+  failed = true;
+} else {
+  console.log(`OK: expanded growth bank (${growthCampaignCatalogSize()} campaigns, ${getProductActions().length} levers)`);
+}
+
 const calState = createInitialState({ companyName: 'Cal Co', categoryId: 'b2b-saas', mode: 'career' });
 if (!isRealCalendarYear(calState.calendar.year)) {
   console.error('FAIL: career should start on real calendar year');

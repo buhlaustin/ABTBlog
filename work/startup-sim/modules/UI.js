@@ -30,7 +30,7 @@ import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
-import { renderProductActionsPanel } from './ProductActions.js';
+import { renderProductActionsPanel, getProductActions } from './ProductActions.js';
 import { sentimentLabel, marketTrustLabel, hasInstitutionalBoard } from './Sentiment.js';
 import { runwayLabel } from './MonthSummary.js';
 import { competitorRevenueMult } from './Competitor.js';
@@ -619,8 +619,13 @@ export function renderGrowthPanel(container, state) {
         ? `<p class="fine-print">Latest board note: ${escapeHtml(lastReason)}</p>`
         : '<p class="fine-print">Desk tasks scale with funding rounds and HQ tier. Paid campaigns below do not use desk slots.</p>'
     }
+    <div id="growth-levers-mount"></div>
     ${renderGrowthCampaignsBlock(state)}
   `;
+  renderProductActionsPanel(document.getElementById('growth-levers-mount'), state, {
+    heading: 'Side growth plays',
+    lede: `Low-lift experiments and founder-led plays — shares the monthly lever limit with the Product tab (${getProductActions().length} in bank).`
+  });
 }
 
 export function renderProductPanel(container, state) {
