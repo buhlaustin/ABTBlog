@@ -68,6 +68,7 @@
       "revenue": [0, 0],
       "buzz": 1,
       "sentiment": 5,
+      "stockPct": 0.015,
       "minTier": 7,
       "requiresPublic": true
     },

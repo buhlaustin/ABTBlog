@@ -159,6 +159,29 @@ const OFFLINE_NEWS_TEMPLATES = [
     })
   },
   {
+    id: 'public-index-flows',
+    source: 'The Financier Times',
+    when: (c) => Boolean(c.state.publicMarket?.indexMember),
+    build: (c) => ({
+      headline: `${c.state.publicMarket?.ticker ?? c.company} rides ${c.state.publicMarket?.indexName ?? 'index'} rebalance flows`,
+      dek: 'Passive money pretends not to care about your burn multiple.',
+      body: `Index inclusion keeps ${c.company} in ETF baskets while active managers debate ${c.arr} ARR versus ${c.state.publicMarket?.analystRating ?? 'Hold'} consensus. Short interest sits near ${c.state.publicMarket?.shortInterestPct ?? 0}%.`
+    })
+  },
+  {
+    id: 'public-analyst-spat',
+    source: 'Terminal Chatter',
+    when: (c) =>
+      Boolean(c.state.flags?.ipoFiled) &&
+      (c.state.publicMarket?.guidanceBeatStreak ?? 0) === 0 &&
+      (c.state.publicMarket?.monthsPublic ?? 0) >= 2,
+    build: (c) => ({
+      headline: `Analysts bicker over ${c.state.publicMarket?.ticker ?? c.company} after a soft month`,
+      dek: `${c.state.publicMarket?.analystRating ?? 'Hold'} vs reality.`,
+      body: `Whisper revenue missed the chat room consensus. ${c.company} still prints ${c.rev} for the month, but the stock desk wants a clearer beat streak before raising price targets above ${c.state.publicMarket?.analystTarget ?? '—'}.`
+    })
+  },
+  {
     id: 'seed-grind',
     source: 'Patty Fundsworth Substack',
     when: (c) => c.state.flags?.seedRoundClosed && !c.state.flags?.seriesAClosed,

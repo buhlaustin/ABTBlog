@@ -29,7 +29,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 20;
+export const SAVE_VERSION = 21;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -229,6 +229,15 @@ export function normalizeSave(raw) {
       if (pm.buybackUsedLifetime === undefined) pm.buybackUsedLifetime = 0;
       if (pm.shortInterestPct === undefined) pm.shortInterestPct = 0;
       if (pm.earningsSurpriseStreak === undefined) pm.earningsSurpriseStreak = 0;
+      if (pm.high52 === undefined) pm.high52 = pm.sharePrice ?? null;
+      if (pm.low52 === undefined) pm.low52 = pm.sharePrice ?? null;
+      if (pm.indexMember === undefined) pm.indexMember = false;
+      if (pm.indexName === undefined) pm.indexName = 'FTEQ-100';
+      if (!pm.marketTape) pm.marketTape = [];
+      if (pm.institutionalHoldPct === undefined) pm.institutionalHoldPct = 42;
+      if (pm.lastSplitTurn === undefined) pm.lastSplitTurn = null;
+      if (pm.lastDividendTurn === undefined) pm.lastDividendTurn = null;
+      if (pm.lastAnalystActionTurn === undefined) pm.lastAnalystActionTurn = null;
     }
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);

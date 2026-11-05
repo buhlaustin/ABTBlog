@@ -3,7 +3,7 @@ import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
-import { tickPublicMarket, tickIpoLockup, isPublicCompany } from './IPO.js';
+import { tickPublicMarket, tickIpoLockup, tickPublicMarketAtMonthStart, isPublicCompany } from './IPO.js';
 import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
 import { syncDraftFromFinalized } from './Staff.js';
 import { tickXcResidency } from './XC.js';
@@ -85,6 +85,9 @@ export function startMonth(state) {
     appendLog(state, line);
   }
   for (const line of tickAcquisitionsAtMonthStart(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickPublicMarketAtMonthStart(state)) {
     appendLog(state, line);
   }
   dealMonthlyTasks(state);

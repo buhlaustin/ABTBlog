@@ -84,6 +84,13 @@ export function fileIpo(state) {
   state.publicMarket.buybackAuthorized = Math.round(valuation * 0.02);
   state.publicMarket.buybackUsedLifetime = 0;
   state.publicMarket.shortInterestPct = 4 + Math.floor(Math.random() * 6);
+  state.publicMarket.high52 = openPrice;
+  state.publicMarket.low52 = openPrice;
+  state.publicMarket.indexMember = false;
+  state.publicMarket.indexName = 'FTEQ-100';
+  state.publicMarket.marketTape = [];
+  state.publicMarket.institutionalHoldPct = 38 + Math.floor(Math.random() * 8);
+  pushMarketTape(state, `Listed at ${formatMoney(openPrice)} — opening pop ${Math.round((pop - 1) * 100)}%.`);
   refreshAnalystCoverage(state, { force: true });
 
   state.finance.valuation = Math.round(openPrice * shares);
@@ -130,6 +137,33 @@ function priceFloor(state, price) {
   return (pm.ipoPrice ?? price) * 0.15;
 }
 
+function hashPublic(state, salt) {
+  const seed = state.meta?.runSeed ?? 1;
+  const turn = calendarTurn(state);
+  let h = (seed ^ salt ^ turn) >>> 0;
+  h = Math.imul(h ^ (turn * 2654435761), 0x9e3779b1);
+  return (h >>> 0) / 0xffffffff;
+}
+
+function pushMarketTape(state, text) {
+  if (!state.publicMarket) return;
+  const pm = state.publicMarket;
+  if (!pm.marketTape) pm.marketTape = [];
+  pm.marketTape.unshift({
+    month: state.calendar.monthIndex,
+    year: state.calendar.year,
+    text
+  });
+  pm.marketTape = pm.marketTape.slice(0, 8);
+}
+
+function updateRange52(state, price) {
+  const pm = state.publicMarket;
+  if (!pm) return;
+  if (pm.high52 == null || price > pm.high52) pm.high52 = price;
+  if (pm.low52 == null || price < pm.low52) pm.low52 = price;
+}
+
 function pushPriceHistory(state, price) {
   const pm = state.publicMarket;
   pm.priceHistory = (pm.priceHistory ?? []).concat({
@@ -138,6 +172,7 @@ function pushPriceHistory(state, price) {
     price
   });
   pm.priceHistory = pm.priceHistory.slice(-36);
+  updateRange52(state, price);
   const shares = totalOutstandingShares(state);
   state.finance.valuation = Math.round(price * shares);
 }
@@ -208,6 +243,7 @@ export function executeStockBuyback(state, amount) {
   const pct = Math.min(0.09, spend / Math.max(marketCap(state), 1) * 2.5);
   applyStockPctMove(state, pct);
   pm.shortInterestPct = Math.max(1, (pm.shortInterestPct ?? 5) - 1);
+  pushMarketTape(state, `Open-market repurchase ${formatMoney(spend)}.`);
   return {
     ok: true,
     spend,
@@ -237,11 +273,121 @@ export function fileFollowOnOffering(state) {
   }
   applyStockPctMove(state, -0.05);
   pm.buybackAuthorized = (pm.buybackAuthorized ?? 0) + Math.round(raise * 0.15);
+  pushMarketTape(state, `Follow-on priced — ${formatMoney(raise)} primary.`);
   return {
     ok: true,
     raise,
     summary: `Follow-on raised ${formatMoney(raise)} — stock −5%, cap table −2.5%.`
   };
+}
+
+export function executeStockSplit(state) {
+  if (!isPublicCompany(state)) return { ok: false, reason: 'Splits require a listed stock.' };
+  const pm = state.publicMarket;
+  const price = pm.sharePrice ?? 0;
+  if (price < 180) {
+    return { ok: false, reason: 'Board waits until the share price is at least $180.' };
+  }
+  const turn = calendarTurn(state);
+  if (pm.lastSplitTurn != null && turn - pm.lastSplitTurn < 6) {
+    return { ok: false, reason: 'One split every 6 months max.' };
+  }
+  pm.lastSplitTurn = turn;
+  for (const row of state.capTable ?? []) {
+    if (row.shares) row.shares *= 2;
+  }
+  pm.sharePrice = Math.round((price / 2) * 100) / 100;
+  pm.ipoPrice = Math.round(((pm.ipoPrice ?? price) / 2) * 100) / 100;
+  applyStockPctMove(state, 0.012);
+  pushMarketTape(state, '2-for-1 split — retail traders celebrate the lower sticker price.');
+  return { ok: true, summary: '2-for-1 split executed — share count doubled, price halved.' };
+}
+
+export function declareStockDividend(state) {
+  if (!isPublicCompany(state)) return { ok: false, reason: 'Dividends unlock after IPO.' };
+  const pm = state.publicMarket;
+  if ((pm.monthsPublic ?? 0) < 3) {
+    return { ok: false, reason: 'Wait 3 months after listing.' };
+  }
+  const turn = calendarTurn(state);
+  if (pm.lastDividendTurn != null && turn - pm.lastDividendTurn < 3) {
+    return { ok: false, reason: 'One dividend declaration per quarter.' };
+  }
+  const shares = totalOutstandingShares(state);
+  const perShare = 0.04;
+  const payout = Math.round(shares * perShare);
+  if ((state.finance?.cash ?? 0) < payout) {
+    return { ok: false, reason: `Need ${formatMoney(payout)} cash for the dividend.` };
+  }
+  pm.lastDividendTurn = turn;
+  state.finance.cash -= payout;
+  recordCashOutflow(state, payout, 'dividend');
+  pm.dividendPerShareLast = perShare;
+  applyStockPctMove(state, 0.018);
+  pm.institutionalHoldPct = Math.min(78, (pm.institutionalHoldPct ?? 42) + 1);
+  pushMarketTape(state, `Declared $${perShare.toFixed(2)}/share dividend (${formatMoney(payout)} total).`);
+  return { ok: true, payout, summary: `Dividend ${formatMoney(payout)} paid — yield chasers bid the stock.` };
+}
+
+function maybeShortSqueeze(state, deltaPct) {
+  const pm = state.publicMarket;
+  if ((pm.shortInterestPct ?? 0) < 9 || (pm.guidanceBeatStreak ?? 0) < 3 || deltaPct <= 0) return null;
+  if (hashPublic(state, 901) > 0.55) return null;
+  const squeeze = 0.07 + hashPublic(state, 902) * 0.05;
+  applyStockPctMove(state, squeeze);
+  pm.shortInterestPct = Math.max(2, pm.shortInterestPct - 4);
+  pushMarketTape(state, `Short squeeze — cover rush added ${(squeeze * 100).toFixed(0)}%.`);
+  return `Short squeeze: shorts scrambled (+${(squeeze * 100).toFixed(1)}%).`;
+}
+
+function maybeAnalystAction(state) {
+  const pm = state.publicMarket;
+  const turn = calendarTurn(state);
+  if (pm.lastAnalystActionTurn === turn) return null;
+  if (hashPublic(state, 801) > 0.38) return null;
+  pm.lastAnalystActionTurn = turn;
+  const streak = pm.guidanceBeatStreak ?? 0;
+  const rival = state.world?.competitor?.pressure ?? 0;
+  if (streak >= 2) {
+    refreshAnalystCoverage(state, { force: true });
+    applyStockPctMove(state, 0.022);
+    const line = `${pm.analystRating} reiterate — price target ${formatMoney(pm.analystTarget)}.`;
+    pushMarketTape(state, line);
+    return `Analyst upgrade buzz: ${line}`;
+  }
+  if (streak === 0 && rival >= 4) {
+    pm.analystRating = 'Underperform';
+    pm.analystTarget = Math.round((pm.sharePrice ?? 1) * 0.92 * 100) / 100;
+    applyStockPctMove(state, -0.028);
+    const line = 'Downgrade to Underperform — rival share gains cited.';
+    pushMarketTape(state, line);
+    return line;
+  }
+  return null;
+}
+
+/** Month open: index, tape, institutional drift while public. */
+export function tickPublicMarketAtMonthStart(state) {
+  if (!isPublicCompany(state) || state.flags?.cashedOut) return [];
+  const pm = state.publicMarket;
+  const lines = [];
+  pm.institutionalHoldPct = Math.min(82, (pm.institutionalHoldPct ?? 42) + (pm.indexMember ? 0.4 : 0.15));
+  if (!pm.indexMember && (pm.monthsPublic ?? 0) >= 6 && marketCap(state) >= 500_000_000) {
+    pm.indexMember = true;
+    pm.indexName = pm.indexName ?? 'FTEQ-100';
+    applyStockPctMove(state, 0.025);
+    pushMarketTape(state, `Added to ${pm.indexName} — passive flows incoming.`);
+    lines.push(`${pm.ticker} entered the ${pm.indexName} — index rebalancing bid expected.`);
+  }
+  const analystLine = maybeAnalystAction(state);
+  if (analystLine) lines.push(analystLine);
+  if (hashPublic(state, 803) < 0.12) {
+    pm.shortInterestPct = Math.min(18, (pm.shortInterestPct ?? 5) + 1);
+    lines.push(`Short interest ticked up to ${pm.shortInterestPct}% — borrow desk busy.`);
+  } else if (hashPublic(state, 804) < 0.1 && (pm.shortInterestPct ?? 0) > 4) {
+    pm.shortInterestPct -= 1;
+  }
+  return lines;
 }
 
 function portfolioConglomerateBonus(state) {
@@ -312,8 +458,11 @@ export function tickPublicMarket(state) {
   pm.whisperRevenueTarget = whisperRevenueTarget(state);
   refreshAnalystCoverage(state);
 
+  const squeezeLine = maybeShortSqueeze(state, deltaPct);
+  if (squeezeLine) lines.push(squeezeLine);
+
   lines.unshift(
-    `Stock (${pm.ticker}) ${deltaPct >= 0 ? '+' : ''}${(deltaPct * 100).toFixed(1)}% → ${formatMoney(next)}/share.`
+    `Stock (${pm.ticker}) ${deltaPct >= 0 ? '+' : ''}${(deltaPct * 100).toFixed(1)}% → ${formatMoney(pm.sharePrice)}/share.`
   );
   return { deltaPct, lines };
 }
@@ -488,9 +637,21 @@ export function renderIpoPanel(container, state) {
         <div><span class="stat-label">Whisper</span><span class="stat-value">${formatMoney(pm.whisperRevenueTarget ?? 0)}/mo</span></div>
         <div><span class="stat-label">Beat streak</span><span class="stat-value">${pm.guidanceBeatStreak ?? 0}</span></div>
         <div><span class="stat-label">Short interest</span><span class="stat-value">${pm.shortInterestPct ?? 0}%</span></div>
+        <div><span class="stat-label">Institutional</span><span class="stat-value">${Math.round(pm.institutionalHoldPct ?? 42)}%</span></div>
+        <div><span class="stat-label">52-week</span><span class="stat-value">${formatMoney(pm.low52 ?? pm.sharePrice ?? 0)} – ${formatMoney(pm.high52 ?? pm.sharePrice ?? 0)}</span></div>
         <div><span class="stat-label">Founder stake</span><span class="stat-value">${formatMoney(stake)}</span></div>
       </div>
-      <p class="fine-print">${pm.monthsPublic ?? 0} month(s) public${earningsSoon ? ' · earnings next month' : ''} · buyback auth ${formatMoney(pm.buybackAuthorized ?? 0)}</p>
+      <p class="fine-print">${pm.monthsPublic ?? 0} month(s) public${earningsSoon ? ' · earnings next month' : ''}${pm.indexMember ? ` · ${escapeHtml(pm.indexName ?? 'Index')}` : ''} · buyback auth ${formatMoney(pm.buybackAuthorized ?? 0)}${pm.dividendPerShareLast ? ` · last div $${Number(pm.dividendPerShareLast).toFixed(2)}/sh` : ''}</p>
+      ${
+        (pm.marketTape?.length ?? 0) > 0
+          ? `<ul class="stock-tape">${pm.marketTape
+              .map(
+                (e) =>
+                  `<li><span class="tape-when">Y${e.year} M${e.month}</span> ${escapeHtml(e.text)}</li>`
+              )
+              .join('')}</ul>`
+          : ''
+      }
       <div class="stock-guidance-row">
         <span class="stat-label">Guidance tone</span>
         <button type="button" class="btn btn-small companies-filter${tone === 'sandbag' ? ' active' : ''}" data-stock-guidance="sandbag">Sandbag</button>
@@ -501,6 +662,8 @@ export function renderIpoPanel(container, state) {
         <button type="button" class="btn btn-small" data-stock-buyback="250000">Buyback $250k</button>
         <button type="button" class="btn btn-small" data-stock-buyback="1000000">Buyback $1M</button>
         <button type="button" class="btn btn-small" data-stock-follow-on>Follow-on offering</button>
+        <button type="button" class="btn btn-small" data-stock-split>2-for-1 split</button>
+        <button type="button" class="btn btn-small" data-stock-dividend>Declare dividend</button>
       </div>
       ${
         pm.pressHeadline

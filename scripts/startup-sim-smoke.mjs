@@ -562,8 +562,14 @@ if (!ipo.ok) {
   if (!bb.ok) {
     console.error(`FAIL: buyback smoke: ${bb.reason}`);
     failed = true;
-  } else {
-    console.log('OK: late-game public market (IPO, guidance, tick, buyback)');
+  }
+  const { tickPublicMarketAtMonthStart } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+  tickPublicMarketAtMonthStart(pub);
+  if (!pub.publicMarket.marketTape?.length) {
+    console.error('FAIL: market tape after buyback');
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: late-game public market (IPO, guidance, tick, buyback, tape)');
   }
 }
 

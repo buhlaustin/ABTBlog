@@ -50,7 +50,16 @@ export function createInitialPublicMarket() {
     buybackUsedLifetime: 0,
     shortInterestPct: 0,
     lastEarningsMonth: null,
-    earningsSurpriseStreak: 0
+    earningsSurpriseStreak: 0,
+    high52: null,
+    low52: null,
+    indexMember: false,
+    indexName: null,
+    marketTape: [],
+    institutionalHoldPct: 42,
+    lastSplitTurn: null,
+    lastDividendTurn: null,
+    lastAnalystActionTurn: null
   };
 }
 

@@ -39,7 +39,9 @@ import {
   applyStockPctMove,
   setPublicGuidanceTone,
   executeStockBuyback,
-  fileFollowOnOffering
+  fileFollowOnOffering,
+  executeStockSplit,
+  declareStockDividend
 } from './modules/IPO.js';
 import {
   adjustDraftHeadcount,
@@ -754,6 +756,13 @@ function bindGameInteractions() {
           return;
         }
         appendLog(sessionState, `Board: “${result.def.title}”.`);
+        if (result.def.stockPct) {
+          applyStockPctMove(sessionState, result.def.stockPct);
+          appendLog(
+            sessionState,
+            `Board read-through: stock ${result.def.stockPct > 0 ? '+' : ''}${Math.round(Number(result.def.stockPct) * 100)}%.`
+          );
+        }
         refresh();
         await openBoardTaskOutcomeDialog({
           title: result.def.title,
@@ -1021,6 +1030,26 @@ function bindGameInteractions() {
     if (e.target.closest('[data-stock-follow-on]') && sessionState) {
       const result = fileFollowOnOffering(sessionState);
       if (!result.ok) showFinanceFeedback(result.reason || 'Follow-on blocked.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.closest('[data-stock-split]') && sessionState) {
+      const result = executeStockSplit(sessionState);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Split blocked.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.closest('[data-stock-dividend]') && sessionState) {
+      const result = declareStockDividend(sessionState);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Dividend blocked.', true);
       else {
         appendLog(sessionState, result.summary);
         showFinanceFeedback(result.summary);

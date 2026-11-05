@@ -298,6 +298,32 @@
       ]
     },
     {
+      "id": "public-index-rebalance",
+      "title": "Index rebalance window",
+      "description": "FTEQ-100 inclusion means passive funds must buy — or you could sell secondary into the flow.",
+      "weight": 2,
+      "minTier": 7,
+      "requiresPublic": true,
+      "choices": [
+        {
+          "label": "Let index funds accumulate",
+          "effects": {
+            "stockPct": 0.04,
+            "sentiment": 2,
+            "buzz": 1
+          }
+        },
+        {
+          "label": "Founder secondary into strength",
+          "effects": {
+            "cash": 800000,
+            "stockPct": -0.03,
+            "sentiment": -2
+          }
+        }
+      ]
+    },
+    {
       "id": "ai-feature-bet",
       "title": "AI feature bet",
       "description": "Engineering wants a month to ship an AI copilot — sales already promised it.",
