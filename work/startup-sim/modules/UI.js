@@ -255,9 +255,11 @@ export function renderDeskPanel(state) {
           const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
           const launchTag = def.scheduleLaunch
             ? ` <span class="task-tag">${canSchedulePublicLaunch(state) ? 'Launch gate' : `${PRE_LAUNCH_BUZZ_REQUIRED} buzz · ${PRE_LAUNCH_PRODUCT_REQUIRED} prod`}</span>`
-            : def.launchPhase === 'pre_launch'
-              ? launchTaskTypeTag(def)
-              : '';
+            : def.xcDemoDay
+              ? ' <span class="task-tag">Demo Day</span>'
+              : def.launchPhase === 'pre_launch'
+                ? launchTaskTypeTag(def)
+                : '';
           return `<article class="${sel}">
             <h3>${escapeHtml(def.title)}${sig}${launchTag}</h3>
             <p>${escapeHtml(def.description)}</p>

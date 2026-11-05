@@ -4,6 +4,7 @@ import { isPublicCompany } from './IPO.js';
 import { launchLifecycleActive } from './LaunchLifecycle.js';
 import { applyScenarioEffects, describeScenarioEffects } from './ScenarioEffects.js';
 import bundled from '../data/decision-events.json' with { type: 'json' };
+import { isXcDemoDayMonth } from './XC.js';
 
 let catalog = bundled;
 let hydrated = false;
@@ -36,6 +37,7 @@ export function hasActiveDecision(state) {
 export async function rollDeskDecision(state) {
   if (state.flags?.gameOver) return null;
   if (state.crisis?.active || state.decision?.active) return null;
+  if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) return null;
   if (!state.decision) state.decision = createInitialDecisionState();
 
   const tier = progressionTier(state);

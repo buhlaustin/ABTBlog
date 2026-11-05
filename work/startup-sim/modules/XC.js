@@ -1,5 +1,6 @@
 import { fetchGameJson } from './utils.js';
-import { STAGES } from './constants.js';
+import { STAGES, formatMoney } from './constants.js';
+import { applyScenarioEffects } from './ScenarioEffects.js';
 import { applyXCSafe } from './CapTable.js';
 import { restorePostXcWorkspace } from './Workspace.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
@@ -44,6 +45,46 @@ export function formatXcBatchCode(year, monthIndex) {
 
 export { calendarTurn };
 
+export const XC_DEMO_DAY_TASK_ID = 'xc-demo-day';
+export const XC_DEMO_DAY_DECISION_ID = 'xc-demo-day-pitch';
+
+export const DEFAULT_SEED_ROUND_TERMS = {
+  raised: 3_000_000,
+  preMoney: 12_000_000,
+  postMoney: 15_000_000
+};
+
+/** Last month of the 3-month XC residency (Demo Day month). */
+export function isXcDemoDayMonth(state) {
+  return Boolean(isInResidency(state) && (state.xc?.residencyMonthsRemaining ?? 0) === 1);
+}
+
+export function getSeedRoundTerms(state) {
+  const t = state.xc?.seedRoundTerms;
+  if (t?.raised && t?.postMoney) {
+    return {
+      raised: t.raised,
+      preMoney: t.preMoney ?? t.postMoney - t.raised,
+      postMoney: t.postMoney
+    };
+  }
+  return { ...DEFAULT_SEED_ROUND_TERMS };
+}
+
+export function seedRoundTermsNote(state) {
+  const pitch = state.xc?.demoDayPitch;
+  if (!pitch) return null;
+  if (pitch === 'focused') {
+    return 'Demo Day focused pitch — investors leaned in; seed terms improved vs. batch median.';
+  }
+  if (pitch === 'bold') {
+    return state.xc.demoDayBoldHit
+      ? 'Demo Day moonshot landed — hot seed round at a premium valuation.'
+      : 'Demo Day swing missed — smaller seed at a softer valuation.';
+  }
+  return null;
+}
+
 let interviewCache = bundledInterview;
 
 export async function loadInterviewQuestions() {
@@ -66,6 +107,10 @@ export function createInitialXcState() {
     needsFollowUpQuestion: false,
     batchStartsTurn: null,
     scheduledBatchCode: null,
+    demoDayTaskDone: false,
+    demoDayPitch: null,
+    demoDayBoldHit: null,
+    seedRoundTerms: null,
     graduateBoostMonths: 0
   };
 }
@@ -257,6 +302,97 @@ export function tickXcResidency(state) {
 export function tickXcGraduateBoost(state) {
   if ((state.xc?.graduateBoostMonths ?? 0) <= 0) return;
   state.xc.graduateBoostMonths -= 1;
+}
+
+/** Opens the Demo Day pitch fork after the desk task completes. */
+export function beginDemoDayPitchDecision(state) {
+  if (!state.decision) state.decision = { active: null };
+  state.decision.active = {
+    id: XC_DEMO_DAY_DECISION_ID,
+    title: 'Demo Day pitch',
+    description:
+      'You are on stage at Demo Day. Partners want a crisp story; the crowd wants fireworks. How do you pitch?',
+    choices: [
+      {
+        label: 'Focused pitch — metrics, roadmap, ask',
+        hint: 'Steady seed terms · higher post-money · lower dilution risk',
+        effects: { seedPitch: 'focused' }
+      },
+      {
+        label: 'Risk-taking pitch — bold vision, big TAM',
+        hint: 'Coin flip · hot round or soft landing · trust swings',
+        effects: { seedPitch: 'bold' }
+      }
+    ]
+  };
+  return state.decision.active;
+}
+
+export function onDemoDayTaskCompleted(state) {
+  state.xc = state.xc ?? createInitialXcState();
+  state.xc.demoDayTaskDone = true;
+  return beginDemoDayPitchDecision(state);
+}
+
+export function applyDemoDayPitchChoice(state, choiceIndex) {
+  const active = state.decision?.active;
+  if (!active || active.id !== XC_DEMO_DAY_DECISION_ID) {
+    return { ok: false, reason: 'No Demo Day pitch to resolve.' };
+  }
+  const choice = active.choices?.[choiceIndex];
+  if (!choice) return { ok: false, reason: 'Pick a pitch style.' };
+
+  state.xc = state.xc ?? createInitialXcState();
+  const pitch = choice.effects?.seedPitch;
+  const outcomeLines = [];
+
+  if (pitch === 'focused') {
+    state.xc.demoDayPitch = 'focused';
+    state.xc.demoDayBoldHit = null;
+    state.xc.seedRoundTerms = {
+      raised: 3_400_000,
+      preMoney: 13_600_000,
+      postMoney: 17_000_000
+    };
+    outcomeLines.push(
+      `Seed trajectory set: ${formatMoney(3_400_000)} at ${formatMoney(17_000_000)} post-money.`
+    );
+    outcomeLines.push(...applyScenarioEffects(state, { buzz: 2, sentiment: 3 }, { title: 'Demo Day' }));
+  } else if (pitch === 'bold') {
+    state.xc.demoDayPitch = 'bold';
+    const hit = Math.random() < 0.55;
+    state.xc.demoDayBoldHit = hit;
+    if (hit) {
+      state.xc.seedRoundTerms = {
+        raised: 4_500_000,
+        preMoney: 17_500_000,
+        postMoney: 22_000_000
+      };
+      outcomeLines.push(
+        `The room bought the vision — ${formatMoney(4_500_000)} seed at ${formatMoney(22_000_000)} post.`
+      );
+      outcomeLines.push(
+        ...applyScenarioEffects(state, { buzz: 4, product: 1, sentiment: 5 }, { title: 'Demo Day' })
+      );
+    } else {
+      state.xc.seedRoundTerms = {
+        raised: 2_600_000,
+        preMoney: 10_400_000,
+        postMoney: 13_000_000
+      };
+      outcomeLines.push(
+        `Investors hedged — ${formatMoney(2_600_000)} seed at ${formatMoney(13_000_000)} post.`
+      );
+      outcomeLines.push(
+        ...applyScenarioEffects(state, { buzz: 1, sentiment: -6 }, { title: 'Demo Day' })
+      );
+    }
+  } else {
+    return { ok: false, reason: 'Unknown pitch choice.' };
+  }
+
+  state.decision.active = null;
+  return { ok: true, summary: choice.label, decisionId: active.id, outcomeLines };
 }
 
 function escapeHtml(s) {

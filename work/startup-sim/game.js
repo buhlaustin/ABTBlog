@@ -120,7 +120,11 @@ import {
   scoreInterview,
   completeXcAcceptance,
   xcBatchStartLabelText,
-  calendarTurn
+  calendarTurn,
+  XC_DEMO_DAY_TASK_ID,
+  XC_DEMO_DAY_DECISION_ID,
+  onDemoDayTaskCompleted,
+  applyDemoDayPitchChoice
 } from './modules/XC.js';
 import { loadHubData, selectHub, addSatellite, removeSatellite, showOfficesFeedback } from './modules/Offices.js';
 import { loadAssetManifest } from './modules/Assets.js';
@@ -298,7 +302,7 @@ function handleCompleteTask(instanceId) {
   }
 
   const rolled = rollTaskOutcome(def, sessionState);
-  const { cost, revenue } = applyTaskOutcome(sessionState, def, rolled);
+  const { cost, revenue, mrrGain } = applyTaskOutcome(sessionState, def, rolled);
   const result = completeTaskInstance(sessionState, instanceId, def, rolled);
   if (!result.ok) return;
 
@@ -310,10 +314,18 @@ function handleCompleteTask(instanceId) {
     );
   }
 
+  const mrrLine = mrrGain > 0 ? `, +${formatMoney(mrrGain)}/mo MRR` : '';
   appendLog(
     sessionState,
-    `“${def.title}” — +${formatMoney(revenue)} revenue, -${formatMoney(cost)} spend.`
+    `“${def.title}” — +${formatMoney(revenue)} revenue, -${formatMoney(cost)} spend${mrrLine}.`
   );
+  if (inst.taskId === XC_DEMO_DAY_TASK_ID) {
+    onDemoDayTaskCompleted(sessionState);
+    appendLog(sessionState, 'Demo Day stage time — pick your pitch on the desk before closing the month.');
+    showDeskFeedback('Demo Day complete — choose focused vs. risk-taking pitch below.');
+    refresh();
+    return;
+  }
   for (const line of recordPreLaunchTaskOutcome(sessionState, def, revenue)) {
     appendLog(sessionState, line);
   }
@@ -689,7 +701,11 @@ function handleCrisisChoice(index) {
 
 function handleDecisionChoice(index) {
   if (!sessionState) return;
-  const result = applyDecisionChoice(sessionState, index);
+  const demoPitch =
+    sessionState.decision?.active?.id === XC_DEMO_DAY_DECISION_ID;
+  const result = demoPitch
+    ? applyDemoDayPitchChoice(sessionState, index)
+    : applyDecisionChoice(sessionState, index);
   if (!result.ok) {
     showDeskFeedback(result.reason || 'Could not apply decision.', true);
     refresh();

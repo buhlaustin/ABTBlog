@@ -9,6 +9,7 @@ import {
   seriesAGateSentiment,
   seriesBGateSentiment
 } from './Sentiment.js';
+import { getSeedRoundTerms, seedRoundTermsNote } from './XC.js';
 
 const FOUNDER_AUTHORIZED = 10_000_000;
 
@@ -82,9 +83,7 @@ export function applySeedRound(state) {
     return { ok: false, reason: 'Seed round already closed.' };
   }
 
-  const preMoney = 12_000_000;
-  const postMoney = 15_000_000;
-  const raised = 3_000_000;
+  const { raised, preMoney, postMoney } = getSeedRoundTerms(state);
 
   let rows = state.capTable.map((r) => ({ ...r }));
   const totalBefore = rows.reduce((s, r) => s + r.shares, 0);
@@ -485,13 +484,17 @@ export function seedRoundPreview(state) {
   }
   const founder = getFounderRow(state);
   const founderPct = founder?.pct ?? 100;
+  const { raised, preMoney, postMoney } = getSeedRoundTerms(state);
+  const dilutionFactor = 1 - raised / postMoney - 0.1 * (1 - raised / postMoney);
+  const founderAfter = Math.round(founderPct * dilutionFactor * 10) / 10;
+  const pitchNote = seedRoundTermsNote(state);
   return {
-    raised: 3_000_000,
-    preMoney: 12_000_000,
-    postMoney: 15_000_000,
+    raised,
+    preMoney,
+    postMoney,
     founderPctNow: founderPct,
-    founderPctAfterApprox: Math.round(founderPct * 0.72 * 10) / 10,
-    note: '~20% to seed investors and 10% ESOP (pro-forma).'
+    founderPctAfterApprox: founderAfter,
+    note: pitchNote ?? '~20% to seed investors and 10% ESOP (pro-forma).'
   };
 }
 

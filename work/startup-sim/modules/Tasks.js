@@ -6,6 +6,8 @@ import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
 import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
+import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
+import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
 import {
   currentLaunchTaskPhase,
   launchPhaseAllowed,
@@ -47,8 +49,21 @@ function mergePostXcPreSeedTasks(base) {
   return { ...base, tasks: merged };
 }
 
+function mergeXcDemoDayTasks(base) {
+  const extra = bundledXcDemoDay?.tasks ?? [];
+  if (!extra.length) return base;
+  const ids = new Set((base.tasks ?? []).map((t) => t.id));
+  const merged = [...(base.tasks ?? [])];
+  for (const t of extra) {
+    if (!ids.has(t.id)) merged.push(t);
+  }
+  return { ...base, tasks: merged };
+}
+
 function mergeCatalog(base) {
-  return mergePostXcPreSeedTasks(mergeLaunchTasks(mergeSignatureTasks(base)));
+  return mergeXcDemoDayTasks(
+    mergePostXcPreSeedTasks(mergeLaunchTasks(mergeSignatureTasks(base)))
+  );
 }
 
 let taskCatalog = mergeCatalog(bundledCatalog);
@@ -221,12 +236,17 @@ function taskTierAllowed(task, state) {
 function buildTaskPool(state) {
   const taskStage = getTaskStage(state);
   const categoryId = state.company?.categoryId;
+  const demoMonth = isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone;
   return getTaskDefinitions().filter(
-    (t) =>
-      stageAllowed(t, taskStage) &&
-      categoryAllowed(t, categoryId) &&
-      taskTierAllowed(t, state) &&
-      launchPhaseAllowed(t, state)
+    (t) => {
+      if (t.xcDemoDay && !demoMonth) return false;
+      return (
+        stageAllowed(t, taskStage) &&
+        categoryAllowed(t, categoryId) &&
+        taskTierAllowed(t, state) &&
+        launchPhaseAllowed(t, state)
+      );
+    }
   );
 }
 
@@ -254,6 +274,12 @@ export function dealMonthlyTasks(state) {
     const sched = pool.find((t) => t.scheduleLaunch);
     if (sched && !offered.some((t) => t.id === sched.id)) {
       offered = [sched, ...offered.filter((t) => t.id !== sched.id)].slice(0, offerCount);
+    }
+  }
+  if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
+    const demo = pool.find((t) => t.id === XC_DEMO_DAY_TASK_ID);
+    if (demo && !offered.some((t) => t.id === demo.id)) {
+      offered = [demo, ...offered.filter((t) => t.id !== demo.id)].slice(0, offerCount);
     }
   }
   if (!launchLifecycleActive(state)) {
@@ -304,6 +330,11 @@ export function confirmTaskLineup(state) {
   const selected = (state.calendar.monthTaskOffers ?? []).filter((o) => o.selected);
   if (selected.length !== slots) {
     return { ok: false, reason: `Select exactly ${slots} tasks for this month.` };
+  }
+  if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
+    if (!selected.some((o) => o.taskId === XC_DEMO_DAY_TASK_ID)) {
+      return { ok: false, reason: 'Demo Day is mandatory in your final batch month — include it in your lineup.' };
+    }
   }
   const recent = state.calendar.recentTaskIds ?? [];
   const dealtIds = selected.map((o) => o.taskId);

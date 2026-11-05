@@ -152,7 +152,11 @@ export function renderFinancePanel(container, state) {
   } else if (xcWaitingForRetry(state)) {
     xcBlock = `<p class="fine-print">XC waitlist — finish this month and reapply next month with sharper metrics.</p>`;
   } else if (isInResidency(state)) {
-    xcBlock = `<p class="fine-print"><strong>In SF batch</strong> — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) left. +35% task revenue, +batch product momentum. Desk tasks are XC-only.</p>`;
+    const demoHint =
+      (state.xc?.residencyMonthsRemaining ?? 0) === 1 && !state.xc?.demoDayTaskDone
+        ? ' Final month: <strong>Demo Day</strong> hits the desk — your pitch sets seed terms.'
+        : '';
+    xcBlock = `<p class="fine-print"><strong>In SF batch</strong> — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) left. +35% task revenue, +batch product momentum. Desk tasks are XC-only.${demoHint}</p>`;
   } else if (isXcAcceptedPendingBatch(state)) {
     const startLabel = xcBatchStartLabelText(state);
     xcBlock = `<p class="fine-print"><strong>Accepted into XC</strong> — ${escapeHtml(startLabel ?? 'next seasonal batch')}. $500k SAFE already on the cap table.</p>`;

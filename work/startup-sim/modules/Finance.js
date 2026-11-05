@@ -168,9 +168,15 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   state.product.level = (state.product.level ?? 0) + productGain;
   const buzzGain = rolled.buzz ?? 0;
   state.product.buzz = (state.product.buzz ?? 0) + buzzGain;
+  const mrrGain = rolled.mrrGain ?? 0;
+  if (mrrGain > 0) {
+    state.finance.mrr = (state.finance.mrr ?? 0) + mrrGain;
+    state.finance.arr = Math.round(state.finance.mrr * 12);
+    state.finance.monthlyRevenue = (state.finance.monthlyRevenue ?? 0) + mrrGain;
+  }
   applyTaskRivalEffects(state, taskDef);
 
-  return { cost, revenue };
+  return { cost, revenue, mrrGain };
 }
 
 export function rollTaskOutcome(taskDef, state) {
@@ -180,7 +186,15 @@ export function rollTaskOutcome(taskDef, state) {
   const base = rMin + Math.random() * Math.max(0, rMax - rMin);
   const mult = headcountExecutionScale(state, taskDef) * departmentTaskMultiplier(state, taskDef);
   const revenue = Math.round(base * mult);
-  return { revenue, product, buzz };
+  let mrrGain = 0;
+  const mrrSpec = taskDef.mrrGain;
+  if (Array.isArray(mrrSpec) && mrrSpec.length >= 2) {
+    const [mMin, mMax] = mrrSpec;
+    mrrGain = Math.round(mMin + Math.random() * Math.max(0, mMax - mMin));
+  } else if (mrrSpec > 0) {
+    mrrGain = Math.round(Number(mrrSpec));
+  }
+  return { revenue, product, buzz, mrrGain };
 }
 
 /** Track spend for lifetime P&L (does not move cash — caller adjusts cash separately). */

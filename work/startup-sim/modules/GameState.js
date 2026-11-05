@@ -31,7 +31,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 30;
+export const SAVE_VERSION = 31;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -402,6 +402,10 @@ export function normalizeSave(raw) {
     if (state.xc?.batchLabel?.startsWith('Batch ') && state.xc.scheduledBatchCode) {
       state.xc.batchLabel = state.xc.scheduledBatchCode;
     }
+    if (state.xc && state.xc.demoDayTaskDone === undefined) state.xc.demoDayTaskDone = false;
+    if (state.xc && state.xc.demoDayPitch === undefined) state.xc.demoDayPitch = null;
+    if (state.xc && state.xc.demoDayBoldHit === undefined) state.xc.demoDayBoldHit = null;
+    if (state.xc && state.xc.seedRoundTerms === undefined) state.xc.seedRoundTerms = null;
     if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
     if (!state.acquisitions.owned) state.acquisitions.owned = [];
     if (!state.acquisitions.dealLog) state.acquisitions.dealLog = [];

@@ -326,6 +326,62 @@ if (fallState.xc.scheduledBatchCode !== 'XC F26') {
   console.log('OK: XC seasonal batch (September accept → Fall F26 in October)');
 }
 
+const {
+  beginResidency,
+  isXcDemoDayMonth,
+  applyDemoDayPitchChoice,
+  getSeedRoundTerms,
+  onDemoDayTaskCompleted,
+  XC_DEMO_DAY_TASK_ID
+} = await import(`file://${join(sim, 'modules/XC.js')}`);
+const demoState = createInitialState({
+  companyName: 'DemoDayCo',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+demoState.flags.xcAccepted = true;
+demoState.flags.xcBatchActive = true;
+demoState.flags.xcResidencyComplete = false;
+beginResidency(demoState);
+demoState.xc.residencyMonthsRemaining = 1;
+if (!isXcDemoDayMonth(demoState)) {
+  console.error('FAIL: residencyMonthsRemaining 1 should be Demo Day month');
+  failed = true;
+} else {
+  dealMonthlyTasks(demoState);
+  const offers = demoState.calendar.monthTaskOffers ?? [];
+  if (!offers.some((o) => o.taskId === XC_DEMO_DAY_TASK_ID)) {
+    console.error('FAIL: Demo Day task should appear on final XC month board');
+    failed = true;
+  } else {
+    const slots = demoState.calendar.monthTaskSlotTarget ?? 6;
+    let picked = 0;
+    for (const o of offers) {
+      if (o.taskId === XC_DEMO_DAY_TASK_ID) {
+        o.selected = true;
+        picked += 1;
+      }
+    }
+    for (const o of offers) {
+      if (picked >= slots) break;
+      if (!o.selected) {
+        o.selected = true;
+        picked += 1;
+      }
+    }
+    confirmTaskLineup(demoState);
+    onDemoDayTaskCompleted(demoState);
+    applyDemoDayPitchChoice(demoState, 0);
+    const terms = getSeedRoundTerms(demoState);
+    if (terms.raised !== 3_400_000 || terms.postMoney !== 17_000_000) {
+      console.error(`FAIL: focused Demo Day pitch seed terms ${JSON.stringify(terms)}`);
+      failed = true;
+    } else {
+      console.log('OK: Demo Day task + focused pitch sets seed terms');
+    }
+  }
+}
+
 const { progressionRevenueMult } = await import(
   `file://${join(sim, 'modules/ProgressionEconomy.js')}`
 );
