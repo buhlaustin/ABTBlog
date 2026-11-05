@@ -1,12 +1,7 @@
 import bundled from '../data/growth-campaigns.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
-import {
-  recordCashOutflow,
-  getCoreTaskRevenueMult,
-  applySandboxRevenueTuning,
-  getTaskRevenueMultiplierPreview
-} from './Finance.js';
+import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
 import { formatMoney } from './constants.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
 import { applyCampaignRivalEffects } from './WorldDynamics.js';
@@ -28,7 +23,7 @@ export function getGrowthCampaigns() {
 }
 
 function campaignRevenueMult(state) {
-  return applySandboxRevenueTuning(state, getCoreTaskRevenueMult(state));
+  return getTaskRevenueMultiplierPreview(state);
 }
 
 export function availableCampaigns(state) {

@@ -32,7 +32,9 @@ import {
   getTaskRevenueMultiplierPreview,
   getCoreTaskRevenueMult,
   getSandboxTuningMult,
-  estimateTaskPayoutBand
+  getRawTaskRevenueMultiplier,
+  estimateTaskPayoutBand,
+  taskRevenueMultHud
 } from './Finance.js';
 import { progressionTierLabel } from './ProgressionEconomy.js';
 import { renderGrowthCampaignsBlock } from './GrowthCampaigns.js';
@@ -151,8 +153,9 @@ export function renderGameHud(state) {
     month.textContent = `M${state.calendar.monthIndex}, Y${state.calendar.year}`;
   }
   if (mode) {
-    const revMult = getTaskRevenueMultiplierPreview(state);
-    mode.textContent = `${state.mode === 'sandbox' ? 'Sandbox' : 'Career'} · rev×${revMult.toFixed(2)}`;
+    const revHud = taskRevenueMultHud(state);
+    const capTag = revHud.label.includes('capped') ? ' (capped)' : '';
+    mode.textContent = `${state.mode === 'sandbox' ? 'Sandbox' : 'Career'} · rev×${revHud.effective.toFixed(2)}${capTag}`;
   }
   if (mrr) mrr.textContent = formatMoney(state.finance.mrr ?? 0);
   const boardTab = document.getElementById('tab-board');
@@ -270,7 +273,11 @@ export function renderDeskPanel(state) {
       <div><span class="stat-label">Next gate</span><span class="stat-value">${escapeHtml(ms)}</span></div>
       <div><span class="stat-label">Pending</span><span class="stat-value">${pending.length}</span></div>
       <div><span class="stat-label">Scale era</span><span class="stat-value">${escapeHtml(progressionTierLabel(state))}</span></div>
-      <div><span class="stat-label">Rev. mult</span><span class="stat-value">${getTaskRevenueMultiplierPreview(state).toFixed(2)}×</span></div>
+      ${(() => {
+        const revHud = taskRevenueMultHud(state);
+        const titleAttr = revHud.title ? ` title="${escapeHtml(revHud.title)}"` : '';
+        return `<div><span class="stat-label">${escapeHtml(revHud.label)}</span><span class="stat-value"${titleAttr}>${revHud.effective.toFixed(2)}×</span></div>`;
+      })()}
     </div>
     ${
       lineupOpen
@@ -481,15 +488,20 @@ export function renderGrowthPanel(container, state) {
 
   const coreMult = getCoreTaskRevenueMult(state);
   const tuneMult = getSandboxTuningMult(state);
-  const totalMult = getTaskRevenueMultiplierPreview(state);
+  const revHud = taskRevenueMultHud(state);
+  const totalMult = revHud.effective;
+  const rawMult = getRawTaskRevenueMultiplier(state);
   const era = progressionTierLabel(state);
   const growthRuns = (state.growth?.campaignsThisMonth ?? []).length;
   const growthSlots = growthCampaignSlots(state);
   const growthLeft = growthCampaignsRemaining(state);
+  const capNote = revHud.label.includes('capped')
+    ? ` · uncapped stack ${rawMult.toFixed(1)}× → <strong>${totalMult.toFixed(2)}× cap</strong>`
+    : '';
   const multNote =
     state.mode === 'sandbox' && tuneMult !== 1
-      ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong> · growth slots ${growthLeft}/${growthSlots} left${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
-      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — effective multiplier <strong>${totalMult.toFixed(2)}×</strong>${growthRuns ? ` · ${growthRuns}/${growthSlots} growth slot(s) used` : ` · ${growthLeft}/${growthSlots} growth slot(s) left`}.</p>`;
+      ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong>${capNote} · growth slots ${growthLeft}/${growthSlots} left${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
+      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — ${revHud.label.includes('capped') ? 'Rev× (capped)' : 'effective multiplier'} <strong>${totalMult.toFixed(2)}×</strong>${capNote}${growthRuns ? ` · ${growthRuns}/${growthSlots} growth slot(s) used` : ` · ${growthLeft}/${growthSlots} growth slot(s) left`}.</p>`;
 
   container.innerHTML = `
     <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks and paid campaigns below share the same multiplier math.</p>

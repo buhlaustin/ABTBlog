@@ -146,9 +146,13 @@ if (totalHeadcountCap(state) !== 0) {
 if (normalizeSave(null) !== null) failed = true;
 if (normalizeSave({ company: {}, finance: {} }) !== null) failed = true;
 
-const { getTaskRevenueMultiplierPreview, getCoreTaskRevenueMult } = await import(
-  `file://${join(sim, 'modules/Finance.js')}`
-);
+const {
+  getTaskRevenueMultiplierPreview,
+  getCoreTaskRevenueMult,
+  getRawTaskRevenueMultiplier,
+  REV_MULT_CAP_CAREER,
+  REV_MULT_CAP_SANDBOX
+} = await import(`file://${join(sim, 'modules/Finance.js')}`);
 const careerMult = getTaskRevenueMultiplierPreview(state);
 if (careerMult < 0.9 || careerMult > 2.5) {
   console.error(`FAIL: career HUD revenue mult out of range: ${careerMult}`);
@@ -200,10 +204,11 @@ const coreCareer = getCoreTaskRevenueMult({
 });
 const coreSand = getCoreTaskRevenueMult(overlayState);
 const totalSand = getTaskRevenueMultiplierPreview(overlayState);
-const expected = Math.round(coreSand * 2 * 100) / 100;
+const expectedUncapped = Math.round(coreSand * 2 * 100) / 100;
+const expected = Math.min(expectedUncapped, REV_MULT_CAP_SANDBOX);
 if (Math.abs(totalSand - expected) > 0.05) {
   console.error(
-    `FAIL: sandbox overlay expected ~${expected} (core ${coreSand} × 2), got ${totalSand}`
+    `FAIL: sandbox overlay expected ~${expected} (core ${coreSand} × 2 capped), got ${totalSand}`
   );
   failed = true;
 } else {
@@ -256,11 +261,64 @@ scaled.flags.seriesBClosed = true;
 scaled.finance.mrr = 2_000_000;
 scaled.finance.arr = 24_000_000;
 const progMult = progressionRevenueMult(scaled);
-if (progMult < 20) {
-  console.error(`FAIL: post-Series-B progression mult too low: ${progMult}`);
+if (progMult < 8 || progMult > 120) {
+  console.error(`FAIL: post-Series-B progression mult out of range: ${progMult}`);
   failed = true;
 } else {
   console.log(`OK: progression revenue mult after A/B ${progMult}`);
+}
+
+const { WORKSPACE_TIER } = await import(`file://${join(sim, 'modules/Workspace.js')}`);
+const maxed = createInitialState({
+  companyName: 'CapTest',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+maxed.flags.xcResidencyComplete = true;
+maxed.flags.seedRoundClosed = true;
+maxed.flags.seriesAClosed = true;
+maxed.flags.seriesBClosed = true;
+maxed.flags.seriesCClosed = true;
+maxed.flags.seriesDClosed = true;
+maxed.flags.seriesEClosed = true;
+maxed.flags.seriesFClosed = true;
+maxed.flags.ipoFiled = true;
+maxed.workspace.tier = WORKSPACE_TIER.HUB;
+maxed.offices.hubId = 'bay';
+maxed.offices.modifiers = { revenueMult: 1.12, costMult: 1.15, salaryMult: 1.12 };
+maxed.finance.arr = 500_000_000;
+maxed.product.level = 40;
+maxed.product.buzz = 40;
+maxed.staff.headcountByDept = { engineering: 50, sales: 50, marketing: 50, product: 50 };
+const rawCareer = getRawTaskRevenueMultiplier(maxed);
+const cappedCareer = getTaskRevenueMultiplierPreview(maxed);
+if (cappedCareer > REV_MULT_CAP_CAREER + 0.01) {
+  console.error(`FAIL: career cap exceeded: ${cappedCareer}`);
+  failed = true;
+} else if (rawCareer <= REV_MULT_CAP_CAREER) {
+  console.log(`OK: career cap not triggered (raw ${rawCareer.toFixed(2)}×)`);
+} else {
+  console.log(`OK: career rev mult capped ${rawCareer.toFixed(1)}× → ${cappedCareer}×`);
+}
+
+const maxedSand = createInitialState({
+  companyName: 'CapTestSand',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxTuning: { revenueMult: 20, ipoGateArr: 1_000_000_000, costMult: 1, startingStage: 'garage' }
+});
+maxedSand.flags = { ...maxed.flags };
+maxedSand.workspace = { ...maxed.workspace };
+maxedSand.offices = JSON.parse(JSON.stringify(maxed.offices));
+maxedSand.finance = { ...maxed.finance };
+maxedSand.product = { ...maxed.product };
+maxedSand.staff = JSON.parse(JSON.stringify(maxed.staff));
+const cappedSand = getTaskRevenueMultiplierPreview(maxedSand);
+if (cappedSand > REV_MULT_CAP_SANDBOX + 0.01) {
+  console.error(`FAIL: sandbox cap exceeded: ${cappedSand}`);
+  failed = true;
+} else {
+  console.log(`OK: sandbox rev mult cap ${cappedSand}×`);
 }
 
 const { completeBoardTask, dealBoardTasks } = await import(

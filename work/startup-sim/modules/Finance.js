@@ -16,6 +16,10 @@ import { acceleratorRevenueMult } from './Accelerators.js';
 import { progressionRevenueMult } from './ProgressionEconomy.js';
 import { applyTaskRivalEffects } from './WorldDynamics.js';
 
+/** Hard caps on desk + growth payout multiplier (after sandbox tuning overlay). */
+export const REV_MULT_CAP_CAREER = 60;
+export const REV_MULT_CAP_SANDBOX = 100;
+
 /** Legacy alias — progression stack replaces seed-only scaling. */
 export function scalingRevenueMult(state) {
   return progressionRevenueMult(state);
@@ -72,9 +76,44 @@ export function getSandboxTuningMult(state) {
   return state.mode === 'sandbox' ? getSandboxExtraRevenueMult(state) : 1;
 }
 
-/** HUD rev× — full desk payout multiplier including sandbox tuning overlay. */
-export function getTaskRevenueMultiplierPreview(state) {
+export function getTaskRevenueCap(state) {
+  return state.mode === 'sandbox' ? REV_MULT_CAP_SANDBOX : REV_MULT_CAP_CAREER;
+}
+
+/** Core × sandbox tuning, before global cap. */
+export function getRawTaskRevenueMultiplier(state) {
   return applySandboxRevenueTuning(state, getCoreTaskRevenueMult(state));
+}
+
+function clampTaskRevenueMult(state, mult) {
+  const cap = getTaskRevenueCap(state);
+  return Math.round(Math.min(mult, cap) * 100) / 100;
+}
+
+/** HUD rev× — capped desk payout multiplier (sandbox tuning included). */
+export function getTaskRevenueMultiplierPreview(state) {
+  return clampTaskRevenueMult(state, getRawTaskRevenueMultiplier(state));
+}
+
+export function isTaskRevenueMultCapped(state) {
+  return getRawTaskRevenueMultiplier(state) > getTaskRevenueCap(state) + 0.001;
+}
+
+/** Label + tooltip for desk / growth HUD. */
+export function taskRevenueMultHud(state) {
+  const effective = getTaskRevenueMultiplierPreview(state);
+  const raw = getRawTaskRevenueMultiplier(state);
+  const cap = getTaskRevenueCap(state);
+  if (isTaskRevenueMultCapped(state)) {
+    return {
+      effective,
+      raw,
+      cap,
+      label: 'Rev× (capped)',
+      title: `Uncapped stack ${raw.toFixed(1)}× — payouts use ${cap}× max`
+    };
+  }
+  return { effective, raw, cap, label: 'Rev. mult', title: '' };
 }
 
 /** Rough desk payout range at current mult (before per-task headcount roll variance). */
@@ -106,10 +145,8 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   const cost = Math.round(
     (taskDef.cost ?? 0) * econ.costMult * sand * hubCostMult(state) * staffCostMultiplier(state)
   );
-  const core = getCoreTaskRevenueMult(state);
-  const revenue = Math.round(
-    rolled.revenue * applySandboxRevenueTuning(state, core) * staffRetentionBonus(state, taskDef)
-  );
+  const payoutMult = getTaskRevenueMultiplierPreview(state);
+  const revenue = Math.round(rolled.revenue * payoutMult * staffRetentionBonus(state, taskDef));
 
   state.finance.cash -= cost;
   state.finance.cash += revenue;
@@ -132,10 +169,7 @@ export function rollTaskOutcome(taskDef, state) {
   const product = taskDef.product ?? 0;
   const buzz = taskDef.buzz ?? 0;
   const base = rMin + Math.random() * Math.max(0, rMax - rMin);
-  const mult =
-    headcountExecutionScale(state, taskDef) *
-    departmentTaskMultiplier(state, taskDef) *
-    productBuzzRevenueMult(state);
+  const mult = headcountExecutionScale(state, taskDef) * departmentTaskMultiplier(state, taskDef);
   const revenue = Math.round(base * mult);
   return { revenue, product, buzz };
 }
