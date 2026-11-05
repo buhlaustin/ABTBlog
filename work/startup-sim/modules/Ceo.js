@@ -31,6 +31,14 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
+function ceoStatCard(label, value, { hero = false, tone = null } = {}) {
+  const classes = ['finance-stat-card'];
+  if (hero) classes.push('finance-stat-card--hero');
+  if (tone === 'pos') classes.push('finance-stat-card--pos');
+  if (tone === 'neg') classes.push('finance-stat-card--neg');
+  return `<div class="${classes.join(' ')}"><span class="finance-stat-label">${escapeHtml(label)}</span><span class="finance-stat-value">${value}</span></div>`;
+}
+
 export { setCeoSalaryAnnual, takeOwnerDraw };
 
 function renderWealthBar(mix) {
@@ -101,7 +109,7 @@ export function renderCeoPanel(container, state) {
   const presetBtns = band.presets
     .map(
       (p) =>
-        `<button type="button" class="btn btn-ghost btn-small${annual === p.annual ? ' active' : ''}" data-ceo-salary-preset="${p.annual}" ${disabled}>${escapeHtml(p.label)}</button>`
+        `<button type="button" class="btn btn-ghost btn-small finance-chip-btn${annual === p.annual ? ' active' : ''}" data-ceo-salary-preset="${p.annual}" ${disabled}>${escapeHtml(p.label)}</button>`
     )
     .join('');
 
@@ -126,156 +134,191 @@ export function renderCeoPanel(container, state) {
     ? `<details class="ceo-debit-history"><summary>Last month debited ${formatMoney(lastExpense.total)}</summary>${renderDebitBreakdown(lastExpense.breakdown)}</details>`
     : '';
 
+  const bankAlert = bankLow
+    ? `<p class="finance-alert finance-alert--tax" role="status"><strong>Low personal runway</strong> — ${escapeHtml(personalRunway.label)} at ~${formatMoney(typicalBurn)}/mo spend. Raise salary or draw from the company.</p>`
+    : '';
+
+  const openingLine =
+    opening != null
+      ? `Opened ${formatMoney(opening)} · typical spend ${formatMoney(typicalBurn)}/mo`
+      : `Typical spend ${formatMoney(typicalBurn)}/mo from salary band`;
+
   const publicBlock =
     publicCo && !state.flags?.cashedOut
-      ? `<div class="finance-action">
-      <p class="stock-headline"><strong>${escapeHtml(shares.ticker ?? '—')}</strong> · ${formatMoney(shares.markPx)}/share · your block ${formatMoney(shares.stakeValue)}</p>
-      <div class="summary-grid">
-        <div><span class="stat-label">Your shares</span><span class="stat-value">${shares.shares.toLocaleString('en-US')}</span></div>
-        <div><span class="stat-label">Ownership</span><span class="stat-value">${pct}%</span></div>
-        <div><span class="stat-label">vs IPO</span><span class="stat-value">${shares.gainSinceIpo != null ? formatMoney(shares.gainSinceIpo) : '—'}</span></div>
-        <div><span class="stat-label">Analyst PT upside</span><span class="stat-value">${shares.upsideAtPt != null ? formatMoney(shares.upsideAtPt) : '—'}</span></div>
+      ? `<section class="finance-section finance-card ceo-public-card">
+      <div class="finance-section-head">
+        <h3 class="finance-section-title">Founder stake (public)</h3>
+        <span class="ceo-ticker-pill">${escapeHtml(shares.ticker ?? '—')} ${formatMoney(shares.markPx)}/sh</span>
+      </div>
+      <p class="ceo-stake-headline">Your block <strong>${formatMoney(shares.stakeValue)}</strong></p>
+      <div class="finance-operating-grid">
+        ${ceoStatCard('Your shares', shares.shares.toLocaleString('en-US'))}
+        ${ceoStatCard('Ownership', `${pct}%`)}
+        ${ceoStatCard('vs IPO', shares.gainSinceIpo != null ? formatMoney(shares.gainSinceIpo) : '—', { tone: shares.gainSinceIpo > 0 ? 'pos' : shares.gainSinceIpo < 0 ? 'neg' : null })}
+        ${ceoStatCard('PT upside', shares.upsideAtPt != null ? formatMoney(shares.upsideAtPt) : '—')}
         ${
           shares.lastDividend > 0
-            ? `<div><span class="stat-label">Last dividend (you)</span><span class="stat-value">${formatMoney(shares.lastDividend)}</span></div>`
+            ? ceoStatCard('Last dividend', formatMoney(shares.lastDividend))
             : ''
         }
       </div>
       ${
         exitPrev
-          ? `<p class="fine-print">If you stepped down today: <strong>${formatMoney(exitPrev.payout)}</strong> stock proceeds + <strong>${formatMoney(exitPrev.liquid)}</strong> already in your bank ≈ <strong>${formatMoney(exitPrev.combined)}</strong>.</p>`
+          ? `<p class="fine-print">Step-down today ≈ ${formatMoney(exitPrev.combined)} (${formatMoney(exitPrev.payout)} stock + ${formatMoney(exitPrev.liquid)} bank).</p>`
           : lockup > 0
-            ? `<p class="fine-print">Paper payout after lockup: <strong>${formatMoney(shares.stakeValue)}</strong> (goes to personal bank on step-down).</p>`
+            ? `<p class="fine-print">Paper value after lockup: ${formatMoney(shares.stakeValue)} (credits personal bank on step-down).</p>`
             : ''
       }
-    </div>`
+    </section>`
+      : '';
+
+  const sellStockBlock =
+    publicCo && !state.flags?.cashedOut
+      ? `<section class="finance-section finance-card">
+        <h3 class="finance-section-title">Sell founder stock (secondary)</h3>
+        <p class="fine-print">Market price · you stay CEO · proceeds to personal bank</p>
+        ${
+          lockup > 0
+            ? `<p class="fine-print">Lockup: ${lockup} month(s) remaining.</p>`
+            : `<div class="finance-charity-chips">
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-sell-founder-pct="5" ${canSellStock ? '' : disabled}>5%</button>
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-sell-founder-pct="10" ${canSellStock ? '' : disabled}>10%</button>
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-sell-founder-pct="25" ${canSellStock ? '' : disabled}>25%</button>
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-sell-founder-pct="50" ${canSellStock ? '' : disabled}>50%</button>
+          </div>
+          <div class="finance-inline-form ceo-salary-row">
+            <label class="visually-hidden" for="ceo-sell-pct-input">Percent of founder shares</label>
+            <input id="ceo-sell-pct-input" type="number" min="1" max="99" step="1" placeholder="Custom %" ${canSellStock ? '' : disabled}>
+            <button type="button" class="btn btn-ghost btn-small" id="btn-sell-founder-custom" ${canSellStock ? '' : disabled}>Sell %</button>
+          </div>`
+        }
+      </section>`
+      : '';
+
+  const stepDownBlock =
+    publicCo && !state.flags?.cashedOut
+      ? `<section class="finance-section finance-card ceo-step-down">
+        <h3 class="finance-section-title">Step down &amp; exit</h3>
+        <p class="fine-print">Sell remaining founder shares; proceeds to personal bank and end the run.</p>
+        ${
+          lockup > 0
+            ? `<p class="fine-print">Lockup: ${lockup} month(s) — manage the stock on Finance until exit unlocks.</p>`
+            : `<button type="button" class="btn btn-primary btn-small" id="btn-cash-out">Step down &amp; cash out</button>`
+        }
+      </section>`
+      : state.flags?.cashedOut
+        ? `<p class="fine-print finance-ceo-pointer">Run ended — start a new company from the main menu.</p>`
+        : `<p class="fine-print finance-ceo-pointer">IPO unlocks a liquid exit; until then, salary and draws fund your personal bank. Company cash → <strong>Finance</strong>.</p>`;
+
+  const runwaySalaryNote =
+    runway.ceoMo > 0 && runway.deltaMo
+      ? `<p class="fine-print finance-details-note">CEO salary adds ~${formatMoney(runway.ceoMo)}/mo company overhead (≈${runway.deltaMo} mo less runway vs $0).</p>`
       : '';
 
   container.innerHTML = `
-    <p class="panel-lede">${escapeHtml(name)} — <strong>company cash</strong> is on Finance; this tab is your personal bank, salary, auto debits, draws, and equity.</p>
+    <div class="ceo-panel">
+      <header class="ceo-hero">
+        <p class="ceo-name-chip">${escapeHtml(name)}</p>
+        <p class="panel-lede">Personal bank, salary band debits, draws, and equity. Company cash lives on Finance.</p>
+      </header>
 
-    <div class="capital-stack ceo-bank-panel" role="region" aria-label="Personal bank">
-      <p class="prelaunch-progress-title"><strong>Personal bank</strong> ${formatMoney(bank)}</p>
-      <p class="fine-print">${opening != null ? `Opened this run at ${formatMoney(opening)}.` : 'Randomized opening balance for this run.'} Salary and owner draws credit here; living debits hit at month close.</p>
-      ${bankLow ? `<p class="fine-print error">Personal runway ${escapeHtml(personalRunway.label)} with ~${formatMoney(typicalBurn)}/mo typical spend — raise salary or draw from the company.</p>` : `<p class="fine-print">Personal runway ~${escapeHtml(personalRunway.label)} (typical spend ${formatMoney(typicalBurn)}/mo from salary band).</p>`}
-    </div>
+      <section class="finance-kpi-row" aria-label="Personal snapshot">
+        ${ceoStatCard('Personal bank', formatMoney(bank), { hero: true })}
+        ${ceoStatCard('Est. net worth', formatMoney(net))}
+        ${ceoStatCard('Personal runway', escapeHtml(personalRunway.label))}
+      </section>
+      <p class="fine-print finance-runway-detail">${openingLine}</p>
+      ${bankAlert}
 
-    <div class="capital-stack ceo-debit-panel" role="region" aria-label="Personal debits">
-      <p class="prelaunch-progress-title"><strong>Personal debits</strong> <span class="fine-print">(not editable)</span></p>
-      <p class="fine-print">${escapeHtml(expenseBand.label)} · salary ${formatMoney(annual)}/yr → band ${formatMoney(expenseBand.min)}–${formatMoney(expenseBand.max)}/mo. Company ARR does <strong>not</strong> change this.</p>
-      <div class="summary-grid">
-        <div><span class="stat-label">This month (rolled)</span><span class="stat-value">${formatMoney(scheduled.total)}</span></div>
-        <div><span class="stat-label">Typical midpoint</span><span class="stat-value">${formatMoney(typicalBurn)}/mo</span></div>
-        <div><span class="stat-label">Career debits paid</span><span class="stat-value">${formatMoney(careerDebits)}</span></div>
-        <div><span class="stat-label">Stage (company)</span><span class="stat-value">${escapeHtml(stageLabel(state.stage))}</span></div>
-      </div>
-      <p class="fine-print">Each month rolls a new total inside your salary band (rent, food, insurance, etc.) — you do not set a budget.</p>
-      ${renderDebitBreakdown(scheduled.breakdown)}
-      ${lastDebitBlock}
-    </div>
+      <section class="finance-section finance-card" aria-label="Wealth mix">
+        <h3 class="finance-section-title">Wealth mix</h3>
+        ${renderWealthBar(mix)}
+      </section>
 
-    <div class="capital-stack" role="region" aria-label="Estimated net worth">
-      <p class="prelaunch-progress-title"><strong>Est. net worth</strong> ${formatMoney(net)} <span class="fine-print">(bank + equity)</span></p>
-      ${renderWealthBar(mix)}
-    </div>
+      <section class="finance-section finance-card ceo-debit-panel" aria-label="Personal debits">
+        <div class="finance-section-head">
+          <h3 class="finance-section-title">Personal debits</h3>
+          <span class="fine-print">Auto · not editable</span>
+        </div>
+        <p class="fine-print">${escapeHtml(expenseBand.label)} · ${formatMoney(annual)}/yr salary → ${formatMoney(expenseBand.min)}–${formatMoney(expenseBand.max)}/mo band</p>
+        <div class="finance-operating-grid">
+          ${ceoStatCard('This month', formatMoney(scheduled.total))}
+          ${ceoStatCard('Typical / mo', formatMoney(typicalBurn))}
+          ${ceoStatCard('Career paid', formatMoney(careerDebits))}
+          ${ceoStatCard('Company stage', escapeHtml(stageLabel(state.stage)))}
+        </div>
+        <details class="ceo-debit-details">
+          <summary>This month’s breakdown</summary>
+          ${renderDebitBreakdown(scheduled.breakdown)}
+        </details>
+        ${lastDebitBlock}
+      </section>
 
-    <div class="summary-grid">
-      <div><span class="stat-label">${equityLabel}</span><span class="stat-value">${formatMoney(equity)}</span></div>
-      <div><span class="stat-label">Career salary (total)</span><span class="stat-value">${formatMoney(salary)}</span></div>
-      <div><span class="stat-label">Owner draws (total)</span><span class="stat-value">${formatMoney(draws)}</span></div>
-      <div><span class="stat-label">Company bonuses</span><span class="stat-value">${formatMoney(bonuses)}</span></div>
-      <div><span class="stat-label">Stock sales (career)</span><span class="stat-value">${formatMoney(stockSales)}</span></div>
-      <div><span class="stat-label">Founder ownership</span><span class="stat-value">${pct}%</span></div>
-      <div><span class="stat-label">CEO pay plan</span><span class="stat-value">${formatMoney(monthly)}/mo</span></div>
-      <div><span class="stat-label">Company runway</span><span class="stat-value">${runway.runwayLabel}</span></div>
-      <div><span class="stat-label">Implied share px</span><span class="stat-value">${shares.markPx > 0 ? formatMoney(shares.markPx) : '—'}</span></div>
-      <div><span class="stat-label">Personal cash comp</span><span class="stat-value">${formatMoney(ceoPersonalCashComp(state))}</span></div>
-    </div>
-    <p class="fine-print">${escapeHtml(runway.runwayDetail)}</p>
-    ${
-      runway.ceoMo > 0 && runway.deltaMo
-        ? `<p class="fine-print">CEO salary adds ~${formatMoney(runway.ceoMo)}/mo to company overhead (≈${runway.deltaMo} mo less runway vs $0 salary).</p>`
-        : ''
-    }
+      <details class="finance-details">
+        <summary>Career totals &amp; company link</summary>
+        <div class="finance-operating-grid finance-details-grid">
+          ${ceoStatCard(equityLabel, formatMoney(equity))}
+          ${ceoStatCard('Career salary', formatMoney(salary))}
+          ${ceoStatCard('Owner draws', formatMoney(draws))}
+          ${ceoStatCard('Bonuses', formatMoney(bonuses))}
+          ${ceoStatCard('Stock sales', formatMoney(stockSales))}
+          ${ceoStatCard('Ownership', `${pct}%`)}
+          ${ceoStatCard('Pay plan', `${formatMoney(monthly)}/mo`)}
+          ${ceoStatCard('Co. runway', escapeHtml(runway.runwayLabel))}
+          ${ceoStatCard('Share price', shares.markPx > 0 ? formatMoney(shares.markPx) : '—')}
+          ${ceoStatCard('Cash comp', formatMoney(ceoPersonalCashComp(state)))}
+        </div>
+        <p class="fine-print finance-details-note">${escapeHtml(runway.runwayDetail)}</p>
+        ${runwaySalaryNote}
+      </details>
 
-    ${publicBlock}
+      ${publicBlock}
+      ${sellStockBlock}
 
-    ${
-      publicCo && !state.flags?.cashedOut
-        ? `<div class="finance-action">
-        <p><strong>Sell founder stock</strong> — secondary at the current market price. You stay CEO; proceeds go to your personal bank. (Step down below to sell 100% and end the run.)</p>
-        ${
-          lockup > 0
-            ? `<p class="fine-print">Founder lockup: ${lockup} month(s) before you can sell.</p>`
-            : `<div class="stock-actions">
-            <button type="button" class="btn btn-small" data-sell-founder-pct="5" ${canSellStock ? '' : disabled}>Sell 5%</button>
-            <button type="button" class="btn btn-small" data-sell-founder-pct="10" ${canSellStock ? '' : disabled}>Sell 10%</button>
-            <button type="button" class="btn btn-small" data-sell-founder-pct="25" ${canSellStock ? '' : disabled}>Sell 25%</button>
-            <button type="button" class="btn btn-small" data-sell-founder-pct="50" ${canSellStock ? '' : disabled}>Sell 50%</button>
+      <section class="finance-section ceo-comp-stack">
+        <h3 class="finance-section-title">Compensation</h3>
+        <div class="finance-action finance-card">
+          <p><strong>CEO salary</strong> — ${escapeHtml(band.label)} · typical ${formatMoney(band.typical)}/yr</p>
+          <p class="fine-print">${escapeHtml(band.note)} Salary sets your personal debit band; paid at month close.</p>
+          ${boardNote ? `<p class="finance-alert finance-alert--tax">${escapeHtml(boardNote)}</p>` : ''}
+          <div class="finance-charity-chips">${presetBtns}</div>
+          <div class="finance-inline-form ceo-salary-row">
+            <label class="visually-hidden" for="ceo-salary-input">Annual salary</label>
+            <input id="ceo-salary-input" type="number" min="0" step="1000" value="${annual}" ${disabled}>
+            <button type="button" class="btn btn-small" id="btn-save-ceo-salary" ${disabled}>Save salary</button>
           </div>
-          <div class="name-row ceo-salary-row">
-            <label class="visually-hidden" for="ceo-sell-pct-input">Percent of founder shares</label>
-            <input id="ceo-sell-pct-input" type="number" min="1" max="99" step="1" placeholder="1–99% of your block" ${canSellStock ? '' : disabled}>
-            <button type="button" class="btn btn-small" id="btn-sell-founder-custom" ${canSellStock ? '' : disabled}>Sell custom %</button>
-          </div>`
-        }
-      </div>`
-        : ''
-    }
+          ${salaryChanges ? `<details class="ceo-salary-history"><summary>Salary history</summary><ul class="instrument-list">${salaryChanges}</ul></details>` : ''}
+        </div>
+        <div class="finance-action finance-card">
+          <p><strong>Owner draws</strong> — company cash → personal bank (max ${formatMoney(maxDraw)} today)</p>
+          <div class="finance-charity-chips">
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-owner-draw="5000" ${disabled}>${formatMoney(5_000)}</button>
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-owner-draw="10000" ${disabled}>${formatMoney(10_000)}</button>
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-owner-draw="25000" ${disabled}>${formatMoney(25_000)}</button>
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-owner-draw="50000" ${disabled}>${formatMoney(50_000)}</button>
+          </div>
+          <div class="finance-inline-form ceo-salary-row">
+            <label class="visually-hidden" for="ceo-draw-input">Custom draw</label>
+            <input id="ceo-draw-input" type="number" min="500" step="500" placeholder="Custom amount" ${disabled}>
+            <button type="button" class="btn btn-ghost btn-small" id="btn-ceo-draw-custom" ${disabled}>Draw</button>
+          </div>
+        </div>
+      </section>
 
-    <div class="finance-action">
-      <p><strong>CEO salary</strong> — ${escapeHtml(band.label)} · typical ${formatMoney(band.typical)}/yr. Paid from company cash at month close, then deposited to your bank. <strong>Salary sets your personal debit band.</strong></p>
-      <p class="fine-print">${escapeHtml(band.note)}</p>
-      ${boardNote ? `<p class="fine-print error">${escapeHtml(boardNote)}</p>` : ''}
-      <div class="stock-actions">${presetBtns}</div>
-      <div class="name-row ceo-salary-row">
-        <label class="visually-hidden" for="ceo-salary-input">Annual salary</label>
-        <input id="ceo-salary-input" type="number" min="0" step="1000" value="${annual}" ${disabled}>
-        <button type="button" class="btn btn-small" id="btn-save-ceo-salary" ${disabled}>Save salary</button>
-      </div>
-      ${salaryChanges ? `<details><summary>Salary changes</summary><ul class="instrument-list">${salaryChanges}</ul></details>` : ''}
+      <section class="finance-section finance-section--cap">
+        <h3 class="finance-section-title">Personal bank ledger</h3>
+        <div class="table-scroll finance-cap-scroll">
+          <table class="data-table">
+            <thead><tr><th>Event</th><th>Amount</th><th>When</th></tr></thead>
+            <tbody>${ledgerRows}</tbody>
+          </table>
+        </div>
+      </section>
+
+      ${stepDownBlock}
+
+      <p id="ceo-feedback" class="desk-feedback" hidden></p>
     </div>
-
-    <div class="finance-action">
-      <p><strong>Owner draws</strong> — from company cash to your personal bank (max ${formatMoney(maxDraw)} today).</p>
-      <div class="stock-actions">
-        <button type="button" class="btn btn-small" data-owner-draw="5000" ${disabled}>Draw $5k</button>
-        <button type="button" class="btn btn-small" data-owner-draw="10000" ${disabled}>Draw $10k</button>
-        <button type="button" class="btn btn-small" data-owner-draw="25000" ${disabled}>Draw $25k</button>
-        <button type="button" class="btn btn-small" data-owner-draw="50000" ${disabled}>Draw $50k</button>
-      </div>
-      <div class="name-row ceo-salary-row">
-        <label class="visually-hidden" for="ceo-draw-input">Custom draw</label>
-        <input id="ceo-draw-input" type="number" min="500" step="500" placeholder="Custom amount" ${disabled}>
-        <button type="button" class="btn btn-small" id="btn-ceo-draw-custom" ${disabled}>Draw custom</button>
-      </div>
-      <p class="fine-print">Lifetime cash comp (salary + draws, before debits): ${formatMoney(ceoPersonalCashComp(state))}.</p>
-    </div>
-
-    <h3 class="log-head">Personal bank ledger</h3>
-    <div class="table-scroll">
-      <table class="data-table">
-        <thead><tr><th>Event</th><th>Amount</th><th>When</th></tr></thead>
-        <tbody>${ledgerRows}</tbody>
-      </table>
-    </div>
-
-    ${
-      publicCo && !state.flags?.cashedOut
-        ? `<div class="finance-action">
-        <p><strong>Step down</strong> — sell founder shares; proceeds deposit to your personal bank and end the run.</p>
-        ${
-          lockup > 0
-            ? `<p class="fine-print">Founder lockup: ${lockup} month(s) — stock desk on Finance until you can exit.</p>`
-            : `<button type="button" class="btn btn-primary btn-small" id="btn-cash-out">Step down &amp; cash out</button>`
-        }
-      </div>`
-        : state.flags?.cashedOut
-          ? `<p class="fine-print">You already stepped down — start a new run from the main menu.</p>`
-          : `<p class="fine-print">IPO unlocks a liquid equity exit; until then, salary and draws fund your personal bank.</p>`
-    }
-
-    <p id="ceo-feedback" class="desk-feedback" hidden></p>
   `;
 }
 
