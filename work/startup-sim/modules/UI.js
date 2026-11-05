@@ -41,7 +41,12 @@ import {
 } from './Finance.js';
 import { progressionTierLabel } from './ProgressionEconomy.js';
 import { renderGrowthCampaignsBlock } from './GrowthCampaigns.js';
-import { launchLifecycleActive, launchPhaseLabel } from './LaunchLifecycle.js';
+import {
+  launchLifecycleActive,
+  launchPhaseLabel,
+  PRE_LAUNCH_BUZZ_REQUIRED,
+  canSchedulePublicLaunch
+} from './LaunchLifecycle.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -215,7 +220,9 @@ export function renderDeskPanel(state) {
           if (!def) return '';
           const sel = offer.selected ? 'task-offer selected' : 'task-offer';
           const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
-          const launchTag = def.scheduleLaunch ? ' <span class="task-tag">Launch gate</span>' : '';
+          const launchTag = def.scheduleLaunch
+            ? ` <span class="task-tag">${canSchedulePublicLaunch(state) ? 'Launch gate' : `${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz`}</span>`
+            : '';
           return `<article class="${sel}">
             <h3>${escapeHtml(def.title)}${sig}${launchTag}</h3>
             <p>${escapeHtml(def.description)}</p>
@@ -255,8 +262,10 @@ export function renderDeskPanel(state) {
   const monthSpend = state.calendar.monthSpend ?? 0;
 
   const tutorial = renderTutorialBanner(activeTutorialStep(state));
+  const buzzNow = state.product?.buzz ?? 0;
+  const prodLv = state.product?.level ?? 0;
   const launchBanner = launchLifecycleActive(state)
-    ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — desk offers are from the launch playbook until you graduate (complete post-launch months or leave the garage).</p>`
+    ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — ship product tasks for level &amp; pre-sell revenue; marketing for buzz (need <strong>${PRE_LAUNCH_BUZZ_REQUIRED}+</strong> to schedule launch — now <strong>${buzzNow}</strong>). Product level <strong>${prodLv}</strong>. Graduate after post-launch playbook or leaving the garage.</p>`
     : '';
 
   desk.innerHTML = `

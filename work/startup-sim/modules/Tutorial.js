@@ -7,7 +7,7 @@ const STEPS = [
     id: 'welcome',
     stages: [STAGES.GARAGE],
     title: 'Welcome, founder',
-    body: 'Complete every task on the Desk, then use Close month. Cash flow from tasks is immediate; payroll hits on month close.'
+    body: 'Early game is pre-launch: product/engineering tasks raise product level and pre-sell revenue; marketing raises buzz. Hit 10+ buzz, then take Schedule public launch. Close month when desk work is done.'
   },
   {
     id: 'people',

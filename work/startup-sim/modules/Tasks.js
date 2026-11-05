@@ -9,7 +9,8 @@ import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { ty
 import {
   currentLaunchTaskPhase,
   launchPhaseAllowed,
-  launchLifecycleActive
+  launchLifecycleActive,
+  canSchedulePublicLaunch
 } from './LaunchLifecycle.js';
 
 /** Shipped catalog — always available with the game bundle. */
@@ -249,7 +250,7 @@ export function dealMonthlyTasks(state) {
   const recent = state.calendar.recentTaskIds ?? [];
   let offered = pickMonthlyTaskDefs(pool, offerCount, recent);
   const launchDesk = currentLaunchTaskPhase(state);
-  if (launchDesk === 'pre_launch' && state.launch?.phase === 'pre_launch') {
+  if (launchDesk === 'pre_launch' && state.launch?.phase === 'pre_launch' && canSchedulePublicLaunch(state)) {
     const sched = pool.find((t) => t.scheduleLaunch);
     if (sched && !offered.some((t) => t.id === sched.id)) {
       offered = [sched, ...offered.filter((t) => t.id !== sched.id)].slice(0, offerCount);

@@ -29,7 +29,11 @@ import {
 } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
-import { onScheduleLaunchTaskCompleted } from './modules/LaunchLifecycle.js';
+import {
+  onScheduleLaunchTaskCompleted,
+  canSchedulePublicLaunch,
+  PRE_LAUNCH_BUZZ_REQUIRED
+} from './modules/LaunchLifecycle.js';
 import { formatMoney } from './modules/GameState.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './modules/Progression.js';
 import {
@@ -271,6 +275,14 @@ function handleCompleteTask(instanceId) {
   const def = getTaskDef(inst.taskId);
   if (!def) return;
 
+  if (def.scheduleLaunch && !canSchedulePublicLaunch(sessionState)) {
+    showDeskFeedback(
+      `Reach ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz with pre-launch marketing before scheduling (now ${sessionState.product?.buzz ?? 0}).`,
+      true
+    );
+    return;
+  }
+
   const rolled = rollTaskOutcome(def, sessionState);
   const { cost, revenue } = applyTaskOutcome(sessionState, def, rolled);
   const result = completeTaskInstance(sessionState, instanceId, def, rolled);
@@ -290,10 +302,12 @@ function handleCompleteTask(instanceId) {
   );
   if (def.scheduleLaunch) {
     const sched = onScheduleLaunchTaskCompleted(sessionState);
-    for (const line of sched.lines ?? []) {
-      appendLog(sessionState, line);
-    }
-    if (sched.ok) {
+    if (!sched.ok) {
+      showDeskFeedback(sched.reason || 'Could not schedule launch.', true);
+    } else {
+      for (const line of sched.lines ?? []) {
+        appendLog(sessionState, line);
+      }
       showDeskFeedback('Public launch scheduled for next month.');
     }
   }

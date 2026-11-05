@@ -1,6 +1,15 @@
 import { STAGES } from './constants.js';
 import { getTaskStage } from './Workspace.js';
 
+/** Minimum product buzz before "Schedule public launch" unlocks. */
+export const PRE_LAUNCH_BUZZ_REQUIRED = 10;
+
+export function canSchedulePublicLaunch(state) {
+  if (!launchLifecycleActive(state)) return false;
+  if (state.launch?.phase !== 'pre_launch') return false;
+  return (state.product?.buzz ?? 0) >= PRE_LAUNCH_BUZZ_REQUIRED;
+}
+
 export function createInitialLaunchState() {
   return {
     phase: 'pre_launch',
@@ -49,6 +58,7 @@ export function launchPhaseAllowed(task, state) {
   if (!task.launchPhase) return false;
   if (needed === 'pre_launch') {
     if (task.scheduleLaunch && state.launch?.phase === 'scheduled') return false;
+    if (task.scheduleLaunch && !canSchedulePublicLaunch(state)) return false;
     return task.launchPhase === 'pre_launch';
   }
   return task.launchPhase === needed;
@@ -75,6 +85,12 @@ export function onScheduleLaunchTaskCompleted(state) {
   if (!state.launch) state.launch = createInitialLaunchState();
   if (state.launch.phase !== 'pre_launch' && state.launch.phase !== 'scheduled') {
     return { ok: false, reason: 'Launch already scheduled or shipped.' };
+  }
+  if (!canSchedulePublicLaunch(state)) {
+    return {
+      ok: false,
+      reason: `Need at least ${PRE_LAUNCH_BUZZ_REQUIRED} buzz from pre-launch marketing before you schedule (currently ${state.product?.buzz ?? 0}).`
+    };
   }
   let monthIndex = state.calendar.monthIndex + 1;
   let year = state.calendar.year;

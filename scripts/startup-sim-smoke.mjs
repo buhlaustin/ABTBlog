@@ -10,7 +10,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const sim = join(root, 'work', 'startup-sim');
 
 const tasksJson = JSON.parse(readFileSync(join(sim, 'data/tasks.json'), 'utf8'));
-const { STAGES, getMonthlyTaskSlots } = await import(
+const { STAGES, getMonthlyTaskSlots, getMonthlyTaskOfferCount } = await import(
   `file://${join(sim, 'modules/constants.js')}`
 );
 const { createInitialState, normalizeSave, formatMoney } = await import(
@@ -134,6 +134,32 @@ if (!preLaunchOnly || !(garageOffers?.length >= 4)) {
   failed = true;
 } else {
   console.log('OK: garage pre-launch task pool');
+}
+
+const { canSchedulePublicLaunch, PRE_LAUNCH_BUZZ_REQUIRED, onScheduleLaunchTaskCompleted } =
+  await import(`file://${join(sim, 'modules/LaunchLifecycle.js')}`);
+const garagePool = getTaskPoolSize(state);
+const offerNeed = getMonthlyTaskOfferCount(STAGES.GARAGE);
+if (garagePool < offerNeed) {
+  console.error(`FAIL: garage pre-launch pool ${garagePool} < offers ${offerNeed}`);
+  failed = true;
+}
+state.product.buzz = PRE_LAUNCH_BUZZ_REQUIRED - 1;
+if (canSchedulePublicLaunch(state)) {
+  console.error('FAIL: schedule launch should require 10 buzz');
+  failed = true;
+}
+const blocked = onScheduleLaunchTaskCompleted(state);
+if (blocked.ok) {
+  console.error('FAIL: schedule with low buzz should fail');
+  failed = true;
+}
+state.product.buzz = PRE_LAUNCH_BUZZ_REQUIRED;
+if (!canSchedulePublicLaunch(state)) {
+  console.error('FAIL: schedule should unlock at 10 buzz');
+  failed = true;
+} else if (!failed) {
+  console.log(`OK: pre-launch buzz gate (${PRE_LAUNCH_BUZZ_REQUIRED}+ to schedule)`);
 }
 
 const { totalHeadcountCap } = await import(`file://${join(sim, 'modules/Offices.js')}`);
