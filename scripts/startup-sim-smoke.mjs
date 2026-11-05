@@ -943,15 +943,23 @@ if (!hireMax.ok || cooSalaryMonthly(garageZero) !== 0) {
 const { growthCampaignCatalogSize } = await import(
   `file://${join(sim, 'modules/GrowthCampaigns.js')}`
 );
-const { getProductActions } = await import(`file://${join(sim, 'modules/ProductActions.js')}`);
-if (growthCampaignCatalogSize() < 95) {
+const { getProductActions, sideTaskBankSize } = await import(
+  `file://${join(sim, 'modules/ProductActions.js')}`
+);
+const productSideBank = sideTaskBankSize(['product', 'both']);
+if (growthCampaignCatalogSize() < 130) {
   console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()})`);
   failed = true;
-} else if (getProductActions().length < 40) {
-  console.error(`FAIL: growth lever bank too small (${getProductActions().length})`);
+} else if (getProductActions().length < 75) {
+  console.error(`FAIL: side-task lever bank too small (${getProductActions().length})`);
+  failed = true;
+} else if (productSideBank < 32) {
+  console.error(`FAIL: product side-task bank too small (${productSideBank})`);
   failed = true;
 } else {
-  console.log(`OK: expanded growth bank (${growthCampaignCatalogSize()} campaigns, ${getProductActions().length} levers)`);
+  console.log(
+    `OK: side-task banks (${growthCampaignCatalogSize()} paid campaigns, ${getProductActions().length} levers, ${productSideBank} product-focused)`
+  );
 }
 
 const calState = createInitialState({ companyName: 'Cal Co', categoryId: 'b2b-saas', mode: 'career' });

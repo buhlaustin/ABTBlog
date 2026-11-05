@@ -6,6 +6,8 @@ import { progressionTier } from './ProgressionEconomy.js';
 import { fetchGameJson } from './utils.js';
 import bundledLevers from '../data/growth-levers.json' with { type: 'json' };
 import bundledLeversExtra from '../data/growth-levers-extra.json' with { type: 'json' };
+import bundledLeversExtra2 from '../data/growth-levers-extra2.json' with { type: 'json' };
+import bundledLeversExtra3 from '../data/growth-levers-extra3.json' with { type: 'json' };
 
 function mergeLeverCatalog(base, ...extras) {
   const actions = [...(base?.actions ?? [])];
@@ -21,7 +23,7 @@ function mergeLeverCatalog(base, ...extras) {
   return actions;
 }
 
-const bundledLeverExtras = [bundledLeversExtra];
+const bundledLeverExtras = [bundledLeversExtra, bundledLeversExtra2, bundledLeversExtra3];
 
 let leverCatalog = mergeLeverCatalog(bundledLevers, ...bundledLeverExtras);
 
@@ -39,6 +41,20 @@ export async function loadGrowthLevers() {
 
 export function getProductActions() {
   return leverCatalog;
+}
+
+export function sideTaskFocus(def) {
+  return def?.focus ?? 'both';
+}
+
+export function filterSideTasksByFocus(actions, focusFilter) {
+  if (!focusFilter?.length) return actions;
+  const allowed = new Set(focusFilter);
+  return actions.filter((a) => allowed.has(sideTaskFocus(a)));
+}
+
+export function sideTaskBankSize(focusFilter) {
+  return filterSideTasksByFocus(getProductActions(), focusFilter).length;
 }
 
 /** @deprecated use getProductActions() */
@@ -107,16 +123,22 @@ export function renderProductActionsPanel(container, state, options = {}) {
   const left = productActionsRemaining(state);
   const limit = actionsPerMonth(state);
   const heading = options.heading ?? 'Growth levers';
+  const focusFilter = options.focusFilter;
+  const bankSize = sideTaskBankSize(focusFilter);
   const lede =
     options.lede ??
-    `Quick plays outside desk tasks — <strong>${left}/${limit}</strong> left this month (${getProductActions().length} in bank).`;
-  const rows = getProductActions()
+    `Cash plays outside desk tasks — <strong>${left}/${limit}</strong> left this month (${bankSize} in this bank · ${getProductActions().length} total side plays).`;
+  const rows = filterSideTasksByFocus(getProductActions(), focusFilter)
     .filter((a) => actionUnlocked(a, state))
     .map((a) => {
       const rival = a.rivalEase ? ` · rival heat −${a.rivalEase}` : '';
+      const focusTag =
+        sideTaskFocus(a) !== 'both'
+          ? ` <span class="task-tag">${escapeHtml(sideTaskFocus(a))}</span>`
+          : '';
       return `<div class="finance-action product-action">
-      <p><strong>${escapeHtml(a.label)}</strong> — ${formatMoney(a.cost)}</p>
-      <p class="fine-print">${escapeHtml(a.description)} Buzz +${a.buzz}${a.product ? ` · Product +${a.product}` : ''}${rival}.</p>
+      <p><strong>${escapeHtml(a.label)}</strong>${focusTag} — ${formatMoney(a.cost)}</p>
+      <p class="fine-print">${escapeHtml(a.description)} Buzz +${a.buzz ?? 0}${a.product ? ` · Product +${a.product}` : ''}${rival}.</p>
       <button type="button" class="btn btn-primary btn-small" data-product-action="${escapeHtml(a.id)}" ${left <= 0 ? 'disabled title="No growth lever plays left this month"' : ''}>Run play</button>
     </div>`;
     })

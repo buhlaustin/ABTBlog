@@ -1,6 +1,7 @@
 import bundled from '../data/growth-campaigns.json' with { type: 'json' };
 import bundledExtra from '../data/growth-campaigns-extra.json' with { type: 'json' };
 import bundledExtra2 from '../data/growth-campaigns-extra2.json' with { type: 'json' };
+import bundledExtra3 from '../data/growth-campaigns-extra3.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
@@ -22,7 +23,7 @@ function mergeCampaignCatalog(base, ...extras) {
   return { ...base, campaigns };
 }
 
-const bundledExtras = [bundledExtra, bundledExtra2];
+const bundledExtras = [bundledExtra, bundledExtra2, bundledExtra3];
 
 let catalog = mergeCampaignCatalog(bundled, ...bundledExtras);
 

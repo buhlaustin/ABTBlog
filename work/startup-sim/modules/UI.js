@@ -30,7 +30,10 @@ import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
-import { renderProductActionsPanel, getProductActions } from './ProductActions.js';
+import { renderProductActionsPanel, sideTaskBankSize } from './ProductActions.js';
+
+const SIDE_TASK_FOCUS_PRODUCT = ['product', 'both'];
+const SIDE_TASK_FOCUS_GROWTH = ['growth', 'brand', 'both'];
 import { sentimentLabel, marketTrustLabel, hasInstitutionalBoard } from './Sentiment.js';
 import { runwayLabel } from './MonthSummary.js';
 import { competitorRevenueMult } from './Competitor.js';
@@ -624,7 +627,8 @@ export function renderGrowthPanel(container, state) {
   `;
   renderProductActionsPanel(document.getElementById('growth-levers-mount'), state, {
     heading: 'Side growth plays',
-    lede: `Low-lift experiments and founder-led plays — shares the monthly lever limit with the Product tab (${getProductActions().length} in bank).`
+    focusFilter: SIDE_TASK_FOCUS_GROWTH,
+    lede: `Marketing and brand experiments — shares the monthly side-task limit with Product (${sideTaskBankSize(SIDE_TASK_FOCUS_GROWTH)} growth/brand plays in bank).`
   });
 }
 
@@ -656,7 +660,7 @@ export function renderProductPanel(container, state) {
       : '';
 
   container.innerHTML = `
-    <p class="panel-lede">A stronger product makes desk tasks pay better — level up by shipping product work on the desk.</p>
+    <p class="panel-lede">A stronger product makes desk tasks pay better. Buy <strong>product side plays</strong> below (UX sprints, enterprise packs, PLG experiments) — they share a monthly limit with Growth tab plays.</p>
     <div class="summary-grid">
       <div><span class="stat-label">Product level</span><span class="stat-value">${state.product.level ?? 0}</span></div>
       <div><span class="stat-label">Buzz</span><span class="stat-value">${state.product.buzz ?? 0}</span></div>
@@ -665,7 +669,11 @@ export function renderProductPanel(container, state) {
     ${pivotBlock}
     <div id="product-actions-mount"></div>
   `;
-  renderProductActionsPanel(document.getElementById('product-actions-mount'), state);
+  renderProductActionsPanel(document.getElementById('product-actions-mount'), state, {
+    heading: 'Product side plays',
+    focusFilter: SIDE_TASK_FOCUS_PRODUCT,
+    lede: `Ship faster without a desk slot — product-focused buys (${sideTaskBankSize(SIDE_TASK_FOCUS_PRODUCT)} in bank).`
+  });
 }
 
 export function renderGameOver(state) {

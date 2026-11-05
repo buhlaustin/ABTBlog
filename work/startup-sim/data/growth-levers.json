@@ -1,8 +1,9 @@
 {
-  "version": 2,
+  "version": 3,
   "actions": [
     {
       "id": "founder_reddit_ama",
+      "focus": "growth",
       "label": "Founder Reddit AMA",
       "cost": 250,
       "buzz": 1,
@@ -13,6 +14,7 @@
     },
     {
       "id": "community_beta",
+      "focus": "product",
       "label": "Invite-only beta list",
       "cost": 900,
       "buzz": 1,
@@ -22,6 +24,7 @@
     },
     {
       "id": "influencer_micro",
+      "focus": "growth",
       "label": "Micro-influencer campaign",
       "cost": 4500,
       "buzz": 2,
@@ -31,6 +34,7 @@
     },
     {
       "id": "influencer_mid",
+      "focus": "growth",
       "label": "Mid-tier influencer tour",
       "cost": 18000,
       "buzz": 5,
@@ -41,6 +45,7 @@
     },
     {
       "id": "product_hackathon",
+      "focus": "product",
       "label": "Customer hackathon",
       "cost": 12000,
       "buzz": 2,
@@ -51,6 +56,7 @@
     },
     {
       "id": "brand_stunt",
+      "focus": "brand",
       "label": "Publicity stunt",
       "cost": 8000,
       "buzz": 4,

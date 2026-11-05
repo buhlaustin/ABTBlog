@@ -1,0 +1,424 @@
+{
+  "campaigns": [
+    {
+      "id": "growth-product-tour-ads",
+      "title": "Product tour video ads",
+      "description": "Sixty-second walkthrough cut for every platform aspect ratio.",
+      "cost": 16000,
+      "revenue": [12000, 72000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-free-tool-launch",
+      "title": "Free standalone tool launch",
+      "description": "Sidecar calculator that funnels to your core SKU.",
+      "cost": 22000,
+      "revenue": [15000, 88000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-integration-directory-blitz",
+      "title": "Integration directory blitz",
+      "description": "List everywhere Zapier clones aggregate connectors.",
+      "cost": 8500,
+      "revenue": [6500, 38000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-customer-story-pod",
+      "title": "Customer story mini-pod series",
+      "description": "Eight episodes, one logo per show — procurement listens.",
+      "cost": 34000,
+      "revenue": [26000, 155000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-benchmark-report-ads",
+      "title": "Benchmark report paid distribution",
+      "description": "Promote the spicy PDF to your exact title targets.",
+      "cost": 28000,
+      "revenue": [21000, 125000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-roi-calculator-ppc",
+      "title": "ROI calculator keyword buy",
+      "description": "Bid on '[category] ROI calculator' before rivals do.",
+      "cost": 12000,
+      "revenue": [9000, 55000],
+      "buzz": 1,
+      "tierMin": 1,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-sandbox-trial-ads",
+      "title": "Sandbox trial LinkedIn ads",
+      "description": "Creative shows fake data; CTR still surprises you.",
+      "cost": 18000,
+      "revenue": [14000, 82000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-docs-sponsored-tutorial",
+      "title": "Sponsored docs tutorial series",
+      "description": "Pay a dev educator to build on your API on camera.",
+      "cost": 9500,
+      "revenue": [7000, 42000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-hackathon-sponsor-global",
+      "title": "Global online hackathon sponsor",
+      "description": "Prizes, Discord stage, and repos full of sample apps.",
+      "cost": 65000,
+      "revenue": [48000, 285000],
+      "buzz": 4,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-vertical-webinar-tour",
+      "title": "Vertical webinar tour",
+      "description": "Healthcare, fintech, retail — same product, new anecdotes.",
+      "cost": 42000,
+      "revenue": [32000, 185000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-analyst-note-sponsor",
+      "title": "Analyst note sponsorship",
+      "description": "Briefing fees and follow-up citations you screenshot.",
+      "cost": 85000,
+      "revenue": [65000, 380000],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-customer-advisory-pr",
+      "title": "Customer advisory PR push",
+      "description": "Press release listing logos that agreed to be named.",
+      "cost": 22000,
+      "revenue": [16000, 95000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-messenger-ads-test",
+      "title": "Messenger / DM ads test",
+      "description": "Click-to-chat units where your buyers already complain.",
+      "cost": 7500,
+      "revenue": [5500, 32000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-pinterest-catalog",
+      "title": "Pinterest catalog ads",
+      "description": "Visual SKUs for products that are secretly software.",
+      "cost": 11000,
+      "revenue": [8500, 52000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-snap-ar-lens",
+      "title": "Snap AR lens campaign",
+      "description": "Filter tries your brand color on every selfie.",
+      "cost": 45000,
+      "revenue": [34000, 195000],
+      "buzz": 4,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-waze-pin-buy",
+      "title": "Waze map pin buy",
+      "description": "Drivers routed past your HQ they will never visit.",
+      "cost": 32000,
+      "revenue": [24000, 140000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-podcast-dynamic-insert",
+      "title": "Podcast dynamic ad insertion",
+      "description": "Swap creative weekly without re-recording hosts.",
+      "cost": 38000,
+      "revenue": [29000, 165000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-crm-nurture-refresh",
+      "title": "CRM nurture sequence refresh",
+      "description": "Agency rewrites twelve emails; ops reconnects integrations.",
+      "cost": 14000,
+      "revenue": [10000, 62000],
+      "buzz": 1,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-partner-marketplace-feature",
+      "title": "Partner marketplace feature",
+      "description": "Paid placement in a platform's app directory.",
+      "cost": 55000,
+      "revenue": [42000, 245000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-executive-dinner-series",
+      "title": "Executive dinner series (3 cities)",
+      "description": "Eight seats, NDA chatter, one customer reference born.",
+      "cost": 48000,
+      "revenue": [36000, 210000],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-commuter-newsletter-takeover",
+      "title": "Commuter newsletter takeover",
+      "description": "Monday AM subject line competition with every other sponsor.",
+      "cost": 18000,
+      "revenue": [13000, 78000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-university-case-competition",
+      "title": "University case competition sponsor",
+      "description": "MBAs pitch using your product; hiring pipeline bonus.",
+      "cost": 25000,
+      "revenue": [12000, 72000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-industry-award-submission",
+      "title": "Industry award submission blitz",
+      "description": "Apply to every 'Best B2B' list with a PDF design agency built.",
+      "cost": 12000,
+      "revenue": [8000, 48000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-retail-popup-demo",
+      "title": "Retail pop-up demo shop",
+      "description": "Physical space explaining software to confused shoppers.",
+      "cost": 95000,
+      "revenue": [72000, 420000],
+      "buzz": 5,
+      "tierMin": 4,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-super-app-mini-program",
+      "title": "Super-app mini program launch",
+      "description": "Embed inside a messaging app ecosystem overseas.",
+      "cost": 68000,
+      "revenue": [52000, 310000],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-creator-whitelist-ads",
+      "title": "Creator whitelist ad program",
+      "description": "Run paid behind organic posts that already work.",
+      "cost": 24000,
+      "revenue": [18000, 105000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-discount-flash-campaign",
+      "title": "48-hour flash discount campaign",
+      "description": "Urgency email + paid social; finance watches margin.",
+      "cost": 32000,
+      "revenue": [28000, 165000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-annual-plan-push",
+      "title": "Annual plan upgrade push",
+      "description": "In-app prompts and success outreach for yearly commits.",
+      "cost": 8500,
+      "revenue": [12000, 95000],
+      "buzz": 1,
+      "tierMin": 2,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-churn-save-offers",
+      "title": "Churn save offer campaign",
+      "description": "Exit survey + save offer tested on cancel flow.",
+      "cost": 6500,
+      "revenue": [8000, 52000],
+      "buzz": 0,
+      "tierMin": 2,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-sales-enablement-roadshow",
+      "title": "Sales enablement roadshow",
+      "description": "Train every AE on the new deck in five time zones.",
+      "cost": 52000,
+      "revenue": [40000, 235000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-customer-video-testimonials",
+      "title": "Customer video testimonial batch",
+      "description": "Ten remote shoots; one golden quote for the homepage.",
+      "cost": 38000,
+      "revenue": [28000, 165000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-geo-expansion-ads",
+      "title": "Geo expansion paid search",
+      "description": "First campaigns in two new countries — currency fun.",
+      "cost": 45000,
+      "revenue": [34000, 195000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-internal-comms-tool-ad",
+      "title": "Internal comms platform ads",
+      "description": "Reach IT buyers inside workplace chat tools.",
+      "cost": 28000,
+      "revenue": [21000, 125000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-open-source-conference",
+      "title": "Open-source conference gold sponsor",
+      "description": "Booth, talk slot, and engineers recruited at the afterparty.",
+      "cost": 75000,
+      "revenue": [55000, 320000],
+      "buzz": 4,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-viral-giveaway",
+      "title": "Viral giveaway collab",
+      "description": "Partner brand bundles prizes; emails shared awkwardly.",
+      "cost": 42000,
+      "revenue": [32000, 185000],
+      "buzz": 5,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-founder-book-tour",
+      "title": "Founder book tour (paid venues)",
+      "description": "Signing events that are really enterprise lead gen.",
+      "cost": 88000,
+      "revenue": [65000, 380000],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-ipo-countdown-ads",
+      "title": "IPO countdown ad series",
+      "description": "Retail investor education — compliance watches every word.",
+      "cost": 420000,
+      "revenue": [320000, 1650000],
+      "buzz": 5,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-micro-community-ads",
+      "title": "Micro-community sponsorship pack",
+      "description": "Ten small Discords/Slacks instead of one big influencer.",
+      "cost": 9800,
+      "revenue": [7500, 45000],
+      "buzz": 2,
+      "tierMin": 1,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-product-update-mailer",
+      "title": "Product update mailer to dormant users",
+      "description": "Reactivation blast highlighting features they missed.",
+      "cost": 4200,
+      "revenue": [5500, 32000],
+      "buzz": 1,
+      "tierMin": 1,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-live-shopping-demo",
+      "title": "Live shopping style demo stream",
+      "description": "Host sells software like it's skincare — chat buys trials.",
+      "cost": 15000,
+      "revenue": [11000, 68000],
+      "buzz": 4,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-cohort-based-course",
+      "title": "Cohort-based course sponsorship",
+      "description": "Your tool is the homework in a paid upskilling program.",
+      "cost": 32000,
+      "revenue": [24000, 140000],
+      "buzz": 3,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-ops-conference-track",
+      "title": "Ops conference track sponsor",
+      "description": "Title a track; fill it with customer speakers.",
+      "cost": 115000,
+      "revenue": [88000, 520000],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    }
+  ]
+}
