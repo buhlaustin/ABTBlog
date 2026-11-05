@@ -17,7 +17,7 @@ export function parseSandboxTuning(formData, mode) {
   const startingStage = String(formData.get('sandboxStartStage') || 'garage');
   const ipoGateArr = Number(formData.get('sandboxIpoGate')) || REVENUE_GATES.IPO;
   return {
-    revenueMult: Math.max(0.5, Math.min(3, revenueMult)),
+    revenueMult: Math.max(0.5, Math.min(20, revenueMult)),
     startingStage,
     ipoGateArr: Math.max(500_000, Math.min(REVENUE_GATES.IPO, ipoGateArr))
   };

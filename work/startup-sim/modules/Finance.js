@@ -13,15 +13,12 @@ import { competitorRevenueMult } from './Competitor.js';
 import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
 import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
+import { progressionRevenueMult } from './ProgressionEconomy.js';
+import { applyTaskRivalEffects } from './WorldDynamics.js';
 
-/** Post-seed scaling so late-game tasks can reach the $1B gate in a reasonable run. */
+/** Legacy alias — progression stack replaces seed-only scaling. */
 export function scalingRevenueMult(state) {
-  if (!state.flags?.seedRoundClosed) return 1;
-  const r = getArr(state);
-  if (r < 500_000) return 1;
-  const base = 1 + Math.min(140, (r / 4_000_000) ** 0.62);
-  const sandbox = state.mode === 'sandbox' ? 1.2 : 1;
-  return Math.round(base * sandbox * 100) / 100;
+  return progressionRevenueMult(state);
 }
 
 export function hubRevenueMult(state) {
@@ -40,22 +37,54 @@ export function productBuzzRevenueMult(state) {
   return 1 + buzzBonus + levelBonus;
 }
 
-/** Approximate desk-task revenue multiplier shown in HUD (not category ACV alone). */
-export function getTaskRevenueMultiplierPreview(state) {
+/** Revenue uses career baseline so sandbox tuning overlay is explicit (e.g. 20× × 2× = 40×). */
+function modeDifficultyMult(_state) {
+  return 2 - MODE_CONFIG.career.difficulty;
+}
+
+/**
+ * Progression + category + hub + staff + buzz (career-equivalent).
+ * Sandbox tuning from setup is applied on top — see applySandboxRevenueTuning().
+ */
+export function getCoreTaskRevenueMult(state) {
   const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
-  const sand = state.mode === 'sandbox' ? MODE_CONFIG.sandbox.difficulty : MODE_CONFIG.career.difficulty;
   const m =
     econ.revenueMult *
-    (2 - sand) *
+    modeDifficultyMult(state) *
     hubRevenueMult(state) *
     scalingRevenueMult(state) *
     competitorRevenueMult(state) *
-    getSandboxExtraRevenueMult(state) *
     xcProgramRevenueMult(state) *
     acceleratorRevenueMult(state) *
     productBuzzRevenueMult(state) *
     staffRevenueMultiplier(state);
   return Math.round(m * 100) / 100;
+}
+
+/** Sandbox setup multiplier stacks on core (e.g. 20× core × 2× tuning = 40×). */
+export function applySandboxRevenueTuning(state, coreMult) {
+  if (state.mode !== 'sandbox') return coreMult;
+  const tune = getSandboxExtraRevenueMult(state);
+  return Math.round(coreMult * tune * 100) / 100;
+}
+
+export function getSandboxTuningMult(state) {
+  return state.mode === 'sandbox' ? getSandboxExtraRevenueMult(state) : 1;
+}
+
+/** HUD rev× — full desk payout multiplier including sandbox tuning overlay. */
+export function getTaskRevenueMultiplierPreview(state) {
+  return applySandboxRevenueTuning(state, getCoreTaskRevenueMult(state));
+}
+
+/** Rough desk payout range at current mult (before per-task headcount roll variance). */
+export function estimateTaskPayoutBand(taskDef, state) {
+  const [rMin, rMax] = taskDef?.revenue ?? [0, 0];
+  const eff = getTaskRevenueMultiplierPreview(state);
+  return {
+    min: Math.round(rMin * eff * 0.45),
+    max: Math.round(rMax * eff * 1.05)
+  };
 }
 
 export function projectMonthlyBurn(state) {
@@ -77,18 +106,9 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   const cost = Math.round(
     (taskDef.cost ?? 0) * econ.costMult * sand * hubCostMult(state) * staffCostMultiplier(state)
   );
+  const core = getCoreTaskRevenueMult(state);
   const revenue = Math.round(
-    rolled.revenue *
-      econ.revenueMult *
-      (2 - sand) *
-      hubRevenueMult(state) *
-      scalingRevenueMult(state) *
-      competitorRevenueMult(state) *
-      getSandboxExtraRevenueMult(state) *
-      xcProgramRevenueMult(state) *
-      acceleratorRevenueMult(state) *
-      staffRevenueMultiplier(state) *
-      staffRetentionBonus(state, taskDef)
+    rolled.revenue * applySandboxRevenueTuning(state, core) * staffRetentionBonus(state, taskDef)
   );
 
   state.finance.cash -= cost;
@@ -102,6 +122,7 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   state.product.level = (state.product.level ?? 0) + productGain;
   const buzzGain = rolled.buzz ?? 0;
   state.product.buzz = (state.product.buzz ?? 0) + buzzGain;
+  applyTaskRivalEffects(state, taskDef);
 
   return { cost, revenue };
 }

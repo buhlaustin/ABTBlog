@@ -1,0 +1,117 @@
+import bundled from '../data/growth-campaigns.json' with { type: 'json' };
+import { fetchGameJson } from './utils.js';
+import { progressionTier } from './ProgressionEconomy.js';
+import {
+  recordCashOutflow,
+  getCoreTaskRevenueMult,
+  applySandboxRevenueTuning,
+  getTaskRevenueMultiplierPreview
+} from './Finance.js';
+import { formatMoney } from './constants.js';
+import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
+import { applyCampaignRivalEffects } from './WorldDynamics.js';
+
+let catalog = bundled;
+
+export async function loadGrowthCampaigns() {
+  try {
+    const data = await fetchGameJson('data/growth-campaigns.json');
+    if (Array.isArray(data?.campaigns) && data.campaigns.length) catalog = data;
+  } catch {
+    /* bundled */
+  }
+  return catalog;
+}
+
+export function getGrowthCampaigns() {
+  return catalog.campaigns ?? [];
+}
+
+function campaignRevenueMult(state) {
+  return applySandboxRevenueTuning(state, getCoreTaskRevenueMult(state));
+}
+
+export function availableCampaigns(state) {
+  const tier = progressionTier(state);
+  const used = new Set(state.growth?.campaignsThisMonth ?? []);
+  return getGrowthCampaigns().filter(
+    (c) =>
+      tier >= (c.tierMin ?? 0) &&
+      tier <= (c.tierMax ?? 99) &&
+      !used.has(c.id)
+  );
+}
+
+export function runGrowthCampaign(state, campaignId) {
+  const def = getGrowthCampaigns().find((c) => c.id === campaignId);
+  if (!def) return { ok: false, reason: 'Unknown campaign.' };
+  const tier = progressionTier(state);
+  if (tier < (def.tierMin ?? 0) || tier > (def.tierMax ?? 99)) {
+    return { ok: false, reason: 'Campaign not unlocked at your current stage.' };
+  }
+  if (!state.growth) state.growth = { campaignsThisMonth: [] };
+  if (state.growth.campaignsThisMonth.includes(def.id)) {
+    return { ok: false, reason: 'Already ran that campaign this month.' };
+  }
+  const slots = growthCampaignSlots(state);
+  if (state.growth.campaignsThisMonth.length >= slots) {
+    return {
+      ok: false,
+      reason: `Marketing bandwidth full (${slots} campaign${slots === 1 ? '' : 's'} per month).`
+    };
+  }
+  const cost = def.cost ?? 0;
+  if ((state.finance.cash ?? 0) < cost) {
+    return { ok: false, reason: `Need ${formatMoney(cost)} cash.` };
+  }
+  const [rMin, rMax] = def.revenue ?? [0, 0];
+  const base = rMin + Math.random() * Math.max(0, rMax - rMin);
+  const revenue = Math.round(base * campaignRevenueMult(state));
+
+  state.finance.cash -= cost;
+  state.finance.cash += revenue;
+  state.finance.lifetimeRevenue += revenue;
+  recordCashOutflow(state, cost, 'growth');
+  state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + revenue;
+  state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
+  state.product.buzz = (state.product.buzz ?? 0) + (def.buzz ?? 0);
+  state.growth.campaignsThisMonth.push(def.id);
+  applyCampaignRivalEffects(state, def);
+
+  return { ok: true, def, cost, revenue };
+}
+
+export function resetGrowthCampaignsMonth(state) {
+  if (!state.growth) state.growth = { campaignsThisMonth: [] };
+  state.growth.campaignsThisMonth = [];
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+export function renderGrowthCampaignsBlock(state) {
+  const campaigns = availableCampaigns(state);
+  if (!campaigns.length) {
+    return '<p class="fine-print">No paid growth plays unlocked yet — close seed and scale ARR for billboards and beyond.</p>';
+  }
+  const mult = getTaskRevenueMultiplierPreview(state);
+  const slots = growthCampaignSlots(state);
+  const remaining = growthCampaignsRemaining(state);
+  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${remaining}/${slots}</strong> remaining (does not use desk tasks).</p>`;
+  const cards = campaigns
+    .map((c) => {
+      const r0 = Math.round((c.revenue?.[0] ?? 0) * mult * 0.5);
+      const r1 = Math.round((c.revenue?.[1] ?? 0) * mult);
+      return `<div class="finance-action">
+        <p><strong>${escapeHtml(c.title)}</strong> — ${escapeHtml(c.description)}</p>
+        <p class="fine-print">Cost ${formatMoney(c.cost)} · typical book ${formatMoney(r0)}–${formatMoney(r1)} at ${mult.toFixed(2)}× · buzz +${c.buzz ?? 0} · no desk slot</p>
+        <button type="button" class="btn btn-ghost btn-small" data-run-growth="${escapeHtml(c.id)}">Launch</button>
+      </div>`;
+    })
+    .join('');
+  return `${slotNote}<h3 class="log-head">Paid growth (Growth tab)</h3>${cards}`;
+}

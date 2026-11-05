@@ -6,6 +6,7 @@ export const WORKSPACE_TIER = {
   SMALL: 'small',
   MEDIUM: 'medium',
   LARGE: 'large',
+  CAMPUS: 'campus',
   HUB: 'hub'
 };
 
@@ -15,6 +16,7 @@ export const ARR_GATES = {
   XC: 100_000,
   MEDIUM_OFFICE: 250_000,
   LARGE_OFFICE: 2_000_000,
+  CAMPUS_HQ: 12_000_000,
   HUB_HQ: 500_000_000
 };
 
@@ -23,6 +25,7 @@ const RENT_BY_TIER = {
   [WORKSPACE_TIER.SMALL]: 2_000,
   [WORKSPACE_TIER.MEDIUM]: 5_000,
   [WORKSPACE_TIER.LARGE]: 12_000,
+  [WORKSPACE_TIER.CAMPUS]: 28_000,
   [WORKSPACE_TIER.HUB]: 18_000
 };
 
@@ -32,6 +35,7 @@ const SALARY_TIER_MULT = {
   [WORKSPACE_TIER.SMALL]: 0.5,
   [WORKSPACE_TIER.MEDIUM]: 0.72,
   [WORKSPACE_TIER.LARGE]: 1,
+  [WORKSPACE_TIER.CAMPUS]: 1.08,
   [WORKSPACE_TIER.HUB]: 1.15
 };
 
@@ -40,7 +44,8 @@ const TIER_RANK = {
   [WORKSPACE_TIER.SMALL]: 1,
   [WORKSPACE_TIER.MEDIUM]: 2,
   [WORKSPACE_TIER.LARGE]: 3,
-  [WORKSPACE_TIER.HUB]: 4
+  [WORKSPACE_TIER.CAMPUS]: 4,
+  [WORKSPACE_TIER.HUB]: 5
 };
 
 export function createInitialWorkspace() {
@@ -49,6 +54,7 @@ export function createInitialWorkspace() {
     smallOfficeOwned: false,
     mediumOfficeOwned: false,
     largeOfficeOwned: false,
+    campusOwned: false,
     hubOwned: false
   };
 }
@@ -98,6 +104,7 @@ export function headcountCap(state) {
   if (tier === WORKSPACE_TIER.SMALL) return 4;
   if (tier === WORKSPACE_TIER.MEDIUM) return 12;
   if (tier === WORKSPACE_TIER.LARGE) return 24;
+  if (tier === WORKSPACE_TIER.CAMPUS) return 100;
   if (tier === WORKSPACE_TIER.HUB) return 999;
   return 0;
 }
@@ -133,12 +140,33 @@ export function canPurchaseTier(state, tier) {
     }
     return { ok: true };
   }
+  if (tier === WORKSPACE_TIER.CAMPUS) {
+    if (arr < ARR_GATES.CAMPUS_HQ) {
+      return { ok: false, reason: `Reach ${formatMoney(ARR_GATES.CAMPUS_HQ)} ARR for a company headquarters.` };
+    }
+    if (!state.workspace?.largeOfficeOwned) {
+      return { ok: false, reason: 'Upgrade to a large office first.' };
+    }
+    if (!state.flags?.seedRoundClosed) {
+      return { ok: false, reason: 'Close seed (or later) before opening headquarters.' };
+    }
+    return { ok: true };
+  }
   if (tier === WORKSPACE_TIER.HUB) {
     if (arr < ARR_GATES.HUB_HQ) {
-      return { ok: false, reason: `Reach ${formatMoney(ARR_GATES.HUB_HQ)} ARR to open a city hub HQ.` };
+      return { ok: false, reason: `Reach ${formatMoney(ARR_GATES.HUB_HQ)} ARR to open a worldwide hub city.` };
+    }
+    if (!state.flags?.seriesAClosed && !state.flags?.seriesBClosed) {
+      return {
+        ok: false,
+        reason: 'Close Series A or B first — investors expect a priced round before a global hub.'
+      };
     }
     if (!state.flags?.xcResidencyComplete) {
       return { ok: false, reason: 'Finish the XC batch before a flagship hub.' };
+    }
+    if (!state.workspace?.campusOwned && !state.workspace?.largeOfficeOwned) {
+      return { ok: false, reason: 'Open company HQ or large office before a hub city.' };
     }
     return { ok: true };
   }
@@ -154,6 +182,12 @@ export function purchaseWorkspaceTier(state, tier) {
   if (tier === WORKSPACE_TIER.SMALL) state.workspace.smallOfficeOwned = true;
   if (tier === WORKSPACE_TIER.MEDIUM) state.workspace.mediumOfficeOwned = true;
   if (tier === WORKSPACE_TIER.LARGE) state.workspace.largeOfficeOwned = true;
+  if (tier === WORKSPACE_TIER.CAMPUS) {
+    state.workspace.campusOwned = true;
+    state.product.level = (state.product.level ?? 0) + 3;
+    state.product.buzz = (state.product.buzz ?? 0) + 4;
+    state.company.location = state.company.location || 'Company HQ';
+  }
   applyWorkspaceBurn(state);
 
   if (tier !== WORKSPACE_TIER.GARAGE && tier !== WORKSPACE_TIER.HUB) {
@@ -179,8 +213,10 @@ export function workspaceLabel(tier) {
       return 'Medium office';
     case WORKSPACE_TIER.LARGE:
       return 'Large office';
+    case WORKSPACE_TIER.CAMPUS:
+      return 'Company HQ';
     case WORKSPACE_TIER.HUB:
-      return 'City hub HQ';
+      return 'Worldwide hub city';
     default:
       return 'Garage';
   }

@@ -10,6 +10,19 @@ import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
 import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
 import { tickAcceleratorBoost } from './Accelerators.js';
+import { resetGrowthCampaignsMonth } from './GrowthCampaigns.js';
+import { resetProductActionsMonth } from './ProductActions.js';
+import {
+  tickLaunchAtMonthStart,
+  settleLaunchAtMonthEnd,
+  graduateLaunchIfLeftGarage
+} from './LaunchLifecycle.js';
+import {
+  applyBuzzDecayAtMonthStart,
+  settleRivalHeatAtMonthEnd,
+  settleBoardGovernance,
+  scorePublicGuidanceBeat
+} from './WorldDynamics.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -58,6 +71,14 @@ export function startMonth(state) {
     }
   }
   syncDraftFromFinalized(state);
+  resetGrowthCampaignsMonth(state);
+  resetProductActionsMonth(state);
+  for (const line of applyBuzzDecayAtMonthStart(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickLaunchAtMonthStart(state)) {
+    appendLog(state, line);
+  }
   dealMonthlyTasks(state);
   dealBoardTasks(state);
   return state;
@@ -76,6 +97,7 @@ export function endMonth(state) {
   const closedYear = state.calendar.year;
   const closedMonthIndex = state.calendar.monthIndex;
   const monthRevenue = state.calendar.monthRevenue ?? 0;
+  const growthCampaignsClosed = state.growth?.campaignsThisMonth?.length ?? 0;
   const burn = resolveMonthEndBurn(state);
   onMonthEndSentiment(state, priorMonthRevenue, state.finance?.monthlyRevenue ?? 0);
   let stockDeltaPct = null;
@@ -85,7 +107,23 @@ export function endMonth(state) {
     `Month closed: ${state.calendar.tasksCompleted} tasks, ${formatLogMoney(state.calendar.monthRevenue)} revenue, ${formatLogMoney(burn)} overhead.`
   );
 
+  for (const line of settleBoardGovernance(state)) {
+    appendLog(state, line);
+  }
+  for (const line of scorePublicGuidanceBeat(state, monthRevenue, burn)) {
+    appendLog(state, line);
+  }
+  for (const line of settleRivalHeatAtMonthEnd(state, monthRevenue, burn)) {
+    appendLog(state, line);
+  }
+  for (const line of settleLaunchAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
+
   syncStageFromProgress(state);
+  for (const line of graduateLaunchIfLeftGarage(state)) {
+    appendLog(state, line);
+  }
   if (state.stage !== priorStage) {
     for (const line of onStageChange(state, priorStage, state.stage)) {
       appendLog(state, line);
@@ -134,7 +172,9 @@ export function endMonth(state) {
         monthRevenue,
         burn,
         cashAfter: state.finance.cash,
-        stockDeltaPct
+        stockDeltaPct,
+        growthCampaignsClosed,
+        arrAfter: state.finance.arr ?? 0
       }
     };
   }
@@ -152,7 +192,9 @@ export function endMonth(state) {
       monthRevenue,
       burn,
       cashAfter,
-      stockDeltaPct
+      stockDeltaPct,
+      growthCampaignsClosed,
+      arrAfter: state.finance.arr ?? 0
     }
   };
 }

@@ -39,7 +39,8 @@ export function createInitialPublicMarket() {
     pressHeadline: null,
     pressDek: null,
     monthsPublic: 0,
-    lockupMonthsRemaining: 0
+    lockupMonthsRemaining: 0,
+    guidanceBeatStreak: 0
   };
 }
 

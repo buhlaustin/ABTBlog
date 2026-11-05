@@ -2,6 +2,7 @@ import { fetchGameJson } from './utils.js';
 import { adjustSentiment } from './Sentiment.js';
 import { bumpCompetitorPressure, easeCompetitorPressure } from './Competitor.js';
 import { isPublicCompany } from './IPO.js';
+import { progressionTier } from './ProgressionEconomy.js';
 import bundledCrises from '../data/crises.json' with { type: 'json' };
 
 let crisisCatalog = bundledCrises;
@@ -33,11 +34,21 @@ export async function rollMonthStartCrisis(state) {
   if (state.flags?.gameOver) return null;
   if (state.crisis?.active) return state.crisis.active;
   if (!state.crisis) state.crisis = createInitialCrisisState();
-  if (Math.random() > 0.14) return null;
+  const pressure = state.world?.competitor?.pressure ?? 0;
+  const tier = progressionTier(state);
+  const rollThreshold = 0.12 + Math.min(0.08, pressure * 0.015) + (tier >= 5 ? 0.04 : 0);
+  if (Math.random() > rollThreshold) return null;
 
   const { crises } = crisesHydrated ? crisisCatalog : await loadCrises();
   if (!crises?.length) return null;
-  const def = crises[Math.floor(Math.random() * crises.length)];
+  const eligible = crises.filter((c) => {
+    if ((c.minTier ?? 0) > tier) return false;
+    if (c.requiresPublic && !isPublicCompany(state)) return false;
+    return true;
+  });
+  const pool = eligible.length ? eligible : crises;
+  const weighted = pool.flatMap((c) => Array(Math.max(1, c.weight ?? 1)).fill(c));
+  const def = weighted[Math.floor(Math.random() * weighted.length)];
   state.crisis.active = {
     id: def.id,
     title: def.title,

@@ -48,9 +48,9 @@
           <input id="ceo-last-name" name="ceoLastName" type="text" maxlength="32" required placeholder="Last">
         </div>
 
-        <label for="startup-category">Startup type</label>
+        <label for="startup-category">Industry</label>
         <select id="startup-category" name="category" required>
-          <option value="" disabled hidden>Choose a category…</option>
+          <option value="" disabled hidden>Pick an industry…</option>
         </select>
 
         <fieldset class="mode-fieldset">
@@ -80,13 +80,18 @@
 
         <div id="sandbox-tuning-wrap" class="sandbox-cash" hidden>
           <p class="fine-print">Sandbox knobs apply only to this new Sandbox company.</p>
-          <label for="sandbox-revenue-mult">Task revenue multiplier</label>
+          <label for="sandbox-revenue-mult">Sandbox revenue overlay</label>
           <select id="sandbox-revenue-mult" name="sandboxRevenueMult">
-            <option value="1">1× (default)</option>
-            <option value="1.25">1.25×</option>
-            <option value="1.5">1.5×</option>
-            <option value="2">2×</option>
+            <option value="1">1× (stacks on progression — default)</option>
+            <option value="1.25">1.25× on top of career math</option>
+            <option value="1.5">1.5× overlay</option>
+            <option value="2">2× overlay</option>
+            <option value="3">3× overlay</option>
+            <option value="5">5× god mode overlay</option>
+            <option value="10">10× god mode overlay</option>
+            <option value="20">20× god mode overlay</option>
           </select>
+          <p class="fine-print">Example: 20× progression × 2× sandbox = 40× desk &amp; Growth payouts.</p>
           <label for="sandbox-start-stage">Starting stage</label>
           <select id="sandbox-start-stage" name="sandboxStartStage">
             <option value="garage">Garage</option>
@@ -197,6 +202,13 @@
 
     <dialog id="board-outcome-dialog" class="month-summary-dialog" aria-labelledby="board-outcome-title">
       <div id="board-outcome-body"></div>
+      <form method="dialog" class="month-summary-actions">
+        <button class="btn btn-primary" type="submit">Continue</button>
+      </form>
+    </dialog>
+
+    <dialog id="growth-outcome-dialog" class="month-summary-dialog" aria-labelledby="growth-outcome-title">
+      <div id="growth-outcome-body"></div>
       <form method="dialog" class="month-summary-actions">
         <button class="btn btn-primary" type="submit">Continue</button>
       </form>

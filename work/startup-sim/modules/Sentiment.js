@@ -1,4 +1,17 @@
-/** Board / investor sentiment (0–100). Gates follow-on rounds and enables down rounds. */
+/** Board / investor sentiment (0–100). Only active after Series A seats a lead investor. */
+
+export function hasInstitutionalBoard(state) {
+  return Boolean(state.flags?.seriesAClosed);
+}
+
+/** Called when Series A closes — board approval tracking begins. */
+export function seatInstitutionalBoard(state, reason = 'Series A lead takes a board seat.') {
+  if (!state.sentiment) state.sentiment = createInitialSentiment();
+  state.sentiment.score = 68;
+  state.sentiment.lastDelta = 0;
+  state.sentiment.lastReason = reason;
+  return state.sentiment.score;
+}
 
 export function createInitialSentiment() {
   return { score: 68, lastDelta: 0, lastReason: null };
@@ -9,6 +22,9 @@ export function clampSentiment(score) {
 }
 
 export function adjustSentiment(state, delta, reason) {
+  if (!hasInstitutionalBoard(state)) {
+    return state.sentiment?.score ?? 68;
+  }
   if (!state.sentiment) state.sentiment = createInitialSentiment();
   const next = clampSentiment(state.sentiment.score + delta);
   state.sentiment.lastDelta = next - state.sentiment.score;
@@ -34,12 +50,14 @@ export function runwayMonths(state) {
 
 /** Call after layoffs finalize. */
 export function onLayoffSentiment(state, layoffPct) {
+  if (!hasInstitutionalBoard(state)) return;
   if (layoffPct >= 0.15) adjustSentiment(state, -14, 'Major layoffs spooked the board.');
   else if (layoffPct > 0) adjustSentiment(state, -5, 'Headcount cuts noted in the board deck.');
 }
 
 /** Call at month end after revenue is finalized. */
 export function onMonthEndSentiment(state, priorRevenue, currentRevenue) {
+  if (!hasInstitutionalBoard(state)) return;
   if (priorRevenue > 0 && currentRevenue < priorRevenue * 0.7) {
     adjustSentiment(state, -8, 'Revenue slipped vs last month.');
   } else if (currentRevenue > priorRevenue * 1.05) {
@@ -49,11 +67,13 @@ export function onMonthEndSentiment(state, priorRevenue, currentRevenue) {
 
 /** After public stock tick. */
 export function onStockSentiment(state, deltaPct) {
+  if (!hasInstitutionalBoard(state)) return;
   if (deltaPct <= -0.06) adjustSentiment(state, -5, 'Stock drawdown worried lead investors.');
   else if (deltaPct >= 0.08) adjustSentiment(state, 3, 'Public market pop helped morale in the boardroom.');
 }
 
 export function onBoardSentiment(state, delta) {
+  if (!hasInstitutionalBoard(state)) return;
   adjustSentiment(state, delta, 'Board task completed.');
 }
 
@@ -87,6 +107,7 @@ export function seriesBGateSentiment(state) {
 }
 
 export function isDownRoundLikely(state) {
+  if (!hasInstitutionalBoard(state)) return false;
   const runway = runwayMonths(state);
   const score = state.sentiment?.score ?? 50;
   return runway != null && runway < 4 && score < 55;

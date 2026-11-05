@@ -15,9 +15,19 @@ import {
   seriesFPreview,
   renderCapTableRows
 } from './CapTable.js';
-import { renderFinanceSummary } from './Finance.js';
+import {
+  renderFinanceSummary,
+  getTaskRevenueMultiplierPreview,
+  getCoreTaskRevenueMult,
+  getSandboxTuningMult
+} from './Finance.js';
+import { progressionTierLabel } from './ProgressionEconomy.js';
 import { formatMoney } from './constants.js';
-import { sentimentLabel, seriesAGateSentiment, seriesBGateSentiment } from './Sentiment.js';
+import {
+  sentimentLabel,
+  seriesBGateSentiment,
+  hasInstitutionalBoard
+} from './Sentiment.js';
 import { setGameFeedback } from './GameFeedback.js';
 import {
   canStartInterview,
@@ -123,26 +133,22 @@ export function renderFinancePanel(container, state) {
     xcBlock = `<p class="fine-print">Reach ${formatMoney(100_000)} ARR to unlock XC.</p>`;
   }
 
-  const sentimentBlock = `<div class="sentiment-meter" role="meter" aria-valuenow="${sentimentScore}" aria-valuemin="0" aria-valuemax="100">
-      <span class="stat-label">Board sentiment</span>
+  const sentimentBlock = hasInstitutionalBoard(state)
+    ? `<div class="sentiment-meter" role="meter" aria-valuenow="${sentimentScore}" aria-valuemin="0" aria-valuemax="100">
+      <span class="stat-label">Board approval</span>
       <div class="sentiment-bar"><div class="sentiment-fill" style="width:${sentimentScore}%"></div></div>
       <span class="stat-value">${sentimentScore} — ${escapeHtml(sentimentLabel(sentimentScore))}</span>
       ${rival ? `<p class="fine-print">Rival in the news: <strong>${escapeHtml(rival)}</strong></p>` : ''}
-    </div>`;
+    </div>`
+    : `<p class="fine-print"><strong>Solo founder mode</strong> — no board yet. Close Series A to seat a lead investor; board approval then gates Series B+ and optional board prep on the Board tab.</p>`;
 
-  const seriesAScore = seriesAGateSentiment(state);
   const seriesBScore = seriesBGateSentiment(state);
   const seriesABlock =
     seriesA && !state.flags?.seriesAClosed
       ? `<div class="finance-action">
         <p><strong>Series A</strong> — raise ${formatMoney(seriesA.raised)} at ${formatMoney(seriesA.postMoney)} post-money.</p>
-        <p class="fine-print">${escapeHtml(seriesA.note)} Founder ~${seriesA.founderPctNow}% → ~${seriesA.founderPctAfterApprox}%.</p>
-        ${
-          seriesAScore < 30
-            ? `<p class="fine-print error">Board sentiment ${seriesAScore}/100 — need at least 30 before Series A (see Growth tab).</p>`
-            : ''
-        }
-        <button type="button" class="btn btn-primary btn-small" id="btn-close-series-a" ${seriesAScore < 30 ? 'disabled title="Raise board sentiment to 30+"' : ''}>Close Series A</button>
+        <p class="fine-print">${escapeHtml(seriesA.note)} Founder ~${seriesA.founderPctNow}% → ~${seriesA.founderPctAfterApprox}%. Seats your first board member — no approval score required yet.</p>
+        <button type="button" class="btn btn-primary btn-small" id="btn-close-series-a">Close Series A</button>
       </div>`
       : state.flags?.seriesAClosed
         ? `<p class="fine-print">Series A closed.</p>`
@@ -178,8 +184,17 @@ export function renderFinancePanel(container, state) {
           ? `<p class="fine-print">Lease a small office to close seed.</p>`
           : '';
 
+  const revMult = getTaskRevenueMultiplierPreview(state);
+  const coreMult = getCoreTaskRevenueMult(state);
+  const tuneMult = getSandboxTuningMult(state);
+  const multExpl =
+    state.mode === 'sandbox' && tuneMult !== 1
+      ? `${progressionTierLabel(state)}: ${coreMult.toFixed(2)}× progression × ${tuneMult.toFixed(2)}× sandbox = ${revMult.toFixed(2)}× on desk & Growth payouts.`
+      : `${progressionTierLabel(state)}: ${revMult.toFixed(2)}× on desk & Growth payouts (rounds + HQ + staff).`;
+
   container.innerHTML = `
     <p class="panel-lede">Cash from desk tasks lands right away. Payroll and rent bill when you close the month. Fundraising lives here, not on the desk.</p>
+    <p class="fine-print">${escapeHtml(multExpl)} Close rounds to jump task tiers and multiplier.</p>
     <div class="summary-grid">
       <div><span class="stat-label">Cash</span><span class="stat-value">${sum.cashLabel}</span></div>
       <div><span class="stat-label">Last month rev.</span><span class="stat-value">${sum.mrrLabel}</span></div>

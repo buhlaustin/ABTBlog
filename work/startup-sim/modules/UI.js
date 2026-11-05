@@ -24,9 +24,19 @@ import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
 import { renderProductActionsPanel } from './ProductActions.js';
-import { sentimentLabel } from './Sentiment.js';
+import { sentimentLabel, hasInstitutionalBoard } from './Sentiment.js';
+import { runwayLabel } from './MonthSummary.js';
 import { competitorRevenueMult } from './Competitor.js';
-import { getTaskRevenueMultiplierPreview } from './Finance.js';
+import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
+import {
+  getTaskRevenueMultiplierPreview,
+  getCoreTaskRevenueMult,
+  getSandboxTuningMult,
+  estimateTaskPayoutBand
+} from './Finance.js';
+import { progressionTierLabel } from './ProgressionEconomy.js';
+import { renderGrowthCampaignsBlock } from './GrowthCampaigns.js';
+import { launchLifecycleActive, launchPhaseLabel } from './LaunchLifecycle.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -58,6 +68,7 @@ export function populateCategorySelect(selectEl, categories) {
     const opt = document.createElement('option');
     opt.value = cat.id;
     opt.textContent = cat.label;
+    if (cat.blurb) opt.title = cat.blurb;
     selectEl.appendChild(opt);
   }
   if (categories.length > 0) {
@@ -144,6 +155,15 @@ export function renderGameHud(state) {
     mode.textContent = `${state.mode === 'sandbox' ? 'Sandbox' : 'Career'} · rev×${revMult.toFixed(2)}`;
   }
   if (mrr) mrr.textContent = formatMoney(state.finance.mrr ?? 0);
+  const boardTab = document.getElementById('tab-board');
+  if (boardTab) {
+    const showBoard = hasInstitutionalBoard(state);
+    boardTab.hidden = !showBoard;
+    boardTab.disabled = !showBoard;
+    if (!showBoard && getActiveTabId() === 'board') {
+      selectTab('desk');
+    }
+  }
   if (stock) {
     if (isPublicCompany(state)) {
       const pm = state.publicMarket ?? {};
@@ -185,8 +205,10 @@ export function renderDeskPanel(state) {
           const def = getTaskDef(offer.taskId);
           if (!def) return '';
           const sel = offer.selected ? 'task-offer selected' : 'task-offer';
+          const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
+          const launchTag = def.scheduleLaunch ? ' <span class="task-tag">Launch gate</span>' : '';
           return `<article class="${sel}">
-            <h3>${escapeHtml(def.title)}</h3>
+            <h3>${escapeHtml(def.title)}${sig}${launchTag}</h3>
             <p>${escapeHtml(def.description)}</p>
             <button type="button" class="btn btn-ghost btn-small" data-toggle-task-offer="${escapeHtml(offer.offerId)}">${offer.selected ? 'Selected' : 'Select'}</button>
           </article>`;
@@ -203,10 +225,16 @@ export function renderDeskPanel(state) {
         inst.status === 'pending'
           ? `<button type="button" class="btn btn-primary btn-small" data-complete-task="${escapeHtml(inst.instanceId)}">Complete</button>`
           : '<span class="task-done-label">Done</span>';
+      const band = estimateTaskPayoutBand(def, state);
+      const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
+      const rival =
+        def.rivalPressure && def.rivalPressure < 0
+          ? ` · rival heat ${def.rivalPressure}`
+          : '';
       return `<article class="${doneClass}">
-        <h3>${escapeHtml(def.title)}</h3>
+        <h3>${escapeHtml(def.title)}${sig}</h3>
         <p>${escapeHtml(def.description)}</p>
-        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Revenue band ${formatMoney(def.revenue?.[0] ?? 0)}–${formatMoney(def.revenue?.[1] ?? 0)}</p>
+        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${rival}</p>
         ${btn}
       </article>`;
     })
@@ -218,9 +246,13 @@ export function renderDeskPanel(state) {
   const monthSpend = state.calendar.monthSpend ?? 0;
 
   const tutorial = renderTutorialBanner(activeTutorialStep(state));
+  const launchBanner = launchLifecycleActive(state)
+    ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — desk offers are from the launch playbook until you graduate (complete post-launch months or leave the garage).</p>`
+    : '';
 
   desk.innerHTML = `
     ${tutorial}
+    ${launchBanner}
     ${
       catalogError
         ? '<p class="desk-feedback error" role="alert">Tasks did not load — reload the page. You cannot close the month until the desk is full.</p>'
@@ -237,6 +269,8 @@ export function renderDeskPanel(state) {
       <div><span class="stat-label">This month</span><span class="stat-value">+${formatMoney(monthRev)} / -${formatMoney(monthSpend)}</span></div>
       <div><span class="stat-label">Next gate</span><span class="stat-value">${escapeHtml(ms)}</span></div>
       <div><span class="stat-label">Pending</span><span class="stat-value">${pending.length}</span></div>
+      <div><span class="stat-label">Scale era</span><span class="stat-value">${escapeHtml(progressionTierLabel(state))}</span></div>
+      <div><span class="stat-label">Rev. mult</span><span class="stat-value">${getTaskRevenueMultiplierPreview(state).toFixed(2)}×</span></div>
     </div>
     ${
       lineupOpen
@@ -445,26 +479,44 @@ export function renderGrowthPanel(container, state) {
   const lastReason = state.sentiment?.lastReason;
   const pendingDesk = (state.calendar?.monthTasks ?? []).filter((t) => t.status === 'pending').length;
 
+  const coreMult = getCoreTaskRevenueMult(state);
+  const tuneMult = getSandboxTuningMult(state);
+  const totalMult = getTaskRevenueMultiplierPreview(state);
+  const era = progressionTierLabel(state);
+  const growthRuns = (state.growth?.campaignsThisMonth ?? []).length;
+  const growthSlots = growthCampaignSlots(state);
+  const growthLeft = growthCampaignsRemaining(state);
+  const multNote =
+    state.mode === 'sandbox' && tuneMult !== 1
+      ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong> · growth slots ${growthLeft}/${growthSlots} left${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
+      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — effective multiplier <strong>${totalMult.toFixed(2)}×</strong>${growthRuns ? ` · ${growthRuns}/${growthSlots} growth slot(s) used` : ` · ${growthLeft}/${growthSlots} growth slot(s) left`}.</p>`;
+
   container.innerHTML = `
-    <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks drive revenue; rivals and board mood nudge outcomes.</p>
+    <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks and paid campaigns below share the same multiplier math.</p>
+    ${multNote}
     <div class="summary-grid">
       <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>
       <div><span class="stat-label">Heat</span><span class="stat-value">${pressure}/5</span></div>
       <div><span class="stat-label">Rev. modifier</span><span class="stat-value">${(revMult * 100).toFixed(0)}%</span></div>
       <div><span class="stat-label">Buzz</span><span class="stat-value">${buzz}</span></div>
-      <div><span class="stat-label">Board</span><span class="stat-value">${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}</span></div>
+      ${
+        hasInstitutionalBoard(state)
+          ? `<div><span class="stat-label">Board approval</span><span class="stat-value">${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}</span></div>`
+          : `<div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(runwayLabel(state))}</span></div>`
+      }
       <div><span class="stat-label">Desk tasks left</span><span class="stat-value">${pendingDesk}</span></div>
     </div>
     ${
       rival
-        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Win months on the Desk and close strong revenue to cool rival heat.</p>`
+        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Strong revenue months, marketing desk tasks, and growth campaigns cool heat. Buzz decays each month — keep shipping.</p>`
         : ''
     }
     ${
-      lastReason
+      hasInstitutionalBoard(state) && lastReason
         ? `<p class="fine-print">Latest board note: ${escapeHtml(lastReason)}</p>`
-        : '<p class="fine-print">Ship desk tasks that match your category — growth and product level feed task payouts on Product.</p>'
+        : '<p class="fine-print">Desk tasks scale with funding rounds and HQ tier. Paid campaigns below do not use desk slots.</p>'
     }
+    ${renderGrowthCampaignsBlock(state)}
   `;
 }
 
@@ -482,8 +534,8 @@ export function renderProductPanel(container, state) {
 
   const pivotBlock = pivotAllowed
     ? `<form id="pivot-form" class="setup-form finance-action">
-        <p><strong>One-time pivot</strong> — reposition the company (buzz and board sentiment take a hit).</p>
-        <label for="pivot-category">New category</label>
+        <p><strong>One-time pivot</strong> — reposition the company (buzz hit${hasInstitutionalBoard(state) ? '; board approval drops if you have a board' : ''}).</p>
+        <label for="pivot-category">New industry</label>
         <select id="pivot-category" name="pivotCategory" required>
           <option value="" disabled selected>Choose new positioning…</option>
           ${options}
@@ -500,7 +552,7 @@ export function renderProductPanel(container, state) {
     <div class="summary-grid">
       <div><span class="stat-label">Product level</span><span class="stat-value">${state.product.level ?? 0}</span></div>
       <div><span class="stat-label">Buzz</span><span class="stat-value">${state.product.buzz ?? 0}</span></div>
-      <div><span class="stat-label">Category</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
+      <div><span class="stat-label">Industry</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
     </div>
     ${pivotBlock}
     <div id="product-actions-mount"></div>

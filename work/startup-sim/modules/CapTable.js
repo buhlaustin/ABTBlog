@@ -3,6 +3,7 @@ import {
   canRaiseSeriesA,
   canRaiseSeriesB,
   isDownRoundLikely,
+  seatInstitutionalBoard,
   seriesAGateSentiment,
   seriesBGateSentiment
 } from './Sentiment.js';
@@ -114,6 +115,7 @@ export function applySeedRound(state) {
     closedYear: state.calendar.year
   };
   state.flags.seedRoundClosed = true;
+  applyFundraiseMomentum(state, 'Seed');
   return { ok: true, raised, postMoney };
 }
 
@@ -181,7 +183,7 @@ function applyPricedRound(state, config) {
     return { ok: false, reason: 'Already public — no new primary rounds.' };
   }
   const sentiment = state.sentiment?.score ?? 50;
-  if (minSentiment != null && sentiment < minSentiment) {
+  if (minSentiment != null && state.flags?.seriesAClosed && sentiment < minSentiment) {
     return {
       ok: false,
       reason: sentimentBlockMessage ?? `Board sentiment too low (${sentiment}/100) for ${roundName}.`
@@ -219,7 +221,28 @@ function applyPricedRound(state, config) {
   };
   state.flags[setFlag] = true;
   if (downRound) state.flags.lastDownRound = true;
-  return { ok: true, raised, postMoney, downRound, roundName };
+  applyFundraiseMomentum(state, roundName);
+  let boardSeated = false;
+  if (setFlag === 'seriesAClosed') {
+    seatInstitutionalBoard(state);
+    boardSeated = true;
+  }
+  return { ok: true, raised, postMoney, downRound, roundName, boardSeated };
+}
+
+function applyFundraiseMomentum(state, roundName) {
+  const bumps = {
+    Seed: { product: 2, buzz: 2 },
+    'Series A': { product: 3, buzz: 4 },
+    'Series B': { product: 3, buzz: 5 },
+    'Series C': { product: 2, buzz: 4 },
+    'Series D': { product: 2, buzz: 3 },
+    'Series E': { product: 1, buzz: 3 },
+    'Series F': { product: 1, buzz: 2 }
+  };
+  const b = bumps[roundName] ?? { product: 1, buzz: 1 };
+  state.product.level = (state.product.level ?? 0) + b.product;
+  state.product.buzz = (state.product.buzz ?? 0) + b.buzz;
 }
 
 export function applySeriesA(state) {
@@ -234,9 +257,7 @@ export function applySeriesA(state) {
     investorId: 'series-a',
     investorLabel: 'Series A investors',
     requireFlag: 'seedRoundClosed',
-    setFlag: 'seriesAClosed',
-    minSentiment: 30,
-    sentimentBlockMessage: 'Board wants stronger momentum before Series A (sentiment below 30).'
+    setFlag: 'seriesAClosed'
   });
 }
 

@@ -65,6 +65,9 @@ export function nextRevenueMilestone(state) {
   if (tier !== 'medium' && arr < ARR_GATES.MEDIUM_OFFICE) {
     return { label: 'Medium office', amount: ARR_GATES.MEDIUM_OFFICE, metric: 'ARR' };
   }
+  if (tier !== 'campus' && arr < ARR_GATES.CAMPUS_HQ && state.flags?.seedRoundClosed) {
+    return { label: 'Company HQ (100 seats)', amount: ARR_GATES.CAMPUS_HQ, metric: 'ARR' };
+  }
   const ipoGate = getEffectiveIpoGate(state);
   if (arr < ipoGate) return { label: 'IPO eligibility', amount: ipoGate, metric: 'ARR' };
   if (!state.flags?.ipoFiled) return { label: 'File IPO', amount: ipoGate, metric: 'ARR' };

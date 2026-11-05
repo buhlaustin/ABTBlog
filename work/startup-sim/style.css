@@ -380,6 +380,10 @@ h1 {
   margin-bottom: 1rem;
 }
 
+.game-tabs button[hidden] {
+  display: none !important;
+}
+
 .game-tabs button {
   border: 1px solid var(--border);
   background: var(--surface);
@@ -537,6 +541,27 @@ h1 {
   font-size: 0.8rem;
   color: var(--success);
   font-weight: 600;
+}
+
+.launch-phase-banner {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  border-left: 3px solid var(--accent-dim, #6b4ce6);
+  background: color-mix(in srgb, var(--surface) 92%, var(--accent-dim) 8%);
+}
+
+.task-tag {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  color: var(--accent, #6b4ce6);
+  border: 1px solid currentColor;
+  border-radius: 4px;
 }
 
 .desk-actions {

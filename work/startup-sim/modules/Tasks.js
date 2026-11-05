@@ -1,19 +1,54 @@
 import { fetchGameJson } from './utils.js';
 import { STAGES, getMonthlyTaskSlots, getMonthlyTaskOfferCount } from './constants.js';
 import { getTaskStage } from './Workspace.js';
+import { progressionTier } from './ProgressionEconomy.js';
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
+import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
+import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
+import {
+  currentLaunchTaskPhase,
+  launchPhaseAllowed,
+  launchLifecycleActive
+} from './LaunchLifecycle.js';
 
 /** Shipped catalog — always available with the game bundle. */
-let taskCatalog = bundledCatalog;
+function mergeSignatureTasks(base) {
+  const sig = bundledSignature?.tasks ?? [];
+  if (!sig.length) return base;
+  const ids = new Set((base.tasks ?? []).map((t) => t.id));
+  const merged = [...(base.tasks ?? [])];
+  for (const t of sig) {
+    if (!ids.has(t.id)) merged.push(t);
+  }
+  return { ...base, tasks: merged };
+}
+
+function mergeLaunchTasks(base) {
+  const launch = bundledLaunch?.tasks ?? [];
+  if (!launch.length) return base;
+  const ids = new Set((base.tasks ?? []).map((t) => t.id));
+  const merged = [...(base.tasks ?? [])];
+  for (const t of launch) {
+    if (!ids.has(t.id)) merged.push(t);
+  }
+  return { ...base, tasks: merged };
+}
+
+function mergeCatalog(base) {
+  return mergeLaunchTasks(mergeSignatureTasks(base));
+}
+
+let taskCatalog = mergeCatalog(bundledCatalog);
 
 export async function loadTaskCatalog() {
   if (!taskCatalog?.tasks?.length) {
     throw new Error('startup-sim: bundled tasks.json is empty');
   }
+  taskCatalog = mergeCatalog(taskCatalog);
   try {
     const data = await fetchGameJson('data/tasks.json');
     if (Array.isArray(data?.tasks) && data.tasks.length > 0) {
-      taskCatalog = data;
+      taskCatalog = mergeCatalog(data);
     }
   } catch {
     /* keep bundled catalog */
@@ -31,7 +66,7 @@ export function isTaskCatalogReady() {
 
 /** Used by headless smoke tests only (loads tasks.json without fetch). */
 export function hydrateTaskCatalog(data) {
-  if (data?.tasks?.length) taskCatalog = data;
+  if (data?.tasks?.length) taskCatalog = mergeCatalog(data);
 }
 
 function shuffle(arr) {
@@ -44,7 +79,7 @@ function shuffle(arr) {
 }
 
 /** Months of dealt task ids to deprioritize when building the next desk lineup. */
-const RECENT_TASK_COOLDOWN_MONTHS = 5;
+const RECENT_TASK_COOLDOWN_MONTHS = 8;
 
 /**
  * Pick up to `slots` tasks from `pool` with unique ids per month.
@@ -69,6 +104,13 @@ export function pickMonthlyTaskDefs(pool, slots, recentTaskIds = []) {
       used.add(def.id);
       picked.push(def);
     }
+  }
+
+  const signaturePool = pool.filter((t) => t.signature);
+  if (signaturePool.length && slots > 0 && !pool.some((t) => t.launchPhase)) {
+    const sig = shuffle(signaturePool)[0];
+    used.add(sig.id);
+    picked.push(sig);
   }
 
   takeUnique(fresh.length ? fresh : pool);
@@ -120,11 +162,43 @@ function stageAllowed(task, stage) {
   return stages.includes(stage);
 }
 
+function inferredTierBand(task) {
+  if (task.tierMin != null || task.tierMax != null) {
+    return { min: task.tierMin ?? 0, max: task.tierMax ?? 99 };
+  }
+  const stages = task.stages ?? [];
+  const rMax = task.revenue?.[1] ?? 0;
+  if (stages.includes('garage') || stages.includes('office')) {
+    return { min: 0, max: 1 };
+  }
+  if (stages.includes('xc')) {
+    return { min: 0, max: 2 };
+  }
+  if (stages.includes('public')) {
+    return { min: 5, max: 99 };
+  }
+  if (rMax >= 500_000) return { min: 5, max: 99 };
+  if (rMax >= 120_000) return { min: 4, max: 99 };
+  if (rMax >= 40_000) return { min: 3, max: 5 };
+  if (rMax >= 12_000) return { min: 2, max: 4 };
+  return { min: 1, max: 2 };
+}
+
+function taskTierAllowed(task, state) {
+  const tier = progressionTier(state);
+  const { min, max } = inferredTierBand(task);
+  return tier >= min && tier <= max;
+}
+
 function buildTaskPool(state) {
   const taskStage = getTaskStage(state);
   const categoryId = state.company?.categoryId;
   return getTaskDefinitions().filter(
-    (t) => stageAllowed(t, taskStage) && categoryAllowed(t, categoryId)
+    (t) =>
+      stageAllowed(t, taskStage) &&
+      categoryAllowed(t, categoryId) &&
+      taskTierAllowed(t, state) &&
+      launchPhaseAllowed(t, state)
   );
 }
 
@@ -146,7 +220,21 @@ export function dealMonthlyTasks(state) {
   }
   state.calendar.taskCatalogError = false;
   const recent = state.calendar.recentTaskIds ?? [];
-  const offered = pickMonthlyTaskDefs(pool, offerCount, recent);
+  let offered = pickMonthlyTaskDefs(pool, offerCount, recent);
+  const launchDesk = currentLaunchTaskPhase(state);
+  if (launchDesk === 'pre_launch' && state.launch?.phase === 'pre_launch') {
+    const sched = pool.find((t) => t.scheduleLaunch);
+    if (sched && !offered.some((t) => t.id === sched.id)) {
+      offered = [sched, ...offered.filter((t) => t.id !== sched.id)].slice(0, offerCount);
+    }
+  }
+  if (!launchLifecycleActive(state)) {
+    const sigPool = pool.filter((t) => t.signature);
+    if (sigPool.length && !offered.some((t) => t.signature) && offered.length > 0) {
+      const sig = shuffle(sigPool)[0];
+      offered = [...offered.slice(0, -1), sig];
+    }
+  }
   state.calendar.monthTaskSlotTarget = slots;
   state.calendar.monthTaskOffers = offered.map((def, index) => ({
     offerId: `${state.calendar.year}-${state.calendar.monthIndex}-offer-${def.id}-${index}`,

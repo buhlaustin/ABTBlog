@@ -12,12 +12,13 @@ import {
 import { completeBoardTask } from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
+import { runGrowthCampaign, loadGrowthCampaigns } from './modules/GrowthCampaigns.js';
+import { openGrowthCampaignOutcomeDialog } from './modules/GrowthOutcome.js';
 import {
-  openExecutiveHireFlow,
-  hireExecutiveCandidate,
-  cancelExecutiveHire,
-  fireExecutive
-} from './modules/Executives.js';
+  getCoreTaskRevenueMult,
+  getSandboxTuningMult,
+  getTaskRevenueMultiplierPreview
+} from './modules/Finance.js';
 import { runProductAction, showProductActionFeedback } from './modules/ProductActions.js';
 import {
   initNarrativeApiUrl,
@@ -28,6 +29,7 @@ import {
 } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
+import { onScheduleLaunchTaskCompleted } from './modules/LaunchLifecycle.js';
 import { formatMoney } from './modules/GameState.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './modules/Progression.js';
 import { fileIpo, fetchIpoPress, cashOut } from './modules/IPO.js';
@@ -246,6 +248,15 @@ function handleCompleteTask(instanceId) {
     sessionState,
     `“${def.title}” — +${formatMoney(revenue)} revenue, -${formatMoney(cost)} spend.`
   );
+  if (def.scheduleLaunch) {
+    const sched = onScheduleLaunchTaskCompleted(sessionState);
+    for (const line of sched.lines ?? []) {
+      appendLog(sessionState, line);
+    }
+    if (sched.ok) {
+      showDeskFeedback('Public launch scheduled for next month.');
+    }
+  }
 
   const priorStage = sessionState.stage;
   syncStageFromProgress(sessionState);
@@ -435,6 +446,9 @@ function handleCloseSeriesA() {
     sessionState,
     `Series A — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post${result.downRound ? ' (down round)' : ''}.`
   );
+  if (result.boardSeated) {
+    appendLog(sessionState, 'Lead investor seated — board approval tracking and Board tab unlocked.');
+  }
   showFinanceFeedback(result.downRound ? 'Series A closed on down-round terms.' : 'Series A closed.');
   refresh();
 }
@@ -626,48 +640,38 @@ function bindGameInteractions() {
       return;
     }
 
-    if (e.target.id === 'btn-start-exec-hire' && sessionState) {
-      const titleEl = document.getElementById('exec-role-title');
-      const title = titleEl?.value ?? 'COO';
-      openExecutiveHireFlow(sessionState, title).then((result) => {
-        if (!result.ok) showPeopleFeedback(result.reason, true);
-        else showPeopleFeedback('Pick a candidate below.');
+    const growthBtn = e.target.closest('[data-run-growth]');
+    if (growthBtn && sessionState) {
+      void (async () => {
+        const id = growthBtn.getAttribute('data-run-growth');
+        const result = runGrowthCampaign(sessionState, id);
+        if (!result.ok) {
+          setGameFeedback(result.reason || 'Could not launch campaign.', true);
+          refresh();
+          return;
+        }
+        appendLog(
+          sessionState,
+          `Growth: ${result.def.title} — spent ${formatMoney(result.cost)}, booked ${formatMoney(result.revenue)}.`
+        );
         refresh();
-      });
-      return;
-    }
-
-    if (e.target.id === 'btn-cancel-exec-hire' && sessionState) {
-      cancelExecutiveHire(sessionState);
-      showPeopleFeedback('');
-      refresh();
-      return;
-    }
-
-    const fireExecBtn = e.target.closest('[data-fire-exec]');
-    if (fireExecBtn && sessionState) {
-      const id = fireExecBtn.getAttribute('data-fire-exec');
-      if (!window.confirm('Release this executive? Payroll drops next month.')) return;
-      const result = fireExecutive(sessionState, id);
-      if (!result.ok) showPeopleFeedback(result.reason, true);
-      else {
-        appendLog(sessionState, `Released ${result.removed.name} (${result.removed.roleTitle}).`);
-        showPeopleFeedback(`${result.removed.name} left the company.`);
-      }
-      refresh();
-      return;
-    }
-
-    const hireExecBtn = e.target.closest('[data-hire-exec]');
-    if (hireExecBtn && sessionState) {
-      const id = hireExecBtn.getAttribute('data-hire-exec');
-      const result = hireExecutiveCandidate(sessionState, id);
-      if (!result.ok) showPeopleFeedback(result.reason, true);
-      else {
-        appendLog(sessionState, `Hired ${result.executive.name} as ${result.executive.roleTitle}.`);
-        showPeopleFeedback(`${result.executive.name} joined as ${result.executive.roleTitle}.`);
-      }
-      refresh();
+        const core = getCoreTaskRevenueMult(sessionState);
+        const tune = getSandboxTuningMult(sessionState);
+        const total = getTaskRevenueMultiplierPreview(sessionState);
+        const multLine =
+          sessionState.mode === 'sandbox' && tune !== 1
+            ? `${core.toFixed(2)}× progression × ${tune.toFixed(2)}× sandbox = ${total.toFixed(2)}× on this payout.`
+            : `${total.toFixed(2)}× effective multiplier on this payout.`;
+        await openGrowthCampaignOutcomeDialog({
+          title: result.def.title,
+          cost: result.cost,
+          revenue: result.revenue,
+          buzzDelta: result.def.buzz ?? 0,
+          multLine
+        });
+        setGameFeedback(`${result.def.title} launched.`);
+        refresh();
+      })();
       return;
     }
 
@@ -1047,6 +1051,7 @@ async function init() {
         loadTaskCatalog(),
         loadHubData(),
         loadAccelerators(),
+        loadGrowthCampaigns(),
         loadAssetManifest(),
         initNarrativeApiUrl(),
         preloadCrisisCatalog(),
