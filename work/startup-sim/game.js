@@ -503,7 +503,17 @@ async function handleFileIpo() {
     sessionState,
     `${result.ticker} listed at ${formatMoney(result.openPrice)}/share — welcome to the public markets.`
   );
-  showFinanceFeedback(`${result.ticker} is live.`);
+  if (result.primaryProceeds > 0) {
+    appendLog(
+      sessionState,
+      `IPO primary raised ${formatMoney(result.primaryProceeds)} — cash now on the balance sheet.`
+    );
+  }
+  showFinanceFeedback(
+    result.primaryProceeds > 0
+      ? `${result.ticker} is live — ${formatMoney(result.primaryProceeds)} primary added to company cash.`
+      : `${result.ticker} is live.`
+  );
   refresh();
 }
 
@@ -557,22 +567,23 @@ function handleCloseAngelSafe() {
   refresh();
 }
 
-function handleCloseSeed() {
+function handleCloseSeed(structure = 'standard') {
   if (!sessionState) return;
-  const result = closeSeedRound(sessionState);
+  const result = closeSeedRound(sessionState, structure);
   if (!result.ok) {
     showFinanceFeedback(result.reason || 'Cannot close seed.', true);
     refresh();
     return;
   }
+  const label = structure === 'lean' ? 'Lean seed' : 'Seed round';
   appendLog(
     sessionState,
-    `Closed seed round — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post-money.`
+    `Closed ${label} — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post-money.`
   );
   for (const line of result.safeLines ?? []) {
     appendLog(sessionState, line);
   }
-  showFinanceFeedback('Seed round closed.');
+  showFinanceFeedback(`${label} closed.`);
   refresh();
 }
 
@@ -1169,7 +1180,12 @@ function bindGameInteractions() {
       return;
     }
     if (e.target.id === 'btn-close-seed') {
-      handleCloseSeed();
+      handleCloseSeed('standard');
+      return;
+    }
+    const seedStructBtn = e.target.closest('[data-seed-structure]');
+    if (seedStructBtn && sessionState) {
+      handleCloseSeed(seedStructBtn.getAttribute('data-seed-structure'));
       return;
     }
     const loanBtn = e.target.closest('[data-loan-draw]');

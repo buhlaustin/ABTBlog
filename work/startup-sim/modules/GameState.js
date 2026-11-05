@@ -290,6 +290,8 @@ export function normalizeSave(raw) {
       if (pm.priceSalesMultiple === undefined) pm.priceSalesMultiple = null;
       if (pm.lastMonthDeltaPct === undefined) pm.lastMonthDeltaPct = null;
       if (!pm.lastTickDrivers) pm.lastTickDrivers = [];
+      if (pm.ipoPrimaryProceeds === undefined) pm.ipoPrimaryProceeds = 0;
+      if (pm.ipoPrimaryShares === undefined) pm.ipoPrimaryShares = 0;
     }
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);

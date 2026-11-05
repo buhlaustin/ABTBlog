@@ -3,7 +3,7 @@ import { getEffectiveIpoGate } from './SandboxTuning.js';
 import { getArr } from './Workspace.js';
 import { calendarTurn } from './XC.js';
 import {
-  ensurePublicFloatOnCapTable,
+  applyPublicListingCapTable,
   getFounderRow,
   issueFollowOnShares,
   recalculateCapTablePercentages,
@@ -74,9 +74,14 @@ export function fileIpo(state) {
 
   const valuation = computeIpoValuation(state);
   const ipoPrice = targetIpoSharePrice(state, valuation);
-  const shares = ensurePublicFloatOnCapTable(state, valuation, ipoPrice);
   const pop = 1.08 + Math.random() * 0.12;
   const openPrice = Math.round(ipoPrice * pop * 100) / 100;
+  const openValuation = Math.round(valuation * pop);
+  const listing = applyPublicListingCapTable(state, openValuation, openPrice, { primaryFdPct: 0.1 });
+  const primaryProceeds = listing.primaryProceeds ?? 0;
+  if (primaryProceeds > 0) {
+    state.finance.cash = (state.finance.cash ?? 0) + primaryProceeds;
+  }
 
   state.publicMarket = state.publicMarket ?? createInitialPublicMarket();
   state.publicMarket.ticker = deriveTicker(state.company?.name);
@@ -100,18 +105,31 @@ export function fileIpo(state) {
   state.publicMarket.indexName = 'FTEQ-100';
   state.publicMarket.marketTape = [];
   state.publicMarket.institutionalHoldPct = 38 + Math.floor(Math.random() * 8);
+  pushMarketTape(
+    state,
+    `IPO primary ${formatMoney(primaryProceeds)} (${listing.primaryShares?.toLocaleString('en-US') ?? '—'} new shares) hits the balance sheet.`
+  );
   pushMarketTape(state, `Listed at ${formatMoney(openPrice)} — opening pop ${Math.round((pop - 1) * 100)}%.`);
   refreshAnalystCoverage(state, { force: true });
   computeFundamentalSharePrice(state);
 
   state.finance.valuation = Math.round(openPrice * totalOutstandingShares(state));
+  state.publicMarket.ipoPrimaryProceeds = primaryProceeds;
+  state.publicMarket.ipoPrimaryShares = listing.primaryShares ?? 0;
   state.flags.ipoFiled = true;
   state.stage = STAGES.PUBLIC;
   state.finance.fixedCostsMonthly = 6_500;
   if (!state.meta) state.meta = {};
   state.meta.monthsAtIpo = calendarTurn(state);
 
-  return { ok: true, ticker: state.publicMarket.ticker, openPrice, valuation: state.finance.valuation };
+  return {
+    ok: true,
+    ticker: state.publicMarket.ticker,
+    openPrice,
+    valuation: state.finance.valuation,
+    primaryProceeds,
+    primaryShares: listing.primaryShares ?? 0
+  };
 }
 
 export function founderStakeValue(state) {
@@ -808,7 +826,7 @@ export function renderIpoPanel(container, state) {
   if (canFileIpo(state)) {
     block = `<div class="finance-action ipo-action">
       <p><strong>IPO window open</strong> — You crossed ${formatMoney(getEffectiveIpoGate(state))} ARR. File to list on the fictional exchange.</p>
-      <p class="fine-print">Market sentiment from recent news can nudge the opening pop. After listing, the stock updates each month.</p>
+      <p class="fine-print">Listing sells ~10% primary shares at the open — proceeds deposit to company cash. Market sentiment nudges the opening pop; the stock updates each month.</p>
       <button type="button" class="btn btn-primary btn-small" id="btn-file-ipo">File IPO</button>
     </div>`;
   } else if (isPublicCompany(state) && !state.flags?.cashedOut) {
@@ -857,7 +875,7 @@ export function renderIpoPanel(container, state) {
         <div><span class="stat-label">52-week</span><span class="stat-value">${formatMoney(pm.low52 ?? pm.sharePrice ?? 0)} – ${formatMoney(pm.high52 ?? pm.sharePrice ?? 0)}</span></div>
       </div>
       <details class="stock-drivers-details"><summary>Last month price drivers</summary>${driverList}</details>
-      <p class="fine-print">${monthsPub} month(s) public${earningsThisMonth ? ' · <strong>earnings month</strong>' : earningsSoon ? ' · earnings next month' : ''}${pm.indexMember ? ` · ${escapeHtml(pm.indexName ?? 'Index')}` : ''} · buyback auth ${formatMoney(pm.buybackAuthorized ?? 0)}${pm.dividendPerShareLast ? ` · last div $${Number(pm.dividendPerShareLast).toFixed(2)}/sh` : ''}. Monthly mark re-rates toward ARR×P/S with growth, guidance, and cash runway.</p>
+      <p class="fine-print">${monthsPub} month(s) public${pm.ipoPrimaryProceeds ? ` · IPO primary ${formatMoney(pm.ipoPrimaryProceeds)} (${(pm.ipoPrimaryShares ?? 0).toLocaleString('en-US')} sh)` : ''}${earningsThisMonth ? ' · <strong>earnings month</strong>' : earningsSoon ? ' · earnings next month' : ''}${pm.indexMember ? ` · ${escapeHtml(pm.indexName ?? 'Index')}` : ''} · buyback auth ${formatMoney(pm.buybackAuthorized ?? 0)}${pm.dividendPerShareLast ? ` · last div $${Number(pm.dividendPerShareLast).toFixed(2)}/sh` : ''}. Monthly mark re-rates toward ARR×P/S with growth, guidance, and cash runway.</p>
       ${
         (pm.marketTape?.length ?? 0) > 0
           ? `<ul class="stock-tape">${pm.marketTape

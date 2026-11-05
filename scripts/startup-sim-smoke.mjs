@@ -501,7 +501,7 @@ if (!isXcDemoDayMonth(demoState)) {
     onDemoDayTaskCompleted(demoState);
     applyDemoDayPitchChoice(demoState, 0);
     const terms = getSeedRoundTerms(demoState);
-    if (terms.raised !== 3_400_000 || terms.postMoney !== 17_000_000) {
+    if (terms.raised !== 3_200_000 || terms.postMoney !== 19_000_000) {
       console.error(`FAIL: focused Demo Day pitch seed terms ${JSON.stringify(terms)}`);
       failed = true;
     } else {
@@ -814,7 +814,8 @@ pub.flags.seedRoundClosed = true;
 pub.flags.ipoUnlocked = true;
 pub.finance.mrr = 5_000_000;
 pub.finance.monthlyBurn = 400_000;
-pub.finance.cash = 50_000_000;
+const cashBeforeIpo = 50_000_000;
+pub.finance.cash = cashBeforeIpo;
 const ipo = fileIpo(pub);
 const floatRow = pub.capTable?.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
 const listPrice = pub.publicMarket?.sharePrice ?? 0;
@@ -827,8 +828,21 @@ if (!ipo.ok) {
 } else if (listPrice > 450 || listPrice < 5) {
   console.error(`FAIL: IPO share price out of band (${listPrice})`);
   failed = true;
+} else if ((pub.finance.cash ?? 0) <= cashBeforeIpo) {
+  console.error(`FAIL: IPO should add primary proceeds to company cash (before ${cashBeforeIpo}, after ${pub.finance.cash})`);
+  failed = true;
+} else if ((ipo.primaryProceeds ?? 0) <= 0) {
+  console.error('FAIL: fileIpo should report primary proceeds');
+  failed = true;
 } else {
-  console.log(`OK: IPO public float on cap table (${floatRow.pct}% float, ${formatMoney(listPrice)}/share)`);
+  const founder = getFounderRow(pub);
+  if ((founder?.pct ?? 0) < 18) {
+    console.error(`FAIL: founder pct at IPO too low (${founder?.pct}%) after float fix`);
+    failed = true;
+  }
+  console.log(
+    `OK: IPO primary + float (${formatMoney(ipo.primaryProceeds)} primary, founder ${founder?.pct}%, ${formatMoney(listPrice)}/share)`
+  );
   const tone = setPublicGuidanceTone(pub, 'aggressive');
   if (!tone.ok || whisperRevenueTarget(pub) <= 0) {
     console.error('FAIL: public guidance / whisper target');

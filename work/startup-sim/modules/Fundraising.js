@@ -82,8 +82,8 @@ export function canCloseSeed(state) {
   );
 }
 
-export function closeSeedRound(state) {
-  return applySeedRound(state);
+export function closeSeedRound(state, structure = 'standard') {
+  return applySeedRound(state, { structure });
 }
 
 export function closeSeriesA(state) {
@@ -305,8 +305,12 @@ export function renderFinancePanel(container, state) {
   const seedBlock = canCloseSeed(state) && preview
     ? `<div class="finance-action">
         <p><strong>Seed round</strong> — raise ${formatMoney(preview.raised)} at ${formatMoney(preview.postMoney)} post-money.</p>
-        <p class="fine-print">${escapeHtml(preview.note)} Founder ~${preview.founderPctNow}% → ~${preview.founderPctAfterApprox}%.${seedPreviewNote}</p>
-        <button type="button" class="btn btn-primary btn-small" id="btn-close-seed">Close seed round</button>
+        <p class="fine-print">${escapeHtml(preview.note)} Founder ~${preview.founderPctNow}% → ~${preview.founderPctAfterApprox}% (8% ESOP).${seedPreviewNote}</p>
+        <div class="stock-actions">
+          <button type="button" class="btn btn-primary btn-small" id="btn-close-seed">Close seed (Demo Day terms)</button>
+          <button type="button" class="btn btn-ghost btn-small" data-seed-structure="lean" ${preview.leanSeedOk ? '' : 'disabled'} title="${preview.leanSeedOk ? '' : escapeHtml(preview.leanSeedReason ?? '')}">Lean close — ${formatMoney(preview.leanRaised)} @ ${formatMoney(preview.leanPostMoney)} post (~${preview.founderPctAfterLean}% founder)</button>
+        </div>
+        ${preview.leanSeedOk ? '' : `<p class="fine-print">${escapeHtml(preview.leanSeedReason ?? '')}</p>`}
       </div>`
     : state.flags?.seedRoundClosed
       ? `<p class="fine-print">Seed round closed${state.finance.lastRound ? ` — ${formatMoney(state.finance.lastRound.raised)} at ${formatMoney(state.finance.lastRound.postMoney)} post.` : '.'}</p>`
