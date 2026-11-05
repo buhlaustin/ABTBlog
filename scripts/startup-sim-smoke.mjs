@@ -762,6 +762,7 @@ const {
   subsidiaryValuationMark,
   tickAcquisitionsAtMonthStart
 } = await import(`file://${join(sim, 'modules/Acquisitions.js')}`);
+const { portfolioPulseSummary } = await import(`file://${join(sim, 'modules/Companies.js')}`);
 await preloadAcquisitionCatalog();
 if (getAcquisitionCatalog().length !== 99) {
   console.error(`FAIL: expected 99 acquisition targets, got ${getAcquisitionCatalog().length}`);
@@ -832,6 +833,13 @@ if (!buy.ok) {
     failed = true;
   } else {
     console.log(`OK: portfolio mark drift (${markBefore.toFixed(3)}× → ${markAfter.toFixed(3)}×)`);
+  }
+  const pulse = portfolioPulseSummary(acqState);
+  if (pulse.portfolioMrr < 1 || pulse.exitVal <= 0 || pulse.invested <= 0) {
+    console.error('FAIL: portfolio pulse summary');
+    failed = true;
+  } else {
+    console.log(`OK: companies pulse (MRR ${formatMoney(pulse.portfolioMrr)}/mo, unrealized ${formatMoney(pulse.unrealized)})`);
   }
 }
 

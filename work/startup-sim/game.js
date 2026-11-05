@@ -187,6 +187,7 @@ import {
   setCompaniesMarketSearch,
   runDueDiligence
 } from './modules/Acquisitions.js';
+import { setCompaniesSection } from './modules/Companies.js';
 import { openMonthSummaryDialog, updateMonthSummaryHeadline } from './modules/MonthSummary.js';
 import { copyRunExportToClipboard } from './modules/RunExport.js';
 import {
@@ -1159,6 +1160,12 @@ function bindGameInteractions() {
     const peopleTab = e.target.closest('[data-people-tab]');
     if (peopleTab && sessionState) {
       setPeopleSection(sessionState, peopleTab.getAttribute('data-people-tab'));
+      refresh();
+      return;
+    }
+    const companiesTab = e.target.closest('[data-companies-tab]');
+    if (companiesTab && sessionState) {
+      setCompaniesSection(sessionState, companiesTab.getAttribute('data-companies-tab'));
       refresh();
       return;
     }

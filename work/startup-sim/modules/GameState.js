@@ -503,6 +503,7 @@ export function normalizeSave(raw) {
     if (!state.acquisitions.diligenceReports) state.acquisitions.diligenceReports = {};
     if (!state.acquisitions.fireSaleIds) state.acquisitions.fireSaleIds = [];
     if (state.acquisitions.fireSaleTurn === undefined) state.acquisitions.fireSaleTurn = null;
+    if (!state.acquisitions.companiesSection) state.acquisitions.companiesSection = 'pulse';
     if (!state.acquisitions.marketSort) state.acquisitions.marketSort = 'ask';
     if (state.acquisitions.marketSearch === undefined) state.acquisitions.marketSearch = '';
     for (const h of state.acquisitions.owned) {
