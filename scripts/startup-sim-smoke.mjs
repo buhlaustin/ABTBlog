@@ -900,7 +900,7 @@ if (!failed) {
   }
 }
 
-const { hireCoo, isCooHired, cooSalaryMonthly } = await import(
+const { hireCoo, isCooHired, cooSalaryMonthly, garageCooSalaryFromEquity } = await import(
   `file://${join(sim, 'modules/Coo.js')}`
 );
 const { getFounderRow } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
@@ -909,18 +909,35 @@ const garageState = createInitialState({
   categoryId: 'b2b-saas',
   mode: 'career'
 });
-const hire = hireCoo(garageState, { firstName: 'Riley', lastName: 'Chen', equityPct: 2 });
-if (!hire.ok || !isCooHired(garageState)) {
-  console.error(`FAIL: garage COO hire: ${hire.reason ?? 'unknown'}`);
+if (garageCooSalaryFromEquity(5) !== 2500 || garageCooSalaryFromEquity(10) !== 0) {
+  console.error('FAIL: garage COO equity/salary curve (5%→2.5K, 10%→0)');
+  failed = true;
+}
+const hireLow = hireCoo(garageState, { firstName: 'Riley', lastName: 'Chen', equityPct: 2 });
+if (!hireLow.ok || !isCooHired(garageState)) {
+  console.error(`FAIL: garage COO hire: ${hireLow.reason ?? 'unknown'}`);
   failed = true;
 } else {
   const founderBefore = getFounderRow(garageState)?.pct ?? 100;
-  if (founderBefore >= 99 || cooSalaryMonthly(garageState) < 7000) {
-    console.error(`FAIL: COO equity/salary founder=${founderBefore} sal=${cooSalaryMonthly(garageState)}`);
+  const sal2 = cooSalaryMonthly(garageState);
+  if (founderBefore >= 99 || sal2 <= 2500 || sal2 >= 7500) {
+    console.error(`FAIL: COO 2% salary band founder=${founderBefore} sal=${sal2}`);
     failed = true;
   } else {
     console.log('OK: named COO from garage with equity on cap table');
   }
+}
+const garageZero = createInitialState({
+  companyName: 'Garage COO Zero',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+const hireMax = hireCoo(garageZero, { firstName: 'Jordan', lastName: 'Lee', equityPct: 10 });
+if (!hireMax.ok || cooSalaryMonthly(garageZero) !== 0) {
+  console.error(`FAIL: 10% garage COO should be $0/mo sal=${cooSalaryMonthly(garageZero)}`);
+  failed = true;
+} else {
+  console.log('OK: 10% garage COO at $0/mo');
 }
 
 const { growthCampaignCatalogSize } = await import(

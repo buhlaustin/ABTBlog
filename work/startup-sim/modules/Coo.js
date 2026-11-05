@@ -3,8 +3,8 @@ import { grantExecutiveEquity } from './CapTable.js';
 import { calendarTurn } from './GameCalendar.js';
 import bundledExecNames from '../data/exec-names.json' with { type: 'json' };
 
+/** Cash comp by workspace tier once you leave the garage (garage uses equity tradeoff). */
 const COO_SALARY_BY_TIER = {
-  garage: 7_500,
   small: 11_000,
   medium: 14_000,
   large: 16_500,
@@ -12,11 +12,17 @@ const COO_SALARY_BY_TIER = {
   hub: 21_000
 };
 
+const GARAGE_SALARY_AT_MIN_EQUITY = 7_500;
+const GARAGE_MIN_EQUITY_PCT = 0.5;
+const GARAGE_MID_EQUITY_PCT = 5;
+const GARAGE_MID_SALARY = 2_500;
+const GARAGE_MAX_EQUITY_PCT = 10;
+
 function workspaceTierKey(state) {
   return state.workspace?.tier ?? 'garage';
 }
 
-export const COO_EQUITY_OPTIONS = [0.5, 1, 1.5, 2, 3, 5];
+export const COO_EQUITY_OPTIONS = [0.5, 1, 1.5, 2, 3, 5, 7.5, 10];
 
 export function createInitialCooState() {
   return {
@@ -46,15 +52,38 @@ export function isCooHired(state) {
   return Boolean(state.coo?.hired);
 }
 
+/** Garage-only: more equity → less cash (10% → $0 like the CEO; 5% → $2.5K/mo). */
+export function garageCooSalaryFromEquity(equityPct) {
+  const eq = Number(equityPct);
+  if (!Number.isFinite(eq) || eq >= GARAGE_MAX_EQUITY_PCT) return 0;
+  if (eq >= GARAGE_MID_EQUITY_PCT) {
+    return Math.round(GARAGE_MID_SALARY * ((GARAGE_MAX_EQUITY_PCT - eq) / (GARAGE_MAX_EQUITY_PCT - GARAGE_MID_EQUITY_PCT)));
+  }
+  if (eq <= GARAGE_MIN_EQUITY_PCT) return GARAGE_SALARY_AT_MIN_EQUITY;
+  const t = (eq - GARAGE_MIN_EQUITY_PCT) / (GARAGE_MID_EQUITY_PCT - GARAGE_MIN_EQUITY_PCT);
+  return Math.round(GARAGE_SALARY_AT_MIN_EQUITY + t * (GARAGE_MID_SALARY - GARAGE_SALARY_AT_MIN_EQUITY));
+}
+
 export function cooSalaryMonthly(state) {
   if (!isCooHired(state)) return 0;
+  const tier = workspaceTierKey(state);
+  if (tier === 'garage') {
+    return garageCooSalaryFromEquity(state.coo?.equityPct ?? 0);
+  }
   const stored = state.coo?.salaryMonthly;
-  if (stored > 0) return stored;
-  return defaultCooSalaryForTier(workspaceTierKey(state));
+  if (typeof stored === 'number' && stored >= 0) return stored;
+  return defaultCooSalaryForTier(tier);
+}
+
+export function previewCooSalaryMonthly(state, equityPct) {
+  const tier = workspaceTierKey(state);
+  if (tier === 'garage') return garageCooSalaryFromEquity(equityPct);
+  return defaultCooSalaryForTier(tier);
 }
 
 export function defaultCooSalaryForTier(tier) {
-  return COO_SALARY_BY_TIER[tier] ?? COO_SALARY_BY_TIER.garage;
+  if (tier === 'garage') return 0;
+  return COO_SALARY_BY_TIER[tier] ?? COO_SALARY_BY_TIER.small;
 }
 
 export function canHireCoo(state) {
@@ -89,11 +118,12 @@ export function hireCoo(state, options) {
 
   const equityPct = parseEquityPct(options?.equityPct);
   if (equityPct == null) {
-    return { ok: false, reason: 'Pick an equity grant (0.5%–5%).' };
+    return { ok: false, reason: 'Pick an equity grant (0.5%–10%).' };
   }
 
   const tier = workspaceTierKey(state);
-  const salaryMonthly = defaultCooSalaryForTier(tier);
+  const salaryMonthly =
+    tier === 'garage' ? garageCooSalaryFromEquity(equityPct) : defaultCooSalaryForTier(tier);
   const fullName = lastName ? `${firstName} ${lastName}` : firstName;
   const capTableId = `coo-${Date.now()}`;
 
@@ -138,7 +168,11 @@ export function releaseCoo(state) {
 
 export function syncCooSalaryToWorkspace(state) {
   if (!isCooHired(state)) return;
-  state.coo.salaryMonthly = defaultCooSalaryForTier(workspaceTierKey(state));
+  const tier = workspaceTierKey(state);
+  state.coo.salaryMonthly =
+    tier === 'garage'
+      ? garageCooSalaryFromEquity(state.coo?.equityPct ?? 0)
+      : defaultCooSalaryForTier(tier);
 }
 
 export function renderLeadershipOrgChart(container, state) {
@@ -163,14 +197,19 @@ export function renderLeadershipOrgChart(container, state) {
       <button type="button" class="btn btn-ghost btn-small" id="btn-release-coo" ${disabled}>Release COO</button>
     </div>`;
   } else {
-    const equityOptions = COO_EQUITY_OPTIONS.map(
-      (p) => `<option value="${p}">${p}%</option>`
-    ).join('');
     const tier = workspaceTierKey(state);
-    const previewSal = defaultCooSalaryForTier(tier);
+    const defaultEquity = COO_EQUITY_OPTIONS[2] ?? 1.5;
+    const equityOptions = COO_EQUITY_OPTIONS.map(
+      (p) => `<option value="${p}"${p === defaultEquity ? ' selected' : ''}>${p}%</option>`
+    ).join('');
+    const previewSal = previewCooSalaryMonthly(state, defaultEquity);
+    const garageTradeoff =
+      tier === 'garage'
+        ? ' In the garage, cash comp trades off for equity — <strong>10%</strong> is <strong>$0/mo</strong> (like you); <strong>5%</strong> is <strong>$2.5K/mo</strong>.'
+        : '';
     cooBlock = `<div class="org-node org-node-open coo-hire-panel">
       <span class="org-role">COO · open seat</span>
-      <p class="fine-print">Hire from the garage — name them yourself and grant equity from the cap table.</p>
+      <p class="fine-print">Hire from the garage — name them yourself and grant up to 10% from the cap table.${garageTradeoff}</p>
       <div class="name-row coo-name-row">
         <label class="visually-hidden" for="coo-first-name">COO first name</label>
         <input id="coo-first-name" type="text" maxlength="40" placeholder="First name" ${disabled} required>
@@ -179,8 +218,8 @@ export function renderLeadershipOrgChart(container, state) {
       </div>
       <div class="name-row coo-equity-row">
         <label for="coo-equity-pct">Equity grant</label>
-        <select id="coo-equity-pct" ${disabled}>${equityOptions}</select>
-        <span class="fine-print">≈ ${formatMoney(previewSal)}/mo at ${tier} workspace</span>
+        <select id="coo-equity-pct" data-workspace-tier="${escapeHtml(tier)}" ${disabled}>${equityOptions}</select>
+        <span class="fine-print" id="coo-salary-preview">≈ ${formatMoney(previewSal)}/mo${tier === 'garage' ? ' at this equity grant' : ` at ${tier} workspace`}</span>
       </div>
       <button type="button" class="btn btn-primary btn-small" id="btn-hire-coo" ${disabled}>Hire COO</button>
     </div>`;

@@ -73,7 +73,12 @@ import {
   showFinanceFeedback
 } from './modules/Fundraising.js';
 import { setCeoSalaryAnnual, takeOwnerDraw } from './modules/Ceo.js';
-import { hireCoo, releaseCoo, syncCooSalaryToWorkspace } from './modules/Coo.js';
+import {
+  hireCoo,
+  releaseCoo,
+  syncCooSalaryToWorkspace,
+  previewCooSalaryMonthly
+} from './modules/Coo.js';
 import { loadAccelerators } from './modules/Accelerators.js';
 import { onLayoffSentiment } from './modules/Sentiment.js';
 import {
@@ -1272,6 +1277,19 @@ function bindGameInteractions() {
   });
 
   app?.addEventListener('change', (e) => {
+    if (e.target.id === 'coo-equity-pct' && sessionState) {
+      const tier = e.target.getAttribute('data-workspace-tier') ?? sessionState.workspace?.tier ?? 'garage';
+      const equity = Number(e.target.value);
+      const sal = previewCooSalaryMonthly(sessionState, equity);
+      const preview = document.getElementById('coo-salary-preview');
+      if (preview) {
+        preview.textContent =
+          tier === 'garage'
+            ? `≈ ${formatMoney(sal)}/mo at this equity grant`
+            : `≈ ${formatMoney(sal)}/mo at ${tier} workspace`;
+      }
+      return;
+    }
     const input = e.target.closest('[data-staff-input]');
     if (!input || !sessionState) return;
     const dept = input.getAttribute('data-staff-input');
