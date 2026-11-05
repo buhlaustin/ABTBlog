@@ -12,7 +12,11 @@ import {
 import { completeBoardTask } from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
-import { runGrowthCampaign, loadGrowthCampaigns } from './modules/GrowthCampaigns.js';
+import {
+  runGrowthCampaign,
+  runAllRemainingGrowthCampaigns,
+  loadGrowthCampaigns
+} from './modules/GrowthCampaigns.js';
 import { loadGrowthLevers } from './modules/ProductActions.js';
 import { openGrowthCampaignOutcomeDialog } from './modules/GrowthOutcome.js';
 import {
@@ -871,6 +875,25 @@ function bindGameInteractions() {
         showOfficesFeedback('Office leased.');
         syncStageFromProgress(sessionState);
       }
+      refresh();
+      return;
+    }
+
+    const buyAllGrowthBtn = e.target.closest('[data-buy-all-growth]');
+    if (buyAllGrowthBtn && sessionState) {
+      const result = runAllRemainingGrowthCampaigns(sessionState);
+      if (!result.ok) {
+        setGameFeedback(result.reason || 'Could not buy growth plays.', true);
+        refresh();
+        return;
+      }
+      appendLog(
+        sessionState,
+        `Growth: bought ${result.count} paid play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, booked ${formatMoney(result.totalRevenue)}.`
+      );
+      setGameFeedback(
+        `Launched ${result.count} growth campaign${result.count === 1 ? '' : 's'} (${formatMoney(result.totalRevenue)} booked).`
+      );
       refresh();
       return;
     }

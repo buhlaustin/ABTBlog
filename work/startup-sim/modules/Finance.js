@@ -22,7 +22,7 @@ import { cooSalaryMonthly } from './Coo.js';
 
 /** Hard caps on desk + growth payout multiplier (after sandbox tuning overlay). */
 export const REV_MULT_CAP_CAREER = 60;
-export const REV_MULT_CAP_SANDBOX = 100;
+export const REV_MULT_CAP_SANDBOX = 240;
 
 /** Legacy alias — progression stack replaces seed-only scaling. */
 export function scalingRevenueMult(state) {
