@@ -13,7 +13,12 @@ import { competitorRevenueMult } from './Competitor.js';
 import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
 import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
-import { progressionRevenueMult, progressionTier } from './ProgressionEconomy.js';
+import {
+  progressionRevenueMult,
+  progressionTier,
+  getTierRevenueProfile,
+  progressionTierLabelAt
+} from './ProgressionEconomy.js';
 import { applyTaskRivalEffects } from './WorldDynamics.js';
 import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 import { loanOverheadMonthly } from './BankLoan.js';
@@ -179,16 +184,36 @@ function sandboxMult(state) {
   return state.mode === 'sandbox' ? MODE_CONFIG.sandbox.difficulty : MODE_CONFIG.career.difficulty;
 }
 
+function tierSingleActionShare(state, tier, profile) {
+  if (profile.singleActionMrrShare == null) return null;
+  const mrr = Math.max(Number(state.finance?.mrr) || 0, getArr(state) / 12);
+  const logM = Math.log10(Math.max(mrr, 1e6));
+  let share = profile.singleActionMrrShare;
+  if (tier >= 7) share += (logM - 6) * 0.01;
+  share = Math.min(0.22, Math.max(0.03, share));
+  if (state.mode === 'sandbox') share = Math.min(0.28, share * 1.12);
+  return share;
+}
+
+function tierMonthlyBookShare(state, tier, profile) {
+  if (profile.monthlyBookMrrShare == null) return null;
+  const mrr = Math.max(Number(state.finance?.mrr) || 0, getArr(state) / 12);
+  const logM = Math.log10(Math.max(mrr, 1e6));
+  let share = profile.monthlyBookMrrShare;
+  if (tier >= 7) share += (logM - 6) * 0.035;
+  share = Math.min(0.75, Math.max(0.22, share));
+  if (state.mode === 'sandbox') share = Math.min(0.82, share * 1.05);
+  return share;
+}
+
 /** MRR-aware ceiling for one desk task or growth campaign (scales up at mega-cap). */
 export function maxSingleBookedRevenue(state) {
   const tier = progressionTier(state);
-  if (tier < 5) return Number.POSITIVE_INFINITY;
+  const profile = getTierRevenueProfile(tier);
+  const share = tierSingleActionShare(state, tier, profile);
+  if (share == null) return Number.POSITIVE_INFINITY;
   const mrr = Math.max(Number(state.finance?.mrr) || 0, getArr(state) / 12);
   if (mrr <= 0) return Number.POSITIVE_INFINITY;
-  const logM = Math.log10(Math.max(mrr, 1e6));
-  let share = tier >= 7 ? 0.035 + (logM - 6) * 0.01 : 0.12;
-  share = Math.min(0.2, Math.max(0.035, share));
-  if (state.mode === 'sandbox') share = Math.min(0.25, share * 1.12);
   const perAction = Math.round(mrr * share);
   const absolute = state.mode === 'sandbox' ? 400_000_000_000 : 120_000_000_000;
   return Math.max(1_000_000, Math.min(perAction, absolute));
@@ -197,23 +222,94 @@ export function maxSingleBookedRevenue(state) {
 /** Monthly cap on booked desk + growth cash (prevents multi-trillion single-month spikes). */
 export function maxMonthlyBookedRevenue(state) {
   const tier = progressionTier(state);
-  if (tier < 5) return Number.POSITIVE_INFINITY;
+  const profile = getTierRevenueProfile(tier);
+  const share = tierMonthlyBookShare(state, tier, profile);
+  if (share == null) return Number.POSITIVE_INFINITY;
   const mrr = Math.max(Number(state.finance?.mrr) || 0, getArr(state) / 12);
   if (mrr <= 0) return Number.POSITIVE_INFINITY;
-  const logM = Math.log10(Math.max(mrr, 1e6));
-  let share = tier >= 7 ? 0.28 + (logM - 6) * 0.035 : 0.5;
-  share = Math.min(0.72, Math.max(0.25, share));
-  if (state.mode === 'sandbox') share = Math.min(0.78, share * 1.05);
   const monthly = Math.round(mrr * share);
   const absolute = state.mode === 'sandbox' ? 900_000_000_000 : 350_000_000_000;
   return Math.max(5_000_000, Math.min(monthly, absolute));
 }
 
+function scaledPayoutBand(baseRange, mult) {
+  const [lo, hi] = baseRange;
+  return [
+    Math.round(lo * mult * 0.45),
+    Math.round(hi * mult * 1.05)
+  ];
+}
+
+/** Desk + growth payout ranges at current rev× for one progression tier (catalog base bands). */
+export function estimateTierPayoutBands(tier, mult, state = null) {
+  const profile = getTierRevenueProfile(tier);
+  let desk = scaledPayoutBand(profile.deskBase, mult);
+  if (profile.deskWhale) {
+    const whale = scaledPayoutBand(profile.deskWhale, mult);
+    desk = [desk[0], Math.max(desk[1], whale[1])];
+  }
+  const growth = scaledPayoutBand(profile.growthBase, mult);
+  if (state && progressionTier(state) === tier && profile.singleActionMrrShare != null) {
+    const cap = maxSingleBookedRevenue(state);
+    desk = [desk[0], Math.min(desk[1], cap)];
+    growth[1] = Math.min(growth[1], cap);
+  }
+  return { desk, growth, profile };
+}
+
+/** Current era payout snapshot for HUD / finance panel. */
+export function estimateEraRevenuePotential(state) {
+  const tier = progressionTier(state);
+  const mult = getTaskRevenueMultiplierPreview(state);
+  const { desk, growth, profile } = estimateTierPayoutBands(tier, mult, state);
+  const monthlyCap =
+    profile.monthlyBookMrrShare != null ? maxMonthlyBookedRevenue(state) : null;
+  const singleCap =
+    profile.singleActionMrrShare != null ? maxSingleBookedRevenue(state) : null;
+  return {
+    tier,
+    label: progressionTierLabelAt(tier),
+    mult,
+    desk,
+    growth,
+    arrGuide: profile.arrGuide,
+    monthlyCap,
+    singleCap
+  };
+}
+
+/** All tiers — base catalog bands and payout at current rev× (current tier includes MRR caps). */
+export function allTierRevenuePotentialRows(state) {
+  const mult = getTaskRevenueMultiplierPreview(state);
+  const current = progressionTier(state);
+  const rows = [];
+  for (let tier = 0; tier <= 7; tier += 1) {
+    const { desk, growth, profile } = estimateTierPayoutBands(
+      tier,
+      mult,
+      tier === current ? state : null
+    );
+    rows.push({
+      tier,
+      label: progressionTierLabelAt(tier),
+      arrGuide: profile.arrGuide,
+      deskBase: profile.deskBase,
+      growthBase: profile.growthBase,
+      deskWhale: profile.deskWhale ?? null,
+      deskPayout: desk,
+      growthPayout: growth,
+      isCurrent: tier === current,
+      monthlyCap: tier === current ? maxMonthlyBookedRevenue(state) : null,
+      singleCap: tier === current ? maxSingleBookedRevenue(state) : null
+    });
+  }
+  return rows;
+}
+
 /** Cap one booking; also respects remaining room in the current month. */
 export function clampBookedRevenue(state, raw) {
   const amount = Math.max(0, Math.round(Number(raw) || 0));
-  const tier = progressionTier(state);
-  if (tier < 5) return amount;
+  if (getTierRevenueProfile(progressionTier(state)).singleActionMrrShare == null) return amount;
   let capped = Math.min(amount, maxSingleBookedRevenue(state));
   const monthCap = maxMonthlyBookedRevenue(state);
   const booked = state.calendar?.monthRevenue ?? 0;

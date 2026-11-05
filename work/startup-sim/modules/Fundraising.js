@@ -20,7 +20,9 @@ import {
   renderFinanceSummary,
   getTaskRevenueMultiplierPreview,
   getCoreTaskRevenueMult,
-  getSandboxTuningMult
+  getSandboxTuningMult,
+  allTierRevenuePotentialRows,
+  estimateEraRevenuePotential
 } from './Finance.js';
 import { progressionTierLabel } from './ProgressionEconomy.js';
 import { formatMoney } from './constants.js';
@@ -115,6 +117,42 @@ function renderPricedRoundBlock(state, preview, flagName, buttonId, label) {
     <p class="fine-print">Founder ~${preview.founderPctNow}% → ~${preview.founderPctAfterApprox}%.</p>
     <button type="button" class="btn btn-primary btn-small" id="${buttonId}">Close ${label}</button>
   </div>`;
+}
+
+function renderTierRevenuePotentialSection(state) {
+  const era = estimateEraRevenuePotential(state);
+  const rows = allTierRevenuePotentialRows(state);
+  const body = rows
+    .map((r) => {
+      const rowClass = r.isCurrent ? ' class="tier-revenue-current"' : '';
+      const capNote =
+        r.isCurrent && r.singleCap
+          ? `<br><span class="fine-print">Per-play MRR cap ~${formatMoney(r.singleCap)}</span>`
+          : '';
+      const monthNote =
+        r.isCurrent && r.monthlyCap
+          ? `<br><span class="fine-print">Month booking cap ~${formatMoney(r.monthlyCap)}</span>`
+          : '';
+      const whale = r.deskWhale
+        ? `<br><span class="fine-print">Whale desk base ${formatMoney(r.deskWhale[0])}–${formatMoney(r.deskWhale[1])}</span>`
+        : '';
+      return `<tr${rowClass}>
+        <td><strong>${escapeHtml(r.label)}</strong><br><span class="fine-print">${escapeHtml(r.arrGuide)}</span></td>
+        <td>${formatMoney(r.deskBase[0])}–${formatMoney(r.deskBase[1])}${whale}</td>
+        <td>${formatMoney(r.growthBase[0])}–${formatMoney(r.growthBase[1])}</td>
+        <td>${formatMoney(r.deskPayout[0])}–${formatMoney(r.deskPayout[1])}${capNote}${monthNote}</td>
+        <td>${formatMoney(r.growthPayout[0])}–${formatMoney(r.growthPayout[1])}</td>
+      </tr>`;
+    })
+    .join('');
+  return `<section class="tier-revenue-panel">
+    <h3 class="log-head">Revenue potential by scale era</h3>
+    <p class="fine-print">Task bank base ranges and estimated cash per play at your current <strong>${era.mult.toFixed(2)}×</strong> rev×. Highlighted row is your era — late-game caps scale with MRR so payouts grow without single-month spikes.</p>
+    <div class="table-scroll"><table class="data-table tier-revenue-table">
+      <thead><tr><th>Era</th><th>Desk base</th><th>Growth base</th><th>Desk @ rev×</th><th>Growth @ rev×</th></tr></thead>
+      <tbody>${body}</tbody>
+    </table></div>
+  </section>`;
 }
 
 function escapeHtml(s) {
@@ -297,6 +335,7 @@ export function renderFinancePanel(container, state) {
   container.innerHTML = `
     <p class="panel-lede">Cash from desk tasks lands right away. Payroll and rent bill when you close the month. Fundraising lives here, not on the desk.</p>
     <p class="fine-print">${escapeHtml(multExpl)} Close rounds to jump task tiers and multiplier.</p>
+    ${renderTierRevenuePotentialSection(state)}
     <div class="summary-grid">
       <div><span class="stat-label">Cash</span><span class="stat-value">${sum.cashLabel}</span></div>
       <div><span class="stat-label">Last month rev.</span><span class="stat-value">${sum.mrrLabel}</span></div>

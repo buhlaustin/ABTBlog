@@ -50,6 +50,7 @@ import {
   getSandboxTuningMult,
   getRawTaskRevenueMultiplier,
   estimateTaskPayoutBand,
+  estimateEraRevenuePotential,
   estimateTaskMrrBand,
   taskRevenueMultHud
 } from './Finance.js';
@@ -365,6 +366,10 @@ export function renderDeskPanel(state) {
         return `<div><span class="stat-label">${escapeHtml(revHud.label)}</span><span class="stat-value"${titleAttr}>${revHud.effective.toFixed(2)}×</span></div>`;
       })()}
     </div>
+    ${(() => {
+      const era = estimateEraRevenuePotential(state);
+      return `<p class="fine-print">This era: typical desk <strong>${formatMoney(era.desk[0])}–${formatMoney(era.desk[1])}</strong> · growth <strong>${formatMoney(era.growth[0])}–${formatMoney(era.growth[1])}</strong> per play at ${era.mult.toFixed(2)}×.${era.monthlyCap ? ` Month booking cap ~${formatMoney(era.monthlyCap)}.` : ''} See Finance for all tiers.</p>`;
+    })()}
     ${
       lineupOpen
         ? `<section class="task-offers"><h3 class="log-head">This month’s offers (${selectedOfferCount(state)} / ${slotTarget} selected)</h3><div class="task-list">${offerCards}</div>

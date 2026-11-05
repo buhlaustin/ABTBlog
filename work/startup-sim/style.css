@@ -607,6 +607,14 @@ h1 {
   color: var(--accent, #5b8def);
 }
 
+.tier-revenue-panel {
+  margin: 0.75rem 0 1rem;
+}
+
+.data-table tr.tier-revenue-current td {
+  background: color-mix(in srgb, var(--accent, #5b8def) 12%, transparent);
+}
+
 .game-flash {
   flex: 1 1 100%;
   margin: 0 0 0.35rem;

@@ -953,7 +953,9 @@ const {
   buildCompLedger,
   suggestedCeoSalaryBand
 } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
-const { projectMonthlyBurn } = await import(`file://${join(sim, 'modules/Finance.js')}`);
+const { projectMonthlyBurn, estimateEraRevenuePotential, allTierRevenuePotentialRows } =
+  await import(`file://${join(sim, 'modules/Finance.js')}`);
+const { TIER_REVENUE_PROFILE } = await import(`file://${join(sim, 'modules/ProgressionEconomy.js')}`);
 const ceoState = createInitialState({ companyName: 'CEO Pay Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 const sal = setCeoSalaryAnnual(ceoState, 120_000);
 if (!sal.ok) {
@@ -991,6 +993,19 @@ if (!failed) {
   } else if (wealthMix(ceoState).salary <= 0) {
     console.error('FAIL: wealth mix');
     failed = true;
+  }
+}
+if (!failed) {
+  if (TIER_REVENUE_PROFILE.length !== 8) {
+    console.error(`FAIL: tier revenue profile length ${TIER_REVENUE_PROFILE.length}`);
+    failed = true;
+  } else {
+    const eraRows = allTierRevenuePotentialRows(ceoState);
+    const era = estimateEraRevenuePotential(ceoState);
+    if (eraRows.length !== 8 || era.desk[1] < era.desk[0] || era.growth[1] < era.growth[0]) {
+      console.error('FAIL: tier revenue potential rows');
+      failed = true;
+    }
   }
 }
 if (!failed) {
