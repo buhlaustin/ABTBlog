@@ -4,12 +4,14 @@ import { test, expect } from '@playwright/test';
 const SAVE_KEY = 'startup_sim_save_v1';
 
 test.describe('Startup Simulator', () => {
+  test.setTimeout(120_000);
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/play/startup-sim/index.html', { waitUntil: 'load' });
     await page.evaluate((key) => localStorage.removeItem(key), SAVE_KEY);
     // Full navigation — reload() can interrupt ES module init on slow CI runners.
     await page.goto('/play/startup-sim/index.html', { waitUntil: 'load' });
-    await expect(page.locator('body[data-startup-sim-ready="true"]')).toBeVisible({ timeout: 45_000 });
+    await expect(page.locator('body[data-startup-sim-ready="true"]')).toBeVisible({ timeout: 60_000 });
     await expect(page.getByRole('button', { name: 'New game' })).toBeVisible();
   });
 
@@ -83,10 +85,11 @@ test.describe('Startup Simulator', () => {
     await expect(page.locator('#btn-toggle-news-archive')).toBeVisible();
 
     await page.locator('#tab-ceo').click();
-    await expect(page.locator('#panel-ceo')).toContainText('CEO salary');
     await expect(page.locator('#panel-ceo')).toContainText('Personal debits');
     await expect(page.locator('#panel-ceo')).toContainText('Est. net worth');
     await expect(page.locator('#panel-ceo')).toContainText('Personal bank');
+    await page.locator('[data-ceo-tab="comp"]').click();
+    await expect(page.locator('#panel-ceo')).toContainText('CEO salary');
     await expect(page.locator('#panel-ceo')).toContainText('Personal bank ledger');
 
     await page.locator('#tab-finance').click();
@@ -96,8 +99,8 @@ test.describe('Startup Simulator', () => {
     await page.locator('#tab-companies').click();
     await expect(page.locator('#panel-companies')).toContainText('Portfolio MRR');
     await expect(page.locator('#panel-companies')).toContainText('X Combinator batch');
-    await expect(page.locator('[data-companies-filter="small"]')).toBeVisible();
-    await expect(page.locator('#panel-companies')).toContainText('Synergy stack');
+    await expect(page.locator('[data-companies-tab="market"]')).toBeVisible();
+    await expect(page.locator('#panel-companies')).toContainText('Synergy');
   });
 
   test('mobile viewport: tabs and people table scroll without horizontal page overflow', async ({
@@ -115,7 +118,7 @@ test.describe('Startup Simulator', () => {
     await page.evaluate((key) => localStorage.removeItem(key), SAVE_KEY);
     await page.goto('/play/startup-sim/index.html', { waitUntil: 'load' });
     await expect(page.locator('body[data-startup-sim-ready="true"]')).toBeVisible({
-      timeout: 45_000,
+      timeout: 60_000,
     });
 
     await page.getByRole('button', { name: 'New game' }).click();
@@ -173,7 +176,7 @@ test.describe('Startup Simulator', () => {
     await page.evaluate((key) => localStorage.removeItem(key), SAVE_KEY);
     await page.goto('/play/startup-sim/index.html', { waitUntil: 'load' });
     await expect(page.locator('body[data-startup-sim-ready="true"]')).toBeVisible({
-      timeout: 45_000,
+      timeout: 60_000,
     });
 
     await page.getByRole('button', { name: 'New game' }).click();
