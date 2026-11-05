@@ -64,6 +64,7 @@
     { "id": "sat-philadelphia", "label": "Philadelphia", "seats": 8, "rentMonthly": 11200 },
     { "id": "sat-salt-lake", "label": "Salt Lake City", "seats": 6, "rentMonthly": 7800 },
     { "id": "sat-charlotte", "label": "Charlotte", "seats": 7, "rentMonthly": 8600 },
+    { "id": "sat-knoxville", "label": "Knoxville", "seats": 6, "rentMonthly": 7100 },
     { "id": "sat-columbus", "label": "Columbus", "seats": 6, "rentMonthly": 7400 },
     { "id": "sat-tampa", "label": "Tampa", "seats": 6, "rentMonthly": 8000 },
     { "id": "sat-las-vegas", "label": "Las Vegas", "seats": 5, "rentMonthly": 7600 },
