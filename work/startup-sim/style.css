@@ -539,6 +539,20 @@ h1 {
   font-weight: 600;
 }
 
+.task-tag {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  color: var(--accent, #6b4ce6);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+}
+
 .desk-actions {
   display: flex;
   flex-wrap: wrap;
