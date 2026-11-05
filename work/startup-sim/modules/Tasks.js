@@ -8,6 +8,7 @@ import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
 import bundledLaunchCrowd from '../data/launch-crowdfunding-tasks.json' with { type: 'json' };
 import bundledSpaceExploration from '../data/space-exploration-tasks.json' with { type: 'json' };
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
+import bundledCatalogExpansion from '../data/tasks-catalog-expansion.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
@@ -67,25 +68,23 @@ function mergeXcDemoDayTasks(base) {
 }
 
 function mergeSpaceExplorationTasks(base) {
-  const packs = [bundledSpaceExploration, bundledSpaceExpansion];
-  let merged = [...(base.tasks ?? [])];
-  const ids = new Set(merged.map((t) => t.id));
-  for (const pack of packs) {
-    for (const t of pack?.tasks ?? []) {
-      if (!ids.has(t.id)) {
-        ids.add(t.id);
-        merged.push(t);
-      }
-    }
+  let out = base;
+  for (const pack of [bundledSpaceExploration, bundledSpaceExpansion]) {
+    out = mergeTaskPack(out, pack?.tasks ?? []);
   }
-  if (merged.length === (base.tasks ?? []).length) return base;
-  return { ...base, tasks: merged };
+  return out;
+}
+
+function mergeCatalogExpansion(base) {
+  return mergeTaskPack(base, bundledCatalogExpansion?.tasks ?? []);
 }
 
 function mergeCatalog(base) {
   return mergeXcDemoDayTasks(
     mergePostXcPreSeedTasks(
-      mergeLaunchTasks(mergeSpaceExplorationTasks(mergeSignatureTasks(base)))
+      mergeLaunchTasks(
+        mergeSpaceExplorationTasks(mergeCatalogExpansion(mergeSignatureTasks(base)))
+      )
     )
   );
 }
@@ -112,6 +111,10 @@ export function getTaskDefinitions() {
   return taskCatalog?.tasks ?? [];
 }
 
+export function taskCatalogSize() {
+  return getTaskDefinitions().length;
+}
+
 /** Headless tests — eligible desk pool for the current run state. */
 export function getTaskPoolSize(state) {
   return buildTaskPool(state).length;
@@ -135,8 +138,22 @@ function shuffle(arr) {
   return a;
 }
 
-/** Months of dealt task ids to deprioritize when building the next desk lineup. */
-const RECENT_TASK_COOLDOWN_MONTHS = 8;
+/** Cross-month cooldown — task ids stay out of the offer board for this many deal cycles. */
+export const RECENT_TASK_COOLDOWN_MONTHS = 12;
+
+function mergeTaskPack(base, extraTasks) {
+  if (!extraTasks?.length) return base;
+  const merged = [...(base.tasks ?? [])];
+  const ids = new Set(merged.map((t) => t.id));
+  for (const t of extraTasks) {
+    if (!ids.has(t.id)) {
+      ids.add(t.id);
+      merged.push(t);
+    }
+  }
+  if (merged.length === (base.tasks ?? []).length) return base;
+  return { ...base, tasks: merged };
+}
 
 /**
  * Pick up to `slots` tasks from `pool` with unique ids per month.
@@ -146,7 +163,8 @@ const RECENT_TASK_COOLDOWN_MONTHS = 8;
 export function pickMonthlyTaskDefs(pool, slots, recentTaskIds = []) {
   if (!pool.length || slots <= 0) return [];
 
-  const cooldownLen = slots * RECENT_TASK_COOLDOWN_MONTHS;
+  const cap = Math.min(slots, pool.length);
+  const cooldownLen = cap * RECENT_TASK_COOLDOWN_MONTHS;
   const recent = new Set((recentTaskIds ?? []).slice(-cooldownLen));
   const fresh = pool.filter((t) => !recent.has(t.id));
   const stale = pool.filter((t) => recent.has(t.id));
@@ -156,35 +174,40 @@ export function pickMonthlyTaskDefs(pool, slots, recentTaskIds = []) {
 
   function takeUnique(source) {
     for (const def of shuffle(source)) {
-      if (picked.length >= slots) break;
+      if (picked.length >= cap) break;
       if (used.has(def.id)) continue;
       used.add(def.id);
       picked.push(def);
     }
   }
 
-  const signaturePool = pool.filter((t) => t.signature);
-  if (signaturePool.length && slots > 0 && !pool.some((t) => t.launchPhase)) {
+  const signaturePool = pool.filter((t) => t.signature && !recent.has(t.id));
+  if (signaturePool.length && cap > 0 && !pool.some((t) => t.launchPhase)) {
     const sig = shuffle(signaturePool)[0];
     used.add(sig.id);
     picked.push(sig);
   }
 
   takeUnique(fresh.length ? fresh : pool);
-  if (picked.length < slots) takeUnique(stale);
-  if (picked.length < slots) takeUnique(pool);
+  if (picked.length < cap) takeUnique(stale);
+  if (picked.length < cap) takeUnique(pool);
 
-  if (picked.length < slots && pool.length > 0) {
-    const extras = shuffle(pool);
-    let guard = 0;
-    while (picked.length < slots && guard < slots * 4) {
-      const def = extras[picked.length % extras.length];
-      picked.push(def);
-      guard += 1;
-    }
+  return picked.slice(0, cap);
+}
+
+/** Force-inject a task into offers without duplicate ids. */
+export function mergeUniqueTaskOffers(offered, def, offerCount) {
+  if (!def) return offered;
+  const rest = offered.filter((t) => t.id !== def.id);
+  const next = [def, ...rest];
+  const seen = new Set();
+  const unique = [];
+  for (const t of next) {
+    if (seen.has(t.id)) continue;
+    seen.add(t.id);
+    unique.push(t);
   }
-
-  return picked.slice(0, slots);
+  return unique.slice(0, Math.min(offerCount, unique.length));
 }
 
 export function monthDealHasDuplicateTaskIds(picked) {
@@ -296,30 +319,48 @@ export function dealMonthlyTasks(state) {
   const launchDesk = currentLaunchTaskPhase(state);
   if (launchDesk === 'pre_launch' && state.launch?.phase === 'pre_launch' && canSchedulePublicLaunch(state)) {
     const sched = pool.find((t) => t.scheduleLaunch);
-    if (sched && !offered.some((t) => t.id === sched.id)) {
-      offered = [sched, ...offered.filter((t) => t.id !== sched.id)].slice(0, offerCount);
-    }
+    if (sched) offered = mergeUniqueTaskOffers(offered, sched, offerCount);
   }
   if (launchDesk === 'pre_launch' && state.launch?.phase === 'pre_launch') {
     const crowdPool = pool.filter((t) => t.crowdfunding);
     if (crowdPool.length && !offered.some((t) => t.crowdfunding)) {
       const pick = shuffle(crowdPool)[0];
-      offered = [pick, ...offered.filter((t) => t.id !== pick.id)].slice(0, offerCount);
+      offered = mergeUniqueTaskOffers(offered, pick, offerCount);
     }
   }
   if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
     const demo = pool.find((t) => t.id === XC_DEMO_DAY_TASK_ID);
-    if (demo && !offered.some((t) => t.id === demo.id)) {
-      offered = [demo, ...offered.filter((t) => t.id !== demo.id)].slice(0, offerCount);
-    }
+    if (demo) offered = mergeUniqueTaskOffers(offered, demo, offerCount);
   }
   if (!launchLifecycleActive(state)) {
     const sigPool = pool.filter((t) => t.signature);
     if (sigPool.length && !offered.some((t) => t.signature) && offered.length > 0) {
-      const sig = shuffle(sigPool)[0];
-      offered = [...offered.slice(0, -1), sig];
+      const available = sigPool.filter((t) => !offered.some((o) => o.id === t.id));
+      const sig = shuffle(available.length ? available : sigPool)[0];
+      if (sig) {
+        const trimmed = offered.filter((t) => t.id !== sig.id);
+        if (trimmed.length >= offerCount) {
+          offered = mergeUniqueTaskOffers(trimmed.slice(0, offerCount - 1), sig, offerCount);
+        } else {
+          offered = mergeUniqueTaskOffers(offered, sig, offerCount);
+        }
+      }
     }
   }
+
+  if (monthDealHasDuplicateTaskIds(offered)) {
+    const seen = new Set();
+    offered = offered.filter((t) => {
+      if (seen.has(t.id)) return false;
+      seen.add(t.id);
+      return true;
+    });
+  }
+
+  const offeredIds = offered.map((t) => t.id);
+  state.calendar.recentTaskIds = [...(state.calendar.recentTaskIds ?? []), ...offeredIds].slice(
+    -offerCount * RECENT_TASK_COOLDOWN_MONTHS
+  );
   state.calendar.monthTaskSlotTarget = slots;
   state.calendar.monthTaskOffers = offered.map((def, index) => ({
     offerId: `${state.calendar.year}-${state.calendar.monthIndex}-offer-${def.id}-${index}`,
@@ -369,7 +410,9 @@ export function confirmTaskLineup(state) {
   }
   const recent = state.calendar.recentTaskIds ?? [];
   const dealtIds = selected.map((o) => o.taskId);
-  state.calendar.recentTaskIds = [...recent, ...dealtIds].slice(-slots * 6);
+  state.calendar.recentTaskIds = [...recent, ...dealtIds].slice(
+    -slots * RECENT_TASK_COOLDOWN_MONTHS * 2
+  );
   state.calendar.monthTasks = selected.map((o, index) => ({
     instanceId: `${state.calendar.year}-${state.calendar.monthIndex}-${o.taskId}-${index}`,
     taskId: o.taskId,

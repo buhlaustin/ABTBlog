@@ -1,0 +1,2072 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "catalog-expansion-001",
+      "title": "Run data pipeline (cycle 1)",
+      "description": "Cross-industry desk play #1 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 650,
+      "revenue": [
+        358,
+        931
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-002",
+      "title": "Launch growth loop (cycle 2)",
+      "description": "Cross-industry desk play #2 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 1100,
+      "revenue": [
+        770,
+        2310
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-003",
+      "title": "Audit billing edge cases (cycle 3)",
+      "description": "Cross-industry desk play #3 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 1550,
+      "revenue": [
+        1318,
+        4481
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-004",
+      "title": "Pilot incident retro (cycle 4)",
+      "description": "Cross-industry desk play #4 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 14000,
+      "revenue": [
+        14000,
+        30800
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-005",
+      "title": "Scale compliance packet (cycle 5)",
+      "description": "Cross-industry desk play #5 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 14450,
+      "revenue": [
+        5780,
+        15028
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-006",
+      "title": "Refactor partner API (cycle 6)",
+      "description": "Cross-industry desk play #6 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 2900,
+      "revenue": [
+        1595,
+        4785
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-007",
+      "title": "Negotiate roadmap bet (cycle 7)",
+      "description": "Cross-industry desk play #7 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 3350,
+      "revenue": [
+        2345,
+        7973
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-008",
+      "title": "Publish demo environment (cycle 8)",
+      "description": "Cross-industry desk play #8 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 3800,
+      "revenue": [
+        3230,
+        7106
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-009",
+      "title": "Instrument support macros (cycle 9)",
+      "description": "Cross-industry desk play #9 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 4250,
+      "revenue": [
+        4250,
+        11050
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-010",
+      "title": "Ship customer council (cycle 10)",
+      "description": "Cross-industry desk play #10 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 16700,
+      "revenue": [
+        6680,
+        20040
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-011",
+      "title": "Run renewal playbook (cycle 11)",
+      "description": "Cross-industry desk play #11 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 17150,
+      "revenue": [
+        9433,
+        32072
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-012",
+      "title": "Launch security review (cycle 12)",
+      "description": "Cross-industry desk play #12 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 5600,
+      "revenue": [
+        3920,
+        8624
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-013",
+      "title": "Audit deploy checklist (cycle 13)",
+      "description": "Cross-industry desk play #13 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 6050,
+      "revenue": [
+        5143,
+        13372
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-014",
+      "title": "Pilot capacity plan (cycle 14)",
+      "description": "Cross-industry desk play #14 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 6500,
+      "revenue": [
+        6500,
+        19500
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-015",
+      "title": "Scale pricing experiment (cycle 15)",
+      "description": "Cross-industry desk play #15 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 6950,
+      "revenue": [
+        2780,
+        9452
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-016",
+      "title": "Refactor SLA dashboard (cycle 16)",
+      "description": "Cross-industry desk play #16 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 19400,
+      "revenue": [
+        10670,
+        23474
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-017",
+      "title": "Negotiate QA matrix (cycle 17)",
+      "description": "Cross-industry desk play #17 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 19850,
+      "revenue": [
+        13895,
+        36127
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-018",
+      "title": "Publish churn post-mortem (cycle 18)",
+      "description": "Cross-industry desk play #18 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 8300,
+      "revenue": [
+        7055,
+        21165
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-019",
+      "title": "Instrument migration toolkit (cycle 19)",
+      "description": "Cross-industry desk play #19 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 8750,
+      "revenue": [
+        8750,
+        29750
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-020",
+      "title": "Ship onboarding (cycle 20)",
+      "description": "Cross-industry desk play #20 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 9200,
+      "revenue": [
+        3680,
+        8096
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-021",
+      "title": "Run data pipeline (cycle 21)",
+      "description": "Cross-industry desk play #21 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 9650,
+      "revenue": [
+        5308,
+        13801
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-022",
+      "title": "Launch growth loop (cycle 22)",
+      "description": "Cross-industry desk play #22 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 22100,
+      "revenue": [
+        15470,
+        46410
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-023",
+      "title": "Audit billing edge cases (cycle 23)",
+      "description": "Cross-industry desk play #23 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 22550,
+      "revenue": [
+        19168,
+        65171
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-024",
+      "title": "Pilot incident retro (cycle 24)",
+      "description": "Cross-industry desk play #24 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 11000,
+      "revenue": [
+        11000,
+        24200
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-025",
+      "title": "Scale compliance packet (cycle 25)",
+      "description": "Cross-industry desk play #25 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 11450,
+      "revenue": [
+        4580,
+        11908
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-026",
+      "title": "Refactor partner API (cycle 26)",
+      "description": "Cross-industry desk play #26 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 11900,
+      "revenue": [
+        6545,
+        19635
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-027",
+      "title": "Negotiate roadmap bet (cycle 27)",
+      "description": "Cross-industry desk play #27 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 12350,
+      "revenue": [
+        8645,
+        29393
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-028",
+      "title": "Publish demo environment (cycle 28)",
+      "description": "Cross-industry desk play #28 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 24800,
+      "revenue": [
+        21080,
+        46376
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-029",
+      "title": "Instrument support macros (cycle 29)",
+      "description": "Cross-industry desk play #29 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 25250,
+      "revenue": [
+        25250,
+        65650
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-030",
+      "title": "Ship customer council (cycle 30)",
+      "description": "Cross-industry desk play #30 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 13700,
+      "revenue": [
+        5480,
+        16440
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-031",
+      "title": "Run renewal playbook (cycle 31)",
+      "description": "Cross-industry desk play #31 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 14150,
+      "revenue": [
+        7783,
+        26462
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-032",
+      "title": "Launch security review (cycle 32)",
+      "description": "Cross-industry desk play #32 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 14600,
+      "revenue": [
+        10220,
+        22484
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-033",
+      "title": "Audit deploy checklist (cycle 33)",
+      "description": "Cross-industry desk play #33 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 15050,
+      "revenue": [
+        12793,
+        33262
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-034",
+      "title": "Pilot capacity plan (cycle 34)",
+      "description": "Cross-industry desk play #34 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 27500,
+      "revenue": [
+        27500,
+        82500
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-035",
+      "title": "Scale pricing experiment (cycle 35)",
+      "description": "Cross-industry desk play #35 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 27950,
+      "revenue": [
+        11180,
+        38012
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-036",
+      "title": "Refactor SLA dashboard (cycle 36)",
+      "description": "Cross-industry desk play #36 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 16400,
+      "revenue": [
+        9020,
+        19844
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-037",
+      "title": "Negotiate QA matrix (cycle 37)",
+      "description": "Cross-industry desk play #37 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 16850,
+      "revenue": [
+        11795,
+        30667
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-038",
+      "title": "Publish churn post-mortem (cycle 38)",
+      "description": "Cross-industry desk play #38 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 17300,
+      "revenue": [
+        14705,
+        44115
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-039",
+      "title": "Instrument migration toolkit (cycle 39)",
+      "description": "Cross-industry desk play #39 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 17750,
+      "revenue": [
+        17750,
+        60350
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-040",
+      "title": "Ship onboarding (cycle 40)",
+      "description": "Cross-industry desk play #40 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 12200,
+      "revenue": [
+        4880,
+        10736
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-041",
+      "title": "Run data pipeline (cycle 41)",
+      "description": "Cross-industry desk play #41 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 12650,
+      "revenue": [
+        6958,
+        18091
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-042",
+      "title": "Launch growth loop (cycle 42)",
+      "description": "Cross-industry desk play #42 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 1100,
+      "revenue": [
+        770,
+        2310
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-043",
+      "title": "Audit billing edge cases (cycle 43)",
+      "description": "Cross-industry desk play #43 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 1550,
+      "revenue": [
+        1318,
+        4481
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-044",
+      "title": "Pilot incident retro (cycle 44)",
+      "description": "Cross-industry desk play #44 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 2000,
+      "revenue": [
+        2000,
+        4400
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-045",
+      "title": "Scale compliance packet (cycle 45)",
+      "description": "Cross-industry desk play #45 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2450,
+      "revenue": [
+        980,
+        2548
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-046",
+      "title": "Refactor partner API (cycle 46)",
+      "description": "Cross-industry desk play #46 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 14900,
+      "revenue": [
+        8195,
+        24585
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-047",
+      "title": "Negotiate roadmap bet (cycle 47)",
+      "description": "Cross-industry desk play #47 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 15350,
+      "revenue": [
+        10745,
+        36533
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-048",
+      "title": "Publish demo environment (cycle 48)",
+      "description": "Cross-industry desk play #48 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 3800,
+      "revenue": [
+        3230,
+        7106
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-049",
+      "title": "Instrument support macros (cycle 49)",
+      "description": "Cross-industry desk play #49 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 4250,
+      "revenue": [
+        4250,
+        11050
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-050",
+      "title": "Ship customer council (cycle 50)",
+      "description": "Cross-industry desk play #50 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 4700,
+      "revenue": [
+        1880,
+        5640
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-051",
+      "title": "Run renewal playbook (cycle 51)",
+      "description": "Cross-industry desk play #51 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 5150,
+      "revenue": [
+        2833,
+        9632
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-052",
+      "title": "Launch security review (cycle 52)",
+      "description": "Cross-industry desk play #52 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 17600,
+      "revenue": [
+        12320,
+        27104
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-053",
+      "title": "Audit deploy checklist (cycle 53)",
+      "description": "Cross-industry desk play #53 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 18050,
+      "revenue": [
+        15343,
+        39892
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-054",
+      "title": "Pilot capacity plan (cycle 54)",
+      "description": "Cross-industry desk play #54 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 6500,
+      "revenue": [
+        6500,
+        19500
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-055",
+      "title": "Scale pricing experiment (cycle 55)",
+      "description": "Cross-industry desk play #55 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 6950,
+      "revenue": [
+        2780,
+        9452
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-056",
+      "title": "Refactor SLA dashboard (cycle 56)",
+      "description": "Cross-industry desk play #56 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 7400,
+      "revenue": [
+        4070,
+        8954
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-057",
+      "title": "Negotiate QA matrix (cycle 57)",
+      "description": "Cross-industry desk play #57 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 7850,
+      "revenue": [
+        5495,
+        14287
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-058",
+      "title": "Publish churn post-mortem (cycle 58)",
+      "description": "Cross-industry desk play #58 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 20300,
+      "revenue": [
+        17255,
+        51765
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-059",
+      "title": "Instrument migration toolkit (cycle 59)",
+      "description": "Cross-industry desk play #59 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 20750,
+      "revenue": [
+        20750,
+        70550
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-060",
+      "title": "Ship onboarding (cycle 60)",
+      "description": "Cross-industry desk play #60 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 9200,
+      "revenue": [
+        3680,
+        8096
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-061",
+      "title": "Run data pipeline (cycle 61)",
+      "description": "Cross-industry desk play #61 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 9650,
+      "revenue": [
+        5308,
+        13801
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-062",
+      "title": "Launch growth loop (cycle 62)",
+      "description": "Cross-industry desk play #62 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 10100,
+      "revenue": [
+        7070,
+        21210
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-063",
+      "title": "Audit billing edge cases (cycle 63)",
+      "description": "Cross-industry desk play #63 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 10550,
+      "revenue": [
+        8968,
+        30491
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-064",
+      "title": "Pilot incident retro (cycle 64)",
+      "description": "Cross-industry desk play #64 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 23000,
+      "revenue": [
+        23000,
+        50600
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-065",
+      "title": "Scale compliance packet (cycle 65)",
+      "description": "Cross-industry desk play #65 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 23450,
+      "revenue": [
+        9380,
+        24388
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-066",
+      "title": "Refactor partner API (cycle 66)",
+      "description": "Cross-industry desk play #66 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 11900,
+      "revenue": [
+        6545,
+        19635
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-067",
+      "title": "Negotiate roadmap bet (cycle 67)",
+      "description": "Cross-industry desk play #67 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 12350,
+      "revenue": [
+        8645,
+        29393
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-068",
+      "title": "Publish demo environment (cycle 68)",
+      "description": "Cross-industry desk play #68 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 12800,
+      "revenue": [
+        10880,
+        23936
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-069",
+      "title": "Instrument support macros (cycle 69)",
+      "description": "Cross-industry desk play #69 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 13250,
+      "revenue": [
+        13250,
+        34450
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-070",
+      "title": "Ship customer council (cycle 70)",
+      "description": "Cross-industry desk play #70 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 25700,
+      "revenue": [
+        10280,
+        30840
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-071",
+      "title": "Run renewal playbook (cycle 71)",
+      "description": "Cross-industry desk play #71 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 26150,
+      "revenue": [
+        14383,
+        48902
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-072",
+      "title": "Launch security review (cycle 72)",
+      "description": "Cross-industry desk play #72 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 14600,
+      "revenue": [
+        10220,
+        22484
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-073",
+      "title": "Audit deploy checklist (cycle 73)",
+      "description": "Cross-industry desk play #73 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 15050,
+      "revenue": [
+        12793,
+        33262
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-074",
+      "title": "Pilot capacity plan (cycle 74)",
+      "description": "Cross-industry desk play #74 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 15500,
+      "revenue": [
+        15500,
+        46500
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-075",
+      "title": "Scale pricing experiment (cycle 75)",
+      "description": "Cross-industry desk play #75 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 15950,
+      "revenue": [
+        6380,
+        21692
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-076",
+      "title": "Refactor SLA dashboard (cycle 76)",
+      "description": "Cross-industry desk play #76 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 28400,
+      "revenue": [
+        15620,
+        34364
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-077",
+      "title": "Negotiate QA matrix (cycle 77)",
+      "description": "Cross-industry desk play #77 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 28850,
+      "revenue": [
+        20195,
+        52507
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-078",
+      "title": "Publish churn post-mortem (cycle 78)",
+      "description": "Cross-industry desk play #78 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 17300,
+      "revenue": [
+        14705,
+        44115
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-079",
+      "title": "Instrument migration toolkit (cycle 79)",
+      "description": "Cross-industry desk play #79 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 17750,
+      "revenue": [
+        17750,
+        60350
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-080",
+      "title": "Ship onboarding (cycle 80)",
+      "description": "Cross-industry desk play #80 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 200,
+      "revenue": [
+        80,
+        176
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-081",
+      "title": "Run data pipeline (cycle 81)",
+      "description": "Cross-industry desk play #81 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 650,
+      "revenue": [
+        358,
+        931
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-082",
+      "title": "Launch growth loop (cycle 82)",
+      "description": "Cross-industry desk play #82 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 13100,
+      "revenue": [
+        9170,
+        27510
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-083",
+      "title": "Audit billing edge cases (cycle 83)",
+      "description": "Cross-industry desk play #83 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 13550,
+      "revenue": [
+        11518,
+        39161
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-084",
+      "title": "Pilot incident retro (cycle 84)",
+      "description": "Cross-industry desk play #84 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 2000,
+      "revenue": [
+        2000,
+        4400
+      ],
+      "product": 2,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-085",
+      "title": "Scale compliance packet (cycle 85)",
+      "description": "Cross-industry desk play #85 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 2450,
+      "revenue": [
+        980,
+        2548
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-086",
+      "title": "Refactor partner API (cycle 86)",
+      "description": "Cross-industry desk play #86 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 2900,
+      "revenue": [
+        1595,
+        4785
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-087",
+      "title": "Negotiate roadmap bet (cycle 87)",
+      "description": "Cross-industry desk play #87 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3350,
+      "revenue": [
+        2345,
+        7973
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-088",
+      "title": "Publish demo environment (cycle 88)",
+      "description": "Cross-industry desk play #88 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 15800,
+      "revenue": [
+        13430,
+        29546
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-089",
+      "title": "Instrument support macros (cycle 89)",
+      "description": "Cross-industry desk play #89 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 16250,
+      "revenue": [
+        16250,
+        42250
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-090",
+      "title": "Ship customer council (cycle 90)",
+      "description": "Cross-industry desk play #90 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 4700,
+      "revenue": [
+        1880,
+        5640
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-091",
+      "title": "Run renewal playbook (cycle 91)",
+      "description": "Cross-industry desk play #91 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 5150,
+      "revenue": [
+        2833,
+        9632
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-092",
+      "title": "Launch security review (cycle 92)",
+      "description": "Cross-industry desk play #92 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 5600,
+      "revenue": [
+        3920,
+        8624
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-093",
+      "title": "Audit deploy checklist (cycle 93)",
+      "description": "Cross-industry desk play #93 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 6050,
+      "revenue": [
+        5143,
+        13372
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-094",
+      "title": "Pilot capacity plan (cycle 94)",
+      "description": "Cross-industry desk play #94 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 18500,
+      "revenue": [
+        18500,
+        55500
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-095",
+      "title": "Scale pricing experiment (cycle 95)",
+      "description": "Cross-industry desk play #95 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 18950,
+      "revenue": [
+        7580,
+        25772
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "catalog-expansion-096",
+      "title": "Refactor SLA dashboard (cycle 96)",
+      "description": "Cross-industry desk play #96 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 7400,
+      "revenue": [
+        4070,
+        8954
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-097",
+      "title": "Negotiate QA matrix (cycle 97)",
+      "description": "Cross-industry desk play #97 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 0,
+      "tierMax": 3,
+      "cost": 7850,
+      "revenue": [
+        5495,
+        14287
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-098",
+      "title": "Publish churn post-mortem (cycle 98)",
+      "description": "Cross-industry desk play #98 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "xc",
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 7,
+      "cost": 8300,
+      "revenue": [
+        7055,
+        21165
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "catalog-expansion-099",
+      "title": "Instrument migration toolkit (cycle 99)",
+      "description": "Cross-industry desk play #99 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 8750,
+      "revenue": [
+        8750,
+        29750
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "catalog-expansion-100",
+      "title": "Ship onboarding (cycle 100)",
+      "description": "Cross-industry desk play #100 — keeps the rotating catalog fresh month to month.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 21200,
+      "revenue": [
+        8480,
+        18656
+      ],
+      "product": 2,
+      "buzz": 2
+    }
+  ]
+}

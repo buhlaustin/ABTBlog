@@ -22,9 +22,35 @@ const {
   pickMonthlyTaskDefs,
   monthDealHasDuplicateTaskIds,
   confirmTaskLineup,
-  getTaskPoolSize
+  getTaskPoolSize,
+  getTaskDefinitions,
+  taskCatalogSize,
+  RECENT_TASK_COOLDOWN_MONTHS
 } = await import(`file://${join(sim, 'modules/Tasks.js')}`);
 hydrateTaskCatalog(tasksJson);
+
+let failed = false;
+
+if (taskCatalogSize() < 1100) {
+  console.error(`FAIL: merged task catalog ${taskCatalogSize()} < 1100`);
+  failed = true;
+} else {
+  console.log(`OK: task catalog size ${taskCatalogSize()} (cooldown ${RECENT_TASK_COOLDOWN_MONTHS} months)`);
+}
+
+const genericPool = getTaskDefinitions().filter((t) => !t.categories?.length && !t.launchPhase);
+for (let i = 0; i < 80; i += 1) {
+  const recent = genericPool.slice(i * 3, i * 3 + 80).map((t) => t.id);
+  const picked = pickMonthlyTaskDefs(genericPool, 10, recent);
+  if (monthDealHasDuplicateTaskIds(picked) || picked.length !== new Set(picked.map((t) => t.id)).size) {
+    console.error('FAIL: monthly task offers must be unique ids');
+    failed = true;
+    break;
+  }
+}
+if (!failed) {
+  console.log('OK: monthly offers unique (no duplicate options per month)');
+}
 
 function categoryAllowed(task, categoryId) {
   const cats = task.categories;
@@ -41,7 +67,6 @@ function stageAllowed(task, stage) {
   return stages.includes(stage);
 }
 
-let failed = false;
 const smokeCategory = 'b2b-saas';
 for (const stage of Object.values(STAGES)) {
   const pool = tasksJson.tasks.filter(
@@ -178,7 +203,6 @@ if (!state.launch.waitlistSignups || !wl.length) {
   console.log(`OK: pre-launch gates (${PRE_LAUNCH_BUZZ_REQUIRED} buzz, ${PRE_LAUNCH_PRODUCT_REQUIRED} product)`);
 }
 
-const { getTaskDefinitions } = await import(`file://${join(sim, 'modules/Tasks.js')}`);
 const crowdPreLaunch = getTaskDefinitions().filter(
   (t) => t.launchPhase === 'pre_launch' && t.crowdfunding
 );
