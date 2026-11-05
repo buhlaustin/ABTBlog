@@ -6,7 +6,7 @@
       "title": "Shadow five onboarding calls",
       "description": "Listen where new users stall before they quietly churn.",
       "types": [
-        "marketing"
+        "research"
       ],
       "stages": [
         "office",
@@ -27,7 +27,7 @@
       "title": "Patch the signup funnel leak",
       "description": "Instrument drop-offs and ship two small UX fixes this month.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "xc",
@@ -35,10 +35,10 @@
       ],
       "tierMin": 3,
       "tierMax": 7,
-      "cost": 1100,
+      "cost": 6800,
       "revenue": [
-        770,
-        2310
+        5440,
+        14960
       ],
       "product": 0,
       "buzz": 1
@@ -48,7 +48,7 @@
       "title": "Win back a churned logo",
       "description": "Founder call, honest retro, and a tight re-pilot scope.",
       "types": [
-        "research"
+        "sales"
       ],
       "stages": [
         "post_xc"
@@ -109,7 +109,7 @@
       "title": "Run a SOC 2 tabletop",
       "description": "Pretend the auditor lands Friday; close the scary gaps first.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "garage",
@@ -130,7 +130,7 @@
       "title": "Offer annual prepay discount",
       "description": "Trade modest margin for cash up front and firm renewal dates.",
       "types": [
-        "research"
+        "sales"
       ],
       "stages": [
         "office",
@@ -151,7 +151,7 @@
       "title": "Define product-qualified leads",
       "description": "Give sales one activation threshold everyone trusts.",
       "types": [
-        "product"
+        "research"
       ],
       "stages": [
         "xc",
@@ -159,10 +159,10 @@
       ],
       "tierMin": 3,
       "tierMax": 7,
-      "cost": 3800,
+      "cost": 7600,
       "revenue": [
-        3230,
-        7106
+        6460,
+        16720
       ],
       "product": 2,
       "buzz": 1
@@ -172,7 +172,7 @@
       "title": "Host a customer advisory lunch",
       "description": "Six power users, no deck, one roadmap bet prioritized.",
       "types": [
-        "marketing"
+        "research"
       ],
       "stages": [
         "post_xc"
@@ -192,7 +192,7 @@
       "title": "Harden billing webhooks",
       "description": "Idempotency, retries, and alerts before finance finds duplicates.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "post_xc",
@@ -213,7 +213,7 @@
       "title": "Stand up a sandbox tenant",
       "description": "Let prospects click around without a sales engineer babysitting.",
       "types": [
-        "research"
+        "sales"
       ],
       "stages": [
         "public"
@@ -233,7 +233,7 @@
       "title": "Rewrite the pricing page",
       "description": "Clarify tiers, limits, and the upgrade path in one scroll.",
       "types": [
-        "product"
+        "marketing"
       ],
       "stages": [
         "garage",
@@ -254,7 +254,7 @@
       "title": "Cold-email 50 ideal accounts",
       "description": "Short notes, one concrete outcome, no “synergies” paragraph.",
       "types": [
-        "marketing"
+        "sales"
       ],
       "stages": [
         "office",
@@ -357,7 +357,7 @@
       "title": "Audit third-party script weight",
       "description": "Drop tags that slow LCP and leak data you should not share.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "garage",
@@ -378,7 +378,7 @@
       "title": "Launch a public roadmap",
       "description": "Show what you will build and what you explicitly will not.",
       "types": [
-        "research"
+        "product"
       ],
       "stages": [
         "office",
@@ -399,7 +399,7 @@
       "title": "Run a pricing sensitivity survey",
       "description": "Stop guessing ARPU—ask willingness-to-pay with a simple study.",
       "types": [
-        "product"
+        "research"
       ],
       "stages": [
         "xc",
@@ -420,7 +420,7 @@
       "title": "Close the security questionnaire backlog",
       "description": "Standard answers, evidence links, fewer all-nighters.",
       "types": [
-        "marketing"
+        "product"
       ],
       "stages": [
         "post_xc"
@@ -440,7 +440,7 @@
       "title": "Pilot usage-based billing",
       "description": "Meter one dimension cleanly before rebilling the whole base.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "post_xc",
@@ -461,7 +461,7 @@
       "title": "Record a founder AMA livestream",
       "description": "Raw Q&A beats polished ads for early trust.",
       "types": [
-        "research"
+        "marketing"
       ],
       "stages": [
         "public"
@@ -502,7 +502,7 @@
       "title": "Build a churn early-warning dashboard",
       "description": "Leading indicators support can act on this week.",
       "types": [
-        "marketing"
+        "product"
       ],
       "stages": [
         "office",
@@ -544,7 +544,7 @@
       "title": "Ship SSO for Google Workspace",
       "description": "Remove the IT blocker on mid-market pilots.",
       "types": [
-        "research"
+        "product"
       ],
       "stages": [
         "post_xc"
@@ -564,7 +564,7 @@
       "title": "Run competitive win-loss calls",
       "description": "Neutral third party extracts truth sales will not say aloud.",
       "types": [
-        "product"
+        "research"
       ],
       "stages": [
         "post_xc",
@@ -605,7 +605,7 @@
       "title": "Tighten API rate limits",
       "description": "Protect uptime; document limits customers can plan around.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "garage",
@@ -626,7 +626,7 @@
       "title": "Launch referral credits experiment",
       "description": "Give both sides something meaningful, not a vanity badge.",
       "types": [
-        "research"
+        "marketing"
       ],
       "stages": [
         "office",
@@ -668,7 +668,7 @@
       "title": "Schedule exec check-ins for renewals",
       "description": "Relationship heat before the ninety-day red zone.",
       "types": [
-        "marketing"
+        "sales"
       ],
       "stages": [
         "post_xc"
@@ -688,7 +688,7 @@
       "title": "Deprecate a legacy feature flag",
       "description": "Kill zombie code paths before they bite a big customer.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "post_xc",
@@ -709,7 +709,7 @@
       "title": "Host a virtual user conference",
       "description": "One track, customer speakers, recording as evergreen content.",
       "types": [
-        "research"
+        "marketing"
       ],
       "stages": [
         "public"
@@ -729,7 +729,7 @@
       "title": "Map F500 procurement steps",
       "description": "Know legal, InfoSec, and vendor onboarding timelines upfront.",
       "types": [
-        "product"
+        "research"
       ],
       "stages": [
         "garage",
@@ -750,7 +750,7 @@
       "title": "Ship audit logs for admins",
       "description": "Enterprise buyers ask; have an answer before the RFP.",
       "types": [
-        "marketing"
+        "product"
       ],
       "stages": [
         "office",
@@ -833,7 +833,7 @@
       "title": "Negotiate cloud commit credits",
       "description": "Prebuy infra at a discount while growth is still predictable.",
       "types": [
-        "marketing"
+        "research"
       ],
       "stages": [
         "public"
@@ -853,7 +853,7 @@
       "title": "Launch a community Slack",
       "description": "Peer support scales better than founder DMs.",
       "types": [
-        "sales"
+        "marketing"
       ],
       "stages": [
         "garage",
@@ -874,7 +874,7 @@
       "title": "Publish SLA and status page",
       "description": "Transparency buys patience during incidents.",
       "types": [
-        "research"
+        "product"
       ],
       "stages": [
         "office",
@@ -895,7 +895,7 @@
       "title": "Ship CSV export customers asked for",
       "description": "Unblock finance and ops workflows this quarter.",
       "types": [
-        "product"
+        "marketing"
       ],
       "stages": [
         "xc",
@@ -903,10 +903,10 @@
       ],
       "tierMin": 3,
       "tierMax": 7,
-      "cost": 2000,
+      "cost": 7400,
       "revenue": [
-        2000,
-        4400
+        6290,
+        16280
       ],
       "product": 2,
       "buzz": 1
@@ -916,7 +916,7 @@
       "title": "Sponsor a niche newsletter",
       "description": "Highly targeted reach beats generic display ads.",
       "types": [
-        "marketing"
+        "product"
       ],
       "stages": [
         "post_xc"
@@ -936,7 +936,7 @@
       "title": "Automate trial expiration nudges",
       "description": "Timely emails beat generic “we miss you” blasts.",
       "types": [
-        "sales"
+        "marketing"
       ],
       "stages": [
         "post_xc",
@@ -957,7 +957,7 @@
       "title": "Conduct an accessibility sweep",
       "description": "WCAG fixes widen TAM and reduce support tickets.",
       "types": [
-        "research"
+        "marketing"
       ],
       "stages": [
         "public"
@@ -998,7 +998,7 @@
       "title": "Bundle implementation hours",
       "description": "Services unlock six-figure ACV faster than software alone.",
       "types": [
-        "marketing"
+        "research"
       ],
       "stages": [
         "office",
@@ -1101,7 +1101,7 @@
       "title": "Pitch a vertical case study",
       "description": "One deep industry story beats ten generic logos.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "garage",
@@ -1122,7 +1122,7 @@
       "title": "Fix invoice PDF branding",
       "description": "Small polish signals you are ready for finance teams.",
       "types": [
-        "research"
+        "marketing"
       ],
       "stages": [
         "office",
@@ -1143,7 +1143,7 @@
       "title": "Run an infra cost review",
       "description": "Right-size instances before margins surprise the board.",
       "types": [
-        "product"
+        "research"
       ],
       "stages": [
         "xc",
@@ -1164,7 +1164,7 @@
       "title": "Enable SCIM provisioning",
       "description": "IT pushes users; you stop spreadsheet seat math.",
       "types": [
-        "marketing"
+        "product"
       ],
       "stages": [
         "post_xc"
@@ -1184,7 +1184,7 @@
       "title": "Host developer office hours",
       "description": "API adoption grows when someone answers live.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "post_xc",
@@ -1205,7 +1205,7 @@
       "title": "Ship guided setup checklist",
       "description": "Progress-bar onboarding beats a blank dashboard stare.",
       "types": [
-        "research"
+        "sales"
       ],
       "stages": [
         "public"
@@ -1225,7 +1225,7 @@
       "title": "Test a freemium upgrade nudge",
       "description": "One well-timed prompt—not ten nag modals.",
       "types": [
-        "product"
+        "marketing"
       ],
       "stages": [
         "garage",
@@ -1246,7 +1246,7 @@
       "title": "Map data retention policies",
       "description": "Align defaults with GDPR and customer contracts.",
       "types": [
-        "marketing"
+        "product"
       ],
       "stages": [
         "office",
@@ -1267,7 +1267,7 @@
       "title": "Launch a reseller pilot",
       "description": "Let agencies sell you where your team cannot travel.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "xc",
@@ -1288,7 +1288,7 @@
       "title": "Refresh employer brand on LinkedIn",
       "description": "Hiring velocity matters once fundraising slows.",
       "types": [
-        "research"
+        "product"
       ],
       "stages": [
         "post_xc"
@@ -1308,7 +1308,7 @@
       "title": "Ship multi-currency checkout",
       "description": "Stop losing international trials at the payment step.",
       "types": [
-        "product"
+        "research"
       ],
       "stages": [
         "post_xc",
@@ -1329,7 +1329,7 @@
       "title": "Template quarterly business reviews",
       "description": "CSMs show value; renewals get easier to forecast.",
       "types": [
-        "marketing"
+        "product"
       ],
       "stages": [
         "public"
@@ -1349,7 +1349,7 @@
       "title": "Cut support response time",
       "description": "Macros, triage tiers, and one visible SLA timer.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "garage",
@@ -1370,7 +1370,7 @@
       "title": "Build a Salesforce integration",
       "description": "CRM sync removes “another tab” objections.",
       "types": [
-        "research"
+        "marketing"
       ],
       "stages": [
         "office",
@@ -1412,7 +1412,7 @@
       "title": "Publish an open-source SDK",
       "description": "Developer love compounds; watch support load while doing it.",
       "types": [
-        "marketing"
+        "product"
       ],
       "stages": [
         "post_xc"
@@ -1432,7 +1432,7 @@
       "title": "Renegotiate payment processor fees",
       "description": "Basis points matter at volume—ask annually.",
       "types": [
-        "sales"
+        "marketing"
       ],
       "stages": [
         "post_xc",
@@ -1453,7 +1453,7 @@
       "title": "Ship dark mode",
       "description": "Low-effort morale win; screenshots look modern in decks.",
       "types": [
-        "research"
+        "product"
       ],
       "stages": [
         "public"
@@ -1494,7 +1494,7 @@
       "title": "Fix SPF and DKIM for product email",
       "description": "Land in inbox, not promotions—or worse, spam.",
       "types": [
-        "marketing"
+        "research"
       ],
       "stages": [
         "office",
@@ -1515,7 +1515,7 @@
       "title": "Launch a changelog RSS feed",
       "description": "Power users subscribe; support repeats fewer “what shipped?” questions.",
       "types": [
-        "sales"
+        "marketing"
       ],
       "stages": [
         "xc",
@@ -1536,7 +1536,7 @@
       "title": "Instrument the North Star metric",
       "description": "One chart the whole company argues about productively.",
       "types": [
-        "research"
+        "product"
       ],
       "stages": [
         "post_xc"
@@ -1556,7 +1556,7 @@
       "title": "Offer VPC or private deploy",
       "description": "Unblock regulated buyers even if few take it.",
       "types": [
-        "product"
+        "marketing"
       ],
       "stages": [
         "post_xc",
@@ -1577,7 +1577,7 @@
       "title": "Ship bulk admin actions",
       "description": "IT admins will not click fifty times to offboard users.",
       "types": [
-        "marketing"
+        "research"
       ],
       "stages": [
         "public"
@@ -1597,7 +1597,7 @@
       "title": "Host a customer hackathon",
       "description": "New integrations emerge; dev communities notice.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "garage",
@@ -1618,7 +1618,7 @@
       "title": "Audit role escalation paths",
       "description": "Close privilege creep before security review finds it.",
       "types": [
-        "research"
+        "marketing"
       ],
       "stages": [
         "office",
@@ -1639,7 +1639,7 @@
       "title": "Publish an API versioning policy",
       "description": "Set expectations before breaking changes alienate builders.",
       "types": [
-        "product"
+        "research"
       ],
       "stages": [
         "xc",
@@ -1647,10 +1647,10 @@
       ],
       "tierMin": 3,
       "tierMax": 7,
-      "cost": 200,
+      "cost": 9200,
       "revenue": [
-        80,
-        176
+        7820,
+        20240
       ],
       "product": 2,
       "buzz": 2
@@ -1660,17 +1660,17 @@
       "title": "Launch customer certification",
       "description": "Trained admins expand usage inside accounts.",
       "types": [
-        "marketing"
+        "product"
       ],
       "stages": [
         "post_xc"
       ],
       "tierMin": 1,
       "tierMax": 3,
-      "cost": 650,
+      "cost": 5200,
       "revenue": [
-        358,
-        931
+        4420,
+        11440
       ],
       "product": 1,
       "buzz": 1
@@ -1680,7 +1680,7 @@
       "title": "Fix timezone bugs in reporting",
       "description": "“Yesterday” must mean the same thing globally.",
       "types": [
-        "sales"
+        "marketing"
       ],
       "stages": [
         "post_xc",
@@ -1701,7 +1701,7 @@
       "title": "Run a win celebration ritual",
       "description": "Sales, product, and support hear why deals actually close.",
       "types": [
-        "research"
+        "product"
       ],
       "stages": [
         "public"
@@ -1721,7 +1721,7 @@
       "title": "Ship saved views and filters",
       "description": "Power users organize data; stickiness follows.",
       "types": [
-        "product"
+        "sales"
       ],
       "stages": [
         "garage",
@@ -1742,7 +1742,7 @@
       "title": "Partner with a university pipeline",
       "description": "Intern hiring beats generic job boards later.",
       "types": [
-        "marketing"
+        "product"
       ],
       "stages": [
         "office",
@@ -1771,10 +1771,10 @@
       ],
       "tierMin": 3,
       "tierMax": 7,
-      "cost": 2900,
+      "cost": 7200,
       "revenue": [
-        1595,
-        4785
+        6120,
+        15840
       ],
       "product": 0,
       "buzz": 1
@@ -1845,7 +1845,7 @@
       "title": "Ship print-friendly reports",
       "description": "Ops teams still export PDFs—stop fighting it.",
       "types": [
-        "sales"
+        "research"
       ],
       "stages": [
         "garage",
@@ -1866,7 +1866,7 @@
       "title": "Renegotiate overlapping SaaS renewals",
       "description": "Fewer overlapping tools and better bundle pricing with finance.",
       "types": [
-        "research"
+        "product"
       ],
       "stages": [
         "office",
@@ -1887,7 +1887,7 @@
       "title": "Publish a public incident postmortem",
       "description": "Trust recovery after a bad outage week.",
       "types": [
-        "product"
+        "sales"
       ],
       "stages": [
         "xc",
@@ -1928,7 +1928,7 @@
       "title": "List on a cloud marketplace",
       "description": "Procurement paths customers already trust.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "post_xc",
@@ -1949,7 +1949,7 @@
       "title": "Fix duplicate CRM contacts",
       "description": "Hygiene before marketing automation embarrasses you.",
       "types": [
-        "research"
+        "sales"
       ],
       "stages": [
         "public"
@@ -1969,7 +1969,7 @@
       "title": "Ship scheduled report emails",
       "description": "Executives get Monday numbers without logging in.",
       "types": [
-        "product"
+        "research"
       ],
       "stages": [
         "garage",
@@ -1990,7 +1990,7 @@
       "title": "Empathy interviews with support",
       "description": "Product learns the top tickets that should not exist.",
       "types": [
-        "marketing"
+        "sales"
       ],
       "stages": [
         "office",
@@ -2011,7 +2011,7 @@
       "title": "Write a pilot success plan",
       "description": "Mutual milestones so pilots convert or fail fast clearly.",
       "types": [
-        "sales"
+        "product"
       ],
       "stages": [
         "xc",
@@ -2052,7 +2052,7 @@
       "title": "Close books early this month",
       "description": "Revenue recognition discipline before scale makes it messy.",
       "types": [
-        "product"
+        "research"
       ],
       "stages": [
         "post_xc",

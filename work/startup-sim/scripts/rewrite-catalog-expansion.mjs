@@ -413,10 +413,145 @@ const COPY = [
   }
 ];
 
+/** Gameplay department tags — hand-matched to each title, not balance-rotated. */
+const TYPES = [
+  ['research'],
+  ['product'],
+  ['sales'],
+  ['product'],
+  ['marketing'],
+  ['product'],
+  ['sales'],
+  ['research'],
+  ['research'],
+  ['product'],
+  ['sales'],
+  ['marketing'],
+  ['sales'],
+  ['sales'],
+  ['research'],
+  ['product'],
+  ['marketing'],
+  ['product'],
+  ['product'],
+  ['research'],
+  ['product'],
+  ['product'],
+  ['marketing'],
+  ['product'],
+  ['product'],
+  ['sales'],
+  ['product'],
+  ['research'],
+  ['marketing'],
+  ['product'],
+  ['marketing'],
+  ['product'],
+  ['sales'],
+  ['product'],
+  ['marketing'],
+  ['research'],
+  ['product'],
+  ['sales'],
+  ['research'],
+  ['product'],
+  ['research'],
+  ['marketing'],
+  ['product'],
+  ['marketing'],
+  ['product'],
+  ['marketing'],
+  ['marketing'],
+  ['product'],
+  ['research'],
+  ['sales'],
+  ['research'],
+  ['product'],
+  ['marketing'],
+  ['product'],
+  ['marketing'],
+  ['research'],
+  ['product'],
+  ['product'],
+  ['sales'],
+  ['marketing'],
+  ['product'],
+  ['product'],
+  ['product'],
+  ['research'],
+  ['product'],
+  ['product'],
+  ['marketing'],
+  ['product'],
+  ['product'],
+  ['marketing'],
+  ['product'],
+  ['product'],
+  ['research'],
+  ['marketing'],
+  ['product'],
+  ['marketing'],
+  ['research'],
+  ['product'],
+  ['marketing'],
+  ['research'],
+  ['product'],
+  ['marketing'],
+  ['product'],
+  ['sales'],
+  ['product'],
+  ['sales'],
+  ['research'],
+  ['product'],
+  ['marketing'],
+  ['research'],
+  ['product'],
+  ['sales'],
+  ['marketing'],
+  ['product'],
+  ['sales'],
+  ['research'],
+  ['sales'],
+  ['product'],
+  ['research'],
+  ['research']
+];
+
+/** Fix stat rows that recycled early-game numbers on late-stage tasks. */
+const ECONOMICS_BY_ID = {
+  'catalog-expansion-002': { cost: 6800, revenue: [5440, 14960] },
+  'catalog-expansion-044': { cost: 7400, revenue: [6290, 16280] },
+  'catalog-expansion-080': { cost: 9200, revenue: [7820, 20240] },
+  'catalog-expansion-081': { cost: 5200, revenue: [4420, 11440] },
+  'catalog-expansion-086': { cost: 7200, revenue: [6120, 15840] }
+};
+
+function stageRank(stages) {
+  const rank = { garage: 0, office: 1, xc: 2, post_xc: 3, public: 4 };
+  return Math.max(0, ...(stages ?? ['garage']).map((s) => rank[s] ?? 0));
+}
+
+/** Re-tier cost/revenue when a late-stage task still carries garage-scale stats. */
+function fixRecycledEconomics(t) {
+  const override = ECONOMICS_BY_ID[t.id];
+  if (override) {
+    t.cost = override.cost;
+    t.revenue = override.revenue;
+    return;
+  }
+  const tierMin = t.tierMin ?? 0;
+  const late = stageRank(t.stages) >= 3;
+  if (!late || tierMin < 3) return;
+  if (t.cost >= 4000) return;
+  const bump = 5200 + tierMin * 800;
+  t.cost = bump;
+  t.revenue = [Math.round(bump * 0.85), Math.round(bump * 2.2)];
+}
+
 const raw = JSON.parse(readFileSync(dataPath, 'utf8'));
 const tasks = raw.tasks ?? [];
-if (COPY.length !== tasks.length) {
-  console.error(`COPY length ${COPY.length} !== tasks ${tasks.length}`);
+if (COPY.length !== tasks.length || TYPES.length !== tasks.length) {
+  console.error(`COPY ${COPY.length} TYPES ${TYPES.length} tasks ${tasks.length}`);
   process.exit(1);
 }
 
@@ -431,7 +566,9 @@ for (let i = 0; i < tasks.length; i += 1) {
   titles.add(title.toLowerCase());
   t.title = title;
   t.description = description;
+  t.types = [...TYPES[i]];
+  fixRecycledEconomics(t);
 }
 
 writeFileSync(dataPath, `${JSON.stringify({ version: raw.version ?? 1, tasks }, null, 2)}\n`);
-console.log(`Wrote ${tasks.length} catalog-expansion tasks with unique copy.`);
+console.log(`Wrote ${tasks.length} catalog-expansion tasks (copy, types, economics).`);
