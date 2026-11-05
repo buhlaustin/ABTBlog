@@ -136,7 +136,14 @@ import {
   onDemoDayTaskCompleted,
   applyDemoDayPitchChoice
 } from './modules/XC.js';
-import { loadHubData, selectHub, addSatellite, removeSatellite, showOfficesFeedback } from './modules/Offices.js';
+import {
+  loadHubData,
+  selectHub,
+  addSatellite,
+  removeSatellite,
+  showOfficesFeedback,
+  previewSatelliteOpen
+} from './modules/Offices.js';
 import { loadAssetManifest } from './modules/Assets.js';
 import { dismissTutorialStep } from './modules/Tutorial.js';
 import { recordRunInHallOfFame, renderHallOfFameBlock } from './modules/HallOfFame.js';
@@ -857,10 +864,24 @@ function handleSelectHub() {
   refresh();
 }
 
+function paintSatelliteOpenPreview() {
+  const preview = document.getElementById('satellite-open-preview');
+  if (!preview) return;
+  const cityId = document.getElementById('satellite-template')?.value;
+  const sizeId = document.getElementById('satellite-size')?.value ?? 'medium';
+  if (!cityId) {
+    preview.textContent = '';
+    return;
+  }
+  const line = previewSatelliteOpen(cityId, sizeId);
+  preview.textContent = line ? `Preview: ${line}` : '';
+}
+
 function handleAddSatellite() {
   if (!sessionState) return;
   const select = document.getElementById('satellite-template');
-  const result = addSatellite(sessionState, select?.value);
+  const sizeSelect = document.getElementById('satellite-size');
+  const result = addSatellite(sessionState, select?.value, sizeSelect?.value ?? 'medium');
   if (!result.ok) {
     showOfficesFeedback(result.reason, true);
     refresh();
@@ -868,9 +889,11 @@ function handleAddSatellite() {
   }
   appendLog(
     sessionState,
-    `Opened ${result.entry.label} satellite (+${result.entry.seats} seats, ${formatMoney(result.entry.rentMonthly)}/mo).`
+    `Opened ${result.entry.sizeLabel ?? 'Medium'} ${result.entry.label} satellite (+${result.entry.seats} seats, ${formatMoney(result.entry.rentMonthly)}/mo).`
   );
-  showOfficesFeedback(`Opened ${result.entry.label} — this city cannot be opened again this run.`);
+  showOfficesFeedback(
+    `Opened ${result.entry.sizeLabel} ${result.entry.label} (+${result.entry.seats} seats, ${formatMoney(result.entry.rentMonthly)}/mo).`
+  );
   refresh();
 }
 
@@ -1497,6 +1520,12 @@ function bindGameInteractions() {
       if (stepId) dismissTutorialStep(stepId);
       refresh();
       return;
+    }
+  });
+
+  app?.addEventListener('change', (e) => {
+    if (e.target.id === 'satellite-template' || e.target.id === 'satellite-size') {
+      paintSatelliteOpenPreview();
     }
   });
 

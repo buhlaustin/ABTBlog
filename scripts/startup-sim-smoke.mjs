@@ -1216,8 +1216,8 @@ if (!failed) {
   }
   const satState = createInitialState({ companyName: 'SatCo', categoryId: 'b2b-saas', mode: 'sandbox' });
   satState.offices = { hubId: 'atlanta', hubLabel: 'Atlanta', satellites: [], usedSatelliteTemplateIds: [] };
-  const open = addSatellite(satState, 'sat-denver');
-  const dup = addSatellite(satState, 'sat-denver');
+  const open = addSatellite(satState, 'sat-denver', 'medium');
+  const dup = addSatellite(satState, 'sat-denver', 'large');
   const avail = availableSatelliteTemplates(satState);
   if (!open.ok || dup.ok) {
     console.error(`FAIL: satellite one-time use (open ${open.ok}, dup ${dup.ok})`);
@@ -1228,6 +1228,25 @@ if (!failed) {
   } else if (!failed) {
     console.log(`OK: satellite catalog (${catalog.length} cities, one-time open)`);
   }
+  const { computeSatelliteOffice } = await import(`file://${join(sim, 'modules/SatelliteOffices.js')}`);
+  const denverTpl = catalog.find((t) => t.id === 'sat-denver');
+  const knoxTpl = catalog.find((t) => t.id === 'sat-knoxville');
+  const denverMed = computeSatelliteOffice(denverTpl, 'medium');
+  const knoxMed = computeSatelliteOffice(knoxTpl, 'medium');
+  const laTpl = catalog.find((t) => t.id === 'sat-los-angeles');
+  const laMed = computeSatelliteOffice(laTpl, 'medium');
+  if (laMed.seats <= knoxMed.seats || laMed.rentMonthly <= knoxMed.rentMonthly) {
+    console.error('FAIL: Los Angeles medium satellite should exceed Knoxville on seats and rent');
+    failed = true;
+  } else if (knoxMed.rentMonthly >= laMed.rentMonthly) {
+    console.error('FAIL: Knoxville should rent cheaper than Los Angeles at the same footprint size');
+    failed = true;
+  } else if (!failed) {
+    console.log(
+      `OK: satellite sizing (Knoxville medium ${knoxMed.seats}/${knoxMed.rentMonthly}, LA medium ${laMed.seats}/${laMed.rentMonthly})`
+    );
+  }
+
   const { totalHeadcountCap, headcountCapBreakdown } = await import(
     `file://${join(sim, 'modules/Offices.js')}`
   );
@@ -1238,13 +1257,23 @@ if (!failed) {
   hubCapState.offices = {
     hubId: 'atlanta',
     hubLabel: 'Atlanta',
-    satellites: [{ id: 'sat-denver', templateId: 'sat-denver', label: 'Denver', seats: 6, rentMonthly: 9000 }],
+    satellites: [
+      {
+        id: 'sat-denver',
+        templateId: 'sat-denver',
+        label: 'Denver',
+        size: 'medium',
+        sizeLabel: 'Medium',
+        seats: denverMed.seats,
+        rentMonthly: denverMed.rentMonthly
+      }
+    ],
     usedSatelliteTemplateIds: ['sat-denver']
   };
   const hubBaseCap = headcountCapBreakdown(hubCapState);
-  if (hubBaseCap.base !== HUB_HEADCOUNT_CAP || totalHeadcountCap(hubCapState) !== HUB_HEADCOUNT_CAP + 6) {
+  if (hubBaseCap.base !== HUB_HEADCOUNT_CAP || totalHeadcountCap(hubCapState) !== HUB_HEADCOUNT_CAP + denverMed.seats) {
     console.error(
-      `FAIL: hub cap expected ${HUB_HEADCOUNT_CAP}+6 seats got base ${hubBaseCap.base} total ${totalHeadcountCap(hubCapState)}`
+      `FAIL: hub cap expected ${HUB_HEADCOUNT_CAP}+${denverMed.seats} seats got base ${hubBaseCap.base} total ${totalHeadcountCap(hubCapState)}`
     );
     failed = true;
   } else if (maxHeadcountForStage(hubCapState.stage, hubCapState) !== totalHeadcountCap(hubCapState)) {

@@ -14,6 +14,25 @@ import {
   headcountCap
 } from './Workspace.js';
 import bundledHubs from '../data/hubs.json' with { type: 'json' };
+import {
+  SATELLITE_SIZE_IDS,
+  SATELLITE_SIZES,
+  computeSatelliteOffice,
+  formatSatellitePreview,
+  resolveSatelliteMarket,
+  satelliteSizeLabel
+} from './SatelliteOffices.js';
+
+function resolveSatelliteMarketLabel(template) {
+  const m = resolveSatelliteMarket(template);
+  return `cost ${m.costTier} · capacity ${m.capacityTier}`;
+}
+
+export function previewSatelliteOpen(templateId, sizeId = 'medium') {
+  const t = getSatelliteTemplates().find((s) => s.id === templateId);
+  if (!t) return '';
+  return formatSatellitePreview(t, sizeId);
+}
 
 let hubsCache = bundledHubs;
 
@@ -150,12 +169,13 @@ export function selectHub(state, hubId) {
   return { ok: true, hub };
 }
 
-export function addSatellite(state, templateId) {
+export function addSatellite(state, templateId, sizeId = 'medium') {
   if (!state.offices?.hubId) {
     return { ok: false, reason: 'Open a city hub HQ first.' };
   }
   const t = getSatelliteTemplates().find((s) => s.id === templateId);
   if (!t) return { ok: false, reason: 'Unknown satellite template.' };
+  const size = SATELLITE_SIZES[sizeId] ? sizeId : 'medium';
 
   if (!state.offices.usedSatelliteTemplateIds) state.offices.usedSatelliteTemplateIds = [];
   const used = usedSatelliteTemplateIds(state);
@@ -163,12 +183,17 @@ export function addSatellite(state, templateId) {
     return { ok: false, reason: `${t.label} satellite was already opened this run — pick another city.` };
   }
 
+  const stats = computeSatelliteOffice(t, size);
   const entry = {
     id: t.id,
     templateId: t.id,
     label: t.label,
-    seats: t.seats,
-    rentMonthly: t.rentMonthly
+    size: stats.size,
+    sizeLabel: stats.sizeLabel,
+    seats: stats.seats,
+    rentMonthly: stats.rentMonthly,
+    costTier: stats.costTier,
+    capacityTier: stats.capacityTier
   };
   state.offices.satellites.push(entry);
   if (!state.offices.usedSatelliteTemplateIds.includes(t.id)) {
@@ -291,7 +316,7 @@ export function renderOfficesPanel(container, state) {
   const satRows = (state.offices?.satellites ?? [])
     .map(
       (s) =>
-        `<tr><td>${escapeHtml(s.label)}</td><td class="num">${s.seats}</td><td class="num">${formatMoney(s.rentMonthly)}</td>
+        `<tr><td>${escapeHtml(s.label)}</td><td>${escapeHtml(s.sizeLabel ?? satelliteSizeLabel(s.size ?? 'medium'))}</td><td class="num">${s.seats}</td><td class="num">${formatMoney(s.rentMonthly)}</td>
         <td><button type="button" class="btn btn-ghost btn-small" data-remove-satellite="${escapeHtml(s.id)}">Remove</button></td></tr>`
     )
     .join('');
@@ -299,29 +324,37 @@ export function renderOfficesPanel(container, state) {
   const allTemplates = getSatelliteTemplates();
   const available = availableSatelliteTemplates(state);
   const satRentTotal = satelliteRent(state);
+  const defaultCity = available[0];
+  const defaultPreview = defaultCity ? formatSatellitePreview(defaultCity, 'medium') : '';
   const satOptions = available
-    .map(
-      (t) =>
-        `<option value="${t.id}">${escapeHtml(t.label)} — ${t.seats} seats · ${formatMoney(t.rentMonthly)}/mo</option>`
-    )
+    .map((t) => {
+      const market = resolveSatelliteMarketLabel(t);
+      return `<option value="${t.id}">${escapeHtml(t.label)} (${market})</option>`;
+    })
     .join('');
+  const sizeOptions = SATELLITE_SIZE_IDS.map(
+    (id) =>
+      `<option value="${id}">${escapeHtml(SATELLITE_SIZES[id].label)} footprint</option>`
+  ).join('');
 
   const satelliteBlock =
     state.offices?.hubId
       ? `
     <h3 class="log-head">Satellite offices</h3>
-    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Each city adds seats to your hiring cap (<strong>once per run</strong>).</p>
+    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Pick a <strong>city</strong> and <strong>size</strong> — alpha markets cost more and add more seats (<strong>once per city per run</strong>).</p>
     <div class="table-scroll">
       <table class="data-table">
-        <thead><tr><th>City</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
-        <tbody>${satRows || '<tr><td colspan="4">No satellites yet.</td></tr>'}</tbody>
+        <thead><tr><th>City</th><th>Size</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
+        <tbody>${satRows || '<tr><td colspan="5">No satellites yet.</td></tr>'}</tbody>
       </table>
     </div>
     ${
       available.length > 0
         ? `<div class="satellite-add">
-      <select id="satellite-template">${satOptions}</select>
+      <select id="satellite-template" aria-label="Satellite city">${satOptions}</select>
+      <select id="satellite-size" aria-label="Satellite size">${sizeOptions}</select>
       <button type="button" class="btn btn-ghost btn-small" id="btn-add-satellite">Open satellite</button>
+      <p class="fine-print" id="satellite-open-preview">${defaultPreview ? `Preview (medium): ${escapeHtml(defaultPreview)}` : ''}</p>
     </div>`
         : `<p class="fine-print">Every satellite city in the catalog is already open this run.</p>`
     }`
