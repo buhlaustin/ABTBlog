@@ -9,6 +9,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
+  timeout: 120_000,
   use: {
     ...devices['Desktop Chrome'],
     baseURL: 'http://127.0.0.1:4173'

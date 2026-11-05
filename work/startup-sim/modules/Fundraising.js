@@ -54,6 +54,7 @@ import {
   bankApprovalBreakdown,
   creditScoreLabel,
   prepayLoan,
+  requestLoanDraw,
   refinanceLoanAfterSeed,
   renderLoanHistoryList
 } from './BankLoan.js';
