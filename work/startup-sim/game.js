@@ -98,14 +98,22 @@ import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback, setCeoSection } fro
 import {
   purchaseCeoHomeCash,
   purchaseCeoHomeMortgage,
-  purchaseCeoLifestyle
+  purchaseCeoLifestyle,
+  sellCeoHome,
+  prepayCeoMortgage,
+  payOffCeoMortgage,
+  getCeoHomeTier,
+  CEO_LIFESTYLE_PURCHASES
 } from './modules/CeoLifestyle.js';
 import {
   preparePersonalExpensesForMonth,
   takeOwnerDrawFraction,
-  donateFromPersonalBank
+  donateFromPersonalBank,
+  assertCeoNetWorthGate,
+  depositPersonalInvestment,
+  withdrawPersonalInvestment,
+  personalInvestmentBalance
 } from './modules/CeoEconomics.js';
-import { sellCeoHome } from './modules/CeoLifestyle.js';
 import {
   hireCoo,
   releaseCoo,
@@ -1262,7 +1270,10 @@ function bindGameInteractions() {
     }
     const homeCashBtn = e.target.closest('[data-ceo-home-cash]');
     if (homeCashBtn && sessionState) {
-      const result = purchaseCeoHomeCash(sessionState, homeCashBtn.getAttribute('data-ceo-home-cash'));
+      const tierId = homeCashBtn.getAttribute('data-ceo-home-cash');
+      const tier = getCeoHomeTier(tierId);
+      const gate = assertCeoNetWorthGate(sessionState, tier?.minNetWorth);
+      const result = purchaseCeoHomeCash(sessionState, tierId, gate);
       if (!result.ok) showCeoFeedback(result.reason || 'Purchase failed.', true);
       else {
         appendLog(sessionState, result.summary);
@@ -1274,10 +1285,10 @@ function bindGameInteractions() {
     }
     const homeMortgageBtn = e.target.closest('[data-ceo-home-mortgage]');
     if (homeMortgageBtn && sessionState) {
-      const result = purchaseCeoHomeMortgage(
-        sessionState,
-        homeMortgageBtn.getAttribute('data-ceo-home-mortgage')
-      );
+      const tierId = homeMortgageBtn.getAttribute('data-ceo-home-mortgage');
+      const tier = getCeoHomeTier(tierId);
+      const gate = assertCeoNetWorthGate(sessionState, tier?.minNetWorth);
+      const result = purchaseCeoHomeMortgage(sessionState, tierId, gate);
       if (!result.ok) showCeoFeedback(result.reason || 'Mortgage declined.', true);
       else {
         appendLog(sessionState, result.summary);
@@ -1289,7 +1300,10 @@ function bindGameInteractions() {
     }
     const lifestyleBtn = e.target.closest('[data-ceo-lifestyle]');
     if (lifestyleBtn && sessionState) {
-      const result = purchaseCeoLifestyle(sessionState, lifestyleBtn.getAttribute('data-ceo-lifestyle'));
+      const purchaseId = lifestyleBtn.getAttribute('data-ceo-lifestyle');
+      const def = CEO_LIFESTYLE_PURCHASES.find((p) => p.id === purchaseId);
+      const gate = assertCeoNetWorthGate(sessionState, def?.minNetWorth);
+      const result = purchaseCeoLifestyle(sessionState, purchaseId, gate);
       if (!result.ok) showCeoFeedback(result.reason || 'Purchase failed.', true);
       else {
         appendLog(sessionState, result.summary);
@@ -1353,6 +1367,82 @@ function bindGameInteractions() {
       else {
         appendLog(sessionState, result.summary);
         showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const investDepositBtn = e.target.closest('[data-ceo-invest-deposit]');
+    if (investDepositBtn && sessionState) {
+      const result = depositPersonalInvestment(
+        sessionState,
+        investDepositBtn.getAttribute('data-ceo-invest-deposit')
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Deposit failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-ceo-invest-deposit' && sessionState) {
+      const input = document.getElementById('ceo-invest-deposit-input');
+      const result = depositPersonalInvestment(sessionState, input?.value);
+      if (!result.ok) showCeoFeedback(result.reason || 'Deposit failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const investWithdrawBtn = e.target.closest('[data-ceo-invest-withdraw]');
+    if (investWithdrawBtn && sessionState) {
+      let amount = investWithdrawBtn.getAttribute('data-ceo-invest-withdraw');
+      if (amount === 'max') amount = personalInvestmentBalance(sessionState);
+      const result = withdrawPersonalInvestment(sessionState, amount);
+      if (!result.ok) showCeoFeedback(result.reason || 'Withdrawal failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const mortgagePrepayBtn = e.target.closest('[data-ceo-mortgage-prepay]');
+    if (mortgagePrepayBtn && sessionState) {
+      const result = prepayCeoMortgage(
+        sessionState,
+        mortgagePrepayBtn.getAttribute('data-ceo-mortgage-prepay')
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Prepay failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-payoff-ceo-mortgage' && sessionState) {
+      const result = payOffCeoMortgage(sessionState);
+      if (!result.ok) showCeoFeedback(result.reason || 'Payoff failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-ceo-mortgage-prepay-custom' && sessionState) {
+      const input = document.getElementById('ceo-mortgage-prepay-input');
+      const result = prepayCeoMortgage(sessionState, input?.value);
+      if (!result.ok) showCeoFeedback(result.reason || 'Prepay failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
       }
       refresh();
       return;

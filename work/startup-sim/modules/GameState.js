@@ -207,6 +207,12 @@ export function normalizeSave(raw) {
       if (!state.ceo.section) state.ceo.section = 'overview';
       if (state.ceo.personalGivingLifetime == null) state.ceo.personalGivingLifetime = 0;
       if (!state.ceo.netWorthHistory) state.ceo.netWorthHistory = [];
+      if (state.ceo.investmentBalance == null) state.ceo.investmentBalance = 0;
+      if (state.ceo.careerInvestmentReturns == null) state.ceo.careerInvestmentReturns = 0;
+      if (state.ceo.lastInvestmentReturn == null) state.ceo.lastInvestmentReturn = 0;
+      if (state.ceo.housing?.mortgageOriginalPrincipal == null) {
+        state.ceo.housing.mortgageOriginalPrincipal = 0;
+      }
     }
     if (state.staff.companyBonusAnnualMode === undefined) state.staff.companyBonusAnnualMode = false;
     if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];

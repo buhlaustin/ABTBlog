@@ -20,7 +20,10 @@ import {
   typicalPersonalExpenseMonthly,
   personalBankRunway,
   ceoPersonalCashComp,
-  ceoNetWorth
+  ceoNetWorth,
+  ceoFinancialHealth,
+  personalInvestmentBalance,
+  personalInvestmentReturnRate
 } from './CeoEconomics.js';
 import {
   CEO_HOME_TIERS,
@@ -65,9 +68,17 @@ function renderWealthBar(mix) {
   if (mix.total <= 0) {
     return '<p class="fine-print">Net worth fills in as personal cash and equity grow.</p>';
   }
+  const investSeg =
+    mix.invest > 0
+      ? `<div class="ceo-wealth-seg ceo-wealth-invest" style="width:${mix.investPct}%"></div>`
+      : '';
   const homeSeg =
     mix.home > 0
       ? `<div class="ceo-wealth-seg ceo-wealth-home" style="width:${mix.homePct}%"></div>`
+      : '';
+  const investLegend =
+    mix.invest > 0
+      ? `<li><span class="ceo-dot ceo-dot-invest"></span> Portfolio ${formatMoney(mix.invest)} (${mix.investPct}%)</li>`
       : '';
   const homeLegend =
     mix.home > 0
@@ -76,11 +87,13 @@ function renderWealthBar(mix) {
   return `<div class="ceo-wealth-bar" role="img" aria-label="Wealth mix">
     <div class="ceo-wealth-seg ceo-wealth-equity" style="width:${mix.equityPct}%"></div>
     <div class="ceo-wealth-seg ceo-wealth-cash" style="width:${mix.cashPct}%"></div>
+    ${investSeg}
     ${homeSeg}
   </div>
   <ul class="ceo-wealth-legend instrument-list">
     <li><span class="ceo-dot ceo-dot-equity"></span> Equity ${formatMoney(mix.equity)} (${mix.equityPct}%)</li>
     <li><span class="ceo-dot ceo-dot-cash"></span> Personal bank ${formatMoney(mix.cash)} (${mix.cashPct}%)</li>
+    ${investLegend}
     ${homeLegend}
   </ul>`;
 }
@@ -154,6 +167,10 @@ function buildCeoPanelContext(state) {
   const bankLow = bank < scheduled.total * 0.75;
   const givingLifetime = state.ceo?.personalGivingLifetime ?? 0;
   const netWorthHist = state.ceo?.netWorthHistory ?? [];
+  const health = ceoFinancialHealth(state);
+  const portfolio = personalInvestmentBalance(state);
+  const investRate = personalInvestmentReturnRate(state);
+  const netWorth = ceoNetWorth(state);
   const section = activeCeoSection(state);
   return {
     name,
@@ -185,6 +202,10 @@ function buildCeoPanelContext(state) {
     bankLow,
     givingLifetime,
     netWorthHist,
+    health,
+    portfolio,
+    investRate,
+    netWorth,
     section,
     state
   };
@@ -214,6 +235,8 @@ function renderCeoOverviewSection(ctx) {
     runway,
     comp,
     shares,
+    health,
+    portfolio,
     state
   } = ctx;
   const runwaySalaryNoteInner =
@@ -235,7 +258,9 @@ function renderCeoOverviewSection(ctx) {
       ${ceoStatCard('Personal bank', formatMoney(bank), { hero: true })}
       ${ceoStatCard('Est. net worth', formatMoney(ceoNetWorth(state)))}
       ${ceoStatCard('Personal runway', escapeHtml(personalRunway.label))}
+      ${ceoStatCard('Liquidity', escapeHtml(health.label), { tone: health.tone === 'pos' ? 'pos' : health.tone === 'neg' ? 'neg' : null })}
     </section>
+    <p class="fine-print">${escapeHtml(health.detail)}${portfolio > 0 ? ` · Portfolio ${formatMoney(portfolio)}.` : ''}</p>
     <p class="fine-print finance-runway-detail">${openingLine}</p>
     ${bankAlert}
     <section class="finance-section finance-card" aria-label="Wealth mix">
@@ -291,9 +316,41 @@ function renderCeoWealthSection(ctx) {
     disabled,
     givingLifetime,
     netWorthHist,
+    portfolio,
+    investRate,
     state
   } = ctx;
   const publicCo = comp.publicCo;
+  const investRateLabel = `${(investRate * 100).toFixed(2)}%/mo est.`;
+  const portfolioBlock = `<section class="finance-section finance-card">
+      <div class="finance-section-head">
+        <h3 class="finance-section-title">Personal portfolio</h3>
+        <span class="fine-print">${investRateLabel}</span>
+      </div>
+      <p class="fine-print">Park cash outside your checking balance — monthly returns track public markets when listed, otherwise a money-market-style rate.</p>
+      <div class="finance-operating-grid">
+        ${ceoStatCard('Portfolio', formatMoney(portfolio), { hero: portfolio > 0 })}
+        ${ceoStatCard('Career returns', formatMoney(state.ceo?.careerInvestmentReturns ?? 0))}
+        ${ceoStatCard('Last month', formatMoney(state.ceo?.lastInvestmentReturn ?? 0), { tone: (state.ceo?.lastInvestmentReturn ?? 0) >= 0 ? 'pos' : 'neg' })}
+      </div>
+      <p class="fine-print"><strong>To portfolio</strong> (from personal bank)</p>
+      <div class="finance-charity-chips">
+        <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-invest-deposit="5000" ${disabled}>${formatMoney(5_000)}</button>
+        <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-invest-deposit="25000" ${disabled}>${formatMoney(25_000)}</button>
+        <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-invest-deposit="100000" ${disabled}>${formatMoney(100_000)}</button>
+      </div>
+      <div class="finance-inline-form ceo-salary-row">
+        <label class="visually-hidden" for="ceo-invest-deposit-input">Deposit amount</label>
+        <input id="ceo-invest-deposit-input" type="number" min="1000" step="1000" placeholder="Deposit $" ${disabled}>
+        <button type="button" class="btn btn-ghost btn-small" id="btn-ceo-invest-deposit" ${disabled}>Deposit</button>
+      </div>
+      <p class="fine-print"><strong>To personal bank</strong></p>
+      <div class="finance-charity-chips">
+        <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-invest-withdraw="5000" ${disabled || portfolio < 5000 ? 'disabled' : ''}>${formatMoney(5_000)}</button>
+        <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-invest-withdraw="25000" ${disabled || portfolio < 25000 ? 'disabled' : ''}>${formatMoney(25_000)}</button>
+        <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-invest-withdraw="max" ${disabled || portfolio < 500 ? 'disabled' : ''}>All</button>
+      </div>
+    </section>`;
   const publicBlock =
     publicCo && !state.flags?.cashedOut
       ? `<section class="finance-section finance-card ceo-public-card">
@@ -366,9 +423,10 @@ function renderCeoWealthSection(ctx) {
 
   return `
     ${publicBlock}
+    ${portfolioBlock}
     <section class="finance-section finance-card">
       <h3 class="finance-section-title">Net worth trend</h3>
-      <p class="fine-print">Snapshot after each month’s personal debits (cash + equity + home equity).</p>
+      <p class="fine-print">Snapshot after each month’s personal debits (cash, portfolio, equity, home equity).</p>
       ${renderNetWorthHistory(netWorthHist)}
     </section>
     <section class="finance-section finance-card finance-charity">
@@ -467,17 +525,19 @@ function renderCeoCompSection(ctx) {
 }
 
 function renderCeoLifestyleSection(ctx) {
-  const { housing, lifestyleOwned, bank, disabled, state } = ctx;
+  const { housing, lifestyleOwned, bank, disabled, netWorth, state } = ctx;
   const currentTierId = housing.mode !== HOUSING_MODE.RENT ? housing.tierId : null;
   const homeCards = CEO_HOME_TIERS.map((tier) => {
     const down = Math.round(tier.cashPrice * (tier.downPct ?? 0.2));
     const principal = tier.cashPrice - down;
     const mo = standardMortgagePayment(principal, tier.mortgageApr);
     const isCurrent = currentTierId === tier.id;
-    const canBuy = housing.mode === HOUSING_MODE.RENT && !disabled;
+    const gated = tier.minNetWorth && netWorth < tier.minNetWorth;
+    const canBuy = housing.mode === HOUSING_MODE.RENT && !disabled && !gated;
     return `<div class="finance-action people-perk-card ceo-home-card${isCurrent ? ' ceo-home-card--current' : ''}">
       <p><strong>${escapeHtml(tier.label)}</strong>${isCurrent ? ' <span class="task-tag">Current</span>' : ''} — ${formatMoney(tier.cashPrice)}</p>
       <p class="fine-print">${escapeHtml(tier.blurb)}</p>
+      ${gated ? `<p class="fine-print people-perk-effects">Unlock ≈ ${formatMoney(tier.minNetWorth)} net worth</p>` : ''}
       <p class="fine-print people-perk-effects">Cash ${formatMoney(tier.cashPrice)} · mortgage ${formatMoney(down)} down · ~${formatMoney(mo)}/mo · upkeep ${formatMoney(tier.maintenanceMo)}/mo</p>
       <div class="ceo-home-actions">
         <button type="button" class="btn btn-primary btn-small" data-ceo-home-cash="${escapeHtml(tier.id)}" ${canBuy ? '' : 'disabled'}>Buy cash</button>
@@ -488,11 +548,13 @@ function renderCeoLifestyleSection(ctx) {
 
   const lifestyleCards = CEO_LIFESTYLE_PURCHASES.map((item) => {
     const owned = lifestyleOwned.has(item.id);
+    const gated = item.minNetWorth && netWorth < item.minNetWorth;
     return `<div class="finance-action people-perk-card">
       <p><strong>${escapeHtml(item.label)}</strong> — ${formatMoney(item.cost)}${owned ? ' <span class="task-tag">Owned</span>' : ''}</p>
       <p class="fine-print">${escapeHtml(item.blurb)}</p>
+      ${gated ? `<p class="fine-print people-perk-effects">Requires ≈ ${formatMoney(item.minNetWorth)} net worth</p>` : ''}
       ${item.monthlyDebitBump ? `<p class="fine-print people-perk-effects">+${formatMoney(item.monthlyDebitBump)}/mo discretionary debits</p>` : ''}
-      <button type="button" class="btn btn-primary btn-small" data-ceo-lifestyle="${escapeHtml(item.id)}" ${owned || disabled ? 'disabled' : ''}>Buy</button>
+      <button type="button" class="btn btn-primary btn-small" data-ceo-lifestyle="${escapeHtml(item.id)}" ${owned || disabled || gated ? 'disabled' : ''}>Buy</button>
     </div>`;
   }).join('');
 
@@ -511,6 +573,25 @@ function renderCeoLifestyleSection(ctx) {
         </div>`
       : '';
 
+  const mortgageBlock =
+    housing.mode === HOUSING_MODE.MORTGAGE && (housing.mortgageBalance ?? 0) > 0
+      ? `<div class="ceo-mortgage-panel finance-card">
+          <h4 class="finance-section-title">Mortgage prepay</h4>
+          <p class="fine-print">Balance ${formatMoney(housing.mortgageBalance)} · ${housing.mortgageProgress}% paid · payment ~${formatMoney(housing.monthlyHousingDebit)}/mo in debits</p>
+          <div class="ceo-mortgage-progress" role="progressbar" aria-valuenow="${housing.mortgageProgress}" aria-valuemin="0" aria-valuemax="100"><span style="width:${housing.mortgageProgress}%"></span></div>
+          <div class="finance-charity-chips">
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-mortgage-prepay="10000" ${disabled}>${formatMoney(10_000)}</button>
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-mortgage-prepay="50000" ${disabled}>${formatMoney(50_000)}</button>
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" id="btn-payoff-ceo-mortgage" ${disabled}>Pay off (${formatMoney(housing.mortgageBalance)})</button>
+          </div>
+          <div class="finance-inline-form ceo-salary-row">
+            <label class="visually-hidden" for="ceo-mortgage-prepay-input">Prepay amount</label>
+            <input id="ceo-mortgage-prepay-input" type="number" min="500" step="500" placeholder="Custom prepay" ${disabled}>
+            <button type="button" class="btn btn-ghost btn-small" id="btn-ceo-mortgage-prepay-custom" ${disabled}>Prepay</button>
+          </div>
+        </div>`
+      : '';
+
   return `
     <section class="finance-section finance-card ceo-lifestyle-section" aria-label="Real estate and lifestyle">
       <div class="finance-section-head">
@@ -520,6 +601,7 @@ function renderCeoLifestyleSection(ctx) {
       <p class="fine-print people-benefits-lede">Spend <strong>personal bank</strong> cash (${formatMoney(bank)}) on homes and splurges. Mortgages replace the rolled <strong>Housing</strong> debit; paid-off homes switch to upkeep.</p>
       <p class="fine-print">${housingStatusLine}</p>
       ${sellHomeBlock}
+      ${mortgageBlock}
       <div class="finance-kpi-row people-kpi-row">
         ${ceoStatCard('Home equity', formatMoney(housing.equity), { hero: housing.equity > 0 })}
         ${ceoStatCard('Est. net worth', formatMoney(ceoNetWorth(state)))}

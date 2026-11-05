@@ -43,7 +43,18 @@ export const CEO_HOME_TIERS = [
     downPct: 0.3,
     mortgageApr: 0.06,
     maintenanceMo: 12_500,
-    blurb: 'Gated drive, staff wing, charity gala hosting mandatory.'
+    blurb: 'Gated drive, staff wing, charity gala hosting mandatory.',
+    minNetWorth: 8_000_000
+  },
+  {
+    id: 'waterfront-penthouse',
+    label: 'Waterfront penthouse',
+    cashPrice: 8_750_000,
+    downPct: 0.25,
+    mortgageApr: 0.061,
+    maintenanceMo: 7_200,
+    blurb: 'Corner unit, concierge, helicopter pad optional.',
+    minNetWorth: 4_000_000
   }
 ];
 
@@ -72,7 +83,8 @@ export const CEO_LIFESTYLE_PURCHASES = [
     label: 'Yacht (48 ft)',
     cost: 2_800_000,
     monthlyDebitBump: 18_000,
-    blurb: 'Dock fees, crew, and fuel — discretionary line never recovers.'
+    blurb: 'Dock fees, crew, and fuel — discretionary line never recovers.',
+    minNetWorth: 3_000_000
   },
   {
     id: 'art-collection',
@@ -108,8 +120,18 @@ function ensureHousing(state) {
       mortgageBalance: 0,
       mortgagePaymentMonthly: 0,
       maintenanceMonthly: 0,
+      mortgageOriginalPrincipal: 0,
       purchasedTurn: null
     };
+  }
+  const housing = state.ceo.housing;
+  if (housing.mortgageOriginalPrincipal == null) housing.mortgageOriginalPrincipal = 0;
+  if (
+    housing.mode === HOUSING_MODE.MORTGAGE &&
+    housing.mortgageOriginalPrincipal <= 0 &&
+    (housing.mortgageBalance ?? 0) > 0
+  ) {
+    housing.mortgageOriginalPrincipal = housing.mortgageBalance;
   }
   if (!state.ceo.lifestyleOwned) state.ceo.lifestyleOwned = [];
   if (state.ceo.lifestyleDebitBump == null) state.ceo.lifestyleDebitBump = 0;
@@ -151,6 +173,14 @@ export function ceoHousingSummary(state) {
     housing.mode === HOUSING_MODE.MORTGAGE
       ? housing.mortgagePaymentMonthly ?? 0
       : housing.maintenanceMonthly ?? tier?.maintenanceMo ?? 0;
+  const original = housing.mortgageOriginalPrincipal ?? 0;
+  const balance = housing.mortgageBalance ?? 0;
+  const mortgageProgress =
+    housing.mode === HOUSING_MODE.MORTGAGE && original > 0
+      ? Math.round((1 - balance / original) * 1000) / 10
+      : housing.mode === HOUSING_MODE.OWNED
+        ? 100
+        : 0;
   return {
     mode: housing.mode,
     label: tier?.label ?? 'Owned home',
@@ -158,7 +188,9 @@ export function ceoHousingSummary(state) {
     monthlyHousingDebit: monthly,
     equity,
     purchasePrice: price,
-    mortgageBalance: housing.mortgageBalance ?? 0,
+    mortgageBalance: balance,
+    mortgageOriginalPrincipal: original,
+    mortgageProgress,
     maintenanceMonthly: housing.maintenanceMonthly ?? 0
   };
 }
@@ -259,6 +291,7 @@ export function sellCeoHome(state) {
   housing.mortgageBalance = 0;
   housing.mortgagePaymentMonthly = 0;
   housing.maintenanceMonthly = 0;
+  housing.mortgageOriginalPrincipal = 0;
   housing.purchasedTurn = null;
   return {
     ok: true,
@@ -270,9 +303,12 @@ export function sellCeoHome(state) {
   };
 }
 
-export function purchaseCeoHomeCash(state, tierId) {
+export function purchaseCeoHomeCash(state, tierId, netWorthGate = null) {
   const tier = getCeoHomeTier(tierId);
   if (!tier) return { ok: false, reason: 'Unknown home tier.' };
+  if (tier.minNetWorth && netWorthGate && !netWorthGate.ok) {
+    return { ok: false, reason: netWorthGate.reason ?? 'Net worth gate.' };
+  }
   const housing = ensureHousing(state);
   if (housing.mode !== HOUSING_MODE.RENT) {
     return { ok: false, reason: 'Sell your current home on the Lifestyle tab before buying another.' };
@@ -294,9 +330,12 @@ export function purchaseCeoHomeCash(state, tierId) {
   };
 }
 
-export function purchaseCeoHomeMortgage(state, tierId) {
+export function purchaseCeoHomeMortgage(state, tierId, netWorthGate = null) {
   const tier = getCeoHomeTier(tierId);
   if (!tier) return { ok: false, reason: 'Unknown home tier.' };
+  if (tier.minNetWorth && netWorthGate && !netWorthGate.ok) {
+    return { ok: false, reason: netWorthGate.reason ?? 'Net worth gate.' };
+  }
   const housing = ensureHousing(state);
   if (housing.mode !== HOUSING_MODE.RENT) {
     return { ok: false, reason: 'Sell your current home before taking a new mortgage.' };
@@ -312,6 +351,7 @@ export function purchaseCeoHomeMortgage(state, tierId) {
   housing.tierId = tier.id;
   housing.purchasePrice = tier.cashPrice;
   housing.mortgageBalance = principal;
+  housing.mortgageOriginalPrincipal = principal;
   housing.mortgagePaymentMonthly = payment;
   housing.maintenanceMonthly = Math.round(tier.maintenanceMo * 0.35);
   housing.purchasedTurn = calendarTurn(state);
@@ -322,11 +362,49 @@ export function purchaseCeoHomeMortgage(state, tierId) {
   };
 }
 
-export function purchaseCeoLifestyle(state, purchaseId) {
+export function prepayCeoMortgage(state, amountRaw) {
+  const housing = ensureHousing(state);
+  if (!housing || housing.mode !== HOUSING_MODE.MORTGAGE) {
+    return { ok: false, reason: 'No active mortgage.' };
+  }
+  const balance = housing.mortgageBalance ?? 0;
+  if (balance <= 0) return { ok: false, reason: 'Mortgage is already paid off.' };
+  const amount = Math.round(Number(amountRaw) || 0);
+  if (amount < 500) return { ok: false, reason: 'Minimum prepayment is $500.' };
+  const pay = Math.min(amount, balance);
+  const paid = payFromPersonalBank(state, pay, 'Mortgage prepayment', 'mortgage_prepay');
+  if (!paid.ok) return paid;
+  housing.mortgageBalance = balance - pay;
+  const lines = [`Mortgage prepayment ${formatMoney(pay)} — balance ${formatMoney(housing.mortgageBalance)}.`];
+  if (housing.mortgageBalance <= 0) {
+    housing.mode = HOUSING_MODE.OWNED;
+    housing.mortgagePaymentMonthly = 0;
+    const tier = getCeoHomeTier(housing.tierId);
+    housing.maintenanceMonthly = tier?.maintenanceMo ?? housing.maintenanceMonthly;
+    housing.mortgageOriginalPrincipal = 0;
+    lines.push('Mortgage paid off — debits shift to upkeep only.');
+  }
+  return { ok: true, summary: lines.join(' ') };
+}
+
+export function payOffCeoMortgage(state) {
+  const housing = ensureHousing(state);
+  if (!housing || housing.mode !== HOUSING_MODE.MORTGAGE) {
+    return { ok: false, reason: 'No active mortgage.' };
+  }
+  const balance = housing.mortgageBalance ?? 0;
+  if (balance <= 0) return { ok: false, reason: 'Nothing left to pay.' };
+  return prepayCeoMortgage(state, balance);
+}
+
+export function purchaseCeoLifestyle(state, purchaseId, netWorthGate = null) {
   const def = CEO_LIFESTYLE_PURCHASES.find((p) => p.id === purchaseId);
   if (!def) return { ok: false, reason: 'Unknown purchase.' };
   if ((state.ceo?.lifestyleOwned ?? []).includes(def.id)) {
     return { ok: false, reason: 'Already purchased this run.' };
+  }
+  if (def.minNetWorth && netWorthGate && !netWorthGate.ok) {
+    return { ok: false, reason: netWorthGate.reason ?? 'Net worth gate.' };
   }
   const paid = payFromPersonalBank(state, def.cost, def.label, 'lifestyle');
   if (!paid.ok) return paid;

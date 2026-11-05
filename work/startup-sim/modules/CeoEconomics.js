@@ -55,7 +55,10 @@ export function createInitialCeoState() {
     lifestyleDebitBump: 0,
     section: 'overview',
     personalGivingLifetime: 0,
-    netWorthHistory: []
+    netWorthHistory: [],
+    investmentBalance: 0,
+    careerInvestmentReturns: 0,
+    lastInvestmentReturn: 0
   };
 }
 
@@ -615,26 +618,163 @@ export function ceoPersonalCashComp(state) {
   );
 }
 
+export function personalInvestmentBalance(state) {
+  return Math.max(0, Math.round(ceoState(state).investmentBalance ?? 0));
+}
+
+export function personalInvestmentReturnRate(state) {
+  if (isPublicCompany(state)) {
+    const move = (state.publicMarket?.lastMonthDeltaPct ?? 0) / 100;
+    return Math.max(-0.025, Math.min(0.03, 0.0035 + move * 0.4));
+  }
+  return 0.0015;
+}
+
+export function assertCeoNetWorthGate(state, minNetWorth) {
+  const min = Math.round(Number(minNetWorth) || 0);
+  if (min <= 0) return { ok: true };
+  const nw = ceoNetWorth(state);
+  if (nw >= min) return { ok: true, netWorth: nw };
+  return {
+    ok: false,
+    netWorth: nw,
+    reason: `Need about ${formatMoney(min)} net worth (yours ≈ ${formatMoney(nw)}).`
+  };
+}
+
+export function depositPersonalInvestment(state, amountRaw) {
+  if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
+  const amount = Math.round(Number(amountRaw) || 0);
+  if (amount < 1_000) return { ok: false, reason: 'Minimum transfer to portfolio is $1,000.' };
+  const ceo = ceoState(state);
+  ensureCeoPersonalBank(state);
+  if ((ceo.bankBalance ?? 0) < amount) {
+    return { ok: false, reason: `Need ${formatMoney(amount)} in personal bank.` };
+  }
+  ceo.bankBalance -= amount;
+  ceo.investmentBalance = personalInvestmentBalance(state) + amount;
+  pushCeoLog(ceo, 'bankLog', {
+    kind: 'invest_deposit',
+    amount,
+    delta: -amount,
+    balanceAfter: ceo.bankBalance,
+    label: 'Moved to personal portfolio',
+    ...logStamp(state)
+  });
+  return {
+    ok: true,
+    amount,
+    summary: `Transferred ${formatMoney(amount)} to personal portfolio (bank ${formatMoney(ceo.bankBalance)}, portfolio ${formatMoney(ceo.investmentBalance)}).`
+  };
+}
+
+export function withdrawPersonalInvestment(state, amountRaw) {
+  if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
+  const amount = Math.round(Number(amountRaw) || 0);
+  if (amount < 500) return { ok: false, reason: 'Minimum withdrawal is $500.' };
+  const ceo = ceoState(state);
+  const bal = personalInvestmentBalance(state);
+  if (bal < amount) {
+    return { ok: false, reason: `Portfolio holds ${formatMoney(bal)}.` };
+  }
+  ceo.investmentBalance = bal - amount;
+  creditPersonalBank(state, amount, 'Portfolio withdrawal', 'invest_withdraw');
+  return {
+    ok: true,
+    amount,
+    summary: `Withdrew ${formatMoney(amount)} from portfolio to personal bank.`
+  };
+}
+
+/** Index-style personal portfolio — returns accrue inside the account. */
+export function settlePersonalInvestmentsAtMonthEnd(state) {
+  const ceo = ceoState(state);
+  const bal = personalInvestmentBalance(state);
+  if (bal <= 0) return [];
+  const rate = personalInvestmentReturnRate(state);
+  const gain = Math.round(bal * rate);
+  if (gain === 0) return [];
+  ceo.investmentBalance = bal + gain;
+  ceo.careerInvestmentReturns = (ceo.careerInvestmentReturns ?? 0) + gain;
+  ceo.lastInvestmentReturn = gain;
+  const pctLabel = `${(rate * 100).toFixed(2)}%`;
+  if (gain > 0) {
+    return [`Personal portfolio +${formatMoney(gain)} (${pctLabel} this month; total ${formatMoney(ceo.investmentBalance)}).`];
+  }
+  return [`Personal portfolio ${formatMoney(gain)} (${pctLabel}; total ${formatMoney(ceo.investmentBalance)}).`];
+}
+
+export function ceoFinancialHealth(state) {
+  const runway = personalBankRunway(state);
+  const burn = runway.burn;
+  const bal = runway.balance;
+  const months =
+    runway.label === '∞' ? 99 : Math.max(0, parseFloat(runway.label) || 0);
+  const lifestyleBump = state.ceo?.lifestyleDebitBump ?? 0;
+  if (bal <= 0 && burn > 0) {
+    return {
+      tone: 'neg',
+      label: 'Overdrawn risk',
+      detail: 'Personal bank is empty — salary or a draw before month close.'
+    };
+  }
+  if (months < 1.5) {
+    return {
+      tone: 'neg',
+      label: 'Cash tight',
+      detail: `~${runway.label} runway at ${formatMoney(burn)}/mo typical spend.`
+    };
+  }
+  if (months < 4) {
+    return {
+      tone: 'neutral',
+      label: 'Watch liquidity',
+      detail: `${runway.label} personal runway${lifestyleBump ? ` (+${formatMoney(lifestyleBump)}/mo lifestyle)` : ''}.`
+    };
+  }
+  return {
+    tone: 'pos',
+    label: 'Liquid',
+    detail: `${runway.label} personal runway · bank ${formatMoney(bal)}.`
+  };
+}
+
 export function ceoNetWorth(state) {
   return (
-    ceoPersonalBankBalance(state) + (founderEquityValue(state) ?? 0) + ceoHomeEquity(state)
+    ceoPersonalBankBalance(state) +
+    personalInvestmentBalance(state) +
+    (founderEquityValue(state) ?? 0) +
+    ceoHomeEquity(state)
   );
 }
 
 export function wealthMix(state) {
   const cash = ceoPersonalBankBalance(state);
+  const invest = personalInvestmentBalance(state);
   const equity = founderEquityValue(state) ?? 0;
   const home = ceoHomeEquity(state);
-  const total = cash + equity + home;
+  const total = cash + invest + equity + home;
   if (total <= 0) {
-    return { cash, equity, home, total: 0, cashPct: 0, equityPct: 100, homePct: 0 };
+    return {
+      cash,
+      invest,
+      equity,
+      home,
+      total: 0,
+      cashPct: 0,
+      investPct: 0,
+      equityPct: 100,
+      homePct: 0
+    };
   }
   return {
     cash,
+    invest,
     equity,
     home,
     total,
     cashPct: Math.round((cash / total) * 1000) / 10,
+    investPct: Math.round((invest / total) * 1000) / 10,
     equityPct: Math.round((equity / total) * 1000) / 10,
     homePct: Math.round((home / total) * 1000) / 10
   };

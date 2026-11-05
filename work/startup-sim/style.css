@@ -567,6 +567,10 @@ h1 {
   background: #f59e0b;
 }
 
+.ceo-wealth-invest {
+  background: #a371f7;
+}
+
 .ceo-wealth-legend {
   margin-bottom: 1rem;
 }
@@ -590,6 +594,29 @@ h1 {
 
 .ceo-dot-home {
   background: #f59e0b;
+}
+
+.ceo-dot-invest {
+  background: #a371f7;
+}
+
+.ceo-mortgage-panel {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+}
+
+.ceo-mortgage-progress {
+  height: 0.5rem;
+  background: var(--panel-muted, rgba(255, 255, 255, 0.08));
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.ceo-mortgage-progress span {
+  display: block;
+  height: 100%;
+  background: var(--accent, #58a6ff);
 }
 
 .ceo-subtabs {

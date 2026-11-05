@@ -1714,10 +1714,13 @@ const {
   isDepartmentUnlocked,
   migrateStaffHeadcount
 } = await import(`file://${join(sim, 'modules/Staff.js')}`);
-const { sellCeoHome, purchaseCeoHomeCash } = await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
-const { donateFromPersonalBank, recordCeoNetWorthSnapshot, ceoNetWorth } = await import(
-  `file://${join(sim, 'modules/CeoEconomics.js')}`
-);
+const { sellCeoHome, purchaseCeoHomeCash, purchaseCeoHomeMortgage, prepayCeoMortgage } =
+  await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
+const {
+  donateFromPersonalBank,
+  recordCeoNetWorthSnapshot,
+  depositPersonalInvestment
+} = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
 const homeState = createInitialState({
   companyName: 'HomeSellCo',
   categoryId: 'b2b-saas',
@@ -1751,9 +1754,29 @@ if (!bought.ok) {
         console.error('FAIL: CEO net worth snapshot');
         failed = true;
       } else {
-        console.log(
-          `OK: CEO tab (sell home ${formatMoney(sold.proceeds)}, personal give, net worth ${formatMoney(ceoNetWorth(giveState))})`
-        );
+        const investState = createInitialState({
+          companyName: 'InvestCo',
+          categoryId: 'b2b-saas',
+          mode: 'sandbox'
+        });
+        investState.ceo.bankBalance = 50_000;
+        const dep = depositPersonalInvestment(investState, 10_000);
+        const mortgageState = createInitialState({
+          companyName: 'MortgageCo',
+          categoryId: 'b2b-saas',
+          mode: 'sandbox'
+        });
+        mortgageState.ceo.bankBalance = 500_000;
+        purchaseCeoHomeMortgage(mortgageState, 'starter-condo');
+        const prepay = prepayCeoMortgage(mortgageState, 25_000);
+        if (!dep.ok || investState.ceo.investmentBalance !== 10_000 || !prepay.ok) {
+          console.error('FAIL: CEO portfolio deposit or mortgage prepay');
+          failed = true;
+        } else {
+          console.log(
+            `OK: CEO tab (sell home ${formatMoney(sold.proceeds)}, portfolio ${formatMoney(investState.ceo.investmentBalance)}, mortgage prepay)`
+          );
+        }
       }
     }
   }

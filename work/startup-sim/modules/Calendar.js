@@ -10,6 +10,7 @@ import {
   recordCeoSalaryForMonth,
   settlePersonalExpensesAtMonthEnd,
   recordCeoNetWorthSnapshot,
+  settlePersonalInvestmentsAtMonthEnd,
   preparePersonalExpensesForMonth
 } from './CeoEconomics.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
@@ -129,6 +130,9 @@ export function endMonth(state) {
     appendLog(state, line);
   }
   for (const line of settlePersonalExpensesAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
+  for (const line of settlePersonalInvestmentsAtMonthEnd(state)) {
     appendLog(state, line);
   }
   recordCeoNetWorthSnapshot(state);
