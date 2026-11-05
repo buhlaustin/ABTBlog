@@ -21,7 +21,8 @@ const {
   dealMonthlyTasks,
   pickMonthlyTaskDefs,
   monthDealHasDuplicateTaskIds,
-  confirmTaskLineup
+  confirmTaskLineup,
+  getTaskPoolSize
 } = await import(`file://${join(sim, 'modules/Tasks.js')}`);
 hydrateTaskCatalog(tasksJson);
 
@@ -466,6 +467,28 @@ if ((unreadSocialCount(feedState) ?? 0) < 1) {
   failed = true;
 } else {
   console.log('OK: social unread count after month feed');
+}
+
+const preSeedState = createInitialState({
+  companyName: 'PreSeedPool',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+preSeedState.flags.xcResidencyComplete = true;
+preSeedState.flags.seedRoundClosed = false;
+for (const categoryId of allCategories) {
+  preSeedState.company.categoryId = categoryId;
+  const poolSize = getTaskPoolSize(preSeedState);
+  const need = getMonthlyTaskSlots(STAGES.POST_XC) + 2;
+  if (poolSize < need) {
+    console.error(
+      `FAIL: post-XC pre-seed pool for ${categoryId} is ${poolSize} (need ≥ ${need} offers)`
+    );
+    failed = true;
+  }
+}
+if (!failed) {
+  console.log('OK: post-XC pre-seed desk pool covers monthly offers (all categories)');
 }
 
 process.exit(failed ? 1 : 0);

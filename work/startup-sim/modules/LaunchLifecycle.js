@@ -1,4 +1,5 @@
 import { STAGES } from './constants.js';
+import { getTaskStage } from './Workspace.js';
 
 export function createInitialLaunchState() {
   return {
@@ -11,7 +12,8 @@ export function createInitialLaunchState() {
 
 /** Garage launch arc still gating the desk catalog. */
 export function launchLifecycleActive(state) {
-  return state.stage === STAGES.GARAGE && state.launch?.phase !== 'graduated';
+  if (getTaskStage(state) !== STAGES.GARAGE) return false;
+  return state.launch?.phase !== 'graduated';
 }
 
 export function launchPhaseLabel(state) {

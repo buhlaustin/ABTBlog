@@ -5,6 +5,7 @@ import { progressionTier } from './ProgressionEconomy.js';
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
 import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
+import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import {
   currentLaunchTaskPhase,
   launchPhaseAllowed,
@@ -34,8 +35,19 @@ function mergeLaunchTasks(base) {
   return { ...base, tasks: merged };
 }
 
+function mergePostXcPreSeedTasks(base) {
+  const extra = bundledPostXcPreSeed?.tasks ?? [];
+  if (!extra.length) return base;
+  const ids = new Set((base.tasks ?? []).map((t) => t.id));
+  const merged = [...(base.tasks ?? [])];
+  for (const t of extra) {
+    if (!ids.has(t.id)) merged.push(t);
+  }
+  return { ...base, tasks: merged };
+}
+
 function mergeCatalog(base) {
-  return mergeLaunchTasks(mergeSignatureTasks(base));
+  return mergePostXcPreSeedTasks(mergeLaunchTasks(mergeSignatureTasks(base)));
 }
 
 let taskCatalog = mergeCatalog(bundledCatalog);
@@ -58,6 +70,11 @@ export async function loadTaskCatalog() {
 
 export function getTaskDefinitions() {
   return taskCatalog?.tasks ?? [];
+}
+
+/** Headless tests — eligible desk pool for the current run state. */
+export function getTaskPoolSize(state) {
+  return buildTaskPool(state).length;
 }
 
 export function isTaskCatalogReady() {
@@ -162,26 +179,36 @@ function stageAllowed(task, stage) {
   return stages.includes(stage);
 }
 
+function postXcRevenueBand(rMax) {
+  if (rMax >= 500_000) return { min: 5, max: 99 };
+  if (rMax >= 120_000) return { min: 4, max: 99 };
+  if (rMax >= 40_000) return { min: 3, max: 5 };
+  if (rMax >= 12_000) return { min: 2, max: 4 };
+  return { min: 1, max: 2 };
+}
+
+/** Union tier bands when a task spans multiple stages (e.g. post_xc + public). */
 function inferredTierBand(task) {
   if (task.tierMin != null || task.tierMax != null) {
     return { min: task.tierMin ?? 0, max: task.tierMax ?? 99 };
   }
   const stages = task.stages ?? [];
   const rMax = task.revenue?.[1] ?? 0;
-  if (stages.includes('garage') || stages.includes('office')) {
-    return { min: 0, max: 1 };
+  let min = 99;
+  let max = 0;
+  const add = (lo, hi) => {
+    min = Math.min(min, lo);
+    max = Math.max(max, hi);
+  };
+  if (stages.includes('garage') || stages.includes('office')) add(0, 1);
+  if (stages.includes('xc')) add(0, 2);
+  if (stages.includes('post_xc')) {
+    const b = postXcRevenueBand(rMax);
+    add(b.min, b.max);
   }
-  if (stages.includes('xc')) {
-    return { min: 0, max: 2 };
-  }
-  if (stages.includes('public')) {
-    return { min: 5, max: 99 };
-  }
-  if (rMax >= 500_000) return { min: 5, max: 99 };
-  if (rMax >= 120_000) return { min: 4, max: 99 };
-  if (rMax >= 40_000) return { min: 3, max: 5 };
-  if (rMax >= 12_000) return { min: 2, max: 4 };
-  return { min: 1, max: 2 };
+  if (stages.includes('public')) add(5, 99);
+  if (min === 99) return postXcRevenueBand(rMax);
+  return { min, max };
 }
 
 function taskTierAllowed(task, state) {
