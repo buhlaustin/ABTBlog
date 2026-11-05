@@ -11,6 +11,7 @@ import { createInitialXcState, calendarTurn } from './XC.js';
 import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
+import { createInitialAcquisitionsState } from './Acquisitions.js';
 import { createInitialCrisisState } from './Crisis.js';
 import { createInitialDecisionState } from './DecisionEvents.js';
 import { createInitialModifiers } from './ScenarioEffects.js';
@@ -28,7 +29,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 16;
+export const SAVE_VERSION = 17;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -104,7 +105,8 @@ export function createInitialState(options) {
     xc: createInitialXcState(),
     advisor: createInitialAdvisor(),
     sentiment: createInitialSentiment(),
-    world: { competitor: createCompetitorForCategory(category.id) },
+    world: { competitor: createCompetitorForCategory(category.id), competitorAcquired: false },
+    acquisitions: createInitialAcquisitionsState(),
     crisis: createInitialCrisisState(),
     decision: createInitialDecisionState(),
     modifiers: createInitialModifiers(),
@@ -313,6 +315,14 @@ export function normalizeSave(raw) {
         state.xc.batchStartsTurn = calendarTurn(state);
         state.flags.xcBatchActive = false;
       }
+    }
+    if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
+    if (!state.acquisitions.owned) state.acquisitions.owned = [];
+    if (state.world && state.world.competitorAcquired === undefined) {
+      state.world.competitorAcquired = false;
+    }
+    if (state.finance && state.finance.subsidiaryMrr === undefined) {
+      state.finance.subsidiaryMrr = 0;
     }
     if (!state.accelerators) state.accelerators = { joined: [], activeBoost: null };
     for (const f of ['seriesCClosed', 'seriesDClosed', 'seriesEClosed', 'seriesFClosed']) {

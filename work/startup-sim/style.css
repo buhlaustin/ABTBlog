@@ -655,6 +655,24 @@ h1 {
   transition: width 0.2s ease;
 }
 
+.acquisitions-section {
+  margin: 1.25rem 0;
+}
+
+.acquisitions-section .panel-subtitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.btn-danger {
+  border-color: #f87171;
+  color: #fecaca;
+}
+
+.btn-danger:hover {
+  background: rgba(248, 113, 113, 0.15);
+}
+
 .crisis-panel {
   max-width: 36rem;
   margin: 0 auto;

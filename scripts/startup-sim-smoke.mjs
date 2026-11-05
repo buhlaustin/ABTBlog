@@ -13,7 +13,7 @@ const tasksJson = JSON.parse(readFileSync(join(sim, 'data/tasks.json'), 'utf8'))
 const { STAGES, getMonthlyTaskSlots } = await import(
   `file://${join(sim, 'modules/constants.js')}`
 );
-const { createInitialState, normalizeSave } = await import(
+const { createInitialState, normalizeSave, formatMoney } = await import(
   `file://${join(sim, 'modules/GameState.js')}`
 );
 const {
@@ -489,6 +489,43 @@ for (const categoryId of allCategories) {
 }
 if (!failed) {
   console.log('OK: post-XC pre-seed desk pool covers monthly offers (all categories)');
+}
+
+const {
+  preloadAcquisitionCatalog,
+  getAcquisitionCatalog,
+  purchaseTarget,
+  totalSubsidiaryMrr,
+  applySubsidiaryMrrPayout
+} = await import(`file://${join(sim, 'modules/Acquisitions.js')}`);
+await preloadAcquisitionCatalog();
+if (getAcquisitionCatalog().length !== 99) {
+  console.error(`FAIL: expected 99 acquisition targets, got ${getAcquisitionCatalog().length}`);
+  failed = true;
+} else {
+  console.log('OK: acquisition catalog has 99 companies');
+}
+const acqState = createInitialState({
+  companyName: 'HoldCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 100_000_000
+});
+acqState.flags.xcResidencyComplete = true;
+const small = getAcquisitionCatalog().find((c) => c.segment === 'small' && !c.isRival);
+const buy = purchaseTarget(acqState, small.id);
+if (!buy.ok) {
+  console.error(`FAIL: could not buy small co: ${buy.reason}`);
+  failed = true;
+} else {
+  const before = acqState.finance.cash;
+  const payout = applySubsidiaryMrrPayout(acqState);
+  if (payout.total < 1 || acqState.finance.cash <= before) {
+    console.error('FAIL: subsidiary MRR payout should add cash');
+    failed = true;
+  } else {
+    console.log(`OK: acquisition + portfolio MRR (${formatMoney(totalSubsidiaryMrr(acqState))}/mo)`);
+  }
 }
 
 process.exit(failed ? 1 : 0);

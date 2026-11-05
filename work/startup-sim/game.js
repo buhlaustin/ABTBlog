@@ -99,6 +99,13 @@ import { dismissTutorialStep } from './modules/Tutorial.js';
 import { recordRunInHallOfFame, renderHallOfFameBlock } from './modules/HallOfFame.js';
 import { parseSandboxTuning } from './modules/SandboxTuning.js';
 import { applyPivot } from './modules/Pivot.js';
+import {
+  purchaseTarget,
+  sellSubsidiary,
+  reinvestInSubsidiary,
+  preloadAcquisitionCatalog,
+  showCompaniesFeedback
+} from './modules/Acquisitions.js';
 import { openMonthSummaryDialog, updateMonthSummaryHeadline } from './modules/MonthSummary.js';
 import { copyRunExportToClipboard } from './modules/RunExport.js';
 import {
@@ -623,6 +630,59 @@ function handleDecisionChoice(index) {
   refresh();
 }
 
+function handleAcquisitionBuy(id) {
+  if (!sessionState) return;
+  const result = purchaseTarget(sessionState, id);
+  if (!result.ok) {
+    showCompaniesFeedback(result.reason || 'Could not acquire.', true);
+    refresh();
+    return;
+  }
+  const name = result.company?.isRival
+    ? sessionState.world?.competitor?.name ?? result.company.name
+    : result.company?.name;
+  appendLog(
+    sessionState,
+    `Acquired ${name} for ${formatMoney(result.price)} (+${formatMoney(result.mrr)}/mo portfolio MRR).`
+  );
+  showCompaniesFeedback(`Acquired ${name} — portfolio MRR +${formatMoney(result.mrr)}/mo.`);
+  refresh();
+}
+
+function handleAcquisitionSell(id) {
+  if (!sessionState) return;
+  const result = sellSubsidiary(sessionState, id);
+  if (!result.ok) {
+    showCompaniesFeedback(result.reason || 'Could not sell.', true);
+    refresh();
+    return;
+  }
+  const name = result.company?.isRival
+    ? sessionState.world?.competitor?.name ?? result.company.name
+    : result.company?.name;
+  appendLog(sessionState, `Sold ${name} for ${formatMoney(result.proceeds)}.`);
+  showCompaniesFeedback(`Sold ${name} for ${formatMoney(result.proceeds)}.`);
+  refresh();
+}
+
+function handleAcquisitionReinvest(id) {
+  if (!sessionState) return;
+  const raw = window.prompt('Reinvest cash into this subsidiary (min $5,000):', '25000');
+  if (raw == null) return;
+  const result = reinvestInSubsidiary(sessionState, id, raw);
+  if (!result.ok) {
+    showCompaniesFeedback(result.reason || 'Reinvestment failed.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Reinvested ${formatMoney(result.amount)} — health ${result.health.toFixed(2)}×, MRR ${formatMoney(result.mrr)}/mo.`
+  );
+  showCompaniesFeedback(`Reinvested ${formatMoney(result.amount)} — MRR now ${formatMoney(result.mrr)}/mo.`);
+  refresh();
+}
+
 function handleSelectHub() {
   if (!sessionState) return;
   const select = document.getElementById('hub-select');
@@ -853,6 +913,21 @@ function bindGameInteractions() {
     const decisionBtn = e.target.closest('[data-decision-choice]');
     if (decisionBtn) {
       handleDecisionChoice(Number(decisionBtn.getAttribute('data-decision-choice')));
+      return;
+    }
+    const acqBuy = e.target.closest('[data-acquisition-buy]');
+    if (acqBuy) {
+      handleAcquisitionBuy(acqBuy.getAttribute('data-acquisition-buy'));
+      return;
+    }
+    const acqSell = e.target.closest('[data-acquisition-sell]');
+    if (acqSell) {
+      handleAcquisitionSell(acqSell.getAttribute('data-acquisition-sell'));
+      return;
+    }
+    const acqReinvest = e.target.closest('[data-acquisition-reinvest]');
+    if (acqReinvest) {
+      handleAcquisitionReinvest(acqReinvest.getAttribute('data-acquisition-reinvest'));
       return;
     }
     if (e.target.id === 'btn-file-ipo') {
@@ -1137,6 +1212,7 @@ async function init() {
         initNarrativeApiUrl(),
         preloadCrisisCatalog(),
         preloadDecisionEvents(),
+        preloadAcquisitionCatalog(),
         preloadNewsTimeline(),
         preloadSocialPersonas()
       ]);

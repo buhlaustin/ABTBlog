@@ -83,7 +83,11 @@ test.describe('Startup Simulator', () => {
 
     await page.locator('#tab-finance').click();
     await expect(page.locator('#panel-finance')).toContainText('Cap table');
-    await expect(page.locator('#panel-finance')).toContainText('Solo founder mode');
+    await expect(page.locator('#panel-finance')).toContainText('Portfolio MRR');
+
+    await page.locator('#tab-companies').click();
+    await expect(page.locator('#panel-companies')).toContainText('Portfolio MRR');
+    await expect(page.locator('#panel-companies')).toContainText('X Combinator batch');
   });
 
   test('mobile viewport: tabs and people table scroll without horizontal page overflow', async ({

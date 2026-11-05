@@ -1,6 +1,7 @@
 import { formatMoney, stageLabel, getMonthlyTaskSlots } from './constants.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
+import { renderCompaniesPanel } from './Acquisitions.js';
 import { renderPeoplePanel } from './Staff.js';
 import { renderSocialPanel, markSocialAsRead, syncSocialTabAlert } from './Social.js';
 import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
@@ -321,6 +322,7 @@ export const TAB_ORDER = [
   'growth',
   'people',
   'finance',
+  'companies',
   'board',
   'social',
   'news',
@@ -361,6 +363,9 @@ function renderPanelForTab(tab, state) {
       break;
     case 'finance':
       renderFinancePanel(document.getElementById('panel-finance'), state);
+      break;
+    case 'companies':
+      renderCompaniesPanel(document.getElementById('panel-companies'), state);
       break;
     case 'board':
       renderBoardPanel(document.getElementById('panel-board'), state);
@@ -454,6 +459,11 @@ export function bindGameKeyboardShortcuts(getSession, onCloseMonth) {
         e.preventDefault();
         selectTab(tab);
       }
+      return;
+    }
+    if (e.key === '0' && !e.altKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      selectTab('advisor');
       return;
     }
 

@@ -24,6 +24,7 @@ import {
   scorePublicGuidanceBeat
 } from './WorldDynamics.js';
 import { tickScenarioModifiers } from './ScenarioEffects.js';
+import { applySubsidiaryMrrPayout } from './Acquisitions.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -103,6 +104,10 @@ export function endMonth(state) {
   const monthRevenue = state.calendar.monthRevenue ?? 0;
   const growthCampaignsClosed = state.growth?.campaignsThisMonth?.length ?? 0;
   const burn = resolveMonthEndBurn(state);
+  const portfolio = applySubsidiaryMrrPayout(state);
+  for (const line of portfolio.lines ?? []) {
+    appendLog(state, line);
+  }
   onMonthEndSentiment(state, priorMonthRevenue, state.finance?.monthlyRevenue ?? 0);
   let stockDeltaPct = null;
 

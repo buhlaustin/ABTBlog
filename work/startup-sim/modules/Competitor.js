@@ -25,6 +25,7 @@ export function createCompetitorForCategory(categoryId) {
 
 /** Slight revenue drag when rival is “winning”. */
 export function competitorRevenueMult(state) {
+  if (state.world?.competitorAcquired) return 1;
   const p = state.world?.competitor?.pressure ?? 0;
   return Math.max(0.92, 1 - p * 0.015);
 }

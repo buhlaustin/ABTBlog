@@ -1,0 +1,819 @@
+{
+  "version": 1,
+  "companies": [
+    {
+      "id": "acq-rival-b2b-saas",
+      "name": "CloudLedger",
+      "isRival": true,
+      "rivalCategory": "b2b-saas",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-rival-consumer-social",
+      "name": "VibeCircle",
+      "isRival": true,
+      "rivalCategory": "consumer-social",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-rival-marketplace",
+      "name": "GigRabbit",
+      "isRival": true,
+      "rivalCategory": "marketplace",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-rival-delivery",
+      "name": "DashDrop",
+      "isRival": true,
+      "rivalCategory": "delivery",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-rival-fintech",
+      "name": "NeonBank",
+      "isRival": true,
+      "rivalCategory": "fintech",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-rival-ai-tools",
+      "name": "Promptly AI",
+      "isRival": true,
+      "rivalCategory": "ai-tools",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-rival-hardware",
+      "name": "BrickWorks",
+      "isRival": true,
+      "rivalCategory": "hardware",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-rival-healthtech",
+      "name": "MediMesh",
+      "isRival": true,
+      "rivalCategory": "healthtech",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-rival-edtech",
+      "name": "LessonLoop",
+      "isRival": true,
+      "rivalCategory": "edtech",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-rival-climate",
+      "name": "GreenStack",
+      "isRival": true,
+      "rivalCategory": "climate",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-rival-gaming-media",
+      "name": "LootLoop",
+      "isRival": true,
+      "rivalCategory": "gaming-media",
+      "segment": "enterprise",
+      "baseMrr": 420000,
+      "basePrice": 48000000,
+      "description": "Your category rival — acquisition removes market friction and adds their book of business."
+    },
+    {
+      "id": "acq-012-kite-status-co",
+      "name": "Kite status Co.",
+      "segment": "small",
+      "baseMrr": 2240,
+      "basePrice": 444000,
+      "description": "Profitable status pages — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-013-mosaic-email-co",
+      "name": "Mosaic email Co.",
+      "segment": "small",
+      "baseMrr": 2360,
+      "basePrice": 466000,
+      "description": "Profitable email deliverability — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-014-parallel-feature-co",
+      "name": "Parallel feature Co.",
+      "segment": "small",
+      "baseMrr": 2480,
+      "basePrice": 488000,
+      "description": "Profitable feature flags — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-015-quartz-observability-co",
+      "name": "Quartz observability Co.",
+      "segment": "small",
+      "baseMrr": 2600,
+      "basePrice": 510000,
+      "description": "Profitable observability — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-016-uplink-platform",
+      "name": "Uplink Platform",
+      "segment": "mid",
+      "baseMrr": 40800,
+      "basePrice": 5080000,
+      "description": "Profitable contract management — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-017-pixel-network",
+      "name": "Pixel Network",
+      "segment": "mid",
+      "baseMrr": 42600,
+      "basePrice": 5260000,
+      "description": "Profitable procurement — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-018-north-holdings",
+      "name": "North Holdings",
+      "segment": "mid",
+      "baseMrr": 44400,
+      "basePrice": 5440000,
+      "description": "Profitable revenue recognition — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-019-cedar-industries",
+      "name": "Cedar Industries",
+      "segment": "enterprise",
+      "baseMrr": 313000,
+      "basePrice": 63600000,
+      "description": "Profitable partner portals — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-020-pixel-payroll-co",
+      "name": "Pixel payroll Co.",
+      "segment": "small",
+      "baseMrr": 3200,
+      "basePrice": 620000,
+      "description": "Profitable payroll APIs — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-021-north-niche-co",
+      "name": "North niche Co.",
+      "segment": "small",
+      "baseMrr": 3320,
+      "basePrice": 642000,
+      "description": "Profitable niche CRM — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-022-harbor-vertical-co",
+      "name": "Harbor vertical Co.",
+      "segment": "small",
+      "baseMrr": 3440,
+      "basePrice": 664000,
+      "description": "Profitable vertical SaaS — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-023-swift-data-co",
+      "name": "Swift data Co.",
+      "segment": "small",
+      "baseMrr": 3560,
+      "basePrice": 686000,
+      "description": "Profitable data pipeline — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-024-lumen-customer-co",
+      "name": "Lumen customer Co.",
+      "segment": "small",
+      "baseMrr": 3680,
+      "basePrice": 708000,
+      "description": "Profitable customer support — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-025-atlas-inventory-co",
+      "name": "Atlas inventory Co.",
+      "segment": "small",
+      "baseMrr": 3800,
+      "basePrice": 730000,
+      "description": "Profitable inventory sync — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-026-echo-platform",
+      "name": "Echo Platform",
+      "segment": "mid",
+      "baseMrr": 58800,
+      "basePrice": 6880000,
+      "description": "Profitable loyalty program — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-027-forge-network",
+      "name": "Forge Network",
+      "segment": "mid",
+      "baseMrr": 60600,
+      "basePrice": 7060000,
+      "description": "Profitable field service — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-028-hatch-holdings",
+      "name": "Hatch Holdings",
+      "segment": "mid",
+      "baseMrr": 62400,
+      "basePrice": 7240000,
+      "description": "Profitable subscription billing — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-029-relay-corporation",
+      "name": "Relay Corporation",
+      "segment": "enterprise",
+      "baseMrr": 433000,
+      "basePrice": 27600000,
+      "description": "Profitable identity layer — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-030-forge-workflow-co",
+      "name": "Forge workflow Co.",
+      "segment": "small",
+      "baseMrr": 4400,
+      "basePrice": 840000,
+      "description": "Profitable workflow automation — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-031-hatch-document-co",
+      "name": "Hatch document Co.",
+      "segment": "small",
+      "baseMrr": 4520,
+      "basePrice": 862000,
+      "description": "Profitable document AI — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-032-kite-status-co",
+      "name": "Kite status Co.",
+      "segment": "small",
+      "baseMrr": 4640,
+      "basePrice": 884000,
+      "description": "Profitable status pages — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-033-mosaic-email-co",
+      "name": "Mosaic email Co.",
+      "segment": "small",
+      "baseMrr": 4760,
+      "basePrice": 906000,
+      "description": "Profitable email deliverability — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-034-parallel-feature-co",
+      "name": "Parallel feature Co.",
+      "segment": "small",
+      "baseMrr": 4880,
+      "basePrice": 928000,
+      "description": "Profitable feature flags — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-035-quartz-observability-co",
+      "name": "Quartz observability Co.",
+      "segment": "small",
+      "baseMrr": 5000,
+      "basePrice": 950000,
+      "description": "Profitable observability — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-036-uplink-platform",
+      "name": "Uplink Platform",
+      "segment": "mid",
+      "baseMrr": 13800,
+      "basePrice": 8680000,
+      "description": "Profitable contract management — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-037-pixel-network",
+      "name": "Pixel Network",
+      "segment": "mid",
+      "baseMrr": 15600,
+      "basePrice": 8860000,
+      "description": "Profitable procurement — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-038-north-holdings",
+      "name": "North Holdings",
+      "segment": "mid",
+      "baseMrr": 17400,
+      "basePrice": 9040000,
+      "description": "Profitable revenue recognition — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-039-cedar-capital",
+      "name": "Cedar Capital",
+      "segment": "enterprise",
+      "baseMrr": 193000,
+      "basePrice": 51600000,
+      "description": "Profitable partner portals — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-040-pixel-payroll-co",
+      "name": "Pixel payroll Co.",
+      "segment": "small",
+      "baseMrr": 800,
+      "basePrice": 1060000,
+      "description": "Profitable payroll APIs — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-041-north-niche-co",
+      "name": "North niche Co.",
+      "segment": "small",
+      "baseMrr": 920,
+      "basePrice": 1082000,
+      "description": "Profitable niche CRM — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-042-harbor-vertical-co",
+      "name": "Harbor vertical Co.",
+      "segment": "small",
+      "baseMrr": 1040,
+      "basePrice": 1104000,
+      "description": "Profitable vertical SaaS — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-043-swift-data-co",
+      "name": "Swift data Co.",
+      "segment": "small",
+      "baseMrr": 1160,
+      "basePrice": 1126000,
+      "description": "Profitable data pipeline — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-044-lumen-customer-co",
+      "name": "Lumen customer Co.",
+      "segment": "small",
+      "baseMrr": 1280,
+      "basePrice": 1148000,
+      "description": "Profitable customer support — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-045-atlas-inventory-co",
+      "name": "Atlas inventory Co.",
+      "segment": "small",
+      "baseMrr": 1400,
+      "basePrice": 1170000,
+      "description": "Profitable inventory sync — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-046-echo-platform",
+      "name": "Echo Platform",
+      "segment": "mid",
+      "baseMrr": 31800,
+      "basePrice": 3280000,
+      "description": "Profitable loyalty program — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-047-forge-network",
+      "name": "Forge Network",
+      "segment": "mid",
+      "baseMrr": 33600,
+      "basePrice": 3460000,
+      "description": "Profitable field service — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-048-hatch-holdings",
+      "name": "Hatch Holdings",
+      "segment": "mid",
+      "baseMrr": 35400,
+      "basePrice": 3640000,
+      "description": "Profitable subscription billing — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-049-relay-international",
+      "name": "Relay International",
+      "segment": "enterprise",
+      "baseMrr": 313000,
+      "basePrice": 75600000,
+      "description": "Profitable identity layer — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-050-forge-workflow-co",
+      "name": "Forge workflow Co.",
+      "segment": "small",
+      "baseMrr": 2000,
+      "basePrice": 180000,
+      "description": "Profitable workflow automation — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-051-hatch-document-co",
+      "name": "Hatch document Co.",
+      "segment": "small",
+      "baseMrr": 2120,
+      "basePrice": 202000,
+      "description": "Profitable document AI — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-052-kite-status-co",
+      "name": "Kite status Co.",
+      "segment": "small",
+      "baseMrr": 2240,
+      "basePrice": 224000,
+      "description": "Profitable status pages — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-053-mosaic-email-co",
+      "name": "Mosaic email Co.",
+      "segment": "small",
+      "baseMrr": 2360,
+      "basePrice": 246000,
+      "description": "Profitable email deliverability — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-054-parallel-feature-co",
+      "name": "Parallel feature Co.",
+      "segment": "small",
+      "baseMrr": 2480,
+      "basePrice": 268000,
+      "description": "Profitable feature flags — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-055-quartz-observability-co",
+      "name": "Quartz observability Co.",
+      "segment": "small",
+      "baseMrr": 2600,
+      "basePrice": 290000,
+      "description": "Profitable observability — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-056-uplink-platform",
+      "name": "Uplink Platform",
+      "segment": "mid",
+      "baseMrr": 49800,
+      "basePrice": 5080000,
+      "description": "Profitable contract management — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-057-pixel-network",
+      "name": "Pixel Network",
+      "segment": "mid",
+      "baseMrr": 51600,
+      "basePrice": 5260000,
+      "description": "Profitable procurement — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-058-north-holdings",
+      "name": "North Holdings",
+      "segment": "mid",
+      "baseMrr": 53400,
+      "basePrice": 5440000,
+      "description": "Profitable revenue recognition — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-059-cedar-industries",
+      "name": "Cedar Industries",
+      "segment": "enterprise",
+      "baseMrr": 433000,
+      "basePrice": 39600000,
+      "description": "Profitable partner portals — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-060-pixel-payroll-co",
+      "name": "Pixel payroll Co.",
+      "segment": "small",
+      "baseMrr": 3200,
+      "basePrice": 400000,
+      "description": "Profitable payroll APIs — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-061-north-niche-co",
+      "name": "North niche Co.",
+      "segment": "small",
+      "baseMrr": 3320,
+      "basePrice": 422000,
+      "description": "Profitable niche CRM — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-062-harbor-vertical-co",
+      "name": "Harbor vertical Co.",
+      "segment": "small",
+      "baseMrr": 3440,
+      "basePrice": 444000,
+      "description": "Profitable vertical SaaS — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-063-swift-data-co",
+      "name": "Swift data Co.",
+      "segment": "small",
+      "baseMrr": 3560,
+      "basePrice": 466000,
+      "description": "Profitable data pipeline — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-064-lumen-customer-co",
+      "name": "Lumen customer Co.",
+      "segment": "small",
+      "baseMrr": 3680,
+      "basePrice": 488000,
+      "description": "Profitable customer support — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-065-atlas-inventory-co",
+      "name": "Atlas inventory Co.",
+      "segment": "small",
+      "baseMrr": 3800,
+      "basePrice": 510000,
+      "description": "Profitable inventory sync — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-066-echo-platform",
+      "name": "Echo Platform",
+      "segment": "mid",
+      "baseMrr": 67800,
+      "basePrice": 6880000,
+      "description": "Profitable loyalty program — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-067-forge-network",
+      "name": "Forge Network",
+      "segment": "mid",
+      "baseMrr": 69600,
+      "basePrice": 7060000,
+      "description": "Profitable field service — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-068-hatch-holdings",
+      "name": "Hatch Holdings",
+      "segment": "mid",
+      "baseMrr": 71400,
+      "basePrice": 7240000,
+      "description": "Profitable subscription billing — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-069-relay-corporation",
+      "name": "Relay Corporation",
+      "segment": "enterprise",
+      "baseMrr": 193000,
+      "basePrice": 63600000,
+      "description": "Profitable identity layer — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-070-forge-workflow-co",
+      "name": "Forge workflow Co.",
+      "segment": "small",
+      "baseMrr": 4400,
+      "basePrice": 620000,
+      "description": "Profitable workflow automation — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-071-hatch-document-co",
+      "name": "Hatch document Co.",
+      "segment": "small",
+      "baseMrr": 4520,
+      "basePrice": 642000,
+      "description": "Profitable document AI — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-072-kite-status-co",
+      "name": "Kite status Co.",
+      "segment": "small",
+      "baseMrr": 4640,
+      "basePrice": 664000,
+      "description": "Profitable status pages — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-073-mosaic-email-co",
+      "name": "Mosaic email Co.",
+      "segment": "small",
+      "baseMrr": 4760,
+      "basePrice": 686000,
+      "description": "Profitable email deliverability — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-074-parallel-feature-co",
+      "name": "Parallel feature Co.",
+      "segment": "small",
+      "baseMrr": 4880,
+      "basePrice": 708000,
+      "description": "Profitable feature flags — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-075-quartz-observability-co",
+      "name": "Quartz observability Co.",
+      "segment": "small",
+      "baseMrr": 5000,
+      "basePrice": 730000,
+      "description": "Profitable observability — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-076-uplink-platform",
+      "name": "Uplink Platform",
+      "segment": "mid",
+      "baseMrr": 22800,
+      "basePrice": 8680000,
+      "description": "Profitable contract management — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-077-pixel-network",
+      "name": "Pixel Network",
+      "segment": "mid",
+      "baseMrr": 24600,
+      "basePrice": 8860000,
+      "description": "Profitable procurement — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-078-north-holdings",
+      "name": "North Holdings",
+      "segment": "mid",
+      "baseMrr": 26400,
+      "basePrice": 9040000,
+      "description": "Profitable revenue recognition — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-079-cedar-capital",
+      "name": "Cedar Capital",
+      "segment": "enterprise",
+      "baseMrr": 313000,
+      "basePrice": 27600000,
+      "description": "Profitable partner portals — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-080-pixel-payroll-co",
+      "name": "Pixel payroll Co.",
+      "segment": "small",
+      "baseMrr": 800,
+      "basePrice": 840000,
+      "description": "Profitable payroll APIs — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-081-north-niche-co",
+      "name": "North niche Co.",
+      "segment": "small",
+      "baseMrr": 920,
+      "basePrice": 862000,
+      "description": "Profitable niche CRM — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-082-harbor-vertical-co",
+      "name": "Harbor vertical Co.",
+      "segment": "small",
+      "baseMrr": 1040,
+      "basePrice": 884000,
+      "description": "Profitable vertical SaaS — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-083-swift-data-co",
+      "name": "Swift data Co.",
+      "segment": "small",
+      "baseMrr": 1160,
+      "basePrice": 906000,
+      "description": "Profitable data pipeline — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-084-lumen-customer-co",
+      "name": "Lumen customer Co.",
+      "segment": "small",
+      "baseMrr": 1280,
+      "basePrice": 928000,
+      "description": "Profitable customer support — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-085-atlas-inventory-co",
+      "name": "Atlas inventory Co.",
+      "segment": "small",
+      "baseMrr": 1400,
+      "basePrice": 950000,
+      "description": "Profitable inventory sync — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-086-echo-platform",
+      "name": "Echo Platform",
+      "segment": "mid",
+      "baseMrr": 40800,
+      "basePrice": 3280000,
+      "description": "Profitable loyalty program — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-087-forge-network",
+      "name": "Forge Network",
+      "segment": "mid",
+      "baseMrr": 42600,
+      "basePrice": 3460000,
+      "description": "Profitable field service — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-088-hatch-holdings",
+      "name": "Hatch Holdings",
+      "segment": "mid",
+      "baseMrr": 44400,
+      "basePrice": 3640000,
+      "description": "Profitable subscription billing — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-089-relay-international",
+      "name": "Relay International",
+      "segment": "enterprise",
+      "baseMrr": 433000,
+      "basePrice": 51600000,
+      "description": "Profitable identity layer — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-090-forge-workflow-co",
+      "name": "Forge workflow Co.",
+      "segment": "small",
+      "baseMrr": 2000,
+      "basePrice": 1060000,
+      "description": "Profitable workflow automation — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-091-hatch-document-co",
+      "name": "Hatch document Co.",
+      "segment": "small",
+      "baseMrr": 2120,
+      "basePrice": 1082000,
+      "description": "Profitable document AI — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-092-kite-status-co",
+      "name": "Kite status Co.",
+      "segment": "small",
+      "baseMrr": 2240,
+      "basePrice": 1104000,
+      "description": "Profitable status pages — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-093-mosaic-email-co",
+      "name": "Mosaic email Co.",
+      "segment": "small",
+      "baseMrr": 2360,
+      "basePrice": 1126000,
+      "description": "Profitable email deliverability — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-094-parallel-feature-co",
+      "name": "Parallel feature Co.",
+      "segment": "small",
+      "baseMrr": 2480,
+      "basePrice": 1148000,
+      "description": "Profitable feature flags — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-095-quartz-observability-co",
+      "name": "Quartz observability Co.",
+      "segment": "small",
+      "baseMrr": 2600,
+      "basePrice": 1170000,
+      "description": "Profitable observability — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-096-uplink-platform",
+      "name": "Uplink Platform",
+      "segment": "mid",
+      "baseMrr": 58800,
+      "basePrice": 5080000,
+      "description": "Profitable contract management — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-097-pixel-network",
+      "name": "Pixel Network",
+      "segment": "mid",
+      "baseMrr": 60600,
+      "basePrice": 5260000,
+      "description": "Profitable procurement — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-098-north-holdings",
+      "name": "North Holdings",
+      "segment": "mid",
+      "baseMrr": 62400,
+      "basePrice": 5440000,
+      "description": "Profitable revenue recognition — steady subscribers, light integration work."
+    },
+    {
+      "id": "acq-099-cedar-industries",
+      "name": "Cedar Industries",
+      "segment": "enterprise",
+      "baseMrr": 193000,
+      "basePrice": 75600000,
+      "description": "Profitable partner portals — steady subscribers, light integration work."
+    }
+  ]
+}

@@ -31,6 +31,7 @@ import {
   hasInstitutionalBoard
 } from './Sentiment.js';
 import { isFundraisingBlockedByScenario } from './ScenarioEffects.js';
+import { totalSubsidiaryMrr } from './Acquisitions.js';
 import { setGameFeedback } from './GameFeedback.js';
 import {
   canStartInterview,
@@ -216,6 +217,7 @@ export function renderFinancePanel(container, state) {
     <div class="summary-grid">
       <div><span class="stat-label">Cash</span><span class="stat-value">${sum.cashLabel}</span></div>
       <div><span class="stat-label">Last month rev.</span><span class="stat-value">${sum.mrrLabel}</span></div>
+      <div><span class="stat-label">Portfolio MRR</span><span class="stat-value">${formatMoney(totalSubsidiaryMrr(state))}/mo</span></div>
       <div><span class="stat-label">Overhead/mo</span><span class="stat-value">${sum.burnLabel}</span></div>
       <div><span class="stat-label">Runway</span><span class="stat-value">${sum.runway}</span></div>
       <div><span class="stat-label">Valuation</span><span class="stat-value">${state.finance.valuation ? formatMoney(state.finance.valuation) : '—'}</span></div>
