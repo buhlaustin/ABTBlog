@@ -197,6 +197,14 @@ export function normalizeSave(raw) {
     if (!state.staff?.headcountByDept) {
       state.staff = createInitialStaff();
     }
+    if (!state.staff.benefitsThisMonth) {
+      state.staff.benefitsThisMonth = { companyBonusPct: null, offsiteId: null, perks: [] };
+    }
+    if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
+    if (state.staff.optionPoolExpandedThisMonth === undefined) {
+      state.staff.optionPoolExpandedThisMonth = false;
+    }
+    if (!state.staff.peopleSection) state.staff.peopleSection = 'staffing';
     delete state.social;
     if (!state.news) state.news = createInitialNews();
     if (!state.product) state.product = { level: 0, buzz: 0 };
@@ -322,6 +330,7 @@ export function normalizeSave(raw) {
       if (state.ceo.salaryAnnual === undefined) state.ceo.salaryAnnual = 0;
       if (state.ceo.careerSalaryPaid === undefined) state.ceo.careerSalaryPaid = 0;
       if (state.ceo.careerOwnerDraws === undefined) state.ceo.careerOwnerDraws = 0;
+      if (state.ceo.careerEmployeeBonuses === undefined) state.ceo.careerEmployeeBonuses = 0;
       if (!state.ceo.drawLog) state.ceo.drawLog = [];
       if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];
       if (!state.ceo.salaryChangeLog) state.ceo.salaryChangeLog = [];

@@ -75,7 +75,7 @@ export function renderCeoPanel(container, state) {
   const name = ceoDisplayName(state);
   const annual = state.ceo?.salaryAnnual ?? 0;
   const monthly = ceoSalaryMonthly(state);
-  const { pct, equity, salary, draws, bank, net, publicCo } = renderCeoCompBreakdown(state);
+  const { pct, equity, salary, draws, bonuses, bank, net, publicCo } = renderCeoCompBreakdown(state);
   const equityLabel = publicCo ? 'Founder stake (public)' : 'Founder stake (@ valuation)';
   const lockup = state.publicMarket?.lockupMonthsRemaining ?? 0;
   const band = suggestedCeoSalaryBand(state);
@@ -181,6 +181,7 @@ export function renderCeoPanel(container, state) {
       <div><span class="stat-label">${equityLabel}</span><span class="stat-value">${formatMoney(equity)}</span></div>
       <div><span class="stat-label">Career salary (total)</span><span class="stat-value">${formatMoney(salary)}</span></div>
       <div><span class="stat-label">Owner draws (total)</span><span class="stat-value">${formatMoney(draws)}</span></div>
+      <div><span class="stat-label">Company bonuses</span><span class="stat-value">${formatMoney(bonuses)}</span></div>
       <div><span class="stat-label">Founder ownership</span><span class="stat-value">${pct}%</span></div>
       <div><span class="stat-label">CEO pay plan</span><span class="stat-value">${formatMoney(monthly)}/mo</span></div>
       <div><span class="stat-label">Company runway</span><span class="stat-value">${runway.runwayLabel}</span></div>

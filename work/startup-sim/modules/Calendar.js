@@ -21,6 +21,7 @@ import { tickAcceleratorBoost } from './Accelerators.js';
 import { tickCooCompensationReview } from './Coo.js';
 import { resetGrowthCampaignsMonth, growthRosterRefreshLine } from './GrowthCampaigns.js';
 import { resetProductActionsMonth } from './ProductActions.js';
+import { resetEmployeeBenefitsMonth } from './EmployeeBenefits.js';
 import {
   tickLaunchAtMonthStart,
   tickPreLaunchAtMonthStart,
@@ -79,6 +80,7 @@ export function startMonth(state) {
   resetGrowthCampaignsMonth(state);
   appendLog(state, growthRosterRefreshLine(state));
   resetProductActionsMonth(state);
+  resetEmployeeBenefitsMonth(state);
   for (const line of applyBuzzDecayAtMonthStart(state)) {
     appendLog(state, line);
   }

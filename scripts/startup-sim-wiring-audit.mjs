@@ -23,7 +23,7 @@ const dataAttrs = new Set();
 for (const { text } of sources) {
   for (const m of text.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) btnIds.add(m[1]);
   for (const m of text.matchAll(/\bid='(btn-[a-z0-9-]+)'/g)) btnIds.add(m[1]);
-  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest-pick|acquisition-reinvest-submit|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action|buy-all-side|buy-all-growth)/g)) {
+  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest-pick|acquisition-reinvest-submit|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action|buy-all-side|buy-all-growth|people-tab|company-bonus|employee-offsite|employee-perk|expand-option-pool)/g)) {
     dataAttrs.add(m[1]);
   }
 }
@@ -87,6 +87,11 @@ const dataPatterns = {
   'product-action': "closest('[data-product-action]')",
   'buy-all-side': "closest('[data-buy-all-side]')",
   'buy-all-growth': "closest('[data-buy-all-growth]')",
+  'people-tab': "closest('[data-people-tab]')",
+  'company-bonus': "closest('[data-company-bonus]')",
+  'employee-offsite': "closest('[data-employee-offsite]')",
+  'employee-perk': "closest('[data-employee-perk]')",
+  'expand-option-pool': "closest('[data-expand-option-pool]')",
   'join-accelerator': "closest('[data-join-accelerator]')",
   'loan-draw': "closest('[data-loan-draw]')",
   'loan-prepay': "closest('[data-loan-prepay]')",

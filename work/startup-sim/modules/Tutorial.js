@@ -13,7 +13,7 @@ const STEPS = [
     id: 'people',
     stages: [STAGES.OFFICE],
     title: 'Staffing',
-    body: 'People tab: adjust department headcount, then Finalize staffing before month close so payroll uses your plan.'
+    body: 'People tab: Staffing for headcount, Employee perks for bonuses/offsites, Option pool to refresh ESOP — finalize staffing before month close.'
   },
   {
     id: 'xc',

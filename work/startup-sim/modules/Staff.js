@@ -39,7 +39,11 @@ export function createInitialStaff() {
     draftHeadcountByDept: { ...headcountByDept },
     lastFinalizedMonth: null,
     lastFinalizedYear: null,
-    payrollMonthly: 0
+    payrollMonthly: 0,
+    peopleSection: 'staffing',
+    benefitsThisMonth: { companyBonusPct: null, offsiteId: null, perks: [] },
+    optionPoolLog: [],
+    optionPoolExpandedThisMonth: false
   };
 }
 
@@ -225,7 +229,7 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
-export function renderPeoplePanel(container, state) {
+export function renderPeopleStaffingPanel(container, state) {
   if (!container) return;
   const econ = projectStaffEconomics(state);
   const maxHc = maxHeadcountForStage(state.stage, state);

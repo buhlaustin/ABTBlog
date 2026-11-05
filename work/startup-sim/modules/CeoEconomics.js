@@ -21,6 +21,7 @@ export function createInitialCeoState() {
     salaryAnnual: 0,
     careerSalaryPaid: 0,
     careerOwnerDraws: 0,
+    careerEmployeeBonuses: 0,
     bankBalance: null,
     personalExpenseScheduled: null,
     lastPersonalExpense: null,
@@ -512,7 +513,11 @@ export function founderEquityValue(state) {
 
 export function ceoPersonalCashComp(state) {
   const ceo = state.ceo ?? {};
-  return (ceo.careerSalaryPaid ?? 0) + (ceo.careerOwnerDraws ?? 0);
+  return (
+    (ceo.careerSalaryPaid ?? 0) +
+    (ceo.careerOwnerDraws ?? 0) +
+    (ceo.careerEmployeeBonuses ?? 0)
+  );
 }
 
 export function ceoNetWorth(state) {
@@ -576,10 +581,11 @@ export function renderCeoCompBreakdown(state) {
   const equity = founderEquityValue(state);
   const salary = state.ceo?.careerSalaryPaid ?? 0;
   const draws = state.ceo?.careerOwnerDraws ?? 0;
+  const bonuses = state.ceo?.careerEmployeeBonuses ?? 0;
   const bank = ceoPersonalBankBalance(state);
   const net = bank + equity;
   const publicCo = isPublicCompany(state);
-  return { pct, equity, salary, draws, bank, net, publicCo };
+  return { pct, equity, salary, draws, bonuses, bank, net, publicCo };
 }
 
 export function buildCompLedger(state, limit = 12) {

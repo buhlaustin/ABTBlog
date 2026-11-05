@@ -65,6 +65,13 @@ import {
   showPeopleFeedback
 } from './modules/Staff.js';
 import {
+  payCompanyWideBonus,
+  conductEmployeeOffsite,
+  runExtraEmployeePerk,
+  issueFurtherOptionPool,
+  setPeopleSection
+} from './modules/EmployeeBenefits.js';
+import {
   closeSeedRound,
   closeSeriesA,
   closeSeriesB,
@@ -967,6 +974,64 @@ function bindGameInteractions() {
       return;
     }
 
+    const peopleTab = e.target.closest('[data-people-tab]');
+    if (peopleTab && sessionState) {
+      setPeopleSection(sessionState, peopleTab.getAttribute('data-people-tab'));
+      refresh();
+      return;
+    }
+    const bonusBtn = e.target.closest('[data-company-bonus]');
+    if (bonusBtn && sessionState) {
+      const result = payCompanyWideBonus(sessionState, bonusBtn.getAttribute('data-company-bonus'));
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else {
+        appendLog(
+          sessionState,
+          `People: ${result.pct}% company bonus — ${formatMoney(result.pool)} (${formatMoney(result.ceoShare)} to CEO bank).`
+        );
+        showPeopleFeedback(
+          `${result.pct}% bonus paid (${formatMoney(result.pool)}). CEO received ${formatMoney(result.ceoShare)} in personal bank.`
+        );
+      }
+      refresh();
+      return;
+    }
+    const offsiteBtn = e.target.closest('[data-employee-offsite]');
+    if (offsiteBtn && sessionState) {
+      const result = conductEmployeeOffsite(sessionState, offsiteBtn.getAttribute('data-employee-offsite'));
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else {
+        appendLog(sessionState, `People: ${result.program.label} — spent ${formatMoney(result.cost)}.`);
+        showPeopleFeedback(`${result.program.label} booked.`);
+      }
+      refresh();
+      return;
+    }
+    const perkBtn = e.target.closest('[data-employee-perk]');
+    if (perkBtn && sessionState) {
+      const result = runExtraEmployeePerk(sessionState, perkBtn.getAttribute('data-employee-perk'));
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else {
+        appendLog(sessionState, `People: ${result.perk.label} — ${formatMoney(result.cost)}.`);
+        showPeopleFeedback(`${result.perk.label} done.`);
+      }
+      refresh();
+      return;
+    }
+    const poolBtn = e.target.closest('[data-expand-option-pool]');
+    if (poolBtn && sessionState) {
+      const result = issueFurtherOptionPool(sessionState, poolBtn.getAttribute('data-expand-option-pool'));
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else {
+        appendLog(
+          sessionState,
+          `Cap table: option pool +${result.pctPoints}% FD (${(result.sharesAdded ?? 0).toLocaleString()} shares, now ${result.poolPct}%).`
+        );
+        showPeopleFeedback(`Option pool expanded +${result.pctPoints}% (now ${result.poolPct}%).`);
+      }
+      refresh();
+      return;
+    }
     const staffDelta = e.target.closest('[data-staff-delta]');
     if (staffDelta) {
       if (!sessionState) return;

@@ -638,6 +638,52 @@ export function renderCapTableRows(state) {
     .join('');
 }
 
+export const ESOP_ROW_ID = 'esop';
+
+export function getOptionPoolRow(state) {
+  return state.capTable?.find((r) => r.id === ESOP_ROW_ID) ?? null;
+}
+
+/** Add pctPoints of fully-diluted shares to the ESOP (e.g. 5 → +5% FD). */
+export function expandEmployeeOptionPool(state, pctPoints) {
+  const pct = Number(pctPoints) / 100;
+  if (!Number.isFinite(pct) || pct <= 0 || pct >= 0.5) {
+    return { ok: false, reason: 'Invalid pool expansion size.' };
+  }
+  if (!state.capTable?.length) {
+    return { ok: false, reason: 'No cap table yet.' };
+  }
+  if (!state.flags?.seedRoundClosed && !getOptionPoolRow(state)) {
+    return { ok: false, reason: 'Close seed first — the employee option pool is created at seed.' };
+  }
+
+  const rows = state.capTable.map((r) => ({ ...r }));
+  let row = rows.find((r) => r.id === ESOP_ROW_ID);
+  if (!row) {
+    row = {
+      id: ESOP_ROW_ID,
+      name: 'Employee option pool',
+      shares: 0,
+      class: 'option'
+    };
+    rows.push(row);
+  }
+  const total = rows.reduce((s, r) => s + (r.shares ?? 0), 0);
+  if (total <= 0) return { ok: false, reason: 'Cap table has no outstanding shares.' };
+
+  const additional = Math.max(1, Math.round(total * (pct / (1 - pct))));
+  row.shares = (row.shares ?? 0) + additional;
+  state.capTable = recalculateCapTablePercentages(rows);
+
+  return {
+    ok: true,
+    pctPoints: Number(pctPoints),
+    sharesAdded: additional,
+    poolPct: row.pct,
+    poolShares: row.shares
+  };
+}
+
 export function renderCapTableSummary(state) {
   const total = totalOutstandingShares(state);
   const floatRow = state.capTable?.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);

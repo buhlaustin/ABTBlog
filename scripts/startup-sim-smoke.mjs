@@ -1326,6 +1326,47 @@ if (!canBuyAllRemainingSideTasks(sideBulk, ['product', 'growth', 'brand', 'both'
   }
 }
 
+const { payCompanyWideBonus, totalEmployeeSalaryMassMonthly } = await import(
+  `file://${join(sim, 'modules/EmployeeBenefits.js')}`
+);
+const { expandEmployeeOptionPool, applySeedCapTableSnapshot } = await import(
+  `file://${join(sim, 'modules/CapTable.js')}`
+);
+const perkState = createInitialState({
+  companyName: 'PerkCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 2_000_000
+});
+perkState.flags.seedRoundClosed = true;
+perkState.flags.xcResidencyComplete = true;
+perkState.staff.headcountByDept.engineering = 5;
+perkState.ceo.salaryAnnual = 120_000;
+const mass = totalEmployeeSalaryMassMonthly(perkState);
+if (mass.total < 1) {
+  console.error('FAIL: employee salary mass should be positive with staff');
+  failed = true;
+} else {
+  const bonus = payCompanyWideBonus(perkState, 5);
+  if (!bonus.ok || (perkState.ceo.careerEmployeeBonuses ?? 0) < 1) {
+    console.error(`FAIL: company bonus: ${bonus.reason ?? 'no ceo credit'}`);
+    failed = true;
+  } else {
+    console.log(`OK: company bonus (${bonus.pct}%, CEO ${formatMoney(bonus.ceoShare)})`);
+  }
+}
+const poolState = createInitialState({ companyName: 'PoolCo', categoryId: 'b2b-saas', mode: 'career' });
+poolState.flags.seedRoundClosed = true;
+applySeedCapTableSnapshot(poolState);
+const before = poolState.capTable.find((r) => r.id === 'esop')?.shares ?? 0;
+const expand = expandEmployeeOptionPool(poolState, 5);
+if (!expand.ok || (poolState.capTable.find((r) => r.id === 'esop')?.shares ?? 0) <= before) {
+  console.error(`FAIL: option pool expand: ${expand.reason ?? 'no shares added'}`);
+  failed = true;
+} else {
+  console.log(`OK: option pool expand +5% (${expand.sharesAdded} shares)`);
+}
+
 const calState = createInitialState({ companyName: 'Cal Co', categoryId: 'b2b-saas', mode: 'career' });
 if (!isRealCalendarYear(calState.calendar.year)) {
   console.error('FAIL: career should start on real calendar year');

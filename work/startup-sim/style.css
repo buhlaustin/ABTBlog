@@ -812,6 +812,36 @@ h1 {
   min-width: 6.5rem;
 }
 
+.people-subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.people-subtabs button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.people-subtabs button.active {
+  color: var(--text);
+  border-color: var(--accent-dim);
+}
+
+.benefits-preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.35rem 0 0.85rem;
+}
+
 .growth-traction-stats {
   margin: 0.65rem 0 0.75rem;
   padding: 0.55rem 0.65rem;

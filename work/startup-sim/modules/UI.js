@@ -9,7 +9,7 @@ import { calendarTurn } from './XC.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
 import { renderCompaniesPanel } from './Acquisitions.js';
-import { renderPeoplePanel } from './Staff.js';
+import { renderPeoplePanel } from './EmployeeBenefits.js';
 import { renderCeoPanel } from './Ceo.js';
 import { ceoPersonalCashComp } from './CeoEconomics.js';
 import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
