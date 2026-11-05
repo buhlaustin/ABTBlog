@@ -1410,6 +1410,227 @@ h1 {
   background: rgba(91, 156, 255, 0.06);
 }
 
+.finance-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.finance-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.finance-hero .panel-lede {
+  margin: 0;
+}
+
+.finance-mult-chip {
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(91, 156, 255, 0.28);
+  background: rgba(91, 156, 255, 0.08);
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.finance-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.finance-stat-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.03);
+  min-width: 0;
+}
+
+.finance-stat-card--hero {
+  border-color: rgba(91, 156, 255, 0.45);
+  background: linear-gradient(145deg, rgba(91, 156, 255, 0.14), rgba(91, 156, 255, 0.04));
+}
+
+.finance-stat-card--pos .finance-stat-value {
+  color: #4ade80;
+}
+
+.finance-stat-card--neg .finance-stat-value {
+  color: #f87171;
+}
+
+.finance-stat-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+
+.finance-stat-value {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.finance-stat-card--hero .finance-stat-value {
+  font-size: 1.35rem;
+}
+
+.finance-runway-detail {
+  margin: -0.35rem 0 0;
+}
+
+.finance-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.finance-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+}
+
+.finance-section-title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.finance-subhead {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.finance-operating-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 0.6rem;
+}
+
+.finance-details {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.finance-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  list-style-position: outside;
+}
+
+.finance-details-grid {
+  margin-top: 0.75rem;
+}
+
+.finance-details-note {
+  margin: 0.65rem 0 0;
+}
+
+.finance-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.finance-charity-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.finance-chip-btn {
+  border-radius: 999px;
+}
+
+.finance-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.35rem;
+}
+
+.finance-inline-form .input-small {
+  flex: 1 1 8rem;
+  max-width: 12rem;
+}
+
+.finance-alert {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.65rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  border-left: 3px solid var(--border);
+}
+
+.finance-alert--tax {
+  border-left-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--text);
+}
+
+.finance-alert--ok {
+  border-left-color: #22c55e;
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.finance-fundraising-stack .finance-action,
+.finance-fundraising-stack .sentiment-meter,
+.finance-fundraising-stack > p.fine-print {
+  margin-bottom: 0;
+}
+
+.finance-fundraising-stack .finance-action:last-child,
+.finance-fundraising-stack .sentiment-meter:last-child {
+  margin-bottom: 0;
+}
+
+.finance-fundraising-stack {
+  gap: 0.75rem;
+}
+
+.finance-section--cap .finance-action {
+  margin-bottom: 0.75rem;
+}
+
+.finance-cap-scroll {
+  margin-bottom: 0.35rem;
+}
+
+.finance-ceo-pointer {
+  margin: 0;
+  text-align: center;
+}
+
 .instrument-list {
   margin: 0 0 1rem;
   padding-left: 1.1rem;
@@ -1602,6 +1823,25 @@ h1 {
 
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .finance-kpi-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .finance-stat-card--hero {
+    grid-column: 1 / -1;
+  }
+
+  .finance-operating-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .finance-charity-chips .finance-chip-btn,
+  .finance-inline-form .btn,
+  .finance-inline-form .input-small {
+    width: 100%;
+    max-width: none;
   }
 
   .task-list {
