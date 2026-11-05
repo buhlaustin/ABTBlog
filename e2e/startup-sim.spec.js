@@ -81,6 +81,10 @@ test.describe('Startup Simulator', () => {
     await page.locator('#tab-news').click();
     await expect(page.locator('#btn-toggle-news-archive')).toBeVisible();
 
+    await page.locator('#tab-ceo').click();
+    await expect(page.locator('#panel-ceo')).toContainText('CEO salary');
+    await expect(page.locator('#panel-ceo')).toContainText('Est. net worth');
+
     await page.locator('#tab-finance').click();
     await expect(page.locator('#panel-finance')).toContainText('Cap table');
     await expect(page.locator('#panel-finance')).toContainText('Portfolio MRR');

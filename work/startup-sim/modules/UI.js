@@ -3,6 +3,8 @@ import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
 import { renderCompaniesPanel } from './Acquisitions.js';
 import { renderPeoplePanel } from './Staff.js';
+import { renderCeoPanel } from './Ceo.js';
+import { ceoPersonalCashComp } from './CeoEconomics.js';
 import { renderSocialPanel, markSocialAsRead, syncSocialTabAlert } from './Social.js';
 import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
 import { renderAdvisorPanel } from './Advisor.js';
@@ -352,6 +354,7 @@ export const TAB_ORDER = [
   'product',
   'growth',
   'people',
+  'ceo',
   'finance',
   'companies',
   'board',
@@ -391,6 +394,9 @@ function renderPanelForTab(tab, state) {
       break;
     case 'people':
       renderPeoplePanel(document.getElementById('panel-people'), state);
+      break;
+    case 'ceo':
+      renderCeoPanel(document.getElementById('panel-ceo'), state);
       break;
     case 'finance':
       renderFinancePanel(document.getElementById('panel-finance'), state);
@@ -666,7 +672,10 @@ export function renderGameOver(state) {
             : ''
         }
         <div class="summary-grid gameover-stats">
-          <div><span class="stat-label">Cash-out</span><span class="stat-value">${formatMoney(e.payout)}</span></div>
+          <div><span class="stat-label">Stock cash-out</span><span class="stat-value">${formatMoney(e.payout)}</span></div>
+          <div><span class="stat-label">CEO salary (career)</span><span class="stat-value">${formatMoney(e.ceoSalaryCareer ?? 0)}</span></div>
+          <div><span class="stat-label">Owner draws</span><span class="stat-value">${formatMoney(e.ceoOwnerDraws ?? 0)}</span></div>
+          <div><span class="stat-label">Total personal cash</span><span class="stat-value">${formatMoney(e.totalCareerCashComp ?? e.payout)}</span></div>
           <div><span class="stat-label">Share price</span><span class="stat-value">${formatMoney(e.sharePrice)}</span></div>
           <div><span class="stat-label">Founder stake</span><span class="stat-value">${e.founderPct}%</span></div>
           <div><span class="stat-label">Months public</span><span class="stat-value">${e.monthsPublic}</span></div>
@@ -683,6 +692,7 @@ export function renderGameOver(state) {
         }
         <p>${escapeHtml(state.flags.gameOverReason || 'Your run ended.')}</p>
         <p>Lifetime revenue: <strong>${formatMoney(state.finance.lifetimeRevenue)}</strong></p>
+        <p>CEO cash comp this run: <strong>${formatMoney(ceoPersonalCashComp(state))}</strong> (salary + owner draws)</p>
         <p>Months played: <strong>${months}</strong></p>
         ${
           isPublicCompany(state)

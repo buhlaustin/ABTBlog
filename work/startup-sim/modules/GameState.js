@@ -19,6 +19,7 @@ import { createInitialLaunchState } from './LaunchLifecycle.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
 import { syncLifetimeProfit } from './Finance.js';
+import { createInitialCeoState } from './CeoEconomics.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -29,7 +30,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 24;
+export const SAVE_VERSION = 25;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -97,6 +98,7 @@ export function createInitialState(options) {
       instruments: [],
       lastRound: null
     },
+    ceo: { salaryAnnual: 0, careerSalaryPaid: 0, careerOwnerDraws: 0, drawLog: [] },
     staff: createInitialStaff(),
     product: { level: 0, buzz: 0, actionsThisMonth: 0 },
     social: createInitialSocial(),
@@ -279,6 +281,14 @@ export function normalizeSave(raw) {
     }
     if (!state.finance.rbf) {
       state.finance.rbf = { active: false, principal: 0, owed: 0, sharePct: 0.12, feeMult: 1.28 };
+    }
+    if (!state.ceo) {
+      state.ceo = createInitialCeoState();
+    } else {
+      if (state.ceo.salaryAnnual === undefined) state.ceo.salaryAnnual = 0;
+      if (state.ceo.careerSalaryPaid === undefined) state.ceo.careerSalaryPaid = 0;
+      if (state.ceo.careerOwnerDraws === undefined) state.ceo.careerOwnerDraws = 0;
+      if (!state.ceo.drawLog) state.ceo.drawLog = [];
     }
     if (state.finance.lastRound === undefined) state.finance.lastRound = null;
     if (!state.flags) state.flags = {};

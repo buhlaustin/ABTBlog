@@ -695,8 +695,39 @@ if (!rbf.ok) {
   console.error('FAIL: revenue advance owed');
   failed = true;
 }
+const { setCeoSalaryAnnual, takeOwnerDraw, ceoSalaryMonthly, recordCeoSalaryForMonth } = await import(
+  `file://${join(sim, 'modules/CeoEconomics.js')}`
+);
+const { projectMonthlyBurn } = await import(`file://${join(sim, 'modules/Finance.js')}`);
+const ceoState = createInitialState({ companyName: 'CEO Pay Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+const sal = setCeoSalaryAnnual(ceoState, 120_000);
+if (!sal.ok) {
+  console.error(`FAIL: set CEO salary: ${sal.reason}`);
+  failed = true;
+} else if (ceoSalaryMonthly(ceoState) !== 10_000) {
+  console.error('FAIL: CEO monthly salary');
+  failed = true;
+} else if (projectMonthlyBurn(ceoState) < 10_000) {
+  console.error('FAIL: CEO salary in burn');
+  failed = true;
+}
 if (!failed) {
-  console.log('OK: finance stack (SAFE, loan, prepay, RBF, SAFE conversion)');
+  ceoState.finance.cash = 50_000;
+  const od = takeOwnerDraw(ceoState, 5_000);
+  if (!od.ok || ceoState.ceo.careerOwnerDraws !== 5_000) {
+    console.error('FAIL: owner draw');
+    failed = true;
+  }
+}
+if (!failed) {
+  recordCeoSalaryForMonth(ceoState);
+  if (ceoState.ceo.careerSalaryPaid !== 10_000) {
+    console.error('FAIL: career salary accrual');
+    failed = true;
+  }
+}
+if (!failed) {
+  console.log('OK: finance stack + CEO salary, draws, career comp');
 }
 
 process.exit(failed ? 1 : 0);

@@ -304,8 +304,8 @@ export function renderFinancePanel(container, state) {
       <div><span class="stat-label">Lifetime expenses</span><span class="stat-value">${sum.lifetimeExpensesLabel}</span></div>
       <div><span class="stat-label">Lifetime profit</span><span class="stat-value">${sum.lifetimeProfitLabel}</span></div>
       <div><span class="stat-label">Starting cash (investment)</span><span class="stat-value">${sum.initialInvestmentLabel}</span></div>
-      <div><span class="stat-label">Founder stake @ valuation</span><span class="stat-value">${sum.founderStakeLabel}</span></div>
     </div>
+    <p class="fine-print">Founder equity, salary, owner draws, and net worth live on the <strong>CEO</strong> tab.</p>
     ${blockNote}
     ${capitalStack}
     ${safeList}

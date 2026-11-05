@@ -71,6 +71,7 @@ import {
   drawRevenueAdvance,
   showFinanceFeedback
 } from './modules/Fundraising.js';
+import { setCeoSalaryAnnual, takeOwnerDraw } from './modules/Ceo.js';
 import { loadAccelerators } from './modules/Accelerators.js';
 import { onLayoffSentiment } from './modules/Sentiment.js';
 import {
@@ -936,6 +937,28 @@ function bindGameInteractions() {
     }
     if (e.target.id === 'btn-xc-interview-cancel') {
       showScreen('game');
+      return;
+    }
+    if (e.target.id === 'btn-save-ceo-salary' && sessionState) {
+      const input = document.getElementById('ceo-salary-input');
+      const result = setCeoSalaryAnnual(sessionState, input?.value);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Invalid salary.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const drawBtn = e.target.closest('[data-owner-draw]');
+    if (drawBtn && sessionState) {
+      const result = takeOwnerDraw(sessionState, drawBtn.getAttribute('data-owner-draw'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Draw failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
       return;
     }
     if (e.target.id === 'btn-close-angel-safe') {

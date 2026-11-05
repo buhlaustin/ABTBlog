@@ -3,6 +3,7 @@ import { getEffectiveIpoGate } from './SandboxTuning.js';
 import { getArr } from './Workspace.js';
 import { calendarTurn } from './XC.js';
 import { getFounderRow } from './CapTable.js';
+import { ceoEndgameCompSnapshot } from './CeoEconomics.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 import { recordCashOutflow } from './Finance.js';
@@ -545,6 +546,7 @@ export function cashOut(state) {
 
   const payout = founderStakeValue(state);
   const founder = getFounderRow(state);
+  const comp = ceoEndgameCompSnapshot(state);
   state.ending = {
     type: 'cash_out',
     payout,
@@ -554,7 +556,10 @@ export function cashOut(state) {
     monthsPublic: state.publicMarket?.monthsPublic ?? 0,
     lifetimeRevenue: state.finance?.lifetimeRevenue ?? 0,
     pressHeadline: state.publicMarket?.pressHeadline ?? null,
-    pressDek: state.publicMarket?.pressDek ?? null
+    pressDek: state.publicMarket?.pressDek ?? null,
+    ceoSalaryCareer: comp.salary,
+    ceoOwnerDraws: comp.draws,
+    totalCareerCashComp: comp.totalCareerCash
   };
 
   state.finance.cash = (state.finance.cash ?? 0) + payout;
@@ -624,7 +629,6 @@ export function renderIpoPanel(container, state) {
   } else if (isPublicCompany(state) && !state.flags?.cashedOut) {
     if (!state.publicMarket?.analystRating) refreshAnalystCoverage(state);
     const pm = state.publicMarket ?? {};
-    const stake = founderStakeValue(state);
     const cap = marketCap(state);
     const tone = pm.guidanceTone ?? 'inline';
     const earningsSoon = (pm.monthsPublic ?? 0) % 3 === 2;
@@ -639,7 +643,6 @@ export function renderIpoPanel(container, state) {
         <div><span class="stat-label">Short interest</span><span class="stat-value">${pm.shortInterestPct ?? 0}%</span></div>
         <div><span class="stat-label">Institutional</span><span class="stat-value">${Math.round(pm.institutionalHoldPct ?? 42)}%</span></div>
         <div><span class="stat-label">52-week</span><span class="stat-value">${formatMoney(pm.low52 ?? pm.sharePrice ?? 0)} – ${formatMoney(pm.high52 ?? pm.sharePrice ?? 0)}</span></div>
-        <div><span class="stat-label">Founder stake</span><span class="stat-value">${formatMoney(stake)}</span></div>
       </div>
       <p class="fine-print">${pm.monthsPublic ?? 0} month(s) public${earningsSoon ? ' · earnings next month' : ''}${pm.indexMember ? ` · ${escapeHtml(pm.indexName ?? 'Index')}` : ''} · buyback auth ${formatMoney(pm.buybackAuthorized ?? 0)}${pm.dividendPerShareLast ? ` · last div $${Number(pm.dividendPerShareLast).toFixed(2)}/sh` : ''}</p>
       ${
@@ -672,8 +675,8 @@ export function renderIpoPanel(container, state) {
       }
       ${
         (pm.lockupMonthsRemaining ?? 0) > 0
-          ? `<p class="fine-print">Founder lockup: ${pm.lockupMonthsRemaining} month(s) remaining before cash-out.</p>`
-          : `<button type="button" class="btn btn-primary btn-small" id="btn-cash-out">Step down &amp; cash out</button>`
+          ? `<p class="fine-print">Founder lockup: ${pm.lockupMonthsRemaining} month(s) remaining — cash out on the CEO tab after lockup.</p>`
+          : `<p class="fine-print">Lockup clear — step down and cash out on the <strong>CEO</strong> tab.</p>`
       }
     </div>`;
   } else if (state.flags?.cashedOut) {
