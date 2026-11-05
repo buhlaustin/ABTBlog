@@ -31,6 +31,18 @@ hydrateTaskCatalog(tasksJson);
 
 let failed = false;
 
+const lifetimeSample = formatMoney(20_754_580_000_000);
+const groupedHuge = formatMoney(1_234_560_000_000_000);
+if (!lifetimeSample.endsWith('T') || lifetimeSample !== '$20.75T') {
+  console.error(`FAIL: formatMoney trillion tier (got ${lifetimeSample})`);
+  failed = true;
+} else if (!groupedHuge.includes(',') || !groupedHuge.endsWith('T')) {
+  console.error(`FAIL: formatMoney should group thousands (got ${groupedHuge})`);
+  failed = true;
+} else if (!failed) {
+  console.log(`OK: formatMoney commas (${lifetimeSample}, ${groupedHuge})`);
+}
+
 if (taskCatalogSize() < 1100) {
   console.error(`FAIL: merged task catalog ${taskCatalogSize()} < 1100`);
   failed = true;

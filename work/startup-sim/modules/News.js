@@ -5,6 +5,7 @@ import { maybeCompetitorNewsArticle, bumpCompetitorPressure } from './Competitor
 import { getArr } from './Workspace.js';
 import bundledTimeline from '../data/news-timeline-seed.json' with { type: 'json' };
 import { calendarTurn, formatStateMonth, formatCalendarStamp } from './GameCalendar.js';
+import { formatMoney } from './constants.js';
 
 let timelineSeed = bundledTimeline;
 let timelineHydrated = false;
@@ -47,13 +48,6 @@ function monthLabel(state) {
   return formatStateMonth(state);
 }
 
-function formatMoneyShort(n) {
-  const v = Number(n) || 0;
-  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
-  if (v >= 1_000) return `$${(v / 1_000).toFixed(0)}k`;
-  return `$${Math.round(v)}`;
-}
-
 function seededRand(state, salt = 0) {
   let t = ((state.meta?.runSeed ?? 1) + monthTurn(state) * 7919 + salt * 104729) >>> 0;
   return () => {
@@ -67,8 +61,8 @@ function seededRand(state, salt = 0) {
 function newsContext(state) {
   const narrative = buildNarrativeContext(state);
   const company = state.company?.name ?? 'Startup';
-  const rev = formatMoneyShort(state.calendar?.monthRevenue ?? state.finance?.monthlyRevenue ?? 0);
-  const arr = formatMoneyShort(getArr(state));
+  const rev = formatMoney(state.calendar?.monthRevenue ?? state.finance?.monthlyRevenue ?? 0);
+  const arr = formatMoney(getArr(state));
   const rival = state.world?.competitor?.name ?? 'a rival';
   const rivalProduct = state.world?.competitor?.product ?? 'a similar product';
   const hub = state.offices?.hubLabel ?? narrative.cityOrHub;
@@ -108,9 +102,9 @@ const OFFLINE_NEWS_TEMPLATES = [
     id: 'runway-watch',
     source: 'The Financier Times',
     build: (c) => ({
-      headline: `Runway watch: ${c.company} balances growth against ${formatMoneyShort(c.narrative.monthlyOverhead)} overhead`,
+      headline: `Runway watch: ${c.company} balances growth against ${formatMoney(c.narrative.monthlyOverhead)} overhead`,
       dek: c.narrative.runwayMonths != null ? `About ${c.narrative.runwayMonths} months of cash cited.` : 'Cash position closely held.',
-      body: `Analysts modeling ${c.company} note ${c.narrative.fundingStage} companies rarely get quiet months. The firm carried ${formatMoneyShort(c.narrative.cash)} in cash while posting ${c.rev} in revenue for the period just ended.`
+      body: `Analysts modeling ${c.company} note ${c.narrative.fundingStage} companies rarely get quiet months. The firm carried ${formatMoney(c.narrative.cash)} in cash while posting ${c.rev} in revenue for the period just ended.`
     })
   },
   {
@@ -221,7 +215,7 @@ const OFFLINE_NEWS_TEMPLATES = [
     build: (c) => ({
       headline: `${c.company} late-stage discipline: ${c.rev} revenue, eyes on rule of 40`,
       dek: 'Growth-efficiency bingo card updated.',
-      body: `Efficiency-minded investors parsed ${c.company}'s month as ${c.narrative.fundingStage} norms tighten. Cash ${formatMoneyShort(c.narrative.cash)}; overhead ${formatMoneyShort(c.narrative.monthlyOverhead)}.`
+      body: `Efficiency-minded investors parsed ${c.company}'s month as ${c.narrative.fundingStage} norms tighten. Cash ${formatMoney(c.narrative.cash)}; overhead ${formatMoney(c.narrative.monthlyOverhead)}.`
     })
   },
   {
