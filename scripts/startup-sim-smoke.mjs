@@ -297,7 +297,11 @@ const sandboxCalendarForm = new FormData();
 sandboxCalendarForm.set('sandboxRevenueMult', '1');
 sandboxCalendarForm.set('sandboxStartStage', 'garage');
 sandboxCalendarForm.set('sandboxIpoGate', '1000000000');
-sandboxCalendarForm.set('sandboxStartYear', '1849');
+const { sandboxCalendarYearOptions } = await import(
+  `file://${join(sim, 'modules/GameCalendar.js')}`
+);
+const pastYear = sandboxCalendarYearOptions()[0];
+sandboxCalendarForm.set('sandboxStartYear', String(pastYear));
 sandboxCalendarForm.set('sandboxStartMonth', '7');
 const calendarTuning = parseSandboxTuning(sandboxCalendarForm, 'sandbox');
 const ancientStart = createInitialState({
@@ -306,18 +310,19 @@ const ancientStart = createInitialState({
   mode: 'sandbox',
   sandboxTuning: calendarTuning
 });
-if (ancientStart.calendar.year !== 1849 || ancientStart.calendar.monthIndex !== 7) {
+if (ancientStart.calendar.year !== pastYear || ancientStart.calendar.monthIndex !== 7) {
   console.error(
-    `FAIL: sandbox calendar start expected Jul 1849 got ${ancientStart.calendar.monthIndex}/${ancientStart.calendar.year}`
+    `FAIL: sandbox calendar start expected Jul ${pastYear} got ${ancientStart.calendar.monthIndex}/${ancientStart.calendar.year}`
   );
   failed = true;
 } else {
   migrateLegacyCalendar(ancientStart);
-  if (ancientStart.calendar.year !== 1849) {
+  if (ancientStart.calendar.year !== pastYear) {
     console.error(`FAIL: migrateLegacyCalendar rewrote sandbox year ${ancientStart.calendar.year}`);
     failed = true;
   } else {
-    console.log('OK: sandbox calendar year range (1849) + save migration');
+    const span = sandboxCalendarYearOptions().length;
+    console.log(`OK: sandbox calendar dropdown (${span} years, oldest ${pastYear}) + save migration`);
   }
 }
 
