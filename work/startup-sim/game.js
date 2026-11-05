@@ -328,7 +328,7 @@ function handleCompleteTask(instanceId) {
     refresh();
     return;
   }
-  for (const line of recordPreLaunchTaskOutcome(sessionState, def, revenue)) {
+  for (const line of recordPreLaunchTaskOutcome(sessionState, def, revenue, rolled)) {
     appendLog(sessionState, line);
   }
   if (def.scheduleLaunch) {

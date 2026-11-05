@@ -255,6 +255,8 @@ export function normalizeSave(raw) {
     if (state.launch.waitlistSignups == null) state.launch.waitlistSignups = 0;
     if (state.launch.preSellBooked == null) state.launch.preSellBooked = 0;
     if (state.launch.marketingTasksDone == null) state.launch.marketingTasksDone = 0;
+    if (state.launch.crowdfundingMrr == null) state.launch.crowdfundingMrr = 0;
+    if (state.launch.crowdfundingCampaigns == null) state.launch.crowdfundingCampaigns = 0;
     if (state.launch.productTasksDone == null) state.launch.productTasksDone = 0;
     if (!state.board) state.board = createInitialBoard();
     if (state.board.governanceStreak === undefined) state.board.governanceStreak = 0;

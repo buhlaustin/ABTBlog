@@ -178,6 +178,31 @@ if (!state.launch.waitlistSignups || !wl.length) {
   console.log(`OK: pre-launch gates (${PRE_LAUNCH_BUZZ_REQUIRED} buzz, ${PRE_LAUNCH_PRODUCT_REQUIRED} product)`);
 }
 
+const { getTaskDefinitions } = await import(`file://${join(sim, 'modules/Tasks.js')}`);
+const crowdPreLaunch = getTaskDefinitions().filter(
+  (t) => t.launchPhase === 'pre_launch' && t.crowdfunding
+);
+if (crowdPreLaunch.length < 12) {
+  console.error(`FAIL: pre-launch crowdfunding desk bank too small (${crowdPreLaunch.length})`);
+  failed = true;
+}
+const { applyTaskOutcome, rollTaskOutcome } = await import(
+  `file://${join(sim, 'modules/Finance.js')}`
+);
+const crowdDef = crowdPreLaunch[0];
+if (crowdDef) {
+  const rolledCrowd = rollTaskOutcome(crowdDef, state);
+  const beforeMrr = state.finance.mrr ?? 0;
+  applyTaskOutcome(state, crowdDef, rolledCrowd);
+  recordPreLaunchTaskOutcome(state, crowdDef, rolledCrowd.revenue, rolledCrowd);
+  if ((state.finance.mrr ?? 0) <= beforeMrr || !(state.launch.crowdfundingMrr > 0)) {
+    console.error('FAIL: crowdfunding desk task should add MRR and track campaigns');
+    failed = true;
+  } else {
+    console.log(`OK: pre-launch crowdfunding desk tasks (${crowdPreLaunch.length} in bank)`);
+  }
+}
+
 const { totalHeadcountCap } = await import(`file://${join(sim, 'modules/Offices.js')}`);
 if (totalHeadcountCap(state) !== 0) {
   console.error('FAIL: garage headcount cap expected 0 got', totalHeadcountCap(state));

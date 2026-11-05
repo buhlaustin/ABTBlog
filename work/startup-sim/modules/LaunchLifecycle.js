@@ -37,16 +37,27 @@ function ensureLaunchMetrics(state) {
   if (state.launch.preSellBooked == null) state.launch.preSellBooked = 0;
   if (state.launch.marketingTasksDone == null) state.launch.marketingTasksDone = 0;
   if (state.launch.productTasksDone == null) state.launch.productTasksDone = 0;
+  if (state.launch.crowdfundingMrr == null) state.launch.crowdfundingMrr = 0;
+  if (state.launch.crowdfundingCampaigns == null) state.launch.crowdfundingCampaigns = 0;
 }
 
 /** After a pre-launch desk task completes — flavor metrics only; revenue stays normal. */
-export function recordPreLaunchTaskOutcome(state, taskDef, revenue) {
+export function recordPreLaunchTaskOutcome(state, taskDef, revenue, rolled) {
   if (!isPreLaunchDeskPhase(state) || !taskDef?.launchPhase) return [];
   ensureLaunchMetrics(state);
   const lines = [];
   const types = taskDef.types ?? [];
   const isMarketing = types.includes('marketing') || (taskDef.buzz ?? 0) > 0;
   const isProduct = types.includes('product') || (taskDef.product ?? 0) > 0;
+
+  const mrrGain = rolled?.mrrGain ?? 0;
+  if (mrrGain > 0 && (taskDef.crowdfunding || taskDef.mrrGain)) {
+    state.launch.crowdfundingMrr = (state.launch.crowdfundingMrr ?? 0) + mrrGain;
+    state.launch.crowdfundingCampaigns = (state.launch.crowdfundingCampaigns ?? 0) + 1;
+    lines.push(
+      `Crowdfunding +${formatMoney(mrrGain)}/mo MRR (${formatMoney(state.launch.crowdfundingMrr)}/mo from ${state.launch.crowdfundingCampaigns} backer campaign${state.launch.crowdfundingCampaigns === 1 ? '' : 's'}).`
+    );
+  }
 
   if (revenue > 0) {
     state.launch.preSellBooked += revenue;
@@ -96,7 +107,8 @@ export function renderPreLaunchProgressBlock(state) {
       <span class="stat-label">Product ${g.level}/${PRE_LAUNCH_PRODUCT_REQUIRED}</span>
       <div class="prelaunch-bar"><div class="prelaunch-fill product" style="width:${prodPct}%"></div></div>
     </div>
-    <p class="fine-print">Waitlist ${waitlist.toLocaleString()} · Pre-sell booked ${formatMoney(preSell)} · ${state.launch.marketingTasksDone ?? 0} marketing / ${state.launch.productTasksDone ?? 0} product tasks done</p>
+    <p class="fine-print">Waitlist ${waitlist.toLocaleString()} · Pre-sell booked ${formatMoney(preSell)} · Crowdfunding ${formatMoney(state.launch.crowdfundingMrr ?? 0)}/mo (${state.launch.crowdfundingCampaigns ?? 0} campaigns) · ${state.launch.marketingTasksDone ?? 0} marketing / ${state.launch.productTasksDone ?? 0} product tasks done</p>
+    <p class="fine-print">Crowdfunding desk tasks add micro MRR plus buzz and product — stack them before you schedule launch.</p>
   </div>`;
 }
 
@@ -109,7 +121,9 @@ export function createInitialLaunchState() {
     waitlistSignups: 0,
     preSellBooked: 0,
     marketingTasksDone: 0,
-    productTasksDone: 0
+    productTasksDone: 0,
+    crowdfundingMrr: 0,
+    crowdfundingCampaigns: 0
   };
 }
 

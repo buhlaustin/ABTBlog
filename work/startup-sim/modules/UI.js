@@ -44,6 +44,7 @@ import {
   getSandboxTuningMult,
   getRawTaskRevenueMultiplier,
   estimateTaskPayoutBand,
+  estimateTaskMrrBand,
   taskRevenueMultHud
 } from './Finance.js';
 import { progressionTierLabel } from './ProgressionEconomy.js';
@@ -223,11 +224,16 @@ function escapeHtml(s) {
 function launchTaskTypeTag(def) {
   const types = def.types ?? [];
   const parts = [];
+  if (def.crowdfunding) parts.push('crowdfund');
   if (types.includes('product') || (def.product ?? 0) > 0) {
     parts.push(`+${def.product ?? 0} product`);
   }
   if (types.includes('marketing') || (def.buzz ?? 0) > 0) {
     parts.push(`+${def.buzz ?? 0} buzz`);
+  }
+  const mrrBand = estimateTaskMrrBand(def);
+  if (mrrBand) {
+    parts.push(`+${formatMoney(mrrBand.min)}–${formatMoney(mrrBand.max)}/mo MRR`);
   }
   if (!parts.length) return '';
   return ` <span class="task-tag">${parts.join(' · ')}</span>`;
@@ -282,17 +288,22 @@ export function renderDeskPanel(state) {
           ? `<button type="button" class="btn btn-primary btn-small" data-complete-task="${escapeHtml(inst.instanceId)}">Complete</button>`
           : '<span class="task-done-label">Done</span>';
       const band = estimateTaskPayoutBand(def, state);
+      const mrrBand = estimateTaskMrrBand(def);
       const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
+      const crowd = def.crowdfunding ? ' <span class="task-tag">Crowdfunding</span>' : '';
       const rival =
         def.rivalPressure && def.rivalPressure < 0
           ? ` · rival heat ${def.rivalPressure}`
           : '';
       const preHint =
         def.launchPhase === 'pre_launch' ? ` · ${launchTaskTypeTag(def).replace(/<[^>]+>/g, '').trim()}` : '';
+      const mrrHint = mrrBand
+        ? ` · MRR +${formatMoney(mrrBand.min)}–${formatMoney(mrrBand.max)}/mo`
+        : '';
       return `<article class="${doneClass}">
-        <h3>${escapeHtml(def.title)}${sig}</h3>
+        <h3>${escapeHtml(def.title)}${sig}${crowd}</h3>
         <p>${escapeHtml(def.description)}</p>
-        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${rival}${preHint}</p>
+        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${mrrHint}${rival}${preHint}</p>
         ${btn}
       </article>`;
     })

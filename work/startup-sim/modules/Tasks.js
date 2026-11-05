@@ -5,6 +5,7 @@ import { progressionTier } from './ProgressionEconomy.js';
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
 import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
+import bundledLaunchCrowd from '../data/launch-crowdfunding-tasks.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
@@ -28,7 +29,10 @@ function mergeSignatureTasks(base) {
 }
 
 function mergeLaunchTasks(base) {
-  const launch = bundledLaunch?.tasks ?? [];
+  const launch = [
+    ...(bundledLaunch?.tasks ?? []),
+    ...(bundledLaunchCrowd?.tasks ?? [])
+  ];
   if (!launch.length) return base;
   const ids = new Set((base.tasks ?? []).map((t) => t.id));
   const merged = [...(base.tasks ?? [])];
@@ -274,6 +278,13 @@ export function dealMonthlyTasks(state) {
     const sched = pool.find((t) => t.scheduleLaunch);
     if (sched && !offered.some((t) => t.id === sched.id)) {
       offered = [sched, ...offered.filter((t) => t.id !== sched.id)].slice(0, offerCount);
+    }
+  }
+  if (launchDesk === 'pre_launch' && state.launch?.phase === 'pre_launch') {
+    const crowdPool = pool.filter((t) => t.crowdfunding);
+    if (crowdPool.length && !offered.some((t) => t.crowdfunding)) {
+      const pick = shuffle(crowdPool)[0];
+      offered = [pick, ...offered.filter((t) => t.id !== pick.id)].slice(0, offerCount);
     }
   }
   if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {

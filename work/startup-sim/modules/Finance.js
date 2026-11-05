@@ -131,6 +131,18 @@ export function estimateTaskPayoutBand(taskDef, state) {
   };
 }
 
+/** Desk tasks with `mrrGain` — shown on pre-launch crowdfunding plays. */
+export function estimateTaskMrrBand(taskDef) {
+  const spec = taskDef?.mrrGain;
+  if (spec == null) return null;
+  if (Array.isArray(spec) && spec.length >= 2) {
+    return { min: Math.round(spec[0]), max: Math.round(spec[1]) };
+  }
+  const n = Math.round(Number(spec));
+  if (!n) return null;
+  return { min: n, max: n };
+}
+
 export function projectMonthlyBurn(state) {
   const headcount = state.staff?.headcountByDept ?? {};
   const payroll = computePayroll(headcount, state.stage, state);
