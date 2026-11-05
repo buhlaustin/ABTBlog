@@ -64,6 +64,8 @@ import {
   closeSeriesE,
   closeSeriesF,
   joinAccelerator,
+  closeAngelSafe,
+  requestLoanDraw,
   showFinanceFeedback
 } from './modules/Fundraising.js';
 import { loadAccelerators } from './modules/Accelerators.js';
@@ -524,6 +526,19 @@ function handleCashOut() {
   refresh();
 }
 
+function handleCloseAngelSafe() {
+  if (!sessionState) return;
+  const result = closeAngelSafe(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Cannot close angel SAFE.', true);
+    refresh();
+    return;
+  }
+  appendLog(sessionState, result.summary);
+  showFinanceFeedback(result.summary);
+  refresh();
+}
+
 function handleCloseSeed() {
   if (!sessionState) return;
   const result = closeSeedRound(sessionState);
@@ -917,8 +932,23 @@ function bindGameInteractions() {
       showScreen('game');
       return;
     }
+    if (e.target.id === 'btn-close-angel-safe') {
+      handleCloseAngelSafe();
+      return;
+    }
     if (e.target.id === 'btn-close-seed') {
       handleCloseSeed();
+      return;
+    }
+    const loanBtn = e.target.closest('[data-loan-draw]');
+    if (loanBtn && sessionState) {
+      const result = requestLoanDraw(sessionState, loanBtn.getAttribute('data-loan-draw'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Loan declined.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
       return;
     }
     if (e.target.id === 'btn-close-series-a') {

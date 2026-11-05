@@ -41,8 +41,17 @@ import {
   xcWaitingForRetry
 } from './XC.js';
 import { renderAcceleratorsBlock, joinAccelerator } from './Accelerators.js';
+import { canCloseAngelSafe, closeAngelSafe, angelSafesClosedCount, ANGEL_SAFE_AMOUNT, ANGEL_SAFE_CAP, ANGEL_SAFE_MAX_ROUNDS } from './AngelSafe.js';
+import {
+  computeCreditLimit,
+  loanOutstanding,
+  loanPaymentMonthly,
+  requestLoanDraw,
+  bankApprovalOdds
+} from './BankLoan.js';
 
 export { joinAccelerator };
+export { closeAngelSafe, requestLoanDraw };
 import { renderOfficesPanel } from './Offices.js';
 import { renderIpoPanel } from './IPO.js';
 
@@ -189,6 +198,31 @@ export function renderFinancePanel(container, state) {
         ? `<p class="fine-print">Series B closed.</p>`
         : '';
 
+  const angelGate = canCloseAngelSafe(state);
+  const angelCount = angelSafesClosedCount(state);
+  const angelBlock =
+    angelGate.ok || angelCount > 0
+      ? `<div class="finance-action">
+        <p><strong>Angel SAFE (garage)</strong> — ${formatMoney(ANGEL_SAFE_AMOUNT)} on ${formatMoney(ANGEL_SAFE_CAP)} post-money cap (~${Math.round((ANGEL_SAFE_AMOUNT / ANGEL_SAFE_CAP) * 1000) / 10}% est.)</p>
+        <p class="fine-print">${angelCount}/${ANGEL_SAFE_MAX_ROUNDS} closed.${angelGate.ok ? '' : ` ${angelGate.reason}`}</p>
+        <button type="button" class="btn btn-ghost btn-small" id="btn-close-angel-safe" ${angelGate.ok && !fundraisingBlocked ? '' : 'disabled'}>Close angel SAFE</button>
+      </div>`
+      : '';
+
+  const creditLimit = computeCreditLimit(state);
+  const loanBal = loanOutstanding(state);
+  const loanPay = loanPaymentMonthly(state);
+  const sampleOdds = bankApprovalOdds(state, 25_000);
+  const loanBlock = `<div class="finance-action loan-panel">
+    <p><strong>Bank line of credit</strong> — draw subject to approval; repay monthly as overhead.</p>
+    <p class="fine-print">Limit ${formatMoney(creditLimit)} · Outstanding ${formatMoney(loanBal)} · Debt service ${formatMoney(loanPay)}/mo${loanBal > 0 ? '' : ` · sample approval ~${Math.round(sampleOdds * 100)}% on $25k`}</p>
+    <div class="stock-actions">
+      <button type="button" class="btn btn-small" data-loan-draw="25000" ${loanBal + 25_000 > creditLimit ? 'disabled' : ''}>Draw $25k</button>
+      <button type="button" class="btn btn-small" data-loan-draw="50000" ${loanBal + 50_000 > creditLimit ? 'disabled' : ''}>Draw $50k</button>
+      <button type="button" class="btn btn-small" data-loan-draw="100000" ${loanBal + 100_000 > creditLimit ? 'disabled' : ''}>Draw $100k</button>
+    </div>
+  </div>`;
+
   const seedBlock = canCloseSeed(state) && preview
     ? `<div class="finance-action">
         <p><strong>Seed round</strong> — raise ${formatMoney(preview.raised)} at ${formatMoney(preview.postMoney)} post-money.</p>
@@ -231,6 +265,8 @@ export function renderFinancePanel(container, state) {
     ${blockNote}
     ${sentimentBlock}
     ${xcBlock}
+    ${angelBlock}
+    ${loanBlock}
     ${seedBlock}
     ${seriesABlock}
     ${seriesBBlock}

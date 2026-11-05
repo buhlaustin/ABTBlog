@@ -615,4 +615,52 @@ if (!ipo.ok) {
   }
 }
 
+const { closeAngelSafe, canCloseAngelSafe } = await import(`file://${join(sim, 'modules/AngelSafe.js')}`);
+const { joinAccelerator } = await import(`file://${join(sim, 'modules/Accelerators.js')}`);
+const { computeCreditLimit, requestLoanDraw, loanOverheadMonthly } = await import(
+  `file://${join(sim, 'modules/BankLoan.js')}`
+);
+const angelState = createInitialState({ companyName: 'Angel Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+angelState.product.level = 2;
+const ag = closeAngelSafe(angelState);
+if (!ag.ok) {
+  console.error(`FAIL: angel SAFE: ${ag.reason}`);
+  failed = true;
+} else if (angelState.finance.cash < 50_000) {
+  console.error('FAIL: angel SAFE cash');
+  failed = true;
+}
+const xcAccel = createInitialState({ companyName: 'Accel Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+xcAccel.flags.xcAccepted = true;
+xcAccel.finance.arr = 80_000;
+xcAccel.finance.mrr = Math.round(80_000 / 12);
+const ja = joinAccelerator(xcAccel, 'angel-rail');
+if (!ja.ok) {
+  console.error(`FAIL: accelerator after XC: ${ja.reason}`);
+  failed = true;
+}
+const loanState = createInitialState({ companyName: 'Loan Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+loanState.finance.lifetimeRevenue = 100_000;
+loanState.finance.arr = 60_000;
+loanState.finance.mrr = 5_000;
+loanState.meta.runSeed = 42;
+let approved = false;
+for (let i = 0; i < 12; i += 1) {
+  loanState.calendar.monthIndex = i + 1;
+  const r = requestLoanDraw(loanState, 25_000);
+  if (r.ok) {
+    approved = true;
+    break;
+  }
+}
+if (!approved) {
+  console.error('FAIL: loan draw never approved in 12 tries');
+  failed = true;
+} else if (loanOverheadMonthly(loanState) <= 0) {
+  console.error('FAIL: loan overhead');
+  failed = true;
+} else if (!failed) {
+  console.log('OK: angel SAFE, post-XC accelerator, bank loan draw');
+}
+
 process.exit(failed ? 1 : 0);

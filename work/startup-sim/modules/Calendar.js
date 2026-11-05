@@ -2,6 +2,7 @@ import { STAGES } from './constants.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
+import { serviceLoanAtMonthEnd } from './BankLoan.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
 import { tickPublicMarket, tickIpoLockup, tickPublicMarketAtMonthStart, isPublicCompany } from './IPO.js';
 import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
@@ -114,6 +115,9 @@ export function endMonth(state) {
   const monthRevenue = state.calendar.monthRevenue ?? 0;
   const growthCampaignsClosed = state.growth?.campaignsThisMonth?.length ?? 0;
   const burn = resolveMonthEndBurn(state);
+  for (const line of serviceLoanAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
   const portfolio = applySubsidiaryMrrPayout(state);
   for (const line of portfolio.lines ?? []) {
     appendLog(state, line);

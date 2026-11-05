@@ -29,7 +29,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 22;
+export const SAVE_VERSION = 23;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -259,6 +259,18 @@ export function normalizeSave(raw) {
     }
     if (state.finance.mrr === undefined) state.finance.mrr = state.finance.monthlyRevenue ?? 0;
     if (!state.finance.instruments) state.finance.instruments = [];
+    if (!state.finance.loan) {
+      state.finance.loan = {
+        balance: 0,
+        totalDrawn: 0,
+        monthlyPayment: 0,
+        apr: 0.14,
+        creditLimit: 0,
+        drawsThisMonth: 0,
+        lastDrawTurn: null,
+        lastServicedTurn: null
+      };
+    }
     if (state.finance.lastRound === undefined) state.finance.lastRound = null;
     if (!state.flags) state.flags = {};
     if (state.flags.gameOver === undefined) state.flags.gameOver = false;
