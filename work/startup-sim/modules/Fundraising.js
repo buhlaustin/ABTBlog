@@ -37,7 +37,6 @@ import {
   canStartInterview,
   isInResidency,
   isXcAcceptedPendingBatch,
-  xcBatchStartLabel,
   xcWaitingForRetry
 } from './XC.js';
 import { renderAcceleratorsBlock, joinAccelerator } from './Accelerators.js';
@@ -156,7 +155,7 @@ export function renderFinancePanel(container, state) {
     xcBlock = `<p class="fine-print"><strong>In SF batch</strong> — ${state.xc?.residencyMonthsRemaining ?? 0} month(s) left. +35% task revenue, +batch product momentum. Desk tasks are XC-only.</p>`;
   } else if (isXcAcceptedPendingBatch(state)) {
     const startLabel = xcBatchStartLabelText(state);
-    xcBlock = `<p class="fine-print"><strong>Accepted into XC</strong> — batch starts ${escapeHtml(startLabel ?? 'next month')}. $500k SAFE already on the cap table.</p>`;
+    xcBlock = `<p class="fine-print"><strong>Accepted into XC</strong> — ${escapeHtml(startLabel ?? 'next seasonal batch')}. $500k SAFE already on the cap table.</p>`;
   } else if (state.flags?.xcAccepted) {
     xcBlock = `<p class="fine-print">XC alumni — ${formatMoney(500_000)} SAFE closed. ${(state.xc?.graduateBoostMonths ?? 0) > 0 ? `${state.xc.graduateBoostMonths} mo alumni revenue boost left.` : 'Batch complete.'}</p>`;
   } else {

@@ -271,7 +271,7 @@ async function submitXcInterview(e) {
 
   appendLog(
     sessionState,
-    `XC accepted (score ${score.score}) — $500k SAFE. Batch starts ${xcBatchStartLabelText(sessionState) ?? 'next month'} (3 months).`
+    `XC accepted (score ${score.score}) — $500k SAFE. ${xcBatchStartLabelText(sessionState) ?? 'Next seasonal batch'} (3 months).`
   );
   syncStageFromProgress(sessionState);
   showScreen('game');

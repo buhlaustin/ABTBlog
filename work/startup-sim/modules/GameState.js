@@ -3,12 +3,12 @@ import { createInitialStaff } from './Staff.js';
 import { createInitialSocial } from './Social.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
-import { realClockNow, migrateLegacyCalendar } from './GameCalendar.js';
+import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
 import { recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
 import { createInitialBoard } from './Board.js';
-import { createInitialXcState, calendarTurn } from './XC.js';
+import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart } from './XC.js';
 import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
@@ -31,7 +31,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 29;
+export const SAVE_VERSION = 30;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -389,9 +389,18 @@ export function normalizeSave(raw) {
         state.flags.xcBatchActive = false;
       } else if (!state.xc?.batchStartsTurn) {
         state.xc = state.xc ?? createInitialXcState();
-        state.xc.batchStartsTurn = calendarTurn(state);
+        const batchStart = nextXcBatchStart(state.calendar.year, state.calendar.monthIndex);
+        state.xc.scheduledBatchCode = formatXcBatchCode(batchStart.year, batchStart.monthIndex);
+        state.xc.batchStartsTurn = calendarTurnAt(state, batchStart.year, batchStart.monthIndex);
         state.flags.xcBatchActive = false;
       }
+    }
+    if (state.xc?.batchStartsTurn != null && !state.xc.scheduledBatchCode) {
+      const cal = turnToCalendar(state, state.xc.batchStartsTurn);
+      state.xc.scheduledBatchCode = formatXcBatchCode(cal.year, cal.monthIndex);
+    }
+    if (state.xc?.batchLabel?.startsWith('Batch ') && state.xc.scheduledBatchCode) {
+      state.xc.batchLabel = state.xc.scheduledBatchCode;
     }
     if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
     if (!state.acquisitions.owned) state.acquisitions.owned = [];

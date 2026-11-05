@@ -4,7 +4,43 @@ import { applyXCSafe } from './CapTable.js';
 import { restorePostXcWorkspace } from './Workspace.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import bundledInterview from '../data/xc-interview.json' with { type: 'json' };
-import { calendarTurn, turnToCalendar, formatCalendarMonth } from './GameCalendar.js';
+import {
+  calendarTurn,
+  calendarTurnAt,
+  turnToCalendar,
+  formatCalendarMonth
+} from './GameCalendar.js';
+
+/** Four batches per year: W Jan–Mar, Y Apr–Jun, S Jul–Sep, F Oct–Dec. */
+export const XC_SEASON_STARTS = [
+  { code: 'W', month: 1 },
+  { code: 'Y', month: 4 },
+  { code: 'S', month: 7 },
+  { code: 'F', month: 10 }
+];
+
+export function seasonCodeForBatchStartMonth(monthIndex) {
+  return XC_SEASON_STARTS.find((s) => s.month === monthIndex)?.code ?? null;
+}
+
+/** First batch season start strictly after the acceptance month. */
+export function nextXcBatchStart(acceptYear, acceptMonth) {
+  const y = Number(acceptYear);
+  const m = Number(acceptMonth);
+  for (let yr = y; yr <= y + 1; yr++) {
+    for (const season of XC_SEASON_STARTS) {
+      if (yr === y && season.month <= m) continue;
+      return { year: yr, monthIndex: season.month, code: season.code };
+    }
+  }
+  return { year: y + 1, monthIndex: 1, code: 'W' };
+}
+
+export function formatXcBatchCode(year, monthIndex) {
+  const code = seasonCodeForBatchStartMonth(monthIndex);
+  const yy = String(Number(year) || 0).slice(-2);
+  return `XC ${code ?? '?'}${yy}`;
+}
 
 export { calendarTurn };
 
@@ -29,6 +65,7 @@ export function createInitialXcState() {
     retryAvailableTurn: null,
     needsFollowUpQuestion: false,
     batchStartsTurn: null,
+    scheduledBatchCode: null,
     graduateBoostMonths: 0
   };
 }
@@ -64,7 +101,9 @@ export function xcBatchStartLabel(state) {
 
 export function xcBatchStartLabelText(state) {
   const start = xcBatchStartLabel(state);
-  return start ? formatCalendarMonth(start.year, start.monthIndex) : null;
+  if (!start) return state.xc?.scheduledBatchCode ?? null;
+  const code = state.xc?.scheduledBatchCode ?? formatXcBatchCode(start.year, start.monthIndex);
+  return `${code} (${formatCalendarMonth(start.year, start.monthIndex)})`;
 }
 
 export function xcProgramRevenueMult(state) {
@@ -160,7 +199,9 @@ function parseScoreJson(text) {
 export function beginResidency(state) {
   state.xc = state.xc ?? createInitialXcState();
   state.xc.residencyMonthsRemaining = 3;
-  state.xc.batchLabel = `Batch ${formatCalendarMonth(state.calendar.year, state.calendar.monthIndex, 'short')}`;
+  state.xc.batchLabel =
+    state.xc.scheduledBatchCode ??
+    formatXcBatchCode(state.calendar.year, state.calendar.monthIndex);
   state.company.location = 'San Francisco (XC batch)';
   state.finance.fixedCostsMonthly = 6_000;
   state.flags.xcResidencyComplete = false;
@@ -170,15 +211,17 @@ export function beginResidency(state) {
   state.product.level = (state.product.level ?? 0) + 2;
 }
 
-/** Schedule batch for next calendar month (acceptance is immediate; batch starts then). */
+/** Schedule the next seasonal XC batch (4 per year: W/Y/S/F). */
 export function completeXcAcceptance(state) {
   const result = applyXCSafe(state);
   if (!result.ok) return result;
   state.xc = state.xc ?? createInitialXcState();
-  state.xc.batchStartsTurn = calendarTurn(state) + 1;
+  const batchStart = nextXcBatchStart(state.calendar.year, state.calendar.monthIndex);
+  state.xc.scheduledBatchCode = formatXcBatchCode(batchStart.year, batchStart.monthIndex);
+  state.xc.batchStartsTurn = calendarTurnAt(state, batchStart.year, batchStart.monthIndex);
   state.flags.xcBatchActive = false;
   const start = xcBatchStartLabel(state);
-  return { ok: true, xcShares: result.xcShares, batchStarts: start };
+  return { ok: true, xcShares: result.xcShares, batchStarts: start, batchCode: state.xc.scheduledBatchCode };
 }
 
 /** Call at the start of each month before dealing tasks. */
@@ -241,7 +284,7 @@ export async function renderInterviewForm(container, state) {
     .join('');
 
   container.innerHTML = `
-    <p class="panel-lede">Partner office hours — short answers, real effort. If accepted, you join the batch <strong>next month</strong> (3-month program).</p>
+    <p class="panel-lede">Partner office hours — short answers, real effort. If accepted, you join the next seasonal batch (<strong>XC W/Y/S/F</strong> — Winter, Spring, Summer, Fall; 3-month program).</p>
     <form id="xc-interview-form" class="setup-form">${fields}
       <button type="submit" class="btn btn-primary">Submit application</button>
       <button type="button" class="btn btn-ghost" id="btn-xc-interview-cancel">Cancel</button>

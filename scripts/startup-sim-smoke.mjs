@@ -262,7 +262,7 @@ if (Math.abs(coreSand - coreCareer) > 0.05) {
   failed = true;
 }
 
-const { completeXcAcceptance, maybeStartScheduledXcBatch, isInResidency } = await import(
+const { completeXcAcceptance, isInResidency, nextXcBatchStart } = await import(
   `file://${join(sim, 'modules/XC.js')}`
 );
 const { startMonth } = await import(`file://${join(sim, 'modules/Calendar.js')}`);
@@ -271,24 +271,59 @@ const xcState = createInitialState({
   categoryId: 'b2b-saas',
   mode: 'career'
 });
+xcState.calendar = { year: 2026, monthIndex: 4 };
+xcState.meta.calendarStartYear = 2026;
+xcState.meta.calendarStartMonth = 4;
 xcState.flags.xcUnlocked = true;
 const accept = completeXcAcceptance(xcState);
+const expectedStart = nextXcBatchStart(2026, 4);
 if (!accept.ok || !xcState.xc?.batchStartsTurn) {
   console.error('FAIL: XC acceptance should schedule batch start turn');
+  failed = true;
+} else if (xcState.xc.scheduledBatchCode !== 'XC S26') {
+  console.error(
+    `FAIL: April acceptance should schedule XC S26, got ${xcState.xc.scheduledBatchCode}`
+  );
   failed = true;
 } else if (isInResidency(xcState)) {
   console.error('FAIL: XC batch should not start same month as acceptance');
   failed = true;
 } else {
   const { advanceCalendarMonth } = await import(`file://${join(sim, 'modules/Calendar.js')}`);
-  advanceCalendarMonth(xcState);
-  startMonth(xcState);
+  while (
+    xcState.calendar.year < expectedStart.year ||
+    (xcState.calendar.year === expectedStart.year &&
+      xcState.calendar.monthIndex < expectedStart.monthIndex)
+  ) {
+    advanceCalendarMonth(xcState);
+    startMonth(xcState);
+  }
   if (!isInResidency(xcState) || xcState.xc?.residencyMonthsRemaining !== 3) {
-    console.error('FAIL: XC batch should begin next month with 3 months remaining');
+    console.error('FAIL: XC batch should begin at seasonal start with 3 months remaining');
+    failed = true;
+  } else if (xcState.xc.batchLabel !== 'XC S26') {
+    console.error(`FAIL: residency batch label should be XC S26, got ${xcState.xc.batchLabel}`);
     failed = true;
   } else {
-    console.log('OK: XC batch starts month after acceptance');
+    console.log('OK: XC seasonal batch (April accept → Summer S26 in July)');
   }
+}
+
+const fallState = createInitialState({
+  companyName: 'XCFall',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+fallState.calendar = { year: 2026, monthIndex: 9 };
+fallState.meta.calendarStartYear = 2026;
+fallState.meta.calendarStartMonth = 9;
+fallState.flags.xcUnlocked = true;
+completeXcAcceptance(fallState);
+if (fallState.xc.scheduledBatchCode !== 'XC F26') {
+  console.error(`FAIL: September acceptance should schedule XC F26, got ${fallState.xc.scheduledBatchCode}`);
+  failed = true;
+} else {
+  console.log('OK: XC seasonal batch (September accept → Fall F26 in October)');
 }
 
 const { progressionRevenueMult } = await import(

@@ -47,24 +47,39 @@ export function addCalendarMonths(year, monthIndex, delta) {
 }
 
 /** 1-based turn index from run start month. */
+export function calendarAnchor(state) {
+  const startY = state.meta?.calendarStartYear;
+  const startM = state.meta?.calendarStartMonth;
+  if (startY != null && startM != null) {
+    return { year: startY, monthIndex: startM };
+  }
+  const y = state.calendar?.year ?? 1;
+  const m = state.calendar?.monthIndex ?? 1;
+  if (isRealCalendarYear(y)) {
+    const now = realClockNow();
+    return { year: now.year, monthIndex: now.monthIndex };
+  }
+  return { year: 1, monthIndex: 1 };
+}
+
 export function calendarTurn(state) {
   const y = state.calendar?.year ?? 1;
   const m = state.calendar?.monthIndex ?? 1;
-  const startY = state.meta?.calendarStartYear;
-  const startM = state.meta?.calendarStartMonth;
-  if (startY == null || startM == null) {
-    if (isRealCalendarYear(y)) {
-      const now = realClockNow();
-      return (y - now.year) * 12 + (m - now.monthIndex) + 1;
-    }
+  const { year: startY, monthIndex: startM } = calendarAnchor(state);
+  if (state.meta?.calendarStartYear == null && !isRealCalendarYear(y)) {
     return (y - 1) * 12 + m;
   }
   return (y - startY) * 12 + (m - startM) + 1;
 }
 
+/** Turn index when the in-game calendar shows the given month. */
+export function calendarTurnAt(state, year, monthIndex) {
+  const { year: startY, monthIndex: startM } = calendarAnchor(state);
+  return (year - startY) * 12 + (monthIndex - startM) + 1;
+}
+
 export function turnToCalendar(state, turn) {
-  const startY = state.meta?.calendarStartYear ?? state.calendar?.year ?? realClockNow().year;
-  const startM = state.meta?.calendarStartMonth ?? state.calendar?.monthIndex ?? realClockNow().monthIndex;
+  const { year: startY, monthIndex: startM } = calendarAnchor(state);
   return addCalendarMonths(startY, startM, Math.max(0, turn - 1));
 }
 
