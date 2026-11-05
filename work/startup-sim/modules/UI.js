@@ -13,7 +13,6 @@ import { renderPeoplePanel } from './Staff.js';
 import { renderCeoPanel } from './Ceo.js';
 import { ceoPersonalCashComp } from './CeoEconomics.js';
 import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
-import { renderAdvisorPanel } from './Advisor.js';
 import {
   getTaskDef,
   pendingTasks,
@@ -406,8 +405,7 @@ export const TAB_ORDER = [
   'finance',
   'companies',
   'board',
-  'news',
-  'advisor'
+  'news'
 ];
 
 export function selectTab(tabId) {
@@ -456,9 +454,6 @@ function renderPanelForTab(tab, state) {
       break;
     case 'news':
       renderNewsPanel(document.getElementById('panel-news'), state);
-      break;
-    case 'advisor':
-      renderAdvisorPanel(document.getElementById('panel-advisor'), state);
       break;
     default:
       break;
@@ -540,12 +535,6 @@ export function bindGameKeyboardShortcuts(getSession, onCloseMonth) {
       }
       return;
     }
-    if (e.key === '0' && !e.altKey && !e.ctrlKey && !e.metaKey) {
-      e.preventDefault();
-      selectTab('advisor');
-      return;
-    }
-
     if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.metaKey && !e.altKey) {
       if (canEndMonth(state)) {
         e.preventDefault();

@@ -108,7 +108,6 @@ import {
   syncNewsTabAlert,
   unreadNewsCount
 } from './modules/News.js';
-import { sendAdvisorMessage } from './modules/Advisor.js';
 import {
   renderInterviewForm,
   scoreInterview,
@@ -1316,22 +1315,6 @@ function bindGameInteractions() {
       submitXcInterview(e);
       return;
     }
-    if (e.target.id === 'advisor-form') {
-      e.preventDefault();
-      if (!sessionState) return;
-      const input = document.getElementById('advisor-input');
-      const text = input?.value;
-      const result = await sendAdvisorMessage(sessionState, text);
-      if (input) input.value = '';
-      if (!result.ok) {
-        setGameFeedback(result.reason || 'Could not send that message.', true);
-        refresh();
-        return;
-      }
-      setGameFeedback('Chief of staff replied.');
-      refresh();
-      return;
-    }
     if (e.target.id === 'pivot-form') {
       e.preventDefault();
       if (!sessionState) return;
@@ -1425,7 +1408,7 @@ async function init() {
     apiStatus.classList.remove('error');
     if (isNarrativeApiLive()) {
       apiStatus.textContent =
-        'The wire is live — batch interviews, headlines, advisor notes, and IPO press are freshly written.';
+        'The wire is live — batch interviews, headlines, and IPO press are freshly written.';
     } else if (isNarrativeApiEnabled()) {
       apiStatus.textContent =
         'Live story server is quiet — headlines still update each month. Reload if interviews stay stuck.';

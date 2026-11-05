@@ -8,7 +8,6 @@ import { createInitialOffices } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
 import { createInitialBoard } from './Board.js';
 import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart } from './XC.js';
-import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
 import { createInitialAcquisitionsState } from './Acquisitions.js';
@@ -122,7 +121,6 @@ export function createInitialState(options) {
     offices: createInitialOffices(),
     xc: createInitialXcState(),
     coo: createInitialCooState(),
-    advisor: createInitialAdvisor(),
     sentiment: createInitialSentiment(),
     world: { competitor: createCompetitorForCategory(category.id), competitorAcquired: false },
     acquisitions: createInitialAcquisitionsState(),
@@ -346,8 +344,7 @@ export function normalizeSave(raw) {
     if (!state.xc) state.xc = createInitialXcState();
     if (state.xc.retryAvailableTurn === undefined) state.xc.retryAvailableTurn = null;
     if (state.xc.needsFollowUpQuestion === undefined) state.xc.needsFollowUpQuestion = false;
-    if (!state.advisor) state.advisor = createInitialAdvisor();
-    if (state.advisor.pending) state.advisor.pending = false;
+    delete state.advisor;
     if (!state.sentiment) state.sentiment = createInitialSentiment();
     if (!state.world?.competitor) {
       state.world = {

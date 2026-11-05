@@ -1289,38 +1289,6 @@ h1 {
   border-top: 1px dashed var(--border);
 }
 
-.advisor-log {
-  max-height: 280px;
-  overflow-y: auto;
-  margin-bottom: 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 0.55rem;
-  padding: 0.65rem 0.75rem;
-  background: rgba(0, 0, 0, 0.12);
-}
-
-.advisor-msg {
-  margin-bottom: 0.65rem;
-}
-
-.advisor-msg p {
-  margin: 0.15rem 0 0;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.advisor-role {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-}
-
-.advisor-assistant {
-  border-left: 2px solid var(--accent-dim);
-  padding-left: 0.5rem;
-}
-
 .ipo-press {
   margin: 0.75rem 0;
   padding: 0.65rem 0.85rem;
@@ -1473,9 +1441,6 @@ h1 {
   .setup-form textarea,
   .hub-select,
   .satellite-add select,
-  #advisor-input {
-    font-size: 16px;
-  }
 
   .task-meta {
     overflow-wrap: anywhere;
@@ -1514,7 +1479,6 @@ h1 {
     justify-content: center;
   }
 
-  #advisor-form .btn,
   .task-offers .btn,
   .finance-action .btn,
   .product-action .btn {

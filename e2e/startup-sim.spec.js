@@ -137,11 +137,11 @@ test.describe('Startup Simulator', () => {
       'product',
       'growth',
       'people',
+      'ceo',
       'finance',
+      'companies',
       'board',
-      'social',
       'news',
-      'advisor',
     ];
     for (const tab of tabIds) {
       const tabBtn = page.locator(`#tab-${tab}`);
