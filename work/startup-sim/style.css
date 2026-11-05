@@ -799,6 +799,55 @@ h1 {
   transition: width 0.2s ease;
 }
 
+.companies-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.companies-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.companies-hero .panel-lede {
+  margin: 0;
+}
+
+.companies-market-chip {
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  background: rgba(52, 211, 153, 0.08);
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.companies-kpi-row {
+  margin: 0;
+}
+
+.companies-strategic-note {
+  margin: 0;
+}
+
+.companies-market-section .companies-filters {
+  margin: 0;
+}
+
+.companies-sort-label {
+  align-self: center;
+}
+
+.companies-deals .companies-deal-log {
+  margin-top: 0.65rem;
+}
+
 .companies-summary {
   margin: 1rem 0 1.25rem;
 }
@@ -1255,6 +1304,11 @@ h1 {
   display: block;
   height: 100%;
   background: linear-gradient(90deg, #fbbf24, #34d399);
+}
+
+.companies-panel .acquisitions-section {
+  margin: 0;
+  gap: 0.65rem;
 }
 
 .acquisitions-section {

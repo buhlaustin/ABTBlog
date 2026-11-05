@@ -631,6 +631,12 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
+function companiesStatCard(label, value, { hero = false } = {}) {
+  const classes = ['finance-stat-card'];
+  if (hero) classes.push('finance-stat-card--hero');
+  return `<div class="${classes.join(' ')}"><span class="finance-stat-label">${escapeHtml(label)}</span><span class="finance-stat-value">${value}</span></div>`;
+}
+
 function segmentLabel(segment) {
   if (segment === 'enterprise') return 'Enterprise';
   if (segment === 'mid') return 'Mid-market';
@@ -776,77 +782,101 @@ export function renderCompaniesPanel(container, state) {
 
   const lockNote = unlocked
     ? ''
-    : `<p class="desk-feedback error" role="alert">Complete your X Combinator batch to unlock acquisitions.</p>`;
+    : `<p class="finance-alert finance-alert--tax" role="alert">Complete your <strong>X Combinator batch</strong> to unlock acquisitions.</p>`;
 
   const rivalNote = state.world?.competitorAcquired
-    ? `<p class="fine-print"><strong>Rival absorbed</strong> — competitor revenue drag removed.</p>`
+    ? `<p class="finance-alert finance-alert--ok">Rival absorbed — competitor revenue drag removed.</p>`
     : state.world?.competitor
-      ? `<p class="fine-print"><strong>Strategic target:</strong> acquiring ${escapeHtml(state.world.competitor.name)} removes rival pressure and adds enterprise MRR (3-month integration).</p>`
+      ? `<p class="fine-print companies-strategic-note"><strong>Strategic target:</strong> ${escapeHtml(state.world.competitor.name)} — rival lock-in + enterprise MRR (3 mo integration).</p>`
       : '';
 
+  const synergyPct = `${((synergy - 1) * 100).toFixed(1)}%`;
+
   container.innerHTML = `
-    <p class="panel-lede">Build a roll-up: buy operators for recurring MRR, then <strong>allocate capital</strong> as a % of each subsidiary&apos;s implied value (program + confirm — not flat $25k/$100k buttons).</p>
-    ${lockNote}
-    ${rivalNote}
-    <p class="companies-brief fine-print" role="status"><strong>Market brief:</strong> ${escapeHtml(marketBrief(state))}</p>
-    ${mixNote ? `<p class="fine-print">${mixNote}</p>` : ''}
-    <div class="companies-summary summary-grid">
-      <div><span class="stat-label">Portfolio MRR</span><span class="stat-value">${formatMoney(portfolioMrr)}/mo</span></div>
-      <div><span class="stat-label">Synergy stack</span><span class="stat-value">${((synergy - 1) * 100).toFixed(1)}%</span></div>
-      <div><span class="stat-label">Est. exit value</span><span class="stat-value">${formatMoney(exitVal)}</span></div>
-      <div><span class="stat-label">Cost basis</span><span class="stat-value">${formatMoney(invested)}</span></div>
-      <div><span class="stat-label">Lifetime portfolio income</span><span class="stat-value">${formatMoney(lifetime)}</span></div>
-      <div><span class="stat-label">Dry powder</span><span class="stat-value">${formatMoney(cash)}</span></div>
-    </div>
-    <section class="acquisitions-section">
-      <h3 class="panel-subtitle">Your portfolio (${owned.length})</h3>
-      ${
-        owned.length
-          ? `<div class="table-scroll"><table class="data-table acquisitions-table">
+    <div class="companies-panel">
+      <header class="companies-hero">
+        <p class="panel-lede">Roll up operators for MRR, then reinvest as a % of each subsidiary&apos;s implied value.</p>
+        <p class="companies-market-chip" role="status">${escapeHtml(marketBrief(state))}</p>
+      </header>
+      ${lockNote}
+      ${rivalNote}
+
+      <section class="finance-kpi-row companies-kpi-row" aria-label="Portfolio snapshot">
+        ${companiesStatCard('Portfolio MRR', `${formatMoney(portfolioMrr)}/mo`, { hero: true })}
+        ${companiesStatCard('Dry powder', formatMoney(cash))}
+        ${companiesStatCard('Est. exit value', formatMoney(exitVal))}
+        ${companiesStatCard('Synergy stack', synergyPct)}
+      </section>
+      ${mixNote ? `<p class="fine-print finance-runway-detail">${escapeHtml(mixNote)}</p>` : ''}
+
+      <details class="finance-details companies-details">
+        <summary>Portfolio economics</summary>
+        <div class="finance-operating-grid finance-details-grid">
+          ${companiesStatCard('Cost basis', formatMoney(invested))}
+          ${companiesStatCard('Lifetime income', formatMoney(lifetime))}
+          ${companiesStatCard('Holdings', String(owned.length))}
+          ${companiesStatCard('Listed targets', String(marketAll.length))}
+        </div>
+        <p class="fine-print finance-details-note">Due diligence ${formatMoney(DILIGENCE_COST)} · hold 6+ mo boosts exit up to +12%</p>
+      </details>
+
+      <section class="finance-section acquisitions-section">
+        <div class="finance-section-head">
+          <h3 class="finance-section-title">Your portfolio</h3>
+          <span class="fine-print">${owned.length} holding${owned.length === 1 ? '' : 's'}</span>
+        </div>
+        ${
+          owned.length
+            ? `<div class="table-scroll finance-cap-scroll"><table class="data-table acquisitions-table">
         <thead><tr><th>Company</th><th>MRR</th><th>Basis</th><th>Est. exit</th><th>Operate</th></tr></thead>
         <tbody>${ownedRows}</tbody>
       </table></div>`
-          : '<p class="fine-print">No acquisitions yet — filter the market below and close your first bolt-on.</p>'
-      }
-    </section>
-    ${
-      dealRows
-        ? `<section class="acquisitions-section"><h3 class="panel-subtitle">Recent deals</h3><ul class="companies-deal-log">${dealRows}</ul></section>`
-        : ''
-    }
-    <section class="acquisitions-section">
-      <h3 class="panel-subtitle">Market</h3>
-      <nav class="companies-filters" aria-label="Filter acquisition targets">
-        ${filterBtn('all', 'All')}
-        ${filterBtn('small', 'Small')}
-        ${filterBtn('mid', 'Mid')}
-        ${filterBtn('enterprise', 'Enterprise')}
-        ${filterBtn('rival', 'Rival')}
-      </nav>
-      <div class="companies-toolbar">
-        <label class="companies-search fine-print">Search
-          <input type="search" id="companies-market-search" class="companies-search-input" placeholder="Name or niche…" value="${escapeHtml(search)}" autocomplete="off" />
-        </label>
-        <span class="fine-print">Sort:</span>
-        <button type="button" class="companies-filter ${sort === 'ask' ? 'active' : ''}" data-companies-sort="ask">Ask</button>
-        <button type="button" class="companies-filter ${sort === 'mrr' ? 'active' : ''}" data-companies-sort="mrr">MRR</button>
-        <button type="button" class="companies-filter ${sort === 'multiple' ? 'active' : ''}" data-companies-sort="multiple">Multiple</button>
-      </div>
-      <p class="fine-print">${marketAll.length} targets · due diligence ${formatMoney(DILIGENCE_COST)} · hold 6+ mo boosts exit up to +12%</p>
-      <div class="table-scroll"><table class="data-table acquisitions-table">
-        <thead><tr><th>Target</th><th>Size</th><th>Base MRR</th><th>Ask</th><th></th></tr></thead>
-        <tbody>${marketRows || '<tr><td colspan="5">No targets in this filter.</td></tr>'}</tbody>
-      </table></div>
+            : '<p class="fine-print">No acquisitions yet — browse the market below for your first bolt-on.</p>'
+        }
+      </section>
+
       ${
-        maxPage > 0
-          ? `<div class="companies-pager">
+        dealRows
+          ? `<details class="finance-details companies-deals">
+        <summary>Recent deals</summary>
+        <ul class="companies-deal-log">${dealRows}</ul>
+      </details>`
+          : ''
+      }
+
+      <section class="finance-section acquisitions-section companies-market-section">
+        <h3 class="finance-section-title">Market</h3>
+        <nav class="companies-filters finance-charity-chips" aria-label="Filter acquisition targets">
+          ${filterBtn('all', 'All')}
+          ${filterBtn('small', 'Small')}
+          ${filterBtn('mid', 'Mid')}
+          ${filterBtn('enterprise', 'Enterprise')}
+          ${filterBtn('rival', 'Rival')}
+        </nav>
+        <div class="companies-toolbar">
+          <label class="companies-search fine-print">Search
+            <input type="search" id="companies-market-search" class="companies-search-input" placeholder="Name or niche…" value="${escapeHtml(search)}" autocomplete="off" />
+          </label>
+          <span class="fine-print companies-sort-label">Sort</span>
+          <button type="button" class="companies-filter ${sort === 'ask' ? 'active' : ''}" data-companies-sort="ask">Ask</button>
+          <button type="button" class="companies-filter ${sort === 'mrr' ? 'active' : ''}" data-companies-sort="mrr">MRR</button>
+          <button type="button" class="companies-filter ${sort === 'multiple' ? 'active' : ''}" data-companies-sort="multiple">Multiple</button>
+        </div>
+        <div class="table-scroll finance-cap-scroll"><table class="data-table acquisitions-table">
+          <thead><tr><th>Target</th><th>Size</th><th>Base MRR</th><th>Ask</th><th></th></tr></thead>
+          <tbody>${marketRows || '<tr><td colspan="5">No targets in this filter.</td></tr>'}</tbody>
+        </table></div>
+        ${
+          maxPage > 0
+            ? `<div class="companies-pager">
         <button type="button" class="btn btn-small" data-companies-page="prev" ${page <= 0 ? 'disabled' : ''}>Prev</button>
         <span class="fine-print">Page ${page + 1} / ${maxPage + 1}</span>
         <button type="button" class="btn btn-small" data-companies-page="next" ${page >= maxPage ? 'disabled' : ''}>Next</button>
       </div>`
-          : ''
-      }
-    </section>
+            : ''
+        }
+      </section>
+    </div>
   `;
 }
 
