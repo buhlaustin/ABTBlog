@@ -310,6 +310,7 @@ export function canEndMonth(state) {
   if (state.flags?.gameOver) return false;
   if (state.calendar?.taskCatalogError) return false;
   if (state.crisis?.active) return false;
+  if (state.decision?.active) return false;
   if (needsTaskLineup(state)) return false;
   return allTasksComplete(state);
 }

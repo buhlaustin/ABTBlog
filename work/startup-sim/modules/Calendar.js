@@ -23,6 +23,7 @@ import {
   settleBoardGovernance,
   scorePublicGuidanceBeat
 } from './WorldDynamics.js';
+import { tickScenarioModifiers } from './ScenarioEffects.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -74,6 +75,9 @@ export function startMonth(state) {
   resetGrowthCampaignsMonth(state);
   resetProductActionsMonth(state);
   for (const line of applyBuzzDecayAtMonthStart(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickScenarioModifiers(state)) {
     appendLog(state, line);
   }
   for (const line of tickLaunchAtMonthStart(state)) {

@@ -60,6 +60,12 @@ import {
   preloadCrisisCatalog
 } from './modules/Crisis.js';
 import {
+  rollDeskDecision,
+  hasActiveDecision,
+  applyDecisionChoice,
+  preloadDecisionEvents
+} from './modules/DecisionEvents.js';
+import {
   recordLayoffEvent,
   applyOfflineMonthlyNews,
   enrichMonthlyNewsWithAi,
@@ -301,6 +307,9 @@ async function handleEndMonth() {
     }
 
     await rollMonthStartCrisis(sessionState);
+    if (!hasActiveCrisis(sessionState)) {
+      await rollDeskDecision(sessionState);
+    }
 
     applyOfflineMonthlyNews(sessionState);
     applyOfflineMonthlySocial(sessionState);
@@ -353,6 +362,12 @@ async function handleEndMonth() {
     if (hasActiveCrisis(sessionState)) {
       appendLog(sessionState, `Crisis: ${sessionState.crisis.active.title}`);
       showDeskFeedback('Month closed — resolve the crisis before you close again.');
+      refresh();
+      return;
+    }
+    if (hasActiveDecision(sessionState)) {
+      appendLog(sessionState, `Decision: ${sessionState.decision.active.title}`);
+      showDeskFeedback('Strategic decision on the desk — pick an option before closing again.');
       refresh();
       return;
     }
@@ -550,6 +565,12 @@ function handleCloseSeriesF() {
   refresh();
 }
 
+function formatScenarioOutcomes(result) {
+  const lines = result.outcomeLines ?? [];
+  if (!lines.length) return result.summary ?? '';
+  return `${result.summary} — ${lines.join(' ')}`;
+}
+
 function handleCrisisChoice(index) {
   if (!sessionState) return;
   const result = applyCrisisChoice(sessionState, index);
@@ -558,9 +579,22 @@ function handleCrisisChoice(index) {
     refresh();
     return;
   }
-  appendLog(sessionState, `Crisis resolved: ${result.summary}`);
-  showDeskFeedback('Crisis handled — back to the desk.');
+  appendLog(sessionState, `Crisis resolved: ${formatScenarioOutcomes(result)}`);
+  showDeskFeedback(formatScenarioOutcomes(result) || 'Crisis handled — back to the desk.');
   showScreen('game');
+  refresh();
+}
+
+function handleDecisionChoice(index) {
+  if (!sessionState) return;
+  const result = applyDecisionChoice(sessionState, index);
+  if (!result.ok) {
+    showDeskFeedback(result.reason || 'Could not apply decision.', true);
+    refresh();
+    return;
+  }
+  appendLog(sessionState, `Decision: ${formatScenarioOutcomes(result)}`);
+  showDeskFeedback(formatScenarioOutcomes(result) || 'Decision locked in.');
   refresh();
 }
 
@@ -789,6 +823,11 @@ function bindGameInteractions() {
     const crisisBtn = e.target.closest('[data-crisis-choice]');
     if (crisisBtn) {
       handleCrisisChoice(Number(crisisBtn.getAttribute('data-crisis-choice')));
+      return;
+    }
+    const decisionBtn = e.target.closest('[data-decision-choice]');
+    if (decisionBtn) {
+      handleDecisionChoice(Number(decisionBtn.getAttribute('data-decision-choice')));
       return;
     }
     if (e.target.id === 'btn-file-ipo') {
@@ -1072,6 +1111,7 @@ async function init() {
         loadAssetManifest(),
         initNarrativeApiUrl(),
         preloadCrisisCatalog(),
+        preloadDecisionEvents(),
         preloadNewsTimeline(),
         preloadSocialPersonas()
       ]);

@@ -12,6 +12,8 @@ import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
 import { createInitialCrisisState } from './Crisis.js';
+import { createInitialDecisionState } from './DecisionEvents.js';
+import { createInitialModifiers } from './ScenarioEffects.js';
 import { createInitialLaunchState } from './LaunchLifecycle.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
@@ -26,7 +28,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 15;
+export const SAVE_VERSION = 16;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -104,6 +106,8 @@ export function createInitialState(options) {
     sentiment: createInitialSentiment(),
     world: { competitor: createCompetitorForCategory(category.id) },
     crisis: createInitialCrisisState(),
+    decision: createInitialDecisionState(),
+    modifiers: createInitialModifiers(),
     launch: createInitialLaunchState(),
     meta: {
       runStartedTurn: 1,
@@ -242,6 +246,8 @@ export function normalizeSave(raw) {
       };
     }
     if (!state.crisis) state.crisis = createInitialCrisisState();
+    if (!state.decision) state.decision = createInitialDecisionState();
+    if (!state.modifiers?.active) state.modifiers = createInitialModifiers();
     if (state.flags.seriesAClosed === undefined) state.flags.seriesAClosed = false;
     if (state.flags.seriesBClosed === undefined) state.flags.seriesBClosed = false;
     if (state.flags.lastDownRound === undefined) state.flags.lastDownRound = false;

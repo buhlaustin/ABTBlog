@@ -1,4 +1,5 @@
 import { STAGES } from './constants.js';
+import { isFundraisingBlockedByScenario } from './ScenarioEffects.js';
 import {
   canRaiseSeriesA,
   canRaiseSeriesB,
@@ -182,8 +183,14 @@ function applyPricedRound(state, config) {
   if (state.flags?.ipoFiled) {
     return { ok: false, reason: 'Already public — no new primary rounds.' };
   }
+  if (isFundraisingBlockedByScenario(state)) {
+    return {
+      ok: false,
+      reason: 'Fundraising frozen — resolve fallout from a recent decision or crisis first.'
+    };
+  }
   const sentiment = state.sentiment?.score ?? 50;
-  if (minSentiment != null && state.flags?.seriesAClosed && sentiment < minSentiment) {
+  if (minSentiment != null && sentiment < minSentiment) {
     return {
       ok: false,
       reason: sentimentBlockMessage ?? `Board sentiment too low (${sentiment}/100) for ${roundName}.`
@@ -257,7 +264,9 @@ export function applySeriesA(state) {
     investorId: 'series-a',
     investorLabel: 'Series A investors',
     requireFlag: 'seedRoundClosed',
-    setFlag: 'seriesAClosed'
+    setFlag: 'seriesAClosed',
+    minSentiment: 32,
+    sentimentBlockMessage: 'Market trust is too low — clean up press and decisions before Series A.'
   });
 }
 

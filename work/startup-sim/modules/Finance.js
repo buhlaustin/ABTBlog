@@ -15,6 +15,7 @@ import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
 import { progressionRevenueMult } from './ProgressionEconomy.js';
 import { applyTaskRivalEffects } from './WorldDynamics.js';
+import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 
 /** Hard caps on desk + growth payout multiplier (after sandbox tuning overlay). */
 export const REV_MULT_CAP_CAREER = 60;
@@ -61,7 +62,8 @@ export function getCoreTaskRevenueMult(state) {
     xcProgramRevenueMult(state) *
     acceleratorRevenueMult(state) *
     productBuzzRevenueMult(state) *
-    staffRevenueMultiplier(state);
+    staffRevenueMultiplier(state) *
+    scenarioRevenueMult(state);
   return Math.round(m * 100) / 100;
 }
 
@@ -143,7 +145,12 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
   const sand = sandboxMult(state);
   const cost = Math.round(
-    (taskDef.cost ?? 0) * econ.costMult * sand * hubCostMult(state) * staffCostMultiplier(state)
+    (taskDef.cost ?? 0) *
+      econ.costMult *
+      sand *
+      hubCostMult(state) *
+      staffCostMultiplier(state) *
+      scenarioCostMult(state)
   );
   const payoutMult = getTaskRevenueMultiplierPreview(state);
   const revenue = Math.round(rolled.revenue * payoutMult * staffRetentionBonus(state, taskDef));

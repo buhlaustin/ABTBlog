@@ -1,0 +1,371 @@
+{
+  "version": 1,
+  "events": [
+    {
+      "id": "pricing-fork",
+      "title": "Pricing fork",
+      "description": "Sales wants a 20% price hike. Product wants a generous free tier to feed the funnel.",
+      "weight": 2,
+      "minTier": 1,
+      "choices": [
+        {
+          "label": "Raise prices",
+          "effects": {
+            "sentiment": -2,
+            "modifier": {
+              "id": "price-hike",
+              "label": "Premium positioning",
+              "revenueMult": 1.12,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Expand free tier",
+          "effects": {
+            "buzz": 3,
+            "sentiment": 1,
+            "modifier": {
+              "id": "free-tier",
+              "label": "Land-grab discounting",
+              "revenueMult": 0.88,
+              "costMult": 1.08,
+              "months": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "security-tradeoff",
+      "title": "Ship vs. security review",
+      "description": "Enterprise prospect wants a feature live Friday. Security wants two more weeks.",
+      "weight": 2,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Ship Friday",
+          "effects": {
+            "product": 2,
+            "buzz": 1,
+            "modifier": {
+              "id": "ship-fast",
+              "label": "Security debt",
+              "revenueMult": 1.05,
+              "months": 1
+            },
+            "sentiment": -4
+          }
+        },
+        {
+          "label": "Delay for audit",
+          "effects": {
+            "cash": -8000,
+            "sentiment": 4,
+            "modifier": {
+              "id": "audit-delay",
+              "label": "Delayed enterprise logo",
+              "revenueMult": 0.92,
+              "months": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "influencer-deal",
+      "title": "Influencer sponsorship offer",
+      "description": "A creator with 2M followers wants $25k for a sponsored thread — legal is nervous.",
+      "weight": 2,
+      "minTier": 1,
+      "choices": [
+        {
+          "label": "Pay for the thread",
+          "effects": {
+            "cash": -25000,
+            "buzz": 5,
+            "sentiment": 1,
+            "competitor": -1
+          }
+        },
+        {
+          "label": "Decline — organic only",
+          "effects": {
+            "cash": 0,
+            "buzz": -1,
+            "competitor": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "office-return",
+      "title": "Return-to-office mandate",
+      "description": "Landlord is offering a rent break if 80% of staff come in three days a week.",
+      "weight": 1,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Mandate hybrid",
+          "effects": {
+            "cash": 12000,
+            "sentiment": -3,
+            "headcountDelta": -2
+          }
+        },
+        {
+          "label": "Stay remote-first",
+          "effects": {
+            "cash": -6000,
+            "sentiment": 2,
+            "buzz": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "acqui-hire",
+      "title": "Acqui-hire pitch",
+      "description": "A tiny competitor wants to join for cash + 4 engineers.",
+      "weight": 1,
+      "minTier": 3,
+      "choices": [
+        {
+          "label": "Buy the team ($180k)",
+          "effects": {
+            "cash": -180000,
+            "headcountDelta": 4,
+            "product": 2,
+            "sentiment": 2
+          }
+        },
+        {
+          "label": "Pass — build in-house",
+          "effects": {
+            "product": 1,
+            "competitor": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "data-licensing",
+      "title": "Data licensing offer",
+      "description": "An analytics broker wants anonymized usage data — $40k/quarter.",
+      "weight": 2,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Take the money",
+          "effects": {
+            "instantRevenue": 40000,
+            "sentiment": -5,
+            "buzz": -2,
+            "modifier": {
+              "id": "data-deal-backlash",
+              "label": "Privacy backlash",
+              "revenueMult": 0.9,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Refuse on principle",
+          "effects": {
+            "sentiment": 4,
+            "buzz": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "channel-partner",
+      "title": "Channel partner rev-share",
+      "description": "A reseller wants 30% forever in exchange for 50 logos this year.",
+      "weight": 2,
+      "minTier": 3,
+      "choices": [
+        {
+          "label": "Sign the reseller",
+          "effects": {
+            "instantRevenue": 65000,
+            "modifier": {
+              "id": "channel-margin",
+              "label": "Channel margin squeeze",
+              "revenueMult": 0.94,
+              "months": 4
+            },
+            "sentiment": 1
+          }
+        },
+        {
+          "label": "Direct sales only",
+          "effects": {
+            "sentiment": -1,
+            "competitor": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "open-source-fork",
+      "title": "Open-source fork threat",
+      "description": "Community contributors threaten a fork unless you open more code.",
+      "weight": 1,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Open-core pivot",
+          "effects": {
+            "buzz": 4,
+            "sentiment": 2,
+            "modifier": {
+              "id": "open-core",
+              "label": "Open-core monetization test",
+              "revenueMult": 0.95,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Stay closed",
+          "effects": {
+            "buzz": -3,
+            "sentiment": -2,
+            "competitor": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "grant-vs-dilution",
+      "title": "Non-dilutive grant vs. bridge",
+      "description": "A government grant pays $120k but requires 6 weeks of paperwork. Angels offer a bridge today.",
+      "weight": 1,
+      "minTier": 0,
+      "choices": [
+        {
+          "label": "Chase the grant",
+          "effects": {
+            "cash": -4000,
+            "instantRevenue": 120000,
+            "sentiment": 3
+          }
+        },
+        {
+          "label": "Skip — focus on product",
+          "effects": {
+            "product": 2,
+            "buzz": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "public-guidance",
+      "title": "Guidance whisper",
+      "description": "Analysts want a bold ARR guide for next quarter. Finance wants sandbagging.",
+      "weight": 2,
+      "minTier": 7,
+      "requiresPublic": true,
+      "choices": [
+        {
+          "label": "Guide high",
+          "effects": {
+            "sentiment": 2,
+            "stockPct": 0.03,
+            "modifier": {
+              "id": "high-guide",
+              "label": "Street expects a beat",
+              "revenueMult": 1.06,
+              "months": 1
+            }
+          }
+        },
+        {
+          "label": "Sandbag guidance",
+          "effects": {
+            "sentiment": -1,
+            "stockPct": -0.02,
+            "modifier": {
+              "id": "low-guide",
+              "label": "Conservative guide",
+              "revenueMult": 0.97,
+              "months": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "ai-feature-bet",
+      "title": "AI feature bet",
+      "description": "Engineering wants a month to ship an AI copilot — sales already promised it.",
+      "weight": 2,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Delay other roadmap",
+          "effects": {
+            "cash": -15000,
+            "product": 3,
+            "buzz": 4,
+            "modifier": {
+              "id": "ai-copilot",
+              "label": "AI copilot hype",
+              "revenueMult": 1.1,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Tell sales to walk it back",
+          "effects": {
+            "sentiment": -3,
+            "buzz": -2,
+            "instantRevenue": -20000,
+            "cash": -20000
+          }
+        }
+      ]
+    },
+    {
+      "id": "support-sla",
+      "title": "Support SLA gamble",
+      "description": "Your largest customer demands 15-minute support SLAs or they churn.",
+      "weight": 2,
+      "minTier": 4,
+      "choices": [
+        {
+          "label": "Hire night-shift support",
+          "effects": {
+            "cash": -28000,
+            "headcountDelta": 3,
+            "sentiment": 3,
+            "modifier": {
+              "id": "sla-win",
+              "label": "Logo saved",
+              "revenueMult": 1.08,
+              "months": 3
+            }
+          }
+        },
+        {
+          "label": "Risk the churn",
+          "effects": {
+            "instantRevenue": -95000,
+            "cash": -95000,
+            "sentiment": -6,
+            "modifier": {
+              "id": "logo-churn",
+              "label": "Enterprise churn scare",
+              "revenueMult": 0.85,
+              "months": 2,
+              "fundraisingBlocked": true
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

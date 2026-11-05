@@ -15,6 +15,8 @@ import {
 import { getTaskStage, workspaceLabel, getWorkspaceTier, getArr } from './Workspace.js';
 import { renderBoardPanel } from './Board.js';
 import { hasActiveCrisis } from './Crisis.js';
+import { hasActiveDecision, renderDeskDecisionBlock } from './DecisionEvents.js';
+import { activeModifierLabels } from './ScenarioEffects.js';
 import { isPublicCompany, founderStakeValue } from './IPO.js';
 import { stageIconUrl, applyGameBackdrop } from './Assets.js';
 import { playUiClick } from './Audio.js';
@@ -24,7 +26,7 @@ import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
 import { renderProductActionsPanel } from './ProductActions.js';
-import { sentimentLabel, hasInstitutionalBoard } from './Sentiment.js';
+import { sentimentLabel, marketTrustLabel, hasInstitutionalBoard } from './Sentiment.js';
 import { runwayLabel } from './MonthSummary.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
@@ -266,6 +268,12 @@ export function renderDeskPanel(state) {
         ? '<p class="desk-feedback error" role="alert">Crisis on the desk — resolve it before closing the month.</p>'
         : ''
     }
+    ${
+      hasActiveDecision(state)
+        ? '<p class="desk-feedback error" role="alert">Strategic decision pending — pick an option below before closing the month.</p>'
+        : ''
+    }
+    ${renderDeskDecisionBlock(state)}
     <p class="panel-lede">Pick ${slotTarget} tasks from this month’s offers, complete them, then close the month. <span class="fine-print">Shortcuts: 1–9 switch tabs, M close month.</span></p>
     <div class="summary-grid">
       <div><span class="stat-label">Tasks</span><span class="stat-value">${done} / ${slotTarget}</span></div>
@@ -503,6 +511,14 @@ export function renderGrowthPanel(container, state) {
   const capNote = revHud.label.includes('capped')
     ? ` · uncapped stack ${rawMult.toFixed(1)}× → <strong>${totalMult.toFixed(2)}× cap</strong>`
     : '';
+  const modLabels = activeModifierLabels(state);
+  const modNote = modLabels.length
+    ? `<p class="fine-print"><strong>Active fallout:</strong> ${modLabels.map((l) => escapeHtml(l)).join(' · ')}</p>`
+    : '';
+  const trustScore = state.sentiment?.score ?? 68;
+  const trustNote = hasInstitutionalBoard(state)
+    ? ''
+    : `<p class="fine-print"><strong>Market trust</strong> ${trustScore} — ${escapeHtml(marketTrustLabel(trustScore))}. Crises and desk decisions move this score; Series A needs at least 32.</p>`;
   const multNote =
     state.mode === 'sandbox' && tuneMult !== 1
       ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong>${capNote} · growth slots ${growthLeft}/${growthSlots} left${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
@@ -510,6 +526,8 @@ export function renderGrowthPanel(container, state) {
 
   container.innerHTML = `
     <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks and paid campaigns below share the same multiplier math.</p>
+    ${trustNote}
+    ${modNote}
     ${multNote}
     <div class="summary-grid">
       <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>

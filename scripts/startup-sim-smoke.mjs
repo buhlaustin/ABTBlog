@@ -374,4 +374,58 @@ if (!headA || headA === headB) {
   console.log('OK: monthly news rotates and marks unread');
 }
 
+const { applyScenarioEffects, scenarioRevenueMult, isFundraisingBlockedByScenario } =
+  await import(`file://${join(sim, 'modules/ScenarioEffects.js')}`);
+const { applyDecisionChoice, hasActiveDecision, createInitialDecisionState } = await import(
+  `file://${join(sim, 'modules/DecisionEvents.js')}`
+);
+const { canEndMonth } = await import(`file://${join(sim, 'modules/Tasks.js')}`);
+
+const scenarioState = createInitialState({
+  companyName: 'ScenarioCo',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+scenarioState.decision = createInitialDecisionState();
+scenarioState.decision.active = {
+  id: 'test',
+  title: 'Test fork',
+  choices: [
+    {
+      label: 'Take premium path',
+      effects: {
+        cash: -1000,
+        sentiment: 3,
+        modifier: { id: 'smoke-premium', label: 'Premium path', revenueMult: 1.1, months: 2 }
+      }
+    }
+  ]
+};
+if (canEndMonth(scenarioState)) {
+  console.error('FAIL: active decision should block month close');
+  failed = true;
+}
+const decResult = applyDecisionChoice(scenarioState, 0);
+if (!decResult.ok || hasActiveDecision(scenarioState) || scenarioRevenueMult(scenarioState) < 1.09) {
+  console.error('FAIL: decision choice should apply modifier and clear active');
+  failed = true;
+} else {
+  console.log('OK: desk decision applies fallout and unblocks month');
+}
+
+applyScenarioEffects(scenarioState, {
+  modifier: {
+    id: 'smoke-block',
+    label: 'PR freeze',
+    fundraisingBlocked: true,
+    months: 1
+  }
+});
+if (!isFundraisingBlockedByScenario(scenarioState)) {
+  console.error('FAIL: scenario modifier should block fundraising');
+  failed = true;
+} else {
+  console.log('OK: scenario fundraising block');
+}
+
 process.exit(failed ? 1 : 0);

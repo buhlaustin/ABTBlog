@@ -1,8 +1,7 @@
 import { fetchGameJson } from './utils.js';
-import { adjustSentiment } from './Sentiment.js';
-import { bumpCompetitorPressure, easeCompetitorPressure } from './Competitor.js';
-import { isPublicCompany } from './IPO.js';
 import { progressionTier } from './ProgressionEconomy.js';
+import { isPublicCompany } from './IPO.js';
+import { applyScenarioEffects, describeScenarioEffects } from './ScenarioEffects.js';
 import bundledCrises from '../data/crises.json' with { type: 'json' };
 
 let crisisCatalog = bundledCrises;
@@ -36,7 +35,7 @@ export async function rollMonthStartCrisis(state) {
   if (!state.crisis) state.crisis = createInitialCrisisState();
   const pressure = state.world?.competitor?.pressure ?? 0;
   const tier = progressionTier(state);
-  const rollThreshold = 0.12 + Math.min(0.08, pressure * 0.015) + (tier >= 5 ? 0.04 : 0);
+  const rollThreshold = 0.16 + Math.min(0.1, pressure * 0.02) + (tier >= 5 ? 0.04 : 0);
   if (Math.random() > rollThreshold) return null;
 
   const { crises } = crisesHydrated ? crisisCatalog : await loadCrises();
@@ -68,23 +67,12 @@ export function applyCrisisChoice(state, choiceIndex) {
   const choice = active.choices[choiceIndex];
   if (!choice) return { ok: false, reason: 'Pick an option.' };
 
-  const fx = choice.effects ?? {};
-  if (fx.cash) state.finance.cash = (state.finance.cash ?? 0) + Number(fx.cash);
-  if (fx.buzz) state.product.buzz = (state.product.buzz ?? 0) + Number(fx.buzz);
-  if (fx.sentiment) adjustSentiment(state, Number(fx.sentiment), `Crisis: ${active.title}`);
-  if (fx.competitor > 0) bumpCompetitorPressure(state, fx.competitor);
-  if (fx.competitor < 0) easeCompetitorPressure(state, Math.abs(fx.competitor));
-
-  if (isPublicCompany(state) && fx.stockPct) {
-    const pm = state.publicMarket;
-    const price = pm.sharePrice ?? pm.ipoPrice ?? 1;
-    const next = Math.max((pm.ipoPrice ?? price) * 0.2, price * (1 + Number(fx.stockPct)));
-    pm.sharePrice = Math.round(next * 100) / 100;
-  }
-
+  const outcomeLines = applyScenarioEffects(state, choice.effects ?? {}, {
+    title: `Crisis: ${active.title}`
+  });
   const summary = choice.label;
   state.crisis.active = null;
-  return { ok: true, summary, crisisId: active.id };
+  return { ok: true, summary, crisisId: active.id, outcomeLines };
 }
 
 function escapeHtml(s) {
@@ -102,10 +90,13 @@ export function renderCrisisPanel(container, state) {
     return;
   }
   const buttons = (active.choices ?? [])
-    .map(
-      (c, i) =>
-        `<button type="button" class="btn btn-primary crisis-choice" data-crisis-choice="${i}">${escapeHtml(c.label)}</button>`
-    )
+    .map((c, i) => {
+      const hint = c.hint ?? describeScenarioEffects(c.effects);
+      return `<button type="button" class="btn btn-primary crisis-choice" data-crisis-choice="${i}">
+        <span class="decision-choice-label">${escapeHtml(c.label)}</span>
+        ${hint ? `<span class="decision-choice-hint">${escapeHtml(hint)}</span>` : ''}
+      </button>`;
+    })
     .join('');
 
   container.innerHTML = `
@@ -113,6 +104,6 @@ export function renderCrisisPanel(container, state) {
     <h2>${escapeHtml(active.title)}</h2>
     <p class="lede">${escapeHtml(active.description)}</p>
     <div class="crisis-actions">${buttons}</div>
-    <p class="fine-print">Pick a path before you close the month — this does not replace a desk task.</p>
+    <p class="fine-print">Pick a path before you close the month — choices change cash, trust, desk revenue, and rival heat.</p>
   `;
 }
