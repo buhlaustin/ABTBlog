@@ -1228,6 +1228,31 @@ if (!failed) {
   } else if (!failed) {
     console.log(`OK: satellite catalog (${catalog.length} cities, one-time open)`);
   }
+  const { totalHeadcountCap, headcountCapBreakdown } = await import(
+    `file://${join(sim, 'modules/Offices.js')}`
+  );
+  const { maxHeadcountForStage } = await import(`file://${join(sim, 'modules/Staff.js')}`);
+  const { HUB_HEADCOUNT_CAP } = await import(`file://${join(sim, 'modules/Workspace.js')}`);
+  const hubCapState = createInitialState({ companyName: 'HubCap', categoryId: 'b2b-saas', mode: 'career' });
+  hubCapState.workspace = { ...(hubCapState.workspace ?? {}), tier: WS_TIER.HUB, hubOwned: true };
+  hubCapState.offices = {
+    hubId: 'atlanta',
+    hubLabel: 'Atlanta',
+    satellites: [{ id: 'sat-denver', templateId: 'sat-denver', label: 'Denver', seats: 6, rentMonthly: 9000 }],
+    usedSatelliteTemplateIds: ['sat-denver']
+  };
+  const hubBaseCap = headcountCapBreakdown(hubCapState);
+  if (hubBaseCap.base !== HUB_HEADCOUNT_CAP || totalHeadcountCap(hubCapState) !== HUB_HEADCOUNT_CAP + 6) {
+    console.error(
+      `FAIL: hub cap expected ${HUB_HEADCOUNT_CAP}+6 seats got base ${hubBaseCap.base} total ${totalHeadcountCap(hubCapState)}`
+    );
+    failed = true;
+  } else if (maxHeadcountForStage(hubCapState.stage, hubCapState) !== totalHeadcountCap(hubCapState)) {
+    console.error('FAIL: People tab cap should match totalHeadcountCap with satellites');
+    failed = true;
+  } else {
+    console.log(`OK: hub HQ cap ${HUB_HEADCOUNT_CAP} + satellite seats (${totalHeadcountCap(hubCapState)} hiring cap)`);
+  }
 }
 if (!failed) {
   const publicCoo = createInitialState({ companyName: 'Public COO', categoryId: 'b2b-saas', mode: 'sandbox' });

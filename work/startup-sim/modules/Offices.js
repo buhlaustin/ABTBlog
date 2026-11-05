@@ -96,8 +96,22 @@ export function satelliteRent(state) {
   return (state.offices?.satellites ?? []).reduce((s, o) => s + (o.rentMonthly ?? 0), 0);
 }
 
+/** Effective hiring cap — hub HQ base plus satellite seat bonuses (career). */
 export function totalHeadcountCap(state) {
-  return headcountCap(state) + satelliteSeats(state);
+  const base = headcountCap(state);
+  if (state?.mode === 'sandbox') return base;
+  if (getWorkspaceTier(state) === WORKSPACE_TIER.HUB && state.offices?.hubId) {
+    return base + satelliteSeats(state);
+  }
+  return base;
+}
+
+export function headcountCapBreakdown(state) {
+  const base = headcountCap(state);
+  const seats = satelliteSeats(state);
+  const total = totalHeadcountCap(state);
+  const atHub = getWorkspaceTier(state) === WORKSPACE_TIER.HUB && Boolean(state.offices?.hubId);
+  return { base, seats, total, atHub };
 }
 
 export function selectHub(state, hubId) {
@@ -164,11 +178,26 @@ export function addSatellite(state, templateId) {
 }
 
 export function removeSatellite(state, satelliteId) {
-  const before = state.offices?.satellites?.length ?? 0;
-  state.offices.satellites = (state.offices.satellites ?? []).filter((s) => s.id !== satelliteId);
-  if (state.offices.satellites.length === before) {
+  const list = state.offices?.satellites ?? [];
+  const target = list.find((s) => s.id === satelliteId);
+  if (!target) {
     return { ok: false, reason: 'Satellite not found.' };
   }
+  const nextSeats = satelliteSeats(state) - (target.seats ?? 0);
+  const base = headcountCap(state);
+  const nextCap =
+    state?.mode === 'sandbox' || !state.offices?.hubId
+      ? base
+      : base + nextSeats;
+  const hc = state.staff?.headcountByDept ?? {};
+  const active = Object.values(hc).reduce((a, b) => a + (Number(b) || 0), 0);
+  if (active > nextCap) {
+    return {
+      ok: false,
+      reason: `Cannot close ${target.label} — ${active} active employees exceeds the ${nextCap} cap without those ${target.seats ?? 0} satellite seats.`
+    };
+  }
+  state.offices.satellites = list.filter((s) => s.id !== satelliteId);
   return { ok: true };
 }
 
@@ -207,7 +236,7 @@ function workspacePurchaseBlock(state) {
         .join('');
 
   const hubNote = atHub
-    ? `<p class="fine-print">Worldwide hub HQ — add satellite offices below. Earlier office tiers are no longer listed here.</p>`
+    ? `<p class="fine-print">Worldwide hub HQ holds up to <strong>5,000</strong> employees — open satellite cities below to add seat capacity (each city once per run).</p>`
     : `<p class="fine-print">Offices are purchased at ARR gates; rent rolls into monthly burn. Garage has no hires.</p>`;
 
   const purchaseRow = buttons ? `<div class="workspace-purchase-row">${buttons}</div>` : '';
@@ -223,7 +252,8 @@ function workspacePurchaseBlock(state) {
 export function renderOfficesPanel(container, state) {
   if (!container) return;
 
-  const cap = headcountCap(state) + satelliteSeats(state);
+  const capBreakdown = headcountCapBreakdown(state);
+  const cap = capBreakdown.total;
   const hub = state.offices?.hubId ? getHubById(state.offices.hubId) : null;
   const residency = state.xc?.residencyMonthsRemaining ?? 0;
   const inResidency = state.flags?.xcAccepted && !state.flags?.xcResidencyComplete;
@@ -250,7 +280,10 @@ export function renderOfficesPanel(container, state) {
         <button type="button" class="btn btn-primary btn-small" id="btn-select-hub">Open hub HQ</button>
       </div>`;
   } else if (hub) {
-    hubSection = `<p class="fine-print">HQ: <strong>${escapeHtml(state.offices.hubLabel)}</strong> · headcount cap ${cap}</p>`;
+    const capDetail = capBreakdown.seats
+      ? `${capBreakdown.base.toLocaleString()} HQ + ${capBreakdown.seats.toLocaleString()} satellite = <strong>${cap.toLocaleString()}</strong>`
+      : `<strong>${capBreakdown.base.toLocaleString()}</strong> (open satellites to grow past hub HQ limit)`;
+    hubSection = `<p class="fine-print">HQ: <strong>${escapeHtml(state.offices.hubLabel)}</strong> · employee cap ${capDetail}</p>`;
   } else if (inResidency) {
     hubSection = `<p class="fine-print">SF batch — ${residency} month(s) left. Desk tasks are XC-only.</p>`;
   }
@@ -277,7 +310,7 @@ export function renderOfficesPanel(container, state) {
     state.offices?.hubId
       ? `
     <h3 class="log-head">Satellite offices</h3>
-    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Each city can be opened <strong>once per run</strong>.</p>
+    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Each city adds seats to your hiring cap (<strong>once per run</strong>).</p>
     <div class="table-scroll">
       <table class="data-table">
         <thead><tr><th>City</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
