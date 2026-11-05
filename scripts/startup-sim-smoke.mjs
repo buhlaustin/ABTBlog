@@ -52,6 +52,33 @@ if (!failed) {
   console.log('OK: monthly offers unique (no duplicate options per month)');
 }
 
+const placeholderTasks = getTaskDefinitions().filter(
+  (t) =>
+    /\(cycle \d+\)/i.test(t.title ?? '') ||
+    (t.description ?? '').includes('keeps the rotating catalog') ||
+    (t.description ?? '').includes('desk play #')
+);
+if (placeholderTasks.length) {
+  console.error(`FAIL: ${placeholderTasks.length} desk tasks still use placeholder catalog copy`);
+  failed = true;
+} else if (!failed) {
+  console.log('OK: no placeholder catalog-expansion copy in merged tasks');
+}
+
+const titleCounts = new Map();
+for (const t of getTaskDefinitions()) {
+  const key = (t.title ?? '').trim().toLowerCase();
+  if (!key) continue;
+  titleCounts.set(key, (titleCounts.get(key) ?? 0) + 1);
+}
+const dupTitles = [...titleCounts.entries()].filter(([, n]) => n > 1);
+if (dupTitles.length) {
+  console.error(`FAIL: duplicate task titles in catalog (${dupTitles.length}), e.g. ${dupTitles[0][0]}`);
+  failed = true;
+} else if (!failed) {
+  console.log('OK: task titles unique across merged catalog');
+}
+
 function categoryAllowed(task, categoryId) {
   const cats = task.categories;
   if (!cats?.length) return true;

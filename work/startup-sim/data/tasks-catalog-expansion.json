@@ -3,8 +3,8 @@
   "tasks": [
     {
       "id": "catalog-expansion-001",
-      "title": "Run data pipeline (cycle 1)",
-      "description": "Cross-industry desk play #1 — keeps the rotating catalog fresh month to month.",
+      "title": "Shadow five onboarding calls",
+      "description": "Listen where new users stall before they quietly churn.",
       "types": [
         "marketing"
       ],
@@ -24,8 +24,8 @@
     },
     {
       "id": "catalog-expansion-002",
-      "title": "Launch growth loop (cycle 2)",
-      "description": "Cross-industry desk play #2 — keeps the rotating catalog fresh month to month.",
+      "title": "Patch the signup funnel leak",
+      "description": "Instrument drop-offs and ship two small UX fixes this month.",
       "types": [
         "sales"
       ],
@@ -45,8 +45,8 @@
     },
     {
       "id": "catalog-expansion-003",
-      "title": "Audit billing edge cases (cycle 3)",
-      "description": "Cross-industry desk play #3 — keeps the rotating catalog fresh month to month.",
+      "title": "Win back a churned logo",
+      "description": "Founder call, honest retro, and a tight re-pilot scope.",
       "types": [
         "research"
       ],
@@ -65,8 +65,8 @@
     },
     {
       "id": "catalog-expansion-004",
-      "title": "Pilot incident retro (cycle 4)",
-      "description": "Cross-industry desk play #4 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship role-based permissions",
+      "description": "Stop enterprise deals dying on “everyone is admin.”",
       "types": [
         "product"
       ],
@@ -86,8 +86,8 @@
     },
     {
       "id": "catalog-expansion-005",
-      "title": "Scale compliance packet (cycle 5)",
-      "description": "Cross-industry desk play #5 — keeps the rotating catalog fresh month to month.",
+      "title": "Publish release notes people read",
+      "description": "Plain language, screenshots, and one customer thank-you.",
       "types": [
         "marketing"
       ],
@@ -106,8 +106,8 @@
     },
     {
       "id": "catalog-expansion-006",
-      "title": "Refactor partner API (cycle 6)",
-      "description": "Cross-industry desk play #6 — keeps the rotating catalog fresh month to month.",
+      "title": "Run a SOC 2 tabletop",
+      "description": "Pretend the auditor lands Friday; close the scary gaps first.",
       "types": [
         "sales"
       ],
@@ -127,8 +127,8 @@
     },
     {
       "id": "catalog-expansion-007",
-      "title": "Negotiate roadmap bet (cycle 7)",
-      "description": "Cross-industry desk play #7 — keeps the rotating catalog fresh month to month.",
+      "title": "Offer annual prepay discount",
+      "description": "Trade modest margin for cash up front and firm renewal dates.",
       "types": [
         "research"
       ],
@@ -148,8 +148,8 @@
     },
     {
       "id": "catalog-expansion-008",
-      "title": "Publish demo environment (cycle 8)",
-      "description": "Cross-industry desk play #8 — keeps the rotating catalog fresh month to month.",
+      "title": "Define product-qualified leads",
+      "description": "Give sales one activation threshold everyone trusts.",
       "types": [
         "product"
       ],
@@ -169,8 +169,8 @@
     },
     {
       "id": "catalog-expansion-009",
-      "title": "Instrument support macros (cycle 9)",
-      "description": "Cross-industry desk play #9 — keeps the rotating catalog fresh month to month.",
+      "title": "Host a customer advisory lunch",
+      "description": "Six power users, no deck, one roadmap bet prioritized.",
       "types": [
         "marketing"
       ],
@@ -189,8 +189,8 @@
     },
     {
       "id": "catalog-expansion-010",
-      "title": "Ship customer council (cycle 10)",
-      "description": "Cross-industry desk play #10 — keeps the rotating catalog fresh month to month.",
+      "title": "Harden billing webhooks",
+      "description": "Idempotency, retries, and alerts before finance finds duplicates.",
       "types": [
         "sales"
       ],
@@ -210,8 +210,8 @@
     },
     {
       "id": "catalog-expansion-011",
-      "title": "Run renewal playbook (cycle 11)",
-      "description": "Cross-industry desk play #11 — keeps the rotating catalog fresh month to month.",
+      "title": "Stand up a sandbox tenant",
+      "description": "Let prospects click around without a sales engineer babysitting.",
       "types": [
         "research"
       ],
@@ -230,8 +230,8 @@
     },
     {
       "id": "catalog-expansion-012",
-      "title": "Launch security review (cycle 12)",
-      "description": "Cross-industry desk play #12 — keeps the rotating catalog fresh month to month.",
+      "title": "Rewrite the pricing page",
+      "description": "Clarify tiers, limits, and the upgrade path in one scroll.",
       "types": [
         "product"
       ],
@@ -251,8 +251,8 @@
     },
     {
       "id": "catalog-expansion-013",
-      "title": "Audit deploy checklist (cycle 13)",
-      "description": "Cross-industry desk play #13 — keeps the rotating catalog fresh month to month.",
+      "title": "Cold-email 50 ideal accounts",
+      "description": "Short notes, one concrete outcome, no “synergies” paragraph.",
       "types": [
         "marketing"
       ],
@@ -272,8 +272,8 @@
     },
     {
       "id": "catalog-expansion-014",
-      "title": "Pilot capacity plan (cycle 14)",
-      "description": "Cross-industry desk play #14 — keeps the rotating catalog fresh month to month.",
+      "title": "Fix your demo dataset",
+      "description": "Seed believable numbers so pitches do not start with apologies.",
       "types": [
         "sales"
       ],
@@ -293,8 +293,8 @@
     },
     {
       "id": "catalog-expansion-015",
-      "title": "Scale pricing experiment (cycle 15)",
-      "description": "Cross-industry desk play #15 — keeps the rotating catalog fresh month to month.",
+      "title": "Interview churned trial users",
+      "description": "Learn why they bounced before blaming marketing spend.",
       "types": [
         "research"
       ],
@@ -313,8 +313,8 @@
     },
     {
       "id": "catalog-expansion-016",
-      "title": "Refactor SLA dashboard (cycle 16)",
-      "description": "Cross-industry desk play #16 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship power-user keyboard shortcuts",
+      "description": "Small surface area, loud delight in niche communities.",
       "types": [
         "product"
       ],
@@ -334,8 +334,8 @@
     },
     {
       "id": "catalog-expansion-017",
-      "title": "Negotiate QA matrix (cycle 17)",
-      "description": "Cross-industry desk play #17 — keeps the rotating catalog fresh month to month.",
+      "title": "Negotiate co-marketing with an integrator",
+      "description": "Shared webinar, joint case study, split the lead list.",
       "types": [
         "marketing"
       ],
@@ -354,8 +354,8 @@
     },
     {
       "id": "catalog-expansion-018",
-      "title": "Publish churn post-mortem (cycle 18)",
-      "description": "Cross-industry desk play #18 — keeps the rotating catalog fresh month to month.",
+      "title": "Audit third-party script weight",
+      "description": "Drop tags that slow LCP and leak data you should not share.",
       "types": [
         "sales"
       ],
@@ -375,8 +375,8 @@
     },
     {
       "id": "catalog-expansion-019",
-      "title": "Instrument migration toolkit (cycle 19)",
-      "description": "Cross-industry desk play #19 — keeps the rotating catalog fresh month to month.",
+      "title": "Launch a public roadmap",
+      "description": "Show what you will build and what you explicitly will not.",
       "types": [
         "research"
       ],
@@ -396,8 +396,8 @@
     },
     {
       "id": "catalog-expansion-020",
-      "title": "Ship onboarding (cycle 20)",
-      "description": "Cross-industry desk play #20 — keeps the rotating catalog fresh month to month.",
+      "title": "Run a pricing sensitivity survey",
+      "description": "Stop guessing ARPU—ask willingness-to-pay with a simple study.",
       "types": [
         "product"
       ],
@@ -417,8 +417,8 @@
     },
     {
       "id": "catalog-expansion-021",
-      "title": "Run data pipeline (cycle 21)",
-      "description": "Cross-industry desk play #21 — keeps the rotating catalog fresh month to month.",
+      "title": "Close the security questionnaire backlog",
+      "description": "Standard answers, evidence links, fewer all-nighters.",
       "types": [
         "marketing"
       ],
@@ -437,8 +437,8 @@
     },
     {
       "id": "catalog-expansion-022",
-      "title": "Launch growth loop (cycle 22)",
-      "description": "Cross-industry desk play #22 — keeps the rotating catalog fresh month to month.",
+      "title": "Pilot usage-based billing",
+      "description": "Meter one dimension cleanly before rebilling the whole base.",
       "types": [
         "sales"
       ],
@@ -458,8 +458,8 @@
     },
     {
       "id": "catalog-expansion-023",
-      "title": "Audit billing edge cases (cycle 23)",
-      "description": "Cross-industry desk play #23 — keeps the rotating catalog fresh month to month.",
+      "title": "Record a founder AMA livestream",
+      "description": "Raw Q&A beats polished ads for early trust.",
       "types": [
         "research"
       ],
@@ -478,8 +478,8 @@
     },
     {
       "id": "catalog-expansion-024",
-      "title": "Pilot incident retro (cycle 24)",
-      "description": "Cross-industry desk play #24 — keeps the rotating catalog fresh month to month.",
+      "title": "Migrate off the flaky cron host",
+      "description": "Move scheduled jobs somewhere observability actually exists.",
       "types": [
         "product"
       ],
@@ -499,8 +499,8 @@
     },
     {
       "id": "catalog-expansion-025",
-      "title": "Scale compliance packet (cycle 25)",
-      "description": "Cross-industry desk play #25 — keeps the rotating catalog fresh month to month.",
+      "title": "Build a churn early-warning dashboard",
+      "description": "Leading indicators support can act on this week.",
       "types": [
         "marketing"
       ],
@@ -520,8 +520,8 @@
     },
     {
       "id": "catalog-expansion-026",
-      "title": "Refactor partner API (cycle 26)",
-      "description": "Cross-industry desk play #26 — keeps the rotating catalog fresh month to month.",
+      "title": "White-glove setup for top accounts",
+      "description": "Concierge onboarding for logos that reference you later.",
       "types": [
         "sales"
       ],
@@ -541,8 +541,8 @@
     },
     {
       "id": "catalog-expansion-027",
-      "title": "Negotiate roadmap bet (cycle 27)",
-      "description": "Cross-industry desk play #27 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship SSO for Google Workspace",
+      "description": "Remove the IT blocker on mid-market pilots.",
       "types": [
         "research"
       ],
@@ -561,8 +561,8 @@
     },
     {
       "id": "catalog-expansion-028",
-      "title": "Publish demo environment (cycle 28)",
-      "description": "Cross-industry desk play #28 — keeps the rotating catalog fresh month to month.",
+      "title": "Run competitive win-loss calls",
+      "description": "Neutral third party extracts truth sales will not say aloud.",
       "types": [
         "product"
       ],
@@ -582,8 +582,8 @@
     },
     {
       "id": "catalog-expansion-029",
-      "title": "Instrument support macros (cycle 29)",
-      "description": "Cross-industry desk play #29 — keeps the rotating catalog fresh month to month.",
+      "title": "Publish an engineering blog post",
+      "description": "Explain one hard technical choice with receipts.",
       "types": [
         "marketing"
       ],
@@ -602,8 +602,8 @@
     },
     {
       "id": "catalog-expansion-030",
-      "title": "Ship customer council (cycle 30)",
-      "description": "Cross-industry desk play #30 — keeps the rotating catalog fresh month to month.",
+      "title": "Tighten API rate limits",
+      "description": "Protect uptime; document limits customers can plan around.",
       "types": [
         "sales"
       ],
@@ -623,8 +623,8 @@
     },
     {
       "id": "catalog-expansion-031",
-      "title": "Run renewal playbook (cycle 31)",
-      "description": "Cross-industry desk play #31 — keeps the rotating catalog fresh month to month.",
+      "title": "Launch referral credits experiment",
+      "description": "Give both sides something meaningful, not a vanity badge.",
       "types": [
         "research"
       ],
@@ -644,8 +644,8 @@
     },
     {
       "id": "catalog-expansion-032",
-      "title": "Launch security review (cycle 32)",
-      "description": "Cross-industry desk play #32 — keeps the rotating catalog fresh month to month.",
+      "title": "Fix mobile layout on checkout",
+      "description": "Half your trials sign up on phones—meet them there.",
       "types": [
         "product"
       ],
@@ -665,8 +665,8 @@
     },
     {
       "id": "catalog-expansion-033",
-      "title": "Audit deploy checklist (cycle 33)",
-      "description": "Cross-industry desk play #33 — keeps the rotating catalog fresh month to month.",
+      "title": "Schedule exec check-ins for renewals",
+      "description": "Relationship heat before the ninety-day red zone.",
       "types": [
         "marketing"
       ],
@@ -685,8 +685,8 @@
     },
     {
       "id": "catalog-expansion-034",
-      "title": "Pilot capacity plan (cycle 34)",
-      "description": "Cross-industry desk play #34 — keeps the rotating catalog fresh month to month.",
+      "title": "Deprecate a legacy feature flag",
+      "description": "Kill zombie code paths before they bite a big customer.",
       "types": [
         "sales"
       ],
@@ -706,8 +706,8 @@
     },
     {
       "id": "catalog-expansion-035",
-      "title": "Scale pricing experiment (cycle 35)",
-      "description": "Cross-industry desk play #35 — keeps the rotating catalog fresh month to month.",
+      "title": "Host a virtual user conference",
+      "description": "One track, customer speakers, recording as evergreen content.",
       "types": [
         "research"
       ],
@@ -726,8 +726,8 @@
     },
     {
       "id": "catalog-expansion-036",
-      "title": "Refactor SLA dashboard (cycle 36)",
-      "description": "Cross-industry desk play #36 — keeps the rotating catalog fresh month to month.",
+      "title": "Map F500 procurement steps",
+      "description": "Know legal, InfoSec, and vendor onboarding timelines upfront.",
       "types": [
         "product"
       ],
@@ -747,8 +747,8 @@
     },
     {
       "id": "catalog-expansion-037",
-      "title": "Negotiate QA matrix (cycle 37)",
-      "description": "Cross-industry desk play #37 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship audit logs for admins",
+      "description": "Enterprise buyers ask; have an answer before the RFP.",
       "types": [
         "marketing"
       ],
@@ -768,8 +768,8 @@
     },
     {
       "id": "catalog-expansion-038",
-      "title": "Publish churn post-mortem (cycle 38)",
-      "description": "Cross-industry desk play #38 — keeps the rotating catalog fresh month to month.",
+      "title": "Rewrite outbound email sequences",
+      "description": "Three emails max, each with a different proof point.",
       "types": [
         "sales"
       ],
@@ -789,8 +789,8 @@
     },
     {
       "id": "catalog-expansion-039",
-      "title": "Instrument migration toolkit (cycle 39)",
-      "description": "Cross-industry desk play #39 — keeps the rotating catalog fresh month to month.",
+      "title": "Instrument ad click to activation",
+      "description": "Find the step marketing and product both ignore.",
       "types": [
         "research"
       ],
@@ -809,8 +809,8 @@
     },
     {
       "id": "catalog-expansion-040",
-      "title": "Ship onboarding (cycle 40)",
-      "description": "Cross-industry desk play #40 — keeps the rotating catalog fresh month to month.",
+      "title": "Run a customer bug bash",
+      "description": "Invite power users to break staging; reward findings loudly.",
       "types": [
         "product"
       ],
@@ -830,8 +830,8 @@
     },
     {
       "id": "catalog-expansion-041",
-      "title": "Run data pipeline (cycle 41)",
-      "description": "Cross-industry desk play #41 — keeps the rotating catalog fresh month to month.",
+      "title": "Negotiate cloud commit credits",
+      "description": "Prebuy infra at a discount while growth is still predictable.",
       "types": [
         "marketing"
       ],
@@ -850,8 +850,8 @@
     },
     {
       "id": "catalog-expansion-042",
-      "title": "Launch growth loop (cycle 42)",
-      "description": "Cross-industry desk play #42 — keeps the rotating catalog fresh month to month.",
+      "title": "Launch a community Slack",
+      "description": "Peer support scales better than founder DMs.",
       "types": [
         "sales"
       ],
@@ -871,8 +871,8 @@
     },
     {
       "id": "catalog-expansion-043",
-      "title": "Audit billing edge cases (cycle 43)",
-      "description": "Cross-industry desk play #43 — keeps the rotating catalog fresh month to month.",
+      "title": "Publish SLA and status page",
+      "description": "Transparency buys patience during incidents.",
       "types": [
         "research"
       ],
@@ -892,8 +892,8 @@
     },
     {
       "id": "catalog-expansion-044",
-      "title": "Pilot incident retro (cycle 44)",
-      "description": "Cross-industry desk play #44 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship CSV export customers asked for",
+      "description": "Unblock finance and ops workflows this quarter.",
       "types": [
         "product"
       ],
@@ -913,8 +913,8 @@
     },
     {
       "id": "catalog-expansion-045",
-      "title": "Scale compliance packet (cycle 45)",
-      "description": "Cross-industry desk play #45 — keeps the rotating catalog fresh month to month.",
+      "title": "Sponsor a niche newsletter",
+      "description": "Highly targeted reach beats generic display ads.",
       "types": [
         "marketing"
       ],
@@ -933,8 +933,8 @@
     },
     {
       "id": "catalog-expansion-046",
-      "title": "Refactor partner API (cycle 46)",
-      "description": "Cross-industry desk play #46 — keeps the rotating catalog fresh month to month.",
+      "title": "Automate trial expiration nudges",
+      "description": "Timely emails beat generic “we miss you” blasts.",
       "types": [
         "sales"
       ],
@@ -954,8 +954,8 @@
     },
     {
       "id": "catalog-expansion-047",
-      "title": "Negotiate roadmap bet (cycle 47)",
-      "description": "Cross-industry desk play #47 — keeps the rotating catalog fresh month to month.",
+      "title": "Conduct an accessibility sweep",
+      "description": "WCAG fixes widen TAM and reduce support tickets.",
       "types": [
         "research"
       ],
@@ -974,8 +974,8 @@
     },
     {
       "id": "catalog-expansion-048",
-      "title": "Publish demo environment (cycle 48)",
-      "description": "Cross-industry desk play #48 — keeps the rotating catalog fresh month to month.",
+      "title": "Run an internal phishing drill",
+      "description": "Train the team before a real breach ruins a deal.",
       "types": [
         "product"
       ],
@@ -995,8 +995,8 @@
     },
     {
       "id": "catalog-expansion-049",
-      "title": "Instrument support macros (cycle 49)",
-      "description": "Cross-industry desk play #49 — keeps the rotating catalog fresh month to month.",
+      "title": "Bundle implementation hours",
+      "description": "Services unlock six-figure ACV faster than software alone.",
       "types": [
         "marketing"
       ],
@@ -1016,8 +1016,8 @@
     },
     {
       "id": "catalog-expansion-050",
-      "title": "Ship customer council (cycle 50)",
-      "description": "Cross-industry desk play #50 — keeps the rotating catalog fresh month to month.",
+      "title": "Consolidate analytics vendors",
+      "description": "One source of truth for product and growth metrics.",
       "types": [
         "sales"
       ],
@@ -1037,8 +1037,8 @@
     },
     {
       "id": "catalog-expansion-051",
-      "title": "Run renewal playbook (cycle 51)",
-      "description": "Cross-industry desk play #51 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship webhook retry diagnostics",
+      "description": "Let customers debug dead endpoints without opening tickets.",
       "types": [
         "research"
       ],
@@ -1057,8 +1057,8 @@
     },
     {
       "id": "catalog-expansion-052",
-      "title": "Launch security review (cycle 52)",
-      "description": "Cross-industry desk play #52 — keeps the rotating catalog fresh month to month.",
+      "title": "Launch an annual customer summit",
+      "description": "Fly in top logos; record testimonials on-site.",
       "types": [
         "product"
       ],
@@ -1078,8 +1078,8 @@
     },
     {
       "id": "catalog-expansion-053",
-      "title": "Audit deploy checklist (cycle 53)",
-      "description": "Cross-industry desk play #53 — keeps the rotating catalog fresh month to month.",
+      "title": "Rebuild search with synonyms",
+      "description": "Stop zero-result queries from looking like missing features.",
       "types": [
         "marketing"
       ],
@@ -1098,8 +1098,8 @@
     },
     {
       "id": "catalog-expansion-054",
-      "title": "Pilot capacity plan (cycle 54)",
-      "description": "Cross-industry desk play #54 — keeps the rotating catalog fresh month to month.",
+      "title": "Pitch a vertical case study",
+      "description": "One deep industry story beats ten generic logos.",
       "types": [
         "sales"
       ],
@@ -1119,8 +1119,8 @@
     },
     {
       "id": "catalog-expansion-055",
-      "title": "Scale pricing experiment (cycle 55)",
-      "description": "Cross-industry desk play #55 — keeps the rotating catalog fresh month to month.",
+      "title": "Fix invoice PDF branding",
+      "description": "Small polish signals you are ready for finance teams.",
       "types": [
         "research"
       ],
@@ -1140,8 +1140,8 @@
     },
     {
       "id": "catalog-expansion-056",
-      "title": "Refactor SLA dashboard (cycle 56)",
-      "description": "Cross-industry desk play #56 — keeps the rotating catalog fresh month to month.",
+      "title": "Run an infra cost review",
+      "description": "Right-size instances before margins surprise the board.",
       "types": [
         "product"
       ],
@@ -1161,8 +1161,8 @@
     },
     {
       "id": "catalog-expansion-057",
-      "title": "Negotiate QA matrix (cycle 57)",
-      "description": "Cross-industry desk play #57 — keeps the rotating catalog fresh month to month.",
+      "title": "Enable SCIM provisioning",
+      "description": "IT pushes users; you stop spreadsheet seat math.",
       "types": [
         "marketing"
       ],
@@ -1181,8 +1181,8 @@
     },
     {
       "id": "catalog-expansion-058",
-      "title": "Publish churn post-mortem (cycle 58)",
-      "description": "Cross-industry desk play #58 — keeps the rotating catalog fresh month to month.",
+      "title": "Host developer office hours",
+      "description": "API adoption grows when someone answers live.",
       "types": [
         "sales"
       ],
@@ -1202,8 +1202,8 @@
     },
     {
       "id": "catalog-expansion-059",
-      "title": "Instrument migration toolkit (cycle 59)",
-      "description": "Cross-industry desk play #59 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship guided setup checklist",
+      "description": "Progress-bar onboarding beats a blank dashboard stare.",
       "types": [
         "research"
       ],
@@ -1222,8 +1222,8 @@
     },
     {
       "id": "catalog-expansion-060",
-      "title": "Ship onboarding (cycle 60)",
-      "description": "Cross-industry desk play #60 — keeps the rotating catalog fresh month to month.",
+      "title": "Test a freemium upgrade nudge",
+      "description": "One well-timed prompt—not ten nag modals.",
       "types": [
         "product"
       ],
@@ -1243,8 +1243,8 @@
     },
     {
       "id": "catalog-expansion-061",
-      "title": "Run data pipeline (cycle 61)",
-      "description": "Cross-industry desk play #61 — keeps the rotating catalog fresh month to month.",
+      "title": "Map data retention policies",
+      "description": "Align defaults with GDPR and customer contracts.",
       "types": [
         "marketing"
       ],
@@ -1264,8 +1264,8 @@
     },
     {
       "id": "catalog-expansion-062",
-      "title": "Launch growth loop (cycle 62)",
-      "description": "Cross-industry desk play #62 — keeps the rotating catalog fresh month to month.",
+      "title": "Launch a reseller pilot",
+      "description": "Let agencies sell you where your team cannot travel.",
       "types": [
         "sales"
       ],
@@ -1285,8 +1285,8 @@
     },
     {
       "id": "catalog-expansion-063",
-      "title": "Audit billing edge cases (cycle 63)",
-      "description": "Cross-industry desk play #63 — keeps the rotating catalog fresh month to month.",
+      "title": "Refresh employer brand on LinkedIn",
+      "description": "Hiring velocity matters once fundraising slows.",
       "types": [
         "research"
       ],
@@ -1305,8 +1305,8 @@
     },
     {
       "id": "catalog-expansion-064",
-      "title": "Pilot incident retro (cycle 64)",
-      "description": "Cross-industry desk play #64 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship multi-currency checkout",
+      "description": "Stop losing international trials at the payment step.",
       "types": [
         "product"
       ],
@@ -1326,8 +1326,8 @@
     },
     {
       "id": "catalog-expansion-065",
-      "title": "Scale compliance packet (cycle 65)",
-      "description": "Cross-industry desk play #65 — keeps the rotating catalog fresh month to month.",
+      "title": "Template quarterly business reviews",
+      "description": "CSMs show value; renewals get easier to forecast.",
       "types": [
         "marketing"
       ],
@@ -1346,8 +1346,8 @@
     },
     {
       "id": "catalog-expansion-066",
-      "title": "Refactor partner API (cycle 66)",
-      "description": "Cross-industry desk play #66 — keeps the rotating catalog fresh month to month.",
+      "title": "Cut support response time",
+      "description": "Macros, triage tiers, and one visible SLA timer.",
       "types": [
         "sales"
       ],
@@ -1367,8 +1367,8 @@
     },
     {
       "id": "catalog-expansion-067",
-      "title": "Negotiate roadmap bet (cycle 67)",
-      "description": "Cross-industry desk play #67 — keeps the rotating catalog fresh month to month.",
+      "title": "Build a Salesforce integration",
+      "description": "CRM sync removes “another tab” objections.",
       "types": [
         "research"
       ],
@@ -1388,8 +1388,8 @@
     },
     {
       "id": "catalog-expansion-068",
-      "title": "Publish demo environment (cycle 68)",
-      "description": "Cross-industry desk play #68 — keeps the rotating catalog fresh month to month.",
+      "title": "Offer a lightweight bug bounty",
+      "description": "Responsible disclosure beats a surprise headline.",
       "types": [
         "product"
       ],
@@ -1409,8 +1409,8 @@
     },
     {
       "id": "catalog-expansion-069",
-      "title": "Instrument support macros (cycle 69)",
-      "description": "Cross-industry desk play #69 — keeps the rotating catalog fresh month to month.",
+      "title": "Publish an open-source SDK",
+      "description": "Developer love compounds; watch support load while doing it.",
       "types": [
         "marketing"
       ],
@@ -1429,8 +1429,8 @@
     },
     {
       "id": "catalog-expansion-070",
-      "title": "Ship customer council (cycle 70)",
-      "description": "Cross-industry desk play #70 — keeps the rotating catalog fresh month to month.",
+      "title": "Renegotiate payment processor fees",
+      "description": "Basis points matter at volume—ask annually.",
       "types": [
         "sales"
       ],
@@ -1450,8 +1450,8 @@
     },
     {
       "id": "catalog-expansion-071",
-      "title": "Run renewal playbook (cycle 71)",
-      "description": "Cross-industry desk play #71 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship dark mode",
+      "description": "Low-effort morale win; screenshots look modern in decks.",
       "types": [
         "research"
       ],
@@ -1470,8 +1470,8 @@
     },
     {
       "id": "catalog-expansion-072",
-      "title": "Launch security review (cycle 72)",
-      "description": "Cross-industry desk play #72 — keeps the rotating catalog fresh month to month.",
+      "title": "Run a design partner program",
+      "description": "Five logos co-build; they accept imperfection for influence.",
       "types": [
         "product"
       ],
@@ -1491,8 +1491,8 @@
     },
     {
       "id": "catalog-expansion-073",
-      "title": "Audit deploy checklist (cycle 73)",
-      "description": "Cross-industry desk play #73 — keeps the rotating catalog fresh month to month.",
+      "title": "Fix SPF and DKIM for product email",
+      "description": "Land in inbox, not promotions—or worse, spam.",
       "types": [
         "marketing"
       ],
@@ -1512,8 +1512,8 @@
     },
     {
       "id": "catalog-expansion-074",
-      "title": "Pilot capacity plan (cycle 74)",
-      "description": "Cross-industry desk play #74 — keeps the rotating catalog fresh month to month.",
+      "title": "Launch a changelog RSS feed",
+      "description": "Power users subscribe; support repeats fewer “what shipped?” questions.",
       "types": [
         "sales"
       ],
@@ -1533,8 +1533,8 @@
     },
     {
       "id": "catalog-expansion-075",
-      "title": "Scale pricing experiment (cycle 75)",
-      "description": "Cross-industry desk play #75 — keeps the rotating catalog fresh month to month.",
+      "title": "Instrument the North Star metric",
+      "description": "One chart the whole company argues about productively.",
       "types": [
         "research"
       ],
@@ -1553,8 +1553,8 @@
     },
     {
       "id": "catalog-expansion-076",
-      "title": "Refactor SLA dashboard (cycle 76)",
-      "description": "Cross-industry desk play #76 — keeps the rotating catalog fresh month to month.",
+      "title": "Offer VPC or private deploy",
+      "description": "Unblock regulated buyers even if few take it.",
       "types": [
         "product"
       ],
@@ -1574,8 +1574,8 @@
     },
     {
       "id": "catalog-expansion-077",
-      "title": "Negotiate QA matrix (cycle 77)",
-      "description": "Cross-industry desk play #77 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship bulk admin actions",
+      "description": "IT admins will not click fifty times to offboard users.",
       "types": [
         "marketing"
       ],
@@ -1594,8 +1594,8 @@
     },
     {
       "id": "catalog-expansion-078",
-      "title": "Publish churn post-mortem (cycle 78)",
-      "description": "Cross-industry desk play #78 — keeps the rotating catalog fresh month to month.",
+      "title": "Host a customer hackathon",
+      "description": "New integrations emerge; dev communities notice.",
       "types": [
         "sales"
       ],
@@ -1615,8 +1615,8 @@
     },
     {
       "id": "catalog-expansion-079",
-      "title": "Instrument migration toolkit (cycle 79)",
-      "description": "Cross-industry desk play #79 — keeps the rotating catalog fresh month to month.",
+      "title": "Audit role escalation paths",
+      "description": "Close privilege creep before security review finds it.",
       "types": [
         "research"
       ],
@@ -1636,8 +1636,8 @@
     },
     {
       "id": "catalog-expansion-080",
-      "title": "Ship onboarding (cycle 80)",
-      "description": "Cross-industry desk play #80 — keeps the rotating catalog fresh month to month.",
+      "title": "Publish an API versioning policy",
+      "description": "Set expectations before breaking changes alienate builders.",
       "types": [
         "product"
       ],
@@ -1657,8 +1657,8 @@
     },
     {
       "id": "catalog-expansion-081",
-      "title": "Run data pipeline (cycle 81)",
-      "description": "Cross-industry desk play #81 — keeps the rotating catalog fresh month to month.",
+      "title": "Launch customer certification",
+      "description": "Trained admins expand usage inside accounts.",
       "types": [
         "marketing"
       ],
@@ -1677,8 +1677,8 @@
     },
     {
       "id": "catalog-expansion-082",
-      "title": "Launch growth loop (cycle 82)",
-      "description": "Cross-industry desk play #82 — keeps the rotating catalog fresh month to month.",
+      "title": "Fix timezone bugs in reporting",
+      "description": "“Yesterday” must mean the same thing globally.",
       "types": [
         "sales"
       ],
@@ -1698,8 +1698,8 @@
     },
     {
       "id": "catalog-expansion-083",
-      "title": "Audit billing edge cases (cycle 83)",
-      "description": "Cross-industry desk play #83 — keeps the rotating catalog fresh month to month.",
+      "title": "Run a win celebration ritual",
+      "description": "Sales, product, and support hear why deals actually close.",
       "types": [
         "research"
       ],
@@ -1718,8 +1718,8 @@
     },
     {
       "id": "catalog-expansion-084",
-      "title": "Pilot incident retro (cycle 84)",
-      "description": "Cross-industry desk play #84 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship saved views and filters",
+      "description": "Power users organize data; stickiness follows.",
       "types": [
         "product"
       ],
@@ -1739,8 +1739,8 @@
     },
     {
       "id": "catalog-expansion-085",
-      "title": "Scale compliance packet (cycle 85)",
-      "description": "Cross-industry desk play #85 — keeps the rotating catalog fresh month to month.",
+      "title": "Partner with a university pipeline",
+      "description": "Intern hiring beats generic job boards later.",
       "types": [
         "marketing"
       ],
@@ -1760,8 +1760,8 @@
     },
     {
       "id": "catalog-expansion-086",
-      "title": "Refactor partner API (cycle 86)",
-      "description": "Cross-industry desk play #86 — keeps the rotating catalog fresh month to month.",
+      "title": "Deploy canary releases",
+      "description": "Reduce blast radius when shipping weekly.",
       "types": [
         "sales"
       ],
@@ -1781,8 +1781,8 @@
     },
     {
       "id": "catalog-expansion-087",
-      "title": "Negotiate roadmap bet (cycle 87)",
-      "description": "Cross-industry desk play #87 — keeps the rotating catalog fresh month to month.",
+      "title": "Launch a limited beta flag",
+      "description": "Scarcity and feedback from friendly accounts.",
       "types": [
         "research"
       ],
@@ -1801,8 +1801,8 @@
     },
     {
       "id": "catalog-expansion-088",
-      "title": "Publish demo environment (cycle 88)",
-      "description": "Cross-industry desk play #88 — keeps the rotating catalog fresh month to month.",
+      "title": "Rewrite Terms for clarity",
+      "description": "Legal still wins; humans can understand acceptance.",
       "types": [
         "product"
       ],
@@ -1822,8 +1822,8 @@
     },
     {
       "id": "catalog-expansion-089",
-      "title": "Instrument support macros (cycle 89)",
-      "description": "Cross-industry desk play #89 — keeps the rotating catalog fresh month to month.",
+      "title": "Dedicated Slack for whale accounts",
+      "description": "High-touch without pretending every customer is equal.",
       "types": [
         "marketing"
       ],
@@ -1842,8 +1842,8 @@
     },
     {
       "id": "catalog-expansion-090",
-      "title": "Ship customer council (cycle 90)",
-      "description": "Cross-industry desk play #90 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship print-friendly reports",
+      "description": "Ops teams still export PDFs—stop fighting it.",
       "types": [
         "sales"
       ],
@@ -1863,8 +1863,8 @@
     },
     {
       "id": "catalog-expansion-091",
-      "title": "Run renewal playbook (cycle 91)",
-      "description": "Cross-industry desk play #91 — keeps the rotating catalog fresh month to month.",
+      "title": "Run a vendor consolidation pass",
+      "description": "Fewer SaaS renewals, better negotiated bundles.",
       "types": [
         "research"
       ],
@@ -1884,8 +1884,8 @@
     },
     {
       "id": "catalog-expansion-092",
-      "title": "Launch security review (cycle 92)",
-      "description": "Cross-industry desk play #92 — keeps the rotating catalog fresh month to month.",
+      "title": "Publish a public incident postmortem",
+      "description": "Trust recovery after a bad outage week.",
       "types": [
         "product"
       ],
@@ -1905,8 +1905,8 @@
     },
     {
       "id": "catalog-expansion-093",
-      "title": "Audit deploy checklist (cycle 93)",
-      "description": "Cross-industry desk play #93 — keeps the rotating catalog fresh month to month.",
+      "title": "Enable custom domains for customers",
+      "description": "White-label credibility for platform plays.",
       "types": [
         "marketing"
       ],
@@ -1925,8 +1925,8 @@
     },
     {
       "id": "catalog-expansion-094",
-      "title": "Pilot capacity plan (cycle 94)",
-      "description": "Cross-industry desk play #94 — keeps the rotating catalog fresh month to month.",
+      "title": "List on a cloud marketplace",
+      "description": "Procurement paths customers already trust.",
       "types": [
         "sales"
       ],
@@ -1946,8 +1946,8 @@
     },
     {
       "id": "catalog-expansion-095",
-      "title": "Scale pricing experiment (cycle 95)",
-      "description": "Cross-industry desk play #95 — keeps the rotating catalog fresh month to month.",
+      "title": "Fix duplicate CRM contacts",
+      "description": "Hygiene before marketing automation embarrasses you.",
       "types": [
         "research"
       ],
@@ -1966,8 +1966,8 @@
     },
     {
       "id": "catalog-expansion-096",
-      "title": "Refactor SLA dashboard (cycle 96)",
-      "description": "Cross-industry desk play #96 — keeps the rotating catalog fresh month to month.",
+      "title": "Ship scheduled report emails",
+      "description": "Executives get Monday numbers without logging in.",
       "types": [
         "product"
       ],
@@ -1987,8 +1987,8 @@
     },
     {
       "id": "catalog-expansion-097",
-      "title": "Negotiate QA matrix (cycle 97)",
-      "description": "Cross-industry desk play #97 — keeps the rotating catalog fresh month to month.",
+      "title": "Empathy interviews with support",
+      "description": "Product learns the top tickets that should not exist.",
       "types": [
         "marketing"
       ],
@@ -2008,8 +2008,8 @@
     },
     {
       "id": "catalog-expansion-098",
-      "title": "Publish churn post-mortem (cycle 98)",
-      "description": "Cross-industry desk play #98 — keeps the rotating catalog fresh month to month.",
+      "title": "Write a pilot success plan",
+      "description": "Mutual milestones so pilots convert or fail fast clearly.",
       "types": [
         "sales"
       ],
@@ -2029,8 +2029,8 @@
     },
     {
       "id": "catalog-expansion-099",
-      "title": "Instrument migration toolkit (cycle 99)",
-      "description": "Cross-industry desk play #99 — keeps the rotating catalog fresh month to month.",
+      "title": "Executive dashboard PDF export",
+      "description": "Board prep in minutes, not all-nighter slides.",
       "types": [
         "research"
       ],
@@ -2049,8 +2049,8 @@
     },
     {
       "id": "catalog-expansion-100",
-      "title": "Ship onboarding (cycle 100)",
-      "description": "Cross-industry desk play #100 — keeps the rotating catalog fresh month to month.",
+      "title": "Close books early this month",
+      "description": "Revenue recognition discipline before scale makes it messy.",
       "types": [
         "product"
       ],

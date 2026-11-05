@@ -452,7 +452,7 @@
     {
       "id": "preseed-cat-hardware-dfm-review",
       "categories": ["hardware"],
-      "title": "DFM review with CM",
+      "title": "Pre-seed DFM with contract manufacturer",
       "description": "Cut parts and assembly steps before the next build.",
       "types": ["product"],
       "stages": ["post_xc"],
