@@ -24,6 +24,7 @@ import { applyTaskRivalEffects } from './WorldDynamics.js';
 import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 import { loanOverheadMonthly } from './BankLoan.js';
 import { accrueFiscalExpense, accrueFiscalRevenue, fiscalYearDisplay } from './CorporateTax.js';
+import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
 import { ceoSalaryMonthly } from './CeoEconomics.js';
 import { cooSalaryMonthly } from './Coo.js';
 import { totalHeadcount } from './Staff.js';
@@ -374,6 +375,7 @@ export function renderFinanceSummary(state) {
   const runway = runwayInfo.monthsLabel;
   syncLifetimeProfit(state);
   const fy = fiscalYearDisplay(state);
+  const pt = ceoPersonalTaxDisplay(state);
 
   return {
     burn,
@@ -401,6 +403,11 @@ export function renderFinanceSummary(state) {
     fiscalTaxLiability: fy.taxLiability,
     fiscalTaxLiabilityLabel: formatMoney(fy.taxLiability),
     fiscalTaxPaid: fy.taxPaid,
-    charityLifetimeLabel: formatMoney(fy.charityLifetime)
+    charityLifetimeLabel: formatMoney(fy.charityLifetime),
+    ceoPersonalTaxLiability: pt.liability,
+    ceoPersonalTaxLiabilityLabel: formatMoney(pt.liability),
+    ceoPersonalTaxPaid: pt.taxPaid,
+    ceoPersonalTaxFilingRequired: pt.filingRequired,
+    ceoPersonalTaxCareerPaidLabel: formatMoney(pt.careerTaxPaid)
   };
 }

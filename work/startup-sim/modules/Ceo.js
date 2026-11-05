@@ -34,6 +34,7 @@ import {
 } from './CeoLifestyle.js';
 import { isPublicCompany, canSellFounderStock } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
+import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
 
 function escapeHtml(s) {
   return String(s)
@@ -172,6 +173,7 @@ function buildCeoPanelContext(state) {
   const investRate = personalInvestmentReturnRate(state);
   const netWorth = ceoNetWorth(state);
   const section = activeCeoSection(state);
+  const personalTax = ceoPersonalTaxDisplay(state);
   return {
     name,
     annual,
@@ -207,6 +209,7 @@ function buildCeoPanelContext(state) {
     investRate,
     netWorth,
     section,
+    personalTax,
     state
   };
 }
@@ -250,6 +253,12 @@ function renderCeoOverviewSection(ctx) {
   const bankAlert = bankLow
     ? `<p class="finance-alert finance-alert--tax" role="status"><strong>Low personal runway</strong> — ${escapeHtml(personalRunway.label)} at ~${formatMoney(typicalBurn)}/mo spend. Raise salary or draw from the company on <strong>Comp &amp; draws</strong>.</p>`
     : '';
+  const personalTaxAlert =
+    ctx.personalTax?.filingRequired && !ctx.personalTax?.taxPaid
+      ? `<p class="finance-alert finance-alert--tax" role="status"><strong>April personal taxes</strong> — ${formatMoney(ctx.personalTax.liability)} on ${formatMoney(ctx.personalTax.baseIncome)} taxable income (salary, draws, bonuses, stock sales). Pay via the mandatory desk task from your personal bank.</p>`
+      : ctx.personalTax?.taxPaid && (state.calendar?.monthIndex ?? 0) === 4
+        ? `<p class="finance-alert finance-alert--ok">Personal taxes filed for ${state.calendar?.year ?? ''} (career paid ${formatMoney(ctx.personalTax.careerTaxPaid)}).</p>`
+        : '';
   const lastDebitBlock = lastExpense?.breakdown?.length
     ? `<details class="ceo-debit-history"><summary>Last month debited ${formatMoney(lastExpense.total)}</summary>${renderDebitBreakdown(lastExpense.breakdown)}</details>`
     : '';
@@ -263,6 +272,7 @@ function renderCeoOverviewSection(ctx) {
     <p class="fine-print">${escapeHtml(health.detail)}${portfolio > 0 ? ` · Portfolio ${formatMoney(portfolio)}.` : ''}</p>
     <p class="fine-print finance-runway-detail">${openingLine}</p>
     ${bankAlert}
+    ${personalTaxAlert}
     <section class="finance-section finance-card" aria-label="Wealth mix">
       <h3 class="finance-section-title">Wealth mix</h3>
       ${renderWealthBar(mix)}
@@ -434,7 +444,7 @@ function renderCeoWealthSection(ctx) {
         <h3 class="finance-section-title">Personal philanthropy</h3>
         <span class="fine-print">Lifetime ${formatMoney(givingLifetime)}</span>
       </div>
-      <p class="fine-print">Give from your <strong>personal bank</strong> — separate from company charity on Finance (no tax modeling).</p>
+      <p class="fine-print">Give from your <strong>personal bank</strong> — separate from company charity on Finance (gifts are not modeled as deductions).</p>
       <div class="finance-charity-chips">
         <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-personal-give="2500" ${disabled}>${formatMoney(2_500)}</button>
         <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-personal-give="10000" ${disabled}>${formatMoney(10_000)}</button>

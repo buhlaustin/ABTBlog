@@ -1688,6 +1688,53 @@ if (!isTaxFilingRequired(taxState)) {
   }
 }
 
+const {
+  isCeoPersonalTaxFilingRequired,
+  CEO_PERSONAL_TAX_FILING_TASK_ID,
+  completeCeoPersonalTaxFilingTask,
+  ceoPersonalTaxBaseIncome,
+  accrueCeoTaxableIncome,
+  ensureCeoPersonalTax
+} = await import(`file://${join(sim, 'modules/CeoPersonalTax.js')}`);
+const { payCeoPersonalTaxFromBank } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
+
+const ceoTaxState = createInitialState({ companyName: 'CEO Tax Co', categoryId: 'b2b-saas', mode: 'career' });
+ceoTaxState.meta.calendarStartYear = 2024;
+ceoTaxState.calendar.year = 2026;
+ceoTaxState.calendar.monthIndex = 4;
+ensureCeoPersonalTax(ceoTaxState);
+ceoTaxState.ceo.personalTax.prior = { year: 2025, income: 200_000 };
+ceoTaxState.ceo.bankBalance = 100_000;
+if (!isCeoPersonalTaxFilingRequired(ceoTaxState)) {
+  console.error('FAIL: April CEO personal tax filing should be required with prior-year income');
+  failed = true;
+} else {
+  const ceoOwed = Math.max(250, Math.round(200_000 * 0.28));
+  const ceoFiled = completeCeoPersonalTaxFilingTask(ceoTaxState, payCeoPersonalTaxFromBank);
+  if (!ceoFiled.ok || ceoTaxState.ceo.personalTax.taxPaidYear !== 2026) {
+    console.error(`FAIL: complete CEO personal tax filing: ${ceoFiled.reason ?? 'bad state'}`);
+    failed = true;
+  } else if (ceoFiled.owed !== ceoOwed) {
+    console.error(`FAIL: CEO personal tax liability (got ${ceoFiled.owed}, expected ${ceoOwed})`);
+    failed = true;
+  } else if (ceoPersonalTaxBaseIncome(ceoTaxState) !== 200_000) {
+    console.error('FAIL: CEO personal tax base should use prior year after year one');
+    failed = true;
+  } else {
+    console.log(`OK: April CEO personal tax filing (${formatMoney(ceoFiled.owed)})`);
+  }
+}
+
+const accrualState = createInitialState({ companyName: 'Accrual Co', categoryId: 'b2b-saas', mode: 'career' });
+accrualState.ceo.salaryAnnual = 120_000;
+accrueCeoTaxableIncome(accrualState, ceoSalaryMonthly(accrualState));
+if ((ensureCeoPersonalTax(accrualState).current.income ?? 0) !== ceoSalaryMonthly(accrualState)) {
+  console.error('FAIL: CEO taxable income accrual');
+  failed = true;
+} else {
+  console.log('OK: CEO taxable income accrual');
+}
+
 const charityState = createInitialState({ companyName: 'Give Co', categoryId: 'b2b-saas', mode: 'career' });
 charityState.finance.cash = 50_000;
 const beforeCash = charityState.finance.cash;
@@ -1732,6 +1779,13 @@ if (getTaskDefinitions().some((t) => t.id === TAX_FILING_TASK_ID)) {
   console.log('OK: tax filing desk task in catalog');
 } else {
   console.error('FAIL: tax filing task missing from merged catalog');
+  failed = true;
+}
+
+if (getTaskDefinitions().some((t) => t.id === CEO_PERSONAL_TAX_FILING_TASK_ID)) {
+  console.log('OK: CEO personal tax filing desk task in catalog');
+} else {
+  console.error('FAIL: CEO personal tax filing task missing from merged catalog');
   failed = true;
 }
 

@@ -343,12 +343,24 @@ export function renderFinancePanel(container, state) {
     ? `<p class="fine-print finance-details-note">Prior FY ${sum.fiscalPriorYear ?? '—'}: ${sum.fiscalPriorRevenueLabel} rev · ${sum.fiscalPriorExpensesLabel} exp · ${sum.fiscalPriorProfitLabel} profit</p>`
     : '';
 
-  const taxAprilNote =
-    sum.fiscalTaxLiability > 0 && !sum.fiscalTaxPaid
-      ? `<p class="finance-alert finance-alert--tax" role="status"><strong>April taxes due</strong> — ${sum.fiscalTaxLiabilityLabel} on fiscal revenue. Complete the mandatory desk task (cash only).</p>`
-      : sum.fiscalTaxPaid && (state.calendar?.monthIndex ?? 0) === 4
-        ? `<p class="finance-alert finance-alert--ok">Corporate taxes filed for ${state.calendar?.year ?? ''}.</p>`
-        : '';
+  const corpTaxDue = sum.fiscalTaxLiability > 0 && !sum.fiscalTaxPaid;
+  const ceoTaxDue = sum.ceoPersonalTaxFilingRequired && !sum.ceoPersonalTaxPaid;
+  let taxAprilNote = '';
+  if (corpTaxDue || ceoTaxDue) {
+    const parts = [];
+    if (corpTaxDue) {
+      parts.push(`${sum.fiscalTaxLiabilityLabel} corporate (desk task · company cash)`);
+    }
+    if (ceoTaxDue) {
+      parts.push(`${sum.ceoPersonalTaxLiabilityLabel} personal (desk task · personal bank)`);
+    }
+    taxAprilNote = `<p class="finance-alert finance-alert--tax" role="status"><strong>April taxes due</strong> — ${parts.join('; ')}.</p>`;
+  } else if (
+    (sum.fiscalTaxPaid || sum.ceoPersonalTaxPaid) &&
+    (state.calendar?.monthIndex ?? 0) === 4
+  ) {
+    taxAprilNote = `<p class="finance-alert finance-alert--ok">April filings done for ${state.calendar?.year ?? ''}${sum.ceoPersonalTaxCareerPaidLabel ? ` (lifetime personal tax ${sum.ceoPersonalTaxCareerPaidLabel})` : ''}.</p>`;
+  }
 
   const valuationLabel = state.finance.valuation ? formatMoney(state.finance.valuation) : '—';
   const portfolioMrr = formatMoney(totalSubsidiaryMrr(state));

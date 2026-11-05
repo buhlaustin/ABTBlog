@@ -4,6 +4,7 @@ import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
 import { closeFiscalYearOnDecember } from './CorporateTax.js';
+import { closeCeoPersonalTaxYearOnDecember } from './CeoPersonalTax.js';
 import { serviceLoanAtMonthEnd } from './BankLoan.js';
 import { settleRevenueAdvanceAtMonthEnd } from './RevenueAdvance.js';
 import {
@@ -232,6 +233,13 @@ export function endMonth(state) {
     appendLog(
       state,
       `Fiscal ${closedYear} closed — revenue ${formatMoney(closedFy.revenue)}, expenses ${formatMoney(closedFy.expenses)}, profit ${formatMoney(closedFy.profit)}.`
+    );
+  }
+  const closedPersonalTax = closeCeoPersonalTaxYearOnDecember(state, closedYear, closedMonthIndex);
+  if (closedPersonalTax) {
+    appendLog(
+      state,
+      `Personal tax year ${closedYear} closed — taxable income ${formatMoney(closedPersonalTax.income)} (April filing).`
     );
   }
   archiveCurrentNews(state);

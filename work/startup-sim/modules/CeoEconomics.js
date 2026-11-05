@@ -14,6 +14,7 @@ import {
   ceoHomeEquity,
   serviceCeoMortgageAtMonthEnd
 } from './CeoLifestyle.js';
+import { accrueCeoTaxableIncome, createInitialCeoPersonalTax } from './CeoPersonalTax.js';
 
 const EXPENSE_DEBIT_CATEGORIES = [
   'Housing',
@@ -58,7 +59,8 @@ export function createInitialCeoState() {
     netWorthHistory: [],
     investmentBalance: 0,
     careerInvestmentReturns: 0,
-    lastInvestmentReturn: 0
+    lastInvestmentReturn: 0,
+    personalTax: createInitialCeoPersonalTax()
   };
 }
 
@@ -114,6 +116,26 @@ export function ensureCeoPersonalBank(state) {
 export function initializeCeoPersonalFinances(state) {
   ensureCeoPersonalBank(state);
   preparePersonalExpensesForMonth(state);
+}
+
+/** April personal tax — debits personal bank only. */
+export function payCeoPersonalTaxFromBank(state, amount) {
+  const owed = Math.round(Number(amount) || 0);
+  if (owed <= 0) return { ok: false, reason: 'Invalid tax amount.' };
+  const ceo = ceoState(state);
+  ensureCeoPersonalBank(state);
+  const bal = ceo.bankBalance ?? 0;
+  if (bal < owed) {
+    return {
+      ok: false,
+      reason: `Need ${formatMoney(owed)} in personal bank to pay taxes (have ${formatMoney(bal)}).`
+    };
+  }
+  const paid = debitPersonalBank(state, owed, 'Personal income tax (April)', 'personal_tax');
+  if (paid < owed) {
+    return { ok: false, reason: `Need ${formatMoney(owed)} in personal bank.` };
+  }
+  return { ok: true, amount: paid };
 }
 
 /** Monthly lifestyle spend band — driven only by CEO salary, not company ARR. */
@@ -410,6 +432,7 @@ export function recordCeoSalaryForMonth(state) {
     year: state.calendar?.year
   });
   creditPersonalBank(state, pay, 'CEO salary deposit', 'salary');
+  accrueCeoTaxableIncome(state, pay);
   return [
     `CEO salary ${formatMoney(pay)} deposited — personal bank ${formatMoney(ceo.bankBalance)} (career ${formatMoney(ceo.careerSalaryPaid)}).`
   ];
@@ -536,6 +559,7 @@ export function takeOwnerDraw(state, amount) {
     year: state.calendar?.year
   });
   creditPersonalBank(state, draw, 'Owner draw deposit', 'draw');
+  accrueCeoTaxableIncome(state, draw);
   return {
     ok: true,
     draw,
@@ -544,7 +568,9 @@ export function takeOwnerDraw(state, amount) {
 }
 
 export function depositStockCashOutToPersonalBank(state, payout) {
-  return creditPersonalBank(state, payout, 'Founder stake cash-out', 'cash_out');
+  const pay = creditPersonalBank(state, payout, 'Founder stake cash-out', 'cash_out');
+  accrueCeoTaxableIncome(state, pay);
+  return pay;
 }
 
 function totalCapShares(state) {
@@ -605,6 +631,7 @@ export function creditCeoStockSale(state, amount, label) {
     label,
     ...logStamp(state)
   });
+  accrueCeoTaxableIncome(state, pay);
   return pay;
 }
 
@@ -699,6 +726,7 @@ export function settlePersonalInvestmentsAtMonthEnd(state) {
   ceo.lastInvestmentReturn = gain;
   const pctLabel = `${(rate * 100).toFixed(2)}%`;
   if (gain > 0) {
+    accrueCeoTaxableIncome(state, gain);
     return [`Personal portfolio +${formatMoney(gain)} (${pctLabel} this month; total ${formatMoney(ceo.investmentBalance)}).`];
   }
   return [`Personal portfolio ${formatMoney(gain)} (${pctLabel}; total ${formatMoney(ceo.investmentBalance)}).`];

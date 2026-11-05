@@ -19,6 +19,7 @@ import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
 import { syncLifetimeProfit } from './Finance.js';
 import { createInitialFiscal, ensureFiscal } from './CorporateTax.js';
+import { ensureCeoPersonalTax } from './CeoPersonalTax.js';
 import {
   createInitialCeoState,
   initializeCeoPersonalFinances,
@@ -213,6 +214,7 @@ export function normalizeSave(raw) {
       if (state.ceo.housing?.mortgageOriginalPrincipal == null) {
         state.ceo.housing.mortgageOriginalPrincipal = 0;
       }
+      ensureCeoPersonalTax(state);
     }
     if (state.staff.companyBonusAnnualMode === undefined) state.staff.companyBonusAnnualMode = false;
     if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];

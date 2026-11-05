@@ -14,8 +14,13 @@ import bundledPublicLateExtra from '../data/tasks-public-late-game-extra.json' w
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import bundledTaxFiling from '../data/tax-filing-task.json' with { type: 'json' };
+import bundledCeoPersonalTaxFiling from '../data/ceo-personal-tax-task.json' with { type: 'json' };
 import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
 import { isTaxFilingRequired, TAX_FILING_TASK_ID } from './CorporateTax.js';
+import {
+  isCeoPersonalTaxFilingRequired,
+  CEO_PERSONAL_TAX_FILING_TASK_ID
+} from './CeoPersonalTax.js';
 import {
   currentLaunchTaskPhase,
   launchPhaseAllowed,
@@ -72,14 +77,18 @@ function mergeXcDemoDayTasks(base) {
 }
 
 function mergeTaxFilingTasks(base) {
-  const extra = bundledTaxFiling?.tasks ?? [];
-  if (!extra.length) return base;
-  const ids = new Set((base.tasks ?? []).map((t) => t.id));
-  const merged = [...(base.tasks ?? [])];
-  for (const t of extra) {
-    if (!ids.has(t.id)) merged.push(t);
+  let out = base;
+  for (const pack of [bundledTaxFiling, bundledCeoPersonalTaxFiling]) {
+    const extra = pack?.tasks ?? [];
+    if (!extra.length) continue;
+    const ids = new Set((out.tasks ?? []).map((t) => t.id));
+    const merged = [...(out.tasks ?? [])];
+    for (const t of extra) {
+      if (!ids.has(t.id)) merged.push(t);
+    }
+    out = { ...out, tasks: merged };
   }
-  return { ...base, tasks: merged };
+  return out;
 }
 
 function mergeSpaceExplorationTasks(base) {
@@ -314,6 +323,7 @@ function buildTaskPool(state) {
     (t) => {
       if (t.xcDemoDay && !demoMonth) return false;
       if (t.taxFiling && !isTaxFilingRequired(state)) return false;
+      if (t.ceoPersonalTaxFiling && !isCeoPersonalTaxFilingRequired(state)) return false;
       return (
         stageAllowed(t, taskStage) &&
         categoryAllowed(t, categoryId) &&
@@ -362,6 +372,10 @@ export function dealMonthlyTasks(state) {
   if (isTaxFilingRequired(state)) {
     const taxTask = pool.find((t) => t.id === TAX_FILING_TASK_ID);
     if (taxTask) offered = mergeUniqueTaskOffers(offered, taxTask, offerCount);
+  }
+  if (isCeoPersonalTaxFilingRequired(state)) {
+    const ceoTax = pool.find((t) => t.id === CEO_PERSONAL_TAX_FILING_TASK_ID);
+    if (ceoTax) offered = mergeUniqueTaskOffers(offered, ceoTax, offerCount);
   }
   if (!launchLifecycleActive(state)) {
     const sigPool = pool.filter((t) => t.signature);
@@ -442,6 +456,11 @@ export function confirmTaskLineup(state) {
   if (isTaxFilingRequired(state)) {
     if (!selected.some((o) => o.taskId === TAX_FILING_TASK_ID)) {
       return { ok: false, reason: 'April corporate tax filing is mandatory — include it in your lineup.' };
+    }
+  }
+  if (isCeoPersonalTaxFilingRequired(state)) {
+    if (!selected.some((o) => o.taskId === CEO_PERSONAL_TAX_FILING_TASK_ID)) {
+      return { ok: false, reason: 'April CEO personal tax filing is mandatory — include it in your lineup.' };
     }
   }
   const recent = state.calendar.recentTaskIds ?? [];

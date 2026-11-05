@@ -13,6 +13,12 @@ import { hasActiveDecision } from './DecisionEvents.js';
 import { estimateTaskPayoutBand, estimateTaskMrrBand } from './Finance.js';
 import { runwayLabel } from './MonthSummary.js';
 import { activeModifierLabels } from './ScenarioEffects.js';
+import { isTaxFilingRequired, TAX_FILING_TASK_ID } from './CorporateTax.js';
+import {
+  isCeoPersonalTaxFilingRequired,
+  CEO_PERSONAL_TAX_FILING_TASK_ID
+} from './CeoPersonalTax.js';
+import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
 
 /** Why the month may not close yet — for the Desk checklist UI. */
 export function deskMonthCloseChecklist(state) {
@@ -86,6 +92,25 @@ export function autoSelectRecommendedLineup(state) {
   }
   const slots =
     state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+  const mandatoryIds = [];
+  if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
+    mandatoryIds.push(XC_DEMO_DAY_TASK_ID);
+  }
+  if (isTaxFilingRequired(state)) mandatoryIds.push(TAX_FILING_TASK_ID);
+  if (isCeoPersonalTaxFilingRequired(state)) {
+    mandatoryIds.push(CEO_PERSONAL_TAX_FILING_TASK_ID);
+  }
+  for (const o of offers) o.selected = false;
+  let picked = 0;
+  for (const taskId of mandatoryIds) {
+    if (picked >= slots) break;
+    const offer = offers.find((o) => o.taskId === taskId);
+    if (offer && !offer.selected) {
+      offer.selected = true;
+      picked += 1;
+    }
+  }
+
   const scored = offers
     .map((offer) => {
       const def = getTaskDef(offer.taskId);
@@ -101,8 +126,6 @@ export function autoSelectRecommendedLineup(state) {
     })
     .sort((a, b) => b.score - a.score);
 
-  for (const o of offers) o.selected = false;
-  let picked = 0;
   for (let i = 0; i < scored.length && picked < slots; i += 1) {
     if (scored[i].score <= 0) continue;
     scored[i].offer.selected = true;

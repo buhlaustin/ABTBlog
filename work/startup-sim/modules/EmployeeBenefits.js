@@ -18,6 +18,7 @@ import {
 } from './CapTable.js';
 import { calendarTurn } from './GameCalendar.js';
 import { formatCalendarStamp } from './GameCalendar.js';
+import { accrueCeoTaxableIncome } from './CeoPersonalTax.js';
 import { panelStatCard, escapeHtml as panelEscapeHtml } from './PanelChrome.js';
 import { meetsProgressionTierMin } from './ProgressionEconomy.js';
 
@@ -287,6 +288,7 @@ function creditCeoBonusShare(state, amount, pct) {
     month: state.calendar?.monthIndex,
     year: state.calendar?.year
   });
+  accrueCeoTaxableIncome(state, pay);
   return pay;
 }
 

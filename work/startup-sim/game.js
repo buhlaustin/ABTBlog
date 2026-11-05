@@ -43,6 +43,7 @@ import {
 } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
 import { completeTaxFilingTask, donateToCharity } from './modules/CorporateTax.js';
+import { completeCeoPersonalTaxFilingTask } from './modules/CeoPersonalTax.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
 import {
   onScheduleLaunchTaskCompleted,
@@ -113,7 +114,8 @@ import {
   assertCeoNetWorthGate,
   depositPersonalInvestment,
   withdrawPersonalInvestment,
-  personalInvestmentBalance
+  personalInvestmentBalance,
+  payCeoPersonalTaxFromBank
 } from './modules/CeoEconomics.js';
 import {
   hireCoo,
@@ -345,6 +347,23 @@ function handleCompleteTask(instanceId) {
     const tax = completeTaxFilingTask(sessionState);
     if (!tax.ok) {
       showDeskFeedback(tax.reason || 'Cannot file taxes.', true);
+      return;
+    }
+    const rolled = rollTaskOutcome(def, sessionState);
+    applyTaskOutcome(sessionState, def, rolled);
+    const result = completeTaskInstance(sessionState, instanceId, def, rolled);
+    if (!result.ok) return;
+    appendLog(sessionState, tax.summary);
+    showDeskFeedback(tax.summary);
+    playUiClick();
+    refresh();
+    return;
+  }
+
+  if (def.ceoPersonalTaxFiling) {
+    const tax = completeCeoPersonalTaxFilingTask(sessionState, payCeoPersonalTaxFromBank);
+    if (!tax.ok) {
+      showDeskFeedback(tax.reason || 'Cannot file personal taxes.', true);
       return;
     }
     const rolled = rollTaskOutcome(def, sessionState);
