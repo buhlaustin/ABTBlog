@@ -4,6 +4,7 @@ import bundledExtra2 from '../data/growth-campaigns-extra2.json' with { type: 'j
 import bundledExtra3 from '../data/growth-campaigns-extra3.json' with { type: 'json' };
 import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { type: 'json' };
 import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json' with { type: 'json' };
+import bundledPublicLate from '../data/growth-campaigns-public-late.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
@@ -26,7 +27,105 @@ function mergeCampaignCatalog(base, ...extras) {
   return { ...base, campaigns };
 }
 
-const bundledExtras = [bundledExtra, bundledExtra2, bundledExtra3, bundledSpaceGrowth, bundledSpaceGrowthExtra];
+const bundledExtras = [
+  bundledExtra,
+  bundledExtra2,
+  bundledExtra3,
+  bundledSpaceGrowth,
+  bundledSpaceGrowthExtra,
+  bundledPublicLate
+];
+
+/** Months before the same paid growth play can appear in the monthly roster again. */
+export const GROWTH_CAMPAIGN_COOLDOWN_MONTHS = 12;
+
+/** Paid growth plays offered on the Growth tab each month (from the full bank). */
+export const GROWTH_MONTHLY_OFFER_COUNT = 22;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickMonthlyCampaignDefs(pool, offerCount, recentCampaignIds = []) {
+  if (!pool.length || offerCount <= 0) return [];
+  const cap = Math.min(offerCount, pool.length);
+  const cooldownLen = cap * GROWTH_CAMPAIGN_COOLDOWN_MONTHS;
+  const recent = new Set((recentCampaignIds ?? []).slice(-cooldownLen));
+  const fresh = pool.filter((c) => !recent.has(c.id));
+  const stale = pool.filter((c) => recent.has(c.id));
+
+  const picked = [];
+  const used = new Set();
+
+  function takeUnique(source) {
+    for (const def of shuffle(source)) {
+      if (picked.length >= cap) break;
+      if (used.has(def.id)) continue;
+      used.add(def.id);
+      picked.push(def);
+    }
+  }
+
+  takeUnique(fresh.length ? fresh : pool);
+  if (picked.length < cap) takeUnique(stale);
+  if (picked.length < cap) takeUnique(pool);
+  return picked.slice(0, cap);
+}
+
+function mergeUniqueCampaignOffers(offered, def, offerCount) {
+  if (!def) return offered;
+  const rest = offered.filter((c) => c.id !== def.id);
+  const next = [def, ...rest];
+  const seen = new Set();
+  const unique = [];
+  for (const c of next) {
+    if (seen.has(c.id)) continue;
+    seen.add(c.id);
+    unique.push(c);
+  }
+  return unique.slice(0, Math.min(offerCount, unique.length));
+}
+
+function eligibleCampaignPool(state) {
+  const tier = progressionTier(state);
+  return getGrowthCampaigns().filter(
+    (c) =>
+      campaignCategoryAllowed(c, state) &&
+      tier >= (c.tierMin ?? 0) &&
+      tier <= (c.tierMax ?? 99)
+  );
+}
+
+export function refreshGrowthCampaignOffers(state) {
+  if (!state.growth) state.growth = { campaignsThisMonth: [] };
+  const pool = eligibleCampaignPool(state);
+  const recent = state.growth.recentCampaignIds ?? [];
+  let offers = pickMonthlyCampaignDefs(pool, GROWTH_MONTHLY_OFFER_COUNT, recent);
+
+  if (progressionTier(state) >= 7) {
+    const recentSet = new Set(recent);
+    const whales = pool.filter(
+      (c) =>
+        !recentSet.has(c.id) &&
+        (c.whale || (c.revenue?.[1] ?? 0) >= 500_000_000)
+    );
+    if (whales.length) {
+      const injectCount = Math.random() < 0.5 ? 2 : 1;
+      for (let w = 0; w < injectCount; w += 1) {
+        const pick = shuffle(whales)[0];
+        if (pick) offers = mergeUniqueCampaignOffers(offers, pick, GROWTH_MONTHLY_OFFER_COUNT);
+      }
+    }
+  }
+
+  state.growth.monthCampaignOffers = offers.map((c) => c.id);
+  return offers;
+}
 
 let catalog = mergeCampaignCatalog(bundled, ...bundledExtras);
 
@@ -61,15 +160,12 @@ function campaignCategoryAllowed(def, state) {
 }
 
 export function availableCampaigns(state) {
-  const tier = progressionTier(state);
+  if (!state.growth?.monthCampaignOffers?.length) {
+    refreshGrowthCampaignOffers(state);
+  }
   const used = new Set(state.growth?.campaignsThisMonth ?? []);
-  return getGrowthCampaigns().filter(
-    (c) =>
-      campaignCategoryAllowed(c, state) &&
-      tier >= (c.tierMin ?? 0) &&
-      tier <= (c.tierMax ?? 99) &&
-      !used.has(c.id)
-  );
+  const offerIds = new Set(state.growth.monthCampaignOffers ?? []);
+  return getGrowthCampaigns().filter((c) => offerIds.has(c.id) && !used.has(c.id));
 }
 
 export function runGrowthCampaign(state, campaignId) {
@@ -85,6 +181,12 @@ export function runGrowthCampaign(state, campaignId) {
   if (!state.growth) state.growth = { campaignsThisMonth: [] };
   if (state.growth.campaignsThisMonth.includes(def.id)) {
     return { ok: false, reason: 'Already ran that campaign this month.' };
+  }
+  if (!state.growth.monthCampaignOffers?.length) {
+    refreshGrowthCampaignOffers(state);
+  }
+  if (!state.growth.monthCampaignOffers?.includes(def.id)) {
+    return { ok: false, reason: 'That play is not on this month\'s growth roster.' };
   }
   const slots = growthCampaignSlots(state);
   if (Number.isFinite(slots) && state.growth.campaignsThisMonth.length >= slots) {
@@ -109,6 +211,10 @@ export function runGrowthCampaign(state, campaignId) {
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
   state.product.buzz = (state.product.buzz ?? 0) + (def.buzz ?? 0);
   state.growth.campaignsThisMonth.push(def.id);
+  const recent = state.growth.recentCampaignIds ?? [];
+  state.growth.recentCampaignIds = [...recent, def.id].slice(
+    -GROWTH_MONTHLY_OFFER_COUNT * GROWTH_CAMPAIGN_COOLDOWN_MONTHS
+  );
   applyCampaignRivalEffects(state, def);
 
   return { ok: true, def, cost, revenue };
@@ -175,6 +281,7 @@ export function canBuyAllRemainingGrowthCampaigns(state) {
 export function resetGrowthCampaignsMonth(state) {
   if (!state.growth) state.growth = { campaignsThisMonth: [] };
   state.growth.campaignsThisMonth = [];
+  refreshGrowthCampaignOffers(state);
 }
 
 function escapeHtml(s) {
@@ -198,7 +305,8 @@ export function renderGrowthCampaignsBlock(state) {
       ? 'Unlimited'
       : `${remaining}/${formatMonthlySideTaskLimit(slots)}`;
   const buyAllDisabled = canBuyAllRemainingGrowthCampaigns(state) ? '' : ' disabled';
-  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> plays unlocked (${bankSize} in bank — does not use desk tasks).</p>
+  const rosterSize = state.growth?.monthCampaignOffers?.length ?? campaigns.length;
+  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> on this month&apos;s roster (${rosterSize} offered, ${bankSize} in bank, ${GROWTH_CAMPAIGN_COOLDOWN_MONTHS}-month cooldown — does not use desk tasks).</p>
     <p class="finance-action"><button type="button" class="btn btn-primary btn-small" data-buy-all-growth${buyAllDisabled}>Buy all remaining</button> <span class="fine-print">Runs every affordable unlocked play until slots or cash run out.</span></p>`;
   const cards = campaigns
     .map((c) => {

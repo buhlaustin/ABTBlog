@@ -91,7 +91,7 @@ export function createInitialState(options) {
       economics
     },
     workspace: createInitialWorkspace(),
-    growth: { campaignsThisMonth: [] },
+    growth: { campaignsThisMonth: [], monthCampaignOffers: [], recentCampaignIds: [] },
     board: createInitialBoard(),
     stage: STAGES.GARAGE,
     calendar: createInitialCalendar(calendarStart),
@@ -236,6 +236,8 @@ export function normalizeSave(raw) {
     delete state.executives;
     if (!state.growth) state.growth = { campaignsThisMonth: [] };
     if (!state.growth.campaignsThisMonth) state.growth.campaignsThisMonth = [];
+    if (!state.growth.recentCampaignIds) state.growth.recentCampaignIds = [];
+    if (!state.growth.monthCampaignOffers) state.growth.monthCampaignOffers = [];
     if (state.workspace && state.workspace.campusOwned === undefined) {
       state.workspace.campusOwned = getWorkspaceTier(state) === 'campus';
     }

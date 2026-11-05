@@ -1,0 +1,2694 @@
+{
+  "campaigns": [
+    {
+      "id": "growth-public-late-001",
+      "title": "Public growth whale #1: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 1250000,
+      "revenue": [
+        495000000,
+        1915000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-002",
+      "title": "Public growth whale #2: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 1700000,
+      "revenue": [
+        590000000,
+        2230000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-003",
+      "title": "Public growth whale #3: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 2150000,
+      "revenue": [
+        685000000,
+        2545000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-004",
+      "title": "Public growth whale #4: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 2600000,
+      "revenue": [
+        780000000,
+        2860000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-005",
+      "title": "Public growth whale #5: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3050000,
+      "revenue": [
+        875000000,
+        3175000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-006",
+      "title": "Public growth whale #6: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3500000,
+      "revenue": [
+        970000000,
+        3490000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-007",
+      "title": "Public growth whale #7: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3950000,
+      "revenue": [
+        1065000000,
+        3805000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-008",
+      "title": "Public growth whale #8: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 4400000,
+      "revenue": [
+        1160000000,
+        4120000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-009",
+      "title": "Public growth whale #9: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 4850000,
+      "revenue": [
+        1255000000,
+        4435000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-010",
+      "title": "Public growth whale #10: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 5300000,
+      "revenue": [
+        1350000000,
+        4750000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-011",
+      "title": "Public growth whale #11: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 5750000,
+      "revenue": [
+        1445000000,
+        2645000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-012",
+      "title": "Public growth whale #12: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 6200000,
+      "revenue": [
+        1540000000,
+        2960000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-013",
+      "title": "Public growth whale #13: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 6650000,
+      "revenue": [
+        1635000000,
+        3275000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-014",
+      "title": "Public growth whale #14: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 7100000,
+      "revenue": [
+        1730000000,
+        3590000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-015",
+      "title": "Public growth whale #15: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 7550000,
+      "revenue": [
+        1825000000,
+        3905000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-016",
+      "title": "Public growth whale #16: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8000000,
+      "revenue": [
+        1920000000,
+        4220000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-017",
+      "title": "Public growth whale #17: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8450000,
+      "revenue": [
+        2015000000,
+        4535000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-018",
+      "title": "Public growth whale #18: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8900000,
+      "revenue": [
+        2110000000,
+        4850000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-019",
+      "title": "Public growth whale #19: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 9350000,
+      "revenue": [
+        2205000000,
+        5165000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-020",
+      "title": "Public growth whale #20: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 800000,
+      "revenue": [
+        2300000000,
+        5480000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-021",
+      "title": "Public growth whale #21: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 1250000,
+      "revenue": [
+        2395000000,
+        5795000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-022",
+      "title": "Public growth whale #22: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 1700000,
+      "revenue": [
+        2490000000,
+        3690000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-023",
+      "title": "Public growth whale #23: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 2150000,
+      "revenue": [
+        2585000000,
+        4005000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-024",
+      "title": "Public growth whale #24: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 2600000,
+      "revenue": [
+        2680000000,
+        4320000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-025",
+      "title": "Public growth whale #25: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3050000,
+      "revenue": [
+        2775000000,
+        4635000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-026",
+      "title": "Public growth whale #26: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3500000,
+      "revenue": [
+        2870000000,
+        4950000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-027",
+      "title": "Public growth whale #27: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3950000,
+      "revenue": [
+        2965000000,
+        5265000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-028",
+      "title": "Public growth whale #28: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 4400000,
+      "revenue": [
+        3060000000,
+        5580000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-029",
+      "title": "Public growth whale #29: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 4850000,
+      "revenue": [
+        3155000000,
+        5895000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-030",
+      "title": "Public growth whale #30: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 5300000,
+      "revenue": [
+        3250000000,
+        6210000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-031",
+      "title": "Public growth whale #31: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 5750000,
+      "revenue": [
+        3345000000,
+        6525000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-032",
+      "title": "Public growth whale #32: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 6200000,
+      "revenue": [
+        3440000000,
+        6840000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-033",
+      "title": "Public growth whale #33: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 6650000,
+      "revenue": [
+        3535000000,
+        4735000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-034",
+      "title": "Public growth whale #34: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 7100000,
+      "revenue": [
+        3630000000,
+        5050000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-035",
+      "title": "Public growth whale #35: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 7550000,
+      "revenue": [
+        400000000,
+        2040000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-036",
+      "title": "Public growth whale #36: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8000000,
+      "revenue": [
+        495000000,
+        2355000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-037",
+      "title": "Public growth whale #37: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8450000,
+      "revenue": [
+        590000000,
+        2670000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-038",
+      "title": "Public growth whale #38: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8900000,
+      "revenue": [
+        685000000,
+        2985000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-039",
+      "title": "Public growth whale #39: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 9350000,
+      "revenue": [
+        780000000,
+        3300000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-040",
+      "title": "Public growth whale #40: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 800000,
+      "revenue": [
+        875000000,
+        3615000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-041",
+      "title": "Public growth whale #41: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 1250000,
+      "revenue": [
+        970000000,
+        3930000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-042",
+      "title": "Public growth whale #42: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 1700000,
+      "revenue": [
+        1065000000,
+        4245000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-043",
+      "title": "Public growth whale #43: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 2150000,
+      "revenue": [
+        1160000000,
+        4560000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-044",
+      "title": "Public growth whale #44: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 2600000,
+      "revenue": [
+        1255000000,
+        2455000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-045",
+      "title": "Public growth whale #45: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3050000,
+      "revenue": [
+        1350000000,
+        2770000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-046",
+      "title": "Public growth whale #46: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3500000,
+      "revenue": [
+        1445000000,
+        3085000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-047",
+      "title": "Public growth whale #47: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3950000,
+      "revenue": [
+        1540000000,
+        3400000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-048",
+      "title": "Public growth whale #48: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 4400000,
+      "revenue": [
+        1635000000,
+        3715000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-049",
+      "title": "Public growth whale #49: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 4850000,
+      "revenue": [
+        1730000000,
+        4030000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-050",
+      "title": "Public growth whale #50: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 5300000,
+      "revenue": [
+        1825000000,
+        4345000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-051",
+      "title": "Public growth whale #51: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 5750000,
+      "revenue": [
+        1920000000,
+        4660000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-052",
+      "title": "Public growth whale #52: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 6200000,
+      "revenue": [
+        2015000000,
+        4975000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-053",
+      "title": "Public growth whale #53: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 6650000,
+      "revenue": [
+        2110000000,
+        5290000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-054",
+      "title": "Public growth whale #54: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 7100000,
+      "revenue": [
+        2205000000,
+        5605000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-055",
+      "title": "Public growth whale #55: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 7550000,
+      "revenue": [
+        2300000000,
+        3500000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-056",
+      "title": "Public growth whale #56: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8000000,
+      "revenue": [
+        2395000000,
+        3815000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-057",
+      "title": "Public growth whale #57: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8450000,
+      "revenue": [
+        2490000000,
+        4130000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-058",
+      "title": "Public growth whale #58: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8900000,
+      "revenue": [
+        2585000000,
+        4445000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-059",
+      "title": "Public growth whale #59: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 9350000,
+      "revenue": [
+        2680000000,
+        4760000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-060",
+      "title": "Public growth whale #60: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 800000,
+      "revenue": [
+        2775000000,
+        5075000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-061",
+      "title": "Public growth whale #61: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 1250000,
+      "revenue": [
+        2870000000,
+        5390000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-062",
+      "title": "Public growth whale #62: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 1700000,
+      "revenue": [
+        2965000000,
+        5705000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-063",
+      "title": "Public growth whale #63: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 2150000,
+      "revenue": [
+        3060000000,
+        6020000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-064",
+      "title": "Public growth whale #64: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 2600000,
+      "revenue": [
+        3155000000,
+        6335000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-065",
+      "title": "Public growth whale #65: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3050000,
+      "revenue": [
+        3250000000,
+        6650000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-066",
+      "title": "Public growth whale #66: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3500000,
+      "revenue": [
+        3345000000,
+        4545000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-067",
+      "title": "Public growth whale #67: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3950000,
+      "revenue": [
+        3440000000,
+        4860000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-068",
+      "title": "Public growth whale #68: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 4400000,
+      "revenue": [
+        3535000000,
+        5175000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-069",
+      "title": "Public growth whale #69: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 4850000,
+      "revenue": [
+        3630000000,
+        5490000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-070",
+      "title": "Public growth whale #70: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 5300000,
+      "revenue": [
+        400000000,
+        2480000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-071",
+      "title": "Public growth whale #71: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 5750000,
+      "revenue": [
+        495000000,
+        2795000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-072",
+      "title": "Public growth whale #72: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 6200000,
+      "revenue": [
+        590000000,
+        3110000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-073",
+      "title": "Public growth whale #73: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 6650000,
+      "revenue": [
+        685000000,
+        3425000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-074",
+      "title": "Public growth whale #74: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 7100000,
+      "revenue": [
+        780000000,
+        3740000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-075",
+      "title": "Public growth whale #75: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 7550000,
+      "revenue": [
+        875000000,
+        4055000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-076",
+      "title": "Public growth whale #76: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8000000,
+      "revenue": [
+        970000000,
+        4370000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-077",
+      "title": "Public growth whale #77: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8450000,
+      "revenue": [
+        1065000000,
+        2265000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-078",
+      "title": "Public growth whale #78: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 8900000,
+      "revenue": [
+        1160000000,
+        2580000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-079",
+      "title": "Public growth whale #79: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 9350000,
+      "revenue": [
+        1255000000,
+        2895000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-080",
+      "title": "Public growth whale #80: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 800000,
+      "revenue": [
+        1350000000,
+        3210000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-081",
+      "title": "Public growth whale #81: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 1250000,
+      "revenue": [
+        1445000000,
+        3525000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-082",
+      "title": "Public growth whale #82: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 1700000,
+      "revenue": [
+        1540000000,
+        3840000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-083",
+      "title": "Public growth whale #83: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 2150000,
+      "revenue": [
+        1635000000,
+        4155000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-084",
+      "title": "Public growth whale #84: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 2600000,
+      "revenue": [
+        1730000000,
+        4470000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-085",
+      "title": "Public growth whale #85: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3050000,
+      "revenue": [
+        1825000000,
+        4785000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-086",
+      "title": "Public growth whale #86: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3500000,
+      "revenue": [
+        1920000000,
+        5100000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-087",
+      "title": "Public growth whale #87: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 3950000,
+      "revenue": [
+        2015000000,
+        5415000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-088",
+      "title": "Public growth whale #88: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 4400000,
+      "revenue": [
+        2110000000,
+        3310000000
+      ],
+      "buzz": 5,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-089",
+      "title": "Public growth whale #89: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 4850000,
+      "revenue": [
+        2205000000,
+        3625000000
+      ],
+      "buzz": 6,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-090",
+      "title": "Public growth whale #90: institutional demand gen",
+      "description": "Late-stage public blitz — IR, brand, and enterprise pipeline in one expensive month.",
+      "cost": 5300000,
+      "revenue": [
+        2300000000,
+        3940000000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7,
+      "whale": true
+    },
+    {
+      "id": "growth-public-late-091",
+      "title": "Scaled growth play #91: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 58000,
+      "revenue": [
+        2800000,
+        12300000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-092",
+      "title": "Scaled growth play #92: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 76000,
+      "revenue": [
+        845000,
+        1485000
+      ],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-093",
+      "title": "Scaled growth play #93: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 94000,
+      "revenue": [
+        890000,
+        1650000
+      ],
+      "buzz": 2,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-094",
+      "title": "Scaled growth play #94: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 112000,
+      "revenue": [
+        935000,
+        1815000
+      ],
+      "buzz": 3,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-095",
+      "title": "Scaled growth play #95: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 130000,
+      "revenue": [
+        980000,
+        1980000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-096",
+      "title": "Scaled growth play #96: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 148000,
+      "revenue": [
+        1025000,
+        2145000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-097",
+      "title": "Scaled growth play #97: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 166000,
+      "revenue": [
+        1070000,
+        2310000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-098",
+      "title": "Scaled growth play #98: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 184000,
+      "revenue": [
+        8400000,
+        19400000
+      ],
+      "buzz": 4,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-099",
+      "title": "Scaled growth play #99: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 202000,
+      "revenue": [
+        1160000,
+        1560000
+      ],
+      "buzz": 2,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-100",
+      "title": "Scaled growth play #100: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 220000,
+      "revenue": [
+        80000,
+        600000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-101",
+      "title": "Scaled growth play #101: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 238000,
+      "revenue": [
+        125000,
+        765000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-102",
+      "title": "Scaled growth play #102: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 256000,
+      "revenue": [
+        170000,
+        930000
+      ],
+      "buzz": 2,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-103",
+      "title": "Scaled growth play #103: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 274000,
+      "revenue": [
+        215000,
+        1095000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-104",
+      "title": "Scaled growth play #104: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 292000,
+      "revenue": [
+        260000,
+        1260000
+      ],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-105",
+      "title": "Scaled growth play #105: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 40000,
+      "revenue": [
+        6000000,
+        18500000
+      ],
+      "buzz": 2,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-106",
+      "title": "Scaled growth play #106: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 58000,
+      "revenue": [
+        350000,
+        1590000
+      ],
+      "buzz": 3,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-107",
+      "title": "Scaled growth play #107: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 76000,
+      "revenue": [
+        395000,
+        1755000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-108",
+      "title": "Scaled growth play #108: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 94000,
+      "revenue": [
+        440000,
+        840000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-109",
+      "title": "Scaled growth play #109: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 112000,
+      "revenue": [
+        485000,
+        1005000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-110",
+      "title": "Scaled growth play #110: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 130000,
+      "revenue": [
+        530000,
+        1170000
+      ],
+      "buzz": 4,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-111",
+      "title": "Scaled growth play #111: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 148000,
+      "revenue": [
+        575000,
+        1335000
+      ],
+      "buzz": 2,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-112",
+      "title": "Scaled growth play #112: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 166000,
+      "revenue": [
+        3600000,
+        17600000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-113",
+      "title": "Scaled growth play #113: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 184000,
+      "revenue": [
+        665000,
+        1665000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-114",
+      "title": "Scaled growth play #114: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 202000,
+      "revenue": [
+        710000,
+        1830000
+      ],
+      "buzz": 2,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-115",
+      "title": "Scaled growth play #115: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 220000,
+      "revenue": [
+        755000,
+        1995000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-116",
+      "title": "Scaled growth play #116: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 238000,
+      "revenue": [
+        800000,
+        2160000
+      ],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-117",
+      "title": "Scaled growth play #117: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 256000,
+      "revenue": [
+        845000,
+        1245000
+      ],
+      "buzz": 2,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-118",
+      "title": "Scaled growth play #118: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 274000,
+      "revenue": [
+        890000,
+        1410000
+      ],
+      "buzz": 3,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-119",
+      "title": "Scaled growth play #119: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 292000,
+      "revenue": [
+        9200000,
+        24700000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-120",
+      "title": "Scaled growth play #120: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 40000,
+      "revenue": [
+        980000,
+        1740000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-121",
+      "title": "Scaled growth play #121: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 58000,
+      "revenue": [
+        1025000,
+        1905000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-122",
+      "title": "Scaled growth play #122: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 76000,
+      "revenue": [
+        1070000,
+        2070000
+      ],
+      "buzz": 4,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-123",
+      "title": "Scaled growth play #123: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 94000,
+      "revenue": [
+        1115000,
+        2235000
+      ],
+      "buzz": 2,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-124",
+      "title": "Scaled growth play #124: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 112000,
+      "revenue": [
+        1160000,
+        2400000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-125",
+      "title": "Scaled growth play #125: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 130000,
+      "revenue": [
+        80000,
+        1440000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-126",
+      "title": "Scaled growth play #126: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 148000,
+      "revenue": [
+        6800000,
+        14800000
+      ],
+      "buzz": 2,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-127",
+      "title": "Scaled growth play #127: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 166000,
+      "revenue": [
+        170000,
+        690000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-128",
+      "title": "Scaled growth play #128: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 184000,
+      "revenue": [
+        215000,
+        855000
+      ],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-129",
+      "title": "Scaled growth play #129: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 202000,
+      "revenue": [
+        260000,
+        1020000
+      ],
+      "buzz": 2,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-130",
+      "title": "Scaled growth play #130: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 220000,
+      "revenue": [
+        305000,
+        1185000
+      ],
+      "buzz": 3,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-131",
+      "title": "Scaled growth play #131: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 238000,
+      "revenue": [
+        350000,
+        1350000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-132",
+      "title": "Scaled growth play #132: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 256000,
+      "revenue": [
+        395000,
+        1515000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-133",
+      "title": "Scaled growth play #133: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 274000,
+      "revenue": [
+        4400000,
+        13900000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-134",
+      "title": "Scaled growth play #134: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 292000,
+      "revenue": [
+        485000,
+        1845000
+      ],
+      "buzz": 4,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-135",
+      "title": "Scaled growth play #135: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 40000,
+      "revenue": [
+        530000,
+        930000
+      ],
+      "buzz": 2,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-136",
+      "title": "Scaled growth play #136: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 58000,
+      "revenue": [
+        575000,
+        1095000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-137",
+      "title": "Scaled growth play #137: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 76000,
+      "revenue": [
+        620000,
+        1260000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-138",
+      "title": "Scaled growth play #138: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 94000,
+      "revenue": [
+        665000,
+        1425000
+      ],
+      "buzz": 2,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-139",
+      "title": "Scaled growth play #139: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 112000,
+      "revenue": [
+        710000,
+        1590000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-140",
+      "title": "Scaled growth play #140: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 130000,
+      "revenue": [
+        2000000,
+        13000000
+      ],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-141",
+      "title": "Scaled growth play #141: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 148000,
+      "revenue": [
+        800000,
+        1920000
+      ],
+      "buzz": 2,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-142",
+      "title": "Scaled growth play #142: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 166000,
+      "revenue": [
+        845000,
+        2085000
+      ],
+      "buzz": 3,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-143",
+      "title": "Scaled growth play #143: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 184000,
+      "revenue": [
+        890000,
+        2250000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-144",
+      "title": "Scaled growth play #144: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 202000,
+      "revenue": [
+        935000,
+        1335000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-145",
+      "title": "Scaled growth play #145: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 220000,
+      "revenue": [
+        980000,
+        1500000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-146",
+      "title": "Scaled growth play #146: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 238000,
+      "revenue": [
+        1025000,
+        1665000
+      ],
+      "buzz": 4,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-147",
+      "title": "Scaled growth play #147: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 256000,
+      "revenue": [
+        7600000,
+        20100000
+      ],
+      "buzz": 2,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-148",
+      "title": "Scaled growth play #148: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 274000,
+      "revenue": [
+        1115000,
+        1995000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-149",
+      "title": "Scaled growth play #149: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 292000,
+      "revenue": [
+        1160000,
+        2160000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-150",
+      "title": "Scaled growth play #150: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 40000,
+      "revenue": [
+        80000,
+        1200000
+      ],
+      "buzz": 2,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-151",
+      "title": "Scaled growth play #151: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 58000,
+      "revenue": [
+        125000,
+        1365000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-152",
+      "title": "Scaled growth play #152: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 76000,
+      "revenue": [
+        170000,
+        1530000
+      ],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-153",
+      "title": "Scaled growth play #153: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 94000,
+      "revenue": [
+        215000,
+        615000
+      ],
+      "buzz": 2,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-154",
+      "title": "Scaled growth play #154: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 112000,
+      "revenue": [
+        5200000,
+        19200000
+      ],
+      "buzz": 3,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-155",
+      "title": "Scaled growth play #155: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 130000,
+      "revenue": [
+        305000,
+        945000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-156",
+      "title": "Scaled growth play #156: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 148000,
+      "revenue": [
+        350000,
+        1110000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-157",
+      "title": "Scaled growth play #157: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 166000,
+      "revenue": [
+        395000,
+        1275000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-158",
+      "title": "Scaled growth play #158: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 184000,
+      "revenue": [
+        440000,
+        1440000
+      ],
+      "buzz": 4,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-159",
+      "title": "Scaled growth play #159: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 202000,
+      "revenue": [
+        485000,
+        1605000
+      ],
+      "buzz": 2,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-160",
+      "title": "Scaled growth play #160: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 220000,
+      "revenue": [
+        530000,
+        1770000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-161",
+      "title": "Scaled growth play #161: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 238000,
+      "revenue": [
+        2800000,
+        18300000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-162",
+      "title": "Scaled growth play #162: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 256000,
+      "revenue": [
+        620000,
+        1020000
+      ],
+      "buzz": 2,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-163",
+      "title": "Scaled growth play #163: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 274000,
+      "revenue": [
+        665000,
+        1185000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-164",
+      "title": "Scaled growth play #164: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 292000,
+      "revenue": [
+        710000,
+        1350000
+      ],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-165",
+      "title": "Scaled growth play #165: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 40000,
+      "revenue": [
+        755000,
+        1515000
+      ],
+      "buzz": 2,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-166",
+      "title": "Scaled growth play #166: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 58000,
+      "revenue": [
+        800000,
+        1680000
+      ],
+      "buzz": 3,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-167",
+      "title": "Scaled growth play #167: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 76000,
+      "revenue": [
+        845000,
+        1845000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-168",
+      "title": "Scaled growth play #168: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 94000,
+      "revenue": [
+        8400000,
+        16400000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-169",
+      "title": "Scaled growth play #169: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 112000,
+      "revenue": [
+        935000,
+        2175000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-170",
+      "title": "Scaled growth play #170: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 130000,
+      "revenue": [
+        980000,
+        2340000
+      ],
+      "buzz": 4,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-171",
+      "title": "Scaled growth play #171: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 148000,
+      "revenue": [
+        1025000,
+        1425000
+      ],
+      "buzz": 2,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-172",
+      "title": "Scaled growth play #172: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 166000,
+      "revenue": [
+        1070000,
+        1590000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-173",
+      "title": "Scaled growth play #173: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 184000,
+      "revenue": [
+        1115000,
+        1755000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-174",
+      "title": "Scaled growth play #174: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 202000,
+      "revenue": [
+        1160000,
+        1920000
+      ],
+      "buzz": 2,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-175",
+      "title": "Scaled growth play #175: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 220000,
+      "revenue": [
+        6000000,
+        15500000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-176",
+      "title": "Scaled growth play #176: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 238000,
+      "revenue": [
+        125000,
+        1125000
+      ],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-177",
+      "title": "Scaled growth play #177: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 256000,
+      "revenue": [
+        170000,
+        1290000
+      ],
+      "buzz": 2,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-178",
+      "title": "Scaled growth play #178: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 274000,
+      "revenue": [
+        215000,
+        1455000
+      ],
+      "buzz": 3,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-179",
+      "title": "Scaled growth play #179: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 292000,
+      "revenue": [
+        260000,
+        1620000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-180",
+      "title": "Scaled growth play #180: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 40000,
+      "revenue": [
+        305000,
+        705000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-181",
+      "title": "Scaled growth play #181: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 58000,
+      "revenue": [
+        350000,
+        870000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-182",
+      "title": "Scaled growth play #182: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 76000,
+      "revenue": [
+        3600000,
+        14600000
+      ],
+      "buzz": 4,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-183",
+      "title": "Scaled growth play #183: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 94000,
+      "revenue": [
+        440000,
+        1200000
+      ],
+      "buzz": 2,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-184",
+      "title": "Scaled growth play #184: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 112000,
+      "revenue": [
+        485000,
+        1365000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-185",
+      "title": "Scaled growth play #185: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 130000,
+      "revenue": [
+        530000,
+        1530000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-186",
+      "title": "Scaled growth play #186: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 148000,
+      "revenue": [
+        575000,
+        1695000
+      ],
+      "buzz": 2,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-187",
+      "title": "Scaled growth play #187: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 166000,
+      "revenue": [
+        620000,
+        1860000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-188",
+      "title": "Scaled growth play #188: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 184000,
+      "revenue": [
+        665000,
+        2025000
+      ],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-189",
+      "title": "Scaled growth play #189: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 202000,
+      "revenue": [
+        9200000,
+        21700000
+      ],
+      "buzz": 2,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-190",
+      "title": "Scaled growth play #190: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 220000,
+      "revenue": [
+        755000,
+        1275000
+      ],
+      "buzz": 3,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-191",
+      "title": "Scaled growth play #191: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 238000,
+      "revenue": [
+        800000,
+        1440000
+      ],
+      "buzz": 4,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-192",
+      "title": "Scaled growth play #192: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 256000,
+      "revenue": [
+        845000,
+        1605000
+      ],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-193",
+      "title": "Scaled growth play #193: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 274000,
+      "revenue": [
+        890000,
+        1770000
+      ],
+      "buzz": 3,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-194",
+      "title": "Scaled growth play #194: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 292000,
+      "revenue": [
+        935000,
+        1935000
+      ],
+      "buzz": 4,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-195",
+      "title": "Scaled growth play #195: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 40000,
+      "revenue": [
+        980000,
+        2100000
+      ],
+      "buzz": 2,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-196",
+      "title": "Scaled growth play #196: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 58000,
+      "revenue": [
+        6800000,
+        20800000
+      ],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-197",
+      "title": "Scaled growth play #197: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 76000,
+      "revenue": [
+        1070000,
+        2430000
+      ],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-198",
+      "title": "Scaled growth play #198: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 94000,
+      "revenue": [
+        1115000,
+        1515000
+      ],
+      "buzz": 2,
+      "tierMin": 6,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-199",
+      "title": "Scaled growth play #199: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 112000,
+      "revenue": [
+        1160000,
+        1680000
+      ],
+      "buzz": 3,
+      "tierMin": 7,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-public-late-200",
+      "title": "Scaled growth play #200: performance + brand",
+      "description": "Mid/late growth lever with spend that scales with your funding era.",
+      "cost": 130000,
+      "revenue": [
+        80000,
+        720000
+      ],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    }
+  ]
+}

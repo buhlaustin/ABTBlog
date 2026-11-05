@@ -1077,9 +1077,14 @@ if (!hireMax.ok || cooSalaryMonthly(garageZero) !== 0) {
   console.log('OK: 10% garage COO at $0/mo');
 }
 
-const { growthCampaignCatalogSize } = await import(
-  `file://${join(sim, 'modules/GrowthCampaigns.js')}`
-);
+const {
+  growthCampaignCatalogSize,
+  GROWTH_MONTHLY_OFFER_COUNT,
+  refreshGrowthCampaignOffers,
+  availableCampaigns,
+  runGrowthCampaign,
+  resetGrowthCampaignsMonth
+} = await import(`file://${join(sim, 'modules/GrowthCampaigns.js')}`);
 const { getProductActions, sideTaskBankSize, sideTaskPlaysPerMonth } = await import(
   `file://${join(sim, 'modules/ProductActions.js')}`
 );
@@ -1143,8 +1148,46 @@ if (spaceDesk.length < 70) {
   );
 }
 
+const growthRosterState = createInitialState({
+  companyName: 'Growth Roster',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+growthRosterState.flags.ipoFiled = true;
+growthRosterState.stage = STAGES.PUBLIC;
+growthRosterState.finance.cash = 50_000_000_000;
+resetGrowthCampaignsMonth(growthRosterState);
+const roster = growthRosterState.growth.monthCampaignOffers ?? [];
+if (roster.length < 1 || roster.length > GROWTH_MONTHLY_OFFER_COUNT) {
+  console.error(`FAIL: growth monthly roster size ${roster.length}`);
+  failed = true;
+} else {
+  const whales = availableCampaigns(growthRosterState).filter(
+    (c) => (c.revenue?.[1] ?? 0) >= 500_000_000
+  );
+  if (!whales.length) {
+    console.error('FAIL: public growth roster should include billion-scale plays');
+    failed = true;
+  } else {
+    const first = whales[0];
+    const run = runGrowthCampaign(growthRosterState, first.id);
+    if (!run.ok || !growthRosterState.growth.recentCampaignIds?.includes(first.id)) {
+      console.error(`FAIL: growth campaign run / cooldown track: ${run.reason ?? 'ok'}`);
+      failed = true;
+    } else {
+      resetGrowthCampaignsMonth(growthRosterState);
+      if (availableCampaigns(growthRosterState).some((c) => c.id === first.id)) {
+        console.error('FAIL: ran growth campaign should stay off roster until cooldown');
+        failed = true;
+      } else {
+        console.log(`OK: growth roster + cooldown (${roster.length}/mo, whales in pool)`);
+      }
+    }
+  }
+}
+
 const productSideBank = sideTaskBankSize(['product', 'both']);
-if (growthCampaignCatalogSize() < 130) {
+if (growthCampaignCatalogSize() < 350) {
   console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()})`);
   failed = true;
 } else if (getProductActions().length < 75) {
