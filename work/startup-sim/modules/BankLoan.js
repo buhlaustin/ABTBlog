@@ -27,12 +27,93 @@ export function computeCreditLimit(state) {
   const arr = getArr(state);
   const lifetime = state.finance?.lifetimeRevenue ?? 0;
   const tier = progressionTier(state);
-  let limit = 20_000 + Math.min(arr * 0.12, 400_000) + Math.min(lifetime * 0.05, 150_000);
-  limit += tier * 8_000;
-  if (state.flags?.xcAccepted) limit += 40_000;
-  if (state.flags?.seedRoundClosed) limit *= 1.35;
-  if (state.product?.level) limit += state.product.level * 2_500;
-  return Math.round(Math.max(25_000, Math.min(limit, 750_000)));
+  const valuation = state.finance?.valuation ?? 0;
+  const cash = state.finance?.cash ?? 0;
+
+  let limit =
+    25_000 +
+    Math.min(arr * 0.2, 120_000_000) +
+    Math.min(lifetime * 0.08, 60_000_000) +
+    tier * 50_000;
+
+  if (state.flags?.xcAccepted) limit += 75_000;
+  if (state.flags?.seedRoundClosed) limit *= 1.45;
+  if (state.flags?.seriesAClosed) limit *= 1.22;
+  if (state.flags?.seriesBClosed) limit *= 1.15;
+  if (state.flags?.seriesCClosed) limit *= 1.1;
+  if (state.flags?.ipoFiled) limit *= 1.35;
+  if (state.product?.level) limit += state.product.level * 10_000;
+
+  if (valuation > 0) limit = Math.max(limit, valuation * 0.05);
+  // Liquidity backstop — scales with cash but stays a fraction (not full balance-sheet lending).
+  limit = Math.max(limit, Math.min(cash * 0.08, 200_000_000));
+
+  const ceiling = Math.max(
+    1_000_000,
+    Math.min(500_000_000, arr * 0.65 + lifetime * 0.22 + tier * 3_000_000)
+  );
+  return Math.round(Math.max(25_000, Math.min(limit, ceiling)));
+}
+
+export function loanHeadroom(state) {
+  const limit = computeCreditLimit(state);
+  return Math.max(0, limit - loanOutstanding(state));
+}
+
+export function roundLoanMoney(amount) {
+  const n = Math.round(Number(amount) || 0);
+  if (n <= 0) return 0;
+  if (n >= 1_000_000) return Math.round(n / 100_000) * 100_000;
+  if (n >= 100_000) return Math.round(n / 10_000) * 10_000;
+  if (n >= 10_000) return Math.round(n / 1_000) * 1_000;
+  return Math.round(n / 100) * 100;
+}
+
+export function loanMinimumDraw(state) {
+  const headroom = loanHeadroom(state);
+  if (headroom <= 0) return 0;
+  const limit = computeCreditLimit(state);
+  const relative = Math.max(5_000, Math.round(limit * 0.01));
+  return Math.min(headroom, relative);
+}
+
+export const LOAN_DRAW_HEADROOM_FRACTIONS = [
+  { fraction: 0.25, label: '25%' },
+  { fraction: 0.5, label: '50%' },
+  { fraction: 0.75, label: '75%' },
+  { fraction: 1, label: 'Max' }
+];
+
+export function loanDrawAmountForHeadroomFraction(state, fraction) {
+  const headroom = loanHeadroom(state);
+  if (headroom <= 0) return 0;
+  if (fraction >= 1) return headroom;
+  const min = loanMinimumDraw(state);
+  const rounded = roundLoanMoney(headroom * fraction);
+  return Math.min(headroom, Math.max(min, rounded));
+}
+
+export function loanDrawPresets(state) {
+  const headroom = loanHeadroom(state);
+  const limit = computeCreditLimit(state);
+  if (headroom <= 0) return [];
+  return LOAN_DRAW_HEADROOM_FRACTIONS.map(({ fraction, label }) => ({
+    label,
+    fraction,
+    amount: loanDrawAmountForHeadroomFraction(state, fraction),
+    headroom,
+    limit
+  })).filter((p) => p.amount > 0);
+}
+
+export function loanPrepayPresets(state) {
+  const balance = loanOutstanding(state);
+  if (balance <= 0) return [];
+  return [
+    { label: '25%', amount: Math.min(balance, Math.max(1_000, roundLoanMoney(balance * 0.25))) },
+    { label: '50%', amount: Math.min(balance, Math.max(1_000, roundLoanMoney(balance * 0.5))) },
+    { label: 'Pay off', amount: balance }
+  ];
 }
 
 function loanState(state) {
@@ -154,8 +235,14 @@ function pushHistory(loan, entry) {
 }
 
 export function requestLoanDraw(state, amount) {
-  const draw = Math.round(Number(amount) || 0);
-  if (draw < 5_000) return { ok: false, reason: 'Minimum draw is $5,000.' };
+  const draw = roundLoanMoney(amount);
+  const minDraw = loanMinimumDraw(state);
+  if (minDraw <= 0) {
+    return { ok: false, reason: 'Credit line is fully drawn.' };
+  }
+  if (draw < minDraw) {
+    return { ok: false, reason: `Minimum draw is ${formatMoney(minDraw)}.` };
+  }
   const loan = loanState(state);
   const limit = computeCreditLimit(state);
   loan.creditLimit = limit;

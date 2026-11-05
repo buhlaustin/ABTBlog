@@ -984,6 +984,27 @@ if (!failed) {
     failed = true;
   }
 }
+const { loanDrawPresets, loanHeadroom } = await import(`file://${join(sim, 'modules/BankLoan.js')}`);
+const scaleLoanState = createInitialState({ companyName: 'BigLine', categoryId: 'b2b-saas', mode: 'sandbox' });
+scaleLoanState.flags.seedRoundClosed = true;
+scaleLoanState.flags.seriesAClosed = true;
+scaleLoanState.finance.arr = 80_000_000;
+scaleLoanState.finance.mrr = Math.round(80_000_000 / 12);
+scaleLoanState.finance.lifetimeRevenue = 400_000_000;
+scaleLoanState.finance.cash = 10_000_000_000_000;
+scaleLoanState.finance.valuation = 500_000_000;
+const bigLimit = computeCreditLimit(scaleLoanState);
+const presets = loanDrawPresets(scaleLoanState);
+const maxPreset = presets.find((p) => p.fraction === 1);
+if (bigLimit <= 750_000) {
+  console.error(`FAIL: scaled credit limit should exceed $750k, got ${bigLimit}`);
+  failed = true;
+} else if (!maxPreset || maxPreset.amount !== loanHeadroom(scaleLoanState)) {
+  console.error('FAIL: loan Max preset should equal headroom');
+  failed = true;
+} else {
+  console.log(`OK: scaled credit limit ${formatMoney(bigLimit)} · max draw ${formatMoney(maxPreset.amount)}`);
+}
 if (!failed && ag.ok) {
   const lines = convertOutstandingSafesAtSeed(angelState, 15_000_000);
   const converted = angelState.finance.instruments.every((i) => i.type !== 'safe' || i.converted);

@@ -1572,6 +1572,19 @@ function bindGameInteractions() {
         setGameFeedback(result.reason || 'Could not pivot.', true);
       }
       refresh();
+      return;
+    }
+    if (e.target.id === 'loan-draw-form') {
+      e.preventDefault();
+      if (!sessionState) return;
+      const raw = e.target.elements?.amount?.value ?? document.getElementById('loan-draw-custom')?.value;
+      const result = requestLoanDraw(sessionState, raw);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Loan declined.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
     }
   });
 

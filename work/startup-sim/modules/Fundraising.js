@@ -46,7 +46,11 @@ import {
   computeCreditLimit,
   loanOutstanding,
   loanPaymentMonthly,
-  requestLoanDraw,
+  loanHeadroom,
+  loanMinimumDraw,
+  loanDrawPresets,
+  loanPrepayPresets,
+  loanDrawAmountForHeadroomFraction,
   bankApprovalBreakdown,
   creditScoreLabel,
   prepayLoan,
@@ -247,24 +251,47 @@ export function renderFinancePanel(container, state) {
   const creditLimit = computeCreditLimit(state);
   const loanBal = loanOutstanding(state);
   const loanPay = loanPaymentMonthly(state);
-  const breakdown = bankApprovalBreakdown(state, 25_000);
+  const headroom = loanHeadroom(state);
+  const minDraw = loanMinimumDraw(state);
+  const sampleDraw =
+    headroom > 0 ? loanDrawAmountForHeadroomFraction(state, 0.25) : Math.min(25_000, creditLimit);
+  const breakdown = bankApprovalBreakdown(state, sampleDraw);
   const score = breakdown.score;
   const factorLines = breakdown.factors
     .map((f) => `<li>${escapeHtml(f.label)}: ${f.pts >= 0 ? '+' : ''}${f.pts} bp</li>`)
     .join('');
+  const drawPresets = loanDrawPresets(state);
+  const drawButtons = drawPresets
+    .map(
+      (p) =>
+        `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-loan-draw="${p.amount}">${escapeHtml(p.label)} · ${formatMoney(p.amount)}</button>`
+    )
+    .join('');
+  const prepayButtons = loanPrepayPresets(state)
+    .map(
+      (p) =>
+        `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-loan-prepay="${p.amount}">${escapeHtml(p.label)} · ${formatMoney(p.amount)}</button>`
+    )
+    .join('');
   const loanBlock = `<div class="finance-action loan-panel">
     <p><strong>Bank line of credit</strong> — draw subject to approval; repay monthly as overhead.</p>
-    <p class="fine-print">Limit ${formatMoney(creditLimit)} · Headroom ${formatMoney(breakdown.headroom)} · Outstanding ${formatMoney(loanBal)} · Debt service ${formatMoney(loanPay)}/mo · APR ${Math.round((state.finance?.loan?.apr ?? 0.14) * 100)}%</p>
-    <p class="fine-print">Credit score <strong>${score}</strong> (${escapeHtml(creditScoreLabel(score))}) · ~${Math.round(breakdown.odds * 100)}% approval on $25k draw</p>
+    <p class="fine-print">Limit ${formatMoney(creditLimit)} · Headroom ${formatMoney(headroom)} · Outstanding ${formatMoney(loanBal)} · Debt service ${formatMoney(loanPay)}/mo · APR ${Math.round((state.finance?.loan?.apr ?? 0.14) * 100)}%</p>
+    <p class="fine-print">Credit score <strong>${score}</strong> (${escapeHtml(creditScoreLabel(score))}) · ~${Math.round(breakdown.odds * 100)}% approval on ${formatMoney(sampleDraw)} draw (25% of headroom)</p>
     <details class="loan-breakdown"><summary>Approval breakdown</summary><ul class="instrument-list">${factorLines}</ul></details>
-    <div class="stock-actions">
-      <button type="button" class="btn btn-small" data-loan-draw="25000" ${loanBal + 25_000 > creditLimit ? 'disabled' : ''}>Draw $25k</button>
-      <button type="button" class="btn btn-small" data-loan-draw="50000" ${loanBal + 50_000 > creditLimit ? 'disabled' : ''}>Draw $50k</button>
-      <button type="button" class="btn btn-small" data-loan-draw="100000" ${loanBal + 100_000 > creditLimit ? 'disabled' : ''}>Draw $100k</button>
-      ${loanBal > 0 ? `<button type="button" class="btn btn-ghost btn-small" data-loan-prepay="10000">Prepay $10k</button>
-      <button type="button" class="btn btn-ghost btn-small" data-loan-prepay="25000">Prepay $25k</button>` : ''}
-      ${state.flags?.seedRoundClosed && loanBal > 0 && !state.finance?.loan?.refinancedAtSeed ? `<button type="button" class="btn btn-ghost btn-small" id="btn-loan-refinance">Refinance at seed rate</button>` : ''}
-    </div>
+    <p class="fine-print">Quick draws are <strong>percent of remaining headroom</strong> (25 / 50 / 75 / Max). Min draw ${formatMoney(minDraw)}.</p>
+    <div class="benefits-preset-row loan-draw-presets">${drawButtons || '<p class="fine-print">Line fully drawn — prepay to free headroom.</p>'}</div>
+    <form id="loan-draw-form" class="finance-inline-form loan-draw-form">
+      <label class="fine-print">Custom draw
+        <input type="number" id="loan-draw-custom" name="amount" min="${minDraw}" max="${headroom}" step="1000" placeholder="${headroom > 0 ? formatMoney(minDraw) : '0'}" ${headroom <= 0 ? 'disabled' : ''} />
+      </label>
+      <button type="submit" class="btn btn-primary btn-small" ${headroom <= 0 ? 'disabled' : ''}>Request draw</button>
+    </form>
+    ${
+      loanBal > 0
+        ? `<div class="benefits-preset-row loan-prepay-presets">${prepayButtons}</div>
+      ${state.flags?.seedRoundClosed && !state.finance?.loan?.refinancedAtSeed ? `<button type="button" class="btn btn-ghost btn-small" id="btn-loan-refinance">Refinance at seed rate</button>` : ''}`
+        : ''
+    }
     ${renderLoanHistoryList(state)}
   </div>`;
 
