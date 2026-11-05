@@ -1,6 +1,6 @@
 import { formatMoney } from './constants.js';
 import { formatCalendarMonth, formatStateMonth } from './GameCalendar.js';
-import { projectMonthlyBurn } from './Finance.js';
+import { companyRunwayDisplay } from './Finance.js';
 import { isPublicCompany, marketCap } from './IPO.js';
 
 function escapeHtml(s) {
@@ -11,12 +11,11 @@ function escapeHtml(s) {
 }
 
 export function runwayLabel(state) {
-  const burn = state.finance?.monthlyBurn ?? projectMonthlyBurn(state);
-  const cash = state.finance?.cash ?? 0;
-  if (burn <= 0) return '∞';
-  const months = cash / burn;
-  if (months >= 99) return '99+ mo';
-  return `${Math.round(months * 10) / 10} mo`;
+  return companyRunwayDisplay(state).monthsLabel;
+}
+
+export function runwayDetail(state) {
+  return companyRunwayDisplay(state).detail;
 }
 
 /** Render month-close summary into dialog body. */
@@ -48,6 +47,7 @@ export function renderMonthSummaryContent(container, state, summary, headlineTea
       <div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(runwayLabel(state))}</span></div>
       ${stockBlock}
     </div>
+    <p class="fine-print">${escapeHtml(runwayDetail(state))}</p>
     ${
       headlineTeaser
         ? `<p class="month-summary-headline"><strong>Headlines:</strong> ${escapeHtml(headlineTeaser)}</p>`

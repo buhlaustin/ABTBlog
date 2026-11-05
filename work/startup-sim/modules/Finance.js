@@ -349,15 +349,32 @@ export function resolveMonthEndBurn(state) {
   return burn;
 }
 
+export function companyRunwayDisplay(state) {
+  const burn = state.finance?.monthlyBurn ?? projectMonthlyBurn(state);
+  const cash = state.finance?.cash ?? 0;
+  let monthsLabel = '∞';
+  if (burn > 0) {
+    const months = cash / burn;
+    monthsLabel = months >= 99 ? '99+ mo' : `${Math.round(months * 10) / 10} mo`;
+  }
+  const detail =
+    burn > 0
+      ? `${formatMoney(cash)} cash · ${formatMoney(burn)}/mo burn`
+      : `${formatMoney(cash)} cash · $0 net burn`;
+  return { monthsLabel, detail, burn, cash };
+}
+
 export function renderFinanceSummary(state) {
   const burn = projectMonthlyBurn(state);
   const cash = state.finance?.cash ?? 0;
-  const runway = burn > 0 ? `${(cash / burn).toFixed(1)} mo` : '∞';
+  const runwayInfo = companyRunwayDisplay(state);
+  const runway = runwayInfo.monthsLabel;
   syncLifetimeProfit(state);
 
   return {
     burn,
     runway,
+    runwayDetail: runwayInfo.detail,
     burnLabel: formatMoney(burn),
     cashLabel: formatMoney(cash),
     mrrLabel: formatMoney(state.finance?.mrr ?? 0),

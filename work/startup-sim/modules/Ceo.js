@@ -21,7 +21,7 @@ import {
   personalBankRunway,
   ceoPersonalCashComp
 } from './CeoEconomics.js';
-import { isPublicCompany } from './IPO.js';
+import { isPublicCompany, canSellFounderStock } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 
 function escapeHtml(s) {
@@ -75,7 +75,9 @@ export function renderCeoPanel(container, state) {
   const name = ceoDisplayName(state);
   const annual = state.ceo?.salaryAnnual ?? 0;
   const monthly = ceoSalaryMonthly(state);
-  const { pct, equity, salary, draws, bonuses, bank, net, publicCo } = renderCeoCompBreakdown(state);
+  const { pct, equity, salary, draws, bonuses, stockSales, bank, net, publicCo } =
+    renderCeoCompBreakdown(state);
+  const canSellStock = canSellFounderStock(state);
   const equityLabel = publicCo ? 'Founder stake (public)' : 'Founder stake (@ valuation)';
   const lockup = state.publicMarket?.lockupMonthsRemaining ?? 0;
   const band = suggestedCeoSalaryBand(state);
@@ -129,7 +131,7 @@ export function renderCeoPanel(container, state) {
       ? `<div class="finance-action">
       <p class="stock-headline"><strong>${escapeHtml(shares.ticker ?? '—')}</strong> · ${formatMoney(shares.markPx)}/share · your block ${formatMoney(shares.stakeValue)}</p>
       <div class="summary-grid">
-        <div><span class="stat-label">Your shares</span><span class="stat-value">${(shares.shares / 1_000_000).toFixed(2)}M</span></div>
+        <div><span class="stat-label">Your shares</span><span class="stat-value">${shares.shares.toLocaleString('en-US')}</span></div>
         <div><span class="stat-label">Ownership</span><span class="stat-value">${pct}%</span></div>
         <div><span class="stat-label">vs IPO</span><span class="stat-value">${shares.gainSinceIpo != null ? formatMoney(shares.gainSinceIpo) : '—'}</span></div>
         <div><span class="stat-label">Analyst PT upside</span><span class="stat-value">${shares.upsideAtPt != null ? formatMoney(shares.upsideAtPt) : '—'}</span></div>
@@ -182,12 +184,14 @@ export function renderCeoPanel(container, state) {
       <div><span class="stat-label">Career salary (total)</span><span class="stat-value">${formatMoney(salary)}</span></div>
       <div><span class="stat-label">Owner draws (total)</span><span class="stat-value">${formatMoney(draws)}</span></div>
       <div><span class="stat-label">Company bonuses</span><span class="stat-value">${formatMoney(bonuses)}</span></div>
+      <div><span class="stat-label">Stock sales (career)</span><span class="stat-value">${formatMoney(stockSales)}</span></div>
       <div><span class="stat-label">Founder ownership</span><span class="stat-value">${pct}%</span></div>
       <div><span class="stat-label">CEO pay plan</span><span class="stat-value">${formatMoney(monthly)}/mo</span></div>
       <div><span class="stat-label">Company runway</span><span class="stat-value">${runway.runwayLabel}</span></div>
       <div><span class="stat-label">Implied share px</span><span class="stat-value">${shares.markPx > 0 ? formatMoney(shares.markPx) : '—'}</span></div>
       <div><span class="stat-label">Personal cash comp</span><span class="stat-value">${formatMoney(ceoPersonalCashComp(state))}</span></div>
     </div>
+    <p class="fine-print">${escapeHtml(runway.runwayDetail)}</p>
     ${
       runway.ceoMo > 0 && runway.deltaMo
         ? `<p class="fine-print">CEO salary adds ~${formatMoney(runway.ceoMo)}/mo to company overhead (≈${runway.deltaMo} mo less runway vs $0 salary).</p>`
@@ -195,6 +199,29 @@ export function renderCeoPanel(container, state) {
     }
 
     ${publicBlock}
+
+    ${
+      publicCo && !state.flags?.cashedOut
+        ? `<div class="finance-action">
+        <p><strong>Sell founder stock</strong> — secondary at the current market price. You stay CEO; proceeds go to your personal bank. (Step down below to sell 100% and end the run.)</p>
+        ${
+          lockup > 0
+            ? `<p class="fine-print">Founder lockup: ${lockup} month(s) before you can sell.</p>`
+            : `<div class="stock-actions">
+            <button type="button" class="btn btn-small" data-sell-founder-pct="5" ${canSellStock ? '' : disabled}>Sell 5%</button>
+            <button type="button" class="btn btn-small" data-sell-founder-pct="10" ${canSellStock ? '' : disabled}>Sell 10%</button>
+            <button type="button" class="btn btn-small" data-sell-founder-pct="25" ${canSellStock ? '' : disabled}>Sell 25%</button>
+            <button type="button" class="btn btn-small" data-sell-founder-pct="50" ${canSellStock ? '' : disabled}>Sell 50%</button>
+          </div>
+          <div class="name-row ceo-salary-row">
+            <label class="visually-hidden" for="ceo-sell-pct-input">Percent of founder shares</label>
+            <input id="ceo-sell-pct-input" type="number" min="1" max="99" step="1" placeholder="1–99% of your block" ${canSellStock ? '' : disabled}>
+            <button type="button" class="btn btn-small" id="btn-sell-founder-custom" ${canSellStock ? '' : disabled}>Sell custom %</button>
+          </div>`
+        }
+      </div>`
+        : ''
+    }
 
     <div class="finance-action">
       <p><strong>CEO salary</strong> — ${escapeHtml(band.label)} · typical ${formatMoney(band.typical)}/yr. Paid from company cash at month close, then deposited to your bank. <strong>Salary sets your personal debit band.</strong></p>

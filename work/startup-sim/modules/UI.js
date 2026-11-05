@@ -46,7 +46,7 @@ import {
 /** Side levers + product levers share one monthly play counter. */
 const SIDE_TASK_FOCUS_ALL = ['product', 'growth', 'brand', 'both'];
 import { sentimentLabel, marketTrustLabel, hasInstitutionalBoard } from './Sentiment.js';
-import { runwayLabel } from './MonthSummary.js';
+import { runwayLabel, runwayDetail } from './MonthSummary.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
 import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
@@ -662,6 +662,11 @@ export function renderGrowthPanel(container, state) {
       }
       <div><span class="stat-label">Desk tasks left</span><span class="stat-value">${pendingDesk}</span></div>
     </div>
+    ${
+      !hasInstitutionalBoard(state)
+        ? `<p class="fine-print">${escapeHtml(runwayDetail(state))}</p>`
+        : ''
+    }
     ${pivotBlock}
     ${
       rival

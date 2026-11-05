@@ -331,6 +331,7 @@ export function normalizeSave(raw) {
       if (state.ceo.careerSalaryPaid === undefined) state.ceo.careerSalaryPaid = 0;
       if (state.ceo.careerOwnerDraws === undefined) state.ceo.careerOwnerDraws = 0;
       if (state.ceo.careerEmployeeBonuses === undefined) state.ceo.careerEmployeeBonuses = 0;
+      if (state.ceo.careerStockSales === undefined) state.ceo.careerStockSales = 0;
       if (!state.ceo.drawLog) state.ceo.drawLog = [];
       if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];
       if (!state.ceo.salaryChangeLog) state.ceo.salaryChangeLog = [];

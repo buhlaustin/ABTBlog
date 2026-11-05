@@ -51,6 +51,7 @@ import {
   fileIpo,
   fetchIpoPress,
   cashOut,
+  sellFounderSharesPartial,
   applyStockPctMove,
   setPublicGuidanceTone,
   executeStockBuyback,
@@ -518,6 +519,28 @@ function handleCashOut() {
     return;
   }
   appendLog(sessionState, `Cashed out founder stake for ${formatMoney(result.payout)}.`);
+  refresh();
+}
+
+function handleSellFounderStock(pctRaw) {
+  if (!sessionState) return;
+  const pct = Number(pctRaw);
+  if (!window.confirm(`Sell ${pct}% of your founder shares at the current market price? You stay CEO.`)) {
+    return;
+  }
+  const result = sellFounderSharesPartial(sessionState, pct);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Stock sale failed.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Sold ${result.sharesSold.toLocaleString('en-US')} founder shares (${result.pctOfFounder}%) for ${formatMoney(result.proceeds)} — ownership now ${result.founderPctAfter}%.`
+  );
+  showFinanceFeedback(
+    `Sold ${result.pctOfFounder}% of your block for ${formatMoney(result.proceeds)} (deposited to personal bank).`
+  );
   refresh();
 }
 
@@ -1293,6 +1316,16 @@ function bindGameInteractions() {
     }
     if (e.target.id === 'btn-cash-out') {
       handleCashOut();
+      return;
+    }
+    const sellPctBtn = e.target.closest('[data-sell-founder-pct]');
+    if (sellPctBtn && sessionState) {
+      handleSellFounderStock(sellPctBtn.getAttribute('data-sell-founder-pct'));
+      return;
+    }
+    if (e.target.id === 'btn-sell-founder-custom' && sessionState) {
+      const input = document.getElementById('ceo-sell-pct-input');
+      handleSellFounderStock(input?.value);
       return;
     }
     const guidanceBtn = e.target.closest('[data-stock-guidance]');

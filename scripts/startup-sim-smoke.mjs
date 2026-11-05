@@ -33,11 +33,11 @@ let failed = false;
 
 const lifetimeSample = formatMoney(20_754_580_000_000);
 const groupedHuge = formatMoney(1_234_560_000_000_000);
-if (!lifetimeSample.endsWith('T') || lifetimeSample !== '$20.75T') {
-  console.error(`FAIL: formatMoney trillion tier (got ${lifetimeSample})`);
+if (lifetimeSample !== '$20,754,580,000,000') {
+  console.error(`FAIL: formatMoney should comma-group large dollars (got ${lifetimeSample})`);
   failed = true;
-} else if (!groupedHuge.includes(',') || !groupedHuge.endsWith('T')) {
-  console.error(`FAIL: formatMoney should group thousands (got ${groupedHuge})`);
+} else if (groupedHuge !== '$1,234,560,000,000,000') {
+  console.error(`FAIL: formatMoney should comma-group huge dollars (got ${groupedHuge})`);
   failed = true;
 } else if (!failed) {
   console.log(`OK: formatMoney commas (${lifetimeSample}, ${groupedHuge})`);
@@ -799,13 +799,14 @@ if (!buy.ok) {
 }
 
 const { STAGES: ST } = await import(`file://${join(sim, 'modules/constants.js')}`);
-const { PUBLIC_FLOAT_ROW_ID } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
+const { PUBLIC_FLOAT_ROW_ID, getFounderRow } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
 const {
   fileIpo,
   tickPublicMarket,
   setPublicGuidanceTone,
   executeStockBuyback,
-  whisperRevenueTarget
+  whisperRevenueTarget,
+  sellFounderSharesPartial
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 pub.stage = ST.PUBLIC;
@@ -850,6 +851,21 @@ if (!ipo.ok) {
     failed = true;
   } else if (!failed) {
     console.log('OK: late-game public market (IPO, guidance, tick, buyback, tape)');
+  }
+  pub.publicMarket.lockupMonthsRemaining = 0;
+  const founderBefore = getFounderRow(pub)?.shares ?? 0;
+  const partial = sellFounderSharesPartial(pub, 10);
+  const founderAfter = getFounderRow(pub)?.shares ?? 0;
+  if (!partial.ok || partial.proceeds <= 0) {
+    console.error(`FAIL: partial founder stock sale: ${partial.reason ?? 'bad result'}`);
+    failed = true;
+  } else if (founderAfter >= founderBefore || (pub.ceo.careerStockSales ?? 0) < 1) {
+    console.error('FAIL: partial sale should reduce founder shares and credit CEO bank');
+    failed = true;
+  } else if (!failed) {
+    console.log(
+      `OK: partial founder stock sale (${formatMoney(partial.proceeds)}, ${founderBefore - founderAfter} shares)`
+    );
   }
 }
 
@@ -1100,7 +1116,6 @@ if (!failed) {
 const { hireCoo, isCooHired, cooSalaryMonthly, garageCooSalaryFromEquity } = await import(
   `file://${join(sim, 'modules/Coo.js')}`
 );
-const { getFounderRow } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
 const garageState = createInitialState({
   companyName: 'Garage COO',
   categoryId: 'b2b-saas',

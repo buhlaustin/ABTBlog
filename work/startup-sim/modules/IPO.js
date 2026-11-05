@@ -6,11 +6,17 @@ import {
   ensurePublicFloatOnCapTable,
   getFounderRow,
   issueFollowOnShares,
+  recalculateCapTablePercentages,
   retirePublicFloatShares,
   targetIpoSharePrice,
-  totalOutstandingShares
+  totalOutstandingShares,
+  PUBLIC_FLOAT_ROW_ID
 } from './CapTable.js';
-import { ceoEndgameCompSnapshot, depositStockCashOutToPersonalBank } from './CeoEconomics.js';
+import {
+  ceoEndgameCompSnapshot,
+  depositStockCashOutToPersonalBank,
+  creditCeoStockSale
+} from './CeoEconomics.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
@@ -514,13 +520,82 @@ function readNewsSentiment(state) {
 }
 
 export function canCashOut(state) {
+  return canSellFounderStock(state);
+}
+
+export function canSellFounderStock(state) {
   const lockup = state.publicMarket?.lockupMonthsRemaining ?? 0;
+  const founder = getFounderRow(state);
   return Boolean(
     isPublicCompany(state) &&
       !state.flags?.cashedOut &&
       !state.flags?.gameOver &&
-      lockup <= 0
+      lockup <= 0 &&
+      (founder?.shares ?? 0) > 0
   );
+}
+
+/** Sell part of the founder block at market — stay CEO (lockup must be clear). */
+export function sellFounderSharesPartial(state, pctOfFounderRaw) {
+  if (!canSellFounderStock(state)) {
+    const lockup = state.publicMarket?.lockupMonthsRemaining ?? 0;
+    if (lockup > 0) {
+      return {
+        ok: false,
+        reason: `Founder lockup — wait ${lockup} more month(s) before selling stock.`
+      };
+    }
+    return { ok: false, reason: 'Stock sales unlock after IPO once lockup ends.' };
+  }
+  const pct = Number(pctOfFounderRaw);
+  if (!Number.isFinite(pct) || pct <= 0 || pct > 99) {
+    return { ok: false, reason: 'Sell 1%–99% of your founder shares per trade.' };
+  }
+
+  const founder = getFounderRow(state);
+  const price = state.publicMarket?.sharePrice ?? 0;
+  if (price <= 0) return { ok: false, reason: 'No market price for your stock.' };
+
+  const totalFounder = founder?.shares ?? 0;
+  let sellShares = Math.max(1, Math.floor(totalFounder * (pct / 100)));
+  if (sellShares >= totalFounder) {
+    return { ok: false, reason: 'Use step down & cash out to sell your entire stake.' };
+  }
+
+  const rows = state.capTable.map((r) => ({ ...r }));
+  const founderRow = rows.find((r) => r.id === 'founder');
+  if (!founderRow) return { ok: false, reason: 'Founder row missing on cap table.' };
+  founderRow.shares -= sellShares;
+
+  let floatRow = rows.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
+  if (!floatRow) {
+    floatRow = {
+      id: PUBLIC_FLOAT_ROW_ID,
+      name: 'Public shareholders (float)',
+      shares: 0,
+      class: 'public'
+    };
+    rows.push(floatRow);
+  }
+  floatRow.shares = (floatRow.shares ?? 0) + sellShares;
+  state.capTable = recalculateCapTablePercentages(rows);
+
+  const proceeds = Math.round(sellShares * price);
+  creditCeoStockSale(
+    state,
+    proceeds,
+    `Sold ${sellShares.toLocaleString('en-US')} shares @ ${formatMoney(price)}`
+  );
+  state.finance.valuation = Math.round(price * totalOutstandingShares(state));
+
+  return {
+    ok: true,
+    proceeds,
+    sharesSold: sellShares,
+    pctOfFounder: pct,
+    sharePrice: price,
+    founderPctAfter: founderRow.pct
+  };
 }
 
 /** Decrement IPO lockup after a month closes while public. */
