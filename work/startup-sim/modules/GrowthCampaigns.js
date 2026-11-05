@@ -114,6 +114,64 @@ export function runGrowthCampaign(state, campaignId) {
   return { ok: true, def, cost, revenue };
 }
 
+/** Launch affordable paid campaigns until monthly slots or unlocked plays run out. */
+export function runAllRemainingGrowthCampaigns(state) {
+  const launched = [];
+  let totalCost = 0;
+  let totalRevenue = 0;
+  let totalBuzz = 0;
+
+  for (let guard = 0; guard < 512; guard += 1) {
+    const remaining = growthCampaignsRemaining(state);
+    if (remaining !== Infinity && remaining <= 0) break;
+
+    const campaigns = availableCampaigns(state);
+    if (!campaigns.length) break;
+
+    const cash = state.finance.cash ?? 0;
+    const affordable = campaigns
+      .filter((c) => cash >= (c.cost ?? 0))
+      .sort((a, b) => (a.cost ?? 0) - (b.cost ?? 0));
+    if (!affordable.length) break;
+
+    const result = runGrowthCampaign(state, affordable[0].id);
+    if (!result.ok) break;
+
+    launched.push(result);
+    totalCost += result.cost;
+    totalRevenue += result.revenue;
+    totalBuzz += result.def.buzz ?? 0;
+  }
+
+  if (!launched.length) {
+    const remaining = growthCampaignsRemaining(state);
+    if (remaining !== Infinity && remaining <= 0) {
+      return { ok: false, reason: 'No campaign slots left this month.' };
+    }
+    const campaigns = availableCampaigns(state);
+    if (!campaigns.length) {
+      return { ok: false, reason: 'No paid growth plays unlocked at your stage.' };
+    }
+    return { ok: false, reason: 'Not enough cash for any remaining growth play.' };
+  }
+
+  return {
+    ok: true,
+    launched,
+    count: launched.length,
+    totalCost,
+    totalRevenue,
+    totalBuzz
+  };
+}
+
+export function canBuyAllRemainingGrowthCampaigns(state) {
+  const remaining = growthCampaignsRemaining(state);
+  if (remaining !== Infinity && remaining <= 0) return false;
+  const cash = state.finance.cash ?? 0;
+  return availableCampaigns(state).some((c) => cash >= (c.cost ?? 0));
+}
+
 export function resetGrowthCampaignsMonth(state) {
   if (!state.growth) state.growth = { campaignsThisMonth: [] };
   state.growth.campaignsThisMonth = [];
@@ -139,7 +197,9 @@ export function renderGrowthCampaignsBlock(state) {
     remaining === Infinity
       ? 'Unlimited'
       : `${remaining}/${formatMonthlySideTaskLimit(slots)}`;
-  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> plays unlocked (${bankSize} in bank — does not use desk tasks).</p>`;
+  const buyAllDisabled = canBuyAllRemainingGrowthCampaigns(state) ? '' : ' disabled';
+  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> plays unlocked (${bankSize} in bank — does not use desk tasks).</p>
+    <p class="finance-action"><button type="button" class="btn btn-primary btn-small" data-buy-all-growth${buyAllDisabled}>Buy all remaining</button> <span class="fine-print">Runs every affordable unlocked play until slots or cash run out.</span></p>`;
   const cards = campaigns
     .map((c) => {
       const r0 = Math.round((c.revenue?.[0] ?? 0) * mult * 0.5);
