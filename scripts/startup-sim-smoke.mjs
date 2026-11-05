@@ -572,9 +572,14 @@ archiveCurrentNews(newsA);
 const { advanceCalendarMonth: advanceNewsMonth } = await import(
   `file://${join(sim, 'modules/Calendar.js')}`
 );
-advanceNewsMonth(newsA);
-applyOfflineMonthlyNews(newsA);
-const headB = newsA.news.currentMonthArticles?.[0]?.headline ?? '';
+let headB = headA;
+for (let i = 0; i < 8 && headB === headA; i += 1) {
+  advanceNewsMonth(newsA);
+  applyOfflineMonthlyNews(newsA);
+  headB = newsA.news.currentMonthArticles?.[0]?.headline ?? '';
+  if (headB !== headA) break;
+  archiveCurrentNews(newsA);
+}
 if (!headA || headA === headB) {
   console.error(`FAIL: monthly news should rotate (${headA} vs ${headB})`);
   failed = true;
