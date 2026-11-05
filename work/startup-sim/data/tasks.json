@@ -1262,6 +1262,235 @@
       "buzz": 1
     },
     {
+      "id": "uni-scale-21-open-source-compliance-audit",
+      "title": "Open-source compliance audit",
+      "description": "LICENSE files and dependency notices in order.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 5,
+      "cost": 6200,
+      "revenue": [
+        8000,
+        52000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "uni-scale-22-revenue-recognition-policy",
+      "title": "Revenue recognition policy",
+      "description": "Finance and sales agree when to book ARR.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 14000,
+      "revenue": [
+        35000,
+        190000
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "uni-scale-23-sales-kickoff-sko-",
+      "title": "Sales kickoff (SKO)",
+      "description": "Pipeline chants and comp plan slides.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 55000,
+      "revenue": [
+        120000,
+        620000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "uni-scale-24-bug-bounty-program-launch",
+      "title": "Bug bounty program launch",
+      "description": "Pay hackers before black hats find you.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 18000,
+      "revenue": [
+        28000,
+        155000
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "uni-scale-25-talent-brand-content-series",
+      "title": "Talent brand content series",
+      "description": "Engineering blog posts that recruit.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 4,
+      "cost": 4500,
+      "revenue": [
+        6000,
+        42000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "uni-scale-26-cap-table-scenario-modeling",
+      "title": "Cap table scenario modeling",
+      "description": "Dilution math before the term sheet.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 5,
+      "cost": 3800,
+      "revenue": [
+        2000,
+        22000
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "uni-scale-27-partner-api-business-review",
+      "title": "Partner API business review",
+      "description": "Quarterly sync with your biggest integrator.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 4,
+      "tierMax": 7,
+      "cost": 9000,
+      "revenue": [
+        75000,
+        380000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "uni-scale-28-design-system-v2-rollout",
+      "title": "Design system v2 rollout",
+      "description": "Components designers and devs both use.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "post_xc"
+      ],
+      "tierMin": 2,
+      "tierMax": 5,
+      "cost": 11000,
+      "revenue": [
+        15000,
+        88000
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "uni-scale-29-incident-postmortem-culture",
+      "title": "Incident postmortem culture",
+      "description": "Blameless writeups that actually change things.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 6,
+      "cost": 4200,
+      "revenue": [
+        12000,
+        72000
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "uni-scale-30-global-payroll-expansion",
+      "title": "Global payroll expansion",
+      "description": "EOR in one country without entity panic.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 32000,
+      "revenue": [
+        45000,
+        240000
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "uni-scale-31-analyst-day-dry-run",
+      "title": "Analyst day dry run",
+      "description": "Public company metrics rehearsal.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 48000,
+      "revenue": [
+        95000,
+        480000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
       "id": "cat-b2b-saas-soc2-type-ii-readiness-sprint",
       "categories": [
         "b2b-saas"
@@ -8905,177 +9134,60 @@
       "buzz": 0
     },
     {
-      "id": "uni-scale-21-open-source-compliance-audit",
-      "title": "Open-source compliance audit",
-      "description": "LICENSE files and dependency notices in order.",
-      "types": [
-        "research"
+      "id": "cat-b2b-saas-cpq-rules-engine-rollout",
+      "categories": [
+        "b2b-saas"
       ],
-      "stages": [
-        "office",
-        "post_xc"
-      ],
-      "tierMin": 2,
-      "tierMax": 5,
-      "cost": 6200,
-      "revenue": [
-        8000,
-        52000
-      ],
-      "product": 1,
-      "buzz": 1
-    },
-    {
-      "id": "uni-scale-22-revenue-recognition-policy",
-      "title": "Revenue recognition policy",
-      "description": "Finance and sales agree when to book ARR.",
-      "types": [
-        "research"
-      ],
-      "stages": [
-        "post_xc",
-        "public"
-      ],
-      "tierMin": 4,
-      "tierMax": 7,
-      "cost": 14000,
-      "revenue": [
-        35000,
-        190000
-      ],
-      "product": 0,
-      "buzz": 0
-    },
-    {
-      "id": "uni-scale-23-sales-kickoff-sko-",
-      "title": "Sales kickoff (SKO)",
-      "description": "Pipeline chants and comp plan slides.",
-      "types": [
-        "marketing"
-      ],
-      "stages": [
-        "post_xc",
-        "public"
-      ],
-      "tierMin": 5,
-      "tierMax": 7,
-      "cost": 55000,
-      "revenue": [
-        120000,
-        620000
-      ],
-      "product": 0,
-      "buzz": 2
-    },
-    {
-      "id": "uni-scale-24-bug-bounty-program-launch",
-      "title": "Bug bounty program launch",
-      "description": "Pay hackers before black hats find you.",
+      "title": "CPQ rules engine rollout",
+      "description": "Quotes that sales cannot underprice by accident.",
       "types": [
         "product"
       ],
       "stages": [
-        "post_xc",
-        "public"
+        "garage",
+        "office"
       ],
-      "tierMin": 4,
-      "tierMax": 7,
-      "cost": 18000,
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 553,
       "revenue": [
-        28000,
-        155000
+        360,
+        3864
       ],
       "product": 2,
-      "buzz": 2
-    },
-    {
-      "id": "uni-scale-25-talent-brand-content-series",
-      "title": "Talent brand content series",
-      "description": "Engineering blog posts that recruit.",
-      "types": [
-        "marketing"
-      ],
-      "stages": [
-        "office",
-        "post_xc"
-      ],
-      "tierMin": 2,
-      "tierMax": 4,
-      "cost": 4500,
-      "revenue": [
-        6000,
-        42000
-      ],
-      "product": 0,
-      "buzz": 3
-    },
-    {
-      "id": "uni-scale-26-cap-table-scenario-modeling",
-      "title": "Cap table scenario modeling",
-      "description": "Dilution math before the term sheet.",
-      "types": [
-        "research"
-      ],
-      "stages": [
-        "office",
-        "post_xc"
-      ],
-      "tierMin": 2,
-      "tierMax": 5,
-      "cost": 3800,
-      "revenue": [
-        2000,
-        22000
-      ],
-      "product": 0,
       "buzz": 0
     },
     {
-      "id": "uni-scale-27-partner-api-business-review",
-      "title": "Partner API business review",
-      "description": "Quarterly sync with your biggest integrator.",
-      "types": [
-        "sales"
+      "id": "cat-b2b-saas-customer-data-platform-sync",
+      "categories": [
+        "b2b-saas"
       ],
-      "stages": [
-        "post_xc",
-        "public"
-      ],
-      "tierMin": 4,
-      "tierMax": 7,
-      "cost": 9000,
-      "revenue": [
-        75000,
-        380000
-      ],
-      "product": 1,
-      "buzz": 1
-    },
-    {
-      "id": "uni-scale-28-design-system-v2-rollout",
-      "title": "Design system v2 rollout",
-      "description": "Components designers and devs both use.",
+      "title": "Customer data platform sync",
+      "description": "Warehouse ↔ app bi-directional without duplicates.",
       "types": [
         "product"
       ],
       "stages": [
         "office",
-        "post_xc"
+        "xc"
       ],
-      "tierMin": 2,
-      "tierMax": 5,
-      "cost": 11000,
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2548,
       "revenue": [
-        15000,
-        88000
+        2156,
+        21340
       ],
-      "product": 2,
-      "buzz": 1
+      "product": 1,
+      "buzz": 0
     },
     {
-      "id": "uni-scale-29-incident-postmortem-culture",
-      "title": "Incident postmortem culture",
-      "description": "Blameless writeups that actually change things.",
+      "id": "cat-b2b-saas-revops-territory-carve",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "RevOps territory carve",
+      "description": "Split accounts without civil war.",
       "types": [
         "research"
       ],
@@ -9083,19 +9195,307 @@
         "post_xc"
       ],
       "tierMin": 3,
-      "tierMax": 6,
-      "cost": 4200,
+      "tierMax": 5,
+      "cost": 10670,
       "revenue": [
-        12000,
-        72000
+        23320,
+        147900
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-b2b-saas-enterprise-keynote-booth",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Enterprise keynote booth",
+      "description": "Big logo backdrop and demo pods.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 39140,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-b2b-saas-support-tier-deflection-study",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Support tier deflection study",
+      "description": "Docs that prevent tickets.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 708,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-b2b-saas-multi-year-ramp-deal-template",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Multi-year ramp deal template",
+      "description": "Recognize revenue without angering auditors.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2380,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-b2b-saas-feature-flag-kill-switch-audit",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Feature flag kill switch audit",
+      "description": "Dark launch with rollback one click away.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10010,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-b2b-saas-customer-education-academy",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Customer education academy",
+      "description": "Certification course for power users.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 36860,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-b2b-saas-partner-mdf-reconciliation",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Partner MDF reconciliation",
+      "description": "Marketing funds accounting actually closes.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 670,
+      "revenue": [
+        360,
+        4284
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-b2b-saas-vulnerability-disclosure-policy",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Vulnerability disclosure policy",
+      "description": "Security researchers know where to email.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3052,
+      "revenue": [
+        2156,
+        20240
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-b2b-saas-in-product-nps-survey",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "In-product NPS survey",
+      "description": "Micro-surveys after the aha moment.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 9350,
+      "revenue": [
+        23320,
+        140650
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-b2b-saas-sales-engineering-demo-script",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Sales engineering demo script",
+      "description": "Repeatable story for technical buyers.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 34580,
+      "revenue": [
+        108300,
+        530400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-b2b-saas-whitespace-account-mapping",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Whitespace account mapping",
+      "description": "Find seats you have not sold yet.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 631,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-b2b-saas-custom-object-schema-migration",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Custom object schema migration",
+      "description": "CRM fields match your product reality.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2884,
+      "revenue": [
+        2156,
+        21340
       ],
       "product": 1,
       "buzz": 0
     },
     {
-      "id": "uni-scale-30-global-payroll-expansion",
-      "title": "Global payroll expansion",
-      "description": "EOR in one country without entity panic.",
+      "id": "cat-b2b-saas-executive-business-review-kit",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Executive business review kit",
+      "description": "QBR slides CSMs personalize fast.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11990,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-b2b-saas-fedramp-gap-assessment",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "FedRAMP gap assessment",
+      "description": "Gov cloud someday — start the paperwork.",
       "types": [
         "research"
       ],
@@ -9105,33 +9505,4383 @@
       ],
       "tierMin": 5,
       "tierMax": 7,
-      "cost": 32000,
+      "cost": 32300,
       "revenue": [
-        45000,
-        240000
+        108300,
+        478400
       ],
       "product": 0,
       "buzz": 0
     },
     {
-      "id": "uni-scale-31-analyst-day-dry-run",
-      "title": "Analyst day dry run",
-      "description": "Public company metrics rehearsal.",
+      "id": "cat-b2b-saas-community-user-group-launch",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Community user group launch",
+      "description": "Local meetups with pizza budget.",
       "types": [
         "marketing"
       ],
       "stages": [
-        "public"
+        "garage",
+        "office"
       ],
-      "tierMin": 7,
-      "tierMax": 7,
-      "cost": 48000,
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 592,
       "revenue": [
-        95000,
-        480000
+        360,
+        4074
       ],
       "product": 0,
       "buzz": 2
+    },
+    {
+      "id": "cat-b2b-saas-api-deprecation-sunset-plan",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "API deprecation sunset plan",
+      "description": "Version N notices before you break N-1.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2716,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-b2b-saas-win-wire-press-release",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Win wire press release",
+      "description": "Logo legal approved for the blog.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11330,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-b2b-saas-services-margin-guardrails",
+      "categories": [
+        "b2b-saas"
+      ],
+      "title": "Services margin guardrails",
+      "description": "PS deals below floor need VP sign-off.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 41420,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-clinical-workflow-time-motion-study",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Clinical workflow time-motion study",
+      "description": "Measure clicks nurses hate.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 553,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-patient-intake-tablet-rollout",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Patient intake tablet rollout",
+      "description": "Kiosks that sanitize and sync.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2548,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-medicare-enrollment-readiness",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Medicare enrollment readiness",
+      "description": "Payer IDs validated before claims.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10670,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-biometric-login-for-clinicians",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Biometric login for clinicians",
+      "description": "Fast auth without sticky notes.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 39140,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-lab-interface-hl7-v2-mapping",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Lab interface HL7 v2 mapping",
+      "description": "Results flow without manual PDFs.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 708,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-care-coordinator-hiring-sprint",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Care coordinator hiring sprint",
+      "description": "Humans between app and doctor.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2380,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-healthtech-patient-satisfaction-survey-hcahps-style",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Patient satisfaction survey (HCAHPS-style)",
+      "description": "Benchmark-friendly questions.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10010,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-medical-director-advisory-contract",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Medical director advisory contract",
+      "description": "Credentialed champion on slide one.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 36860,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-healthtech-prior-auth-dashboard-for-admins",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Prior auth dashboard for admins",
+      "description": "Queue visibility ops can act on.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 670,
+      "revenue": [
+        360,
+        4284
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-clinical-content-localization",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Clinical content localization",
+      "description": "Spanish instructions that providers trust.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3052,
+      "revenue": [
+        2156,
+        20240
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-device-integration-qa-lab",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Device integration QA lab",
+      "description": "Simulators for vital sign feeds.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 9350,
+      "revenue": [
+        23320,
+        140650
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-payer-sandbox-certification",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Payer sandbox certification",
+      "description": "Test claims before prod traffic.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 34580,
+      "revenue": [
+        108300,
+        530400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-healthtech-patient-financial-assistance-workflow",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Patient financial assistance workflow",
+      "description": "Charity care without shame UX.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 631,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-telepsychiatry-consent-flow",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Telepsychiatry consent flow",
+      "description": "State rules encoded in branching.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2884,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-home-health-aide-mobile-app",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Home health aide mobile app",
+      "description": "Offline charting in the field.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11990,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-quality-improvement-pdsa-cycle",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Quality improvement PDSA cycle",
+      "description": "Small test of change in one clinic.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 32300,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-medical-affairs-publication-plan",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Medical affairs publication plan",
+      "description": "Peer-reviewed credibility timeline.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 592,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-healthtech-ambulance-handoff-integration",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Ambulance handoff integration",
+      "description": "EMS data meets ED triage.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2716,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-pharmacy-benefits-carve-out-analysis",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Pharmacy benefits carve-out analysis",
+      "description": "Formulary math for employers.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11330,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-healthtech-patient-family-portal-access",
+      "categories": [
+        "healthtech"
+      ],
+      "title": "Patient family portal access",
+      "description": "Caregiver proxies with scoped rights.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 41420,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-algorithm-explainability-panel",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Algorithm explainability panel",
+      "description": "Why you saw that post — in UI.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 553,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-creator-monetization-tiers",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Creator monetization tiers",
+      "description": "Subscriptions vs tips vs ads.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2548,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-consumer-social-photo-moderation-queue-sla",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Photo moderation queue SLA",
+      "description": "Reports reviewed within hours.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10670,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-campus-rep-referral-codes",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Campus rep referral codes",
+      "description": "Track which dorms convert.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 39140,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-consumer-social-audio-rooms-discovery-tab",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Audio rooms discovery tab",
+      "description": "Surfacing live conversations.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 708,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-age-verification-pilot",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Age verification pilot",
+      "description": "Selfie + ID for restricted content.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2380,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-share-sheet-optimization",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Share sheet optimization",
+      "description": "One tap to every platform.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10010,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-interest-graph-import-from-contacts",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Interest graph import from contacts",
+      "description": "Opt-in friend suggestions refresh.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 36860,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-weekly-email-digest-experiment",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Weekly email digest experiment",
+      "description": "Re-engage dormant users politely.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 670,
+      "revenue": [
+        360,
+        4284
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-consumer-social-in-app-purchase-price-test",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "In-app purchase price test",
+      "description": "Regional pricing without rage.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3052,
+      "revenue": [
+        2156,
+        20240
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-community-strikes-appeals-flow",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Community strikes appeals flow",
+      "description": "Fair process when bans happen.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 9350,
+      "revenue": [
+        23320,
+        140650
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-hashtag-trend-detection",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Hashtag trend detection",
+      "description": "Promote rising topics safely.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 34580,
+      "revenue": [
+        108300,
+        530400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-profile-aesthetic-themes",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Profile aesthetic themes",
+      "description": "Paid skins for power users.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 631,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-consumer-social-watch-party-feature-beta",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Watch party feature beta",
+      "description": "Sync video with friends remotely.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2884,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-bot-network-takedown",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Bot network takedown",
+      "description": "Coordinate blocks across accounts.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11990,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-localized-moderation-hires",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Localized moderation hires",
+      "description": "Language-native trust teams.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 32300,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-consumer-social-memories-on-this-day-feature",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Memories / on-this-day feature",
+      "description": "Nostalgia push notifications.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 592,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-consumer-social-groups-admin-tooling-v2",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Groups admin tooling v2",
+      "description": "Roles, pins, and slow mode.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2716,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-api-for-third-party-clients",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "API for third-party clients",
+      "description": "Read-only feeds with OAuth.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11330,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-consumer-social-safety-center-transparency-report",
+      "categories": [
+        "consumer-social"
+      ],
+      "title": "Safety center transparency report",
+      "description": "Publish enforcement stats quarterly.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 41420,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-marketplace-instant-book-vs-request-to-book-test",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Instant book vs request-to-book test",
+      "description": "Conversion vs control tradeoff.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 553,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-provider-quality-score-refresh",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Provider quality score refresh",
+      "description": "Weights tied to refund rates.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2548,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-escrow-release-automation",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Escrow release automation",
+      "description": "Funds move when job completes.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10670,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-category-seo-landing-refresh",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Category SEO landing refresh",
+      "description": "Rewrite copy for top 20 cities.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 39140,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-marketplace-chargeback-representment-playbook",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Chargeback representment playbook",
+      "description": "Win disputes with evidence packs.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 708,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-loyalty-points-for-repeat-buyers",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Loyalty points for repeat buyers",
+      "description": "Stamps without breaking unit economics.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2380,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-marketplace-provider-earnings-dashboard",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Provider earnings dashboard",
+      "description": "Transparent fees and tips.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10010,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-weekend-surge-cap-policy",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Weekend surge cap policy",
+      "description": "Limit price gouging headlines.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 36860,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-b2b-bulk-order-invoicing",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "B2B bulk order invoicing",
+      "description": "Net-30 for corporate accounts.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 670,
+      "revenue": [
+        360,
+        4284
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-marketplace-photo-guidelines-for-listings",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Photo guidelines for listings",
+      "description": "Reject dark blurry hero shots.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3052,
+      "revenue": [
+        2156,
+        20240
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-multi-language-chat-translation",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Multi-language chat translation",
+      "description": "Buyer/seller speak different languages.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 9350,
+      "revenue": [
+        23320,
+        140650
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-scheduled-booking-windows",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Scheduled booking windows",
+      "description": "Calendars providers actually keep.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 34580,
+      "revenue": [
+        108300,
+        530400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-insurance-verification-api",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Insurance verification API",
+      "description": "Real-time proof for risky jobs.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 631,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-marketplace-tax-remittance",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Marketplace tax remittance",
+      "description": "Collect and remit where required.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2884,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-featured-provider-rotation",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Featured provider rotation",
+      "description": "Fair exposure algorithm.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11990,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-cohort-retention-by-acquisition-channel",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Cohort retention by acquisition channel",
+      "description": "Kill ads that bring churners.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 32300,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-white-label-marketplace-pilot",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "White-label marketplace pilot",
+      "description": "Power a brand’s existing audience.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 592,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-marketplace-item-authenticity-program",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Item authenticity program",
+      "description": "Serial checks for luxury goods.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2716,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-marketplace-provider-loan-advance-product",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Provider loan advance product",
+      "description": "Cash flow before payout day.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11330,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-marketplace-crisis-pricing-freeze-switch",
+      "categories": [
+        "marketplace"
+      ],
+      "title": "Crisis pricing freeze switch",
+      "description": "Disable surge during emergencies.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 41420,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-picker-gamification-pilot",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Picker gamification pilot",
+      "description": "Points for accuracy and speed.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 553,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-customer-substitution-preferences",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Customer substitution preferences",
+      "description": "Replace kale with spinach automatically.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2548,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-fleet-ev-transition-study",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Fleet EV transition study",
+      "description": "Chargers, range, and depot layout.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10670,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-alcohol-delivery-compliance",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Alcohol delivery compliance",
+      "description": "ID scan at door workflows.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 39140,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-merchant-menu-sync-webhook",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Merchant menu sync webhook",
+      "description": "86 items in real time.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 708,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-drone-delivery-regulatory-memo",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Drone delivery regulatory memo",
+      "description": "FAA waivers even if far off.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2380,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-delivery-fee-transparency-a-b",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Delivery fee transparency A/B",
+      "description": "Show service fee breakdown.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10010,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-hub-staffing-forecast-model",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Hub staffing forecast model",
+      "description": "Shifts match predicted orders.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 36860,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-customer-photo-proof-preferences",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Customer photo proof preferences",
+      "description": "Opt out of doorstep pics.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 670,
+      "revenue": [
+        360,
+        4284
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-route-optimizer-shadow-mode",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Route optimizer shadow mode",
+      "description": "Test new algo without customer impact.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3052,
+      "revenue": [
+        2156,
+        20240
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-gift-message-packaging-upsell",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Gift message & packaging upsell",
+      "description": "Margin on ribbons.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 9350,
+      "revenue": [
+        23320,
+        140650
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-delivery-subscription-grocery-box-trial",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Subscription grocery box trial",
+      "description": "Recurring basket with skip weeks.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 34580,
+      "revenue": [
+        108300,
+        530400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-delivery-driver-tip-matching-promo",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Driver tip matching promo",
+      "description": "Platform matches tips one weekend.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 631,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-delivery-cold-chain-sensor-rollout",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Cold chain sensor rollout",
+      "description": "Alerts before spoilage claims.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2884,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-urban-micro-hub-lease",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Urban micro-hub lease",
+      "description": "Sign short-term warehouse space.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11990,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-delivery-delivery-partner-api-rate-limits",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Delivery partner API rate limits",
+      "description": "Protect ops from rogue integrators.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 32300,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-noise-ordinance-compliance-routing",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Noise ordinance compliance routing",
+      "description": "No scooters at 2 a.m. downtown.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 592,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-delivery-corporate-meal-stipend-integration",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Corporate meal stipend integration",
+      "description": "Employer-paid lunch budgets.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2716,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-delivery-rain-gear-stipend-for-couriers",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Rain gear stipend for couriers",
+      "description": "Retention perk that costs little.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11330,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-delivery-order-batching-fairness-audit",
+      "categories": [
+        "delivery"
+      ],
+      "title": "Order batching fairness audit",
+      "description": "Drivers see equitable groupings.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 41420,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-wire-recall-procedure-drill",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Wire recall procedure drill",
+      "description": "When someone fat-fingers SWIFT.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 553,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-card-art-refresh-bin-routing",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Card art refresh & BIN routing",
+      "description": "New designs without re-KYC everyone.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2548,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-merchant-category-risk-scoring",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Merchant category risk scoring",
+      "description": "Block gambling MCCs faster.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10670,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-consumer-financial-health-dashboard",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Consumer financial health dashboard",
+      "description": "Cash flow insights users open weekly.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 39140,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-small-business-lending-model-validation",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Small business lending model validation",
+      "description": "Backtest defaults honestly.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 708,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-mobile-check-deposit-ml",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Mobile check deposit ML",
+      "description": "Fewer rejected photos.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2380,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-partner-bank-api-failover-test",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Partner bank API failover test",
+      "description": "Switch rails without user panic.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10010,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-rewards-program-liability-model",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Rewards program liability model",
+      "description": "Points on balance sheet correctly.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 36860,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-account-closure-offboarding",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Account closure offboarding",
+      "description": "Reg E compliant final statements.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 670,
+      "revenue": [
+        360,
+        4284
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-crypto-staking-disclosure-update",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Crypto staking disclosure update",
+      "description": "Yield risks in plain language.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3052,
+      "revenue": [
+        2156,
+        20240
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-payroll-connect-integration",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Payroll connect integration",
+      "description": "Direct deposit switch in-app.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 9350,
+      "revenue": [
+        23320,
+        140650
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-invoice-factoring-marketplace",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Invoice factoring marketplace",
+      "description": "SMBs sell AR for cash today.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 34580,
+      "revenue": [
+        108300,
+        530400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-fintech-regulatory-change-monitoring-feed",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Regulatory change monitoring feed",
+      "description": "Alerts when rules shift.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 631,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-biometric-step-up-for-high-transfers",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Biometric step-up for high transfers",
+      "description": "Friction only when needed.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2884,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-white-label-neobank-partner-launch",
+      "categories": [
+        "fintech"
+      ],
+      "title": "White-label neobank partner launch",
+      "description": "Brand X card powered by you.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11990,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-fintech-overdraft-fee-reform-experiment",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Overdraft fee reform experiment",
+      "description": "Grace buffer vs fee revenue.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 32300,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-tax-loss-harvesting-feature",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Tax loss harvesting feature",
+      "description": "Wealth tier automation.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 592,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-sanctions-false-positive-review",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Sanctions false positive review",
+      "description": "Humans clear innocent names.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2716,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-core-banking-migration-cutover",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Core banking migration cutover",
+      "description": "Weekend war room scheduled.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11330,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-fintech-financial-literacy-push-notification-series",
+      "categories": [
+        "fintech"
+      ],
+      "title": "Financial literacy push notification series",
+      "description": "Engagement without nagging.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 41420,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-ai-tools-context-caching-cost-analysis",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Context caching cost analysis",
+      "description": "Dollars saved on repeated prompts.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 553,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-tool-use-agent-sandbox",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Tool-use agent sandbox",
+      "description": "Safe code execution boundaries.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2548,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-model-routing-by-task-type",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Model routing by task type",
+      "description": "Cheap model for easy prompts.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10670,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-customer-data-opt-out-for-training",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Customer data opt-out for training",
+      "description": "Toggle with legal backing.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 39140,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-jailbreak-regression-suite",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Jailbreak regression suite",
+      "description": "CI blocks unsafe releases.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 708,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-prompt-injection-filter-layer",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Prompt injection filter layer",
+      "description": "Strip hidden instructions in RAG.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2380,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-gpu-cluster-autoscaling-rules",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "GPU cluster autoscaling rules",
+      "description": "Scale down at night.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10010,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-fine-tune-data-licensing-audit",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Fine-tune data licensing audit",
+      "description": "Rights to every corpus row.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 36860,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-enterprise-audit-log-export",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Enterprise audit log export",
+      "description": "SOC teams download prompts/responses.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 670,
+      "revenue": [
+        360,
+        4284
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-multilingual-eval-set-expansion",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Multilingual eval set expansion",
+      "description": "Quality beyond English.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3052,
+      "revenue": [
+        2156,
+        20240
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-image-generation-safety-classifier",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Image generation safety classifier",
+      "description": "Block NSFW outputs at source.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 9350,
+      "revenue": [
+        23320,
+        140650
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-developer-playground-quotas",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Developer playground quotas",
+      "description": "Free tier that converts.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 34580,
+      "revenue": [
+        108300,
+        530400
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-ai-tools-sla-backed-dedicated-throughput",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "SLA-backed dedicated throughput",
+      "description": "Premium tier with guaranteed TPS.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 631,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-ai-tools-embedding-reindex-pipeline",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Embedding reindex pipeline",
+      "description": "Zero-downtime vector refresh.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2884,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-model-deprecation-comms-plan",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Model deprecation comms plan",
+      "description": "90-day notice for API users.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11990,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-ai-tools-on-prem-air-gapped-installer",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "On-prem air-gapped installer",
+      "description": "USB sneakernet for defense clients.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 32300,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-synthetic-persona-red-teaming",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Synthetic persona red teaming",
+      "description": "Adversarial users in sim.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 592,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-token-usage-forecasting-dashboard",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Token usage forecasting dashboard",
+      "description": "Customers predict their bill.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2716,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-ai-tools-academic-research-partnership",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Academic research partnership",
+      "description": "Credibility via university lab.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11330,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-ai-tools-voice-mode-latency-polish",
+      "categories": [
+        "ai-tools"
+      ],
+      "title": "Voice mode latency polish",
+      "description": "Sub-second turn taking.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 41420,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-emc-pre-compliance-scan",
+      "categories": [
+        "hardware"
+      ],
+      "title": "EMC pre-compliance scan",
+      "description": "Fix radiation before the lab.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 553,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-repair-parts-inventory-model",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Repair parts inventory model",
+      "description": "Stock SKUs that actually break.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2548,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-in-store-demo-fixture-build",
+      "categories": [
+        "hardware"
+      ],
+      "title": "In-store demo fixture build",
+      "description": "Retail endcaps that survive kids.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10670,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-hardware-firmware-signing-hsm-setup",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Firmware signing HSM setup",
+      "description": "Keys never on laptops.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 39140,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-crowdfunding-backer-update-3",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Crowdfunding backer update #3",
+      "description": "Honest delays with photos.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 708,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-hardware-component-obsolescence-watchlist",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Component obsolescence watchlist",
+      "description": "Second source before EOL panic.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2380,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-user-manual-localization",
+      "categories": [
+        "hardware"
+      ],
+      "title": "User manual localization",
+      "description": "Diagrams without mistranslated warnings.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10010,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-extended-warranty-sku-launch",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Extended warranty SKU launch",
+      "description": "Attach rate experiment at checkout.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 36860,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-hardware-field-telemetry-privacy-review",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Field telemetry privacy review",
+      "description": "Device data minimization.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 670,
+      "revenue": [
+        360,
+        4284
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-manufacturing-yield-improvement",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Manufacturing yield improvement",
+      "description": "SCRAP rate down one point.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3052,
+      "revenue": [
+        2156,
+        20240
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-accessory-bundle-on-amazon",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Accessory bundle on Amazon",
+      "description": "FBA shipment plan approved.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 9350,
+      "revenue": [
+        23320,
+        140650
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-hardware-hardware-security-bug-bounty",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Hardware security bug bounty",
+      "description": "Pay for firmware vulnerabilities.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 34580,
+      "revenue": [
+        108300,
+        530400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-noise-cancellation-tuning",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Noise cancellation tuning",
+      "description": "Microphone arrays calibrated.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 631,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-retail-return-refurb-grading",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Retail return refurb grading",
+      "description": "A/B/C stock priced accordingly.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2884,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-power-adapter-certification",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Power adapter certification",
+      "description": "UL marks for every region.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11990,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-kickstarter-stretch-goal-fulfillment",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Kickstarter stretch goal fulfillment",
+      "description": "Extra color actually ships.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 32300,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-hardware-spare-parts-self-service-portal",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Spare parts self-service portal",
+      "description": "Users order clips and cables.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 592,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-enterprise-mdm-profile",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Enterprise MDM profile",
+      "description": "IT can push configs silently.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2716,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-sustainability-material-swap",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Sustainability material swap",
+      "description": "Recycled plastic without brittle feel.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11330,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-hardware-developer-hardware-loaner-tracking",
+      "categories": [
+        "hardware"
+      ],
+      "title": "Developer hardware loaner tracking",
+      "description": "Serials return or auto-charge.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 41420,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-climate-community-solar-waitlist-crm",
+      "categories": [
+        "climate"
+      ],
+      "title": "Community solar waitlist CRM",
+      "description": "Subscriber pipeline with SMS nudges.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 553,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-battery-warranty-claims-workflow",
+      "categories": [
+        "climate"
+      ],
+      "title": "Battery warranty claims workflow",
+      "description": "RMA without angry homeowners.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2548,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-grid-curtailment-notification-api",
+      "categories": [
+        "climate"
+      ],
+      "title": "Grid curtailment notification API",
+      "description": "Alert assets when asked to stop.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10670,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-carbon-mrv-field-audit",
+      "categories": [
+        "climate"
+      ],
+      "title": "Carbon MRV field audit",
+      "description": "Verify sequestration on-site.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 39140,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-green-tariff-marketing-landing",
+      "categories": [
+        "climate"
+      ],
+      "title": "Green tariff marketing landing",
+      "description": "Utility partnership co-brand.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 708,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-climate-ev-charger-ocpp-compliance",
+      "categories": [
+        "climate"
+      ],
+      "title": "EV charger OCPP compliance",
+      "description": "Interoperability certification pass.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2380,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-scope-1-fleet-telematics-rollout",
+      "categories": [
+        "climate"
+      ],
+      "title": "Scope 1 fleet telematics rollout",
+      "description": "Track your own vans.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10010,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-vpp-enrollment-customer-ux",
+      "categories": [
+        "climate"
+      ],
+      "title": "VPP enrollment customer UX",
+      "description": "Opt-in to sell power back.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 36860,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-climate-wind-resource-assessment-lease",
+      "categories": [
+        "climate"
+      ],
+      "title": "Wind resource assessment lease",
+      "description": "Met towers on candidate land.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 670,
+      "revenue": [
+        360,
+        4284
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-climate-rec-arbitrage-model-update",
+      "categories": [
+        "climate"
+      ],
+      "title": "REC arbitrage model update",
+      "description": "Buy low retire high legally.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3052,
+      "revenue": [
+        2156,
+        20240
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-building-electrification-rebate-filing",
+      "categories": [
+        "climate"
+      ],
+      "title": "Building electrification rebate filing",
+      "description": "State forms automated.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 9350,
+      "revenue": [
+        23320,
+        140650
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-hydrogen-pilot-safety-review",
+      "categories": [
+        "climate"
+      ],
+      "title": "Hydrogen pilot safety review",
+      "description": "Permits before the photo op.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 34580,
+      "revenue": [
+        108300,
+        530400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-corporate-ppa-rfp-response",
+      "categories": [
+        "climate"
+      ],
+      "title": "Corporate PPA RFP response",
+      "description": "Bid into buyer auction.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 631,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-climate-solar-loan-underwriting-model",
+      "categories": [
+        "climate"
+      ],
+      "title": "Solar loan underwriting model",
+      "description": "FICO + sun score combined.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2884,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-wildfire-shutoff-comms-plan",
+      "categories": [
+        "climate"
+      ],
+      "title": "Wildfire shutoff comms plan",
+      "description": "Push alerts before blackouts.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11990,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-geothermal-desk-study",
+      "categories": [
+        "climate"
+      ],
+      "title": "Geothermal desk study",
+      "description": "Heat maps for drill/no-drill.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 32300,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-carbon-registry-api-redundancy",
+      "categories": [
+        "climate"
+      ],
+      "title": "Carbon registry API redundancy",
+      "description": "Failover when registry is down.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 592,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-climate-energy-audit-sales-door-knock",
+      "categories": [
+        "climate"
+      ],
+      "title": "Energy audit sales door-knock",
+      "description": "Old-school leads for retrofits.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2716,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "cat-climate-offshore-wind-stakeholder-forum",
+      "categories": [
+        "climate"
+      ],
+      "title": "Offshore wind stakeholder forum",
+      "description": "Fishers, NGOs, and slides.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11330,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-climate-climate-risk-gis-layer-for-insurers",
+      "categories": [
+        "climate"
+      ],
+      "title": "Climate risk GIS layer for insurers",
+      "description": "Sell data to underwriters.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 41420,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-gaming-media-battle-pass-balance-patch",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Battle pass balance patch",
+      "description": "XP curve that feels grindy-not-brutal.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 553,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-creator-code-rev-share-update",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Creator code rev share update",
+      "description": "Streamers promote with tracking.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2548,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-gaming-media-console-cert-day-submission",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Console cert day submission",
+      "description": "Lotcheck tickets closed.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10670,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-seasonal-narrative-comic-drop",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Seasonal narrative comic drop",
+      "description": "Transmedia lore on the web.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 39140,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-gaming-media-ranked-mode-smurf-detection",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Ranked mode smurf detection",
+      "description": "Alt accounts flagged faster.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 708,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-in-game-economy-sink-design",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "In-game economy sink design",
+      "description": "Gold leaves the system somewhere.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2380,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-speedrun-category-rules-page",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Speedrun category rules page",
+      "description": "Community-approved definitions.",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 10010,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "cat-gaming-media-voice-chat-toxicity-mute-defaults",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Voice chat toxicity mute defaults",
+      "description": "Safer defaults for minors.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 36860,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-platform-specific-control-remap",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Platform-specific control remap",
+      "description": "Steam Deck layout polished.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 670,
+      "revenue": [
+        360,
+        4284
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-live-event-server-shard-plan",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Live event server shard plan",
+      "description": "Capacity for one-night concerts.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 3052,
+      "revenue": [
+        2156,
+        20240
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-cosmetic-collab-legal-clearance",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Cosmetic collab legal clearance",
+      "description": "IP partner approves skins.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 9350,
+      "revenue": [
+        23320,
+        140650
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-gaming-media-patch-day-rollback-script",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Patch day rollback script",
+      "description": "Revert bad build in minutes.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 34580,
+      "revenue": [
+        108300,
+        530400
+      ],
+      "product": 1,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-esports-sponsorship-deck",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Esports sponsorship deck",
+      "description": "Logo placement packages priced.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 631,
+      "revenue": [
+        360,
+        3864
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-gaming-media-player-support-macro-refresh",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Player support macro refresh",
+      "description": "Refund policies consistent.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2884,
+      "revenue": [
+        2156,
+        21340
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-anti-wishlist-bombing-monitoring",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Anti-wishlist bombing monitoring",
+      "description": "Steam charts stay honest.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11990,
+      "revenue": [
+        23320,
+        147900
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-mod-marketplace-revenue-split",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Mod marketplace revenue split",
+      "description": "Creators paid on downloads.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 32300,
+      "revenue": [
+        108300,
+        478400
+      ],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "cat-gaming-media-tutorial-skip-analytics",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Tutorial skip analytics",
+      "description": "Fix where pros bounce.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage",
+        "office"
+      ],
+      "tierMin": 0,
+      "tierMax": 2,
+      "cost": 592,
+      "revenue": [
+        360,
+        4074
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-regional-pricing-parity-review",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Regional pricing parity review",
+      "description": "Purchasing power adjustments.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "office",
+        "xc"
+      ],
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 2716,
+      "revenue": [
+        2156,
+        22440
+      ],
+      "product": 0,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-highlight-reel-ml-tags",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Highlight reel ML tags",
+      "description": "Auto-detect clutch moments.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc"
+      ],
+      "tierMin": 3,
+      "tierMax": 5,
+      "cost": 11330,
+      "revenue": [
+        23320,
+        133400
+      ],
+      "product": 2,
+      "buzz": 0
+    },
+    {
+      "id": "cat-gaming-media-guild-war-matchmaking-v2",
+      "categories": [
+        "gaming-media"
+      ],
+      "title": "Guild war matchmaking v2",
+      "description": "Fair fights, shorter queues.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "post_xc",
+        "public"
+      ],
+      "tierMin": 5,
+      "tierMax": 7,
+      "cost": 41420,
+      "revenue": [
+        108300,
+        504400
+      ],
+      "product": 1,
+      "buzz": 0
     }
   ]
 }

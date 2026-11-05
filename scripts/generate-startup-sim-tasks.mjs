@@ -1,11 +1,12 @@
 /**
- * Rebuild tasks.json: core universal tasks + category-specific catalog (~400 tasks).
+ * Rebuild tasks.json: core universal tasks + category-specific catalog (~600 tasks).
  * Run: node scripts/generate-startup-sim-tasks.mjs
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SEEDS, packCategoryTasks } from './startup-sim-task-seeds.mjs';
+import { EXTRA_ROWS } from './startup-sim-category-extra.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const path = join(root, 'work/startup-sim/data/tasks.json');
@@ -360,10 +361,15 @@ const universalScale = [
   { title: 'Analyst day dry run', description: 'Public company metrics rehearsal.', types: ['marketing'], stages: ['public'], tierMin: 7, tierMax: 7, cost: 48000, revenue: [95000, 480000], product: 0, buzz: 2 }
 ].map((t, i) => ({ id: `uni-scale-${i + 1}-${t.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`, ...t }));
 
+const extraCategoryTasks = Object.entries(EXTRA_ROWS).flatMap(([categoryId, rows]) =>
+  categoryBlock(categoryId, categoryId, rows)
+);
+
 const categoryTasks = [
   ...(SEEDS['b2b-saas'] ?? []),
   ...(SEEDS.healthtech ?? []),
-  ...Object.values(BULK).flat()
+  ...Object.values(BULK).flat(),
+  ...extraCategoryTasks
 ];
 
 const ids = new Set();
