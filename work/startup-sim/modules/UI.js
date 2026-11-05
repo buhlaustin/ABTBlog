@@ -45,7 +45,9 @@ import {
   launchLifecycleActive,
   launchPhaseLabel,
   PRE_LAUNCH_BUZZ_REQUIRED,
-  canSchedulePublicLaunch
+  PRE_LAUNCH_PRODUCT_REQUIRED,
+  canSchedulePublicLaunch,
+  renderPreLaunchProgressBlock
 } from './LaunchLifecycle.js';
 
 const screens = {
@@ -197,6 +199,19 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
+function launchTaskTypeTag(def) {
+  const types = def.types ?? [];
+  const parts = [];
+  if (types.includes('product') || (def.product ?? 0) > 0) {
+    parts.push(`+${def.product ?? 0} product`);
+  }
+  if (types.includes('marketing') || (def.buzz ?? 0) > 0) {
+    parts.push(`+${def.buzz ?? 0} buzz`);
+  }
+  if (!parts.length) return '';
+  return ` <span class="task-tag">${parts.join(' · ')}</span>`;
+}
+
 export function renderDeskPanel(state) {
   const desk = document.getElementById('panel-desk');
   if (!desk) return;
@@ -221,8 +236,10 @@ export function renderDeskPanel(state) {
           const sel = offer.selected ? 'task-offer selected' : 'task-offer';
           const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
           const launchTag = def.scheduleLaunch
-            ? ` <span class="task-tag">${canSchedulePublicLaunch(state) ? 'Launch gate' : `${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz`}</span>`
-            : '';
+            ? ` <span class="task-tag">${canSchedulePublicLaunch(state) ? 'Launch gate' : `${PRE_LAUNCH_BUZZ_REQUIRED} buzz · ${PRE_LAUNCH_PRODUCT_REQUIRED} prod`}</span>`
+            : def.launchPhase === 'pre_launch'
+              ? launchTaskTypeTag(def)
+              : '';
           return `<article class="${sel}">
             <h3>${escapeHtml(def.title)}${sig}${launchTag}</h3>
             <p>${escapeHtml(def.description)}</p>
@@ -247,10 +264,12 @@ export function renderDeskPanel(state) {
         def.rivalPressure && def.rivalPressure < 0
           ? ` · rival heat ${def.rivalPressure}`
           : '';
+      const preHint =
+        def.launchPhase === 'pre_launch' ? ` · ${launchTaskTypeTag(def).replace(/<[^>]+>/g, '').trim()}` : '';
       return `<article class="${doneClass}">
         <h3>${escapeHtml(def.title)}${sig}</h3>
         <p>${escapeHtml(def.description)}</p>
-        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${rival}</p>
+        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${rival}${preHint}</p>
         ${btn}
       </article>`;
     })
@@ -262,15 +281,15 @@ export function renderDeskPanel(state) {
   const monthSpend = state.calendar.monthSpend ?? 0;
 
   const tutorial = renderTutorialBanner(activeTutorialStep(state));
-  const buzzNow = state.product?.buzz ?? 0;
-  const prodLv = state.product?.level ?? 0;
   const launchBanner = launchLifecycleActive(state)
-    ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — ship product tasks for level &amp; pre-sell revenue; marketing for buzz (need <strong>${PRE_LAUNCH_BUZZ_REQUIRED}+</strong> to schedule launch — now <strong>${buzzNow}</strong>). Product level <strong>${prodLv}</strong>. Graduate after post-launch playbook or leaving the garage.</p>`
+    ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — engineering raises product level; marketing raises buzz. Schedule launch at <strong>${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz</strong> and <strong>product ${PRE_LAUNCH_PRODUCT_REQUIRED}+</strong>. Pre-sell revenue is normal desk cash. Graduate after post-launch or leaving the garage.</p>`
     : '';
+  const preLaunchProgress = renderPreLaunchProgressBlock(state);
 
   desk.innerHTML = `
     ${tutorial}
     ${launchBanner}
+    ${preLaunchProgress}
     ${
       catalogError
         ? '<p class="desk-feedback error" role="alert">Tasks did not load — reload the page. You cannot close the month until the desk is full.</p>'

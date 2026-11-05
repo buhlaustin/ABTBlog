@@ -136,8 +136,13 @@ if (!preLaunchOnly || !(garageOffers?.length >= 4)) {
   console.log('OK: garage pre-launch task pool');
 }
 
-const { canSchedulePublicLaunch, PRE_LAUNCH_BUZZ_REQUIRED, onScheduleLaunchTaskCompleted } =
-  await import(`file://${join(sim, 'modules/LaunchLifecycle.js')}`);
+const {
+  canSchedulePublicLaunch,
+  PRE_LAUNCH_BUZZ_REQUIRED,
+  PRE_LAUNCH_PRODUCT_REQUIRED,
+  onScheduleLaunchTaskCompleted,
+  recordPreLaunchTaskOutcome
+} = await import(`file://${join(sim, 'modules/LaunchLifecycle.js')}`);
 const garagePool = getTaskPoolSize(state);
 const offerNeed = getMonthlyTaskOfferCount(STAGES.GARAGE);
 if (garagePool < offerNeed) {
@@ -155,11 +160,22 @@ if (blocked.ok) {
   failed = true;
 }
 state.product.buzz = PRE_LAUNCH_BUZZ_REQUIRED;
+state.product.level = PRE_LAUNCH_PRODUCT_REQUIRED - 1;
+if (canSchedulePublicLaunch(state)) {
+  console.error('FAIL: schedule should require product level');
+  failed = true;
+}
+state.product.level = PRE_LAUNCH_PRODUCT_REQUIRED;
 if (!canSchedulePublicLaunch(state)) {
-  console.error('FAIL: schedule should unlock at 10 buzz');
+  console.error('FAIL: schedule should unlock at buzz + product gates');
+  failed = true;
+}
+const wl = recordPreLaunchTaskOutcome(state, { launchPhase: 'pre_launch', types: ['marketing'], buzz: 2 }, 500);
+if (!state.launch.waitlistSignups || !wl.length) {
+  console.error('FAIL: pre-launch waitlist tracking');
   failed = true;
 } else if (!failed) {
-  console.log(`OK: pre-launch buzz gate (${PRE_LAUNCH_BUZZ_REQUIRED}+ to schedule)`);
+  console.log(`OK: pre-launch gates (${PRE_LAUNCH_BUZZ_REQUIRED} buzz, ${PRE_LAUNCH_PRODUCT_REQUIRED} product)`);
 }
 
 const { totalHeadcountCap } = await import(`file://${join(sim, 'modules/Offices.js')}`);

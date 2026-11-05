@@ -14,6 +14,7 @@ import { resetGrowthCampaignsMonth } from './GrowthCampaigns.js';
 import { resetProductActionsMonth } from './ProductActions.js';
 import {
   tickLaunchAtMonthStart,
+  tickPreLaunchAtMonthStart,
   settleLaunchAtMonthEnd,
   graduateLaunchIfLeftGarage
 } from './LaunchLifecycle.js';
@@ -82,6 +83,9 @@ export function startMonth(state) {
     appendLog(state, line);
   }
   for (const line of tickLaunchAtMonthStart(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickPreLaunchAtMonthStart(state)) {
     appendLog(state, line);
   }
   for (const line of tickAcquisitionsAtMonthStart(state)) {

@@ -32,7 +32,9 @@ import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js
 import {
   onScheduleLaunchTaskCompleted,
   canSchedulePublicLaunch,
-  PRE_LAUNCH_BUZZ_REQUIRED
+  PRE_LAUNCH_BUZZ_REQUIRED,
+  PRE_LAUNCH_PRODUCT_REQUIRED,
+  recordPreLaunchTaskOutcome
 } from './modules/LaunchLifecycle.js';
 import { formatMoney } from './modules/GameState.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './modules/Progression.js';
@@ -277,7 +279,7 @@ function handleCompleteTask(instanceId) {
 
   if (def.scheduleLaunch && !canSchedulePublicLaunch(sessionState)) {
     showDeskFeedback(
-      `Reach ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz with pre-launch marketing before scheduling (now ${sessionState.product?.buzz ?? 0}).`,
+      `Need ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz (now ${sessionState.product?.buzz ?? 0}) and product ${PRE_LAUNCH_PRODUCT_REQUIRED}+ (now ${sessionState.product?.level ?? 0}) before scheduling.`,
       true
     );
     return;
@@ -300,6 +302,9 @@ function handleCompleteTask(instanceId) {
     sessionState,
     `“${def.title}” — +${formatMoney(revenue)} revenue, -${formatMoney(cost)} spend.`
   );
+  for (const line of recordPreLaunchTaskOutcome(sessionState, def, revenue)) {
+    appendLog(sessionState, line);
+  }
   if (def.scheduleLaunch) {
     const sched = onScheduleLaunchTaskCompleted(sessionState);
     if (!sched.ok) {

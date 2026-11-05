@@ -1,6 +1,7 @@
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { isPublicCompany } from './IPO.js';
+import { launchLifecycleActive } from './LaunchLifecycle.js';
 import { applyScenarioEffects, describeScenarioEffects } from './ScenarioEffects.js';
 import bundled from '../data/decision-events.json' with { type: 'json' };
 
@@ -45,6 +46,9 @@ export async function rollDeskDecision(state) {
   const eligible = events.filter((e) => {
     if ((e.minTier ?? 0) > tier) return false;
     if (e.requiresPublic && !isPublicCompany(state)) return false;
+    if (e.requiresPreLaunch && !(launchLifecycleActive(state) && state.launch?.phase === 'pre_launch')) {
+      return false;
+    }
     return true;
   });
   const pool = eligible.length ? eligible : events;

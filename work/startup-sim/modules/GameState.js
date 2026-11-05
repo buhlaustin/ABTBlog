@@ -29,7 +29,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 21;
+export const SAVE_VERSION = 22;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -213,6 +213,10 @@ export function normalizeSave(raw) {
       state.meta.runSeed = Math.floor(Math.random() * 2_147_483_647);
     }
     if (!state.launch) state.launch = createInitialLaunchState();
+    if (state.launch.waitlistSignups == null) state.launch.waitlistSignups = 0;
+    if (state.launch.preSellBooked == null) state.launch.preSellBooked = 0;
+    if (state.launch.marketingTasksDone == null) state.launch.marketingTasksDone = 0;
+    if (state.launch.productTasksDone == null) state.launch.productTasksDone = 0;
     if (!state.board) state.board = createInitialBoard();
     if (state.board.governanceStreak === undefined) state.board.governanceStreak = 0;
     if (state.publicMarket && state.publicMarket.guidanceBeatStreak === undefined) {

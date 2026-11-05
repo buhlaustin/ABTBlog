@@ -298,6 +298,32 @@
       ]
     },
     {
+      "id": "prelaunch-beta-leak",
+      "title": "Beta build leaked",
+      "description": "A tester posted screenshots. Press DMs are open. Stay dark or ride the spike?",
+      "weight": 2,
+      "minTier": 0,
+      "requiresPreLaunch": true,
+      "choices": [
+        {
+          "label": "Lean in — open waitlist wide",
+          "effects": {
+            "buzz": 4,
+            "sentiment": -1,
+            "instantRevenue": 1200
+          }
+        },
+        {
+          "label": "Lawyer letter + stay dark",
+          "effects": {
+            "cash": -800,
+            "buzz": -2,
+            "product": 1
+          }
+        }
+      ]
+    },
+    {
       "id": "public-index-rebalance",
       "title": "Index rebalance window",
       "description": "FTEQ-100 inclusion means passive funds must buy — or you could sell secondary into the flow.",

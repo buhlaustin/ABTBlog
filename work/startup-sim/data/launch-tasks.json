@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "tasks": [
     {
       "id": "launch-schedule-public",
@@ -7,10 +7,17 @@
       "scheduleLaunch": true,
       "title": "Schedule public launch",
       "description": "Pick a date, warn the servers, and tell your mom — goes live next month. Requires 10+ buzz from pre-launch marketing.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 200,
-      "revenue": [0, 400],
+      "revenue": [
+        0,
+        400
+      ],
       "product": 1,
       "buzz": 2
     },
@@ -19,10 +26,17 @@
       "launchPhase": "pre_launch",
       "title": "Waitlist landing page",
       "description": "Hero copy, email capture, and pre-sell deposits from people who swear they will convert.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 280,
-      "revenue": [120, 850],
+      "revenue": [
+        120,
+        850
+      ],
       "product": 0,
       "buzz": 2
     },
@@ -31,10 +45,17 @@
       "launchPhase": "pre_launch",
       "title": "Closed alpha with 20 users",
       "description": "Hand-picked testers who promise feedback; a few pay early for lifetime access.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 350,
-      "revenue": [150, 720],
+      "revenue": [
+        150,
+        720
+      ],
       "product": 2,
       "buzz": 1
     },
@@ -43,10 +64,17 @@
       "launchPhase": "pre_launch",
       "title": "Record launch demo video",
       "description": "Ninety seconds, fourteen takes, one usable cut.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 420,
-      "revenue": [50, 800],
+      "revenue": [
+        50,
+        800
+      ],
       "product": 1,
       "buzz": 2
     },
@@ -55,10 +83,17 @@
       "launchPhase": "pre_launch",
       "title": "Draft pricing page",
       "description": "Three tiers, one of them 'Contact sales' as a cop-out.",
-      "types": ["research"],
-      "stages": ["garage"],
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 180,
-      "revenue": [100, 900],
+      "revenue": [
+        100,
+        900
+      ],
       "product": 0,
       "buzz": 0
     },
@@ -67,10 +102,17 @@
       "launchPhase": "pre_launch",
       "title": "Write support macros",
       "description": "Canned replies for the questions you already get in DMs.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 120,
-      "revenue": [0, 350],
+      "revenue": [
+        0,
+        350
+      ],
       "product": 1,
       "buzz": 0
     },
@@ -79,10 +121,17 @@
       "launchPhase": "pre_launch",
       "title": "Terms of service (template)",
       "description": "Copy-paste legalese — not legal advice, still better than nothing.",
-      "types": ["research"],
-      "stages": ["garage"],
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 400,
-      "revenue": [0, 200],
+      "revenue": [
+        0,
+        200
+      ],
       "product": 0,
       "buzz": 0
     },
@@ -91,10 +140,17 @@
       "launchPhase": "pre_launch",
       "title": "Founder launch thread draft",
       "description": "Story arc, humble brag, and a link you will post twice.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 90,
-      "revenue": [40, 600],
+      "revenue": [
+        40,
+        600
+      ],
       "product": 0,
       "buzz": 3
     },
@@ -103,10 +159,17 @@
       "launchPhase": "pre_launch",
       "title": "Load test staging",
       "description": "Synthetic traffic so launch day is only mildly terrifying.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 550,
-      "revenue": [0, 450],
+      "revenue": [
+        0,
+        450
+      ],
       "product": 2,
       "buzz": 0
     },
@@ -115,10 +178,17 @@
       "launchPhase": "pre_launch",
       "title": "Ship MVP core loop",
       "description": "One painful workflow end-to-end — enough to charge design partners.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 420,
-      "revenue": [200, 1100],
+      "revenue": [
+        200,
+        1100
+      ],
       "product": 3,
       "buzz": 0
     },
@@ -127,10 +197,17 @@
       "launchPhase": "pre_launch",
       "title": "Auth + billing stub",
       "description": "Login works; Stripe test mode collects real pre-sell checks.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 380,
-      "revenue": [250, 1400],
+      "revenue": [
+        250,
+        1400
+      ],
       "product": 2,
       "buzz": 0
     },
@@ -139,10 +216,17 @@
       "launchPhase": "pre_launch",
       "title": "Onboarding flow v1",
       "description": "Empty states, tooltips, and the one path that must not break.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 310,
-      "revenue": [100, 900],
+      "revenue": [
+        100,
+        900
+      ],
       "product": 2,
       "buzz": 1
     },
@@ -151,10 +235,17 @@
       "launchPhase": "pre_launch",
       "title": "Analytics instrumentation",
       "description": "Event names you will rename later; funnels you will trust for pre-sell proof.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 260,
-      "revenue": [80, 650],
+      "revenue": [
+        80,
+        650
+      ],
       "product": 1,
       "buzz": 0
     },
@@ -163,10 +254,17 @@
       "launchPhase": "pre_launch",
       "title": "Design-partner API",
       "description": "Thin REST layer so two logos can integrate before launch day.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 480,
-      "revenue": [400, 1800],
+      "revenue": [
+        400,
+        1800
+      ],
       "product": 2,
       "buzz": 1
     },
@@ -175,10 +273,17 @@
       "launchPhase": "pre_launch",
       "title": "Mobile-responsive pass",
       "description": "Fix the layout before screenshots leak on social.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 340,
-      "revenue": [120, 780],
+      "revenue": [
+        120,
+        780
+      ],
       "product": 2,
       "buzz": 0
     },
@@ -187,10 +292,17 @@
       "launchPhase": "pre_launch",
       "title": "Beta bug bash weekend",
       "description": "Friends break prod; you fix the top ten and invoice early believers.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 290,
-      "revenue": [180, 950],
+      "revenue": [
+        180,
+        950
+      ],
       "product": 3,
       "buzz": 1
     },
@@ -199,10 +311,17 @@
       "launchPhase": "pre_launch",
       "title": "Feature flags + kill switches",
       "description": "Ship dark; flip when pre-sell cohort is ready.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 220,
-      "revenue": [60, 520],
+      "revenue": [
+        60,
+        520
+      ],
       "product": 1,
       "buzz": 0
     },
@@ -211,10 +330,17 @@
       "launchPhase": "pre_launch",
       "title": "Design system components",
       "description": "Buttons, modals, and a table that does not shame you in demos.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 360,
-      "revenue": [90, 680],
+      "revenue": [
+        90,
+        680
+      ],
       "product": 2,
       "buzz": 0
     },
@@ -223,10 +349,17 @@
       "launchPhase": "pre_launch",
       "title": "Performance profiling sprint",
       "description": "Find the N+1 before paying users do.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 400,
-      "revenue": [100, 720],
+      "revenue": [
+        100,
+        720
+      ],
       "product": 2,
       "buzz": 0
     },
@@ -235,10 +368,17 @@
       "launchPhase": "pre_launch",
       "title": "Early adopter DM outreach",
       "description": "Personal invites; a few reply with pre-sell commitments.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 140,
-      "revenue": [200, 1200],
+      "revenue": [
+        200,
+        1200
+      ],
       "product": 0,
       "buzz": 2
     },
@@ -247,10 +387,17 @@
       "launchPhase": "pre_launch",
       "title": "Newsletter teaser series",
       "description": "Three emails building hype; paid tier pre-orders at the bottom.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 210,
-      "revenue": [150, 980],
+      "revenue": [
+        150,
+        980
+      ],
       "product": 0,
       "buzz": 3
     },
@@ -259,10 +406,17 @@
       "launchPhase": "pre_launch",
       "title": "Seed Discord community",
       "description": "Channels, rules, and founders answering questions at midnight.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 180,
-      "revenue": [80, 640],
+      "revenue": [
+        80,
+        640
+      ],
       "product": 0,
       "buzz": 3
     },
@@ -271,10 +425,17 @@
       "launchPhase": "pre_launch",
       "title": "Podcast guest pitches",
       "description": "Ten pitches, one yes, pre-sell link in show notes.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 320,
-      "revenue": [250, 1500],
+      "revenue": [
+        250,
+        1500
+      ],
       "product": 0,
       "buzz": 2
     },
@@ -283,10 +444,17 @@
       "launchPhase": "pre_launch",
       "title": "Lifetime deal pre-sell page",
       "description": "AppSumo energy without the platform fees — yet.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 450,
-      "revenue": [500, 2200],
+      "revenue": [
+        500,
+        2200
+      ],
       "product": 0,
       "buzz": 2
     },
@@ -295,10 +463,17 @@
       "launchPhase": "pre_launch",
       "title": "Social proof wall",
       "description": "Alpha quotes, logo blurbs, and pre-sell counters that tick up.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 240,
-      "revenue": [180, 1100],
+      "revenue": [
+        180,
+        1100
+      ],
       "product": 0,
       "buzz": 2
     },
@@ -307,10 +482,17 @@
       "launchPhase": "pre_launch",
       "title": "SEO baseline content",
       "description": "Comparison posts that rank and funnel pre-sell signups.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 380,
-      "revenue": [220, 1300],
+      "revenue": [
+        220,
+        1300
+      ],
       "product": 0,
       "buzz": 2
     },
@@ -319,10 +501,17 @@
       "launchPhase": "pre_launch",
       "title": "Micro-influencer pre-launch posts",
       "description": "Small accounts, honest captions, affiliate pre-sell codes.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 520,
-      "revenue": [350, 1900],
+      "revenue": [
+        350,
+        1900
+      ],
       "product": 0,
       "buzz": 3
     },
@@ -331,10 +520,17 @@
       "launchPhase": "pre_launch",
       "title": "Product Hunt ship page prep",
       "description": "Gallery, maker comment draft, and hunter DMs warming up.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 300,
-      "revenue": [120, 880],
+      "revenue": [
+        120,
+        880
+      ],
       "product": 0,
       "buzz": 2
     },
@@ -343,10 +539,17 @@
       "launchPhase": "pre_launch",
       "title": "Founder podcast mini-tour",
       "description": "Three indie shows; each host shares your pre-sell link.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 410,
-      "revenue": [280, 1600],
+      "revenue": [
+        280,
+        1600
+      ],
       "product": 0,
       "buzz": 3
     },
@@ -355,11 +558,350 @@
       "launchPhase": "pre_launch",
       "title": "Landing page A/B test",
       "description": "Headline variants until pre-sell conversion stops embarrassing you.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 350,
-      "revenue": [200, 1250],
+      "revenue": [
+        200,
+        1250
+      ],
       "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "launch-pre-cat-gaming-media",
+      "launchPhase": "pre_launch",
+      "title": "Creator playtest stream",
+      "description": "Early build on stream; pre-sell founder packs in chat.",
+      "types": [
+        "marketing",
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "gaming-media"
+      ],
+      "cost": 360,
+      "revenue": [
+        250,
+        1700
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "launch-pre-cat-climate",
+      "launchPhase": "pre_launch",
+      "title": "Site pilot pre-sell",
+      "description": "One anchor site and grant-friendly pre-sell milestones.",
+      "types": [
+        "product",
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "climate"
+      ],
+      "cost": 360,
+      "revenue": [
+        520,
+        2800
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "launch-pre-cat-edtech",
+      "launchPhase": "pre_launch",
+      "title": "District champion intro",
+      "description": "Teacher advocates and a rostering demo that unlocks pre-sell POs.",
+      "types": [
+        "marketing",
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "edtech"
+      ],
+      "cost": 360,
+      "revenue": [
+        380,
+        2200
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "launch-pre-cat-healthtech",
+      "launchPhase": "pre_launch",
+      "title": "Clinic pilot charter",
+      "description": "HIPAA checklist and one clinic pre-sell for the pilot cohort.",
+      "types": [
+        "product",
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "healthtech"
+      ],
+      "cost": 360,
+      "revenue": [
+        450,
+        2600
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "launch-pre-cat-hardware",
+      "launchPhase": "pre_launch",
+      "title": "Prototype DVT batch",
+      "description": "Ten devices to beta houses; pre-orders fund the next spin.",
+      "types": [
+        "marketing",
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "hardware"
+      ],
+      "cost": 360,
+      "revenue": [
+        600,
+        3200
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "launch-pre-cat-ai-tools",
+      "launchPhase": "pre_launch",
+      "title": "Eval harness + copilot teaser",
+      "description": "Ship evals and a gated copilot waitlist with prepaid credits.",
+      "types": [
+        "product",
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "ai-tools"
+      ],
+      "cost": 360,
+      "revenue": [
+        320,
+        2000
+      ],
+      "product": 3,
+      "buzz": 2
+    },
+    {
+      "id": "launch-pre-cat-fintech",
+      "launchPhase": "pre_launch",
+      "title": "Compliance sandbox demo",
+      "description": "Bank partner office hours; pre-sell treasury pilot slots.",
+      "types": [
+        "product",
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "fintech"
+      ],
+      "cost": 360,
+      "revenue": [
+        500,
+        2400
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "launch-pre-cat-delivery",
+      "launchPhase": "pre_launch",
+      "title": "Zone launch map + driver waitlist",
+      "description": "Draw the first delivery zone; drivers pre-register for shift slots.",
+      "types": [
+        "marketing",
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "delivery"
+      ],
+      "cost": 360,
+      "revenue": [
+        280,
+        1600
+      ],
+      "product": 1,
+      "buzz": 2
+    },
+    {
+      "id": "launch-pre-cat-marketplace",
+      "launchPhase": "pre_launch",
+      "title": "Supply-side pre-launch",
+      "description": "Onboard providers before demand shows up — pre-sell listing fees.",
+      "types": [
+        "marketing",
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "marketplace"
+      ],
+      "cost": 360,
+      "revenue": [
+        350,
+        1900
+      ],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "launch-pre-cat-consumer-social",
+      "launchPhase": "pre_launch",
+      "title": "Creator seed cohort",
+      "description": "Twenty micro-creators post early access; pre-sell tips flow through.",
+      "types": [
+        "marketing",
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "consumer-social"
+      ],
+      "cost": 360,
+      "revenue": [
+        180,
+        1400
+      ],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "launch-pre-cat-b2b-saas",
+      "launchPhase": "pre_launch",
+      "title": "Pilot LOI with design partner",
+      "description": "SOC2-lite deck and a signed letter of intent with pre-sell deposit.",
+      "types": [
+        "product",
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "categories": [
+        "b2b-saas"
+      ],
+      "cost": 360,
+      "revenue": [
+        400,
+        2100
+      ],
+      "product": 2,
+      "buzz": 1
+    },
+    {
+      "id": "launch-pre-refund-policy",
+      "launchPhase": "pre_launch",
+      "title": "Pre-sell refund policy",
+      "description": "Trust-building legalese so early buyers feel safe pre-sell paying.",
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "cost": 200,
+      "revenue": [
+        150,
+        950
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "launch-pre-competitive-teardown",
+      "launchPhase": "pre_launch",
+      "title": "Competitive teardown doc",
+      "description": "Honest feature matrix that still ends with your pre-sell CTA.",
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "cost": 240,
+      "revenue": [
+        120,
+        880
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "launch-pre-gtm-one-pager",
+      "launchPhase": "pre_launch",
+      "title": "GTM one-pager",
+      "description": "ICP, wedge, and pre-sell offer on a single PDF sales can forward.",
+      "types": [
+        "research",
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "cost": 160,
+      "revenue": [
+        90,
+        720
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "launch-pre-signature-design-partner",
+      "signature": true,
+      "launchPhase": "pre_launch",
+      "title": "Signature design-partner week",
+      "description": "One marquee customer, one shippable milestone, one pre-sell wire.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "garage"
+      ],
+      "cost": 520,
+      "revenue": [
+        650,
+        3200
+      ],
+      "product": 3,
       "buzz": 2
     },
     {
@@ -367,10 +909,17 @@
       "launchPhase": "launch",
       "title": "Product Hunt launch",
       "description": "Hunter pinged, gif ready, comments refreshed obsessively.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 600,
-      "revenue": [1200, 5500],
+      "revenue": [
+        1200,
+        5500
+      ],
       "product": 0,
       "buzz": 5,
       "rivalPressure": -1
@@ -380,10 +929,17 @@
       "launchPhase": "launch",
       "title": "Show HN post",
       "description": "Post at the sacred hour; brace for architecture feedback.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 150,
-      "revenue": [800, 4200],
+      "revenue": [
+        800,
+        4200
+      ],
       "product": 0,
       "buzz": 4,
       "rivalPressure": -1
@@ -393,10 +949,17 @@
       "launchPhase": "launch",
       "title": "Press & newsletter blast",
       "description": "Forty BCCs to journalists who never reply.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 900,
-      "revenue": [500, 3200],
+      "revenue": [
+        500,
+        3200
+      ],
       "product": 0,
       "buzz": 3
     },
@@ -405,10 +968,17 @@
       "launchPhase": "launch",
       "title": "Live launch livestream",
       "description": "Demo gods willing, you ship on camera.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 1100,
-      "revenue": [700, 3800],
+      "revenue": [
+        700,
+        3800
+      ],
       "product": 1,
       "buzz": 4
     },
@@ -417,10 +987,17 @@
       "launchPhase": "launch",
       "title": "War-room onboarding shifts",
       "description": "Founders answer tickets until their wrists hurt.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 400,
-      "revenue": [900, 4500],
+      "revenue": [
+        900,
+        4500
+      ],
       "product": 2,
       "buzz": 1
     },
@@ -429,10 +1006,17 @@
       "launchPhase": "launch",
       "title": "Status page & incident runbook",
       "description": "Green checkmarks preferred; yellow acceptable; red tweeted.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 700,
-      "revenue": [200, 1800],
+      "revenue": [
+        200,
+        1800
+      ],
       "product": 2,
       "buzz": 0
     },
@@ -441,10 +1025,17 @@
       "launchPhase": "post_launch",
       "title": "Week-one metrics retro",
       "description": "Count signups, churn, and how many times the site fell over.",
-      "types": ["research"],
-      "stages": ["garage"],
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 220,
-      "revenue": [300, 2200],
+      "revenue": [
+        300,
+        2200
+      ],
       "product": 1,
       "buzz": 0
     },
@@ -453,10 +1044,17 @@
       "launchPhase": "post_launch",
       "title": "Launch bugfix sprint",
       "description": "The backlog you promised you would not ship to prod.",
-      "types": ["product"],
-      "stages": ["garage"],
+      "types": [
+        "product"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 650,
-      "revenue": [400, 2800],
+      "revenue": [
+        400,
+        2800
+      ],
       "product": 2,
       "buzz": 1
     },
@@ -465,10 +1063,17 @@
       "launchPhase": "post_launch",
       "title": "Thank-you email to day-one users",
       "description": "Genuine gratitude, subtle upsell, one typo you fix later.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 180,
-      "revenue": [500, 3200],
+      "revenue": [
+        500,
+        3200
+      ],
       "product": 0,
       "buzz": 2
     },
@@ -477,10 +1082,17 @@
       "launchPhase": "post_launch",
       "title": "First customer case study",
       "description": "One quote, one logo, one PDF sales will reuse forever.",
-      "types": ["sales"],
-      "stages": ["garage"],
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 480,
-      "revenue": [900, 4500],
+      "revenue": [
+        900,
+        4500
+      ],
       "product": 0,
       "buzz": 2,
       "rivalPressure": -1
@@ -490,10 +1102,17 @@
       "launchPhase": "post_launch",
       "title": "Post-launch pricing tweak",
       "description": "Move a decimal based on who actually converted.",
-      "types": ["research"],
-      "stages": ["garage"],
+      "types": [
+        "research"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 260,
-      "revenue": [600, 3600],
+      "revenue": [
+        600,
+        3600
+      ],
       "product": 0,
       "buzz": 0
     },
@@ -502,10 +1121,17 @@
       "launchPhase": "post_launch",
       "title": "Referral loop experiment",
       "description": "Give credits, hope virality is not imaginary.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 720,
-      "revenue": [800, 4200],
+      "revenue": [
+        800,
+        4200
+      ],
       "product": 1,
       "buzz": 3
     },
@@ -514,10 +1140,17 @@
       "launchPhase": "post_launch",
       "title": "Post-launch community AMA",
       "description": "Answer hard questions in public; dodge the roadmap ones.",
-      "types": ["marketing"],
-      "stages": ["garage"],
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "garage"
+      ],
       "cost": 320,
-      "revenue": [350, 2400],
+      "revenue": [
+        350,
+        2400
+      ],
       "product": 0,
       "buzz": 3
     }

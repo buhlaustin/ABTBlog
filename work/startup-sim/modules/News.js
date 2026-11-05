@@ -149,6 +149,18 @@ const OFFLINE_NEWS_TEMPLATES = [
     })
   },
   {
+    id: 'prelaunch-waitlist',
+    source: 'Startup Chirp',
+    when: (c) =>
+      Boolean(c.state.launch?.phase === 'pre_launch' || c.state.launch?.phase === 'scheduled') &&
+      (c.state.launch?.waitlistSignups ?? 0) > 0,
+    build: (c) => ({
+      headline: `${c.company} waitlist passes ${(c.state.launch?.waitlistSignups ?? 0).toLocaleString()} signups`,
+      dek: 'Pre-sell revenue quietly hits the bank account.',
+      body: `Founders claim ${c.narrative.category} momentum before launch day. Buzz sits at ${c.state.product?.buzz ?? 0} with product level ${c.state.product?.level ?? 0}. Rivals still loud; your pre-sell booked total is the quiet flex.`
+    })
+  },
+  {
     id: 'public-tease',
     source: 'IPO Watch (Parody)',
     when: (c) => Boolean(c.state.flags?.ipoFiled || c.state.publicMarket?.ticker),

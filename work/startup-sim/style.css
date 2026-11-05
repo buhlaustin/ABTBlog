@@ -755,6 +755,47 @@ h1 {
   margin-right: 0.25rem;
 }
 
+.prelaunch-progress {
+  margin: 0.75rem 0 1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(96, 165, 250, 0.06);
+}
+
+.prelaunch-progress-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.92rem;
+}
+
+.prelaunch-meter {
+  margin: 0.35rem 0;
+}
+
+.prelaunch-meter .stat-label {
+  display: block;
+  font-size: 0.78rem;
+  margin-bottom: 0.2rem;
+}
+
+.prelaunch-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.2);
+  overflow: hidden;
+}
+
+.prelaunch-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #fbbf24, #f97316);
+  transition: width 0.2s ease;
+}
+
+.prelaunch-fill.product {
+  background: linear-gradient(90deg, #34d399, #60a5fa);
+}
+
 .stock-tape {
   list-style: none;
   margin: 0.5rem 0 0.75rem;

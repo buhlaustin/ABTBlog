@@ -7,7 +7,7 @@ const STEPS = [
     id: 'welcome',
     stages: [STAGES.GARAGE],
     title: 'Welcome, founder',
-    body: 'Early game is pre-launch: product/engineering tasks raise product level and pre-sell revenue; marketing raises buzz. Hit 10+ buzz, then take Schedule public launch. Close month when desk work is done.'
+    body: 'Early game is pre-launch: product tasks raise level (need 4+); marketing raises buzz (need 10+). Track waitlist and pre-sell on the desk meters, then Schedule public launch. Close month when tasks are done.'
   },
   {
     id: 'people',
