@@ -1458,9 +1458,12 @@ if (!canBuyAllRemainingSideTasks(sideBulk, ['product', 'growth', 'brand', 'both'
   }
 }
 
-const { payCompanyWideBonus, totalEmployeeSalaryMassMonthly } = await import(
-  `file://${join(sim, 'modules/EmployeeBenefits.js')}`
-);
+const {
+  payCompanyWideBonus,
+  totalEmployeeSalaryMassMonthly,
+  EXTRA_PERKS,
+  runExtraEmployeePerk
+} = await import(`file://${join(sim, 'modules/EmployeeBenefits.js')}`);
 const { expandEmployeeOptionPool, applySeedCapTableSnapshot } = await import(
   `file://${join(sim, 'modules/CapTable.js')}`
 );
@@ -1485,6 +1488,20 @@ if (mass.total < 1) {
     failed = true;
   } else {
     console.log(`OK: company bonus (${bonus.pct}%, CEO ${formatMoney(bonus.ceoShare)})`);
+  }
+}
+if (EXTRA_PERKS.length < 15) {
+  console.error(`FAIL: expected 15+ employee perks, got ${EXTRA_PERKS.length}`);
+  failed = true;
+} else {
+  perkState.flags.seriesAClosed = true;
+  const beforeProduct = perkState.product?.level ?? 0;
+  const hack = runExtraEmployeePerk(perkState, 'hackathon');
+  if (!hack.ok || (perkState.product?.level ?? 0) !== beforeProduct + 1) {
+    console.error(`FAIL: hackathon perk: ${hack.reason ?? 'product level unchanged'}`);
+    failed = true;
+  } else {
+    console.log(`OK: employee perks catalog (${EXTRA_PERKS.length}) + hackathon run`);
   }
 }
 const poolState = createInitialState({ companyName: 'PoolCo', categoryId: 'b2b-saas', mode: 'career' });

@@ -950,6 +950,34 @@ h1 {
   margin: 0.35rem 0 0.85rem;
 }
 
+.people-benefits-lede {
+  margin: 0 0 0.35rem;
+}
+
+.people-benefits-compare {
+  margin: 0.15rem 0 0.5rem;
+}
+
+.people-perk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.65rem;
+}
+
+.people-perk-group {
+  margin-top: 0.35rem;
+}
+
+.people-perk-effects {
+  margin-top: 0.15rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.people-offsite-grid {
+  margin-bottom: 0.75rem;
+}
+
 .growth-panel .growth-kpi-row {
   grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
 }
