@@ -1,15 +1,13 @@
 import { getCategoryById, categoryEconomics } from './Categories.js';
 import { createInitialStaff } from './Staff.js';
-import { createInitialSocial } from './Social.js';
 import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
 import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './CapTable.js';
-import { createInitialOffices } from './Offices.js';
+import { createInitialOffices, satelliteTemplateIdFromEntry } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
 import { createInitialBoard } from './Board.js';
 import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart } from './XC.js';
-import { createInitialAdvisor } from './Advisor.js';
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
 import { createInitialAcquisitionsState } from './Acquisitions.js';
@@ -20,6 +18,7 @@ import { createInitialLaunchState } from './LaunchLifecycle.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
 import { syncLifetimeProfit } from './Finance.js';
+import { createInitialFiscal, ensureFiscal } from './CorporateTax.js';
 import {
   createInitialCeoState,
   initializeCeoPersonalFinances,
@@ -107,7 +106,8 @@ export function createInitialState(options) {
       valuation: null,
       fixedCostsMonthly: fixedCostsForStage(STAGES.GARAGE),
       instruments: [],
-      lastRound: null
+      lastRound: null,
+      fiscal: createInitialFiscal()
     },
     ceo: {
       salaryAnnual: 0,
@@ -119,12 +119,10 @@ export function createInitialState(options) {
     },
     staff: createInitialStaff(),
     product: { level: 0, buzz: 0, actionsThisMonth: 0 },
-    social: createInitialSocial(),
     news: createInitialNews(),
     offices: createInitialOffices(),
     xc: createInitialXcState(),
     coo: createInitialCooState(),
-    advisor: createInitialAdvisor(),
     sentiment: createInitialSentiment(),
     world: { competitor: createCompetitorForCategory(category.id), competitorAcquired: false },
     acquisitions: createInitialAcquisitionsState(),
@@ -201,10 +199,15 @@ export function normalizeSave(raw) {
     if (!state.staff?.headcountByDept) {
       state.staff = createInitialStaff();
     }
-    if (!state.social) state.social = createInitialSocial();
-    if (state.social && state.social.unreadFeedCount === undefined) {
-      state.social.unreadFeedCount = 0;
+    if (!state.staff.benefitsThisMonth) {
+      state.staff.benefitsThisMonth = { companyBonusPct: null, offsiteId: null, perks: [] };
     }
+    if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
+    if (state.staff.optionPoolExpandedThisMonth === undefined) {
+      state.staff.optionPoolExpandedThisMonth = false;
+    }
+    if (!state.staff.peopleSection) state.staff.peopleSection = 'staffing';
+    delete state.social;
     if (!state.news) state.news = createInitialNews();
     if (!state.product) state.product = { level: 0, buzz: 0 };
     if (!state.product.buzz && state.product.buzz !== 0) state.product.buzz = 0;
@@ -242,6 +245,7 @@ export function normalizeSave(raw) {
       state.workspace.campusOwned = getWorkspaceTier(state) === 'campus';
     }
     if (state.finance.lifetimeExpenses === undefined) state.finance.lifetimeExpenses = 0;
+    ensureFiscal(state);
     if (state.finance.lifetimeProfit === undefined) {
       state.finance.lifetimeProfit =
         (state.finance.lifetimeRevenue ?? 0) - (state.finance.lifetimeExpenses ?? 0);
@@ -262,6 +266,10 @@ export function normalizeSave(raw) {
     if (state.launch.productTasksDone == null) state.launch.productTasksDone = 0;
     if (!state.board) state.board = createInitialBoard();
     if (state.board.governanceStreak === undefined) state.board.governanceStreak = 0;
+    if (!state.board.members) state.board.members = [];
+    if (!state.board.sentimentHistory) state.board.sentimentHistory = [];
+    if (state.board.mandateBonusClaimed === undefined) state.board.mandateBonusClaimed = false;
+    if (state.board.meetingsHeld === undefined) state.board.meetingsHeld = 0;
     if (state.publicMarket && state.publicMarket.guidanceBeatStreak === undefined) {
       state.publicMarket.guidanceBeatStreak = 0;
     }
@@ -285,6 +293,12 @@ export function normalizeSave(raw) {
       if (pm.lastSplitTurn === undefined) pm.lastSplitTurn = null;
       if (pm.lastDividendTurn === undefined) pm.lastDividendTurn = null;
       if (pm.lastAnalystActionTurn === undefined) pm.lastAnalystActionTurn = null;
+      if (pm.fundamentalPrice === undefined) pm.fundamentalPrice = null;
+      if (pm.priceSalesMultiple === undefined) pm.priceSalesMultiple = null;
+      if (pm.lastMonthDeltaPct === undefined) pm.lastMonthDeltaPct = null;
+      if (!pm.lastTickDrivers) pm.lastTickDrivers = [];
+      if (pm.ipoPrimaryProceeds === undefined) pm.ipoPrimaryProceeds = 0;
+      if (pm.ipoPrimaryShares === undefined) pm.ipoPrimaryShares = 0;
     }
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);
@@ -329,6 +343,8 @@ export function normalizeSave(raw) {
       if (state.ceo.salaryAnnual === undefined) state.ceo.salaryAnnual = 0;
       if (state.ceo.careerSalaryPaid === undefined) state.ceo.careerSalaryPaid = 0;
       if (state.ceo.careerOwnerDraws === undefined) state.ceo.careerOwnerDraws = 0;
+      if (state.ceo.careerEmployeeBonuses === undefined) state.ceo.careerEmployeeBonuses = 0;
+      if (state.ceo.careerStockSales === undefined) state.ceo.careerStockSales = 0;
       if (!state.ceo.drawLog) state.ceo.drawLog = [];
       if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];
       if (!state.ceo.salaryChangeLog) state.ceo.salaryChangeLog = [];
@@ -348,11 +364,19 @@ export function normalizeSave(raw) {
     if (state.flags.gameOver === undefined) state.flags.gameOver = false;
     if (state.flags.seedRoundClosed === undefined) state.flags.seedRoundClosed = false;
     if (!state.offices) state.offices = createInitialOffices();
+    if (state.offices && !state.offices.usedSatelliteTemplateIds) {
+      state.offices.usedSatelliteTemplateIds = [];
+      for (const s of state.offices.satellites ?? []) {
+        const tid = satelliteTemplateIdFromEntry(s);
+        if (tid && !state.offices.usedSatelliteTemplateIds.includes(tid)) {
+          state.offices.usedSatelliteTemplateIds.push(tid);
+        }
+      }
+    }
     if (!state.xc) state.xc = createInitialXcState();
     if (state.xc.retryAvailableTurn === undefined) state.xc.retryAvailableTurn = null;
     if (state.xc.needsFollowUpQuestion === undefined) state.xc.needsFollowUpQuestion = false;
-    if (!state.advisor) state.advisor = createInitialAdvisor();
-    if (state.advisor.pending) state.advisor.pending = false;
+    delete state.advisor;
     if (!state.sentiment) state.sentiment = createInitialSentiment();
     if (!state.world?.competitor) {
       state.world = {

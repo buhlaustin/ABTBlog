@@ -17,14 +17,18 @@ import {
   runAllRemainingGrowthCampaigns,
   loadGrowthCampaigns
 } from './modules/GrowthCampaigns.js';
-import { loadGrowthLevers } from './modules/ProductActions.js';
 import { openGrowthCampaignOutcomeDialog } from './modules/GrowthOutcome.js';
 import {
   getCoreTaskRevenueMult,
   getSandboxTuningMult,
   getTaskRevenueMultiplierPreview
 } from './modules/Finance.js';
-import { runProductAction, showProductActionFeedback } from './modules/ProductActions.js';
+import {
+  loadGrowthLevers,
+  runProductAction,
+  runAllRemainingSideTasks,
+  showProductActionFeedback
+} from './modules/ProductActions.js';
 import {
   initNarrativeApiUrl,
   isNarrativeApiEnabled,
@@ -33,6 +37,7 @@ import {
   shouldUseNarrativeAi
 } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
+import { completeTaxFilingTask, donateToCharity } from './modules/CorporateTax.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
 import {
   onScheduleLaunchTaskCompleted,
@@ -47,6 +52,7 @@ import {
   fileIpo,
   fetchIpoPress,
   cashOut,
+  sellFounderSharesPartial,
   applyStockPctMove,
   setPublicGuidanceTone,
   executeStockBuyback,
@@ -60,6 +66,13 @@ import {
   finalizeStaffing,
   showPeopleFeedback
 } from './modules/Staff.js';
+import {
+  payCompanyWideBonus,
+  conductEmployeeOffsite,
+  runExtraEmployeePerk,
+  issueFurtherOptionPool,
+  setPeopleSection
+} from './modules/EmployeeBenefits.js';
 import {
   closeSeedRound,
   closeSeriesA,
@@ -109,19 +122,6 @@ import {
   unreadNewsCount
 } from './modules/News.js';
 import {
-  publishPlayerPost,
-  setSocialNetwork,
-  showSocialFeedback,
-  applyOfflineMonthlySocial,
-  enrichMonthlySocialWithAi,
-  renderSocialPanel,
-  preloadSocialPersonas,
-  updateChirpCharCount,
-  unreadSocialCount,
-  syncSocialTabAlert
-} from './modules/Social.js';
-import { sendAdvisorMessage } from './modules/Advisor.js';
-import {
   renderInterviewForm,
   scoreInterview,
   completeXcAcceptance,
@@ -142,6 +142,8 @@ import {
   purchaseTarget,
   sellSubsidiary,
   reinvestInSubsidiary,
+  computeReinvestQuote,
+  REINVEST_PROGRAMS,
   preloadAcquisitionCatalog,
   showCompaniesFeedback,
   setCompaniesMarketFilter,
@@ -307,6 +309,23 @@ function handleCompleteTask(instanceId) {
     return;
   }
 
+  if (def.taxFiling) {
+    const tax = completeTaxFilingTask(sessionState);
+    if (!tax.ok) {
+      showDeskFeedback(tax.reason || 'Cannot file taxes.', true);
+      return;
+    }
+    const rolled = rollTaskOutcome(def, sessionState);
+    applyTaskOutcome(sessionState, def, rolled);
+    const result = completeTaskInstance(sessionState, instanceId, def, rolled);
+    if (!result.ok) return;
+    appendLog(sessionState, tax.summary);
+    showDeskFeedback(tax.summary);
+    playUiClick();
+    refresh();
+    return;
+  }
+
   const rolled = rollTaskOutcome(def, sessionState);
   const { cost, revenue, mrrGain } = applyTaskOutcome(sessionState, def, rolled);
   const result = completeTaskInstance(sessionState, instanceId, def, rolled);
@@ -393,35 +412,17 @@ async function handleEndMonth() {
     }
 
     applyOfflineMonthlyNews(sessionState);
-    applyOfflineMonthlySocial(sessionState);
     const newArticles = unreadNewsCount(sessionState);
-    const newSocial = unreadSocialCount(sessionState);
     if (newArticles > 0) {
       appendLog(
         sessionState,
         `Press: ${newArticles} new headline${newArticles === 1 ? '' : 's'} on the News tab.`
       );
-    }
-    if (newSocial > 0) {
-      appendLog(
-        sessionState,
-        `Social: ${newSocial} new post${newSocial === 1 ? '' : 's'} on ProNet and Chirp.`
-      );
-    }
-    if (newArticles > 0 && newSocial > 0) {
-      setGameFeedback(
-        `${newArticles} new article${newArticles === 1 ? '' : 's'} and ${newSocial} new social post${newSocial === 1 ? '' : 's'} — check News and Social.`
-      );
-    } else if (newArticles > 0) {
       setGameFeedback(
         `${newArticles} new article${newArticles === 1 ? '' : 's'} posted — open News to read.`
       );
-    } else if (newSocial > 0) {
-      setGameFeedback(
-        `${newSocial} new social post${newSocial === 1 ? '' : 's'} — open Social to read.`
-      );
     }
-    syncSocialTabAlert(sessionState);
+    syncNewsTabAlert(sessionState);
     refresh();
 
     const headlineNow = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
@@ -431,10 +432,7 @@ async function handleEndMonth() {
     }
 
     if (shouldUseNarrativeAi()) {
-      void Promise.all([
-        enrichMonthlyNewsWithAi(sessionState),
-        enrichMonthlySocialWithAi(sessionState)
-      ]).then(([newsAi, socialAi]) => {
+      void enrichMonthlyNewsWithAi(sessionState).then((newsAi) => {
         if (newsAi) {
           appendLog(sessionState, 'Fresh AI headlines hit the wire.');
           updateMonthSummaryHeadline(sessionState.news?.currentMonthArticles?.[0]?.headline ?? null);
@@ -443,24 +441,12 @@ async function handleEndMonth() {
             setGameFeedback(`${n} updated article${n === 1 ? '' : 's'} on the News tab.`);
           }
           syncNewsTabAlert(sessionState);
-        }
-        if (socialAi) {
-          appendLog(sessionState, 'ProNet and Chirp are buzzing.');
-          const s = unreadSocialCount(sessionState);
-          if (s > 0) {
-            setGameFeedback(`${s} updated social post${s === 1 ? '' : 's'} on the Social tab.`);
-          }
-          syncSocialTabAlert(sessionState);
-        }
-        if (newsAi || socialAi) {
           renderNewsPanel(document.getElementById('panel-news'), sessionState);
-          renderSocialPanel(document.getElementById('panel-social'), sessionState);
           persistProgress(true);
         }
       });
     } else {
       appendLog(sessionState, 'Headlines updated.');
-      appendLog(sessionState, 'Social feeds updated.');
     }
 
     if (hasActiveCrisis(sessionState)) {
@@ -535,7 +521,17 @@ async function handleFileIpo() {
     sessionState,
     `${result.ticker} listed at ${formatMoney(result.openPrice)}/share — welcome to the public markets.`
   );
-  showFinanceFeedback(`${result.ticker} is live.`);
+  if (result.primaryProceeds > 0) {
+    appendLog(
+      sessionState,
+      `IPO primary raised ${formatMoney(result.primaryProceeds)} — cash now on the balance sheet.`
+    );
+  }
+  showFinanceFeedback(
+    result.primaryProceeds > 0
+      ? `${result.ticker} is live — ${formatMoney(result.primaryProceeds)} primary added to company cash.`
+      : `${result.ticker} is live.`
+  );
   refresh();
 }
 
@@ -554,6 +550,28 @@ function handleCashOut() {
   refresh();
 }
 
+function handleSellFounderStock(pctRaw) {
+  if (!sessionState) return;
+  const pct = Number(pctRaw);
+  if (!window.confirm(`Sell ${pct}% of your founder shares at the current market price? You stay CEO.`)) {
+    return;
+  }
+  const result = sellFounderSharesPartial(sessionState, pct);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Stock sale failed.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Sold ${result.sharesSold.toLocaleString('en-US')} founder shares (${result.pctOfFounder}%) for ${formatMoney(result.proceeds)} — ownership now ${result.founderPctAfter}%.`
+  );
+  showFinanceFeedback(
+    `Sold ${result.pctOfFounder}% of your block for ${formatMoney(result.proceeds)} (deposited to personal bank).`
+  );
+  refresh();
+}
+
 function handleCloseAngelSafe() {
   if (!sessionState) return;
   const result = closeAngelSafe(sessionState);
@@ -567,22 +585,23 @@ function handleCloseAngelSafe() {
   refresh();
 }
 
-function handleCloseSeed() {
+function handleCloseSeed(structure = 'standard') {
   if (!sessionState) return;
-  const result = closeSeedRound(sessionState);
+  const result = closeSeedRound(sessionState, structure);
   if (!result.ok) {
     showFinanceFeedback(result.reason || 'Cannot close seed.', true);
     refresh();
     return;
   }
+  const label = structure === 'lean' ? 'Lean seed' : 'Seed round';
   appendLog(
     sessionState,
-    `Closed seed round — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post-money.`
+    `Closed ${label} — ${formatMoney(result.raised)} at ${formatMoney(result.postMoney)} post-money.`
   );
   for (const line of result.safeLines ?? []) {
     appendLog(sessionState, line);
   }
-  showFinanceFeedback('Seed round closed.');
+  showFinanceFeedback(`${label} closed.`);
   refresh();
 }
 
@@ -757,14 +776,41 @@ function handleAcquisitionSell(id) {
   refresh();
 }
 
-function handleAcquisitionReinvest(id, presetAmount) {
+function reinvestProgramIdForSubsidiary(id) {
+  const select = document.querySelector(`[data-reinvest-program-for="${CSS.escape(id)}"]`);
+  return select?.value ?? 'product';
+}
+
+function reinvestPctForSubsidiary(id) {
+  const input = document.querySelector(`[data-reinvest-pct-input="${CSS.escape(id)}"]`);
+  const raw = input?.value;
+  const pct = Number(raw);
+  return Number.isFinite(pct) ? pct : 3;
+}
+
+function handleAcquisitionReinvestSubmit(id) {
   if (!sessionState) return;
-  let raw = presetAmount;
-  if (raw == null) {
-    raw = window.prompt('Reinvest cash into this subsidiary (min $5,000):', '25000');
-    if (raw == null) return;
+  const programId = reinvestProgramIdForSubsidiary(id);
+  const pct = reinvestPctForSubsidiary(id);
+  const quote = computeReinvestQuote(sessionState, id, pct, programId);
+  if (!quote.ok) {
+    showCompaniesFeedback(quote.reason || 'Could not quote deployment.', true);
+    refresh();
+    return;
   }
-  const result = reinvestInSubsidiary(sessionState, id, raw);
+  const { company, program, amount, impliedValue, projectedHealth } = quote;
+  const name = company.isRival
+    ? sessionState.world?.competitor?.name ?? company.name
+    : company.name;
+  const ok = window.confirm(
+    `Deploy ${formatMoney(amount)} (${pct}% of ~${formatMoney(impliedValue)} value) into ${name}?\n\n` +
+      `Program: ${program.label}\n` +
+      `${program.blurb}\n\n` +
+      `Projected health: ~${projectedHealth.toFixed(2)}×`
+  );
+  if (!ok) return;
+
+  const result = reinvestInSubsidiary(sessionState, id, { pctOfValue: pct, program: programId });
   if (!result.ok) {
     showCompaniesFeedback(result.reason || 'Reinvestment failed.', true);
     refresh();
@@ -772,10 +818,19 @@ function handleAcquisitionReinvest(id, presetAmount) {
   }
   appendLog(
     sessionState,
-    `Reinvested ${formatMoney(result.amount)} — health ${result.health.toFixed(2)}×, MRR ${formatMoney(result.mrr)}/mo.`
+    `Allocated ${formatMoney(result.amount)} (${result.pctOfValue}% of value) to ${name} — ${result.program.label}; health ${result.health.toFixed(2)}×, MRR ${formatMoney(result.mrr)}/mo.`
   );
-  showCompaniesFeedback(`Reinvested ${formatMoney(result.amount)} — MRR now ${formatMoney(result.mrr)}/mo.`);
+  showCompaniesFeedback(
+    `Deployed ${formatMoney(result.amount)} via ${result.program.label} — MRR now ${formatMoney(result.mrr)}/mo.`
+  );
   refresh();
+}
+
+function handleReinvestProgramChange(selectEl) {
+  const id = selectEl.getAttribute('data-reinvest-program-for');
+  const program = REINVEST_PROGRAMS.find((p) => p.id === selectEl.value);
+  const blurb = document.querySelector(`[data-reinvest-blurb-for="${CSS.escape(id)}"]`);
+  if (blurb && program) blurb.textContent = program.blurb;
 }
 
 function handleSelectHub() {
@@ -807,8 +862,11 @@ function handleAddSatellite() {
     refresh();
     return;
   }
-  appendLog(sessionState, `Opened ${result.entry.label} (+${result.entry.seats} seats).`);
-  showOfficesFeedback('Satellite added.');
+  appendLog(
+    sessionState,
+    `Opened ${result.entry.label} satellite (+${result.entry.seats} seats, ${formatMoney(result.entry.rentMonthly)}/mo).`
+  );
+  showOfficesFeedback(`Opened ${result.entry.label} — this city cannot be opened again this run.`);
   refresh();
 }
 
@@ -825,11 +883,13 @@ function bindGameInteractions() {
           return;
         }
         appendLog(sessionState, `Board: “${result.def.title}”.`);
-        if (result.def.stockPct) {
-          applyStockPctMove(sessionState, result.def.stockPct);
+        if (result.mandateBonus > 0) {
+          appendLog(sessionState, `Lead director ask fulfilled (+${result.mandateBonus} approval).`);
+        }
+        if (result.stockPct) {
           appendLog(
             sessionState,
-            `Board read-through: stock ${result.def.stockPct > 0 ? '+' : ''}${Math.round(Number(result.def.stockPct) * 100)}%.`
+            `Board read-through: stock ${result.stockPct > 0 ? '+' : ''}${Math.round(Number(result.stockPct) * 100)}%.`
           );
         }
         refresh();
@@ -837,7 +897,9 @@ function bindGameInteractions() {
           title: result.def.title,
           sentimentDelta: result.sentimentDelta ?? 0,
           sentimentAfter: result.sentimentAfter ?? 0,
-          buzzDelta: result.buzzDelta ?? 0
+          buzzDelta: result.buzzDelta ?? 0,
+          mandateBonus: result.mandateBonus ?? 0,
+          stockPct: result.stockPct
         });
         setGameFeedback('Board task done.');
         refresh();
@@ -875,6 +937,25 @@ function bindGameInteractions() {
         showOfficesFeedback('Office leased.');
         syncStageFromProgress(sessionState);
       }
+      refresh();
+      return;
+    }
+
+    const buyAllSideBtn = e.target.closest('[data-buy-all-side]');
+    if (buyAllSideBtn && sessionState) {
+      const result = runAllRemainingSideTasks(sessionState, ['product', 'growth', 'brand', 'both']);
+      if (!result.ok) {
+        setGameFeedback(result.reason || 'Could not buy side plays.', true);
+        refresh();
+        return;
+      }
+      appendLog(
+        sessionState,
+        `Growth: ran ${result.count} side play${result.count === 1 ? '' : 's'} — spent ${formatMoney(result.totalCost)}, buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}.`
+      );
+      setGameFeedback(
+        `Ran ${result.count} side play${result.count === 1 ? '' : 's'} (buzz +${result.totalBuzz}${result.totalProduct ? `, product +${result.totalProduct}` : ''}).`
+      );
       refresh();
       return;
     }
@@ -952,6 +1033,64 @@ function bindGameInteractions() {
       return;
     }
 
+    const peopleTab = e.target.closest('[data-people-tab]');
+    if (peopleTab && sessionState) {
+      setPeopleSection(sessionState, peopleTab.getAttribute('data-people-tab'));
+      refresh();
+      return;
+    }
+    const bonusBtn = e.target.closest('[data-company-bonus]');
+    if (bonusBtn && sessionState) {
+      const result = payCompanyWideBonus(sessionState, bonusBtn.getAttribute('data-company-bonus'));
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else {
+        appendLog(
+          sessionState,
+          `People: ${result.pct}% company bonus — ${formatMoney(result.pool)} (${formatMoney(result.ceoShare)} to CEO bank).`
+        );
+        showPeopleFeedback(
+          `${result.pct}% bonus paid (${formatMoney(result.pool)}). CEO received ${formatMoney(result.ceoShare)} in personal bank.`
+        );
+      }
+      refresh();
+      return;
+    }
+    const offsiteBtn = e.target.closest('[data-employee-offsite]');
+    if (offsiteBtn && sessionState) {
+      const result = conductEmployeeOffsite(sessionState, offsiteBtn.getAttribute('data-employee-offsite'));
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else {
+        appendLog(sessionState, `People: ${result.program.label} — spent ${formatMoney(result.cost)}.`);
+        showPeopleFeedback(`${result.program.label} booked.`);
+      }
+      refresh();
+      return;
+    }
+    const perkBtn = e.target.closest('[data-employee-perk]');
+    if (perkBtn && sessionState) {
+      const result = runExtraEmployeePerk(sessionState, perkBtn.getAttribute('data-employee-perk'));
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else {
+        appendLog(sessionState, `People: ${result.perk.label} — ${formatMoney(result.cost)}.`);
+        showPeopleFeedback(`${result.perk.label} done.`);
+      }
+      refresh();
+      return;
+    }
+    const poolBtn = e.target.closest('[data-expand-option-pool]');
+    if (poolBtn && sessionState) {
+      const result = issueFurtherOptionPool(sessionState, poolBtn.getAttribute('data-expand-option-pool'));
+      if (!result.ok) showPeopleFeedback(result.reason, true);
+      else {
+        appendLog(
+          sessionState,
+          `Cap table: option pool +${result.pctPoints}% FD (${(result.sharesAdded ?? 0).toLocaleString()} shares, now ${result.poolPct}%).`
+        );
+        showPeopleFeedback(`Option pool expanded +${result.pctPoints}% (now ${result.poolPct}%).`);
+      }
+      refresh();
+      return;
+    }
     const staffDelta = e.target.closest('[data-staff-delta]');
     if (staffDelta) {
       if (!sessionState) return;
@@ -1058,12 +1197,39 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const charityBtn = e.target.closest('[data-charity-donate]');
+    if (charityBtn && sessionState) {
+      const result = donateToCharity(sessionState, charityBtn.getAttribute('data-charity-donate'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Donation failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-charity-donate-custom' && sessionState) {
+      const input = document.getElementById('charity-donate-input');
+      const result = donateToCharity(sessionState, input?.value);
+      if (!result.ok) showFinanceFeedback(result.reason || 'Donation failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     if (e.target.id === 'btn-close-angel-safe') {
       handleCloseAngelSafe();
       return;
     }
     if (e.target.id === 'btn-close-seed') {
-      handleCloseSeed();
+      handleCloseSeed('standard');
+      return;
+    }
+    const seedStructBtn = e.target.closest('[data-seed-structure]');
+    if (seedStructBtn && sessionState) {
+      handleCloseSeed(seedStructBtn.getAttribute('data-seed-structure'));
       return;
     }
     const loanBtn = e.target.closest('[data-loan-draw]');
@@ -1164,13 +1330,17 @@ function bindGameInteractions() {
       handleAcquisitionSell(acqSell.getAttribute('data-acquisition-sell'));
       return;
     }
-    const acqReinvest = e.target.closest('[data-acquisition-reinvest]');
-    if (acqReinvest) {
-      const amt = acqReinvest.getAttribute('data-acquisition-reinvest-amt');
-      handleAcquisitionReinvest(
-        acqReinvest.getAttribute('data-acquisition-reinvest'),
-        amt != null ? Number(amt) : null
-      );
+    const acqReinvestPick = e.target.closest('[data-acquisition-reinvest-pick]');
+    if (acqReinvestPick) {
+      const id = acqReinvestPick.getAttribute('data-acquisition-reinvest-pick');
+      const pct = acqReinvestPick.getAttribute('data-reinvest-pct');
+      const input = document.querySelector(`[data-reinvest-pct-input="${CSS.escape(id)}"]`);
+      if (input && pct != null) input.value = pct;
+      return;
+    }
+    const acqReinvestSubmit = e.target.closest('[data-acquisition-reinvest-submit]');
+    if (acqReinvestSubmit) {
+      handleAcquisitionReinvestSubmit(acqReinvestSubmit.getAttribute('data-acquisition-reinvest-submit'));
       return;
     }
     const filterBtn = e.target.closest('[data-companies-filter]');
@@ -1209,6 +1379,16 @@ function bindGameInteractions() {
     }
     if (e.target.id === 'btn-cash-out') {
       handleCashOut();
+      return;
+    }
+    const sellPctBtn = e.target.closest('[data-sell-founder-pct]');
+    if (sellPctBtn && sessionState) {
+      handleSellFounderStock(sellPctBtn.getAttribute('data-sell-founder-pct'));
+      return;
+    }
+    if (e.target.id === 'btn-sell-founder-custom' && sessionState) {
+      const input = document.getElementById('ceo-sell-pct-input');
+      handleSellFounderStock(input?.value);
       return;
     }
     const guidanceBtn = e.target.closest('[data-stock-guidance]');
@@ -1286,20 +1466,13 @@ function bindGameInteractions() {
       refresh();
       return;
     }
-    const socialTab = e.target.closest('[data-social-tab]');
-    if (socialTab && sessionState) {
-      setSocialNetwork(sessionState, socialTab.getAttribute('data-social-tab'));
-      refresh();
-    }
-  });
-
-  app?.addEventListener('input', (e) => {
-    if (e.target.id === 'social-post-text') {
-      updateChirpCharCount(e.target.value);
-    }
   });
 
   app?.addEventListener('change', (e) => {
+    if (e.target.matches('[data-reinvest-program-for]')) {
+      handleReinvestProgramChange(e.target);
+      return;
+    }
     if (e.target.id === 'coo-equity-pct' && sessionState) {
       const tier = e.target.getAttribute('data-workspace-tier') ?? sessionState.workspace?.tier ?? 'garage';
       const equity = Number(e.target.value);
@@ -1324,34 +1497,6 @@ function bindGameInteractions() {
   app?.addEventListener('submit', async (e) => {
     if (e.target.id === 'xc-interview-form') {
       submitXcInterview(e);
-      return;
-    }
-    if (e.target.id === 'social-post-form') {
-      e.preventDefault();
-      if (!sessionState) return;
-      const text = document.getElementById('social-post-text')?.value;
-      const network = sessionState.social?.activeNetwork ?? 'pronet';
-      showSocialFeedback('Posting…');
-      const result = await publishPlayerPost(sessionState, network, text);
-      if (!result.ok) showSocialFeedback(result.reason, true);
-      else showSocialFeedback('Posted.');
-      refresh();
-      return;
-    }
-    if (e.target.id === 'advisor-form') {
-      e.preventDefault();
-      if (!sessionState) return;
-      const input = document.getElementById('advisor-input');
-      const text = input?.value;
-      const result = await sendAdvisorMessage(sessionState, text);
-      if (input) input.value = '';
-      if (!result.ok) {
-        setGameFeedback(result.reason || 'Could not send that message.', true);
-        refresh();
-        return;
-      }
-      setGameFeedback('Chief of staff replied.');
-      refresh();
       return;
     }
     if (e.target.id === 'pivot-form') {
@@ -1447,10 +1592,10 @@ async function init() {
     apiStatus.classList.remove('error');
     if (isNarrativeApiLive()) {
       apiStatus.textContent =
-        'The wire is live — batch interviews, headlines, social chatter, advisor notes, and IPO press are freshly written.';
+        'The wire is live — batch interviews, headlines, and IPO press are freshly written.';
     } else if (isNarrativeApiEnabled()) {
       apiStatus.textContent =
-        'Live story server is quiet — headlines and social still update each month. Reload if interviews stay stuck.';
+        'Live story server is quiet — headlines still update each month. Reload if interviews stay stuck.';
       apiStatus.classList.remove('error');
     } else {
       apiStatus.hidden = true;
@@ -1558,8 +1703,7 @@ async function init() {
         preloadCrisisCatalog(),
         preloadDecisionEvents(),
         preloadAcquisitionCatalog(),
-        preloadNewsTimeline(),
-        preloadSocialPersonas()
+        preloadNewsTimeline()
       ]);
       populateCategorySelect(categorySelect, getCategoriesSync());
     } catch {

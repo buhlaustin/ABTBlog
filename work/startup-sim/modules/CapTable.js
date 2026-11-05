@@ -14,26 +14,64 @@ export function targetIpoSharePrice(state, valuation) {
   return Math.max(8, Math.min(420, price));
 }
 
-/** Issue tradable float so outstanding shares match market cap / price. */
-export function ensurePublicFloatOnCapTable(state, valuation, sharePrice) {
-  if (!state.capTable?.length) return 0;
+/** ESOP created at seed — 8% fully-diluted (was 10%). */
+export const SEED_ESOP_FD_PCT = 0.08;
+
+/** Typical IPO: ~25% tradable float; ~8% primary (new shares, cash to company). */
+export const IPO_TARGET_FLOAT_FD_PCT = 0.26;
+export const IPO_PRIMARY_FD_PCT = 0.08;
+/** Cap valuation-implied share inflation (old bug pushed ~70%+ float). */
+export const IPO_MAX_FLOAT_FD_PCT = 0.32;
+
+/**
+ * IPO listing: primary shares (cash to company) + public float (secondary + free float).
+ * Targets realistic dilution — not the pre-fix ~74% float, and not an ~18% toy float.
+ */
+export function applyPublicListingCapTable(state, valuation, sharePrice, opts = {}) {
+  if (!state.capTable?.length) {
+    return { totalShares: 0, primaryShares: 0, primaryProceeds: 0, liquidityShares: 0 };
+  }
   const rows = state.capTable.filter((r) => r.id !== PUBLIC_FLOAT_ROW_ID).map((r) => ({ ...r }));
   const insider = rows.reduce((s, r) => s + (r.shares ?? 0), 0);
   const price = Math.max(Number(sharePrice) || 0, 0.01);
-  let total = Math.max(insider + 1, Math.round(valuation / price));
-  let floatShares = total - insider;
-  if (floatShares < Math.round(insider * 0.45)) {
-    total = insider + Math.round(insider * 2.8);
-    floatShares = total - insider;
-  }
+  const floatFdPct = opts.floatFdPct ?? IPO_TARGET_FLOAT_FD_PCT;
+  const primaryFdPct = opts.primaryFdPct ?? IPO_PRIMARY_FD_PCT;
+  const maxFloatFdPct = opts.maxFloatFdPct ?? IPO_MAX_FLOAT_FD_PCT;
+
+  const fromFloatTarget = Math.round(insider / (1 - floatFdPct));
+  const fromValuation = Math.round(valuation / price);
+  const capTotal = Math.round(insider / (1 - maxFloatFdPct));
+  let totalShares = Math.max(fromFloatTarget, fromValuation);
+  totalShares = Math.min(totalShares, capTotal);
+  totalShares = Math.max(totalShares, insider + 1);
+
+  const newPublicShares = totalShares - insider;
+  const primaryShares = Math.min(
+    Math.max(1, Math.round(primaryFdPct * totalShares)),
+    newPublicShares
+  );
+  const liquidityShares = newPublicShares - primaryShares;
+  const primaryProceeds = Math.round(primaryShares * price);
+
   rows.push({
     id: PUBLIC_FLOAT_ROW_ID,
     name: 'Public shareholders (float)',
-    shares: floatShares,
+    shares: newPublicShares,
     class: 'public'
   });
   state.capTable = recalculateCapTablePercentages(rows);
-  return total;
+  return {
+    totalShares,
+    primaryShares,
+    primaryProceeds,
+    liquidityShares,
+    publicFloatShares: newPublicShares
+  };
+}
+
+/** @deprecated name kept for callers — runs applyPublicListingCapTable. */
+export function ensurePublicFloatOnCapTable(state, valuation, sharePrice, opts = {}) {
+  return applyPublicListingCapTable(state, valuation, sharePrice, opts).totalShares;
 }
 
 export function migratePublicFloatCapTable(state) {
@@ -139,6 +177,15 @@ export function applyXCSafe(state) {
   if (!state.flags?.xcUnlocked) {
     return { ok: false, reason: 'Reach $100k ARR to apply.' };
   }
+  if (state.flags?.seriesAClosed || state.flags?.ipoFiled || state.stage === STAGES.PUBLIC) {
+    return { ok: false, reason: 'X Combinator acceptance closes after Series A / going public.' };
+  }
+  if ((state.accelerators?.joined?.length ?? 0) >= 2) {
+    return {
+      ok: false,
+      reason: 'You already joined two accelerator programs — cannot add X Combinator.'
+    };
+  }
 
   const founder = getFounderRow(state);
   const founderShares = founder?.shares ?? FOUNDER_AUTHORIZED;
@@ -174,7 +221,55 @@ export function applyXCSafe(state) {
  * Seed round: $3M on $15M post (~20% to seed investors) + 10% ESOP.
  * Requires XC acceptance.
  */
-export function applySeedRound(state) {
+export function negotiateSeedTerms(baseTerms, structure) {
+  const raised = baseTerms.raised;
+  const postMoney = baseTerms.postMoney;
+  if (structure === 'lean') {
+    const leanRaised = Math.round(raised * 0.85);
+    const leanPost = Math.round(postMoney * 1.12);
+    return {
+      raised: leanRaised,
+      postMoney: leanPost,
+      preMoney: leanPost - leanRaised
+    };
+  }
+  if (structure === 'growth') {
+    const growthRaised = Math.round(raised * 1.12);
+    const growthPost = Math.round(postMoney * 0.94);
+    return {
+      raised: growthRaised,
+      postMoney: growthPost,
+      preMoney: growthPost - growthRaised
+    };
+  }
+  return {
+    raised,
+    postMoney,
+    preMoney: baseTerms.preMoney ?? postMoney - raised
+  };
+}
+
+export function canCloseLeanSeed(state) {
+  if (state.flags?.seedRoundClosed) return { ok: false, reason: 'Seed already closed.' };
+  const pitch = state.xc?.demoDayPitch;
+  const sentiment = state.sentiment?.score ?? 50;
+  if (pitch === 'lean' || pitch === 'focused' || sentiment >= 40) {
+    return { ok: true };
+  }
+  return {
+    ok: false,
+    reason: 'Lean seed needs a focused Demo Day pitch or board sentiment ≥ 40.'
+  };
+}
+
+export function seedFounderPctAfterPreview(founderPct, raised, postMoney, esopPct = SEED_ESOP_FD_PCT) {
+  const investorSlice = raised / postMoney;
+  const afterInvestors = founderPct * (1 - investorSlice);
+  const afterEsop = afterInvestors * (1 - esopPct);
+  return Math.round(afterEsop * 10) / 10;
+}
+
+export function applySeedRound(state, options = {}) {
   if (!state.flags?.xcAccepted) {
     return { ok: false, reason: 'Complete X Combinator acceptance first.' };
   }
@@ -188,7 +283,12 @@ export function applySeedRound(state) {
     return { ok: false, reason: 'Seed round already closed.' };
   }
 
-  const { raised, preMoney, postMoney } = getSeedRoundTerms(state);
+  const structure = options.structure ?? 'standard';
+  if (structure === 'lean' && !canCloseLeanSeed(state).ok) {
+    return canCloseLeanSeed(state);
+  }
+
+  const { raised, preMoney, postMoney } = negotiateSeedTerms(getSeedRoundTerms(state), structure);
 
   let rows = state.capTable.map((r) => ({ ...r }));
   const totalBefore = rows.reduce((s, r) => s + r.shares, 0);
@@ -201,7 +301,7 @@ export function applySeedRound(state) {
   });
 
   let total = rows.reduce((s, r) => s + r.shares, 0);
-  const esopShares = Math.round(total * (0.1 / 0.9));
+  const esopShares = Math.round(total * (SEED_ESOP_FD_PCT / (1 - SEED_ESOP_FD_PCT)));
   rows.push({
     id: 'esop',
     name: 'Employee option pool',
@@ -213,17 +313,18 @@ export function applySeedRound(state) {
   state.finance.cash = (state.finance.cash ?? 0) + raised;
   state.finance.valuation = postMoney;
   state.finance.lastRound = {
-    name: 'Seed',
+    name: structure === 'lean' ? 'Seed (lean)' : structure === 'growth' ? 'Seed (growth)' : 'Seed',
     raised,
     preMoney,
     postMoney,
+    structure,
     closedMonth: state.calendar.monthIndex,
     closedYear: state.calendar.year
   };
   state.flags.seedRoundClosed = true;
   applyFundraiseMomentum(state, 'Seed');
   const safeLines = convertOutstandingSafesAtSeed(state, postMoney);
-  return { ok: true, raised, postMoney, safeLines };
+  return { ok: true, raised, postMoney, preMoney, structure, safeLines };
 }
 
 /** Cap table + instruments shape after seed — no cash or flag checks (sandbox bootstrap). */
@@ -254,7 +355,7 @@ export function applySeedCapTableSnapshot(state) {
   }
   let total = rows.reduce((s, r) => s + r.shares, 0);
   if (!rows.some((r) => r.id === 'esop')) {
-    const esopShares = Math.round(total * (0.1 / 0.9));
+    const esopShares = Math.round(total * (SEED_ESOP_FD_PCT / (1 - SEED_ESOP_FD_PCT)));
     rows.push({
       id: 'esop',
       name: 'Employee option pool',
@@ -589,17 +690,25 @@ export function seedRoundPreview(state) {
   }
   const founder = getFounderRow(state);
   const founderPct = founder?.pct ?? 100;
-  const { raised, preMoney, postMoney } = getSeedRoundTerms(state);
-  const dilutionFactor = 1 - raised / postMoney - 0.1 * (1 - raised / postMoney);
-  const founderAfter = Math.round(founderPct * dilutionFactor * 10) / 10;
+  const base = getSeedRoundTerms(state);
+  const { raised, preMoney, postMoney } = base;
+  const lean = negotiateSeedTerms(base, 'lean');
+  const founderAfter = seedFounderPctAfterPreview(founderPct, raised, postMoney);
+  const founderAfterLean = seedFounderPctAfterPreview(founderPct, lean.raised, lean.postMoney);
   const pitchNote = seedRoundTermsNote(state);
+  const leanGate = canCloseLeanSeed(state);
   return {
     raised,
     preMoney,
     postMoney,
+    leanRaised: lean.raised,
+    leanPostMoney: lean.postMoney,
     founderPctNow: founderPct,
     founderPctAfterApprox: founderAfter,
-    note: pitchNote ?? '~20% to seed investors and 10% ESOP (pro-forma).'
+    founderPctAfterLean: founderAfterLean,
+    leanSeedOk: leanGate.ok,
+    leanSeedReason: leanGate.reason,
+    note: pitchNote ?? `~${Math.round((raised / postMoney) * 100)}% to seed investors and ${Math.round(SEED_ESOP_FD_PCT * 100)}% ESOP (pro-forma).`
   };
 }
 
@@ -627,6 +736,52 @@ export function renderCapTableRows(state) {
       return `<tr${rowClass}><td>${escapeHtml(r.name)}</td><td class="num">${(r.shares ?? 0).toLocaleString()}</td><td class="num">${r.pct ?? 0}%</td><td>${escapeHtml(r.class ?? '—')}</td></tr>`;
     })
     .join('');
+}
+
+export const ESOP_ROW_ID = 'esop';
+
+export function getOptionPoolRow(state) {
+  return state.capTable?.find((r) => r.id === ESOP_ROW_ID) ?? null;
+}
+
+/** Add pctPoints of fully-diluted shares to the ESOP (e.g. 5 → +5% FD). */
+export function expandEmployeeOptionPool(state, pctPoints) {
+  const pct = Number(pctPoints) / 100;
+  if (!Number.isFinite(pct) || pct <= 0 || pct >= 0.5) {
+    return { ok: false, reason: 'Invalid pool expansion size.' };
+  }
+  if (!state.capTable?.length) {
+    return { ok: false, reason: 'No cap table yet.' };
+  }
+  if (!state.flags?.seedRoundClosed && !getOptionPoolRow(state)) {
+    return { ok: false, reason: 'Close seed first — the employee option pool is created at seed.' };
+  }
+
+  const rows = state.capTable.map((r) => ({ ...r }));
+  let row = rows.find((r) => r.id === ESOP_ROW_ID);
+  if (!row) {
+    row = {
+      id: ESOP_ROW_ID,
+      name: 'Employee option pool',
+      shares: 0,
+      class: 'option'
+    };
+    rows.push(row);
+  }
+  const total = rows.reduce((s, r) => s + (r.shares ?? 0), 0);
+  if (total <= 0) return { ok: false, reason: 'Cap table has no outstanding shares.' };
+
+  const additional = Math.max(1, Math.round(total * (pct / (1 - pct))));
+  row.shares = (row.shares ?? 0) + additional;
+  state.capTable = recalculateCapTablePercentages(rows);
+
+  return {
+    ok: true,
+    pctPoints: Number(pctPoints),
+    sharesAdded: additional,
+    poolPct: row.pct,
+    poolShares: row.shares
+  };
 }
 
 export function renderCapTableSummary(state) {

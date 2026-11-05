@@ -9,12 +9,10 @@ import { calendarTurn } from './XC.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
 import { renderCompaniesPanel } from './Acquisitions.js';
-import { renderPeoplePanel } from './Staff.js';
+import { renderPeoplePanel } from './EmployeeBenefits.js';
 import { renderCeoPanel } from './Ceo.js';
 import { ceoPersonalCashComp } from './CeoEconomics.js';
-import { renderSocialPanel, markSocialAsRead, syncSocialTabAlert } from './Social.js';
 import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
-import { renderAdvisorPanel } from './Advisor.js';
 import {
   getTaskDef,
   pendingTasks,
@@ -35,12 +33,20 @@ import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
-import { renderProductActionsPanel, sideTaskBankSize } from './ProductActions.js';
+import {
+  renderProductActionsPanel,
+  sideTaskBankSize,
+  canBuyAllRemainingSideTasks
+} from './ProductActions.js';
+import {
+  renderGrowthCampaignsBlock,
+  canBuyAllRemainingGrowthCampaigns
+} from './GrowthCampaigns.js';
 
-const SIDE_TASK_FOCUS_PRODUCT = ['product', 'both'];
-const SIDE_TASK_FOCUS_GROWTH = ['growth', 'brand', 'both'];
+/** Side levers + product levers share one monthly play counter. */
+const SIDE_TASK_FOCUS_ALL = ['product', 'growth', 'brand', 'both'];
 import { sentimentLabel, marketTrustLabel, hasInstitutionalBoard } from './Sentiment.js';
-import { runwayLabel } from './MonthSummary.js';
+import { runwayLabel, runwayDetail } from './MonthSummary.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
 import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
@@ -50,11 +56,11 @@ import {
   getSandboxTuningMult,
   getRawTaskRevenueMultiplier,
   estimateTaskPayoutBand,
+  estimateEraRevenuePotential,
   estimateTaskMrrBand,
   taskRevenueMultHud
 } from './Finance.js';
 import { progressionTierLabel } from './ProgressionEconomy.js';
-import { renderGrowthCampaignsBlock } from './GrowthCampaigns.js';
 import {
   launchLifecycleActive,
   launchPhaseLabel,
@@ -268,8 +274,7 @@ export function renderDeskPanel(state) {
           if (!def) return '';
           const sel = offer.selected ? 'task-offer selected' : 'task-offer';
           const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
-          const whale =
-            def.whale || (def.revenue?.[1] ?? 0) >= 1_000_000_000
+          const whale = def.whale === true
               ? ' <span class="task-tag">Whale</span>'
               : '';
           const launchTag = def.scheduleLaunch
@@ -300,8 +305,7 @@ export function renderDeskPanel(state) {
       const band = estimateTaskPayoutBand(def, state);
       const mrrBand = estimateTaskMrrBand(def);
       const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
-      const whale =
-        def.whale || (def.revenue?.[1] ?? 0) >= 1_000_000_000
+      const whale = def.whale === true
           ? ' <span class="task-tag">Whale</span>'
           : '';
       const crowd = def.crowdfunding ? ' <span class="task-tag">Crowdfunding</span>' : '';
@@ -367,6 +371,10 @@ export function renderDeskPanel(state) {
         return `<div><span class="stat-label">${escapeHtml(revHud.label)}</span><span class="stat-value"${titleAttr}>${revHud.effective.toFixed(2)}×</span></div>`;
       })()}
     </div>
+    ${(() => {
+      const era = estimateEraRevenuePotential(state);
+      return `<p class="fine-print">This era: native desk <strong>${formatMoney(era.desk[0])}–${formatMoney(era.desk[1])}</strong> · growth <strong>${formatMoney(era.growth[0])}–${formatMoney(era.growth[1])}</strong> per play at ${era.mult.toFixed(2)}× (shared early tasks scale up automatically). Finance tab has the full ladder.</p>`;
+    })()}
     ${
       lineupOpen
         ? `<section class="task-offers"><h3 class="log-head">This month’s offers (${selectedOfferCount(state)} / ${slotTarget} selected)</h3><div class="task-list">${offerCards}</div>
@@ -397,16 +405,13 @@ export function showDeskFeedback(message, isError = false) {
 
 export const TAB_ORDER = [
   'desk',
-  'product',
   'growth',
   'people',
   'ceo',
   'finance',
   'companies',
   'board',
-  'social',
-  'news',
-  'advisor'
+  'news'
 ];
 
 export function selectTab(tabId) {
@@ -432,9 +437,6 @@ function renderPanelForTab(tab, state) {
     case 'desk':
       renderDeskPanel(state);
       break;
-    case 'product':
-      renderProductPanel(document.getElementById('panel-product'), state);
-      break;
     case 'growth':
       renderGrowthPanel(document.getElementById('panel-growth'), state);
       break;
@@ -453,14 +455,8 @@ function renderPanelForTab(tab, state) {
     case 'board':
       renderBoardPanel(document.getElementById('panel-board'), state);
       break;
-    case 'social':
-      renderSocialPanel(document.getElementById('panel-social'), state);
-      break;
     case 'news':
       renderNewsPanel(document.getElementById('panel-news'), state);
-      break;
-    case 'advisor':
-      renderAdvisorPanel(document.getElementById('panel-advisor'), state);
       break;
     default:
       break;
@@ -489,10 +485,8 @@ function activateTab(nav, tab) {
   const state = panelStateProvider?.();
   if (state) {
     if (tab === 'news') markNewsAsRead(state);
-    if (tab === 'social') markSocialAsRead(state);
     renderPanelForTab(tab, state);
     if (tab === 'news') syncNewsTabAlert(state);
-    if (tab === 'social') syncSocialTabAlert(state);
   }
 }
 
@@ -544,12 +538,6 @@ export function bindGameKeyboardShortcuts(getSession, onCloseMonth) {
       }
       return;
     }
-    if (e.key === '0' && !e.altKey && !e.ctrlKey && !e.metaKey) {
-      e.preventDefault();
-      selectTab('advisor');
-      return;
-    }
-
     if ((e.key === 'm' || e.key === 'M') && !e.ctrlKey && !e.metaKey && !e.altKey) {
       if (canEndMonth(state)) {
         e.preventDefault();
@@ -576,7 +564,6 @@ export function renderAllPanels(state) {
   }
   renderGameHud(state);
   syncNewsTabAlert(state);
-  syncSocialTabAlert(state);
   renderDeskPanel(state);
   const active = getActiveTabId();
   if (active !== 'desk') {
@@ -623,63 +610,19 @@ export function renderGrowthPanel(container, state) {
       ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong>${capNote} · paid campaigns ${growthLeftLabel}${growthRuns ? ` (${growthRuns} launched)` : ''}.</p>`
       : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — ${revHud.label.includes('capped') ? 'Rev× (capped)' : 'effective multiplier'} <strong>${totalMult.toFixed(2)}×</strong>${capNote}${growthRuns ? ` · ${growthRuns}/${growthSlotLabel} paid campaign(s) used` : ` · ${growthLeftLabel} paid campaign(s) left`}.</p>`;
 
-  container.innerHTML = `
-    <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks and paid campaigns below share the same multiplier math.</p>
-    ${trustNote}
-    ${modNote}
-    ${multNote}
-    <div class="summary-grid">
-      <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>
-      <div><span class="stat-label">Heat</span><span class="stat-value">${pressure}/5</span></div>
-      <div><span class="stat-label">Rev. modifier</span><span class="stat-value">${(revMult * 100).toFixed(0)}%</span></div>
-      <div><span class="stat-label">Buzz</span><span class="stat-value">${buzz}</span></div>
-      ${
-        hasInstitutionalBoard(state)
-          ? `<div><span class="stat-label">Board approval</span><span class="stat-value">${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}</span></div>`
-          : `<div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(runwayLabel(state))}</span></div>`
-      }
-      <div><span class="stat-label">Desk tasks left</span><span class="stat-value">${pendingDesk}</span></div>
-    </div>
-    ${
-      rival
-        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Strong revenue months, marketing desk tasks, and growth campaigns cool heat. Buzz decays each month — keep shipping.</p>`
-        : ''
-    }
-    ${
-      hasInstitutionalBoard(state) && lastReason
-        ? `<p class="fine-print">Latest board note: ${escapeHtml(lastReason)}</p>`
-        : '<p class="fine-print">Desk tasks scale with funding rounds and HQ tier. Paid campaigns below do not use desk slots.</p>'
-    }
-    <div id="growth-levers-mount"></div>
-    ${renderGrowthCampaignsBlock(state)}
-  `;
-  renderProductActionsPanel(document.getElementById('growth-levers-mount'), state, {
-    heading: 'Side growth plays',
-    focusFilter: SIDE_TASK_FOCUS_GROWTH,
-    showLimitHint: false,
-    lede: `Marketing and brand experiments — shares the monthly side-play limit with Product (${sideTaskBankSize(SIDE_TASK_FOCUS_GROWTH)} growth/brand plays in bank).`
-  });
-}
-
-export function renderProductPanel(container, state) {
-  if (!container) return;
   const pivotAllowed = canPivot(state);
   const categories = getCategoriesSync();
-  const options = categories
+  const pivotOptions = categories
     .filter((c) => c.id !== state.company.categoryId)
-    .map(
-      (c) =>
-        `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}</option>`
-    )
+    .map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}</option>`)
     .join('');
-
   const pivotBlock = pivotAllowed
     ? `<form id="pivot-form" class="setup-form finance-action">
         <p><strong>One-time pivot</strong> — reposition the company (buzz hit${hasInstitutionalBoard(state) ? '; board approval drops if you have a board' : ''}).</p>
         <label for="pivot-category">New industry</label>
         <select id="pivot-category" name="pivotCategory" required>
           <option value="" disabled selected>Choose new positioning…</option>
-          ${options}
+          ${pivotOptions}
         </select>
         <button type="submit" class="btn btn-primary btn-small">Pivot company</button>
       </form>
@@ -688,20 +631,61 @@ export function renderProductPanel(container, state) {
       ? '<p class="fine-print">You already used your one-time pivot this run.</p>'
       : '';
 
+  const sideBuyAllDisabled = canBuyAllRemainingSideTasks(state, SIDE_TASK_FOCUS_ALL) ? '' : ' disabled';
+  const paidBuyAllDisabled = canBuyAllRemainingGrowthCampaigns(state) ? '' : ' disabled';
+  const sideBank = sideTaskBankSize(SIDE_TASK_FOCUS_ALL);
+  const productLevel = state.product?.level ?? 0;
+
   container.innerHTML = `
-    <p class="panel-lede">A stronger product makes desk tasks pay better. Buy <strong>product side plays</strong> below (UX sprints, enterprise packs, PLG experiments) — they share a monthly limit with Growth tab plays.</p>
-    <div class="summary-grid">
-      <div><span class="stat-label">Product level</span><span class="stat-value">${state.product.level ?? 0}</span></div>
-      <div><span class="stat-label">Buzz</span><span class="stat-value">${state.product.buzz ?? 0}</span></div>
+    <p class="panel-lede">Growth hub for ${escapeHtml(state.company.categoryLabel)} — side plays and paid campaigns share progression multipliers with desk tasks.</p>
+    <div class="growth-traction-stats summary-grid" aria-label="Product traction">
+      <div><span class="stat-label">Product level</span><span class="stat-value" id="growth-stat-product-level">${productLevel}</span></div>
+      <div><span class="stat-label">Buzz</span><span class="stat-value" id="growth-stat-buzz">${buzz}</span></div>
       <div><span class="stat-label">Industry</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
     </div>
+    <div class="growth-buy-all-bar finance-action">
+      <button type="button" class="btn btn-primary btn-small" data-buy-all-side${sideBuyAllDisabled}>Buy all side plays</button>
+      <button type="button" class="btn btn-primary btn-small" data-buy-all-growth${paidBuyAllDisabled}>Buy all paid campaigns</button>
+      <p class="fine-print">Runs every affordable unlocked play until monthly slots or cash run out (${sideBank} side plays in bank).</p>
+    </div>
+    ${trustNote}
+    ${modNote}
+    ${multNote}
+    <div class="summary-grid">
+      <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>
+      <div><span class="stat-label">Heat</span><span class="stat-value">${pressure}/5</span></div>
+      <div><span class="stat-label">Rev. modifier</span><span class="stat-value">${(revMult * 100).toFixed(0)}%</span></div>
+      ${
+        hasInstitutionalBoard(state)
+          ? `<div><span class="stat-label">Board approval</span><span class="stat-value">${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}</span></div>`
+          : `<div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(runwayLabel(state))}</span></div>`
+      }
+      <div><span class="stat-label">Desk tasks left</span><span class="stat-value">${pendingDesk}</span></div>
+    </div>
+    ${
+      !hasInstitutionalBoard(state)
+        ? `<p class="fine-print">${escapeHtml(runwayDetail(state))}</p>`
+        : ''
+    }
     ${pivotBlock}
-    <div id="product-actions-mount"></div>
+    ${
+      rival
+        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Strong revenue months, marketing desk tasks, and growth campaigns cool heat. Buzz decays each month — keep shipping.</p>`
+        : ''
+    }
+    ${
+      hasInstitutionalBoard(state) && lastReason
+        ? `<p class="fine-print">Latest board note: ${escapeHtml(lastReason)}</p>`
+        : '<p class="fine-print">Desk tasks scale with funding rounds and HQ tier. Side plays and paid campaigns below do not use desk slots.</p>'
+    }
+    <div id="growth-levers-mount"></div>
+    ${renderGrowthCampaignsBlock(state)}
   `;
-  renderProductActionsPanel(document.getElementById('product-actions-mount'), state, {
-    heading: 'Product side plays',
-    focusFilter: SIDE_TASK_FOCUS_PRODUCT,
-    lede: `Ship faster without a desk slot — product-focused buys (${sideTaskBankSize(SIDE_TASK_FOCUS_PRODUCT)} in bank). Limit grows with stage; hub removes the cap.`
+  renderProductActionsPanel(document.getElementById('growth-levers-mount'), state, {
+    heading: 'Side growth plays',
+    focusFilter: SIDE_TASK_FOCUS_ALL,
+    showLimitHint: true,
+    lede: `Marketing, brand, and product experiments outside desk tasks — <strong>${sideBank}</strong> plays in bank, one shared monthly limit.`
   });
 }
 

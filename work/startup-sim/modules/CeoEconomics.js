@@ -1,5 +1,11 @@
 import { STAGES, formatMoney } from './constants.js';
-import { recordCashOutflow, founderValuationStake, founderEquityPct, projectMonthlyBurn } from './Finance.js';
+import {
+  recordCashOutflow,
+  founderValuationStake,
+  founderEquityPct,
+  projectMonthlyBurn,
+  companyRunwayDisplay
+} from './Finance.js';
 import { founderStakeValue, isPublicCompany, canCashOut } from './IPO.js';
 import { getFounderRow } from './CapTable.js';
 import { calendarTurn } from './XC.js';
@@ -21,6 +27,8 @@ export function createInitialCeoState() {
     salaryAnnual: 0,
     careerSalaryPaid: 0,
     careerOwnerDraws: 0,
+    careerEmployeeBonuses: 0,
+    careerStockSales: 0,
     bankBalance: null,
     personalExpenseScheduled: null,
     lastPersonalExpense: null,
@@ -339,7 +347,7 @@ export function ceoSalaryBoardNote(state) {
 
 export function setCeoSalaryAnnual(state, annual) {
   if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
-  const n = Math.max(0, Math.min(2_000_000, Math.round(Number(annual) || 0)));
+  const n = Math.max(0, Math.round(Number(annual) || 0));
   const ceo = ceoState(state);
   const prior = ceo.salaryAnnual ?? 0;
   if (prior !== n) {
@@ -510,9 +518,31 @@ export function founderEquityValue(state) {
   return founderShareStats(state).stakeValue;
 }
 
+export function creditCeoStockSale(state, amount, label) {
+  const pay = Math.round(Number(amount) || 0);
+  if (pay <= 0) return 0;
+  const ceo = ceoState(state);
+  ceo.bankBalance = (ceo.bankBalance ?? 0) + pay;
+  ceo.careerStockSales = (ceo.careerStockSales ?? 0) + pay;
+  pushCeoLog(ceo, 'bankLog', {
+    kind: 'stock_sale',
+    amount: pay,
+    delta: pay,
+    balanceAfter: ceo.bankBalance,
+    label,
+    ...logStamp(state)
+  });
+  return pay;
+}
+
 export function ceoPersonalCashComp(state) {
   const ceo = state.ceo ?? {};
-  return (ceo.careerSalaryPaid ?? 0) + (ceo.careerOwnerDraws ?? 0);
+  return (
+    (ceo.careerSalaryPaid ?? 0) +
+    (ceo.careerOwnerDraws ?? 0) +
+    (ceo.careerEmployeeBonuses ?? 0) +
+    (ceo.careerStockSales ?? 0)
+  );
 }
 
 export function ceoNetWorth(state) {
@@ -536,16 +566,18 @@ export function wealthMix(state) {
 }
 
 export function ceoRunwayNote(state) {
-  const burn = projectMonthlyBurn(state);
-  const cash = state.finance?.cash ?? 0;
+  const runwayInfo = companyRunwayDisplay(state);
+  const burn = runwayInfo.burn;
   const ceoMo = ceoSalaryMonthly(state);
+  const cash = runwayInfo.cash;
   const runway = burn > 0 ? cash / burn : Infinity;
   const burnSansCeo = Math.max(0, burn - ceoMo);
   const runwaySansCeo = burnSansCeo > 0 ? cash / burnSansCeo : Infinity;
   return {
     burn,
     ceoMo,
-    runwayLabel: burn > 0 ? `${runway.toFixed(1)} mo` : '∞',
+    runwayLabel: runwayInfo.monthsLabel,
+    runwayDetail: runwayInfo.detail,
     runwaySansCeoLabel: burnSansCeo > 0 ? `${runwaySansCeo.toFixed(1)} mo` : '∞',
     deltaMo:
       ceoMo > 0 && burnSansCeo > 0 && Number.isFinite(runway) && Number.isFinite(runwaySansCeo)
@@ -576,10 +608,12 @@ export function renderCeoCompBreakdown(state) {
   const equity = founderEquityValue(state);
   const salary = state.ceo?.careerSalaryPaid ?? 0;
   const draws = state.ceo?.careerOwnerDraws ?? 0;
+  const bonuses = state.ceo?.careerEmployeeBonuses ?? 0;
+  const stockSales = state.ceo?.careerStockSales ?? 0;
   const bank = ceoPersonalBankBalance(state);
   const net = bank + equity;
   const publicCo = isPublicCompany(state);
-  return { pct, equity, salary, draws, bank, net, publicCo };
+  return { pct, equity, salary, draws, bonuses, stockSales, bank, net, publicCo };
 }
 
 export function buildCompLedger(state, limit = 12) {

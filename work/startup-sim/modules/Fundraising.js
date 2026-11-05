@@ -20,7 +20,9 @@ import {
   renderFinanceSummary,
   getTaskRevenueMultiplierPreview,
   getCoreTaskRevenueMult,
-  getSandboxTuningMult
+  getSandboxTuningMult,
+  allTierRevenuePotentialRows,
+  estimateEraRevenuePotential
 } from './Finance.js';
 import { progressionTierLabel } from './ProgressionEconomy.js';
 import { formatMoney } from './constants.js';
@@ -80,8 +82,8 @@ export function canCloseSeed(state) {
   );
 }
 
-export function closeSeedRound(state) {
-  return applySeedRound(state);
+export function closeSeedRound(state, structure = 'standard') {
+  return applySeedRound(state, { structure });
 }
 
 export function closeSeriesA(state) {
@@ -115,6 +117,34 @@ function renderPricedRoundBlock(state, preview, flagName, buttonId, label) {
     <p class="fine-print">Founder ~${preview.founderPctNow}% → ~${preview.founderPctAfterApprox}%.</p>
     <button type="button" class="btn btn-primary btn-small" id="${buttonId}">Close ${label}</button>
   </div>`;
+}
+
+function renderTierRevenuePotentialSection(state) {
+  const era = estimateEraRevenuePotential(state);
+  const rows = allTierRevenuePotentialRows(state);
+  const body = rows
+    .map((r) => {
+      const rowClass = r.isCurrent ? ' class="tier-revenue-current"' : '';
+      const whale = r.deskWhale
+        ? `<br><span class="fine-print">Whale desk base ${formatMoney(r.deskWhale[0])}–${formatMoney(r.deskWhale[1])}</span>`
+        : '';
+      return `<tr${rowClass}>
+        <td><strong>${escapeHtml(r.label)}</strong><br><span class="fine-print">${escapeHtml(r.arrGuide)}</span></td>
+        <td>${formatMoney(r.deskBase[0])}–${formatMoney(r.deskBase[1])}${whale}</td>
+        <td>${formatMoney(r.growthBase[0])}–${formatMoney(r.growthBase[1])}</td>
+        <td>${formatMoney(r.deskPayout[0])}–${formatMoney(r.deskPayout[1])}</td>
+        <td>${formatMoney(r.growthPayout[0])}–${formatMoney(r.growthPayout[1])}</td>
+      </tr>`;
+    })
+    .join('');
+  return `<section class="tier-revenue-panel">
+    <h3 class="log-head">Revenue potential by scale era</h3>
+    <p class="fine-print">Native base ranges for tasks/campaigns authored at each era, and estimated cash per play at your current <strong>${era.mult.toFixed(2)}×</strong> rev×. Older tasks that reappear late-game also get an <strong>era base scale</strong> (garage $ → public $) before rev× — not the same payout twice.</p>
+    <div class="table-scroll"><table class="data-table tier-revenue-table">
+      <thead><tr><th>Era</th><th>Desk base</th><th>Growth base</th><th>Desk @ rev×</th><th>Growth @ rev×</th></tr></thead>
+      <tbody>${body}</tbody>
+    </table></div>
+  </section>`;
 }
 
 function escapeHtml(s) {
@@ -275,8 +305,12 @@ export function renderFinancePanel(container, state) {
   const seedBlock = canCloseSeed(state) && preview
     ? `<div class="finance-action">
         <p><strong>Seed round</strong> — raise ${formatMoney(preview.raised)} at ${formatMoney(preview.postMoney)} post-money.</p>
-        <p class="fine-print">${escapeHtml(preview.note)} Founder ~${preview.founderPctNow}% → ~${preview.founderPctAfterApprox}%.${seedPreviewNote}</p>
-        <button type="button" class="btn btn-primary btn-small" id="btn-close-seed">Close seed round</button>
+        <p class="fine-print">${escapeHtml(preview.note)} Founder ~${preview.founderPctNow}% → ~${preview.founderPctAfterApprox}% (8% ESOP).${seedPreviewNote}</p>
+        <div class="stock-actions">
+          <button type="button" class="btn btn-primary btn-small" id="btn-close-seed">Close seed (Demo Day terms)</button>
+          <button type="button" class="btn btn-ghost btn-small" data-seed-structure="lean" ${preview.leanSeedOk ? '' : 'disabled'} title="${preview.leanSeedOk ? '' : escapeHtml(preview.leanSeedReason ?? '')}">Lean close — ${formatMoney(preview.leanRaised)} @ ${formatMoney(preview.leanPostMoney)} post (~${preview.founderPctAfterLean}% founder)</button>
+        </div>
+        ${preview.leanSeedOk ? '' : `<p class="fine-print">${escapeHtml(preview.leanSeedReason ?? '')}</p>`}
       </div>`
     : state.flags?.seedRoundClosed
       ? `<p class="fine-print">Seed round closed${state.finance.lastRound ? ` — ${formatMoney(state.finance.lastRound.raised)} at ${formatMoney(state.finance.lastRound.postMoney)} post.` : '.'}</p>`
@@ -294,9 +328,40 @@ export function renderFinancePanel(container, state) {
       ? `${progressionTierLabel(state)}: ${coreMult.toFixed(2)}× progression × ${tuneMult.toFixed(2)}× sandbox = ${revMult.toFixed(2)}× on desk & Growth payouts.`
       : `${progressionTierLabel(state)}: ${revMult.toFixed(2)}× on desk & Growth payouts (rounds + HQ + staff).`;
 
+  const priorFyBlock = sum.fiscalShowPrior
+    ? `<div class="summary-grid fiscal-prior">
+      <div class="summary-grid-span"><span class="stat-label">Prior FY ${sum.fiscalPriorYear ?? '—'} (Jan–Dec)</span></div>
+      <div><span class="stat-label">Revenue</span><span class="stat-value">${sum.fiscalPriorRevenueLabel}</span></div>
+      <div><span class="stat-label">Expenses</span><span class="stat-value">${sum.fiscalPriorExpensesLabel}</span></div>
+      <div><span class="stat-label">Profit</span><span class="stat-value">${sum.fiscalPriorProfitLabel}</span></div>
+    </div>`
+    : '';
+
+  const taxAprilNote =
+    sum.fiscalTaxLiability > 0 && !sum.fiscalTaxPaid
+      ? `<p class="fine-print error">April taxes: ${sum.fiscalTaxLiabilityLabel} due on fiscal revenue — mandatory desk task (cash only).</p>`
+      : sum.fiscalTaxPaid && (state.calendar?.monthIndex ?? 0) === 4
+        ? `<p class="fine-print">Corporate taxes filed for ${state.calendar?.year ?? ''}.</p>`
+        : '';
+
+  const charityBlock = `<div class="finance-action">
+    <p><strong>Donate to charity</strong> — spend company cash (expense; minimum ${formatMoney(1_000)}).</p>
+    <p class="fine-print">Lifetime donated: ${sum.charityLifetimeLabel}</p>
+    <div class="btn-row">
+      <button type="button" class="btn btn-ghost btn-small" data-charity-donate="5000">Donate $5k</button>
+      <button type="button" class="btn btn-ghost btn-small" data-charity-donate="25000">Donate $25k</button>
+      <button type="button" class="btn btn-ghost btn-small" data-charity-donate="100000">Donate $100k</button>
+    </div>
+    <div class="inline-form">
+      <input type="number" id="charity-donate-input" class="input input-small" min="1000" step="1000" placeholder="Custom amount" />
+      <button type="button" class="btn btn-ghost btn-small" id="btn-charity-donate-custom">Donate custom</button>
+    </div>
+  </div>`;
+
   container.innerHTML = `
     <p class="panel-lede">Cash from desk tasks lands right away. Payroll and rent bill when you close the month. Fundraising lives here, not on the desk.</p>
     <p class="fine-print">${escapeHtml(multExpl)} Close rounds to jump task tiers and multiplier.</p>
+    ${renderTierRevenuePotentialSection(state)}
     <div class="summary-grid">
       <div><span class="stat-label">Cash</span><span class="stat-value">${sum.cashLabel}</span></div>
       <div><span class="stat-label">Last month rev.</span><span class="stat-value">${sum.mrrLabel}</span></div>
@@ -310,6 +375,16 @@ export function renderFinancePanel(container, state) {
       <div><span class="stat-label">Lifetime profit</span><span class="stat-value">${sum.lifetimeProfitLabel}</span></div>
       <div><span class="stat-label">Starting cash (investment)</span><span class="stat-value">${sum.initialInvestmentLabel}</span></div>
     </div>
+    <h3 class="log-head">Fiscal year (Jan–Dec ${sum.fiscalCurrentYear ?? '—'})</h3>
+    <div class="summary-grid">
+      <div><span class="stat-label">FY revenue</span><span class="stat-value">${sum.fiscalCurrentRevenueLabel}</span></div>
+      <div><span class="stat-label">FY expenses</span><span class="stat-value">${sum.fiscalCurrentExpensesLabel}</span></div>
+      <div><span class="stat-label">FY profit</span><span class="stat-value">${sum.fiscalCurrentProfitLabel}</span></div>
+    </div>
+    ${priorFyBlock}
+    ${taxAprilNote}
+    ${charityBlock}
+    <p class="fine-print">${sum.runwayDetail}</p>
     <p class="fine-print">Founder equity, salary, owner draws, and net worth live on the <strong>CEO</strong> tab.</p>
     ${blockNote}
     ${capitalStack}

@@ -8,7 +8,8 @@
       "revenue": [0, 0],
       "buzz": 0,
       "sentiment": 2,
-      "minTier": 2
+      "minTier": 2,
+      "committee": "governance"
     },
     {
       "id": "board-comp-plan",
@@ -18,7 +19,8 @@
       "revenue": [0, 0],
       "buzz": 0,
       "sentiment": 3,
-      "minTier": 2
+      "minTier": 2,
+      "committee": "comp"
     },
     {
       "id": "board-audit-committee",
@@ -28,7 +30,8 @@
       "revenue": [0, 0],
       "buzz": 1,
       "sentiment": 2,
-      "minTier": 3
+      "minTier": 3,
+      "committee": "audit"
     },
     {
       "id": "board-strategy-offsite",
@@ -38,7 +41,8 @@
       "revenue": [0, 0],
       "buzz": 2,
       "sentiment": 4,
-      "minTier": 4
+      "minTier": 4,
+      "committee": "full"
     },
     {
       "id": "board-409a-refresh",
@@ -48,7 +52,8 @@
       "revenue": [0, 0],
       "buzz": 0,
       "sentiment": 3,
-      "minTier": 2
+      "minTier": 2,
+      "committee": "comp"
     },
     {
       "id": "board-diversity-report",
@@ -58,7 +63,8 @@
       "revenue": [0, 0],
       "buzz": 1,
       "sentiment": 2,
-      "minTier": 3
+      "minTier": 3,
+      "committee": "governance"
     },
     {
       "id": "board-earnings-preview",
@@ -70,7 +76,8 @@
       "sentiment": 5,
       "stockPct": 0.015,
       "minTier": 7,
-      "requiresPublic": true
+      "requiresPublic": true,
+      "committee": "full"
     },
     {
       "id": "board-ma-scenario",
@@ -80,7 +87,144 @@
       "revenue": [0, 0],
       "buzz": 2,
       "sentiment": 4,
-      "minTier": 5
+      "minTier": 5,
+      "committee": "full"
+    },
+    {
+      "id": "board-risk-register",
+      "title": "Enterprise risk register update",
+      "description": "Catalog top 10 risks with owners — auditors love a tidy grid.",
+      "cost": 650,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 2,
+      "minTier": 3,
+      "committee": "audit"
+    },
+    {
+      "id": "board-customer-advisory",
+      "title": "Customer advisory board sync",
+      "description": "Three logos on stage; feed quotes into the next investor update.",
+      "cost": 1800,
+      "revenue": [0, 0],
+      "buzz": 3,
+      "sentiment": 2,
+      "minTier": 3,
+      "committee": "governance"
+    },
+    {
+      "id": "board-cyber-drill",
+      "title": "Incident response tabletop",
+      "description": "Simulate a breach notification — board wants to see the runbook work.",
+      "cost": 2400,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "minTier": 4,
+      "committee": "audit"
+    },
+    {
+      "id": "board-ipo-readiness",
+      "title": "IPO readiness committee",
+      "description": "S-1 timeline, SOX scope, and who owns the roadshow deck.",
+      "cost": 5200,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 4,
+      "minTier": 6,
+      "committee": "full"
+    },
+    {
+      "id": "board-buyback-brief",
+      "title": "Buyback authorization brief",
+      "description": "Model repurchase scenarios for the public-company board packet.",
+      "cost": 3100,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "stockPct": 0.008,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "full"
+    },
+    {
+      "id": "board-executive-session",
+      "title": "Lead director executive session",
+      "description": "Board meets without management — send the pre-read they asked for.",
+      "cost": 1100,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 4,
+      "minTier": 4,
+      "committee": "governance"
+    },
+    {
+      "id": "board-unit-economics",
+      "title": "Unit economics deep dive",
+      "description": "CAC, payback, and cohort curves the partners will actually read.",
+      "cost": 950,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 3,
+      "minTier": 2,
+      "committee": "governance"
+    },
+    {
+      "id": "board-talent-review",
+      "title": "Talent & succession review",
+      "description": "Bench strength for VP+ roles — comp committee joins for an hour.",
+      "cost": 1600,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "minTier": 3,
+      "committee": "comp"
+    },
+    {
+      "id": "board-lp-update",
+      "title": "LP letter draft for lead",
+      "description": "Help your Series A lead write the fund update without embarrassing you.",
+      "cost": 700,
+      "revenue": [0, 0],
+      "buzz": 2,
+      "sentiment": 2,
+      "minTier": 2,
+      "committee": "governance"
+    },
+    {
+      "id": "board-rival-briefing",
+      "title": "Competitive landscape briefing",
+      "description": "Rival heat, win/loss notes, and why you are still the category winner.",
+      "cost": 850,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 2,
+      "minTier": 2,
+      "committee": "governance"
+    },
+    {
+      "id": "board-sarbanes-preview",
+      "title": "SOX readiness preview",
+      "description": "Controls map for life as a public company — audit chair runs the agenda.",
+      "cost": 4100,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 4,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "audit"
+    },
+    {
+      "id": "board-dividend-policy",
+      "title": "Dividend policy workshop",
+      "description": "Should you return cash? Model yield vs growth for skeptical independents.",
+      "cost": 2800,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "full"
     }
   ]
 }

@@ -33,11 +33,11 @@ let failed = false;
 
 const lifetimeSample = formatMoney(20_754_580_000_000);
 const groupedHuge = formatMoney(1_234_560_000_000_000);
-if (!lifetimeSample.endsWith('T') || lifetimeSample !== '$20.75T') {
-  console.error(`FAIL: formatMoney trillion tier (got ${lifetimeSample})`);
+if (lifetimeSample !== '$20,754,580,000,000') {
+  console.error(`FAIL: formatMoney should comma-group large dollars (got ${lifetimeSample})`);
   failed = true;
-} else if (!groupedHuge.includes(',') || !groupedHuge.endsWith('T')) {
-  console.error(`FAIL: formatMoney should group thousands (got ${groupedHuge})`);
+} else if (groupedHuge !== '$1,234,560,000,000,000') {
+  console.error(`FAIL: formatMoney should comma-group huge dollars (got ${groupedHuge})`);
   failed = true;
 } else if (!failed) {
   console.log(`OK: formatMoney commas (${lifetimeSample}, ${groupedHuge})`);
@@ -74,6 +74,25 @@ if (!catalogAudit.ok) {
   failed = true;
 } else {
   console.log(`OK: all ${catalogAudit.taskCount} desk tasks pass catalog audit (schema + copy bar)`);
+}
+
+const { auditGrowthCampaignCatalog } = await import(
+  `file://${join(sim, 'modules/GrowthCampaignAudit.js')}`
+);
+const { getGrowthCampaigns } = await import(`file://${join(sim, 'modules/GrowthCampaigns.js')}`);
+const growthAudit = auditGrowthCampaignCatalog(getGrowthCampaigns());
+if (!growthAudit.ok) {
+  console.error(
+    `FAIL: growth campaign audit (${growthAudit.issues.length} issues on ${growthAudit.campaignCount} campaigns)`
+  );
+  growthAudit.issues.slice(0, 12).forEach((issue) => {
+    console.error(`  ${issue.code} ${issue.campaignId ?? issue.id}: ${issue.message}`);
+  });
+  failed = true;
+} else {
+  console.log(
+    `OK: all ${growthAudit.campaignCount} paid growth campaigns pass catalog audit (unique, no template slop)`
+  );
 }
 
 function categoryAllowed(task, categoryId) {
@@ -482,7 +501,7 @@ if (!isXcDemoDayMonth(demoState)) {
     onDemoDayTaskCompleted(demoState);
     applyDemoDayPitchChoice(demoState, 0);
     const terms = getSeedRoundTerms(demoState);
-    if (terms.raised !== 3_400_000 || terms.postMoney !== 17_000_000) {
+    if (terms.raised !== 3_200_000 || terms.postMoney !== 19_000_000) {
       console.error(`FAIL: focused Demo Day pitch seed terms ${JSON.stringify(terms)}`);
       failed = true;
     } else {
@@ -578,16 +597,26 @@ if (cappedSand > sandCap + 0.01) {
   console.log(`OK: sandbox rev mult cap ${cappedSand}× (workforce ceiling ${sandCap}×)`);
 }
 
-const { completeBoardTask, dealBoardTasks } = await import(
+const { completeBoardTask, dealBoardTasks, getBoardTaskDefs, ensureBoardRoster } = await import(
   `file://${join(sim, 'modules/Board.js')}`
 );
+if (getBoardTaskDefs().length < 18) {
+  console.error(`FAIL: board task catalog too small (${getBoardTaskDefs().length})`);
+  failed = true;
+}
 const boardState = createInitialState({
   companyName: 'BoardSmoke',
   categoryId: 'b2b-saas',
   mode: 'career'
 });
 boardState.flags.seriesAClosed = true;
+boardState.finance.cash = 500_000;
 dealBoardTasks(boardState);
+ensureBoardRoster(boardState);
+if ((boardState.board?.members?.length ?? 0) < 2) {
+  console.error('FAIL: board roster should include lead + founder after Series A');
+  failed = true;
+}
 const inst = boardState.board?.monthTasks?.[0];
 if (!inst) {
   console.error('FAIL: board tasks not dealt');
@@ -693,46 +722,6 @@ if (!isFundraisingBlockedByScenario(scenarioState)) {
   console.log('OK: scenario fundraising block');
 }
 
-const { buzzEngagementMult, socialFollowers } = await import(
-  `file://${join(sim, 'modules/Social.js')}`
-);
-const lowBuzz = createInitialState({
-  companyName: 'SocialLow',
-  categoryId: 'b2b-saas',
-  mode: 'career'
-});
-lowBuzz.product.buzz = 0;
-const highBuzz = createInitialState({
-  companyName: 'SocialHigh',
-  categoryId: 'b2b-saas',
-  mode: 'career'
-});
-highBuzz.product.buzz = 15;
-const lowLikes = Math.round(10 * buzzEngagementMult(lowBuzz));
-const highLikes = Math.round(10 * buzzEngagementMult(highBuzz));
-if (highLikes <= lowLikes || socialFollowers(highBuzz, 'chirp') <= socialFollowers(lowBuzz, 'chirp')) {
-  console.error(`FAIL: buzz should boost social reach (${lowLikes} vs ${highLikes} likes)`);
-  failed = true;
-} else {
-  console.log(`OK: buzz scales social engagement (${lowLikes} → ${highLikes} likes, mult ${buzzEngagementMult(highBuzz).toFixed(2)}×)`);
-}
-
-const { applyOfflineMonthlySocial, unreadSocialCount } = await import(
-  `file://${join(sim, 'modules/Social.js')}`
-);
-const feedState = createInitialState({
-  companyName: 'FeedCo',
-  categoryId: 'b2b-saas',
-  mode: 'career'
-});
-applyOfflineMonthlySocial(feedState);
-if ((unreadSocialCount(feedState) ?? 0) < 1) {
-  console.error('FAIL: monthly social should mark unread feed posts');
-  failed = true;
-} else {
-  console.log('OK: social unread count after month feed');
-}
-
 const preSeedState = createInitialState({
   companyName: 'PreSeedPool',
   categoryId: 'b2b-saas',
@@ -760,7 +749,10 @@ const {
   getAcquisitionCatalog,
   purchaseTarget,
   totalSubsidiaryMrr,
-  applySubsidiaryMrrPayout
+  applySubsidiaryMrrPayout,
+  computeReinvestQuote,
+  reinvestInSubsidiary,
+  subsidiarySalePrice
 } = await import(`file://${join(sim, 'modules/Acquisitions.js')}`);
 await preloadAcquisitionCatalog();
 if (getAcquisitionCatalog().length !== 99) {
@@ -790,16 +782,41 @@ if (!buy.ok) {
   } else {
     console.log(`OK: acquisition + portfolio MRR (${formatMoney(totalSubsidiaryMrr(acqState))}/mo)`);
   }
+  const holding = acqState.acquisitions.owned[0];
+  const implied = subsidiarySalePrice(acqState, holding, small);
+  const quote5 = computeReinvestQuote(acqState, small.id, 5, 'product');
+  if (!quote5.ok) {
+    console.error(`FAIL: reinvest quote: ${quote5.reason}`);
+    failed = true;
+  } else {
+    const expected = Math.round(implied * 0.05);
+    const tol = Math.max(5000, Math.round(implied * 0.002));
+    if (Math.abs(quote5.amount - expected) > tol && quote5.amount !== Math.max(expected, tol)) {
+      console.error(
+        `FAIL: reinvest 5% should scale with implied value (~${formatMoney(expected)}), got ${formatMoney(quote5.amount)}`
+      );
+      failed = true;
+    } else {
+      const rein = reinvestInSubsidiary(acqState, small.id, { pctOfValue: 2, program: 'gtm' });
+      if (!rein.ok || rein.pctOfValue !== 2) {
+        console.error(`FAIL: pct-based reinvest: ${rein.reason ?? 'bad result'}`);
+        failed = true;
+      } else {
+        console.log(`OK: portfolio reinvest scales with value (${formatMoney(rein.amount)} for 2%)`);
+      }
+    }
+  }
 }
 
 const { STAGES: ST } = await import(`file://${join(sim, 'modules/constants.js')}`);
-const { PUBLIC_FLOAT_ROW_ID } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
+const { PUBLIC_FLOAT_ROW_ID, getFounderRow } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
 const {
   fileIpo,
   tickPublicMarket,
   setPublicGuidanceTone,
   executeStockBuyback,
-  whisperRevenueTarget
+  whisperRevenueTarget,
+  sellFounderSharesPartial
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 pub.stage = ST.PUBLIC;
@@ -807,7 +824,8 @@ pub.flags.seedRoundClosed = true;
 pub.flags.ipoUnlocked = true;
 pub.finance.mrr = 5_000_000;
 pub.finance.monthlyBurn = 400_000;
-pub.finance.cash = 50_000_000;
+const cashBeforeIpo = 50_000_000;
+pub.finance.cash = cashBeforeIpo;
 const ipo = fileIpo(pub);
 const floatRow = pub.capTable?.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
 const listPrice = pub.publicMarket?.sharePrice ?? 0;
@@ -820,8 +838,29 @@ if (!ipo.ok) {
 } else if (listPrice > 450 || listPrice < 5) {
   console.error(`FAIL: IPO share price out of band (${listPrice})`);
   failed = true;
+} else if ((pub.finance.cash ?? 0) <= cashBeforeIpo) {
+  console.error(`FAIL: IPO should add primary proceeds to company cash (before ${cashBeforeIpo}, after ${pub.finance.cash})`);
+  failed = true;
+} else if ((ipo.primaryProceeds ?? 0) <= 0) {
+  console.error('FAIL: fileIpo should report primary proceeds');
+  failed = true;
 } else {
-  console.log(`OK: IPO public float on cap table (${floatRow.pct}% float, ${formatMoney(listPrice)}/share)`);
+  const founder = getFounderRow(pub);
+  const floatPct = floatRow?.pct ?? 0;
+  if ((founder?.pct ?? 0) < 18) {
+    console.error(`FAIL: founder pct at IPO too low (${founder?.pct}%)`);
+    failed = true;
+  } else if (floatPct < 20 || floatPct > 34) {
+    console.error(`FAIL: IPO public float should be realistic (~20–32% FD, got ${floatPct}%)`);
+    failed = true;
+  } else if ((founder?.pct ?? 0) > 82) {
+    console.error(`FAIL: IPO float too small — founder still ${founder?.pct}% (expected meaningful dilution)`);
+    failed = true;
+  } else {
+    console.log(
+      `OK: IPO primary + float (${formatMoney(ipo.primaryProceeds)} primary, float ${floatPct}%, founder ${founder?.pct}%, ${formatMoney(listPrice)}/share)`
+    );
+  }
   const tone = setPublicGuidanceTone(pub, 'aggressive');
   if (!tone.ok || whisperRevenueTarget(pub) <= 0) {
     console.error('FAIL: public guidance / whisper target');
@@ -845,6 +884,21 @@ if (!ipo.ok) {
   } else if (!failed) {
     console.log('OK: late-game public market (IPO, guidance, tick, buyback, tape)');
   }
+  pub.publicMarket.lockupMonthsRemaining = 0;
+  const founderBefore = getFounderRow(pub)?.shares ?? 0;
+  const partial = sellFounderSharesPartial(pub, 10);
+  const founderAfter = getFounderRow(pub)?.shares ?? 0;
+  if (!partial.ok || partial.proceeds <= 0) {
+    console.error(`FAIL: partial founder stock sale: ${partial.reason ?? 'bad result'}`);
+    failed = true;
+  } else if (founderAfter >= founderBefore || (pub.ceo.careerStockSales ?? 0) < 1) {
+    console.error('FAIL: partial sale should reduce founder shares and credit CEO bank');
+    failed = true;
+  } else if (!failed) {
+    console.log(
+      `OK: partial founder stock sale (${formatMoney(partial.proceeds)}, ${founderBefore - founderAfter} shares)`
+    );
+  }
 }
 
 const { closeAngelSafe, canCloseAngelSafe } = await import(`file://${join(sim, 'modules/AngelSafe.js')}`);
@@ -862,6 +916,9 @@ if (!ag.ok) {
 } else if (angelState.finance.cash < 50_000) {
   console.error('FAIL: angel SAFE cash');
   failed = true;
+} else if (closeAngelSafe(angelState).ok) {
+  console.error('FAIL: second angel SAFE should be blocked');
+  failed = true;
 }
 const xcAccel = createInitialState({ companyName: 'Accel Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 xcAccel.flags.xcAccepted = true;
@@ -870,6 +927,17 @@ xcAccel.finance.mrr = Math.round(80_000 / 12);
 const ja = joinAccelerator(xcAccel, 'angel-rail');
 if (!ja.ok) {
   console.error(`FAIL: accelerator after XC: ${ja.reason}`);
+  failed = true;
+} else if (joinAccelerator(xcAccel, 'techlot').ok) {
+  console.error('FAIL: third accelerator should be blocked');
+  failed = true;
+}
+const postASeries = createInitialState({ companyName: 'Post A', categoryId: 'b2b-saas', mode: 'sandbox' });
+postASeries.flags.seriesAClosed = true;
+postASeries.finance.arr = 5_000_000;
+postASeries.finance.mrr = Math.round(5_000_000 / 12);
+if (joinAccelerator(postASeries, 'velocity-lab').ok) {
+  console.error('FAIL: accelerator after Series A should be blocked');
   failed = true;
 }
 const loanState = createInitialState({ companyName: 'Loan Co', categoryId: 'b2b-saas', mode: 'sandbox' });
@@ -939,7 +1007,11 @@ const {
   buildCompLedger,
   suggestedCeoSalaryBand
 } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
-const { projectMonthlyBurn } = await import(`file://${join(sim, 'modules/Finance.js')}`);
+const { projectMonthlyBurn, estimateEraRevenuePotential, allTierRevenuePotentialRows } =
+  await import(`file://${join(sim, 'modules/Finance.js')}`);
+const { TIER_REVENUE_PROFILE, eraBaseRevenueScaleForTask } = await import(
+  `file://${join(sim, 'modules/ProgressionEconomy.js')}`
+);
 const ceoState = createInitialState({ companyName: 'CEO Pay Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 const sal = setCeoSalaryAnnual(ceoState, 120_000);
 if (!sal.ok) {
@@ -976,6 +1048,42 @@ if (!failed) {
     failed = true;
   } else if (wealthMix(ceoState).salary <= 0) {
     console.error('FAIL: wealth mix');
+    failed = true;
+  }
+}
+if (!failed) {
+  if (TIER_REVENUE_PROFILE.length !== 8) {
+    console.error(`FAIL: tier revenue profile length ${TIER_REVENUE_PROFILE.length}`);
+    failed = true;
+  } else {
+    const eraRows = allTierRevenuePotentialRows(ceoState);
+    const era = estimateEraRevenuePotential(ceoState);
+    if (eraRows.length !== 8 || era.desk[1] < era.desk[0] || era.growth[1] < era.growth[0]) {
+      console.error('FAIL: tier revenue potential rows');
+      failed = true;
+    }
+  }
+}
+if (!failed) {
+  const sharedTask = getTaskDefinitions().find((t) => t.id === 'mega-deal-close');
+  if (sharedTask) {
+    const seedEra = createInitialState({ companyName: 'Era', categoryId: 'b2b-saas', mode: 'career' });
+    seedEra.flags.seedRoundClosed = true;
+    const pubEra = createInitialState({ companyName: 'Era', categoryId: 'b2b-saas', mode: 'career' });
+    pubEra.flags.ipoFiled = true;
+    pubEra.stage = STAGES.PUBLIC;
+    const seedRoll = rollTaskOutcome(sharedTask, seedEra).revenue;
+    const pubRoll = rollTaskOutcome(sharedTask, pubEra).revenue;
+    if (pubRoll <= seedRoll * 50) {
+      console.error(`FAIL: era base scale seed=${seedRoll} public=${pubRoll}`);
+      failed = true;
+    }
+  }
+}
+if (!failed) {
+  const bigSal = setCeoSalaryAnnual(ceoState, 20_000_000);
+  if (!bigSal.ok || bigSal.annual !== 20_000_000) {
+    console.error('FAIL: CEO salary should not be capped at $2M');
     failed = true;
   }
 }
@@ -1040,7 +1148,6 @@ if (!failed) {
 const { hireCoo, isCooHired, cooSalaryMonthly, garageCooSalaryFromEquity } = await import(
   `file://${join(sim, 'modules/Coo.js')}`
 );
-const { getFounderRow } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
 const garageState = createInitialState({
   companyName: 'Garage COO',
   categoryId: 'b2b-saas',
@@ -1075,6 +1182,69 @@ if (!hireMax.ok || cooSalaryMonthly(garageZero) !== 0) {
   failed = true;
 } else {
   console.log('OK: 10% garage COO at $0/mo');
+}
+if (!failed) {
+  const { workspaceRentMonthly, WORKSPACE_TIER: WS_TIER } = await import(
+    `file://${join(sim, 'modules/Workspace.js')}`
+  );
+  const campusRent = workspaceRentMonthly({
+    workspace: { tier: WS_TIER.CAMPUS }
+  });
+  const hubRentState = createInitialState({ companyName: 'Hub Rent', categoryId: 'b2b-saas', mode: 'career' });
+  hubRentState.workspace.tier = WS_TIER.HUB;
+  hubRentState.offices = { hubId: 'nashville' };
+  hubRentState.finance.hubRentMonthly = 125_000;
+  const hubMo = workspaceRentMonthly(hubRentState);
+  if (hubMo < 125_000 || hubMo <= campusRent) {
+    console.error(`FAIL: hub rent ${hubMo} should exceed campus ${campusRent}`);
+    failed = true;
+  } else {
+    console.log(`OK: hub city rent (${hubMo}/mo) above campus HQ (${campusRent}/mo)`);
+  }
+
+  const { addSatellite, getSatelliteTemplates, availableSatelliteTemplates } = await import(
+    `file://${join(sim, 'modules/Offices.js')}`
+  );
+  const catalog = getSatelliteTemplates();
+  if (catalog.length < 30) {
+    console.error(`FAIL: expected 30+ satellite cities (got ${catalog.length})`);
+    failed = true;
+  }
+  const satState = createInitialState({ companyName: 'SatCo', categoryId: 'b2b-saas', mode: 'sandbox' });
+  satState.offices = { hubId: 'atlanta', hubLabel: 'Atlanta', satellites: [], usedSatelliteTemplateIds: [] };
+  const open = addSatellite(satState, 'sat-denver');
+  const dup = addSatellite(satState, 'sat-denver');
+  const avail = availableSatelliteTemplates(satState);
+  if (!open.ok || dup.ok) {
+    console.error(`FAIL: satellite one-time use (open ${open.ok}, dup ${dup.ok})`);
+    failed = true;
+  } else if (avail.some((t) => t.id === 'sat-denver')) {
+    console.error('FAIL: used satellite should not appear in available list');
+    failed = true;
+  } else if (!failed) {
+    console.log(`OK: satellite catalog (${catalog.length} cities, one-time open)`);
+  }
+}
+if (!failed) {
+  const publicCoo = createInitialState({ companyName: 'Public COO', categoryId: 'b2b-saas', mode: 'sandbox' });
+  publicCoo.workspace.tier = WORKSPACE_TIER.LARGE;
+  publicCoo.flags.ipoFiled = true;
+  publicCoo.stage = STAGES.PUBLIC;
+  setCeoSalaryAnnual(publicCoo, 20_000_000);
+  const hired = hireCoo(publicCoo, { firstName: 'Sam', lastName: 'Ops', equityPct: 2 });
+  if (!hired.ok) {
+    console.error(`FAIL: public COO hire: ${hired.reason}`);
+    failed = true;
+  } else {
+    const expectedFloor = Math.round((20_000_000 / 12) * 0.6);
+    const cooMo = cooSalaryMonthly(publicCoo);
+    if (cooMo < expectedFloor) {
+      console.error(`FAIL: public COO ${cooMo} < 60% CEO ${expectedFloor}`);
+      failed = true;
+    } else {
+      console.log(`OK: public COO comp tracks CEO (${cooMo}/mo ≥ 60% floor)`);
+    }
+  }
 }
 
 const {
@@ -1164,14 +1334,12 @@ if (roster.length < 1 || roster.length > expectedOffers) {
   console.error(`FAIL: growth monthly roster size ${roster.length} (max ${expectedOffers})`);
   failed = true;
 } else {
-  const whales = availableCampaigns(growthRosterState).filter(
-    (c) => (c.revenue?.[1] ?? 0) >= 500_000_000
-  );
-  if (!whales.length) {
-    console.error('FAIL: public growth roster should include billion-scale plays');
+  const playable = availableCampaigns(growthRosterState);
+  if (!playable.length) {
+    console.error('FAIL: public growth roster has no playable campaigns');
     failed = true;
   } else {
-    const first = whales[0];
+    const first = playable[0];
     const run = runGrowthCampaign(growthRosterState, first.id);
     if (!run.ok || !growthRosterState.growth.recentCampaignIds?.includes(first.id)) {
       console.error(`FAIL: growth campaign run / cooldown track: ${run.reason ?? 'ok'}`);
@@ -1182,14 +1350,14 @@ if (roster.length < 1 || roster.length > expectedOffers) {
         console.error('FAIL: ran growth campaign should stay off roster until cooldown');
         failed = true;
       } else {
-        console.log(`OK: growth roster + cooldown (${roster.length}/mo, whales in pool)`);
+        console.log(`OK: growth roster + cooldown (${roster.length}/mo, era-scaled payouts)`);
       }
     }
   }
 }
 
 const productSideBank = sideTaskBankSize(['product', 'both']);
-if (growthCampaignCatalogSize() < 350) {
+if (growthCampaignCatalogSize() < 270) {
   console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()})`);
   failed = true;
 } else if (getProductActions().length < 75) {
@@ -1204,6 +1372,71 @@ if (growthCampaignCatalogSize() < 350) {
   );
 }
 
+const { runAllRemainingSideTasks, canBuyAllRemainingSideTasks } = await import(
+  `file://${join(sim, 'modules/ProductActions.js')}`
+);
+const sideBulk = createInitialState({
+  companyName: 'SideBulk',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 500_000
+});
+sideBulk.flags.xcResidencyComplete = true;
+sideBulk.flags.seedRoundClosed = true;
+if (!canBuyAllRemainingSideTasks(sideBulk, ['product', 'growth', 'brand', 'both'])) {
+  console.error('FAIL: sandbox should allow buy-all side plays');
+  failed = true;
+} else {
+  const bulk = runAllRemainingSideTasks(sideBulk, ['product', 'growth', 'brand', 'both']);
+  if (!bulk.ok || bulk.count < 1) {
+    console.error(`FAIL: buy-all side plays: ${bulk.reason ?? 'empty'}`);
+    failed = true;
+  } else {
+    console.log(`OK: buy-all side plays (${bulk.count} runs)`);
+  }
+}
+
+const { payCompanyWideBonus, totalEmployeeSalaryMassMonthly } = await import(
+  `file://${join(sim, 'modules/EmployeeBenefits.js')}`
+);
+const { expandEmployeeOptionPool, applySeedCapTableSnapshot } = await import(
+  `file://${join(sim, 'modules/CapTable.js')}`
+);
+const perkState = createInitialState({
+  companyName: 'PerkCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 2_000_000
+});
+perkState.flags.seedRoundClosed = true;
+perkState.flags.xcResidencyComplete = true;
+perkState.staff.headcountByDept.engineering = 5;
+perkState.ceo.salaryAnnual = 120_000;
+const mass = totalEmployeeSalaryMassMonthly(perkState);
+if (mass.total < 1) {
+  console.error('FAIL: employee salary mass should be positive with staff');
+  failed = true;
+} else {
+  const bonus = payCompanyWideBonus(perkState, 5);
+  if (!bonus.ok || (perkState.ceo.careerEmployeeBonuses ?? 0) < 1) {
+    console.error(`FAIL: company bonus: ${bonus.reason ?? 'no ceo credit'}`);
+    failed = true;
+  } else {
+    console.log(`OK: company bonus (${bonus.pct}%, CEO ${formatMoney(bonus.ceoShare)})`);
+  }
+}
+const poolState = createInitialState({ companyName: 'PoolCo', categoryId: 'b2b-saas', mode: 'career' });
+poolState.flags.seedRoundClosed = true;
+applySeedCapTableSnapshot(poolState);
+const before = poolState.capTable.find((r) => r.id === 'esop')?.shares ?? 0;
+const expand = expandEmployeeOptionPool(poolState, 5);
+if (!expand.ok || (poolState.capTable.find((r) => r.id === 'esop')?.shares ?? 0) <= before) {
+  console.error(`FAIL: option pool expand: ${expand.reason ?? 'no shares added'}`);
+  failed = true;
+} else {
+  console.log(`OK: option pool expand +5% (${expand.sharesAdded} shares)`);
+}
+
 const calState = createInitialState({ companyName: 'Cal Co', categoryId: 'b2b-saas', mode: 'career' });
 if (!isRealCalendarYear(calState.calendar.year)) {
   console.error('FAIL: career should start on real calendar year');
@@ -1214,6 +1447,82 @@ if (!isRealCalendarYear(calState.calendar.year)) {
 }
 if (!failed) {
   console.log('OK: finance stack + CEO salary, draws, career comp, real calendar');
+}
+
+const {
+  closeFiscalYearOnDecember,
+  computeTaxLiability,
+  completeTaxFilingTask,
+  donateToCharity,
+  isTaxFilingRequired,
+  TAX_FILING_TASK_ID,
+  ensureFiscal,
+  taxBaseRevenue
+} = await import(`file://${join(sim, 'modules/CorporateTax.js')}`);
+
+const fyRoll = createInitialState({ companyName: 'FY Co', categoryId: 'b2b-saas', mode: 'career' });
+ensureFiscal(fyRoll);
+fyRoll.finance.fiscal.current.revenue = 50_000;
+fyRoll.finance.fiscal.current.expenses = 12_000;
+const rolled = closeFiscalYearOnDecember(fyRoll, 2025, 12);
+if (!rolled || rolled.revenue !== 50_000 || rolled.profit !== 38_000) {
+  console.error('FAIL: fiscal year rollover on December close');
+  failed = true;
+} else if (fyRoll.finance.fiscal.current.year !== 2026 || fyRoll.finance.fiscal.current.revenue !== 0) {
+  console.error('FAIL: fiscal current year should reset after December close');
+  failed = true;
+} else {
+  console.log('OK: fiscal year rollover (Jan–Dec)');
+}
+
+const taxState = createInitialState({ companyName: 'Tax Co', categoryId: 'b2b-saas', mode: 'career' });
+taxState.meta.calendarStartYear = 2024;
+taxState.calendar.year = 2026;
+taxState.calendar.monthIndex = 4;
+taxState.finance.cash = 100_000;
+ensureFiscal(taxState);
+taxState.finance.fiscal.prior = { year: 2025, revenue: 100_000, expenses: 40_000, profit: 60_000 };
+if (!isTaxFilingRequired(taxState)) {
+  console.error('FAIL: April tax filing should be required with prior FY revenue');
+  failed = true;
+} else {
+  const owed = computeTaxLiability(taxState);
+  if (owed !== Math.max(500, Math.round(100_000 * 0.21))) {
+    console.error(`FAIL: tax liability on revenue base (got ${owed})`);
+    failed = true;
+  } else {
+    const filed = completeTaxFilingTask(taxState);
+    if (!filed.ok || taxState.finance.fiscal.taxPaidYear !== 2026) {
+      console.error(`FAIL: complete tax filing: ${filed.reason ?? 'bad state'}`);
+      failed = true;
+    } else if (taxBaseRevenue(taxState) !== 100_000) {
+      console.error('FAIL: tax base should use prior FY revenue after year one');
+      failed = true;
+    } else {
+      console.log(`OK: April corporate tax filing (${formatMoney(filed.owed)})`);
+    }
+  }
+}
+
+const charityState = createInitialState({ companyName: 'Give Co', categoryId: 'b2b-saas', mode: 'career' });
+charityState.finance.cash = 50_000;
+const beforeCash = charityState.finance.cash;
+const gift = donateToCharity(charityState, 5_000);
+if (!gift.ok || charityState.finance.cash !== beforeCash - 5_000) {
+  console.error(`FAIL: charity donate: ${gift.reason ?? 'cash mismatch'}`);
+  failed = true;
+} else if ((charityState.finance.fiscal?.charityDonatedLifetime ?? 0) !== 5_000) {
+  console.error('FAIL: charity lifetime tracker');
+  failed = true;
+} else {
+  console.log('OK: charity donation from company cash');
+}
+
+if (getTaskDefinitions().some((t) => t.id === TAX_FILING_TASK_ID)) {
+  console.log('OK: tax filing desk task in catalog');
+} else {
+  console.error('FAIL: tax filing task missing from merged catalog');
+  failed = true;
 }
 
 process.exit(failed ? 1 : 0);

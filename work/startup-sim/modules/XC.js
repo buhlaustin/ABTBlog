@@ -78,6 +78,9 @@ export function seedRoundTermsNote(state) {
   if (pitch === 'focused') {
     return 'Demo Day focused pitch — investors leaned in; seed terms improved vs. batch median.';
   }
+  if (pitch === 'lean') {
+    return 'Demo Day capital-efficient pitch — lean seed terms and a Finance “lean close” option.';
+  }
   if (pitch === 'bold') {
     return state.xc.demoDayBoldHit
       ? 'Demo Day moonshot landed — hot seed round at a premium valuation.'
@@ -321,6 +324,11 @@ export function beginDemoDayPitchDecision(state) {
         effects: { seedPitch: 'focused' }
       },
       {
+        label: 'Capital-efficient pitch — smaller round, keep equity',
+        hint: 'Lean seed trajectory · unlocks lean close on Finance',
+        effects: { seedPitch: 'lean' }
+      },
+      {
         label: 'Risk-taking pitch — bold vision, big TAM',
         hint: 'Coin flip · hot round or soft landing · trust swings',
         effects: { seedPitch: 'bold' }
@@ -352,14 +360,26 @@ export function applyDemoDayPitchChoice(state, choiceIndex) {
     state.xc.demoDayPitch = 'focused';
     state.xc.demoDayBoldHit = null;
     state.xc.seedRoundTerms = {
-      raised: 3_400_000,
-      preMoney: 13_600_000,
-      postMoney: 17_000_000
+      raised: 3_200_000,
+      preMoney: 15_800_000,
+      postMoney: 19_000_000
     };
     outcomeLines.push(
-      `Seed trajectory set: ${formatMoney(3_400_000)} at ${formatMoney(17_000_000)} post-money.`
+      `Seed trajectory set: ${formatMoney(3_200_000)} at ${formatMoney(19_000_000)} post-money (efficient terms).`
     );
     outcomeLines.push(...applyScenarioEffects(state, { buzz: 2, sentiment: 3 }, { title: 'Demo Day' }));
+  } else if (pitch === 'lean') {
+    state.xc.demoDayPitch = 'lean';
+    state.xc.demoDayBoldHit = null;
+    state.xc.seedRoundTerms = {
+      raised: 2_400_000,
+      preMoney: 17_600_000,
+      postMoney: 20_000_000
+    };
+    outcomeLines.push(
+      `Lean seed trajectory: ${formatMoney(2_400_000)} at ${formatMoney(20_000_000)} post — you kept more of the cap table.`
+    );
+    outcomeLines.push(...applyScenarioEffects(state, { buzz: 1, sentiment: 2 }, { title: 'Demo Day' }));
   } else if (pitch === 'bold') {
     state.xc.demoDayPitch = 'bold';
     const hit = Math.random() < 0.55;

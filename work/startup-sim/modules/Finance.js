@@ -13,10 +13,17 @@ import { competitorRevenueMult } from './Competitor.js';
 import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
 import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
-import { progressionRevenueMult } from './ProgressionEconomy.js';
+import {
+  progressionRevenueMult,
+  progressionTier,
+  getTierRevenueProfile,
+  progressionTierLabelAt,
+  eraBaseRevenueScaleForTask
+} from './ProgressionEconomy.js';
 import { applyTaskRivalEffects } from './WorldDynamics.js';
 import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 import { loanOverheadMonthly } from './BankLoan.js';
+import { accrueFiscalExpense, accrueFiscalRevenue, fiscalYearDisplay } from './CorporateTax.js';
 import { ceoSalaryMonthly } from './CeoEconomics.js';
 import { cooSalaryMonthly } from './Coo.js';
 import { totalHeadcount } from './Staff.js';
@@ -142,9 +149,10 @@ export function taskRevenueMultHud(state) {
 export function estimateTaskPayoutBand(taskDef, state) {
   const [rMin, rMax] = taskDef?.revenue ?? [0, 0];
   const eff = getTaskRevenueMultiplierPreview(state);
+  const era = eraBaseRevenueScaleForTask(taskDef, state);
   return {
-    min: Math.round(rMin * eff * 0.45),
-    max: Math.round(rMax * eff * 1.05)
+    min: Math.round(rMin * era * eff * 0.45),
+    max: Math.round(rMax * era * eff * 1.05)
   };
 }
 
@@ -179,6 +187,63 @@ function sandboxMult(state) {
   return state.mode === 'sandbox' ? MODE_CONFIG.sandbox.difficulty : MODE_CONFIG.career.difficulty;
 }
 
+function scaledPayoutBand(baseRange, mult) {
+  const [lo, hi] = baseRange;
+  return [
+    Math.round(lo * mult * 0.45),
+    Math.round(hi * mult * 1.05)
+  ];
+}
+
+/** Desk + growth payout ranges at current rev× for one progression tier (native catalog bases). */
+export function estimateTierPayoutBands(tier, mult) {
+  const profile = getTierRevenueProfile(tier);
+  let desk = scaledPayoutBand(profile.deskBase, mult);
+  if (profile.deskWhale) {
+    const whale = scaledPayoutBand(profile.deskWhale, mult);
+    desk = [desk[0], Math.max(desk[1], whale[1])];
+  }
+  const growth = scaledPayoutBand(profile.growthBase, mult);
+  return { desk, growth, profile };
+}
+
+/** Current era payout snapshot for HUD / finance panel. */
+export function estimateEraRevenuePotential(state) {
+  const tier = progressionTier(state);
+  const mult = getTaskRevenueMultiplierPreview(state);
+  const { desk, growth, profile } = estimateTierPayoutBands(tier, mult);
+  return {
+    tier,
+    label: progressionTierLabelAt(tier),
+    mult,
+    desk,
+    growth,
+    arrGuide: profile.arrGuide
+  };
+}
+
+/** All tiers — native base bands and illustrative payout at current rev×. */
+export function allTierRevenuePotentialRows(state) {
+  const mult = getTaskRevenueMultiplierPreview(state);
+  const current = progressionTier(state);
+  const rows = [];
+  for (let tier = 0; tier <= 7; tier += 1) {
+    const { desk, growth, profile } = estimateTierPayoutBands(tier, mult);
+    rows.push({
+      tier,
+      label: progressionTierLabelAt(tier),
+      arrGuide: profile.arrGuide,
+      deskBase: profile.deskBase,
+      growthBase: profile.growthBase,
+      deskWhale: profile.deskWhale ?? null,
+      deskPayout: desk,
+      growthPayout: growth,
+      isCurrent: tier === current
+    });
+  }
+  return rows;
+}
+
 /** Apply one task's cash flow immediately when completed. */
 export function applyTaskOutcome(state, taskDef, rolled) {
   const econ = state.company.economics ?? { revenueMult: 1, costMult: 1 };
@@ -192,11 +257,14 @@ export function applyTaskOutcome(state, taskDef, rolled) {
       scenarioCostMult(state)
   );
   const payoutMult = getTaskRevenueMultiplierPreview(state);
-  const revenue = Math.round(rolled.revenue * payoutMult * staffRetentionBonus(state, taskDef));
+  const revenue = Math.round(
+    rolled.revenue * payoutMult * staffRetentionBonus(state, taskDef)
+  );
 
   state.finance.cash -= cost;
   state.finance.cash += revenue;
   state.finance.lifetimeRevenue += revenue;
+  if (revenue > 0) accrueFiscalRevenue(state, revenue);
   if (cost > 0) recordCashOutflow(state, cost, 'task');
   state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + revenue;
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
@@ -222,7 +290,8 @@ export function rollTaskOutcome(taskDef, state) {
   const buzz = taskDef.buzz ?? 0;
   const base = rMin + Math.random() * Math.max(0, rMax - rMin);
   const mult = headcountExecutionScale(state, taskDef) * departmentTaskMultiplier(state, taskDef);
-  const revenue = Math.round(base * mult);
+  const era = eraBaseRevenueScaleForTask(taskDef, state);
+  const revenue = Math.round(base * mult * era);
   let mrrGain = 0;
   const mrrSpec = taskDef.mrrGain;
   if (Array.isArray(mrrSpec) && mrrSpec.length >= 2) {
@@ -240,6 +309,7 @@ export function recordCashOutflow(state, amount, _category = 'other') {
   if (!n) return;
   if (!state.finance) state.finance = {};
   state.finance.lifetimeExpenses = (state.finance.lifetimeExpenses ?? 0) + n;
+  accrueFiscalExpense(state, n);
   syncLifetimeProfit(state);
 }
 
@@ -282,15 +352,33 @@ export function resolveMonthEndBurn(state) {
   return burn;
 }
 
+export function companyRunwayDisplay(state) {
+  const burn = state.finance?.monthlyBurn ?? projectMonthlyBurn(state);
+  const cash = state.finance?.cash ?? 0;
+  let monthsLabel = '∞';
+  if (burn > 0) {
+    const months = cash / burn;
+    monthsLabel = months >= 99 ? '99+ mo' : `${Math.round(months * 10) / 10} mo`;
+  }
+  const detail =
+    burn > 0
+      ? `${formatMoney(cash)} cash · ${formatMoney(burn)}/mo burn`
+      : `${formatMoney(cash)} cash · $0 net burn`;
+  return { monthsLabel, detail, burn, cash };
+}
+
 export function renderFinanceSummary(state) {
   const burn = projectMonthlyBurn(state);
   const cash = state.finance?.cash ?? 0;
-  const runway = burn > 0 ? `${(cash / burn).toFixed(1)} mo` : '∞';
+  const runwayInfo = companyRunwayDisplay(state);
+  const runway = runwayInfo.monthsLabel;
   syncLifetimeProfit(state);
+  const fy = fiscalYearDisplay(state);
 
   return {
     burn,
     runway,
+    runwayDetail: runwayInfo.detail,
     burnLabel: formatMoney(burn),
     cashLabel: formatMoney(cash),
     mrrLabel: formatMoney(state.finance?.mrr ?? 0),
@@ -298,6 +386,19 @@ export function renderFinanceSummary(state) {
     lifetimeExpensesLabel: formatMoney(state.finance?.lifetimeExpenses ?? 0),
     lifetimeProfitLabel: formatMoney(state.finance?.lifetimeProfit ?? 0),
     initialInvestmentLabel: formatMoney(initialInvestmentCash(state)),
-    founderStakeLabel: founderValuationStake(state) != null ? formatMoney(founderValuationStake(state)) : '—'
+    founderStakeLabel: founderValuationStake(state) != null ? formatMoney(founderValuationStake(state)) : '—',
+    fiscalCurrentYear: fy.currentYear,
+    fiscalCurrentRevenueLabel: formatMoney(fy.currentRevenue),
+    fiscalCurrentExpensesLabel: formatMoney(fy.currentExpenses),
+    fiscalCurrentProfitLabel: formatMoney(fy.currentProfit),
+    fiscalShowPrior: fy.showPrior,
+    fiscalPriorYear: fy.prior?.year,
+    fiscalPriorRevenueLabel: formatMoney(fy.prior?.revenue ?? 0),
+    fiscalPriorExpensesLabel: formatMoney(fy.prior?.expenses ?? 0),
+    fiscalPriorProfitLabel: formatMoney(fy.prior?.profit ?? 0),
+    fiscalTaxLiability: fy.taxLiability,
+    fiscalTaxLiabilityLabel: formatMoney(fy.taxLiability),
+    fiscalTaxPaid: fy.taxPaid,
+    charityLifetimeLabel: formatMoney(fy.charityLifetime)
   };
 }

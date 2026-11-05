@@ -23,7 +23,7 @@ const dataAttrs = new Set();
 for (const { text } of sources) {
   for (const m of text.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) btnIds.add(m[1]);
   for (const m of text.matchAll(/\bid='(btn-[a-z0-9-]+)'/g)) btnIds.add(m[1]);
-  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|social-tab|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action)/g)) {
+  for (const m of text.matchAll(/data-(complete-task|complete-board-task|staff-delta|remove-satellite|crisis-choice|decision-choice|acquisition-buy|acquisition-sell|acquisition-reinvest-pick|acquisition-reinvest-submit|acquisition-diligence|companies-filter|companies-page|companies-sort|stock-guidance|stock-buyback|stock-follow-on|stock-split|stock-dividend|join-accelerator|loan-draw|loan-prepay|owner-draw|ceo-salary-preset|staff-input|tutorial-id|toggle-task-offer|purchase-workspace|hire-exec|product-action|buy-all-side|buy-all-growth|people-tab|company-bonus|employee-offsite|employee-perk|expand-option-pool|seed-structure)/g)) {
     dataAttrs.add(m[1]);
   }
 }
@@ -67,7 +67,8 @@ const dataPatterns = {
   'decision-choice': "closest('[data-decision-choice]')",
   'acquisition-buy': "closest('[data-acquisition-buy]')",
   'acquisition-sell': "closest('[data-acquisition-sell]')",
-  'acquisition-reinvest': "closest('[data-acquisition-reinvest]')",
+  'acquisition-reinvest-pick': "closest('[data-acquisition-reinvest-pick]')",
+  'acquisition-reinvest-submit': "closest('[data-acquisition-reinvest-submit]')",
   'companies-filter': "closest('[data-companies-filter]')",
   'companies-page': "closest('[data-companies-page]')",
   'companies-sort': "closest('[data-companies-sort]')",
@@ -77,18 +78,26 @@ const dataPatterns = {
   'stock-follow-on': "closest('[data-stock-follow-on]')",
   'stock-split': "closest('[data-stock-split]')",
   'stock-dividend': "closest('[data-stock-dividend]')",
-  'social-tab': "closest('[data-social-tab]')",
   'staff-input': "closest('[data-staff-input]')",
   'tutorial-id': 'btn-dismiss-tutorial',
   'toggle-task-offer': "closest('[data-toggle-task-offer]')",
   'purchase-workspace': "closest('[data-purchase-workspace]')",
+  'seed-structure': "closest('[data-seed-structure]')",
   'complete-board-task': "closest('[data-complete-board-task]')",
   'hire-exec': "closest('[data-hire-exec]')",
   'product-action': "closest('[data-product-action]')",
+  'buy-all-side': "closest('[data-buy-all-side]')",
+  'buy-all-growth': "closest('[data-buy-all-growth]')",
+  'people-tab': "closest('[data-people-tab]')",
+  'company-bonus': "closest('[data-company-bonus]')",
+  'employee-offsite': "closest('[data-employee-offsite]')",
+  'employee-perk': "closest('[data-employee-perk]')",
+  'expand-option-pool': "closest('[data-expand-option-pool]')",
   'join-accelerator': "closest('[data-join-accelerator]')",
   'loan-draw': "closest('[data-loan-draw]')",
   'loan-prepay': "closest('[data-loan-prepay]')",
   'owner-draw': "closest('[data-owner-draw]')",
+  'charity-donate': "closest('[data-charity-donate]')",
   'ceo-salary-preset': "closest('[data-ceo-salary-preset]')"
 };
 

@@ -3,6 +3,7 @@ import { advanceRealCalendarMonth, realClockNow } from './GameCalendar.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
 import { resolveMonthEndBurn } from './Finance.js';
+import { closeFiscalYearOnDecember } from './CorporateTax.js';
 import { serviceLoanAtMonthEnd } from './BankLoan.js';
 import { settleRevenueAdvanceAtMonthEnd } from './RevenueAdvance.js';
 import {
@@ -18,8 +19,10 @@ import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
 import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
 import { tickAcceleratorBoost } from './Accelerators.js';
+import { tickCooCompensationReview } from './Coo.js';
 import { resetGrowthCampaignsMonth, growthRosterRefreshLine } from './GrowthCampaigns.js';
 import { resetProductActionsMonth } from './ProductActions.js';
+import { resetEmployeeBenefitsMonth } from './EmployeeBenefits.js';
 import {
   tickLaunchAtMonthStart,
   tickPreLaunchAtMonthStart,
@@ -78,6 +81,7 @@ export function startMonth(state) {
   resetGrowthCampaignsMonth(state);
   appendLog(state, growthRosterRefreshLine(state));
   resetProductActionsMonth(state);
+  resetEmployeeBenefitsMonth(state);
   for (const line of applyBuzzDecayAtMonthStart(state)) {
     appendLog(state, line);
   }
@@ -118,6 +122,9 @@ export function endMonth(state) {
   const growthCampaignsClosed = state.growth?.campaignsThisMonth?.length ?? 0;
   const burn = resolveMonthEndBurn(state);
   for (const line of recordCeoSalaryForMonth(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickCooCompensationReview(state)) {
     appendLog(state, line);
   }
   for (const line of settlePersonalExpensesAtMonthEnd(state)) {
@@ -214,6 +221,13 @@ export function endMonth(state) {
   }
 
   const cashAfter = state.finance.cash;
+  const closedFy = closeFiscalYearOnDecember(state, closedYear, closedMonthIndex);
+  if (closedFy) {
+    appendLog(
+      state,
+      `Fiscal ${closedYear} closed — revenue ${formatMoney(closedFy.revenue)}, expenses ${formatMoney(closedFy.expenses)}, profit ${formatMoney(closedFy.profit)}.`
+    );
+  }
   archiveCurrentNews(state);
   advanceCalendarMonth(state);
   startMonth(state);

@@ -1,16 +1,21 @@
 import { formatMoney } from './constants.js';
 import { grantExecutiveEquity } from './CapTable.js';
 import { calendarTurn } from './GameCalendar.js';
+import { ceoSalaryMonthly } from './CeoEconomics.js';
+import { isPublicCompany } from './IPO.js';
 import bundledExecNames from '../data/exec-names.json' with { type: 'json' };
 
 /** Cash comp by workspace tier once you leave the garage (garage uses equity tradeoff). */
 const COO_SALARY_BY_TIER = {
   small: 11_000,
-  medium: 14_000,
-  large: 16_500,
-  campus: 18_000,
-  hub: 21_000
+  medium: 16_000,
+  large: 24_000,
+  campus: 48_000,
+  hub: 72_000
 };
+
+export const COO_ANNUAL_REVIEW_MONTHS = 12;
+export const COO_MARKET_RAISE_PCT = 0.045;
 
 const GARAGE_SALARY_AT_MIN_EQUITY = 7_500;
 const GARAGE_MIN_EQUITY_PCT = 0.5;
@@ -35,7 +40,9 @@ export function createInitialCooState() {
     bio: null,
     hiredTurn: null,
     hiredYear: null,
-    hiredMonth: null
+    hiredMonth: null,
+    lastSalaryReviewYear: null,
+    lastSalaryReviewMonth: null
   };
 }
 
@@ -64,8 +71,7 @@ export function garageCooSalaryFromEquity(equityPct) {
   return Math.round(GARAGE_SALARY_AT_MIN_EQUITY + t * (GARAGE_MID_SALARY - GARAGE_SALARY_AT_MIN_EQUITY));
 }
 
-export function cooSalaryMonthly(state) {
-  if (!isCooHired(state)) return 0;
+function cooBaseSalaryMonthly(state) {
   const tier = workspaceTierKey(state);
   if (tier === 'garage') {
     return garageCooSalaryFromEquity(state.coo?.equityPct ?? 0);
@@ -73,6 +79,17 @@ export function cooSalaryMonthly(state) {
   const stored = state.coo?.salaryMonthly;
   if (typeof stored === 'number' && stored >= 0) return stored;
   return defaultCooSalaryForTier(tier);
+}
+
+export function cooSalaryMonthly(state) {
+  if (!isCooHired(state)) return 0;
+  let pay = cooBaseSalaryMonthly(state);
+  if (isPublicCompany(state) || state.flags?.ipoFiled) {
+    const ceoMo = ceoSalaryMonthly(state);
+    const publicFloor = Math.round(ceoMo * 0.6);
+    if (publicFloor > pay) pay = publicFloor;
+  }
+  return pay;
 }
 
 export function previewCooSalaryMonthly(state, equityPct) {
@@ -145,6 +162,8 @@ export function hireCoo(state, options) {
   state.coo.hiredTurn = calendarTurn(state);
   state.coo.hiredYear = state.calendar?.year;
   state.coo.hiredMonth = state.calendar?.monthIndex;
+  state.coo.lastSalaryReviewYear = state.calendar?.year;
+  state.coo.lastSalaryReviewMonth = state.calendar?.monthIndex;
 
   return {
     ok: true,
@@ -169,10 +188,42 @@ export function releaseCoo(state) {
 export function syncCooSalaryToWorkspace(state) {
   if (!isCooHired(state)) return;
   const tier = workspaceTierKey(state);
-  state.coo.salaryMonthly =
+  const next =
     tier === 'garage'
       ? garageCooSalaryFromEquity(state.coo?.equityPct ?? 0)
       : defaultCooSalaryForTier(tier);
+  const prior = state.coo.salaryMonthly ?? 0;
+  state.coo.salaryMonthly = Math.max(prior, next);
+}
+
+/** Annual market-style raise (stored base; public IPO floor applied at payout). */
+export function tickCooCompensationReview(state) {
+  if (!isCooHired(state)) return [];
+  const tier = workspaceTierKey(state);
+  if (tier === 'garage') return [];
+
+  const c = state.coo;
+  const year = state.calendar?.year ?? 0;
+  const month = state.calendar?.monthIndex ?? 0;
+  if (c.lastSalaryReviewYear == null) {
+    c.lastSalaryReviewYear = c.hiredYear ?? year;
+    c.lastSalaryReviewMonth = c.hiredMonth ?? month;
+    return [];
+  }
+
+  const elapsed =
+    (year - c.lastSalaryReviewYear) * 12 + (month - c.lastSalaryReviewMonth);
+  if (elapsed < COO_ANNUAL_REVIEW_MONTHS) return [];
+
+  const prior = c.salaryMonthly ?? defaultCooSalaryForTier(tier);
+  const floor = defaultCooSalaryForTier(tier);
+  const raised = Math.max(floor, Math.round(prior * (1 + COO_MARKET_RAISE_PCT)));
+  c.salaryMonthly = raised;
+  c.lastSalaryReviewYear = year;
+  c.lastSalaryReviewMonth = month;
+  return [
+    `COO compensation review — base cash comp adjusted to ${formatMoney(raised)}/mo (public companies also track ≥60% of CEO salary).`
+  ];
 }
 
 export function renderLeadershipOrgChart(container, state) {

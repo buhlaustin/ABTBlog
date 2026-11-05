@@ -1,9 +1,30 @@
 {
   "tasks": [
     {
-      "id": "public-whale-001",
-      "title": "Public whale desk #1: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-fortune-100-platform-deal",
+      "title": "Renew Fortune 100 platform deal",
+      "description": "Legal redlines the size of a phone book; procurement still wants 3% off.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 8000,
+      "revenue": [
+        90000,
+        270000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "stockPct": 0.008
+    },
+    {
+      "id": "close-federal-rfp-tranche",
+      "title": "Close federal RFP tranche",
+      "description": "Compliance docs, pen tests, and a demo that cannot drop Wi‑Fi.",
       "types": [
         "sales",
         "marketing"
@@ -13,20 +34,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 290000,
+      "cost": 14500,
       "revenue": [
-        1625000000,
-        4305000000
+        125000,
+        400000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 2
     },
     {
-      "id": "public-whale-002",
-      "title": "Public whale desk #2: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "upsell-enterprise-ai-add-on",
+      "title": "Upsell enterprise AI add-on",
+      "description": "Customer already pays for seats; now they want “copilot everywhere.”",
       "types": [
         "product",
         "sales"
@@ -36,20 +55,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 330000,
+      "cost": 21000,
       "revenue": [
-        1750000000,
-        4610000000
+        160000,
+        530000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 3
     },
     {
-      "id": "public-whale-003",
-      "title": "Public whale desk #3: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "defend-renewal-against-rival-bake-off",
+      "title": "Defend renewal against rival bake-off",
+      "description": "Incumbent discount vs. your new roadmap slide deck.",
       "types": [
         "marketing"
       ],
@@ -58,43 +75,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 370000,
+      "cost": 27500,
       "revenue": [
-        1875000000,
-        4915000000
+        195000,
+        660000
       ],
-      "product": 1,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.02
+      "product": 0,
+      "buzz": 4
     },
     {
-      "id": "public-whale-004",
-      "title": "Public whale desk #4: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "launch-analyst-day-dry-run",
+      "title": "Launch analyst day dry run",
+      "description": "IR coaches the CEO on saying “confident” without promising numbers.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 410000,
+      "cost": 34000,
       "revenue": [
-        2000000000,
-        5220000000
+        230000,
+        790000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.024
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-005",
-      "title": "Public whale desk #5: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "ship-public-sector-reference-win",
+      "title": "Ship public-sector reference win",
+      "description": "Case study with enough redactions to look mysterious.",
       "types": [
         "sales"
       ],
@@ -103,20 +116,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 450000,
+      "cost": 40500,
       "revenue": [
-        2125000000,
-        5525000000
+        265000,
+        920000
       ],
       "product": 0,
       "buzz": 2,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.02
     },
     {
-      "id": "public-whale-006",
-      "title": "Public whale desk #6: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "negotiate-multi-year-ela",
+      "title": "Negotiate multi-year ELA",
+      "description": "Legal wants five years; customer wants a one-year escape hatch.",
       "types": [
         "sales",
         "marketing"
@@ -126,20 +138,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 490000,
+      "cost": 47000,
       "revenue": [
-        2250000000,
-        5830000000
+        300000,
+        1050000
       ],
-      "product": 1,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.012
+      "product": 0,
+      "buzz": 3
     },
     {
-      "id": "public-whale-007",
-      "title": "Public whale desk #7: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "run-global-pricing-harmonization",
+      "title": "Run global pricing harmonization",
+      "description": "Same SKU, twelve currencies, one angry CFO in France.",
       "types": [
         "product",
         "sales"
@@ -149,20 +159,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 530000,
+      "cost": 53500,
       "revenue": [
-        2375000000,
-        6135000000
+        335000,
+        1180000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 4
     },
     {
-      "id": "public-whale-008",
-      "title": "Public whale desk #8: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-healthcare-system-expansion",
+      "title": "Land healthcare system expansion",
+      "description": "HIPAA packet, BAA signatures, and a go-live date that moved twice.",
       "types": [
         "marketing"
       ],
@@ -171,43 +179,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 570000,
+      "cost": 60000,
       "revenue": [
-        2500000000,
-        6440000000
+        370000,
+        1310000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.02
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-009",
-      "title": "Public whale desk #9: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-media-conglomerate-pilot",
+      "title": "Close media conglomerate pilot",
+      "description": "POC success metric is “executives stopped emailing.”",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 610000,
+      "cost": 66500,
       "revenue": [
-        2625000000,
-        6745000000
+        405000,
+        585000
       ],
-      "product": 1,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.024
+      "product": 0,
+      "buzz": 2
     },
     {
-      "id": "public-whale-010",
-      "title": "Public whale desk #10: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-telco-edge-deployment",
+      "title": "Expand telco edge deployment",
+      "description": "Field engineers, SLAs, and a rival claiming they were “almost done.”",
       "types": [
         "sales"
       ],
@@ -216,20 +220,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 650000,
+      "cost": 73000,
       "revenue": [
-        2750000000,
-        7050000000
+        440000,
+        715000
       ],
       "product": 0,
       "buzz": 3,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.014
     },
     {
-      "id": "public-whale-011",
-      "title": "Public whale desk #11: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-retailer-peak-season-prep",
+      "title": "Win retailer peak-season prep",
+      "description": "Black Friday load test or bust; marketing wants logos early.",
       "types": [
         "sales",
         "marketing"
@@ -239,20 +242,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 690000,
+      "cost": 79500,
       "revenue": [
-        2875000000,
-        7355000000
+        475000,
+        845000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 4
     },
     {
-      "id": "public-whale-012",
-      "title": "Public whale desk #12: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "secure-university-system-contract",
+      "title": "Secure university system contract",
+      "description": "Procurement via committee; students want SSO yesterday.",
       "types": [
         "product",
         "sales"
@@ -262,20 +263,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 250000,
+      "cost": 86000,
       "revenue": [
-        3000000000,
-        7660000000
+        510000,
+        975000
       ],
       "product": 1,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 1
     },
     {
-      "id": "public-whale-013",
-      "title": "Public whale desk #13: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-automotive-oem-tier-2-deal",
+      "title": "Close automotive OEM tier-2 deal",
+      "description": "Long cycle, longer security questionnaire.",
       "types": [
         "marketing"
       ],
@@ -284,43 +283,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 290000,
+      "cost": 92500,
       "revenue": [
-        3125000000,
-        7965000000
+        545000,
+        1105000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.02
+      "buzz": 2
     },
     {
-      "id": "public-whale-014",
-      "title": "Public whale desk #14: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-insurance-carrier-book",
+      "title": "Renew insurance carrier book",
+      "description": "Actuarial models meet your uptime chart.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 330000,
+      "cost": 8000,
       "revenue": [
-        3250000000,
-        8270000000
+        580000,
+        1235000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 3
     },
     {
-      "id": "public-whale-015",
-      "title": "Public whale desk #15: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-energy-sector-analytics-pack",
+      "title": "Land energy sector analytics pack",
+      "description": "OT network approval took longer than the sale.",
       "types": [
         "sales"
       ],
@@ -329,20 +324,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 370000,
+      "cost": 14500,
       "revenue": [
-        3375000000,
-        8575000000
+        615000,
+        1365000
       ],
-      "product": 1,
+      "product": 0,
       "buzz": 4,
-      "whale": true,
       "stockPct": 0.008
     },
     {
-      "id": "public-whale-016",
-      "title": "Public whale desk #16: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-logistics-partner-network",
+      "title": "Expand logistics partner network",
+      "description": "API keys for partners who still email CSVs.",
       "types": [
         "sales",
         "marketing"
@@ -352,20 +346,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 410000,
+      "cost": 21000,
       "revenue": [
-        3500000000,
-        8880000000
+        650000,
+        1495000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.012
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-017",
-      "title": "Public whale desk #17: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-hospitality-chain-rollout",
+      "title": "Close hospitality chain rollout",
+      "description": "Property managers care about tablets, not your architecture diagram.",
       "types": [
         "product",
         "sales"
@@ -375,20 +367,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 450000,
+      "cost": 27500,
       "revenue": [
-        3625000000,
-        6125000000
+        90000,
+        1030000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 2
     },
     {
-      "id": "public-whale-018",
-      "title": "Public whale desk #18: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-gaming-publisher-live-ops",
+      "title": "Win gaming publisher live-ops",
+      "description": "Launch week traffic spikes are the only sermon they hear.",
       "types": [
         "marketing"
       ],
@@ -397,43 +387,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 490000,
+      "cost": 34000,
       "revenue": [
-        3750000000,
-        6430000000
+        125000,
+        305000
       ],
-      "product": 1,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.02
+      "product": 0,
+      "buzz": 3
     },
     {
-      "id": "public-whale-019",
-      "title": "Public whale desk #19: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "defend-public-sector-renewal",
+      "title": "Defend public-sector renewal",
+      "description": "New commissioner, same budget, fresh RFP anyway.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 530000,
+      "cost": 40500,
       "revenue": [
-        3875000000,
-        6735000000
+        160000,
+        435000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 4
     },
     {
-      "id": "public-whale-020",
-      "title": "Public whale desk #20: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "upsell-manufacturing-mes-bridge",
+      "title": "Upsell manufacturing MES bridge",
+      "description": "Shop floor tablets finally talk to finance.",
       "types": [
         "sales"
       ],
@@ -442,20 +428,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 570000,
+      "cost": 47000,
       "revenue": [
-        4000000000,
-        7040000000
+        195000,
+        565000
       ],
-      "product": 0,
+      "product": 1,
       "buzz": 1,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.02
     },
     {
-      "id": "public-whale-021",
-      "title": "Public whale desk #21: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-pharma-validation-package",
+      "title": "Land pharma validation package",
+      "description": "CSV docs and auditors who love checklists.",
       "types": [
         "sales",
         "marketing"
@@ -465,20 +450,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 610000,
+      "cost": 53500,
       "revenue": [
-        4125000000,
-        7345000000
+        230000,
+        695000
       ],
-      "product": 1,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.012
+      "product": 0,
+      "buzz": 2
     },
     {
-      "id": "public-whale-022",
-      "title": "Public whale desk #22: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-airline-loyalty-integration",
+      "title": "Close airline loyalty integration",
+      "description": "Miles, points, and a middleware team on both sides.",
       "types": [
         "product",
         "sales"
@@ -488,20 +471,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 650000,
+      "cost": 60000,
       "revenue": [
-        4250000000,
-        7650000000
+        265000,
+        825000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 3
     },
     {
-      "id": "public-whale-023",
-      "title": "Public whale desk #23: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-neobank-feature-bundle",
+      "title": "Expand neobank feature bundle",
+      "description": "Regulators peek over the fence; ship anyway.",
       "types": [
         "marketing"
       ],
@@ -510,43 +491,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 690000,
+      "cost": 66500,
       "revenue": [
-        4375000000,
-        7955000000
+        300000,
+        955000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.02
+      "buzz": 4
     },
     {
-      "id": "public-whale-024",
-      "title": "Public whale desk #24: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-saas-reseller-agreement",
+      "title": "Renew SaaS reseller agreement",
+      "description": "Channel margin fight with a partner who also resells your rival.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 250000,
+      "cost": 73000,
       "revenue": [
-        4500000000,
-        8260000000
+        335000,
+        1085000
       ],
       "product": 1,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 1
     },
     {
-      "id": "public-whale-025",
-      "title": "Public whale desk #25: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-municipal-open-data-portal",
+      "title": "Win municipal open-data portal",
+      "description": "Press release drafted before procurement finishes.",
       "types": [
         "sales"
       ],
@@ -555,20 +532,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 290000,
+      "cost": 79500,
       "revenue": [
-        4625000000,
-        8565000000
+        370000,
+        1215000
       ],
       "product": 0,
       "buzz": 2,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.014
     },
     {
-      "id": "public-whale-026",
-      "title": "Public whale desk #26: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-defense-subcontract-scope",
+      "title": "Land defense subcontract scope",
+      "description": "Clearance paperwork slower than the product roadmap.",
       "types": [
         "sales",
         "marketing"
@@ -578,20 +554,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 330000,
+      "cost": 86000,
       "revenue": [
-        4750000000,
-        8870000000
+        405000,
+        1345000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 3
     },
     {
-      "id": "public-whale-027",
-      "title": "Public whale desk #27: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-sports-league-stats-deal",
+      "title": "Close sports league stats deal",
+      "description": "Real-time feeds; fans complain on Twitter if you lag.",
       "types": [
         "product",
         "sales"
@@ -601,20 +575,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 370000,
+      "cost": 92500,
       "revenue": [
-        4875000000,
-        9175000000
+        440000,
+        620000
       ],
-      "product": 1,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.016
+      "product": 0,
+      "buzz": 4
     },
     {
-      "id": "public-whale-028",
-      "title": "Public whale desk #28: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-payment-processor-rails",
+      "title": "Expand payment processor rails",
+      "description": "Chargebacks, disputes, and a fraud model update.",
       "types": [
         "marketing"
       ],
@@ -623,43 +595,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 410000,
+      "cost": 8000,
       "revenue": [
-        5000000000,
-        9480000000
+        475000,
+        750000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.02
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-029",
-      "title": "Public whale desk #29: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-hr-platform-global-seats",
+      "title": "Renew HR platform global seats",
+      "description": "Payroll cutover weekend — nobody sleeps.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 450000,
+      "cost": 14500,
       "revenue": [
-        5125000000,
-        9785000000
+        510000,
+        880000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 2
     },
     {
-      "id": "public-whale-030",
-      "title": "Public whale desk #30: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-edtech-district-wide-sso",
+      "title": "Win edtech district-wide SSO",
+      "description": "Parent emails, teacher training, and one broken Chromebook cart.",
       "types": [
         "sales"
       ],
@@ -668,20 +636,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 490000,
+      "cost": 21000,
       "revenue": [
-        5250000000,
-        10090000000
+        545000,
+        1010000
       ],
-      "product": 1,
+      "product": 0,
       "buzz": 3,
-      "whale": true,
       "stockPct": 0.008
     },
     {
-      "id": "public-whale-031",
-      "title": "Public whale desk #31: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-cre-portfolio-analytics",
+      "title": "Land CRE portfolio analytics",
+      "description": "Owners want occupancy dashboards, not jargon.",
       "types": [
         "sales",
         "marketing"
@@ -691,20 +658,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 530000,
+      "cost": 27500,
       "revenue": [
-        5375000000,
-        10395000000
+        580000,
+        1140000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 4
     },
     {
-      "id": "public-whale-032",
-      "title": "Public whale desk #32: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-cybersecurity-mssp-bundle",
+      "title": "Close cybersecurity MSSP bundle",
+      "description": "SOC handoff runbook thicker than the contract.",
       "types": [
         "product",
         "sales"
@@ -714,20 +679,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 570000,
+      "cost": 34000,
       "revenue": [
-        5500000000,
-        10700000000
+        615000,
+        1270000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.016
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-033",
-      "title": "Public whale desk #33: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-iot-fleet-telemetry",
+      "title": "Expand IoT fleet telemetry",
+      "description": "Devices in the field that never get firmware updates.",
       "types": [
         "marketing"
       ],
@@ -736,43 +699,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 610000,
+      "cost": 40500,
       "revenue": [
-        5625000000,
-        11005000000
+        650000,
+        1400000
       ],
-      "product": 1,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.02
+      "product": 0,
+      "buzz": 2
     },
     {
-      "id": "public-whale-034",
-      "title": "Public whale desk #34: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "defend-media-streaming-renewal",
+      "title": "Defend media streaming renewal",
+      "description": "Churn cohort slide saves the quarter.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 650000,
+      "cost": 47000,
       "revenue": [
-        5750000000,
-        8250000000
+        90000,
+        935000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 3
     },
     {
-      "id": "public-whale-035",
-      "title": "Public whale desk #35: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "upsell-ad-tech-clean-room",
+      "title": "Upsell ad-tech clean room",
+      "description": "Privacy lawyers finally nod in the same meeting.",
       "types": [
         "sales"
       ],
@@ -781,20 +740,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 690000,
+      "cost": 53500,
       "revenue": [
-        5875000000,
-        8555000000
+        125000,
+        1065000
       ],
       "product": 0,
       "buzz": 4,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.02
     },
     {
-      "id": "public-whale-036",
-      "title": "Public whale desk #36: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-semiconductor-yield-module",
+      "title": "Win semiconductor yield module",
+      "description": "Fab managers speak in acronyms; you learn fast.",
       "types": [
         "sales",
         "marketing"
@@ -804,20 +762,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 250000,
+      "cost": 60000,
       "revenue": [
-        6000000000,
-        8860000000
+        160000,
+        340000
       ],
       "product": 1,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 1
     },
     {
-      "id": "public-whale-037",
-      "title": "Public whale desk #37: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-agricultural-co-op-order",
+      "title": "Close agricultural co-op order",
+      "description": "Harvest season deadline beats your sprint planning.",
       "types": [
         "product",
         "sales"
@@ -827,20 +783,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 290000,
+      "cost": 66500,
       "revenue": [
-        6125000000,
-        9165000000
+        195000,
+        470000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 2
     },
     {
-      "id": "public-whale-038",
-      "title": "Public whale desk #38: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-legal-tech-matter-sync",
+      "title": "Renew legal tech matter sync",
+      "description": "Partners trust redlines, not roadmaps.",
       "types": [
         "marketing"
       ],
@@ -849,43 +803,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 330000,
+      "cost": 73000,
       "revenue": [
-        6250000000,
-        9470000000
+        230000,
+        600000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.02
+      "buzz": 3
     },
     {
-      "id": "public-whale-039",
-      "title": "Public whale desk #39: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-nonprofit-grant-reporting",
+      "title": "Land nonprofit grant reporting",
+      "description": "Donors want impact metrics in plain English.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 370000,
+      "cost": 79500,
       "revenue": [
-        6375000000,
-        9775000000
+        265000,
+        730000
       ],
-      "product": 1,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.024
+      "product": 0,
+      "buzz": 4
     },
     {
-      "id": "public-whale-040",
-      "title": "Public whale desk #40: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-marketplace-take-rate-test",
+      "title": "Expand marketplace take-rate test",
+      "description": "GMV up; sellers complain about fees on Discord.",
       "types": [
         "sales"
       ],
@@ -894,20 +844,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 410000,
+      "cost": 86000,
       "revenue": [
-        1500000000,
-        5080000000
+        300000,
+        860000
       ],
-      "product": 0,
+      "product": 1,
       "buzz": 1,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.014
     },
     {
-      "id": "public-whale-041",
-      "title": "Public whale desk #41: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-real-estate-brokerage-crm",
+      "title": "Close real-estate brokerage CRM",
+      "description": "Agents want mobile; IT wants MDM.",
       "types": [
         "sales",
         "marketing"
@@ -917,20 +866,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 450000,
+      "cost": 92500,
       "revenue": [
-        1625000000,
-        5385000000
+        335000,
+        990000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 2
     },
     {
-      "id": "public-whale-042",
-      "title": "Public whale desk #42: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-public-transit-mobile-tickets",
+      "title": "Win public transit mobile tickets",
+      "description": "Riders want offline mode; ops wants fraud controls.",
       "types": [
         "product",
         "sales"
@@ -940,20 +887,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 490000,
+      "cost": 8000,
       "revenue": [
-        1750000000,
-        5690000000
+        370000,
+        1120000
       ],
-      "product": 1,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.016
+      "product": 0,
+      "buzz": 3
     },
     {
-      "id": "public-whale-043",
-      "title": "Public whale desk #43: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "defend-healthcare-payer-renewal",
+      "title": "Defend healthcare payer renewal",
+      "description": "Claims volume spike after flu season.",
       "types": [
         "marketing"
       ],
@@ -962,43 +907,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 530000,
+      "cost": 14500,
       "revenue": [
-        1875000000,
-        5995000000
+        405000,
+        1250000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.02
+      "buzz": 4
     },
     {
-      "id": "public-whale-044",
-      "title": "Public whale desk #44: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-warehouse-robotics-api",
+      "title": "Land warehouse robotics API",
+      "description": "Pick rates up when the robots stop arguing with WMS.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 570000,
+      "cost": 21000,
       "revenue": [
-        2000000000,
-        6300000000
+        440000,
+        1380000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.024
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-045",
-      "title": "Public whale desk #45: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-cybersecurity-insurance-attestation",
+      "title": "Renew cybersecurity insurance attestation",
+      "description": "Questionnaire answers become product requirements.",
       "types": [
         "sales"
       ],
@@ -1007,20 +948,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 610000,
+      "cost": 27500,
       "revenue": [
-        2125000000,
-        6605000000
+        475000,
+        655000
       ],
-      "product": 1,
+      "product": 0,
       "buzz": 2,
-      "whale": true,
       "stockPct": 0.008
     },
     {
-      "id": "public-whale-046",
-      "title": "Public whale desk #46: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-consortium-data-share",
+      "title": "Close consortium data share",
+      "description": "Competitors share threat intel without sharing customers.",
       "types": [
         "sales",
         "marketing"
@@ -1030,20 +970,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 650000,
+      "cost": 34000,
       "revenue": [
-        2250000000,
-        6910000000
+        510000,
+        785000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 3
     },
     {
-      "id": "public-whale-047",
-      "title": "Public whale desk #47: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-latam-reseller-mesh",
+      "title": "Expand LATAM reseller mesh",
+      "description": "Currency swings; contracts in USD anyway.",
       "types": [
         "product",
         "sales"
@@ -1053,20 +991,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 690000,
+      "cost": 40500,
       "revenue": [
-        2375000000,
-        7215000000
+        545000,
+        915000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 4
     },
     {
-      "id": "public-whale-048",
-      "title": "Public whale desk #48: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-apac-data-residency-pack",
+      "title": "Win APAC data residency pack",
+      "description": "Local entity, local keys, local counsel bills.",
       "types": [
         "marketing"
       ],
@@ -1075,43 +1011,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 250000,
+      "cost": 47000,
       "revenue": [
-        2500000000,
-        7520000000
+        580000,
+        1045000
       ],
       "product": 1,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.02
+      "buzz": 1
     },
     {
-      "id": "public-whale-049",
-      "title": "Public whale desk #49: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-eu-public-tender-slice",
+      "title": "Land EU public tender slice",
+      "description": "GDPR DPIA attached to every signature.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 290000,
+      "cost": 53500,
       "revenue": [
-        2625000000,
-        7825000000
+        615000,
+        1175000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 2
     },
     {
-      "id": "public-whale-050",
-      "title": "Public whale desk #50: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-uk-government-g-cloud",
+      "title": "Renew UK government G-Cloud",
+      "description": "Framework paperwork is the real product.",
       "types": [
         "sales"
       ],
@@ -1120,20 +1052,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 330000,
+      "cost": 60000,
       "revenue": [
-        2750000000,
-        8130000000
+        650000,
+        1305000
       ],
       "product": 0,
       "buzz": 3,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.02
     },
     {
-      "id": "public-whale-051",
-      "title": "Public whale desk #51: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-middle-east-smart-city-pilot",
+      "title": "Close Middle East smart-city pilot",
+      "description": "Heat, dust, and uptime SLAs in the same sentence.",
       "types": [
         "sales",
         "marketing"
@@ -1143,20 +1074,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 370000,
+      "cost": 66500,
       "revenue": [
-        2875000000,
-        5375000000
+        90000,
+        840000
       ],
-      "product": 1,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.012
+      "product": 0,
+      "buzz": 4
     },
     {
-      "id": "public-whale-052",
-      "title": "Public whale desk #52: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-africa-mobile-money-bridge",
+      "title": "Expand Africa mobile-money bridge",
+      "description": "SMS fallbacks save the demo.",
       "types": [
         "product",
         "sales"
@@ -1166,20 +1095,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 410000,
+      "cost": 73000,
       "revenue": [
-        3000000000,
-        5680000000
+        125000,
+        970000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.016
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-053",
-      "title": "Public whale desk #53: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-canada-privacy-refactor",
+      "title": "Win Canada privacy refactor",
+      "description": "Bill C-something changed again; legal is calm (lying).",
       "types": [
         "marketing"
       ],
@@ -1188,43 +1115,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 450000,
+      "cost": 79500,
       "revenue": [
-        3125000000,
-        5985000000
+        160000,
+        1100000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.02
+      "buzz": 2
     },
     {
-      "id": "public-whale-054",
-      "title": "Public whale desk #54: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "defend-japan-keiretsu-renewal",
+      "title": "Defend Japan keiretsu renewal",
+      "description": "Relationship dinner > feature matrix.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 490000,
+      "cost": 86000,
       "revenue": [
-        3250000000,
-        6290000000
+        195000,
+        375000
       ],
-      "product": 1,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.024
+      "product": 0,
+      "buzz": 3
     },
     {
-      "id": "public-whale-055",
-      "title": "Public whale desk #55: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-korea-chaebol-poc",
+      "title": "Land Korea chaebol PoC",
+      "description": "Speed matters; translation matters more.",
       "types": [
         "sales"
       ],
@@ -1233,20 +1156,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 530000,
+      "cost": 92500,
       "revenue": [
-        3375000000,
-        6595000000
+        230000,
+        505000
       ],
       "product": 0,
       "buzz": 4,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.014
     },
     {
-      "id": "public-whale-056",
-      "title": "Public whale desk #56: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-australia-super-fund-module",
+      "title": "Close Australia super-fund module",
+      "description": "Retirement money moves slowly until it doesn’t.",
       "types": [
         "sales",
         "marketing"
@@ -1256,20 +1178,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 570000,
+      "cost": 8000,
       "revenue": [
-        3500000000,
-        6900000000
+        265000,
+        635000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.012
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-057",
-      "title": "Public whale desk #57: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-brazil-tax-compliance-add-on",
+      "title": "Renew Brazil tax compliance add-on",
+      "description": "NF-e rules changed mid-quarter.",
       "types": [
         "product",
         "sales"
@@ -1279,20 +1199,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 610000,
+      "cost": 14500,
       "revenue": [
-        3625000000,
-        7205000000
+        300000,
+        765000
       ],
-      "product": 1,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.016
+      "product": 0,
+      "buzz": 2
     },
     {
-      "id": "public-whale-058",
-      "title": "Public whale desk #58: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-india-upi-volume-tier",
+      "title": "Win India UPI volume tier",
+      "description": "Spikes during festivals; infra team sweats.",
       "types": [
         "marketing"
       ],
@@ -1301,43 +1219,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 650000,
+      "cost": 21000,
       "revenue": [
-        3750000000,
-        7510000000
+        335000,
+        895000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.02
+      "buzz": 3
     },
     {
-      "id": "public-whale-059",
-      "title": "Public whale desk #59: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-mexico-nearshore-support",
+      "title": "Expand Mexico nearshore support",
+      "description": "Same time zone; better NPS scores.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 690000,
+      "cost": 27500,
       "revenue": [
-        3875000000,
-        7815000000
+        370000,
+        1025000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 4
     },
     {
-      "id": "public-whale-060",
-      "title": "Public whale desk #60: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-sovereign-wealth-lp-meeting",
+      "title": "Close sovereign wealth LP meeting",
+      "description": "They ask about capital efficiency, not buzzwords.",
       "types": [
         "sales"
       ],
@@ -1346,20 +1260,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 250000,
+      "cost": 34000,
       "revenue": [
-        4000000000,
-        8120000000
+        405000,
+        1155000
       ],
       "product": 1,
       "buzz": 1,
-      "whale": true,
       "stockPct": 0.008
     },
     {
-      "id": "public-whale-061",
-      "title": "Public whale desk #61: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-pension-fund-risk-dashboard",
+      "title": "Land pension fund risk dashboard",
+      "description": "Board wants downside scenarios in charts.",
       "types": [
         "sales",
         "marketing"
@@ -1369,20 +1282,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 290000,
+      "cost": 40500,
       "revenue": [
-        4125000000,
-        8425000000
+        440000,
+        1285000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 2
     },
     {
-      "id": "public-whale-062",
-      "title": "Public whale desk #62: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-endowment-reporting-suite",
+      "title": "Renew endowment reporting suite",
+      "description": "Quarterly letters quote your uptime footnote.",
       "types": [
         "product",
         "sales"
@@ -1392,20 +1303,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 330000,
+      "cost": 47000,
       "revenue": [
-        4250000000,
-        8730000000
+        475000,
+        1415000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 3
     },
     {
-      "id": "public-whale-063",
-      "title": "Public whale desk #63: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-family-office-portfolio-view",
+      "title": "Win family office portfolio view",
+      "description": "They still print PDFs; you accommodate.",
       "types": [
         "marketing"
       ],
@@ -1414,43 +1323,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 370000,
+      "cost": 53500,
       "revenue": [
-        4375000000,
-        9035000000
+        510000,
+        690000
       ],
-      "product": 1,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.02
+      "product": 0,
+      "buzz": 4
     },
     {
-      "id": "public-whale-064",
-      "title": "Public whale desk #64: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "defend-activist-adjacent-renewal",
+      "title": "Defend activist-adjacent renewal",
+      "description": "Customer’s board drama becomes your QBR theme.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 410000,
+      "cost": 60000,
       "revenue": [
-        4500000000,
-        9340000000
+        545000,
+        820000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.024
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-065",
-      "title": "Public whale desk #65: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-spin-out-carve-out-deal",
+      "title": "Close spin-out carve-out deal",
+      "description": "Parent company TSA ends; data migration begins.",
       "types": [
         "sales"
       ],
@@ -1459,20 +1364,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 450000,
+      "cost": 66500,
       "revenue": [
-        4625000000,
-        9645000000
+        580000,
+        950000
       ],
       "product": 0,
       "buzz": 2,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.02
     },
     {
-      "id": "public-whale-066",
-      "title": "Public whale desk #66: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-pe-portfolio-roll-up",
+      "title": "Expand PE portfolio roll-up",
+      "description": "Same playbook, fifth acquisition this year.",
       "types": [
         "sales",
         "marketing"
@@ -1482,20 +1386,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 490000,
+      "cost": 73000,
       "revenue": [
-        4750000000,
-        9950000000
+        615000,
+        1080000
       ],
-      "product": 1,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.012
+      "product": 0,
+      "buzz": 3
     },
     {
-      "id": "public-whale-067",
-      "title": "Public whale desk #67: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-spac-leftover-cleanup",
+      "title": "Land SPAC leftover cleanup",
+      "description": "Reverse merger survivors need stable ARR stories.",
       "types": [
         "product",
         "sales"
@@ -1505,20 +1407,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 530000,
+      "cost": 79500,
       "revenue": [
-        4875000000,
-        10255000000
+        650000,
+        1210000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 4
     },
     {
-      "id": "public-whale-068",
-      "title": "Public whale desk #68: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-post-merger-integration-kit",
+      "title": "Renew post-merger integration kit",
+      "description": "Two ERPs enter; one ERP leaves.",
       "types": [
         "marketing"
       ],
@@ -1527,43 +1427,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 570000,
+      "cost": 86000,
       "revenue": [
-        5000000000,
-        7500000000
+        90000,
+        745000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.02
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-069",
-      "title": "Public whale desk #69: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-divestiture-day-one-bundle",
+      "title": "Win divestiture day-one bundle",
+      "description": "Stand up a mini-company over a weekend.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 610000,
+      "cost": 92500,
       "revenue": [
-        5125000000,
-        7805000000
+        125000,
+        875000
       ],
-      "product": 1,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.024
+      "product": 0,
+      "buzz": 2
     },
     {
-      "id": "public-whale-070",
-      "title": "Public whale desk #70: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-joint-venture-revenue-share",
+      "title": "Close joint venture revenue share",
+      "description": "Lawyers pick the definition of “net.”",
       "types": [
         "sales"
       ],
@@ -1572,20 +1468,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 650000,
+      "cost": 8000,
       "revenue": [
-        5250000000,
-        8110000000
+        160000,
+        1005000
       ],
       "product": 0,
       "buzz": 3,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.014
     },
     {
-      "id": "public-whale-071",
-      "title": "Public whale desk #71: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-oem-white-label-pack",
+      "title": "Expand OEM white-label pack",
+      "description": "Their brand on your uptime commitments.",
       "types": [
         "sales",
         "marketing"
@@ -1595,20 +1490,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 690000,
+      "cost": 14500,
       "revenue": [
-        5375000000,
-        8415000000
+        195000,
+        1135000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 4
     },
     {
-      "id": "public-whale-072",
-      "title": "Public whale desk #72: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-franchise-analytics-rollout",
+      "title": "Land franchise analytics rollout",
+      "description": "Store #1,247 still uses spreadsheets.",
       "types": [
         "product",
         "sales"
@@ -1618,20 +1511,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 250000,
+      "cost": 21000,
       "revenue": [
-        5500000000,
-        8720000000
+        230000,
+        410000
       ],
       "product": 1,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 1
     },
     {
-      "id": "public-whale-073",
-      "title": "Public whale desk #73: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-co-brand-credit-card-perks",
+      "title": "Renew co-brand credit card perks",
+      "description": "Points liability on someone else’s balance sheet.",
       "types": [
         "marketing"
       ],
@@ -1640,43 +1531,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 290000,
+      "cost": 27500,
       "revenue": [
-        5625000000,
-        9025000000
+        265000,
+        540000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.02
+      "buzz": 2
     },
     {
-      "id": "public-whale-074",
-      "title": "Public whale desk #74: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-embedded-finance-sdk-deal",
+      "title": "Win embedded finance SDK deal",
+      "description": "Developers want copy-paste; compliance wants controls.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 330000,
+      "cost": 34000,
       "revenue": [
-        5750000000,
-        9330000000
+        300000,
+        670000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 3
     },
     {
-      "id": "public-whale-075",
-      "title": "Public whale desk #75: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "defend-api-platform-renewal",
+      "title": "Defend API platform renewal",
+      "description": "Rate limits become a pricing lever.",
       "types": [
         "sales"
       ],
@@ -1685,20 +1572,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 370000,
+      "cost": 40500,
       "revenue": [
-        5875000000,
-        9635000000
+        335000,
+        800000
       ],
-      "product": 1,
+      "product": 0,
       "buzz": 4,
-      "whale": true,
       "stockPct": 0.008
     },
     {
-      "id": "public-whale-076",
-      "title": "Public whale desk #76: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-usage-based-enterprise-commit",
+      "title": "Close usage-based enterprise commit",
+      "description": "True-up math gives finance nightmares.",
       "types": [
         "sales",
         "marketing"
@@ -1708,20 +1594,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 410000,
+      "cost": 47000,
       "revenue": [
-        6000000000,
-        9940000000
+        370000,
+        930000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.012
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-077",
-      "title": "Public whale desk #77: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-consumption-tier-bridge",
+      "title": "Expand consumption tier bridge",
+      "description": "Credits expire; customer wants rollover anyway.",
       "types": [
         "product",
         "sales"
@@ -1731,20 +1615,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 450000,
+      "cost": 53500,
       "revenue": [
-        6125000000,
-        10245000000
+        405000,
+        1060000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 2
     },
     {
-      "id": "public-whale-078",
-      "title": "Public whale desk #78: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-mainframe-connector-maintenance",
+      "title": "Land mainframe connector maintenance",
+      "description": "COBOL team retired; you are the bridge.",
       "types": [
         "marketing"
       ],
@@ -1753,43 +1635,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 490000,
+      "cost": 60000,
       "revenue": [
-        6250000000,
-        10550000000
+        440000,
+        1190000
       ],
-      "product": 1,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.02
+      "product": 0,
+      "buzz": 3
     },
     {
-      "id": "public-whale-079",
-      "title": "Public whale desk #79: mega enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-legacy-erp-plugin",
+      "title": "Renew legacy ERP plugin",
+      "description": "Still on-prem; still pays like clockwork.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 530000,
+      "cost": 66500,
       "revenue": [
-        6375000000,
-        10855000000
+        475000,
+        1320000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 4
     },
     {
-      "id": "public-whale-080",
-      "title": "Public whale desk #80: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-main-vendor-consolidation-rfp",
+      "title": "Win main vendor consolidation RFP",
+      "description": "You replace three tools; inherit three grudges.",
       "types": [
         "sales"
       ],
@@ -1798,20 +1676,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 570000,
+      "cost": 73000,
       "revenue": [
-        1500000000,
-        6160000000
+        510000,
+        1450000
       ],
-      "product": 0,
+      "product": 1,
       "buzz": 1,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.02
     },
     {
-      "id": "public-whale-081",
-      "title": "Public whale desk #81: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-board-requested-cost-takeout",
+      "title": "Close board-requested cost takeout",
+      "description": "Customer cuts vendors; you survive the cull.",
       "types": [
         "sales",
         "marketing"
@@ -1821,20 +1698,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 610000,
+      "cost": 79500,
       "revenue": [
-        1625000000,
-        6465000000
+        545000,
+        725000
       ],
-      "product": 1,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.012
+      "product": 0,
+      "buzz": 2
     },
     {
-      "id": "public-whale-082",
-      "title": "Public whale desk #82: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-customer-success-premium-tier",
+      "title": "Expand customer success premium tier",
+      "description": "White-glove team for accounts that email the CEO.",
       "types": [
         "product",
         "sales"
@@ -1844,20 +1719,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 650000,
+      "cost": 86000,
       "revenue": [
-        1750000000,
-        6770000000
+        580000,
+        855000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 3
     },
     {
-      "id": "public-whale-083",
-      "title": "Public whale desk #83: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-professional-services-retainer",
+      "title": "Land professional services retainer",
+      "description": "Statement of work vague; relationship strong.",
       "types": [
         "marketing"
       ],
@@ -1866,43 +1739,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 690000,
+      "cost": 92500,
       "revenue": [
-        1875000000,
-        7075000000
+        615000,
+        985000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.02
+      "buzz": 4
     },
     {
-      "id": "public-whale-084",
-      "title": "Public whale desk #84: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-training-academy-license",
+      "title": "Renew training academy license",
+      "description": "Certified admins renew more often.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 250000,
+      "cost": 8000,
       "revenue": [
-        2000000000,
-        7380000000
+        650000,
+        1115000
       ],
       "product": 1,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 1
     },
     {
-      "id": "public-whale-085",
-      "title": "Public whale desk #85: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-partner-certification-blitz",
+      "title": "Win partner certification blitz",
+      "description": "Badges on LinkedIn; pipeline in Slack.",
       "types": [
         "sales"
       ],
@@ -1911,20 +1780,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 290000,
+      "cost": 14500,
       "revenue": [
-        2125000000,
-        4625000000
+        90000,
+        650000
       ],
       "product": 0,
       "buzz": 2,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.014
     },
     {
-      "id": "public-whale-086",
-      "title": "Public whale desk #86: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "defend-low-code-integrator-renewal",
+      "title": "Defend low-code integrator renewal",
+      "description": "Citizen developers built a monster; you tame it.",
       "types": [
         "sales",
         "marketing"
@@ -1934,20 +1802,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 330000,
+      "cost": 21000,
       "revenue": [
-        2250000000,
-        4930000000
+        125000,
+        780000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 3
     },
     {
-      "id": "public-whale-087",
-      "title": "Public whale desk #87: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-si-global-frame-agreement",
+      "title": "Close SI global frame agreement",
+      "description": "Big four partner puts you in every deck.",
       "types": [
         "product",
         "sales"
@@ -1957,20 +1823,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 370000,
+      "cost": 27500,
       "revenue": [
-        2375000000,
-        5235000000
+        160000,
+        910000
       ],
-      "product": 1,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.016
+      "product": 0,
+      "buzz": 4
     },
     {
-      "id": "public-whale-088",
-      "title": "Public whale desk #88: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-gsis-managed-offering",
+      "title": "Expand GSIs managed offering",
+      "description": "They resell; you stay up at night anyway.",
       "types": [
         "marketing"
       ],
@@ -1979,43 +1843,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 410000,
+      "cost": 34000,
       "revenue": [
-        2500000000,
-        5540000000
+        195000,
+        1040000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.02
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-089",
-      "title": "Public whale desk #89: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-boutique-consultancy-package",
+      "title": "Land boutique consultancy package",
+      "description": "Niche industry slides that actually resonate.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 450000,
+      "cost": 40500,
       "revenue": [
-        2625000000,
-        5845000000
+        230000,
+        1170000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 2
     },
     {
-      "id": "public-whale-090",
-      "title": "Public whale desk #90: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-var-annual-summit-sponsorship",
+      "title": "Renew VAR annual summit sponsorship",
+      "description": "T-shirts, leads, and one awkward keynote photo.",
       "types": [
         "sales"
       ],
@@ -2024,20 +1884,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 490000,
+      "cost": 47000,
       "revenue": [
-        2750000000,
-        6150000000
+        265000,
+        445000
       ],
-      "product": 1,
+      "product": 0,
       "buzz": 3,
-      "whale": true,
       "stockPct": 0.008
     },
     {
-      "id": "public-whale-091",
-      "title": "Public whale desk #91: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-technology-alliance-press-cycle",
+      "title": "Win technology alliance press cycle",
+      "description": "Joint blog post timed to earnings silence.",
       "types": [
         "sales",
         "marketing"
@@ -2047,20 +1906,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 530000,
+      "cost": 53500,
       "revenue": [
-        2875000000,
-        6455000000
+        300000,
+        575000
       ],
       "product": 0,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 4
     },
     {
-      "id": "public-whale-092",
-      "title": "Public whale desk #92: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-patent-cross-license-fee",
+      "title": "Close patent cross-license fee",
+      "description": "Legal settles; product ships.",
       "types": [
         "product",
         "sales"
@@ -2070,20 +1927,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 570000,
+      "cost": 60000,
       "revenue": [
-        3000000000,
-        6760000000
+        335000,
+        705000
       ],
-      "product": 0,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.016
+      "product": 1,
+      "buzz": 1
     },
     {
-      "id": "public-whale-093",
-      "title": "Public whale desk #93: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-open-source-enterprise-support",
+      "title": "Expand open-source enterprise support",
+      "description": "Community edition free; on-call is not.",
       "types": [
         "marketing"
       ],
@@ -2092,43 +1947,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 610000,
+      "cost": 66500,
       "revenue": [
-        3125000000,
-        7065000000
+        370000,
+        835000
       ],
-      "product": 1,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.02
+      "product": 0,
+      "buzz": 2
     },
     {
-      "id": "public-whale-094",
-      "title": "Public whale desk #94: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-compliance-automation-audit",
+      "title": "Land compliance automation audit",
+      "description": "Controls mapped; auditors less grumpy.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 650000,
+      "cost": 73000,
       "revenue": [
-        3250000000,
-        7370000000
+        405000,
+        965000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.024
+      "buzz": 3
     },
     {
-      "id": "public-whale-095",
-      "title": "Public whale desk #95: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "renew-esg-reporting-connector",
+      "title": "Renew ESG reporting connector",
+      "description": "Scope 3 arguments converted to charts.",
       "types": [
         "sales"
       ],
@@ -2137,20 +1988,19 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 690000,
+      "cost": 79500,
       "revenue": [
-        3375000000,
-        7675000000
+        440000,
+        1095000
       ],
       "product": 0,
       "buzz": 4,
-      "whale": true,
-      "stockPct": 0.008
+      "stockPct": 0.02
     },
     {
-      "id": "public-whale-096",
-      "title": "Public whale desk #96: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "win-supply-chain-traceability-pilot",
+      "title": "Win supply-chain traceability pilot",
+      "description": "Barcode scans become board slides.",
       "types": [
         "sales",
         "marketing"
@@ -2160,20 +2010,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 250000,
+      "cost": 86000,
       "revenue": [
-        3500000000,
-        7980000000
+        475000,
+        1225000
       ],
       "product": 1,
-      "buzz": 1,
-      "whale": true,
-      "stockPct": 0.012
+      "buzz": 1
     },
     {
-      "id": "public-whale-097",
-      "title": "Public whale desk #97: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "defend-quality-recall-readiness-module",
+      "title": "Defend quality recall readiness module",
+      "description": "Hope you never need it; pay anyway.",
       "types": [
         "product",
         "sales"
@@ -2183,20 +2031,18 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 290000,
+      "cost": 92500,
       "revenue": [
-        3625000000,
-        8285000000
+        510000,
+        1355000
       ],
       "product": 0,
-      "buzz": 2,
-      "whale": true,
-      "stockPct": 0.016
+      "buzz": 2
     },
     {
-      "id": "public-whale-098",
-      "title": "Public whale desk #98: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "close-disaster-recovery-test-week",
+      "title": "Close disaster recovery test week",
+      "description": "Failover works; pizza for the war room.",
       "types": [
         "marketing"
       ],
@@ -2205,43 +2051,39 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 330000,
+      "cost": 8000,
       "revenue": [
-        3750000000,
-        8590000000
+        545000,
+        1485000
       ],
       "product": 0,
-      "buzz": 3,
-      "whale": true,
-      "stockPct": 0.02
+      "buzz": 3
     },
     {
-      "id": "public-whale-099",
-      "title": "Public whale desk #99: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "expand-zero-trust-rollout-tranche",
+      "title": "Expand zero-trust rollout tranche",
+      "description": "Identity team finally owns the project.",
       "types": [
-        "sales",
-        "product"
+        "research",
+        "sales"
       ],
       "stages": [
         "public"
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 370000,
+      "cost": 14500,
       "revenue": [
-        3875000000,
-        8895000000
+        580000,
+        760000
       ],
-      "product": 1,
-      "buzz": 4,
-      "whale": true,
-      "stockPct": 0.024
+      "product": 0,
+      "buzz": 4
     },
     {
-      "id": "public-whale-100",
-      "title": "Public whale desk #100: giga enterprise close",
-      "description": "Tier-7 public motion — IR, corp dev, and sales leadership want this in the 10-K narrative.",
+      "id": "land-secrets-rotation-automation",
+      "title": "Land secrets rotation automation",
+      "description": "Keys roll; nobody pages at 3 a.m. this time.",
       "types": [
         "sales"
       ],
@@ -2250,15 +2092,222 @@
       ],
       "tierMin": 7,
       "tierMax": 7,
-      "cost": 410000,
+      "cost": 21000,
       "revenue": [
-        4000000000,
-        9200000000
+        615000,
+        890000
+      ],
+      "product": 1,
+      "buzz": 1,
+      "stockPct": 0.014
+    },
+    {
+      "id": "renew-observability-unified-bill",
+      "title": "Renew observability unified bill",
+      "description": "Logs, metrics, traces — one invoice, one throat to choke.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 27500,
+      "revenue": [
+        650000,
+        1020000
       ],
       "product": 0,
-      "buzz": 1,
-      "whale": true,
+      "buzz": 2
+    },
+    {
+      "id": "win-finops-chargeback-rollout",
+      "title": "Win FinOps chargeback rollout",
+      "description": "Engineers see cost tags; behavior shifts slowly.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 34000,
+      "revenue": [
+        90000,
+        555000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "close-internal-developer-portal-phase",
+      "title": "Close internal developer portal phase",
+      "description": "Golden paths reduce Slack “how do I deploy?”",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 40500,
+      "revenue": [
+        125000,
+        685000
+      ],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "expand-platform-engineering-guild",
+      "title": "Expand platform engineering guild",
+      "description": "Paved roads; teams still off-road sometimes.",
+      "types": [
+        "research",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 47000,
+      "revenue": [
+        160000,
+        815000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "land-ai-governance-committee-win",
+      "title": "Land AI governance committee win",
+      "description": "Model cards attached to every release note.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 53500,
+      "revenue": [
+        195000,
+        945000
+      ],
+      "product": 0,
+      "buzz": 2,
       "stockPct": 0.008
+    },
+    {
+      "id": "renew-responsible-ai-attestation",
+      "title": "Renew responsible-AI attestation",
+      "description": "Bias tests documented; PR calm for a week.",
+      "types": [
+        "sales",
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 60000,
+      "revenue": [
+        230000,
+        1075000
+      ],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "win-public-earnings-demo-prep",
+      "title": "Win public earnings demo prep",
+      "description": "Feature flagged for the call; nothing unrehearsed.",
+      "types": [
+        "product",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 66500,
+      "revenue": [
+        265000,
+        1205000
+      ],
+      "product": 0,
+      "buzz": 4
+    },
+    {
+      "id": "defend-shareholder-question-dry-run",
+      "title": "Defend shareholder question dry run",
+      "description": "IR scripts answers for “why this metric?”",
+      "types": [
+        "marketing"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 73000,
+      "revenue": [
+        300000,
+        480000
+      ],
+      "product": 1,
+      "buzz": 1
+    },
+    {
+      "id": "close-index-inclusion-readiness",
+      "title": "Close index inclusion readiness",
+      "description": "Liquidity story matches the product story.",
+      "types": [
+        "research",
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 79500,
+      "revenue": [
+        335000,
+        610000
+      ],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "expand-institutional-roadshow-week",
+      "title": "Expand institutional roadshow week",
+      "description": "Same deck, twelve cities, zero sleep.",
+      "types": [
+        "sales"
+      ],
+      "stages": [
+        "public"
+      ],
+      "tierMin": 7,
+      "tierMax": 7,
+      "cost": 86000,
+      "revenue": [
+        370000,
+        740000
+      ],
+      "product": 0,
+      "buzz": 3,
+      "stockPct": 0.02
     }
   ]
 }

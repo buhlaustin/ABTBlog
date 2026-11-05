@@ -10,9 +10,12 @@ import bundledSpaceExploration from '../data/space-exploration-tasks.json' with 
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
 import bundledCatalogExpansion from '../data/tasks-catalog-expansion.json' with { type: 'json' };
 import bundledPublicLate from '../data/tasks-public-late-game.json' with { type: 'json' };
+import bundledPublicLateExtra from '../data/tasks-public-late-game-extra.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
+import bundledTaxFiling from '../data/tax-filing-task.json' with { type: 'json' };
 import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
+import { isTaxFilingRequired, TAX_FILING_TASK_ID } from './CorporateTax.js';
 import {
   currentLaunchTaskPhase,
   launchPhaseAllowed,
@@ -68,6 +71,17 @@ function mergeXcDemoDayTasks(base) {
   return { ...base, tasks: merged };
 }
 
+function mergeTaxFilingTasks(base) {
+  const extra = bundledTaxFiling?.tasks ?? [];
+  if (!extra.length) return base;
+  const ids = new Set((base.tasks ?? []).map((t) => t.id));
+  const merged = [...(base.tasks ?? [])];
+  for (const t of extra) {
+    if (!ids.has(t.id)) merged.push(t);
+  }
+  return { ...base, tasks: merged };
+}
+
 function mergeSpaceExplorationTasks(base) {
   let out = base;
   for (const pack of [bundledSpaceExploration, bundledSpaceExpansion]) {
@@ -81,15 +95,20 @@ function mergeCatalogExpansion(base) {
 }
 
 function mergePublicLateGameTasks(base) {
-  return mergeTaskPack(base, bundledPublicLate?.tasks ?? []);
+  return mergeTaskPack(
+    mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
+    bundledPublicLateExtra?.tasks ?? []
+  );
 }
 
 function mergeCatalog(base) {
-  return mergeXcDemoDayTasks(
-    mergePostXcPreSeedTasks(
-      mergeLaunchTasks(
-        mergeSpaceExplorationTasks(
-          mergePublicLateGameTasks(mergeCatalogExpansion(mergeSignatureTasks(base)))
+  return mergeTaxFilingTasks(
+    mergeXcDemoDayTasks(
+      mergePostXcPreSeedTasks(
+        mergeLaunchTasks(
+          mergeSpaceExplorationTasks(
+            mergePublicLateGameTasks(mergeCatalogExpansion(mergeSignatureTasks(base)))
+          )
         )
       )
     )
@@ -294,6 +313,7 @@ function buildTaskPool(state) {
   return getTaskDefinitions().filter(
     (t) => {
       if (t.xcDemoDay && !demoMonth) return false;
+      if (t.taxFiling && !isTaxFilingRequired(state)) return false;
       return (
         stageAllowed(t, taskStage) &&
         categoryAllowed(t, categoryId) &&
@@ -339,15 +359,9 @@ export function dealMonthlyTasks(state) {
     const demo = pool.find((t) => t.id === XC_DEMO_DAY_TASK_ID);
     if (demo) offered = mergeUniqueTaskOffers(offered, demo, offerCount);
   }
-  if (progressionTier(state) >= 7) {
-    const whales = pool.filter((t) => t.whale || (t.revenue?.[1] ?? 0) >= 1_000_000_000);
-    if (whales.length) {
-      const injectCount = Math.random() < 0.45 ? 2 : 1;
-      for (let w = 0; w < injectCount; w += 1) {
-        const pick = shuffle(whales)[0];
-        if (pick) offered = mergeUniqueTaskOffers(offered, pick, offerCount);
-      }
-    }
+  if (isTaxFilingRequired(state)) {
+    const taxTask = pool.find((t) => t.id === TAX_FILING_TASK_ID);
+    if (taxTask) offered = mergeUniqueTaskOffers(offered, taxTask, offerCount);
   }
   if (!launchLifecycleActive(state)) {
     const sigPool = pool.filter((t) => t.signature);
@@ -423,6 +437,11 @@ export function confirmTaskLineup(state) {
   if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
     if (!selected.some((o) => o.taskId === XC_DEMO_DAY_TASK_ID)) {
       return { ok: false, reason: 'Demo Day is mandatory in your final batch month — include it in your lineup.' };
+    }
+  }
+  if (isTaxFilingRequired(state)) {
+    if (!selected.some((o) => o.taskId === TAX_FILING_TASK_ID)) {
+      return { ok: false, reason: 'April corporate tax filing is mandatory — include it in your lineup.' };
     }
   }
   const recent = state.calendar.recentTaskIds ?? [];

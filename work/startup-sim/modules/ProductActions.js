@@ -125,6 +125,75 @@ export function runProductAction(state, actionId) {
   return { ok: true, action: def };
 }
 
+function availableSideTasks(state, focusFilter) {
+  return filterSideTasksByFocus(getProductActions(), focusFilter).filter((a) =>
+    actionUnlocked(a, state)
+  );
+}
+
+export function canBuyAllRemainingSideTasks(state, focusFilter) {
+  const left = productActionsRemaining(state);
+  if (Number.isFinite(sideTaskPlaysPerMonth(state)) && left <= 0) return false;
+  const cash = state.finance.cash ?? 0;
+  return availableSideTasks(state, focusFilter).some((a) => cash >= (a.cost ?? 0));
+}
+
+/** Run affordable side levers until monthly slots or unlocked plays run out. */
+export function runAllRemainingSideTasks(state, focusFilter) {
+  const launched = [];
+  let totalCost = 0;
+  let totalBuzz = 0;
+  let totalProduct = 0;
+
+  for (let guard = 0; guard < 512; guard += 1) {
+    if (Number.isFinite(sideTaskPlaysPerMonth(state)) && productActionsRemaining(state) <= 0) {
+      break;
+    }
+
+    const tasks = availableSideTasks(state, focusFilter);
+    if (!tasks.length) break;
+
+    const cash = state.finance.cash ?? 0;
+    const impactScore = (d) => (d.buzz ?? 0) + (d.product ?? 0) * 2;
+    const affordable = tasks
+      .filter((a) => cash >= (a.cost ?? 0))
+      .sort((a, b) => {
+        const diff = impactScore(b) - impactScore(a);
+        return diff !== 0 ? diff : (a.cost ?? 0) - (b.cost ?? 0);
+      });
+    if (!affordable.length) break;
+
+    const result = runProductAction(state, affordable[0].id);
+    if (!result.ok) break;
+
+    launched.push(result);
+    totalCost += result.action.cost ?? 0;
+    totalBuzz += result.action.buzz ?? 0;
+    totalProduct += result.action.product ?? 0;
+  }
+
+  if (!launched.length) {
+    const left = productActionsRemaining(state);
+    if (Number.isFinite(sideTaskPlaysPerMonth(state)) && left <= 0) {
+      return { ok: false, reason: 'No side play slots left this month.' };
+    }
+    const tasks = availableSideTasks(state, focusFilter);
+    if (!tasks.length) {
+      return { ok: false, reason: 'No side growth plays unlocked at your stage.' };
+    }
+    return { ok: false, reason: 'Not enough cash for any remaining side play.' };
+  }
+
+  return {
+    ok: true,
+    launched,
+    count: launched.length,
+    totalCost,
+    totalBuzz,
+    totalProduct
+  };
+}
+
 function escapeHtml(s) {
   return String(s)
     .replace(/&/g, '&amp;')

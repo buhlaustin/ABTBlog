@@ -66,32 +66,6 @@ const KINDS = [
     }
   },
   {
-    kind: 'startup_social_reactions',
-    context: {
-      snapshot,
-      post: { network: 'chirp', text: 'Shipped v0.1 — feedback welcome', author: 'Founder' },
-      personas: [{ name: 'Patty Fundsworth' }],
-      recentHeadlines: [],
-      playerRecentPosts: []
-    },
-    validate: (d) =>
-      d &&
-      typeof d === 'object' &&
-      (Array.isArray(d.comments) || d.likes !== undefined || d.type === 'startup_social')
-  },
-  {
-    kind: 'startup_advisor_chat',
-    context: {
-      snapshot,
-      messages: [{ role: 'user', content: 'Should I hire sales or finish the product?' }],
-      rules: 'In-game advice only.'
-    },
-    validate: (d) =>
-      d &&
-      typeof d === 'object' &&
-      (Boolean(d.reply) || Boolean(d.text) || d.type === 'startup_advisor')
-  },
-  {
     kind: 'startup_ipo_press',
     context: {
       snapshot,

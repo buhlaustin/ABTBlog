@@ -8,6 +8,8 @@ import bundledPublicLate from '../data/growth-campaigns-public-late.json' with {
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
+import { accrueFiscalRevenue } from './CorporateTax.js';
+import { eraBaseRevenueScaleForCampaign } from './ProgressionEconomy.js';
 import { formatMoney } from './constants.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
 import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
@@ -113,26 +115,8 @@ export function refreshGrowthCampaignOffers(state) {
   const offerCount = growthMonthlyOfferCount(state);
   let offers = pickMonthlyCampaignDefs(pool, offerCount, recent);
 
-  if (progressionTier(state) >= 7) {
-    const recentSet = new Set(recent);
-    const whales = pool.filter(
-      (c) =>
-        !recentSet.has(c.id) &&
-        (c.whale || (c.revenue?.[1] ?? 0) >= 500_000_000)
-    );
-    if (whales.length) {
-      const injectCount = Math.random() < 0.5 ? 2 : 1;
-      for (let w = 0; w < injectCount; w += 1) {
-        const pick = shuffle(whales)[0];
-        if (pick) offers = mergeUniqueCampaignOffers(offers, pick, offerCount);
-      }
-    }
-  }
-
   state.growth.monthCampaignOffers = offers.map((c) => c.id);
-  state.growth.lastRosterWhaleCount = offers.filter(
-    (c) => c.whale || (c.revenue?.[1] ?? 0) >= 500_000_000
-  ).length;
+  state.growth.lastRosterWhaleCount = offers.filter((c) => c.whale === true).length;
   return offers;
 }
 
@@ -218,11 +202,13 @@ export function runGrowthCampaign(state, campaignId) {
   }
   const [rMin, rMax] = def.revenue ?? [0, 0];
   const base = rMin + Math.random() * Math.max(0, rMax - rMin);
-  const revenue = Math.round(base * campaignRevenueMult(state));
+  const era = eraBaseRevenueScaleForCampaign(def, state);
+  const revenue = Math.round(base * era * campaignRevenueMult(state));
 
   state.finance.cash -= cost;
   state.finance.cash += revenue;
   state.finance.lifetimeRevenue += revenue;
+  if (revenue > 0) accrueFiscalRevenue(state, revenue);
   recordCashOutflow(state, cost, 'growth');
   state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + revenue;
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
@@ -324,10 +310,8 @@ export function renderGrowthCampaignsBlock(state) {
     remaining === Infinity
       ? 'Unlimited'
       : `${remaining}/${formatMonthlySideTaskLimit(slots)}`;
-  const buyAllDisabled = canBuyAllRemainingGrowthCampaigns(state) ? '' : ' disabled';
   const rosterSize = state.growth?.monthCampaignOffers?.length ?? campaigns.length;
-  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> on this month&apos;s roster (${rosterSize} offered, ${bankSize} in bank, ${GROWTH_CAMPAIGN_COOLDOWN_MONTHS}-month cooldown — does not use desk tasks).</p>
-    <p class="finance-action"><button type="button" class="btn btn-primary btn-small" data-buy-all-growth${buyAllDisabled}>Buy all remaining</button> <span class="fine-print">Runs every affordable unlocked play until slots or cash run out.</span></p>`;
+  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${slotLabel}</strong> remaining · <strong>${campaigns.length}</strong> on this month&apos;s roster (${rosterSize} offered, ${bankSize} in bank, ${GROWTH_CAMPAIGN_COOLDOWN_MONTHS}-month cooldown — does not use desk tasks).</p>`;
   const sorted = [...campaigns].sort((a, b) => (b.revenue?.[1] ?? 0) - (a.revenue?.[1] ?? 0));
   const cards = sorted
     .map((c) => {
@@ -348,5 +332,5 @@ export function renderGrowthCampaignsBlock(state) {
       </div>`;
     })
     .join('');
-  return `${slotNote}<h3 class="log-head">Paid growth (Growth tab)</h3>${cards}`;
+  return `${slotNote}<h3 class="log-head">Paid growth campaigns</h3>${cards}`;
 }

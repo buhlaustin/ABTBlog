@@ -5,7 +5,7 @@ import { getArr } from './Workspace.js';
 
 export const ANGEL_SAFE_AMOUNT = 50_000;
 export const ANGEL_SAFE_CAP = 1_500_000;
-export const ANGEL_SAFE_MAX_ROUNDS = 6;
+export const ANGEL_SAFE_MAX_ROUNDS = 1;
 const EST_PCT = Math.round((ANGEL_SAFE_AMOUNT / ANGEL_SAFE_CAP) * 1000) / 10;
 
 const ANGEL_LEADS = [

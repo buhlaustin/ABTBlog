@@ -47,8 +47,34 @@ export function createInitialOffices() {
     hubId: null,
     hubLabel: null,
     modifiers: { costMult: 1, revenueMult: 1, salaryMult: 1 },
-    satellites: []
+    satellites: [],
+    /** Template ids that were ever opened — each city satellite is one-time per run. */
+    usedSatelliteTemplateIds: []
   };
+}
+
+export function satelliteTemplateIdFromEntry(entry) {
+  if (!entry) return null;
+  if (entry.templateId) return entry.templateId;
+  const id = String(entry.id ?? '');
+  const m = id.match(/^(sat-[a-z0-9-]+)/);
+  if (m) return m[1];
+  return id || null;
+}
+
+export function usedSatelliteTemplateIds(state) {
+  const offices = state.offices ?? {};
+  const claimed = new Set(offices.usedSatelliteTemplateIds ?? []);
+  for (const s of offices.satellites ?? []) {
+    const tid = satelliteTemplateIdFromEntry(s);
+    if (tid) claimed.add(tid);
+  }
+  return claimed;
+}
+
+export function availableSatelliteTemplates(state, list = hubsCache) {
+  const used = usedSatelliteTemplateIds(state);
+  return getSatelliteTemplates(list).filter((t) => !used.has(t.id));
 }
 
 export function getHubById(hubId, list = hubsCache) {
@@ -117,13 +143,23 @@ export function addSatellite(state, templateId) {
   const t = getSatelliteTemplates().find((s) => s.id === templateId);
   if (!t) return { ok: false, reason: 'Unknown satellite template.' };
 
+  if (!state.offices.usedSatelliteTemplateIds) state.offices.usedSatelliteTemplateIds = [];
+  const used = usedSatelliteTemplateIds(state);
+  if (used.has(t.id)) {
+    return { ok: false, reason: `${t.label} satellite was already opened this run — pick another city.` };
+  }
+
   const entry = {
-    id: `${t.id}-${Date.now()}`,
+    id: t.id,
+    templateId: t.id,
     label: t.label,
     seats: t.seats,
     rentMonthly: t.rentMonthly
   };
   state.offices.satellites.push(entry);
+  if (!state.offices.usedSatelliteTemplateIds.includes(t.id)) {
+    state.offices.usedSatelliteTemplateIds.push(t.id);
+  }
   return { ok: true, entry };
 }
 
@@ -146,6 +182,7 @@ function escapeHtml(s) {
 function workspacePurchaseBlock(state) {
   const arr = getArr(state);
   const tier = getWorkspaceTier(state);
+  const atHub = Boolean(state.offices?.hubId) || tier === WORKSPACE_TIER.HUB;
   const tiers = [
     { id: WORKSPACE_TIER.SMALL, label: 'Small office', rent: '$2k/mo', gate: ARR_GATES.SMALL_OFFICE, cap: 4 },
     { id: WORKSPACE_TIER.MEDIUM, label: 'Medium office', rent: '$5k/mo', gate: ARR_GATES.MEDIUM_OFFICE, cap: 12 },
@@ -158,20 +195,28 @@ function workspacePurchaseBlock(state) {
       cap: 100
     }
   ];
-  const buttons = tiers
-    .map((t) => {
-      const can = canPurchaseTier(state, t.id);
-      const disabled = !can.ok ? 'disabled' : '';
-      const title = can.ok ? '' : ` title="${escapeHtml(can.reason)}"`;
-      return `<button type="button" class="btn btn-ghost btn-small" data-purchase-workspace="${t.id}" ${disabled}${title}>${escapeHtml(t.label)} · ${t.rent} · ${t.cap} seats</button>`;
-    })
-    .join('');
+  const buttons = atHub
+    ? ''
+    : tiers
+        .map((t) => {
+          const can = canPurchaseTier(state, t.id);
+          const disabled = !can.ok ? 'disabled' : '';
+          const title = can.ok ? '' : ` title="${escapeHtml(can.reason)}"`;
+          return `<button type="button" class="btn btn-ghost btn-small" data-purchase-workspace="${t.id}" ${disabled}${title}>${escapeHtml(t.label)} · ${t.rent} · ${t.cap} seats</button>`;
+        })
+        .join('');
+
+  const hubNote = atHub
+    ? `<p class="fine-print">Worldwide hub HQ — add satellite offices below. Earlier office tiers are no longer listed here.</p>`
+    : `<p class="fine-print">Offices are purchased at ARR gates; rent rolls into monthly burn. Garage has no hires.</p>`;
+
+  const purchaseRow = buttons ? `<div class="workspace-purchase-row">${buttons}</div>` : '';
 
   return `
     <div class="finance-action">
       <p><strong>Workspace</strong> — ${escapeHtml(workspaceLabel(tier))} · rent ${formatMoney(workspaceRentMonthly(state))}/mo · ARR ${formatMoney(arr)}</p>
-      <p class="fine-print">Offices are purchased at ARR gates; rent rolls into monthly burn. Garage has no hires.</p>
-      <div class="workspace-purchase-row">${buttons}</div>
+      ${hubNote}
+      ${purchaseRow}
     </div>`;
 }
 
@@ -218,24 +263,35 @@ export function renderOfficesPanel(container, state) {
     )
     .join('');
 
-  const satOptions = getSatelliteTemplates()
-    .map((t) => `<option value="${t.id}">${escapeHtml(t.label)} — ${t.seats} seats · ${formatMoney(t.rentMonthly)}/mo</option>`)
+  const allTemplates = getSatelliteTemplates();
+  const available = availableSatelliteTemplates(state);
+  const satRentTotal = satelliteRent(state);
+  const satOptions = available
+    .map(
+      (t) =>
+        `<option value="${t.id}">${escapeHtml(t.label)} — ${t.seats} seats · ${formatMoney(t.rentMonthly)}/mo</option>`
+    )
     .join('');
 
   const satelliteBlock =
     state.offices?.hubId
       ? `
     <h3 class="log-head">Satellite offices</h3>
+    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Each city can be opened <strong>once per run</strong>.</p>
     <div class="table-scroll">
       <table class="data-table">
-        <thead><tr><th>Office</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
+        <thead><tr><th>City</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>
         <tbody>${satRows || '<tr><td colspan="4">No satellites yet.</td></tr>'}</tbody>
       </table>
     </div>
-    <div class="satellite-add">
+    ${
+      available.length > 0
+        ? `<div class="satellite-add">
       <select id="satellite-template">${satOptions}</select>
-      <button type="button" class="btn btn-ghost btn-small" id="btn-add-satellite">Add satellite</button>
+      <button type="button" class="btn btn-ghost btn-small" id="btn-add-satellite">Open satellite</button>
     </div>`
+        : `<p class="fine-print">Every satellite city in the catalog is already open this run.</p>`
+    }`
       : '';
 
   container.innerHTML = `

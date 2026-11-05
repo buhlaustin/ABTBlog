@@ -72,11 +72,12 @@ test.describe('Startup Simulator', () => {
     await expect(page.locator('#tab-board')).toBeHidden();
 
     await page.locator('#tab-growth').click();
+    await expect(page.locator('#growth-stat-product-level')).toBeVisible();
+    await expect(page.locator('#growth-stat-buzz')).toBeVisible();
+    await expect(page.locator('#panel-growth')).toContainText('Product level');
+    await expect(page.locator('#panel-growth')).toContainText('Buzz');
     await expect(page.locator('#panel-growth')).toContainText('Rival');
     await expect(page.locator('#panel-growth')).toContainText('Runway');
-
-    await page.locator('#tab-social').click();
-    await expect(page.locator('[data-social-tab="archive"]')).toBeVisible();
 
     await page.locator('#tab-news').click();
     await expect(page.locator('#btn-toggle-news-archive')).toBeVisible();
@@ -132,19 +133,18 @@ test.describe('Startup Simulator', () => {
     await page.locator('#btn-confirm-task-lineup').click();
 
     await page.locator('#tab-finance').click();
-    await expect(page.locator('#panel-finance .table-scroll')).toBeVisible();
+    await expect(page.locator('#panel-finance .data-table').first()).toBeVisible();
     await expect(page.locator('#tab-desk')).toHaveCSS('min-height', '44px');
 
     const tabIds = [
       'desk',
-      'product',
       'growth',
       'people',
+      'ceo',
       'finance',
+      'companies',
       'board',
-      'social',
       'news',
-      'advisor',
     ];
     for (const tab of tabIds) {
       const tabBtn = page.locator(`#tab-${tab}`);
@@ -197,9 +197,10 @@ test.describe('Startup Simulator', () => {
     await lockBtn.click();
 
     await page.locator('#tab-finance').click();
-    await expect(page.locator('.workspace-purchase-row .btn').first()).toBeVisible();
-    await page.locator('#tab-social').click();
-    await expect(page.locator('.social-subtabs button').first()).toHaveCSS('min-height', '44px');
+    await expect(page.locator('#panel-finance')).toContainText('Worldwide hub');
+    await expect(page.locator('#btn-add-satellite')).toBeVisible();
+    await page.locator('#tab-news').click();
+    await expect(page.locator('#btn-toggle-news-archive')).toHaveCSS('min-height', '44px');
 
     const docWidth = await page.evaluate(() => document.documentElement.clientWidth);
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);

@@ -6,7 +6,7 @@
       "costMult": 1.15,
       "revenueMult": 1.12,
       "salaryMult": 1.12,
-      "fixedBase": 8500
+      "fixedBase": 168000
     },
     {
       "id": "nyc",
@@ -14,7 +14,7 @@
       "costMult": 1.1,
       "revenueMult": 1.08,
       "salaryMult": 1.08,
-      "fixedBase": 8000
+      "fixedBase": 158000
     },
     {
       "id": "miami",
@@ -22,7 +22,7 @@
       "costMult": 0.95,
       "revenueMult": 1.02,
       "salaryMult": 0.95,
-      "fixedBase": 5500
+      "fixedBase": 108000
     },
     {
       "id": "dallas",
@@ -30,7 +30,7 @@
       "costMult": 0.88,
       "revenueMult": 0.98,
       "salaryMult": 0.9,
-      "fixedBase": 4800
+      "fixedBase": 98000
     },
     {
       "id": "atlanta",
@@ -38,7 +38,7 @@
       "costMult": 0.9,
       "revenueMult": 1.0,
       "salaryMult": 0.92,
-      "fixedBase": 5000
+      "fixedBase": 102000
     },
     {
       "id": "nashville",
@@ -46,13 +46,43 @@
       "costMult": 0.93,
       "revenueMult": 1.03,
       "salaryMult": 0.94,
-      "fixedBase": 5200
+      "fixedBase": 125000
     }
   ],
   "satelliteTemplates": [
-    { "id": "sat-denver", "label": "Denver satellite", "seats": 6, "rentMonthly": 9000 },
-    { "id": "sat-austin", "label": "Austin satellite", "seats": 8, "rentMonthly": 11000 },
-    { "id": "sat-chicago", "label": "Chicago satellite", "seats": 10, "rentMonthly": 14000 },
-    { "id": "sat-seattle", "label": "Seattle satellite", "seats": 8, "rentMonthly": 13000 }
+    { "id": "sat-denver", "label": "Denver", "seats": 6, "rentMonthly": 9000 },
+    { "id": "sat-austin", "label": "Austin", "seats": 8, "rentMonthly": 11000 },
+    { "id": "sat-chicago", "label": "Chicago", "seats": 10, "rentMonthly": 14000 },
+    { "id": "sat-seattle", "label": "Seattle", "seats": 8, "rentMonthly": 13000 },
+    { "id": "sat-boston", "label": "Boston", "seats": 9, "rentMonthly": 15000 },
+    { "id": "sat-phoenix", "label": "Phoenix", "seats": 7, "rentMonthly": 8500 },
+    { "id": "sat-portland", "label": "Portland", "seats": 6, "rentMonthly": 8200 },
+    { "id": "sat-raleigh", "label": "Raleigh–Durham", "seats": 8, "rentMonthly": 9500 },
+    { "id": "sat-minneapolis", "label": "Minneapolis", "seats": 7, "rentMonthly": 8800 },
+    { "id": "sat-houston", "label": "Houston", "seats": 9, "rentMonthly": 10200 },
+    { "id": "sat-san-diego", "label": "San Diego", "seats": 7, "rentMonthly": 12000 },
+    { "id": "sat-philadelphia", "label": "Philadelphia", "seats": 8, "rentMonthly": 11200 },
+    { "id": "sat-salt-lake", "label": "Salt Lake City", "seats": 6, "rentMonthly": 7800 },
+    { "id": "sat-charlotte", "label": "Charlotte", "seats": 7, "rentMonthly": 8600 },
+    { "id": "sat-columbus", "label": "Columbus", "seats": 6, "rentMonthly": 7400 },
+    { "id": "sat-tampa", "label": "Tampa", "seats": 6, "rentMonthly": 8000 },
+    { "id": "sat-las-vegas", "label": "Las Vegas", "seats": 5, "rentMonthly": 7600 },
+    { "id": "sat-detroit", "label": "Detroit", "seats": 8, "rentMonthly": 7900 },
+    { "id": "sat-kansas-city", "label": "Kansas City", "seats": 6, "rentMonthly": 7200 },
+    { "id": "sat-london", "label": "London", "seats": 12, "rentMonthly": 18000 },
+    { "id": "sat-berlin", "label": "Berlin", "seats": 10, "rentMonthly": 13500 },
+    { "id": "sat-paris", "label": "Paris", "seats": 9, "rentMonthly": 14200 },
+    { "id": "sat-amsterdam", "label": "Amsterdam", "seats": 8, "rentMonthly": 12800 },
+    { "id": "sat-dublin", "label": "Dublin", "seats": 7, "rentMonthly": 11500 },
+    { "id": "sat-toronto", "label": "Toronto", "seats": 10, "rentMonthly": 12500 },
+    { "id": "sat-vancouver", "label": "Vancouver", "seats": 7, "rentMonthly": 11800 },
+    { "id": "sat-sydney", "label": "Sydney", "seats": 9, "rentMonthly": 13800 },
+    { "id": "sat-singapore", "label": "Singapore", "seats": 11, "rentMonthly": 15500 },
+    { "id": "sat-tokyo", "label": "Tokyo", "seats": 10, "rentMonthly": 16200 },
+    { "id": "sat-bangalore", "label": "Bangalore", "seats": 14, "rentMonthly": 6800 },
+    { "id": "sat-sao-paulo", "label": "São Paulo", "seats": 10, "rentMonthly": 9200 },
+    { "id": "sat-mexico-city", "label": "Mexico City", "seats": 9, "rentMonthly": 8800 },
+    { "id": "sat-tel-aviv", "label": "Tel Aviv", "seats": 8, "rentMonthly": 13200 },
+    { "id": "sat-dubai", "label": "Dubai", "seats": 8, "rentMonthly": 14500 }
   ]
 }
