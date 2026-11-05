@@ -1,10 +1,11 @@
 {
-  "version": 1,
+  "version": 2,
   "crises": [
     {
       "id": "outage",
       "title": "Production outage",
       "description": "Status page red. Enterprise customers are refreshing aggressively.",
+      "weight": 2,
       "choices": [
         {
           "label": "All-hands war room (expensive)",
@@ -20,6 +21,7 @@
       "id": "lawsuit-parody",
       "title": "Patent troll letter",
       "description": "A firm you've never heard of claims you invented their invention.",
+      "weight": 2,
       "choices": [
         {
           "label": "Settle quickly",
@@ -35,6 +37,8 @@
       "id": "poached-hire",
       "title": "Key hire poached",
       "description": "Your rival dangled equity and a title with the word “Chief”.",
+      "weight": 2,
+      "minTier": 2,
       "choices": [
         {
           "label": "Counter-offer package",
@@ -50,6 +54,7 @@
       "id": "data-scare",
       "title": "Near-miss data incident",
       "description": "An engineer almost pasted prod credentials into a public gist.",
+      "weight": 2,
       "choices": [
         {
           "label": "Hire security audit",
@@ -58,6 +63,109 @@
         {
           "label": "Internal memo only",
           "effects": { "cash": -2000, "buzz": -1, "sentiment": -5 }
+        }
+      ]
+    },
+    {
+      "id": "viral-backlash",
+      "title": "Viral backlash thread",
+      "description": "A screenshot of your pricing page is getting ratio'd on Chirp.",
+      "weight": 2,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Founder apology thread",
+          "effects": { "cash": -5000, "buzz": 2, "sentiment": 3, "competitor": -1 }
+        },
+        {
+          "label": "Ignore until it trends down",
+          "effects": { "cash": 0, "buzz": -3, "sentiment": -6, "competitor": 1 }
+        }
+      ]
+    },
+    {
+      "id": "enterprise-churn-scare",
+      "title": "Enterprise logo churn scare",
+      "description": "Your largest account's champion left for your rival.",
+      "weight": 2,
+      "minTier": 4,
+      "choices": [
+        {
+          "label": "Executive fly-in + discount",
+          "effects": { "cash": -35000, "buzz": 0, "sentiment": 2, "competitor": -1 }
+        },
+        {
+          "label": "Self-serve save offer",
+          "effects": { "cash": -8000, "buzz": -1, "sentiment": -2 }
+        }
+      ]
+    },
+    {
+      "id": "regulator-letter",
+      "title": "Regulator inquiry letter",
+      "description": "Compliance wants a deck about data handling yesterday.",
+      "weight": 1,
+      "minTier": 5,
+      "choices": [
+        {
+          "label": "Hire outside counsel blitz",
+          "effects": { "cash": -55000, "buzz": 0, "sentiment": 5 }
+        },
+        {
+          "label": "Intern-led response",
+          "effects": { "cash": -6000, "buzz": -2, "sentiment": -8 }
+        }
+      ]
+    },
+    {
+      "id": "supply-chain-snafu",
+      "title": "Vendor supply chain snafu",
+      "description": "A critical SaaS vendor had a breach — customers are asking if you were exposed.",
+      "weight": 2,
+      "minTier": 3,
+      "choices": [
+        {
+          "label": "Customer comms + credit",
+          "effects": { "cash": -22000, "buzz": 1, "sentiment": 3 }
+        },
+        {
+          "label": "Status quo blog post",
+          "effects": { "cash": -4000, "buzz": -1, "sentiment": -4, "competitor": 1 }
+        }
+      ]
+    },
+    {
+      "id": "public-short-report",
+      "title": "Short-seller report drops",
+      "description": "A firm you never heard of claims your metrics are 'aspirational'.",
+      "weight": 2,
+      "minTier": 7,
+      "requiresPublic": true,
+      "choices": [
+        {
+          "label": "Buyback headline + data room",
+          "effects": { "cash": -120000, "buzz": 2, "sentiment": 4, "stockPct": 0.04 }
+        },
+        {
+          "label": "One-line denial",
+          "effects": { "cash": 0, "buzz": -2, "sentiment": -5, "stockPct": -0.06 }
+        }
+      ]
+    },
+    {
+      "id": "union-whispers",
+      "title": "Union organizing whispers",
+      "description": "Slack channels you are not in are suddenly very active.",
+      "weight": 1,
+      "minTier": 4,
+      "choices": [
+        {
+          "label": "All-hands + comp refresh",
+          "effects": { "cash": -42000, "buzz": 0, "sentiment": 6 }
+        },
+        {
+          "label": "HR FAQ only",
+          "effects": { "cash": -3000, "buzz": -1, "sentiment": -5 }
         }
       ]
     }

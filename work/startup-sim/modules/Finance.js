@@ -14,6 +14,7 @@ import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
 import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
 import { progressionRevenueMult } from './ProgressionEconomy.js';
+import { applyTaskRivalEffects } from './WorldDynamics.js';
 
 /** Legacy alias — progression stack replaces seed-only scaling. */
 export function scalingRevenueMult(state) {
@@ -121,6 +122,7 @@ export function applyTaskOutcome(state, taskDef, rolled) {
   state.product.level = (state.product.level ?? 0) + productGain;
   const buzzGain = rolled.buzz ?? 0;
   state.product.buzz = (state.product.buzz ?? 0) + buzzGain;
+  applyTaskRivalEffects(state, taskDef);
 
   return { cost, revenue };
 }

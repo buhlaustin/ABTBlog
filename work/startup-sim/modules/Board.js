@@ -3,6 +3,8 @@ import { formatMoney } from './constants.js';
 import { recordCashOutflow } from './Finance.js';
 import { setGameFeedback } from './GameFeedback.js';
 import { onBoardSentiment } from './Sentiment.js';
+import { progressionTier } from './ProgressionEconomy.js';
+import { isPublicCompany } from './IPO.js';
 
 let boardCatalog = bundledBoard;
 
@@ -29,9 +31,17 @@ function shuffle(arr) {
 
 const BOARD_TASK_COOLDOWN = 4;
 
+function boardTaskAllowed(def, state) {
+  const tier = progressionTier(state);
+  if ((def.minTier ?? 0) > tier) return false;
+  if (def.requiresPublic && !isPublicCompany(state)) return false;
+  return true;
+}
+
 export function dealBoardTasks(state) {
   if (!state.board) state.board = createInitialBoard();
-  const pool = getBoardTaskDefs();
+  let pool = getBoardTaskDefs().filter((t) => boardTaskAllowed(t, state));
+  if (!pool.length) pool = getBoardTaskDefs();
   const recent = new Set((state.board.recentTaskIds ?? []).slice(-BOARD_TASK_COOLDOWN * 3));
   const fresh = pool.filter((t) => !recent.has(t.id));
   const source = fresh.length >= 3 ? fresh : pool;
@@ -110,8 +120,13 @@ export function renderBoardPanel(container, state) {
     })
     .join('');
 
+  const governanceNote = state.flags?.seriesAClosed
+    ? '<p class="fine-print">After Series A, skipping <em>all</em> board prep this month hurts sentiment and heats up your rival.</p>'
+    : '';
+
   container.innerHTML = `
     <p class="panel-lede">Optional board work — does not count toward desk slots. Good for sentiment before fundraising.</p>
+    ${governanceNote}
     <div class="task-list">${cards || '<div class="tab-placeholder">New board tasks appear each month.</div>'}</div>
   `;
 }

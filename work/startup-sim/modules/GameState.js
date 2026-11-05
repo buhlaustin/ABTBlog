@@ -25,7 +25,7 @@ import {
   createInitialPublicMarket
 } from './constants.js';
 
-export const SAVE_VERSION = 12;
+export const SAVE_VERSION = 13;
 
 const SANDBOX_CASH_MIN = 10_000;
 const SANDBOX_CASH_MAX = 1_000_000_000;
@@ -201,6 +201,10 @@ export function normalizeSave(raw) {
       state.meta.runSeed = Math.floor(Math.random() * 2_147_483_647);
     }
     if (!state.board) state.board = createInitialBoard();
+    if (state.board.governanceStreak === undefined) state.board.governanceStreak = 0;
+    if (state.publicMarket && state.publicMarket.guidanceBeatStreak === undefined) {
+      state.publicMarket.guidanceBeatStreak = 0;
+    }
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);
     }

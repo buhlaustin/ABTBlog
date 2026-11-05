@@ -11,6 +11,12 @@ import { archiveCurrentNews } from './News.js';
 import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
 import { tickAcceleratorBoost } from './Accelerators.js';
 import { resetGrowthCampaignsMonth } from './GrowthCampaigns.js';
+import {
+  applyBuzzDecayAtMonthStart,
+  settleRivalHeatAtMonthEnd,
+  settleBoardGovernance,
+  scorePublicGuidanceBeat
+} from './WorldDynamics.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -60,6 +66,9 @@ export function startMonth(state) {
   }
   syncDraftFromFinalized(state);
   resetGrowthCampaignsMonth(state);
+  for (const line of applyBuzzDecayAtMonthStart(state)) {
+    appendLog(state, line);
+  }
   dealMonthlyTasks(state);
   dealBoardTasks(state);
   return state;
@@ -87,6 +96,16 @@ export function endMonth(state) {
     state,
     `Month closed: ${state.calendar.tasksCompleted} tasks, ${formatLogMoney(state.calendar.monthRevenue)} revenue, ${formatLogMoney(burn)} overhead.`
   );
+
+  for (const line of settleBoardGovernance(state)) {
+    appendLog(state, line);
+  }
+  for (const line of scorePublicGuidanceBeat(state, monthRevenue, burn)) {
+    appendLog(state, line);
+  }
+  for (const line of settleRivalHeatAtMonthEnd(state, monthRevenue, burn)) {
+    appendLog(state, line);
+  }
 
   syncStageFromProgress(state);
   if (state.stage !== priorStage) {

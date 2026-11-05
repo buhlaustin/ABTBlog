@@ -26,6 +26,7 @@ import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
 import { renderProductActionsPanel } from './ProductActions.js';
 import { sentimentLabel } from './Sentiment.js';
 import { competitorRevenueMult } from './Competitor.js';
+import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
 import {
   getTaskRevenueMultiplierPreview,
   getCoreTaskRevenueMult,
@@ -192,8 +193,9 @@ export function renderDeskPanel(state) {
           const def = getTaskDef(offer.taskId);
           if (!def) return '';
           const sel = offer.selected ? 'task-offer selected' : 'task-offer';
+          const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
           return `<article class="${sel}">
-            <h3>${escapeHtml(def.title)}</h3>
+            <h3>${escapeHtml(def.title)}${sig}</h3>
             <p>${escapeHtml(def.description)}</p>
             <button type="button" class="btn btn-ghost btn-small" data-toggle-task-offer="${escapeHtml(offer.offerId)}">${offer.selected ? 'Selected' : 'Select'}</button>
           </article>`;
@@ -211,10 +213,15 @@ export function renderDeskPanel(state) {
           ? `<button type="button" class="btn btn-primary btn-small" data-complete-task="${escapeHtml(inst.instanceId)}">Complete</button>`
           : '<span class="task-done-label">Done</span>';
       const band = estimateTaskPayoutBand(def, state);
+      const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
+      const rival =
+        def.rivalPressure && def.rivalPressure < 0
+          ? ` · rival heat ${def.rivalPressure}`
+          : '';
       return `<article class="${doneClass}">
-        <h3>${escapeHtml(def.title)}</h3>
+        <h3>${escapeHtml(def.title)}${sig}</h3>
         <p>${escapeHtml(def.description)}</p>
-        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×</p>
+        <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${rival}</p>
         ${btn}
       </article>`;
     })
@@ -460,10 +467,12 @@ export function renderGrowthPanel(container, state) {
   const totalMult = getTaskRevenueMultiplierPreview(state);
   const era = progressionTierLabel(state);
   const growthRuns = (state.growth?.campaignsThisMonth ?? []).length;
+  const growthSlots = growthCampaignSlots(state);
+  const growthLeft = growthCampaignsRemaining(state);
   const multNote =
     state.mode === 'sandbox' && tuneMult !== 1
       ? `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — desk &amp; Growth: <strong>${coreMult.toFixed(2)}×</strong> progression × <strong>${tuneMult.toFixed(2)}×</strong> sandbox = <strong>${totalMult.toFixed(2)}×</strong>${growthRuns ? ` · ${growthRuns} campaign(s) launched this month` : ''}.</p>`
-      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — effective multiplier <strong>${totalMult.toFixed(2)}×</strong>${growthRuns ? ` · ${growthRuns} campaign(s) this month` : ''}.</p>`;
+      : `<p class="fine-print"><strong>${escapeHtml(era)}</strong> — effective multiplier <strong>${totalMult.toFixed(2)}×</strong>${growthRuns ? ` · ${growthRuns}/${growthSlots} growth slot(s) used` : ` · ${growthLeft}/${growthSlots} growth slot(s) left`}.</p>`;
 
   container.innerHTML = `
     <p class="panel-lede">Market position for ${escapeHtml(state.company.categoryLabel)} — desk tasks and paid campaigns below share the same multiplier math.</p>
@@ -478,7 +487,7 @@ export function renderGrowthPanel(container, state) {
     </div>
     ${
       rival
-        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Win months on the Desk and close strong revenue to cool rival heat.</p>`
+        ? `<p class="fine-print"><strong>${escapeHtml(rival.name)}</strong> sells ${escapeHtml(rival.product)}. Strong revenue months, marketing desk tasks, and growth campaigns cool heat. Buzz decays each month — keep shipping.</p>`
         : ''
     }
     ${

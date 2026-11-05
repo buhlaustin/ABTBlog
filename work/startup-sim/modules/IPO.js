@@ -117,8 +117,9 @@ export function tickPublicMarket(state) {
   const buzz = Math.min(0.03, (state.product?.buzz ?? 0) * 0.004);
   const noise = (Math.random() - 0.5) * 0.1;
   const sentiment = readNewsSentiment(state);
+  const guidanceBeat = Math.min(0.06, (pm.guidanceBeatStreak ?? 0) * 0.012);
 
-  const deltaPct = growth * 0.35 + runwayStress + buzz + noise + sentiment;
+  const deltaPct = growth * 0.35 + runwayStress + buzz + noise + sentiment + guidanceBeat;
   const floor = (pm.ipoPrice ?? price) * 0.15;
   const next = Math.max(floor, Math.round(price * (1 + deltaPct) * 100) / 100);
 

@@ -3,18 +3,31 @@ import { STAGES, getMonthlyTaskSlots, getMonthlyTaskOfferCount } from './constan
 import { getTaskStage } from './Workspace.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
+import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
 
 /** Shipped catalog — always available with the game bundle. */
-let taskCatalog = bundledCatalog;
+function mergeSignatureTasks(base) {
+  const sig = bundledSignature?.tasks ?? [];
+  if (!sig.length) return base;
+  const ids = new Set((base.tasks ?? []).map((t) => t.id));
+  const merged = [...(base.tasks ?? [])];
+  for (const t of sig) {
+    if (!ids.has(t.id)) merged.push(t);
+  }
+  return { ...base, tasks: merged };
+}
+
+let taskCatalog = mergeSignatureTasks(bundledCatalog);
 
 export async function loadTaskCatalog() {
   if (!taskCatalog?.tasks?.length) {
     throw new Error('startup-sim: bundled tasks.json is empty');
   }
+  taskCatalog = mergeSignatureTasks(taskCatalog);
   try {
     const data = await fetchGameJson('data/tasks.json');
     if (Array.isArray(data?.tasks) && data.tasks.length > 0) {
-      taskCatalog = data;
+      taskCatalog = mergeSignatureTasks(data);
     }
   } catch {
     /* keep bundled catalog */
@@ -32,7 +45,7 @@ export function isTaskCatalogReady() {
 
 /** Used by headless smoke tests only (loads tasks.json without fetch). */
 export function hydrateTaskCatalog(data) {
-  if (data?.tasks?.length) taskCatalog = data;
+  if (data?.tasks?.length) taskCatalog = mergeSignatureTasks(data);
 }
 
 function shuffle(arr) {
@@ -70,6 +83,13 @@ export function pickMonthlyTaskDefs(pool, slots, recentTaskIds = []) {
       used.add(def.id);
       picked.push(def);
     }
+  }
+
+  const signaturePool = pool.filter((t) => t.signature);
+  if (signaturePool.length && slots > 0) {
+    const sig = shuffle(signaturePool)[0];
+    used.add(sig.id);
+    picked.push(sig);
   }
 
   takeUnique(fresh.length ? fresh : pool);
@@ -178,7 +198,12 @@ export function dealMonthlyTasks(state) {
   }
   state.calendar.taskCatalogError = false;
   const recent = state.calendar.recentTaskIds ?? [];
-  const offered = pickMonthlyTaskDefs(pool, offerCount, recent);
+  let offered = pickMonthlyTaskDefs(pool, offerCount, recent);
+  const sigPool = pool.filter((t) => t.signature);
+  if (sigPool.length && !offered.some((t) => t.signature) && offered.length > 0) {
+    const sig = shuffle(sigPool)[0];
+    offered = [...offered.slice(0, -1), sig];
+  }
   state.calendar.monthTaskSlotTarget = slots;
   state.calendar.monthTaskOffers = offered.map((def, index) => ({
     offerId: `${state.calendar.year}-${state.calendar.monthIndex}-offer-${def.id}-${index}`,

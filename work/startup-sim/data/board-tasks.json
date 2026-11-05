@@ -16,7 +16,8 @@
       "cost": 800,
       "revenue": [0, 0],
       "buzz": 0,
-      "sentiment": 3
+      "sentiment": 3,
+      "minTier": 2
     },
     {
       "id": "board-audit-committee",
@@ -25,7 +26,8 @@
       "cost": 1200,
       "revenue": [0, 0],
       "buzz": 1,
-      "sentiment": 2
+      "sentiment": 2,
+      "minTier": 3
     },
     {
       "id": "board-strategy-offsite",
@@ -34,7 +36,49 @@
       "cost": 3500,
       "revenue": [0, 0],
       "buzz": 2,
-      "sentiment": 4
+      "sentiment": 4,
+      "minTier": 4
+    },
+    {
+      "id": "board-409a-refresh",
+      "title": "409A refresh coordination",
+      "description": "Valuation firm, lawyers, and the option grant spreadsheet of doom.",
+      "cost": 2200,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "minTier": 2
+    },
+    {
+      "id": "board-diversity-report",
+      "title": "Board diversity & ESG snapshot",
+      "description": "One-pager LPs can forward without embarrassment.",
+      "cost": 900,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 2,
+      "minTier": 3
+    },
+    {
+      "id": "board-earnings-preview",
+      "title": "Pre-earnings board preview",
+      "description": "Walk directors through the quarter before the public sees it.",
+      "cost": 4800,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 5,
+      "minTier": 7,
+      "requiresPublic": true
+    },
+    {
+      "id": "board-ma-scenario",
+      "title": "M&A scenario tabletop",
+      "description": "What if BigTech calls? Numbers ready, egos in check.",
+      "cost": 6200,
+      "revenue": [0, 0],
+      "buzz": 2,
+      "sentiment": 4,
+      "minTier": 5
     }
   ]
 }

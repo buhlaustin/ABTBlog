@@ -8,6 +8,8 @@ import {
   getTaskRevenueMultiplierPreview
 } from './Finance.js';
 import { formatMoney } from './constants.js';
+import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
+import { applyCampaignRivalEffects } from './WorldDynamics.js';
 
 let catalog = bundled;
 
@@ -51,6 +53,13 @@ export function runGrowthCampaign(state, campaignId) {
   if (state.growth.campaignsThisMonth.includes(def.id)) {
     return { ok: false, reason: 'Already ran that campaign this month.' };
   }
+  const slots = growthCampaignSlots(state);
+  if (state.growth.campaignsThisMonth.length >= slots) {
+    return {
+      ok: false,
+      reason: `Marketing bandwidth full (${slots} campaign${slots === 1 ? '' : 's'} per month).`
+    };
+  }
   const cost = def.cost ?? 0;
   if ((state.finance.cash ?? 0) < cost) {
     return { ok: false, reason: `Need ${formatMoney(cost)} cash.` };
@@ -67,6 +76,7 @@ export function runGrowthCampaign(state, campaignId) {
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
   state.product.buzz = (state.product.buzz ?? 0) + (def.buzz ?? 0);
   state.growth.campaignsThisMonth.push(def.id);
+  applyCampaignRivalEffects(state, def);
 
   return { ok: true, def, cost, revenue };
 }
@@ -89,6 +99,9 @@ export function renderGrowthCampaignsBlock(state) {
     return '<p class="fine-print">No paid growth plays unlocked yet — close seed and scale ARR for billboards and beyond.</p>';
   }
   const mult = getTaskRevenueMultiplierPreview(state);
+  const slots = growthCampaignSlots(state);
+  const remaining = growthCampaignsRemaining(state);
+  const slotNote = `<p class="fine-print">Campaign slots this month: <strong>${remaining}/${slots}</strong> remaining (does not use desk tasks).</p>`;
   const cards = campaigns
     .map((c) => {
       const r0 = Math.round((c.revenue?.[0] ?? 0) * mult * 0.5);
@@ -100,5 +113,5 @@ export function renderGrowthCampaignsBlock(state) {
       </div>`;
     })
     .join('');
-  return `<h3 class="log-head">Paid growth (Growth tab)</h3>${cards}`;
+  return `${slotNote}<h3 class="log-head">Paid growth (Growth tab)</h3>${cards}`;
 }
