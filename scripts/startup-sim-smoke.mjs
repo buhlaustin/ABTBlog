@@ -1015,14 +1015,20 @@ if (spaceState.world?.competitor?.name !== 'SpaceXY') {
   failed = true;
 }
 const spaceDesk = getTaskDefinitions().filter((t) => t.categories?.includes('space-exploration'));
-if (spaceDesk.length < 35) {
-  console.error(`FAIL: space-exploration desk bank ${spaceDesk.length} < 35`);
+const spaceSigs = spaceDesk.filter((t) => t.signature);
+if (spaceDesk.length < 70) {
+  console.error(`FAIL: space-exploration desk bank ${spaceDesk.length} < 70`);
+  failed = true;
+} else if (spaceSigs.length < 10) {
+  console.error(`FAIL: space-exploration signatures ${spaceSigs.length} < 10`);
   failed = true;
 } else if (getTaskPoolSize(spaceState) < getMonthlyTaskOfferCount(STAGES.GARAGE)) {
   console.error(`FAIL: space-exploration garage pool ${getTaskPoolSize(spaceState)} too small`);
   failed = true;
 } else {
-  console.log(`OK: space-exploration category (${spaceDesk.length} custom desk tasks, rival SpaceXY)`);
+  console.log(
+    `OK: space-exploration category (${spaceDesk.length} custom desk tasks, ${spaceSigs.length} signatures, rival SpaceXY)`
+  );
 }
 
 const productSideBank = sideTaskBankSize(['product', 'both']);

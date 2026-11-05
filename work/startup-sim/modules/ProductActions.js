@@ -17,6 +17,7 @@ import bundledLeversExtra from '../data/growth-levers-extra.json' with { type: '
 import bundledLeversExtra2 from '../data/growth-levers-extra2.json' with { type: 'json' };
 import bundledLeversExtra3 from '../data/growth-levers-extra3.json' with { type: 'json' };
 import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { type: 'json' };
+import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json' with { type: 'json' };
 
 function mergeLeverCatalog(base, ...extras) {
   const actions = [...(base?.actions ?? [])];
@@ -32,7 +33,13 @@ function mergeLeverCatalog(base, ...extras) {
   return actions;
 }
 
-const bundledLeverExtras = [bundledLeversExtra, bundledLeversExtra2, bundledLeversExtra3, bundledSpaceGrowth];
+const bundledLeverExtras = [
+  bundledLeversExtra,
+  bundledLeversExtra2,
+  bundledLeversExtra3,
+  bundledSpaceGrowth,
+  bundledSpaceGrowthExtra
+];
 
 let leverCatalog = mergeLeverCatalog(bundledLevers, ...bundledLeverExtras);
 

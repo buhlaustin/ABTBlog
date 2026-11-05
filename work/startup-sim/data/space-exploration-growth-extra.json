@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "campaigns": [
+    {
+      "id": "growth-space-nasa-town-hall-sponsor",
+      "categories": ["space-exploration"],
+      "title": "NASA town hall sponsorship",
+      "description": "Banner behind the administrator; procurement officers take notes.",
+      "cost": 95000,
+      "revenue": [72000, 420000],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 7
+    },
+    {
+      "id": "growth-space-launch-live-youtube",
+      "categories": ["space-exploration"],
+      "title": "Launch livestream mega-buy",
+      "description": "Pre-roll on every space stream — even the ones SpaceXY hosts.",
+      "cost": 52000,
+      "revenue": [38000, 220000],
+      "buzz": 5,
+      "tierMin": 3,
+      "tierMax": 6
+    },
+    {
+      "id": "growth-space-cape-visitor-center",
+      "categories": ["space-exploration"],
+      "title": "Cape visitor center exhibit",
+      "description": "Kids touch your engine nozzle replica; parents sign up for tours.",
+      "cost": 78000,
+      "revenue": [45000, 265000],
+      "buzz": 4,
+      "tierMin": 3,
+      "tierMax": 6
+    }
+  ],
+  "actions": [
+    {
+      "id": "lever-space-nasa-industry-day",
+      "focus": "growth",
+      "categories": ["space-exploration"],
+      "label": "NASA industry day booth",
+      "cost": 28000,
+      "buzz": 3,
+      "product": 1,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Program office briefings and hallway lobbying."
+    },
+    {
+      "id": "lever-space-booster-return-livestream",
+      "focus": "brand",
+      "categories": ["space-exploration"],
+      "label": "Booster recovery livestream",
+      "cost": 8500,
+      "buzz": 4,
+      "product": 0,
+      "rivalEase": 2,
+      "tierMin": 3,
+      "tierMax": 7,
+      "description": "Millions watch the landing; SpaceXY trend line dips."
+    },
+    {
+      "id": "lever-space-engine-test-public-day",
+      "focus": "brand",
+      "categories": ["space-exploration"],
+      "label": "Public engine test viewing day",
+      "cost": 12000,
+      "buzz": 4,
+      "product": 2,
+      "tierMin": 2,
+      "tierMax": 6,
+      "description": "Rumble felt in chests — recruiting event disguised as PR."
+    },
+    {
+      "id": "lever-space-crew-nasa-badge-tour",
+      "focus": "product",
+      "categories": ["space-exploration"],
+      "label": "Crew & NASA badge factory tour",
+      "cost": 45000,
+      "buzz": 3,
+      "product": 3,
+      "tierMin": 5,
+      "tierMax": 7,
+      "description": "Human spaceflight credibility in one photo op."
+    }
+  ]
+}

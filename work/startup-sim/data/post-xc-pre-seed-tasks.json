@@ -674,6 +674,34 @@
       "product": 1,
       "buzz": 1,
       "mrrGain": [120, 450]
+    },
+    {
+      "id": "preseed-cat-space-exploration-nasa-teaming",
+      "categories": ["space-exploration"],
+      "title": "NASA teaming agreement draft",
+      "description": "Align on tech milestones before the SBIR check lands.",
+      "types": ["research"],
+      "stages": ["post_xc"],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 3600,
+      "revenue": [5200, 28000],
+      "product": 2,
+      "buzz": 2
+    },
+    {
+      "id": "preseed-cat-space-exploration-pad-construction",
+      "categories": ["space-exploration"],
+      "title": "Launch pad construction milestone",
+      "description": "Concrete cured; flame trench ready for static fire season.",
+      "types": ["product"],
+      "stages": ["post_xc"],
+      "tierMin": 1,
+      "tierMax": 2,
+      "cost": 7800,
+      "revenue": [6500, 34000],
+      "product": 2,
+      "buzz": 2
     }
   ]
 }

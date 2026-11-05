@@ -3,6 +3,7 @@ import bundledExtra from '../data/growth-campaigns-extra.json' with { type: 'jso
 import bundledExtra2 from '../data/growth-campaigns-extra2.json' with { type: 'json' };
 import bundledExtra3 from '../data/growth-campaigns-extra3.json' with { type: 'json' };
 import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { type: 'json' };
+import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
@@ -25,7 +26,7 @@ function mergeCampaignCatalog(base, ...extras) {
   return { ...base, campaigns };
 }
 
-const bundledExtras = [bundledExtra, bundledExtra2, bundledExtra3, bundledSpaceGrowth];
+const bundledExtras = [bundledExtra, bundledExtra2, bundledExtra3, bundledSpaceGrowth, bundledSpaceGrowthExtra];
 
 let catalog = mergeCampaignCatalog(bundled, ...bundledExtras);
 

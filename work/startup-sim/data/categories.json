@@ -79,7 +79,7 @@
   {
     "id": "space-exploration",
     "label": "Space exploration",
-    "blurb": "Launch, orbit, and ground segment — long cycles, payload customers, and rivals like SpaceXY on every manifest.",
+    "blurb": "Build rockets like the real world — static fires, NASA LSP awards, booster landings, and SpaceXY on every manifest.",
     "defaultACV": 95000,
     "salesCycleWeeks": 22
   }
