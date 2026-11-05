@@ -114,9 +114,9 @@
               <option value="11">November</option>
               <option value="12">December</option>
             </select>
-            <select id="sandbox-start-year" name="sandboxStartYear" aria-label="Starting year"></select>
+            <input id="sandbox-start-year" name="sandboxStartYear" type="number" inputmode="numeric" aria-label="Starting year" required>
           </div>
-          <p class="fine-print">Career mode always starts in the current real-world month. Sandbox can backdate or skip ahead.</p>
+          <p class="fine-print">Career mode always starts in the current real-world month. Sandbox year can be any integer from 1 through 999,999.</p>
           <label for="sandbox-ipo-gate">IPO ARR gate</label>
           <select id="sandbox-ipo-gate" name="sandboxIpoGate">
             <option value="1000000000">$1B ARR (Career default)</option>

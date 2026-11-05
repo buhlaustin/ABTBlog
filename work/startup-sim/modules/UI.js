@@ -1,5 +1,11 @@
 import { formatMoney, stageLabel, getMonthlyTaskSlots } from './constants.js';
-import { formatStateMonth, formatCalendarStamp, realClockNow, sandboxCalendarYearOptions } from './GameCalendar.js';
+import {
+  formatStateMonth,
+  formatCalendarStamp,
+  realClockNow,
+  SANDBOX_CALENDAR_YEAR_MIN,
+  SANDBOX_CALENDAR_YEAR_MAX
+} from './GameCalendar.js';
 import { calendarTurn } from './XC.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
@@ -110,18 +116,14 @@ export function bindSandboxCashToggle(form) {
   };
 
   const monthSel = document.getElementById('sandbox-start-month');
-  const yearSel = document.getElementById('sandbox-start-year');
-  if (yearSel && !yearSel.options.length) {
-    for (const yr of sandboxCalendarYearOptions()) {
-      const opt = document.createElement('option');
-      opt.value = String(yr);
-      opt.textContent = String(yr);
-      yearSel.appendChild(opt);
-    }
+  const yearInput = document.getElementById('sandbox-start-year');
+  if (yearInput) {
+    yearInput.min = String(SANDBOX_CALENDAR_YEAR_MIN);
+    yearInput.max = String(SANDBOX_CALENDAR_YEAR_MAX);
   }
   const now = realClockNow();
   if (monthSel) monthSel.value = String(now.monthIndex);
-  if (yearSel) yearSel.value = String(now.year);
+  if (yearInput) yearInput.value = String(now.year);
 
   form.addEventListener('change', sync);
   sync();
