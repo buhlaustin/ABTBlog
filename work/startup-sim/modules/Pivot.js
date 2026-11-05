@@ -46,6 +46,7 @@ export function applyPivot(state, newCategoryId) {
     0,
     4
   );
+  state.news.unreadCount = Math.min(9, (state.news.unreadCount ?? 0) + 1);
 
   dealMonthlyTasks(state);
 

@@ -274,6 +274,12 @@ export function normalizeSave(raw) {
     if (state.news && state.news.seedCelebrationShown === undefined) {
       state.news.seedCelebrationShown = false;
     }
+    if (state.news && state.news.unreadCount === undefined) {
+      state.news.unreadCount = 0;
+    }
+    if (state.news && state.news.publishedTurn === undefined) {
+      state.news.publishedTurn = null;
+    }
 
     if (state.flags.xcResidencyComplete === undefined) {
       state.flags.xcResidencyComplete = false;

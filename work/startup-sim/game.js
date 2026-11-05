@@ -65,7 +65,9 @@ import {
   enrichMonthlyNewsWithAi,
   renderNewsPanel,
   toggleNewsArchive,
-  preloadNewsTimeline
+  preloadNewsTimeline,
+  syncNewsTabAlert,
+  unreadNewsCount
 } from './modules/News.js';
 import {
   publishPlayerPost,
@@ -302,6 +304,16 @@ async function handleEndMonth() {
 
     applyOfflineMonthlyNews(sessionState);
     applyOfflineMonthlySocial(sessionState);
+    const newArticles = unreadNewsCount(sessionState);
+    if (newArticles > 0) {
+      appendLog(
+        sessionState,
+        `Press: ${newArticles} new headline${newArticles === 1 ? '' : 's'} on the News tab.`
+      );
+      setGameFeedback(
+        `${newArticles} new article${newArticles === 1 ? '' : 's'} posted — open News to read.`
+      );
+    }
     refresh();
 
     const headlineNow = sessionState.news?.currentMonthArticles?.[0]?.headline ?? null;
@@ -316,8 +328,13 @@ async function handleEndMonth() {
         enrichMonthlySocialWithAi(sessionState)
       ]).then(([newsAi, socialAi]) => {
         if (newsAi) {
-          appendLog(sessionState, 'Fresh headlines hit the wire.');
+          appendLog(sessionState, 'Fresh AI headlines hit the wire.');
           updateMonthSummaryHeadline(sessionState.news?.currentMonthArticles?.[0]?.headline ?? null);
+          const n = unreadNewsCount(sessionState);
+          if (n > 0) {
+            setGameFeedback(`${n} updated article${n === 1 ? '' : 's'} on the News tab.`);
+          }
+          syncNewsTabAlert(sessionState);
         }
         if (socialAi) {
           appendLog(sessionState, 'ProNet and Chirp are buzzing.');

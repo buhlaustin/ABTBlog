@@ -3,7 +3,7 @@ import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
 import { renderPeoplePanel } from './Staff.js';
 import { renderSocialPanel } from './Social.js';
-import { renderNewsPanel } from './News.js';
+import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
 import { renderAdvisorPanel } from './Advisor.js';
 import {
   getTaskDef,
@@ -391,7 +391,11 @@ function activateTab(nav, tab) {
   });
   activeBtn?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' });
   const state = panelStateProvider?.();
-  if (state) renderPanelForTab(tab, state);
+  if (state) {
+    if (tab === 'news') markNewsAsRead(state);
+    renderPanelForTab(tab, state);
+    if (tab === 'news') syncNewsTabAlert(state);
+  }
 }
 
 export function bindTabNavigation() {
@@ -468,6 +472,7 @@ export function renderAllPanels(state) {
     }
   }
   renderGameHud(state);
+  syncNewsTabAlert(state);
   renderDeskPanel(state);
   const active = getActiveTabId();
   if (active !== 'desk') {

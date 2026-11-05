@@ -349,4 +349,29 @@ if (!inst) {
   }
 }
 
+const { applyOfflineMonthlyNews, archiveCurrentNews } = await import(
+  `file://${join(sim, 'modules/News.js')}`
+);
+const newsA = createInitialState({
+  companyName: 'NewsCo',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+newsA.meta.runSeed = 4242;
+applyOfflineMonthlyNews(newsA);
+const headA = newsA.news.currentMonthArticles?.[0]?.headline ?? '';
+archiveCurrentNews(newsA);
+newsA.calendar.monthIndex += 1;
+applyOfflineMonthlyNews(newsA);
+const headB = newsA.news.currentMonthArticles?.[0]?.headline ?? '';
+if (!headA || headA === headB) {
+  console.error(`FAIL: monthly news should rotate (${headA} vs ${headB})`);
+  failed = true;
+} else if ((newsA.news.unreadCount ?? 0) < 1) {
+  console.error('FAIL: new month news should mark unread');
+  failed = true;
+} else {
+  console.log('OK: monthly news rotates and marks unread');
+}
+
 process.exit(failed ? 1 : 0);
