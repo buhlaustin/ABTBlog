@@ -231,6 +231,7 @@ export function normalizeSave(raw) {
     if (!state.calendar.log) state.calendar.log = [];
     if (!state.calendar.recentTaskIds) state.calendar.recentTaskIds = [];
     if (!state.calendar.monthTaskOffers) state.calendar.monthTaskOffers = [];
+    if (state.meta && state.meta.deskTasksLifetime == null) state.meta.deskTasksLifetime = 0;
     if (state.calendar.taskLineupConfirmed === undefined) {
       state.calendar.taskLineupConfirmed = (state.calendar.monthTasks?.length ?? 0) > 0;
     }
@@ -422,6 +423,7 @@ export function normalizeSave(raw) {
     if (state.meta.monthsAtIpo === undefined) state.meta.monthsAtIpo = null;
     if (state.meta.hofRecorded === undefined) state.meta.hofRecorded = false;
     if (!state.meta.hofHighlights) state.meta.hofHighlights = [];
+    if (state.meta.deskTasksLifetime == null) state.meta.deskTasksLifetime = 0;
     if (state.mode === 'sandbox' && state.sandboxTuning === undefined) {
       state.sandboxTuning = null;
     }

@@ -262,5 +262,7 @@ export function completeTaskInstance(state, instanceId, taskDef, rolled) {
 
   task.status = 'done';
   state.calendar.tasksCompleted = (state.calendar.tasksCompleted ?? 0) + 1;
+  if (!state.meta) state.meta = {};
+  state.meta.deskTasksLifetime = (state.meta.deskTasksLifetime ?? 0) + 1;
   return { ok: true };
 }

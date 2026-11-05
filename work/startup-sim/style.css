@@ -1173,6 +1173,68 @@ h1 {
   gap: 1.15rem;
 }
 
+.desk-pulse-row {
+  margin-top: -0.25rem;
+}
+
+.desk-checklist-section--ready {
+  border-color: rgba(63, 185, 80, 0.35);
+}
+
+.desk-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+}
+
+.desk-check-item {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  font-size: 0.92rem;
+}
+
+.desk-check-item--done {
+  opacity: 0.85;
+}
+
+.desk-check-mark {
+  flex-shrink: 0;
+  width: 1.25rem;
+  text-align: center;
+  color: var(--accent, #58a6ff);
+}
+
+.desk-check-item--done .desk-check-mark {
+  color: #3fb950;
+}
+
+.desk-type-row {
+  margin: 0.25rem 0 0.35rem;
+}
+
+.desk-type-chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.12rem 0.45rem;
+  margin-right: 0.35rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted, #8b949e);
+}
+
+.desk-mod-chips {
+  margin: 0.25rem 0 0.75rem;
+}
+
+.desk-lineup-actions {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .desk-kpi-row,
 .people-kpi-row,
 .board-kpi-row,

@@ -72,6 +72,13 @@ import {
   canSchedulePublicLaunch,
   renderPreLaunchProgressBlock
 } from './LaunchLifecycle.js';
+import {
+  deskMonthCloseChecklist,
+  deskCanCloseSummary,
+  deskCompanyPulse,
+  taskTypeChipsHtml,
+  deskOfferPoolSize
+} from './Desk.js';
 
 const screens = {
   start: () => document.getElementById('screen-start'),
@@ -287,9 +294,13 @@ export function renderDeskPanel(state) {
               : def.launchPhase === 'pre_launch'
                 ? launchTaskTypeTag(def)
                 : '';
+          const types = taskTypeChipsHtml(def);
+          const band = estimateTaskPayoutBand(def, state);
           return `<article class="${sel}">
             <h3>${escapeHtml(def.title)}${sig}${whale}${launchTag}</h3>
+            ${types ? `<p class="desk-type-row">${types}</p>` : ''}
             <p>${escapeHtml(def.description)}</p>
+            <p class="fine-print task-meta">Typical ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×</p>
             <button type="button" class="btn btn-ghost btn-small" data-toggle-task-offer="${escapeHtml(offer.offerId)}">${offer.selected ? 'Selected' : 'Select'}</button>
           </article>`;
         })
@@ -321,8 +332,10 @@ export function renderDeskPanel(state) {
       const mrrHint = mrrBand
         ? ` · MRR +${formatMoney(mrrBand.min)}–${formatMoney(mrrBand.max)}/mo`
         : '';
+      const types = taskTypeChipsHtml(def);
       return `<article class="${doneClass}">
         <h3>${escapeHtml(def.title)}${sig}${whale}${crowd}</h3>
+        ${types ? `<p class="desk-type-row">${types}</p>` : ''}
         <p>${escapeHtml(def.description)}</p>
         <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${mrrHint}${rival}${preHint}${def.stockPct && isPublicCompany(state) ? ` · stock ${def.stockPct > 0 ? '+' : ''}${Math.round(Number(def.stockPct) * 100)}%` : ''}</p>
         ${btn}
@@ -345,6 +358,21 @@ export function renderDeskPanel(state) {
   const era = estimateEraRevenuePotential(state);
   const eraChip = `Desk ${formatMoney(era.desk[0])}–${formatMoney(era.desk[1])} · growth ${formatMoney(era.growth[0])}–${formatMoney(era.growth[1])} at ${era.mult.toFixed(2)}×`;
   const revMultTitle = revHud.title ? ` title="${escapeHtml(revHud.title)}"` : '';
+  const pulse = deskCompanyPulse(state);
+  const checklist = deskMonthCloseChecklist(state);
+  const closeReady = canEndMonth(state);
+  const checklistHtml = checklist
+    .map(
+      (item) =>
+        `<li class="desk-check-item${item.done ? ' desk-check-item--done' : ''}"><span class="desk-check-mark" aria-hidden="true">${item.done ? '✓' : '○'}</span><span><strong>${escapeHtml(item.label)}</strong>${item.detail ? `<br><span class="fine-print">${escapeHtml(item.detail)}</span>` : ''}</span></li>`
+    )
+    .join('');
+  const modChips = pulse.modifiers.length
+    ? `<div class="finance-charity-chips desk-mod-chips">${pulse.modifiers
+        .map((m) => `<span class="growth-channel-badge growth-channel-badge--inline">${escapeHtml(m)}</span>`)
+        .join('')}</div>`
+    : '';
+  const offerPool = deskOfferPoolSize(state);
 
   desk.innerHTML = `
     <div class="desk-panel finance-panel">
@@ -378,6 +406,23 @@ export function renderDeskPanel(state) {
         ${panelStatCard('Month spend', `−${formatMoney(monthSpend)}`, { tone: monthSpend > 0 ? 'neg' : null })}
         ${panelStatCard(revHud.label, `${revHud.effective.toFixed(2)}×`)}
       </div>
+      <div class="finance-kpi-row desk-pulse-row" aria-label="Company pulse">
+        ${panelStatCard('ARR', formatMoney(pulse.arr))}
+        ${panelStatCard('Cash', formatMoney(pulse.cash))}
+        ${panelStatCard('Runway', escapeHtml(pulse.runway))}
+        ${panelStatCard('Product', String(pulse.product))}
+        ${panelStatCard('Buzz', String(pulse.buzz))}
+        ${panelStatCard('Career tasks', String(pulse.lifetimeTasks))}
+      </div>
+      ${modChips}
+      <section class="finance-section finance-card desk-checklist-section${closeReady ? ' desk-checklist-section--ready' : ''}" aria-label="Month close checklist">
+        <div class="finance-section-head">
+          <h3 class="finance-section-title">Month close checklist</h3>
+          <span class="growth-channel-badge growth-channel-badge--inline">${closeReady ? 'Ready' : 'In progress'}</span>
+        </div>
+        <p class="fine-print">${escapeHtml(deskCanCloseSummary(state))}</p>
+        <ul class="desk-checklist">${checklistHtml}</ul>
+      </section>
       <details class="finance-details desk-gate-details">
         <summary>Next gate &amp; scale era</summary>
         <p class="fine-print"><strong>Next gate:</strong> ${escapeHtml(ms)} · <strong>Era:</strong> ${escapeHtml(progressionTierLabel(state))}<span class="desk-rev-mult-hint"${revMultTitle}> · ${escapeHtml(revHud.label)} ${revHud.effective.toFixed(2)}×</span></p>
@@ -387,10 +432,14 @@ export function renderDeskPanel(state) {
           ? `<section class="finance-section desk-offers-section">
           <div class="finance-section-head">
             <h3 class="finance-section-title">This month’s offers</h3>
-            <span class="growth-channel-badge growth-channel-badge--inline">${selectedOfferCount(state)} / ${slotTarget} selected</span>
+            <span class="growth-channel-badge growth-channel-badge--inline">${selectedOfferCount(state)} / ${slotTarget} selected · ${offerPool} in pool</span>
           </div>
+          <p class="fine-print">Pick ${slotTarget} deals — auto-pick ranks by payout and recurring upside; you can still swap selections.</p>
           <div class="task-list">${offerCards}</div>
-          <button type="button" id="btn-confirm-task-lineup" class="btn btn-primary btn-small" ${selectedOfferCount(state) === slotTarget ? '' : 'disabled'}>Lock desk lineup</button>
+          <div class="desk-actions desk-lineup-actions">
+            <button type="button" id="btn-desk-auto-lineup" class="btn btn-ghost btn-small">Auto-pick best payouts</button>
+            <button type="button" id="btn-confirm-task-lineup" class="btn btn-primary btn-small" ${selectedOfferCount(state) === slotTarget ? '' : 'disabled'}>Lock desk lineup</button>
+          </div>
         </section>`
           : ''
       }

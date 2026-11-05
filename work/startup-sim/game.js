@@ -9,6 +9,7 @@ import {
   toggleTaskOffer,
   confirmTaskLineup
 } from './modules/Tasks.js';
+import { autoSelectRecommendedLineup } from './modules/Desk.js';
 import { completeBoardTask } from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
@@ -962,6 +963,16 @@ function bindGameInteractions() {
       return;
     }
 
+    if (e.target.id === 'btn-desk-auto-lineup' && sessionState) {
+      const result = autoSelectRecommendedLineup(sessionState);
+      if (!result.ok) showDeskFeedback(result.reason || 'Could not auto-pick.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showDeskFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     if (e.target.id === 'btn-confirm-task-lineup' && sessionState) {
       const result = confirmTaskLineup(sessionState);
       if (!result.ok) showDeskFeedback(result.reason, true);

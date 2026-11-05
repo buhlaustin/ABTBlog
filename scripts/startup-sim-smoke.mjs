@@ -22,6 +22,8 @@ const {
   pickMonthlyTaskDefs,
   monthDealHasDuplicateTaskIds,
   confirmTaskLineup,
+  selectedOfferCount,
+  needsTaskLineup,
   getTaskPoolSize,
   getTaskDefinitions,
   taskCatalogSize,
@@ -1698,6 +1700,32 @@ if (!gift.ok || charityState.finance.cash !== beforeCash - 5_000) {
   failed = true;
 } else {
   console.log('OK: charity donation from company cash');
+}
+
+const { autoSelectRecommendedLineup, deskMonthCloseChecklist } = await import(
+  `file://${join(sim, 'modules/Desk.js')}`
+);
+const deskState = createInitialState({ companyName: 'DeskCo', categoryId: 'b2b-saas', mode: 'sandbox' });
+deskState.workspace.tier = 'small';
+dealMonthlyTasks(deskState);
+if (!needsTaskLineup(deskState) || !(deskState.calendar.monthTaskOffers?.length > 0)) {
+  console.error('FAIL: desk should open monthly lineup with offers');
+  failed = true;
+} else {
+  const auto = autoSelectRecommendedLineup(deskState);
+  const slots = deskState.calendar.monthTaskSlotTarget ?? 4;
+  if (!auto.ok || selectedOfferCount(deskState) !== slots) {
+    console.error(`FAIL: desk auto-lineup: ${auto.reason ?? `picked ${selectedOfferCount(deskState)}/${slots}`}`);
+    failed = true;
+  } else {
+    const checklist = deskMonthCloseChecklist(deskState);
+    if (!checklist.some((c) => c.id === 'lineup') || checklist.find((c) => c.id === 'tasks')?.done) {
+      console.error('FAIL: desk month-close checklist shape');
+      failed = true;
+    } else {
+      console.log(`OK: desk tab (auto-lineup ${auto.picked}/${slots}, checklist ${checklist.length} items)`);
+    }
+  }
 }
 
 if (getTaskDefinitions().some((t) => t.id === TAX_FILING_TASK_ID)) {
