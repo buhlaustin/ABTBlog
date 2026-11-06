@@ -3109,8 +3109,13 @@ if (!signConf.ok) {
 }
 
 {
-  const { preloadFinancePropertyPrograms, acquireFinanceProperty, propertyHoldingsSummary, propertyRevenueMultBonus } =
-    await import(`file://${join(sim, 'modules/FinanceProperty.js')}`);
+  const {
+    preloadFinancePropertyPrograms,
+    acquireFinanceProperty,
+    propertyHoldingsSummary,
+    propertyRevenueMultBonus,
+    tickFinancePropertyAtMonthStart
+  } = await import(`file://${join(sim, 'modules/FinanceProperty.js')}`);
   await preloadFinancePropertyPrograms();
   const aiState = createInitialState({
     companyName: 'GPU Co',
@@ -3146,7 +3151,24 @@ if (!signConf.ok) {
       console.error(`FAIL: finance property acquire (edtech): ${emo.reason}`);
       failed = true;
     } else {
-      console.log('OK: finance property (category tiers, capex, rev× / EMO MRR)');
+      const mrrAfterBuy = edState.finance.mrr;
+      tickFinancePropertyAtMonthStart(edState);
+      tickFinancePropertyAtMonthStart(edState);
+      if (edState.finance.mrr !== mrrAfterBuy) {
+        console.error('FAIL: property contracted MRR should not stack each month');
+        failed = true;
+      } else if ((edState.financeProperty?.lifetimeContractedCash ?? 0) < 18500) {
+        console.error('FAIL: property contracted cash yield at month start');
+        failed = true;
+      } else {
+        const gated = acquireFinanceProperty(edState, { tierId: 'edtech-regional-emo', quantityRaw: 1 });
+        if (gated.ok) {
+          console.error('FAIL: edtech regional EMO should require virtual charters');
+          failed = true;
+        } else {
+          console.log('OK: finance property (category tiers, capex, rev× / EMO MRR)');
+        }
+      }
     }
   }
 }

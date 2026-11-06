@@ -597,6 +597,7 @@ export function normalizeSave(raw) {
       if (fp.lifetimeCapex == null) fp.lifetimeCapex = 0;
       if (fp.lifetimeOpex == null) fp.lifetimeOpex = 0;
       if (fp.lifetimeMrrGranted == null) fp.lifetimeMrrGranted = 0;
+      if (fp.lifetimeContractedCash == null) fp.lifetimeContractedCash = 0;
     }
     if (!state.startupConference) {
       state.startupConference = createInitialStartupConferenceState();

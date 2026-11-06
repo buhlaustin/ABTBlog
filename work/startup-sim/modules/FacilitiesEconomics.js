@@ -16,7 +16,7 @@ import {
   sponsoredMrrMonthly,
   renderTreasurySponsorshipPanel
 } from './TreasurySponsorships.js';
-import { propertyOpexMonthly } from './FinanceProperty.js';
+import { propertyOpexMonthly, propertyMrrGrantMonthly } from './FinanceProperty.js';
 
 /** Annual lease review applied each January (HQ, hub, satellites). */
 export const ANNUAL_RENT_ESCALATION_RATE = 0.045;
@@ -86,6 +86,7 @@ export function treasuryObligationsSummary(state) {
   const sponsorPay = sponsorshipPaymentMonthly(state);
   const sponsorMrr = sponsoredMrrMonthly(state);
   const propertyOpex = propertyOpexMonthly(state);
+  const propertyYield = propertyMrrGrantMonthly(state);
   const fixedMo = rent.totalMonthly + loanPay + rbfEstMo + propertyOpex;
   return {
     rent,
@@ -96,6 +97,7 @@ export function treasuryObligationsSummary(state) {
     sponsorPay,
     sponsorMrr,
     propertyOpex,
+    propertyYield,
     fixedMo,
     creditLimit: computeCreditLimit(state),
     headroom: loanHeadroom(state)
@@ -143,6 +145,20 @@ function renderObligationsTable(state) {
           label: 'Sponsor revenue (contracted)',
           amount: 0,
           note: `~${formatMoney(ob.sponsorMrr)}/mo recognizing at month close (fees paid upfront)`
+        }
+      : null,
+    ob.propertyOpex > 0
+      ? {
+          label: 'Category property OPEX',
+          amount: ob.propertyOpex,
+          note: 'Finance → Property holdings'
+        }
+      : null,
+    ob.propertyYield > 0
+      ? {
+          label: 'Property contracted yield',
+          amount: 0,
+          note: `~${formatMoney(ob.propertyYield)}/mo cash at month start (MRR booked at acquire)`
         }
       : null
   ].filter(Boolean);

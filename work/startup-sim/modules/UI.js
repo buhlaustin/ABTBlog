@@ -9,6 +9,7 @@ import { calendarTurn } from './XC.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
 import { renderStartupConferenceDeskBanner } from './StartupConference.js';
+import { propertyDeskBanner } from './FinanceProperty.js';
 import { renderCompaniesPanel } from './Companies.js';
 import { renderPeoplePanel } from './EmployeeBenefits.js';
 import { renderCeoPanel } from './Ceo.js';
@@ -365,6 +366,7 @@ export function renderDeskPanel(state) {
     ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — ${escapeHtml(launchDeskPhaseBanner(state))}</p>`
     : '';
   const conferenceBanner = renderStartupConferenceDeskBanner(state);
+  const propertyBanner = propertyDeskBanner(state);
   const preLaunchProgress = renderPreLaunchProgressBlock(state);
 
   const revHud = taskRevenueMultHud(state);
@@ -392,6 +394,7 @@ export function renderDeskPanel(state) {
       ${tutorial}
       ${launchBanner}
       ${conferenceBanner}
+      ${propertyBanner}
       ${preLaunchProgress}
       ${
         catalogError

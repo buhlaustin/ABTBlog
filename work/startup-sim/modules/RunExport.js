@@ -44,7 +44,7 @@ export function buildRunExportText(state) {
   const propSum = propertyHoldingsSummary(state);
   if (propProgram && propSum.totalUnits > 0) {
     lines.push(
-      `Category property (${propProgram.tabTitle}): ${propSum.totalUnits} units · ${formatMoney(propSum.lifetimeCapex)} capex · +${(propSum.revenueMultBonus * 100).toFixed(1)}% desk rev× · ${formatMoney(propSum.mrrGrantMonthly)}/mo contracted`
+      `Category property (${propProgram.tabTitle}): ${propSum.totalUnits} units · ${formatMoney(propSum.lifetimeCapex)} capex · +${(propSum.revenueMultBonus * 100).toFixed(1)}% desk rev×${propSum.ladderComplete ? ' (ladder synergy)' : ''} · ${formatMoney(propSum.mrrGrantMonthly)}/mo yield cash · ${formatMoney(propSum.lifetimeContractedCash)} collected`
     );
   }
 
