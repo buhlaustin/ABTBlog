@@ -2791,7 +2791,30 @@ if (activeFinanceSection({ finance: { section: 'treasury' } }) !== 'treasury') {
   console.error('FAIL: finance treasury section');
   failed = true;
 } else {
-  console.log('OK: finance treasury section');
+  const { renderFinanceTreasuryPanel, treasuryObligationsSummary } = await import(
+    `file://${join(sim, 'modules/FacilitiesEconomics.js')}`
+  );
+  const { renderFinanceSummary } = await import(`file://${join(sim, 'modules/Finance.js')}`);
+  const treasuryState = createInitialState({ companyName: 'Treasury UI', categoryId: 'b2b-saas', mode: 'sandbox' });
+  treasuryState.workspace.tier = WORKSPACE_TIER.SMALL;
+  treasuryState.workspace.smallOfficeOwned = true;
+  treasuryState.finance.arr = 500_000;
+  treasuryState.finance.mrr = 40_000;
+  const html = renderFinanceTreasuryPanel(treasuryState, {
+    sum: renderFinanceSummary(treasuryState),
+    creditBlocksHtml: ''
+  });
+  const ob = treasuryObligationsSummary(treasuryState);
+  if (
+    !html.includes('Recurring obligations') ||
+    !html.includes('Corporate liquidity') ||
+    ob.rent.hqEffective <= 0
+  ) {
+    console.error('FAIL: treasury panel content');
+    failed = true;
+  } else {
+    console.log('OK: finance treasury section');
+  }
 }
 
 process.exit(failed ? 1 : 0);

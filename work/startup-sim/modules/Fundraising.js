@@ -87,7 +87,7 @@ import {
   renderFinancePublicSection,
   setFinanceSection
 } from './PublicMarkets.js';
-import { renderFinanceTreasuryIntro, facilitiesRentBreakdown } from './FacilitiesEconomics.js';
+import { renderFinanceTreasuryPanel } from './FacilitiesEconomics.js';
 
 export { setFinanceSection };
 import {
@@ -455,26 +455,13 @@ export function renderFinancePanel(container, state) {
         ${showPublicTab ? financeTabBtn('public', 'Public') : ''}
       </nav>`;
 
-  const rentSnap = facilitiesRentBreakdown(state);
   const treasuryBody =
     financeSection === 'treasury'
-      ? `${renderFinanceTreasuryIntro(state)}
-      <section class="finance-section finance-card" aria-label="Lease costs">
-        <h3 class="finance-section-title">Monthly lease stack</h3>
-        <p class="fine-print">${rentSnap.hubLine ? `Hub: ${escapeHtml(rentSnap.hubLine)} · ` : ''}${rentSnap.satelliteCount} satellite office(s).</p>
-        ${panelMetricGrid('3', [
-          panelStatCard('HQ rent', `${formatMoney(rentSnap.hqMonthly)}/mo`, { hero: true }),
-          panelStatCard('Satellites', `${formatMoney(rentSnap.satelliteMonthly)}/mo`),
-          panelStatCard('Combined', `${formatMoney(rentSnap.totalMonthly)}/mo`)
-        ])}
-      </section>
-      <section class="finance-section finance-fundraising-stack">
-        <h3 class="finance-section-title">Credit & non-dilutive capital</h3>
-        ${creditBlocks || '<p class="fine-print">No active credit lines yet — bank LOC unlocks as the company scales.</p>'}
-      </section>
-      <section class="finance-section finance-section--cap">
-        <div id="offices-panel-mount"></div>
-      </section>`
+      ? renderFinanceTreasuryPanel(state, {
+          sum,
+          creditBlocksHtml: creditBlocks,
+          charityLifetimeLabel: sum.charityLifetimeLabel
+        })
       : '';
 
   const overviewBody =
