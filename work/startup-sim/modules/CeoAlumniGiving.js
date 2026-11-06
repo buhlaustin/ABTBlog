@@ -44,9 +44,51 @@ export const ALUMNI_GIFT_FUNDS = [
   {
     id: 'capital',
     label: 'Capital campaign',
-    blurb: 'Business school wing, athletics, or research lab naming.',
+    blurb: 'Business school wing, research lab, or campus building naming.',
     chips: [500_000, 5_000_000, 25_000_000]
   }
+];
+
+/** Athletics-specific lanes (also roll into lifetime alumni giving). */
+export const ALUMNI_ATHLETICS_PROGRAMS = [
+  {
+    id: 'boosters',
+    label: 'Varsity booster fund',
+    blurb: 'Travel, equipment, and game-day operations for all sports.',
+    chips: [2_500, 15_000, 75_000]
+  },
+  {
+    id: 'scholarships',
+    label: 'Student-athlete scholarships',
+    blurb: 'Endowed or annual aid for roster spots — AD sends a personal thank-you video.',
+    chips: [25_000, 125_000, 500_000]
+  },
+  {
+    id: 'coaching',
+    label: 'Coaching & recruiting',
+    blurb: 'Staff retention, recruiting travel, and summer camps.',
+    chips: [50_000, 200_000, 1_000_000]
+  },
+  {
+    id: 'facilities',
+    label: 'Facilities & training complex',
+    blurb: 'Fields, courts, weight room upgrades, and sports medicine space.',
+    chips: [150_000, 1_000_000, 8_000_000]
+  },
+  {
+    id: 'stadium',
+    label: 'Stadium / arena naming',
+    blurb: 'Your name on the press box, concourse, or court — homecoming forever.',
+    chips: [500_000, 5_000_000, 20_000_000]
+  }
+];
+
+const ATHLETICS_BOOSTER_TIERS = [
+  { minLifetime: 5_000_000, label: 'Hall of fame donor' },
+  { minLifetime: 1_000_000, label: 'Stadium circle' },
+  { minLifetime: 250_000, label: 'Team captain club' },
+  { minLifetime: 25_000, label: 'Varsity booster club' },
+  { minLifetime: 0, label: 'Fan supporter' }
 ];
 
 const RECOGNITION_TIERS = [
@@ -140,9 +182,20 @@ export function alumniRecognitionLabel(lifetime) {
   return tier?.label ?? RECOGNITION_TIERS[RECOGNITION_TIERS.length - 1].label;
 }
 
+export function athleticsBoosterLabel(lifetime) {
+  const n = Math.max(0, Number(lifetime) || 0);
+  const tier = ATHLETICS_BOOSTER_TIERS.find((t) => n >= t.minLifetime);
+  return tier?.label ?? ATHLETICS_BOOSTER_TIERS[ATHLETICS_BOOSTER_TIERS.length - 1].label;
+}
+
+export function alumniAthleticsLifetime(state) {
+  return Math.max(0, state.ceo?.alumniAthleticsLifetime ?? 0);
+}
+
 function ensureAlumniGiving(state) {
   if (!state.ceo) return null;
   if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
+  if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
   if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
   return state.ceo;
 }
@@ -174,6 +227,42 @@ function applyAlumniGiftEffects(state, amount) {
   return lines;
 }
 
+function applyAthleticsGiftEffects(state, amount, program) {
+  const lines = [];
+  if (amount >= 50_000 && state.product) {
+    state.product.buzz = (state.product.buzz ?? 0) + 1;
+    lines.push('Sideline feature on the athletics livestream — product buzz +1.');
+  }
+  if (program?.id === 'stadium' && amount >= 500_000) {
+    state.sentiment = state.sentiment ?? { score: 68 };
+    const bump = amount >= 5_000_000 ? 3 : 2;
+    state.sentiment.score = Math.min(100, (state.sentiment.score ?? 68) + bump);
+    lines.push(`Stadium naming announcement — sentiment +${bump}.`);
+  } else if (amount >= 250_000) {
+    state.sentiment = state.sentiment ?? { score: 68 };
+    state.sentiment.score = Math.min(100, (state.sentiment.score ?? 68) + 1);
+    lines.push('Athletics press release — sentiment +1.');
+  }
+  return lines;
+}
+
+function recordAlumniGift(state, { school, fundLabel, fundId, amount, athletics = false, programId = null }) {
+  const ceo = ensureAlumniGiving(state);
+  ceo.alumniGivingLifetime = (ceo.alumniGivingLifetime ?? 0) + amount;
+  if (athletics) {
+    ceo.alumniAthleticsLifetime = (ceo.alumniAthleticsLifetime ?? 0) + amount;
+  }
+  pushAlumniLog(state, {
+    fundId,
+    fundLabel,
+    amount,
+    athletics,
+    programId,
+    schoolId: school.id,
+    schoolLabel: school.label
+  });
+}
+
 export function canDonateToAlmaMater(state, amountRaw) {
   if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
   const school = resolveCompanyAlmaMater(state);
@@ -199,17 +288,15 @@ export function donateToAlmaMater(state, amountRaw, fundId = 'annual-fund') {
     return { ok: false, reason: 'Personal bank is empty.' };
   }
 
-  const ceo = ensureAlumniGiving(state);
-  ceo.alumniGivingLifetime = (ceo.alumniGivingLifetime ?? 0) + paid;
-  const recognition = alumniRecognitionLabel(ceo.alumniGivingLifetime);
-  pushAlumniLog(state, {
-    fundId: fund.id,
+  recordAlumniGift(state, {
+    school,
     fundLabel: fund.label,
+    fundId: fund.id,
     amount: paid,
-    schoolId: school.id,
-    schoolLabel: school.label
+    athletics: false
   });
-
+  const ceo = ensureAlumniGiving(state);
+  const recognition = alumniRecognitionLabel(ceo.alumniGivingLifetime);
   const effectLines = applyAlumniGiftEffects(state, paid);
   return {
     ok: true,
@@ -221,6 +308,46 @@ export function donateToAlmaMater(state, amountRaw, fundId = 'annual-fund') {
   };
 }
 
+export function donateToAlmaMaterAthletics(state, amountRaw, programId = 'boosters') {
+  const gate = canDonateToAlmaMater(state, amountRaw);
+  if (!gate.ok) return gate;
+
+  const program =
+    ALUMNI_ATHLETICS_PROGRAMS.find((p) => p.id === programId) ?? ALUMNI_ATHLETICS_PROGRAMS[0];
+  const school = gate.school;
+  const fundLabel = `Athletics — ${program.label}`;
+  const paid = payFromPersonalBank(state, gate.amount, `${school.shortLabel ?? school.label} — ${fundLabel}`, 'alumni_athletics');
+  if (paid <= 0) {
+    return { ok: false, reason: 'Personal bank is empty.' };
+  }
+
+  recordAlumniGift(state, {
+    school,
+    fundLabel,
+    fundId: `athletics:${program.id}`,
+    amount: paid,
+    athletics: true,
+    programId: program.id
+  });
+  const ceo = ensureAlumniGiving(state);
+  const recognition = alumniRecognitionLabel(ceo.alumniGivingLifetime);
+  const booster = athleticsBoosterLabel(ceo.alumniAthleticsLifetime);
+  const effectLines = [
+    ...applyAlumniGiftEffects(state, paid),
+    ...applyAthleticsGiftEffects(state, paid, program)
+  ];
+  return {
+    ok: true,
+    amount: paid,
+    lifetime: ceo.alumniGivingLifetime,
+    athleticsLifetime: ceo.alumniAthleticsLifetime,
+    recognition,
+    booster,
+    effectLines,
+    summary: `Gave ${formatMoney(paid)} to ${school.label} athletics (${program.label}). Athletics giving ${formatMoney(ceo.alumniAthleticsLifetime)} — ${booster}. Total alumni ${formatMoney(ceo.alumniGivingLifetime)} — ${recognition}.${effectLines.length ? ` ${effectLines.join(' ')}` : ''}`
+  };
+}
+
 function renderDonationHistory(state) {
   const log = state.ceo?.alumniDonationLog ?? [];
   if (!log.length) return '';
@@ -228,7 +355,7 @@ function renderDonationHistory(state) {
     .slice(0, 6)
     .map(
       (h) =>
-        `<tr><td>${escapeHtml(h.fundLabel ?? '—')}</td><td class="num">${formatMoney(h.amount)}</td><td class="fine-print">${escapeHtml(h.year ? `Y${h.year} M${h.month}` : '—')}</td></tr>`
+        `<tr><td>${escapeHtml(h.fundLabel ?? '—')}${h.athletics ? ' <span class="task-tag">Athletics</span>' : ''}</td><td class="num">${formatMoney(h.amount)}</td><td class="fine-print">${escapeHtml(h.year ? `Y${h.year} M${h.month}` : '—')}</td></tr>`
     )
     .join('');
   return `<details class="ceo-debit-details"><summary>Recent alumni gifts</summary>
@@ -248,6 +375,23 @@ export function renderCeoAlumniSection(state, { disabled = '' } = {}) {
       <p class="fine-print">This save has no alma mater on file — start a new run and pick your school on the setup screen.</p>
     </section>`;
   }
+
+  const athleticsLifetime = alumniAthleticsLifetime(state);
+  const booster = athleticsBoosterLabel(athleticsLifetime);
+
+  const athleticsBlocks = ALUMNI_ATHLETICS_PROGRAMS.map((program) => {
+    const chips = program.chips
+      .map(
+        (amt) =>
+          `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-alumni-athletics-give="${amt}" data-ceo-alumni-athletics-program="${escapeHtml(program.id)}" ${disabled}>${formatMoney(amt)}</button>`
+      )
+      .join('');
+    return `<div class="finance-action ceo-alumni-athletics-program">
+      <p><strong>${escapeHtml(program.label)}</strong></p>
+      <p class="fine-print">${escapeHtml(program.blurb)}</p>
+      <div class="finance-charity-chips">${chips}</div>
+    </div>`;
+  }).join('');
 
   const fundBlocks = ALUMNI_GIFT_FUNDS.map((fund) => {
     const chips = fund.chips
@@ -277,13 +421,30 @@ export function renderCeoAlumniSection(state, { disabled = '' } = {}) {
       panelStatCard('Lifetime to alma mater', formatMoney(lifetime), { hero: lifetime > 0 }),
       panelStatCard('Recognition', recognition)
     ])}
+    ${panelMetricGrid('2', [
+      panelStatCard('Athletics giving', athleticsLifetime > 0 ? formatMoney(athleticsLifetime) : '—', {
+        hero: athleticsLifetime > 0
+      }),
+      panelStatCard('Booster status', booster)
+    ])}
+    <h4 class="finance-subhead">Academic &amp; campus funds</h4>
     ${fundBlocks}
+    <h4 class="finance-subhead">Athletics funding</h4>
+    <p class="fine-print">Support ${escapeHtml(school.shortLabel ?? school.label)} varsity programs from your personal bank. Athletics gifts count toward total alumni recognition and build a separate <strong>booster status</strong> track.</p>
+    ${athleticsBlocks}
     <div class="finance-inline-form ceo-salary-row">
       <label class="visually-hidden" for="ceo-alumni-give-input">Custom alumni gift</label>
       <select id="ceo-alumni-fund-select" aria-label="Gift fund" ${disabled}>
-        ${ALUMNI_GIFT_FUNDS.map(
-          (f) => `<option value="${escapeHtml(f.id)}">${escapeHtml(f.label)}</option>`
-        ).join('')}
+        <optgroup label="Academic &amp; campus">
+          ${ALUMNI_GIFT_FUNDS.map(
+            (f) => `<option value="${escapeHtml(f.id)}">${escapeHtml(f.label)}</option>`
+          ).join('')}
+        </optgroup>
+        <optgroup label="Athletics">
+          ${ALUMNI_ATHLETICS_PROGRAMS.map(
+            (p) => `<option value="athletics:${escapeHtml(p.id)}">${escapeHtml(p.label)}</option>`
+          ).join('')}
+        </optgroup>
       </select>
       <input id="ceo-alumni-give-input" type="number" min="500" step="500" placeholder="Custom amount" ${disabled}>
       <button type="button" class="btn btn-ghost btn-small" id="btn-ceo-alumni-give-custom" ${disabled}>Give</button>

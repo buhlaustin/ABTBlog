@@ -85,6 +85,7 @@ export function createInitialCeoState() {
     section: 'overview',
     personalGivingLifetime: 0,
     alumniGivingLifetime: 0,
+    alumniAthleticsLifetime: 0,
     alumniDonationLog: [],
     netWorthHistory: [],
     investmentBalance: 0,

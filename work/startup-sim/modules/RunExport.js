@@ -2,7 +2,11 @@ import { formatMoney, stageLabel } from './constants.js';
 import { formatStateMonth } from './GameCalendar.js';
 import { calendarTurn } from './XC.js';
 import { sponsoredMrrMonthly, sponsorshipBookSummary } from './TreasurySponsorships.js';
-import { resolveCompanyAlmaMater, alumniRecognitionLabel } from './CeoAlumniGiving.js';
+import {
+  resolveCompanyAlmaMater,
+  alumniRecognitionLabel,
+  athleticsBoosterLabel
+} from './CeoAlumniGiving.js';
 import { ceoLifestyleLifetimeSpend, ceoLifestyleOwnedDetails } from './CeoLifestyle.js';
 
 export function buildRunExportText(state) {
@@ -31,6 +35,12 @@ export function buildRunExportText(state) {
     lines.push(
       `Alma mater (${school.shortLabel ?? school.label}): ${formatMoney(alumniLifetime)} lifetime — ${alumniRecognitionLabel(alumniLifetime)}`
     );
+    const athleticsLifetime = state.ceo?.alumniAthleticsLifetime ?? 0;
+    if (athleticsLifetime > 0) {
+      lines.push(
+        `  Athletics: ${formatMoney(athleticsLifetime)} — ${athleticsBoosterLabel(athleticsLifetime)}`
+      );
+    }
   }
 
   const sponsorMrr = sponsoredMrrMonthly(state);

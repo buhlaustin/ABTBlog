@@ -228,6 +228,7 @@ export function normalizeSave(raw) {
       if (!state.ceo.section) state.ceo.section = 'overview';
       if (state.ceo.personalGivingLifetime == null) state.ceo.personalGivingLifetime = 0;
       if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
+      if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
       if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
       if (!state.ceo.netWorthHistory) state.ceo.netWorthHistory = [];
       if (state.ceo.investmentBalance == null) state.ceo.investmentBalance = 0;
@@ -447,6 +448,7 @@ export function normalizeSave(raw) {
       if (state.ceo.lifestyleDebitBump == null) state.ceo.lifestyleDebitBump = 0;
       if (state.ceo.lifestyleLifetimeSpend == null) state.ceo.lifestyleLifetimeSpend = 0;
       if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
+      if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
       if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
     }
     ensureCeoPersonalBank(state);

@@ -123,7 +123,8 @@ import {
 import {
   preloadCeoAlmaMaterCatalog,
   populateAlmaMaterSelect,
-  donateToAlmaMater
+  donateToAlmaMater,
+  donateToAlmaMaterAthletics
 } from './modules/CeoAlumniGiving.js';
 import {
   preparePersonalExpensesForMonth,
@@ -1532,6 +1533,21 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const alumniAthleticsBtn = e.target.closest('[data-ceo-alumni-athletics-give]');
+    if (alumniAthleticsBtn && sessionState) {
+      const result = donateToAlmaMaterAthletics(
+        sessionState,
+        alumniAthleticsBtn.getAttribute('data-ceo-alumni-athletics-give'),
+        alumniAthleticsBtn.getAttribute('data-ceo-alumni-athletics-program') || 'boosters'
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Athletics gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     const alumniGiveBtn = e.target.closest('[data-ceo-alumni-give]');
     if (alumniGiveBtn && sessionState) {
       const result = donateToAlmaMater(
@@ -1550,7 +1566,12 @@ function bindGameInteractions() {
     if (e.target.id === 'btn-ceo-alumni-give-custom' && sessionState) {
       const input = document.getElementById('ceo-alumni-give-input');
       const fund = document.getElementById('ceo-alumni-fund-select')?.value || 'annual-fund';
-      const result = donateToAlmaMater(sessionState, input?.value, fund);
+      let result;
+      if (fund.startsWith('athletics:')) {
+        result = donateToAlmaMaterAthletics(sessionState, input?.value, fund.slice('athletics:'.length));
+      } else {
+        result = donateToAlmaMater(sessionState, input?.value, fund);
+      }
       if (!result.ok) showCeoFeedback(result.reason || 'Alumni gift failed.', true);
       else {
         appendLog(sessionState, result.summary);

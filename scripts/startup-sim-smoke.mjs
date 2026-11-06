@@ -2933,7 +2933,9 @@ if (!signConf.ok) {
   const {
     preloadCeoAlmaMaterCatalog,
     donateToAlmaMater,
+    donateToAlmaMaterAthletics,
     alumniRecognitionLabel,
+    athleticsBoosterLabel,
     getAlmaMaterCatalogCount,
     getAlmaMaterById
   } = await import(`file://${join(sim, 'modules/CeoAlumniGiving.js')}`);
@@ -2960,7 +2962,18 @@ if (!signConf.ok) {
     console.error('FAIL: CEO alumni recognition tier');
     failed = true;
   } else {
-    console.log('OK: CEO alma mater alumni giving');
+    const athleticsGift = donateToAlmaMaterAthletics(alumniState, 50_000, 'boosters');
+    if (
+      !athleticsGift.ok ||
+      alumniState.ceo.alumniAthleticsLifetime !== 50_000 ||
+      alumniState.ceo.alumniGivingLifetime !== 75_000 ||
+      athleticsBoosterLabel(alumniState.ceo.alumniAthleticsLifetime) !== 'Varsity booster club'
+    ) {
+      console.error(`FAIL: CEO athletics alumni donation: ${athleticsGift.reason ?? 'amount/tiers'}`);
+      failed = true;
+    } else {
+      console.log('OK: CEO alma mater alumni giving (incl. athletics funding)');
+    }
   }
 }
 
