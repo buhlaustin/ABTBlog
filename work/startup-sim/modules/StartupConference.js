@@ -9,6 +9,9 @@ import {
   panelSnapshotSection
 } from './PanelChrome.js';
 
+/** Mandatory desk task each live conference month — main stage presentation. */
+export const CONFERENCE_KEYNOTE_TASK_ID = 'conf-keynote-script-lock';
+
 export const CONFERENCE_MIN_BUDGET = 25_000;
 export const CONFERENCE_MAX_BUDGET = 5_000_000;
 export const CONFERENCE_BUDGET_PRESETS = [50_000, 150_000, 350_000, 750_000, 1_500_000, 3_000_000];
@@ -314,6 +317,11 @@ export function conferenceMonthActive(state) {
   return c.budgetPaidYear === state.calendar?.year;
 }
 
+/** CEO main-stage keynote must appear in the desk lineup during a funded conference month. */
+export function isConferenceKeynoteMandatory(state) {
+  return conferenceMonthActive(state);
+}
+
 function creditConferenceYield(state, amount, label) {
   const n = Math.max(0, Math.round(Number(amount) || 0));
   if (!n) return 0;
@@ -399,7 +407,7 @@ export function renderStartupConferenceDeskBanner(state) {
   if (conferenceMonthActive(state)) {
     const c = ensureStartupConference(state);
     const econ = estimateConferenceMonthEconomics(state);
-    return `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(c.name)}</strong> — conference month: desk tasks only · ${econ.deskMult.toFixed(2)}× payouts · ~${econ.attendees.toLocaleString('en-US')} attendees · ${formatMoney(econ.sponsorRev + econ.ticketRev)} sponsor/ticket yield at close.</p>`;
+    return `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(c.name)}</strong> — conference month: desk tasks only · <strong>main stage keynote is mandatory</strong> · ${econ.deskMult.toFixed(2)}× payouts · ~${econ.attendees.toLocaleString('en-US')} attendees · ${formatMoney(econ.sponsorRev + econ.ticketRev)} sponsor/ticket yield at close.</p>`;
   }
   if (isConferenceNextMonth(state)) {
     const c = ensureStartupConference(state);
@@ -517,7 +525,7 @@ export function renderStartupConferencePanel(state) {
     <section class="finance-section finance-card">
       <h3 class="finance-section-title">How it works</h3>
       <ul class="instrument-list">
-        <li>During your conference month, <strong>every desk offer</strong> is a conference task (mandatory tax filings still appear in April).</li>
+        <li>During your conference month, <strong>every desk offer</strong> is a conference task. The <strong>main stage keynote / presentation</strong> is mandatory in your lineup (April tax filings still appear when due).</li>
         <li>Desk payouts scale with base budget, sponsor tier, and edition momentum.</li>
         <li>At month close you also collect modeled <strong>ticket</strong> and <strong>sponsor</strong> revenue into company cash.</li>
       </ul>

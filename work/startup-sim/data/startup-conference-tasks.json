@@ -2,11 +2,12 @@
   "tasks": [
     {
       "id": "conf-keynote-script-lock",
-      "title": "Lock keynote script & stage run",
-      "description": "Final rehearsal with teleprompter timing, AV cues, and a backup laptop that actually boots.",
+      "title": "Main stage keynote & presentation",
+      "description": "Deliver the headline talk — teleprompter lock, AV cues, live demo backup, and the one slide investors screenshot.",
       "types": ["marketing"],
       "stages": ["post_xc", "public"],
       "startupConference": true,
+      "conferenceKeynote": true,
       "cost": 12000,
       "revenue": [48000, 135000],
       "product": 1,

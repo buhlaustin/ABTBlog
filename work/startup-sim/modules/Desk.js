@@ -19,6 +19,10 @@ import {
   CEO_PERSONAL_TAX_FILING_TASK_ID
 } from './CeoPersonalTax.js';
 import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
+import {
+  CONFERENCE_KEYNOTE_TASK_ID,
+  isConferenceKeynoteMandatory
+} from './StartupConference.js';
 
 /** Why the month may not close yet — for the Desk checklist UI. */
 export function deskMonthCloseChecklist(state) {
@@ -99,6 +103,9 @@ export function autoSelectRecommendedLineup(state) {
   if (isTaxFilingRequired(state)) mandatoryIds.push(TAX_FILING_TASK_ID);
   if (isCeoPersonalTaxFilingRequired(state)) {
     mandatoryIds.push(CEO_PERSONAL_TAX_FILING_TASK_ID);
+  }
+  if (isConferenceKeynoteMandatory(state)) {
+    mandatoryIds.push(CONFERENCE_KEYNOTE_TASK_ID);
   }
   for (const o of offers) o.selected = false;
   let picked = 0;

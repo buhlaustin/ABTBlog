@@ -298,7 +298,11 @@ export function renderDeskPanel(state) {
           const whale = def.whale === true
               ? ' <span class="task-tag">Whale</span>'
               : '';
-          const confTag = def.startupConference ? ' <span class="task-tag">Conference</span>' : '';
+          const confTag = def.conferenceKeynote
+            ? ' <span class="task-tag">Keynote</span>'
+            : def.startupConference
+              ? ' <span class="task-tag">Conference</span>'
+              : '';
           const launchTag = def.scheduleLaunch
             ? ` <span class="task-tag">${canSchedulePublicLaunch(state) ? 'Launch gate' : `${PRE_LAUNCH_BUZZ_REQUIRED} buzz · ${PRE_LAUNCH_PRODUCT_REQUIRED} prod`}</span>`
             : def.xcDemoDay
@@ -335,7 +339,11 @@ export function renderDeskPanel(state) {
           ? ' <span class="task-tag">Whale</span>'
           : '';
       const crowd = def.crowdfunding ? ' <span class="task-tag">Crowdfunding</span>' : '';
-      const confTag = def.startupConference ? ' <span class="task-tag">Conference</span>' : '';
+      const confTag = def.conferenceKeynote
+        ? ' <span class="task-tag">Keynote</span>'
+        : def.startupConference
+          ? ' <span class="task-tag">Conference</span>'
+          : '';
       const rival =
         def.rivalPressure && def.rivalPressure < 0
           ? ` · rival heat ${def.rivalPressure}`

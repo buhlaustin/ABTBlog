@@ -3061,10 +3061,12 @@ if (!signConf.ok) {
 }
 
 {
-  const { saveStartupConferenceConfig, tickStartupConferenceAtMonthStart } = await import(
-    `file://${join(sim, 'modules/StartupConference.js')}`
-  );
-  const { dealMonthlyTasks, getEligibleDeskTasks } = await import(
+  const {
+    saveStartupConferenceConfig,
+    tickStartupConferenceAtMonthStart,
+    CONFERENCE_KEYNOTE_TASK_ID
+  } = await import(`file://${join(sim, 'modules/StartupConference.js')}`);
+  const { dealMonthlyTasks, getEligibleDeskTasks, confirmTaskLineup } = await import(
     `file://${join(sim, 'modules/Tasks.js')}`
   );
   const confState = createInitialState({
@@ -3101,8 +3103,44 @@ if (!signConf.ok) {
       if (!pool.length || pool.some((t) => !t.startupConference && !t.taxFiling && !t.ceoPersonalTaxFiling)) {
         console.error('FAIL: conference month desk pool should be conference tasks only');
         failed = true;
+      } else if (!pool.some((t) => t.id === CONFERENCE_KEYNOTE_TASK_ID)) {
+        console.error('FAIL: conference month desk pool must include mandatory keynote task');
+        failed = true;
       } else {
-        console.log('OK: startup conference (schedule, budget, conference-only desk)');
+        const offers = confState.calendar.monthTaskOffers ?? [];
+        if (!offers.some((o) => o.taskId === CONFERENCE_KEYNOTE_TASK_ID)) {
+          console.error('FAIL: conference month offers must include mandatory keynote');
+          failed = true;
+        } else {
+          const slots = confState.calendar.monthTaskSlotTarget ?? 3;
+          for (const o of offers) o.selected = false;
+          let picked = 0;
+          for (const o of offers) {
+            if (o.taskId === CONFERENCE_KEYNOTE_TASK_ID) continue;
+            if (picked >= slots) break;
+            o.selected = true;
+            picked += 1;
+          }
+          const withoutKeynote = confirmTaskLineup(confState);
+          if (withoutKeynote.ok || !String(withoutKeynote.reason || '').includes('keynote')) {
+            console.error('FAIL: lineup should require main stage keynote');
+            failed = true;
+          } else {
+            for (const o of offers) o.selected = false;
+            picked = 0;
+            for (const o of offers) {
+              if (picked >= slots) break;
+              o.selected = true;
+              picked += 1;
+            }
+            if (!confirmTaskLineup(confState).ok) {
+              console.error('FAIL: lineup with keynote should lock');
+              failed = true;
+            } else {
+              console.log('OK: startup conference (schedule, budget, conference-only desk, mandatory keynote)');
+            }
+          }
+        }
       }
     }
   }

@@ -27,7 +27,11 @@ import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json'
 import bundledTaxFiling from '../data/tax-filing-task.json' with { type: 'json' };
 import bundledCeoPersonalTaxFiling from '../data/ceo-personal-tax-task.json' with { type: 'json' };
 import bundledStartupConference from '../data/startup-conference-tasks.json' with { type: 'json' };
-import { conferenceMonthActive } from './StartupConference.js';
+import {
+  conferenceMonthActive,
+  CONFERENCE_KEYNOTE_TASK_ID,
+  isConferenceKeynoteMandatory
+} from './StartupConference.js';
 import {
   isXcDemoDayMonth,
   isAiPostBatchApiReleaseMonth,
@@ -404,6 +408,10 @@ function mandatoryDeskTasks(state) {
     const t = pick(CEO_PERSONAL_TAX_FILING_TASK_ID);
     if (t) out.push(t);
   }
+  if (isConferenceKeynoteMandatory(state)) {
+    const t = pick(CONFERENCE_KEYNOTE_TASK_ID);
+    if (t) out.push(t);
+  }
   return out;
 }
 
@@ -519,6 +527,10 @@ export function dealMonthlyTasks(state) {
     const ceoTax = pool.find((t) => t.id === CEO_PERSONAL_TAX_FILING_TASK_ID);
     if (ceoTax) offered = mergeUniqueTaskOffers(offered, ceoTax, offerCount);
   }
+  if (isConferenceKeynoteMandatory(state)) {
+    const keynote = pool.find((t) => t.id === CONFERENCE_KEYNOTE_TASK_ID);
+    if (keynote) offered = mergeUniqueTaskOffers(offered, keynote, offerCount);
+  }
   if (!launchLifecycleActive(state)) {
     const sigPool = pool.filter((t) => t.signature);
     if (sigPool.length && !offered.some((t) => t.signature) && offered.length > 0) {
@@ -611,6 +623,14 @@ export function confirmTaskLineup(state) {
   if (isCeoPersonalTaxFilingRequired(state)) {
     if (!selected.some((o) => o.taskId === CEO_PERSONAL_TAX_FILING_TASK_ID)) {
       return { ok: false, reason: 'April CEO personal tax filing is mandatory — include it in your lineup.' };
+    }
+  }
+  if (isConferenceKeynoteMandatory(state)) {
+    if (!selected.some((o) => o.taskId === CONFERENCE_KEYNOTE_TASK_ID)) {
+      return {
+        ok: false,
+        reason: 'Conference month — the main stage keynote / presentation is mandatory in your lineup.'
+      };
     }
   }
   const recent = state.calendar.recentTaskIds ?? [];
