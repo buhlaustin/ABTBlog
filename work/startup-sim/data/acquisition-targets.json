@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "catalogSize": 165,
+  "catalogSize": 175,
   "companies": [
     {
       "id": "acq-rival-b2b-saas",
@@ -1497,6 +1497,96 @@
       "basePrice": 1863000000,
       "description": "Publisher with mobile portfolio — IAP and ads mix.",
       "marketCategory": "gaming-media"
+    },
+    {
+      "id": "acq-166-google",
+      "name": "Google",
+      "segment": "giant",
+      "baseMrr": 188000000,
+      "basePrice": 45120000000,
+      "description": "Search, ads, and cloud at global scale — strategic integrations run long.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-167-meta",
+      "name": "Meta",
+      "segment": "giant",
+      "baseMrr": 176000000,
+      "basePrice": 42240000000,
+      "description": "Social graph and Reality Labs — mega-cap consumer distribution.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-168-microsoft",
+      "name": "Microsoft",
+      "segment": "giant",
+      "baseMrr": 191000000,
+      "basePrice": 45840000000,
+      "description": "Productivity, Azure, and enterprise AI — decades-long install base.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-169-apple",
+      "name": "Apple",
+      "segment": "giant",
+      "baseMrr": 205000000,
+      "basePrice": 49200000000,
+      "description": "Devices, silicon, and services — premium hardware meets recurring revenue.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-170-amazon",
+      "name": "Amazon",
+      "segment": "giant",
+      "baseMrr": 199000000,
+      "basePrice": 47760000000,
+      "description": "E-commerce, logistics, and AWS — operational scale rivals nations.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-171-nvidia",
+      "name": "Nvidia",
+      "segment": "giant",
+      "baseMrr": 172000000,
+      "basePrice": 41280000000,
+      "description": "Accelerated compute and data-center GPUs — capex-heavy, deeply strategic.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-172-sony",
+      "name": "Sony",
+      "segment": "giant",
+      "baseMrr": 170000000,
+      "basePrice": 40800000000,
+      "description": "PlayStation, imaging, music, and film — diversified global IP and hardware.",
+      "marketCategory": "gaming-media"
+    },
+    {
+      "id": "acq-173-oracle",
+      "name": "Oracle",
+      "segment": "giant",
+      "baseMrr": 169000000,
+      "basePrice": 40560000000,
+      "description": "Database and cloud applications — mission-critical workloads and lock-in.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-174-samsung-electronics",
+      "name": "Samsung Electronics",
+      "segment": "giant",
+      "baseMrr": 177000000,
+      "basePrice": 42480000000,
+      "description": "Smartphones, memory, and displays — manufacturing scale at tier-one OEMs.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-175-cisco",
+      "name": "Cisco",
+      "segment": "giant",
+      "baseMrr": 171000000,
+      "basePrice": 41040000000,
+      "description": "Networking and security infrastructure — backbone of enterprise connectivity.",
+      "marketCategory": "b2b-saas"
     }
   ]
 }
