@@ -293,11 +293,48 @@ if (crowdDef) {
 }
 
 const { totalHeadcountCap } = await import(`file://${join(sim, 'modules/Offices.js')}`);
+const { HEADCOUNT_CAP_BY_WORKSPACE_TIER, WORKSPACE_TIER: CAP_WS_TIER } = await import(
+  `file://${join(sim, 'modules/Workspace.js')}`
+);
 if (totalHeadcountCap(state) !== 0) {
   console.error('FAIL: garage headcount cap expected 0 got', totalHeadcountCap(state));
   failed = true;
 } else {
   console.log('OK: Offices STAGES import / headcount cap');
+}
+const sandGarageCap = createInitialState({
+  companyName: 'Sand Garage',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+if (totalHeadcountCap(sandGarageCap) === 10_000) {
+  console.error('FAIL: sandbox garage should not use flat 10k headcount cap');
+  failed = true;
+}
+const sandOfficeCap = createInitialState({
+  companyName: 'Sand Cap',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxTuning: { startingStage: 'garage', revenueMult: 1, ipoGateArr: 50_000_000 }
+});
+sandOfficeCap.workspace.tier = CAP_WS_TIER.SMALL;
+sandOfficeCap.workspace.smallOfficeOwned = true;
+if (totalHeadcountCap(sandOfficeCap) !== HEADCOUNT_CAP_BY_WORKSPACE_TIER[CAP_WS_TIER.SMALL]) {
+  console.error(
+    `FAIL: sandbox office start cap should match small office (${HEADCOUNT_CAP_BY_WORKSPACE_TIER[CAP_WS_TIER.SMALL]}), got ${totalHeadcountCap(sandOfficeCap)}`
+  );
+  failed = true;
+} else {
+  sandOfficeCap.workspace.tier = CAP_WS_TIER.CAMPUS;
+  sandOfficeCap.workspace.campusOwned = true;
+  if (totalHeadcountCap(sandOfficeCap) !== HEADCOUNT_CAP_BY_WORKSPACE_TIER[CAP_WS_TIER.CAMPUS]) {
+    console.error(
+      `FAIL: sandbox campus cap expected ${HEADCOUNT_CAP_BY_WORKSPACE_TIER[CAP_WS_TIER.CAMPUS]}, got ${totalHeadcountCap(sandOfficeCap)}`
+    );
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: sandbox headcount cap follows office tier (not flat 10k)');
+  }
 }
 
 if (normalizeSave(null) !== null) failed = true;
@@ -2218,14 +2255,15 @@ const { heuristicStaffingPlan, applyStaffingDraftPlan } = await import(
   `file://${join(sim, 'modules/StaffingPlanner.js')}`
 );
 const staffPlanState = createInitialState({ companyName: 'StaffPlan Co', categoryId: 'b2b-saas', mode: 'sandbox' });
-staffPlanState.workspace.tier = WORKSPACE_TIER.SMALL;
+staffPlanState.workspace.tier = WORKSPACE_TIER.MEDIUM;
+staffPlanState.workspace.mediumOfficeOwned = true;
 staffPlanState.stage = STAGES.OFFICE;
 staffPlanState.finance.cash = 500_000;
 staffPlanState.calendar.monthRevenue = 80_000;
 staffPlanState.staff.draftHeadcountByDept = { ...emptyHeadcount(), engineering: 2, sales: 1, product: 1 };
 staffPlanState.staff.headcountByDept = { ...staffPlanState.staff.draftHeadcountByDept };
 const growPlan = heuristicStaffingPlan(staffPlanState, 'increase');
-if (!growPlan.ok || totalHeadcount(growPlan.headcountByDept) <= 4) {
+if (!growPlan.ok || totalHeadcount(growPlan.headcountByDept) <= totalHeadcount(staffPlanState.staff.draftHeadcountByDept)) {
   console.error(`FAIL: staffing increase heuristic: ${growPlan.reason ?? 'no growth'}`);
   failed = true;
 } else {

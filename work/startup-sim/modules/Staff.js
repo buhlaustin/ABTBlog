@@ -461,7 +461,9 @@ export function renderPeopleStaffingPanel(container, state) {
     ? capBreakdown.seats
       ? `Cap: ${capBreakdown.base.toLocaleString()} hub HQ + ${capBreakdown.seats.toLocaleString()} satellite seats.`
       : `Cap: ${capBreakdown.base.toLocaleString()} at hub HQ — open satellites on Finance to hire beyond that.`
-    : '';
+    : maxHc > 0
+      ? `Cap: ${maxHc.toLocaleString()} at your current office tier.`
+      : '';
   const totalDraft = totalHeadcount(state.staff.draftHeadcountByDept);
   const totalFinal = totalHeadcount(state.staff.headcountByDept);
   const finalizedLabel =
@@ -513,11 +515,9 @@ export function renderPeopleStaffingPanel(container, state) {
     <section class="finance-section people-staffing-section">
       ${orgMount}
       <div id="org-chart-mount"></div>
-      <p class="fine-print">Hire a named <strong>COO</strong> in the org chart (garage onward). Department headcount unlocks after a small office ($10k ARR).${
-        state.mode === 'sandbox' && !capBreakdown.atHub
-          ? ' Sandbox default cap <strong>10,000</strong> until a hub city (then HQ + satellites).'
-          : ''
-      }${capHint ? ` ${capHint}` : ''}${
+      <p class="fine-print">Hire a named <strong>COO</strong> in the org chart (garage onward). Department headcount unlocks after a small office ($10k ARR). Headcount cap follows your office tier (upgrade space on Finance to hire more).${
+        capHint ? ` ${capHint}` : ''
+      }${
         marketSalaryMult(state) > 1.001
           ? ` Market comp index <strong>×${marketSalaryMult(state).toFixed(3)}</strong> (annual reset).`
           : ' Base pay resets every 12 months for market demand.'

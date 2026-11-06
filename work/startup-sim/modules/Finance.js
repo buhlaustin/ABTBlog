@@ -33,6 +33,7 @@ import { totalHeadcountCap } from './Offices.js';
 /** Hard caps on desk + growth payout multiplier (after sandbox tuning overlay). */
 export const REV_MULT_CAP_CAREER = 60;
 export const REV_MULT_CAP_SANDBOX = 800;
+/** @deprecated Sandbox workforce scaling uses office headcount cap, not a flat 10k. */
 export const SANDBOX_WORKFORCE_HEADCOUNT_FULL = 10_000;
 
 /** Legacy alias — progression stack replaces seed-only scaling. */
@@ -93,7 +94,7 @@ export function getSandboxTuningMult(state) {
 }
 
 function sandboxWorkforceHeadcountFull(state) {
-  return Math.max(SANDBOX_WORKFORCE_HEADCOUNT_FULL, totalHeadcountCap(state));
+  return Math.max(1, totalHeadcountCap(state));
 }
 
 export function getTaskRevenueCap(state) {
@@ -101,7 +102,7 @@ export function getTaskRevenueCap(state) {
   const hc = totalHeadcount(state.staff?.headcountByDept);
   const workforceFull = sandboxWorkforceHeadcountFull(state);
   const scale = Math.min(1, hc / workforceFull);
-  /** 30% of cap at zero headcount → 100% at 10k employees (sandbox only). */
+  /** 30% of cap at zero headcount → 100% at office hiring cap (sandbox only). */
   const workforceScale = 0.3 + scale * 0.7;
   return Math.round(REV_MULT_CAP_SANDBOX * workforceScale * 100) / 100;
 }
