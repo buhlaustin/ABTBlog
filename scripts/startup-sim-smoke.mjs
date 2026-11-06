@@ -59,8 +59,11 @@ const publicWhales = getTaskDefinitions().filter((t) => t.whale === true && t.st
 if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal')) {
   console.error('FAIL: handcrafted public whale pack not merged into catalog');
   failed = true;
-} else if (publicWhales.length < 20) {
-  console.error(`FAIL: expected 20+ public whale desk tasks, got ${publicWhales.length}`);
+} else if (publicWhales.length < 23) {
+  console.error(`FAIL: expected 23+ public whale desk tasks, got ${publicWhales.length}`);
+  failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'public-esg-metrics-audit-defense')) {
+  console.error('FAIL: public late handcrafted pack not merged');
   failed = true;
 } else if (!failed) {
   console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
@@ -1615,8 +1618,11 @@ if (!failed) {
       }
     ];
     const sandHubTotal = totalHeadcountCap(sandPostXc);
-    if (sandHubTotal <= 10_000) {
-      console.error(`FAIL: sandbox hub + satellite cap should exceed 10k (got ${sandHubTotal})`);
+    const expectedSandHub = HUB_HEADCOUNT_CAP + denverMed.seats;
+    if (sandHubTotal !== expectedSandHub || sandHubTotal === 10_000) {
+      console.error(
+        `FAIL: sandbox hub cap should be HQ+seats (${expectedSandHub}), not flat 10k (got ${sandHubTotal})`
+      );
       failed = true;
     } else if (!failed) {
       console.log(`OK: sandbox hub cap ${HUB_HEADCOUNT_CAP} + satellites (${sandHubTotal}, not flat 10k)`);
