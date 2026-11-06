@@ -3,14 +3,26 @@ import { fetchGameJson } from './utils.js';
 import { payFromPersonalBank } from './CeoEconomics.js';
 import { calendarTurn } from './GameCalendar.js';
 import { escapeHtml, panelStatCard, panelMetricGrid } from './PanelChrome.js';
+import bundledAlmaMaterCatalog from '../data/ceo-alma-maters.json' with { type: 'json' };
 
-const BUILTIN_ALMA_MATERS = [
-  {
-    id: 'state-flagship',
-    label: 'State flagship university',
-    shortLabel: 'State U',
-    region: 'Regional'
-  }
+const BUILTIN_ALMA_MATERS = Array.isArray(bundledAlmaMaterCatalog) ? bundledAlmaMaterCatalog : [];
+
+const ALUMNI_TYPE_LABELS = {
+  research: 'Research university',
+  liberal_arts: 'Liberal arts',
+  hbcu: 'HBCU',
+  community: 'Community college'
+};
+
+const REGION_ORDER = [
+  'Northeast',
+  'Mid-Atlantic',
+  'South',
+  'Midwest',
+  'Mountain',
+  'West',
+  'Canada',
+  'Regional'
 ];
 
 let almaMaterCache = null;
@@ -49,13 +61,24 @@ const RECOGNITION_TIERS = [
 
 export async function preloadCeoAlmaMaterCatalog() {
   if (almaMaterCache) return almaMaterCache;
-  try {
-    const data = await fetchGameJson('data/ceo-alma-maters.json');
-    almaMaterCache = Array.isArray(data) && data.length ? data : BUILTIN_ALMA_MATERS;
-  } catch {
-    almaMaterCache = BUILTIN_ALMA_MATERS;
+  almaMaterCache = BUILTIN_ALMA_MATERS;
+  if (typeof window !== 'undefined') {
+    try {
+      const data = await fetchGameJson('data/ceo-alma-maters.json');
+      if (Array.isArray(data) && data.length) almaMaterCache = data;
+    } catch {
+      /* bundled catalog */
+    }
   }
   return almaMaterCache;
+}
+
+export function alumniSchoolTypeLabel(type) {
+  return ALUMNI_TYPE_LABELS[type] ?? 'College or university';
+}
+
+export function getAlmaMaterCatalogCount() {
+  return getCeoAlmaMaterCatalogSync().length;
 }
 
 export function getCeoAlmaMaterCatalogSync() {
@@ -73,22 +96,42 @@ export function resolveCompanyAlmaMater(state) {
 }
 
 export function defaultAlmaMaterId() {
-  return getCeoAlmaMaterCatalogSync()[0]?.id ?? 'state-flagship';
+  return getAlmaMaterById('state-flagship')?.id ?? getAlmaMaterById('maryville-college')?.id ?? 'maryville-college';
 }
 
 export function populateAlmaMaterSelect(selectEl) {
   if (!selectEl) return;
-  const list = getCeoAlmaMaterCatalogSync();
+  const list = [...getCeoAlmaMaterCatalogSync()].sort((a, b) =>
+    a.label.localeCompare(b.label, undefined, { sensitivity: 'base' })
+  );
   const keep = selectEl.querySelector('option[value=""]');
+  const prior = selectEl.value;
   selectEl.innerHTML = '';
   if (keep) selectEl.appendChild(keep);
+
+  const byRegion = {};
   for (const school of list) {
-    const opt = document.createElement('option');
-    opt.value = school.id;
-    opt.textContent = school.label;
-    selectEl.appendChild(opt);
+    const region = school.region ?? 'Regional';
+    if (!byRegion[region]) byRegion[region] = [];
+    byRegion[region].push(school);
   }
-  if (!selectEl.value && list[0]) selectEl.value = list[0].id;
+  const regions = [
+    ...REGION_ORDER.filter((r) => byRegion[r]?.length),
+    ...Object.keys(byRegion).filter((r) => !REGION_ORDER.includes(r)).sort()
+  ];
+  for (const region of regions) {
+    const group = document.createElement('optgroup');
+    group.label = region;
+    for (const school of byRegion[region]) {
+      const opt = document.createElement('option');
+      opt.value = school.id;
+      const typeNote = school.type ? ` · ${alumniSchoolTypeLabel(school.type)}` : '';
+      opt.textContent = `${school.label}${typeNote}`;
+      group.appendChild(opt);
+    }
+    selectEl.appendChild(group);
+  }
+  if (prior && getAlmaMaterById(prior)) selectEl.value = prior;
 }
 
 export function alumniRecognitionLabel(lifetime) {
@@ -220,12 +263,15 @@ export function renderCeoAlumniSection(state, { disabled = '' } = {}) {
     </div>`;
   }).join('');
 
+  const typeLabel = school.type ? alumniSchoolTypeLabel(school.type) : null;
+  const regionLabel = school.region ?? null;
+
   return `<section class="finance-section finance-card ceo-alumni-section" aria-label="Alumni donations">
     <div class="finance-section-head">
       <h3 class="finance-section-title">Alma mater giving</h3>
       <span class="growth-channel-badge growth-channel-badge--inline">${escapeHtml(school.shortLabel ?? school.label)}</span>
     </div>
-    <p class="fine-print">Personal gifts to <strong>${escapeHtml(school.label)}</strong> — separate from general philanthropy and from company charity on Finance. Large gifts can move sentiment and buzz; recognition tracks lifetime alumni giving.</p>
+    <p class="fine-print">Personal gifts to <strong>${escapeHtml(school.label)}</strong>${regionLabel ? ` (${escapeHtml(regionLabel)}${typeLabel ? ` · ${escapeHtml(typeLabel)}` : ''})` : ''} — separate from general philanthropy and from company charity on Finance. Large gifts can move sentiment and buzz; recognition tracks lifetime alumni giving.</p>
     ${panelMetricGrid('3', [
       panelStatCard('Personal bank', formatMoney(bank), { hero: bank > 0 }),
       panelStatCard('Lifetime to alma mater', formatMoney(lifetime), { hero: lifetime > 0 }),

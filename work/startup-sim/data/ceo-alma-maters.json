@@ -1,62 +1,842 @@
 [
   {
-    "id": "stanford",
-    "label": "Stanford University",
-    "shortLabel": "Stanford",
-    "region": "West"
+    "id": "amherst",
+    "label": "Amherst College",
+    "shortLabel": "Amherst",
+    "region": "Northeast",
+    "type": "liberal_arts"
   },
   {
-    "id": "mit",
-    "label": "Massachusetts Institute of Technology",
-    "shortLabel": "MIT",
-    "region": "Northeast"
+    "id": "arizona-state",
+    "label": "Arizona State University",
+    "shortLabel": "ASU",
+    "region": "West",
+    "type": "research"
   },
   {
-    "id": "berkeley",
-    "label": "UC Berkeley",
-    "shortLabel": "Berkeley",
-    "region": "West"
+    "id": "auburn",
+    "label": "Auburn University",
+    "shortLabel": "Auburn",
+    "region": "South",
+    "type": "research"
   },
   {
-    "id": "michigan",
-    "label": "University of Michigan",
-    "shortLabel": "Michigan",
-    "region": "Midwest"
+    "id": "barnard",
+    "label": "Barnard College",
+    "shortLabel": "Barnard",
+    "region": "Northeast",
+    "type": "liberal_arts"
   },
   {
-    "id": "texas-austin",
-    "label": "University of Texas at Austin",
-    "shortLabel": "UT Austin",
-    "region": "South"
+    "id": "baylor",
+    "label": "Baylor University",
+    "shortLabel": "Baylor",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "belmont",
+    "label": "Belmont University",
+    "shortLabel": "Belmont",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "bc",
+    "label": "Boston College",
+    "shortLabel": "Boston College",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "boston-university",
+    "label": "Boston University",
+    "shortLabel": "BU",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "bowdoin",
+    "label": "Bowdoin College",
+    "shortLabel": "Bowdoin",
+    "region": "Northeast",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "byu",
+    "label": "Brigham Young University",
+    "shortLabel": "BYU",
+    "region": "Mountain",
+    "type": "research"
+  },
+  {
+    "id": "brown",
+    "label": "Brown University",
+    "shortLabel": "Brown",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "cal-poly-slo",
+    "label": "Cal Poly San Luis Obispo",
+    "shortLabel": "Cal Poly SLO",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "caltech",
+    "label": "California Institute of Technology",
+    "shortLabel": "Caltech",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "carleton",
+    "label": "Carleton College",
+    "shortLabel": "Carleton",
+    "region": "Midwest",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "carnegie-mellon",
+    "label": "Carnegie Mellon University",
+    "shortLabel": "CMU",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "case-western",
+    "label": "Case Western Reserve University",
+    "shortLabel": "Case Western",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "clemson",
+    "label": "Clemson University",
+    "shortLabel": "Clemson",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "colgate",
+    "label": "Colgate University",
+    "shortLabel": "Colgate",
+    "region": "Northeast",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "colorado-mines",
+    "label": "Colorado School of Mines",
+    "shortLabel": "Mines",
+    "region": "Mountain",
+    "type": "research"
+  },
+  {
+    "id": "columbia",
+    "label": "Columbia University",
+    "shortLabel": "Columbia",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "community-college",
+    "label": "Community college (generic)",
+    "shortLabel": "Community college",
+    "region": "Regional",
+    "type": "community"
+  },
+  {
+    "id": "cornell",
+    "label": "Cornell University",
+    "shortLabel": "Cornell",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "dartmouth",
+    "label": "Dartmouth College",
+    "shortLabel": "Dartmouth",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "davidson",
+    "label": "Davidson College",
+    "shortLabel": "Davidson",
+    "region": "South",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "de-anza",
+    "label": "De Anza College",
+    "shortLabel": "De Anza",
+    "region": "West",
+    "type": "community"
+  },
+  {
+    "id": "dillard",
+    "label": "Dillard University",
+    "shortLabel": "Dillard",
+    "region": "South",
+    "type": "hbcu"
+  },
+  {
+    "id": "duke",
+    "label": "Duke University",
+    "shortLabel": "Duke",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "emory",
+    "label": "Emory University",
+    "shortLabel": "Emory",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "fisk",
+    "label": "Fisk University",
+    "shortLabel": "Fisk",
+    "region": "South",
+    "type": "hbcu"
+  },
+  {
+    "id": "florida-state",
+    "label": "Florida State University",
+    "shortLabel": "Florida State",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "furman",
+    "label": "Furman University",
+    "shortLabel": "Furman",
+    "region": "South",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "georgetown",
+    "label": "Georgetown University",
+    "shortLabel": "Georgetown",
+    "region": "Mid-Atlantic",
+    "type": "research"
   },
   {
     "id": "georgia-tech",
     "label": "Georgia Institute of Technology",
     "shortLabel": "Georgia Tech",
-    "region": "South"
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "grinnell",
+    "label": "Grinnell College",
+    "shortLabel": "Grinnell",
+    "region": "Midwest",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "hampton",
+    "label": "Hampton University",
+    "shortLabel": "Hampton",
+    "region": "South",
+    "type": "hbcu"
+  },
+  {
+    "id": "harvard",
+    "label": "Harvard University",
+    "shortLabel": "Harvard",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "harvey-mudd",
+    "label": "Harvey Mudd College",
+    "shortLabel": "Harvey Mudd",
+    "region": "West",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "howard",
+    "label": "Howard University",
+    "shortLabel": "Howard",
+    "region": "Mid-Atlantic",
+    "type": "hbcu"
+  },
+  {
+    "id": "indiana",
+    "label": "Indiana University Bloomington",
+    "shortLabel": "Indiana",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "johns-hopkins",
+    "label": "Johns Hopkins University",
+    "shortLabel": "Johns Hopkins",
+    "region": "Mid-Atlantic",
+    "type": "research"
+  },
+  {
+    "id": "liberal-arts",
+    "label": "Liberal arts college (generic)",
+    "shortLabel": "Liberal arts",
+    "region": "Regional",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "lipscomb",
+    "label": "Lipscomb University",
+    "shortLabel": "Lipscomb",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "lmu",
+    "label": "Loyola Marymount University",
+    "shortLabel": "LMU",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "macalester",
+    "label": "Macalester College",
+    "shortLabel": "Macalester",
+    "region": "Midwest",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "maryville-college",
+    "label": "Maryville College",
+    "shortLabel": "Maryville College",
+    "region": "South",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "mit",
+    "label": "Massachusetts Institute of Technology",
+    "shortLabel": "MIT",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "mcgill",
+    "label": "McGill University",
+    "shortLabel": "McGill",
+    "region": "Canada",
+    "type": "research"
+  },
+  {
+    "id": "michigan-state",
+    "label": "Michigan State University",
+    "shortLabel": "Michigan State",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "middlebury",
+    "label": "Middlebury College",
+    "shortLabel": "Middlebury",
+    "region": "Northeast",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "morehouse",
+    "label": "Morehouse College",
+    "shortLabel": "Morehouse",
+    "region": "South",
+    "type": "hbcu"
+  },
+  {
+    "id": "nyu",
+    "label": "New York University",
+    "shortLabel": "NYU",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "nc-state",
+    "label": "North Carolina State University",
+    "shortLabel": "NC State",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "northwestern",
+    "label": "Northwestern University",
+    "shortLabel": "Northwestern",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "oberlin",
+    "label": "Oberlin College",
+    "shortLabel": "Oberlin",
+    "region": "Midwest",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "pepperdine",
+    "label": "Pepperdine University",
+    "shortLabel": "Pepperdine",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "pomona",
+    "label": "Pomona College",
+    "shortLabel": "Pomona",
+    "region": "West",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "princeton",
+    "label": "Princeton University",
+    "shortLabel": "Princeton",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "purdue",
+    "label": "Purdue University",
+    "shortLabel": "Purdue",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "queens-u",
+    "label": "Queen's University",
+    "shortLabel": "Queen's",
+    "region": "Canada",
+    "type": "research"
+  },
+  {
+    "id": "reed",
+    "label": "Reed College",
+    "shortLabel": "Reed",
+    "region": "West",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "rhodes",
+    "label": "Rhodes College",
+    "shortLabel": "Rhodes",
+    "region": "South",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "rice",
+    "label": "Rice University",
+    "shortLabel": "Rice",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "rit",
+    "label": "Rochester Institute of Technology",
+    "shortLabel": "RIT",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "san-diego-state",
+    "label": "San Diego State University",
+    "shortLabel": "SDSU",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "san-jose-state",
+    "label": "San José State University",
+    "shortLabel": "SJSU",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "santa-clara",
+    "label": "Santa Clara University",
+    "shortLabel": "Santa Clara",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "santa-monica-college",
+    "label": "Santa Monica College",
+    "shortLabel": "SMC",
+    "region": "West",
+    "type": "community"
+  },
+  {
+    "id": "smu",
+    "label": "Southern Methodist University",
+    "shortLabel": "SMU",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "spelman",
+    "label": "Spelman College",
+    "shortLabel": "Spelman",
+    "region": "South",
+    "type": "hbcu"
+  },
+  {
+    "id": "stanford",
+    "label": "Stanford University",
+    "shortLabel": "Stanford",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "state-flagship",
+    "label": "State flagship university (generic)",
+    "shortLabel": "State U",
+    "region": "Regional",
+    "type": "research"
+  },
+  {
+    "id": "swarthmore",
+    "label": "Swarthmore College",
+    "shortLabel": "Swarthmore",
+    "region": "Northeast",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "texas-am",
+    "label": "Texas A&M University",
+    "shortLabel": "Texas A&M",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "tcu",
+    "label": "Texas Christian University",
+    "shortLabel": "TCU",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "ohio-state",
+    "label": "The Ohio State University",
+    "shortLabel": "Ohio State",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "tuskegee",
+    "label": "Tuskegee University",
+    "shortLabel": "Tuskegee",
+    "region": "South",
+    "type": "hbcu"
+  },
+  {
+    "id": "berkeley",
+    "label": "UC Berkeley",
+    "shortLabel": "Berkeley",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "uc-davis",
+    "label": "UC Davis",
+    "shortLabel": "UC Davis",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "uc-irvine",
+    "label": "UC Irvine",
+    "shortLabel": "UC Irvine",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "uc-san-diego",
+    "label": "UC San Diego",
+    "shortLabel": "UCSD",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "ucla",
+    "label": "UCLA",
+    "shortLabel": "UCLA",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "bama",
+    "label": "University of Alabama",
+    "shortLabel": "Alabama",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "arizona",
+    "label": "University of Arizona",
+    "shortLabel": "Arizona",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "ubc",
+    "label": "University of British Columbia",
+    "shortLabel": "UBC",
+    "region": "Canada",
+    "type": "research"
+  },
+  {
+    "id": "ucf",
+    "label": "University of Central Florida",
+    "shortLabel": "UCF",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "chicago",
+    "label": "University of Chicago",
+    "shortLabel": "UChicago",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "colorado",
+    "label": "University of Colorado Boulder",
+    "shortLabel": "Colorado",
+    "region": "Mountain",
+    "type": "research"
+  },
+  {
+    "id": "florida",
+    "label": "University of Florida",
+    "shortLabel": "Florida",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "georgia",
+    "label": "University of Georgia",
+    "shortLabel": "Georgia",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "illinois",
+    "label": "University of Illinois Urbana-Champaign",
+    "shortLabel": "Illinois",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "iowa",
+    "label": "University of Iowa",
+    "shortLabel": "Iowa",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "kentucky",
+    "label": "University of Kentucky",
+    "shortLabel": "Kentucky",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "louisville",
+    "label": "University of Louisville",
+    "shortLabel": "Louisville",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "miami",
+    "label": "University of Miami",
+    "shortLabel": "Miami",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "michigan",
+    "label": "University of Michigan",
+    "shortLabel": "Michigan",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "minnesota",
+    "label": "University of Minnesota Twin Cities",
+    "shortLabel": "Minnesota",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "unc",
+    "label": "University of North Carolina at Chapel Hill",
+    "shortLabel": "UNC",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "notre-dame",
+    "label": "University of Notre Dame",
+    "shortLabel": "Notre Dame",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "oregon",
+    "label": "University of Oregon",
+    "shortLabel": "Oregon",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "penn",
+    "label": "University of Pennsylvania",
+    "shortLabel": "Penn",
+    "region": "Northeast",
+    "type": "research"
+  },
+  {
+    "id": "south-carolina",
+    "label": "University of South Carolina",
+    "shortLabel": "South Carolina",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "usc",
+    "label": "University of Southern California",
+    "shortLabel": "USC",
+    "region": "West",
+    "type": "research"
+  },
+  {
+    "id": "tennessee",
+    "label": "University of Tennessee Knoxville",
+    "shortLabel": "Tennessee",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "texas-austin",
+    "label": "University of Texas at Austin",
+    "shortLabel": "UT Austin",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "sewanee",
+    "label": "University of the South (Sewanee)",
+    "shortLabel": "Sewanee",
+    "region": "South",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "toronto",
+    "label": "University of Toronto",
+    "shortLabel": "Toronto",
+    "region": "Canada",
+    "type": "research"
+  },
+  {
+    "id": "utah",
+    "label": "University of Utah",
+    "shortLabel": "Utah",
+    "region": "Mountain",
+    "type": "research"
+  },
+  {
+    "id": "virginia",
+    "label": "University of Virginia",
+    "shortLabel": "Virginia",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "washington",
+    "label": "University of Washington",
+    "shortLabel": "Washington",
+    "region": "West",
+    "type": "research"
   },
   {
     "id": "waterloo",
     "label": "University of Waterloo",
     "shortLabel": "Waterloo",
-    "region": "Canada"
+    "region": "Canada",
+    "type": "research"
   },
   {
-    "id": "state-flagship",
-    "label": "State flagship university",
-    "shortLabel": "State U",
-    "region": "Regional"
+    "id": "wisconsin",
+    "label": "University of Wisconsin–Madison",
+    "shortLabel": "Wisconsin",
+    "region": "Midwest",
+    "type": "research"
   },
   {
-    "id": "liberal-arts",
-    "label": "Liberal arts college",
-    "shortLabel": "Liberal arts",
-    "region": "Regional"
+    "id": "vanderbilt",
+    "label": "Vanderbilt University",
+    "shortLabel": "Vanderbilt",
+    "region": "South",
+    "type": "research"
   },
   {
-    "id": "community-college",
-    "label": "Community college",
-    "shortLabel": "Community college",
-    "region": "Regional"
+    "id": "virginia-tech",
+    "label": "Virginia Tech",
+    "shortLabel": "Virginia Tech",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "wake-forest",
+    "label": "Wake Forest University",
+    "shortLabel": "Wake Forest",
+    "region": "South",
+    "type": "research"
+  },
+  {
+    "id": "washu",
+    "label": "Washington University in St. Louis",
+    "shortLabel": "WashU",
+    "region": "Midwest",
+    "type": "research"
+  },
+  {
+    "id": "whitman",
+    "label": "Whitman College",
+    "shortLabel": "Whitman",
+    "region": "West",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "williams",
+    "label": "Williams College",
+    "shortLabel": "Williams",
+    "region": "Northeast",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "wofford",
+    "label": "Wofford College",
+    "shortLabel": "Wofford",
+    "region": "South",
+    "type": "liberal_arts"
+  },
+  {
+    "id": "xavier-la",
+    "label": "Xavier University of Louisiana",
+    "shortLabel": "Xavier",
+    "region": "South",
+    "type": "hbcu"
+  },
+  {
+    "id": "yale",
+    "label": "Yale University",
+    "shortLabel": "Yale",
+    "region": "Northeast",
+    "type": "research"
   }
 ]

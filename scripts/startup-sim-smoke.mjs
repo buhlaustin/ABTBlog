@@ -2930,19 +2930,30 @@ if (!signConf.ok) {
 }
 
 {
-  const { preloadCeoAlmaMaterCatalog, donateToAlmaMater, alumniRecognitionLabel } = await import(
-    `file://${join(sim, 'modules/CeoAlumniGiving.js')}`
-  );
+  const {
+    preloadCeoAlmaMaterCatalog,
+    donateToAlmaMater,
+    alumniRecognitionLabel,
+    getAlmaMaterCatalogCount,
+    getAlmaMaterById
+  } = await import(`file://${join(sim, 'modules/CeoAlumniGiving.js')}`);
   await preloadCeoAlmaMaterCatalog();
+  if (getAlmaMaterCatalogCount() < 120 || !getAlmaMaterById('maryville-college')) {
+    console.error('FAIL: alma mater catalog (expected 120+ schools incl. Maryville College)');
+    failed = true;
+  }
   const alumniState = createInitialState({
     companyName: 'Alumni Co',
     categoryId: 'b2b-saas',
     mode: 'sandbox',
-    almaMaterId: 'mit'
+    almaMaterId: 'maryville-college'
   });
   alumniState.ceo.bankBalance = 200_000;
   const gift = donateToAlmaMater(alumniState, 25_000, 'annual-fund');
-  if (!gift.ok || alumniState.ceo.alumniGivingLifetime !== 25_000) {
+  if (alumniState.company.almaMaterId !== 'maryville-college') {
+    console.error('FAIL: alma mater not stored on company');
+    failed = true;
+  } else if (!gift.ok || alumniState.ceo.alumniGivingLifetime !== 25_000) {
     console.error(`FAIL: CEO alumni donation: ${gift.reason ?? 'amount'}`);
     failed = true;
   } else if (alumniRecognitionLabel(alumniState.ceo.alumniGivingLifetime) !== 'Annual fund donor') {

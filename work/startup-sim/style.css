@@ -2117,6 +2117,14 @@ h1 {
   min-width: 10rem;
 }
 
+#ceo-alma-mater {
+  max-width: 100%;
+}
+
+.setup-form #ceo-alma-mater {
+  font-size: 0.92rem;
+}
+
 .ceo-lifestyle-card-actions {
   display: flex;
   flex-wrap: wrap;
