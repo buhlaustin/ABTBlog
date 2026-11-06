@@ -16,7 +16,10 @@ import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
 import { createInitialAcquisitionsState } from './Acquisitions.js';
-import { createInitialTreasurySponsorshipsState } from './TreasurySponsorships.js';
+import {
+  createInitialTreasurySponsorshipsState,
+  migrateLegacySponsorshipContract
+} from './TreasurySponsorships.js';
 import { createInitialCrisisState } from './Crisis.js';
 import { createInitialDecisionState } from './DecisionEvents.js';
 import { createInitialModifiers } from './ScenarioEffects.js';
@@ -583,6 +586,7 @@ export function normalizeSave(raw) {
       for (const c of state.treasurySponsorships.active) {
         if (c.monthsTotal == null && c.monthsRemaining != null) c.monthsTotal = c.monthsRemaining;
         if (c.buzzPerMonth == null) c.buzzPerMonth = 0;
+        migrateLegacySponsorshipContract(c, state);
       }
     }
     if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();

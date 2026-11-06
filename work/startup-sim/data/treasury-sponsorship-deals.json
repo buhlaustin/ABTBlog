@@ -24,7 +24,9 @@
     "signingBonus": 2500000,
     "buzzPerMonth": 2,
     "sentimentOnSign": 2,
-    "blurb": "$48M/yr — $4M/mo fee for guaranteed $4M/mo contracted MRR for the term."
+    "revenueMultipleMin": 1.05,
+    "revenueMultipleMax": 2.1,
+    "blurb": "Flagship naming — pay $48M upfront; contracted sponsor revenue over 5 years typically ~$50M–$100M total, recognized monthly."
   },
   {
     "id": "nra-university-football",
@@ -49,7 +51,7 @@
     "minArr": 8000000,
     "requiresSeed": true,
     "buzzPerMonth": 1,
-    "blurb": "Every commuter sees the brand. Fee and booked MRR match monthly."
+    "blurb": "Every commuter sees the brand. Upfront fee; sponsor revenue books over the term."
   },
   {
     "id": "transit-bike-share",
@@ -73,7 +75,7 @@
     "requiresSeed": true,
     "signingBonus": 750000,
     "buzzPerMonth": 2,
-    "blurb": "Broadcast overlays and jersey patches — recurring fee, recurring MRR credit."
+    "blurb": "Broadcast overlays and jersey patches — upfront fee, contracted revenue over the term."
   },
   {
     "id": "f1-race-title",
@@ -88,7 +90,7 @@
     "signingBonus": 4000000,
     "buzzPerMonth": 3,
     "sentimentOnSign": 3,
-    "blurb": "Global broadcast flyover shots — premium fee, premium guaranteed MRR."
+    "blurb": "Global broadcast flyover shots — premium upfront fee, premium contracted revenue."
   },
   {
     "id": "airport-lounge-nra",
@@ -124,7 +126,7 @@
     "termYears": 3,
     "minArr": 12000000,
     "requiresSeed": true,
-    "blurb": "Ticket stubs and streaming interstitials — fee tracks booked MRR 1:1."
+    "blurb": "Ticket stubs and streaming interstitials — upfront fee, revenue over the term."
   },
   {
     "id": "public-jersey-patch",
@@ -212,7 +214,7 @@
     "signingBonus": 3000000,
     "buzzPerMonth": 2,
     "sentimentOnSign": 2,
-    "blurb": "Summer night games and playoff runs — long-dated fee/MRR stack."
+    "blurb": "Summer night games and playoff runs — long-dated upfront fee and revenue recognition."
   },
   {
     "id": "public-times-square",

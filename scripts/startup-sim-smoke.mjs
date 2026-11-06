@@ -2871,23 +2871,32 @@ sponsorState.finance.cash = 500_000_000;
 sponsorState.finance.mrr = 5_000_000;
 sponsorState.finance.arr = 60_000_000;
 const signConf = signTreasurySponsorship(sponsorState, 'nra-stadium-flagship');
+const active = sponsorState.treasurySponsorships?.active?.[0];
+const grantPace = active?.monthlyGrant ?? 0;
+const totalRev = active?.totalRevenueCommit ?? 0;
 if (!signConf.ok) {
   console.error(`FAIL: sign sponsorship: ${signConf.reason}`);
   failed = true;
-} else if (sponsoredMrrMonthly(sponsorState) !== 4_000_000) {
-  console.error(`FAIL: sponsorship MRR grant expected 4000000/mo`);
+} else if (totalRev < 50_000_000 || totalRev > 101_000_000) {
+  console.error(`FAIL: sponsorship total revenue expected ~50-100M on 48M upfront, got ${totalRev}`);
+  failed = true;
+} else if (grantPace <= 0 || Math.abs(grantPace * 60 - totalRev) > 60_000) {
+  console.error('FAIL: sponsorship grant pace vs total revenue');
+  failed = true;
+} else if (sponsorState.finance.cash > 500_000_000 - 48_000_000 - 2_500_000 + 1_000_000) {
+  console.error('FAIL: sponsorship upfront fee not debited from cash');
   failed = true;
 } else {
   sponsorState.calendar.monthRevenue = 100_000;
   const revBefore = sponsorState.calendar.monthRevenue;
   const lines = settleTreasurySponsorshipsAtMonthEnd(sponsorState);
-  if (lines.length === 0 || sponsorState.calendar.monthRevenue !== revBefore + 4_000_000) {
-    console.error('FAIL: sponsorship month-end settle');
+  if (lines.length === 0 || sponsorState.calendar.monthRevenue !== revBefore + grantPace) {
+    console.error('FAIL: sponsorship month-end revenue recognition');
     failed = true;
   } else {
     const book = sponsorshipBookSummary(sponsorState);
-    if (book.remainingFees <= 0) {
-      console.error('FAIL: sponsorship book remaining fees');
+    if (book.remainingMrrMonths <= 0) {
+      console.error('FAIL: sponsorship book remaining revenue');
       failed = true;
     } else {
       sponsorState.treasurySponsorships.active[0].monthsRemaining = 2;
@@ -2906,13 +2915,13 @@ if (!signConf.ok) {
           failed = true;
         } else {
           sponsorState.treasurySponsorships.lastEscalationYear = null;
-          const before = sponsorState.treasurySponsorships.active[0].paymentMonthly;
+          const before = sponsorState.treasurySponsorships.active[0].monthlyGrant;
           tickSponsorshipEscalationAtMonthStart(sponsorState);
-          if (sponsorState.treasurySponsorships.active[0].paymentMonthly <= before) {
-            console.error('FAIL: sponsorship January escalation');
+          if (sponsorState.treasurySponsorships.active[0].monthlyGrant <= before) {
+            console.error('FAIL: sponsorship January revenue index');
             failed = true;
           } else {
-            console.log('OK: treasury sponsorship contracts (fee → guaranteed MRR, renew, escalate)');
+            console.log('OK: treasury sponsorship (upfront fee, contracted revenue, renew, index)');
           }
         }
       }

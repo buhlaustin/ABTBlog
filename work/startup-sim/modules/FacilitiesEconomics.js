@@ -84,7 +84,7 @@ export function treasuryObligationsSummary(state) {
     rbfOwed > 0 ? Math.min(rbfOwed, Math.round((state.finance?.mrr ?? 0) * rbfShare)) : 0;
   const sponsorPay = sponsorshipPaymentMonthly(state);
   const sponsorMrr = sponsoredMrrMonthly(state);
-  const fixedMo = rent.totalMonthly + loanPay + rbfEstMo + sponsorPay;
+  const fixedMo = rent.totalMonthly + loanPay + rbfEstMo;
   return {
     rent,
     loanPay,
@@ -135,11 +135,11 @@ function renderObligationsTable(state) {
           note: `${formatMoney(ob.rbfOwed)} left · ~${Math.round((state.finance?.rbf?.sharePct ?? 0.12) * 100)}% of desk revenue`
         }
       : null,
-    ob.sponsorPay > 0
+    ob.sponsorMrr > 0
       ? {
-          label: 'Sponsorship / naming fees',
-          amount: ob.sponsorPay,
-          note: `+${formatMoney(ob.sponsorMrr)}/mo guaranteed MRR when paid`
+          label: 'Sponsor revenue (contracted)',
+          amount: 0,
+          note: `~${formatMoney(ob.sponsorMrr)}/mo recognizing at month close (fees paid upfront)`
         }
       : null
   ].filter(Boolean);

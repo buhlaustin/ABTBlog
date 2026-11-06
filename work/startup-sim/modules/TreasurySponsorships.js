@@ -7,8 +7,12 @@ import { isPublicCompany } from './IPO.js';
 import { calendarTurn } from './GameCalendar.js';
 import { escapeHtml, panelStatCard, panelMetricGrid } from './PanelChrome.js';
 
-/** Annual step-up on active sponsor fees & matching MRR (January). */
+/** January index on remaining contracted sponsor revenue (not on cash fees). */
 export const SPONSOR_ANNUAL_ESCALATION_RATE = 0.03;
+
+/** Default total contracted revenue = upfront fee × multiple (over full term). */
+export const SPONSOR_REVENUE_MULTIPLE_MIN = 1.05;
+export const SPONSOR_REVENUE_MULTIPLE_MAX = 2.1;
 
 const MAX_ACTIVE_CONTRACTS = 8;
 
@@ -34,7 +38,9 @@ const BUILTIN_DEALS = [
     requiresSeed: true,
     signingBonus: 2_500_000,
     buzzPerMonth: 2,
-    blurb: '$48M/yr — $4M/mo fee for guaranteed $4M/mo contracted MRR for the term.'
+    revenueMultipleMin: 1.05,
+    revenueMultipleMax: 2.1,
+    blurb: 'Pay the naming fee upfront; contracted sponsor revenue over the term typically exceeds the fee (e.g. ~$50M–$100M on a $48M package over 5 years).'
   },
   {
     id: 'conference-title-global',
@@ -46,7 +52,7 @@ const BUILTIN_DEALS = [
     minArr: 3_000_000,
     requiresSeed: false,
     buzzPerMonth: 2,
-    blurb: 'Keynote backdrop rights — shorter term, faster MRR bump.'
+    blurb: 'Upfront title fee — sponsor revenue books monthly through the term.'
   }
 ];
 
@@ -108,27 +114,87 @@ function pushHistory(state, entry) {
   if (bag.history.length > 24) bag.history.length = 24;
 }
 
-export function sponsoredMrrMonthly(state) {
-  return ensureSponsorships(state).active.reduce((s, c) => s + (c.mrrMonthly ?? 0), 0);
+function revenueMultipleForDeal(deal, state) {
+  const min = deal.revenueMultipleMin ?? SPONSOR_REVENUE_MULTIPLE_MIN;
+  const max = deal.revenueMultipleMax ?? SPONSOR_REVENUE_MULTIPLE_MAX;
+  let seed = state.meta?.runSeed ?? 1;
+  const id = deal.id ?? '';
+  for (let i = 0; i < id.length; i++) {
+    seed = (seed + id.charCodeAt(i) * 31) % 2_147_483_647;
+  }
+  seed = (seed + calendarTurn(state) * 17) % 2_147_483_647;
+  const r = (seed % 10_000) / 10_000;
+  return min + r * (max - min);
 }
 
+/** Total sponsor revenue recognized over the contract term (not equal to upfront fee). */
+export function computeSponsorTotalRevenue(deal, state, { upfrontFee = null } = {}) {
+  const fee = Math.round(upfrontFee ?? deal.annualPayment ?? 0);
+  if (fee <= 0) return 0;
+  return Math.round(fee * revenueMultipleForDeal(deal, state));
+}
+
+export function sponsorRevenueRangeLabel(deal) {
+  const fee = deal.annualPayment ?? 0;
+  const min = deal.revenueMultipleMin ?? SPONSOR_REVENUE_MULTIPLE_MIN;
+  const max = deal.revenueMultipleMax ?? SPONSOR_REVENUE_MULTIPLE_MAX;
+  const yrs = deal.termYears ?? 1;
+  return `${formatMoney(Math.round(fee * min))}–${formatMoney(Math.round(fee * max))} over ${yrs} yr`;
+}
+
+/** Migrate legacy monthly-fee contracts to upfront + revenue pool model. */
+export function migrateLegacySponsorshipContract(contract, state) {
+  if (!contract) return;
+  if (contract.totalRevenueCommit != null && contract.revenueRemaining != null) {
+    if (contract.monthlyGrant == null && contract.mrrMonthly != null) {
+      contract.monthlyGrant = contract.mrrMonthly;
+    }
+    contract.paymentMonthly = 0;
+    return;
+  }
+  const deal = getTreasurySponsorshipDeal(contract.dealId);
+  const monthsTotal = Math.max(1, contract.monthsTotal ?? contract.monthsRemaining ?? 12);
+  const monthsRemaining = Math.max(0, contract.monthsRemaining ?? monthsTotal);
+  if (deal && contract.paymentMonthly > 0) {
+    const upfront = deal.annualPayment ?? contract.paymentMonthly * 12;
+    contract.upfrontPaid = contract.upfrontPaid ?? upfront;
+    contract.upfrontBasis = contract.upfrontBasis ?? upfront;
+    contract.totalRevenueCommit = computeSponsorTotalRevenue(deal, state ?? { meta: { runSeed: 1 } });
+    const granted = (contract.mrrMonthly ?? contract.paymentMonthly) * (monthsTotal - monthsRemaining);
+    contract.revenueRemaining = Math.max(0, contract.totalRevenueCommit - granted);
+  } else {
+    const legacyMrr = contract.mrrMonthly ?? contract.paymentMonthly ?? 0;
+    contract.totalRevenueCommit = legacyMrr * monthsTotal;
+    contract.revenueRemaining = legacyMrr * monthsRemaining;
+    contract.upfrontPaid = contract.upfrontPaid ?? 0;
+    contract.upfrontBasis = contract.upfrontBasis ?? deal?.annualPayment ?? 0;
+  }
+  contract.monthlyGrant = Math.round(
+    contract.revenueRemaining / Math.max(1, monthsRemaining)
+  );
+  contract.mrrMonthly = contract.monthlyGrant;
+  contract.paymentMonthly = 0;
+}
+
+export function sponsoredMrrMonthly(state) {
+  return ensureSponsorships(state).active.reduce((s, c) => s + (c.mrrMonthly ?? c.monthlyGrant ?? 0), 0);
+}
+
+/** No recurring sponsor cash fees after upfront payment. */
 export function sponsorshipPaymentMonthly(state) {
-  return ensureSponsorships(state).active.reduce((s, c) => s + (c.paymentMonthly ?? 0), 0);
+  return 0;
 }
 
 export function sponsorshipBookSummary(state) {
   const bag = ensureSponsorships(state);
-  let remainingFees = 0;
-  let remainingMrrMonths = 0;
+  let remainingRevenue = 0;
   for (const c of bag.active) {
-    const mo = c.monthsRemaining ?? 0;
-    remainingFees += (c.paymentMonthly ?? 0) * mo;
-    remainingMrrMonths += (c.mrrMonthly ?? 0) * mo;
+    remainingRevenue += c.revenueRemaining ?? 0;
   }
   return {
     activeCount: bag.active.length,
-    remainingFees,
-    remainingMrrMonths,
+    remainingFees: 0,
+    remainingMrrMonths: remainingRevenue,
     lifetimeFees: bag.lifetimeFeesPaid ?? 0,
     lifetimeMrr: bag.lifetimeMrrGranted ?? 0
   };
@@ -190,17 +256,19 @@ export function canSignTreasurySponsorship(state, dealId) {
     };
   }
 
-  const paymentMonthly = Math.round(deal.annualPayment / 12);
+  const upfront = Math.round(deal.annualPayment ?? 0);
   const signingBonus = Math.round(deal.signingBonus ?? 0);
   const cash = state.finance?.cash ?? 0;
-  const need = paymentMonthly + signingBonus;
+  const need = upfront + signingBonus;
+  if (upfront <= 0) return { ok: false, reason: 'Invalid deal economics.' };
   if (cash < need) {
     return {
       ok: false,
-      reason: `Need ${formatMoney(need)} cash (${formatMoney(paymentMonthly)} first month${signingBonus ? ` + ${formatMoney(signingBonus)} signing` : ''}; have ${formatMoney(cash)}).`
+      reason: `Need ${formatMoney(need)} cash (${formatMoney(upfront)} upfront${signingBonus ? ` + ${formatMoney(signingBonus)} signing` : ''}; have ${formatMoney(cash)}).`
     };
   }
-  return { ok: true, deal, paymentMonthly, signingBonus };
+  const totalRevenue = computeSponsorTotalRevenue(deal, state);
+  return { ok: true, deal, upfront, signingBonus, totalRevenue };
 }
 
 export function signTreasurySponsorship(state, dealId) {
@@ -208,10 +276,16 @@ export function signTreasurySponsorship(state, dealId) {
   if (!gate.ok) return gate;
 
   const deal = gate.deal;
-  const paymentMonthly = gate.paymentMonthly;
-  const mrrMonthly = paymentMonthly;
-  const monthsTotal = Math.max(1, Math.round((deal.termYears ?? 1) * 12));
+  const upfront = gate.upfront;
   const signingBonus = gate.signingBonus ?? 0;
+  const totalRevenue = gate.totalRevenue;
+  const monthsTotal = Math.max(1, Math.round((deal.termYears ?? 1) * 12));
+  const monthlyGrant = Math.round(totalRevenue / monthsTotal);
+
+  state.finance.cash -= upfront;
+  recordCashOutflow(state, upfront, 'sponsorship_upfront');
+  ensureSponsorships(state).lifetimeFeesPaid =
+    (ensureSponsorships(state).lifetimeFeesPaid ?? 0) + upfront;
 
   if (signingBonus > 0) {
     state.finance.cash -= signingBonus;
@@ -226,8 +300,13 @@ export function signTreasurySponsorship(state, dealId) {
     label: deal.label,
     category: deal.category,
     exclusiveGroup: deal.exclusiveGroup ?? null,
-    paymentMonthly,
-    mrrMonthly,
+    upfrontPaid: upfront,
+    upfrontBasis: upfront,
+    totalRevenueCommit: totalRevenue,
+    revenueRemaining: totalRevenue,
+    monthlyGrant,
+    mrrMonthly: monthlyGrant,
+    paymentMonthly: 0,
     annualPayment: deal.annualPayment,
     monthsRemaining: monthsTotal,
     monthsTotal,
@@ -242,17 +321,19 @@ export function signTreasurySponsorship(state, dealId) {
     kind: 'signed',
     dealId: deal.id,
     label: deal.label,
-    amount: signingBonus,
-    note: `${deal.termYears} yr · ${formatMoney(deal.annualPayment)}/yr`
+    amount: upfront + signingBonus,
+    note: `${deal.termYears} yr · ${formatMoney(totalRevenue)} contracted revenue`
   });
 
   const brandLines = applyBrandEffects(state, deal, { onSign: true });
-  const bonusNote = signingBonus ? ` Paid ${formatMoney(signingBonus)} signing bonus.` : '';
+  const bonusNote = signingBonus ? ` Plus ${formatMoney(signingBonus)} signing bonus.` : '';
 
   return {
     ok: true,
-    summary: `Signed ${deal.label} — ${formatMoney(deal.annualPayment)}/yr for ${deal.termYears} yr (${formatMoney(paymentMonthly)}/mo fee → +${formatMoney(mrrMonthly)}/mo guaranteed MRR each month paid).${bonusNote} First monthly fee runs at month close.`,
-    brandLines
+    summary: `Signed ${deal.label} — paid ${formatMoney(upfront)} upfront for ${deal.termYears} yr.${bonusNote} Contracted sponsor revenue ${formatMoney(totalRevenue)} (~${formatMoney(monthlyGrant)}/mo at month close).`,
+    brandLines,
+    totalRevenue,
+    monthlyGrant
   };
 }
 
@@ -263,33 +344,49 @@ export function canRenewTreasurySponsorship(state, dealId) {
   if ((c.monthsRemaining ?? 0) > 3) {
     return { ok: false, reason: 'Renewal opens in the final 3 months of the term.' };
   }
-  const nextPay = Math.round((c.paymentMonthly ?? 0) * 1.05);
-  if ((state.finance?.cash ?? 0) < nextPay) {
-    return { ok: false, reason: `Need ${formatMoney(nextPay)} cash for the renewal month.` };
+  const deal = getTreasurySponsorshipDeal(dealId);
+  const renewUpfront = Math.round((c.upfrontBasis ?? deal?.annualPayment ?? 0) * 1.05);
+  if ((state.finance?.cash ?? 0) < renewUpfront) {
+    return { ok: false, reason: `Need ${formatMoney(renewUpfront)} cash for the renewal upfront fee.` };
   }
-  return { ok: true, contract: c, nextPay };
+  return { ok: true, contract: c, deal, renewUpfront };
 }
 
-/** Extend 12 months at +5% monthly fee (MRR still matches fee). */
+/** Extend 12 months: pay +5% upfront fee, add a new contracted revenue pool. */
 export function renewTreasurySponsorship(state, dealId) {
   const gate = canRenewTreasurySponsorship(state, dealId);
   if (!gate.ok) return gate;
   const c = gate.contract;
-  c.paymentMonthly = gate.nextPay;
-  c.mrrMonthly = gate.nextPay;
-  c.annualPayment = gate.nextPay * 12;
+  const deal = gate.deal ?? getTreasurySponsorshipDeal(dealId);
+  const renewUpfront = gate.renewUpfront;
+
+  state.finance.cash -= renewUpfront;
+  recordCashOutflow(state, renewUpfront, 'sponsorship_renewal');
+  ensureSponsorships(state).lifetimeFeesPaid =
+    (ensureSponsorships(state).lifetimeFeesPaid ?? 0) + renewUpfront;
+
+  const addRevenue = deal
+    ? computeSponsorTotalRevenue(deal, state, { upfrontFee: renewUpfront })
+    : Math.round(renewUpfront * 1.25);
+
+  c.upfrontBasis = renewUpfront;
+  c.revenueRemaining = (c.revenueRemaining ?? 0) + addRevenue;
+  c.totalRevenueCommit = (c.totalRevenueCommit ?? 0) + addRevenue;
   c.monthsRemaining = (c.monthsRemaining ?? 0) + 12;
   c.monthsTotal = (c.monthsTotal ?? 0) + 12;
+  c.monthlyGrant = Math.round(c.revenueRemaining / Math.max(1, c.monthsRemaining));
+  c.mrrMonthly = c.monthlyGrant;
+
   pushHistory(state, {
     kind: 'renewed',
     dealId: c.dealId,
     label: c.label,
-    amount: gate.nextPay,
-    note: '+12 mo @ +5% fee/MRR'
+    amount: renewUpfront,
+    note: `+12 mo · +${formatMoney(addRevenue)} revenue`
   });
   return {
     ok: true,
-    summary: `Renewed ${c.label} — 12 more months at ${formatMoney(c.paymentMonthly)}/mo fee & MRR (${c.monthsRemaining} mo left).`
+    summary: `Renewed ${c.label} — ${formatMoney(renewUpfront)} upfront, +${formatMoney(addRevenue)} contracted revenue (${c.monthsRemaining} mo left, ~${formatMoney(c.mrrMonthly)}/mo).`
   };
 }
 
@@ -297,9 +394,9 @@ export function canTerminateTreasurySponsorship(state, dealId) {
   const bag = ensureSponsorships(state);
   const c = bag.active.find((x) => x.dealId === dealId);
   if (!c) return { ok: false, reason: 'No active contract.' };
-  const breakFee = Math.round((c.paymentMonthly ?? 0) * 3);
+  const breakFee = Math.round((c.mrrMonthly ?? c.monthlyGrant ?? 0) * 3);
   if ((state.finance?.cash ?? 0) < breakFee) {
-    return { ok: false, reason: `Need ${formatMoney(breakFee)} break fee (3× monthly).` };
+    return { ok: false, reason: `Need ${formatMoney(breakFee)} break fee (3× monthly grant).` };
   }
   return { ok: true, contract: c, breakFee };
 }
@@ -320,15 +417,15 @@ export function terminateTreasurySponsorship(state, dealId) {
     dealId: c.dealId,
     label: c.label,
     amount: breakFee,
-    note: 'Early exit'
+    note: 'Early exit — unearned revenue forfeited'
   });
   return {
     ok: true,
-    summary: `Terminated ${c.label} early — paid ${formatMoney(breakFee)} break fee. Guaranteed MRR from this deal stops.`
+    summary: `Terminated ${c.label} early — paid ${formatMoney(breakFee)} break fee. Remaining contracted revenue stops.`
   };
 }
 
-/** January: escalate active sponsor fees & matching MRR. */
+/** January: index remaining contracted revenue & monthly grant (no extra cash fee). */
 export function tickSponsorshipEscalationAtMonthStart(state) {
   const cal = state.calendar;
   if (!cal || cal.monthIndex !== 1) return [];
@@ -342,16 +439,17 @@ export function tickSponsorshipEscalationAtMonthStart(state) {
 
   const mult = 1 + SPONSOR_ANNUAL_ESCALATION_RATE;
   for (const c of bag.active) {
-    c.paymentMonthly = Math.round((c.paymentMonthly ?? 0) * mult);
-    c.mrrMonthly = c.paymentMonthly;
-    c.annualPayment = c.paymentMonthly * 12;
+    c.revenueRemaining = Math.round((c.revenueRemaining ?? 0) * mult);
+    c.totalRevenueCommit = Math.round((c.totalRevenueCommit ?? 0) * mult);
+    c.monthlyGrant = Math.round((c.monthlyGrant ?? c.mrrMonthly ?? 0) * mult);
+    c.mrrMonthly = c.monthlyGrant;
   }
   return [
-    `Sponsor contract index +${Math.round(SPONSOR_ANNUAL_ESCALATION_RATE * 1000) / 10}% on ${bag.active.length} active deal(s) (fee & guaranteed MRR).`
+    `Sponsor revenue index +${Math.round(SPONSOR_ANNUAL_ESCALATION_RATE * 1000) / 10}% on ${bag.active.length} active deal(s) (remaining contracted revenue).`
   ];
 }
 
-/** Month-end: pay sponsor fees, book guaranteed MRR, expire finished terms. */
+/** Month-end: book contracted sponsor revenue (no recurring fee). */
 export function settleTreasurySponsorshipsAtMonthEnd(state) {
   const bag = ensureSponsorships(state);
   if (!bag.active.length) return [];
@@ -360,51 +458,54 @@ export function settleTreasurySponsorshipsAtMonthEnd(state) {
   const stillActive = [];
 
   for (const contract of bag.active) {
-    const pay = contract.paymentMonthly ?? 0;
-    const grant = contract.mrrMonthly ?? 0;
-    if (pay <= 0 || grant <= 0) continue;
-
-    if ((state.finance?.cash ?? 0) < pay) {
-      lines.push(
-        `${contract.label} — missed ${formatMoney(pay)} fee; sponsor withheld MRR and terminated the deal.`
-      );
+    migrateLegacySponsorshipContract(contract, state);
+    const remaining = contract.revenueRemaining ?? 0;
+    const moLeft = contract.monthsRemaining ?? 0;
+    if (remaining <= 0 || moLeft <= 0) {
+      lines.push(`${contract.label} — term complete.`);
       pushHistory(state, {
-        kind: 'missed',
+        kind: 'expired',
         dealId: contract.dealId,
         label: contract.label,
-        amount: pay,
-        note: 'Payment default'
+        amount: 0,
+        note: 'Term ended'
       });
       continue;
     }
 
-    state.finance.cash -= pay;
-    recordCashOutflow(state, pay, 'sponsorship');
-    bag.lifetimeFeesPaid = (bag.lifetimeFeesPaid ?? 0) + pay;
+    const grant =
+      moLeft === 1 ? remaining : Math.min(remaining, contract.monthlyGrant ?? contract.mrrMonthly ?? 0);
+    if (grant <= 0) continue;
 
     state.calendar.monthRevenue = (state.calendar.monthRevenue ?? 0) + grant;
     state.finance.lifetimeRevenue = (state.finance.lifetimeRevenue ?? 0) + grant;
     accrueFiscalRevenue(state, grant);
     bag.lifetimeMrrGranted = (bag.lifetimeMrrGranted ?? 0) + grant;
+    contract.revenueRemaining = Math.max(0, remaining - grant);
 
     if (contract.buzzPerMonth) {
       state.product = state.product ?? { level: 0, buzz: 0 };
       state.product.buzz = (state.product.buzz ?? 0) + contract.buzzPerMonth;
     }
 
-    contract.monthsRemaining = Math.max(0, (contract.monthsRemaining ?? 0) - 1);
+    contract.monthsRemaining = Math.max(0, moLeft - 1);
+    if (contract.monthsRemaining > 0) {
+      contract.monthlyGrant = Math.round(contract.revenueRemaining / contract.monthsRemaining);
+      contract.mrrMonthly = contract.monthlyGrant;
+    }
+
     lines.push(
-      `${contract.label}: ${formatMoney(pay)} fee → +${formatMoney(grant)} guaranteed MRR (${contract.monthsRemaining} mo left).`
+      `${contract.label}: +${formatMoney(grant)} sponsor revenue (${formatMoney(contract.revenueRemaining)} left · ${contract.monthsRemaining} mo).`
     );
     pushHistory(state, {
-      kind: 'paid',
+      kind: 'recognized',
       dealId: contract.dealId,
       label: contract.label,
-      amount: pay,
-      note: `+${formatMoney(grant)} MRR`
+      amount: grant,
+      note: 'Contracted sponsor revenue'
     });
 
-    if (contract.monthsRemaining > 0) stillActive.push(contract);
+    if (contract.monthsRemaining > 0 && contract.revenueRemaining > 0) stillActive.push(contract);
     else {
       lines.push(`${contract.label} — term complete.`);
       pushHistory(state, {
@@ -428,15 +529,17 @@ function renderActiveContracts(state) {
   }
   const rows = bag.active
     .map((c) => {
+      migrateLegacySponsorshipContract(c, state);
       const canRenew = (c.monthsRemaining ?? 0) <= 3;
       const renewBtn = canRenew
         ? `<button type="button" class="btn btn-ghost btn-small" data-renew-sponsorship="${escapeHtml(c.dealId)}">Renew +12 mo</button>`
         : '';
-      const termBtn = `<button type="button" class="btn btn-ghost btn-small" data-terminate-sponsorship="${escapeHtml(c.dealId)}" title="Pay 3× monthly break fee">Exit early</button>`;
+      const termBtn = `<button type="button" class="btn btn-ghost btn-small" data-terminate-sponsorship="${escapeHtml(c.dealId)}" title="Pay 3× monthly grant break fee">Exit early</button>`;
       return `<tr>
         <td>${escapeHtml(c.label)}<br><span class="fine-print">${escapeHtml(sponsorshipCategoryLabel(c.category))}</span></td>
-        <td class="num">+${formatMoney(c.mrrMonthly)}/mo</td>
-        <td class="num">${formatMoney(c.paymentMonthly)}/mo</td>
+        <td class="num">~${formatMoney(c.mrrMonthly)}/mo</td>
+        <td class="num">${formatMoney(c.revenueRemaining ?? 0)} left</td>
+        <td class="num">${formatMoney(c.upfrontPaid ?? 0)} paid</td>
         <td class="num">${c.monthsRemaining} / ${c.monthsTotal ?? c.monthsRemaining}</td>
         <td class="treasury-sponsor-actions">${renewBtn} ${termBtn}</td>
       </tr>`;
@@ -444,7 +547,7 @@ function renderActiveContracts(state) {
     .join('');
   return `<div class="table-scroll finance-cap-scroll">
     <table class="data-table">
-      <thead><tr><th>Contract</th><th>Guaranteed MRR</th><th>Monthly fee</th><th>Months left</th><th></th></tr></thead>
+      <thead><tr><th>Contract</th><th>Grant pace</th><th>Revenue left</th><th>Upfront paid</th><th>Months left</th><th></th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   </div>`;
@@ -468,11 +571,11 @@ function renderHistory(state) {
 function renderDealCard(state, deal) {
   const bag = ensureSponsorships(state);
   const gate = canSignTreasurySponsorship(state, deal.id);
-  const monthly = Math.round(deal.annualPayment / 12);
   const signed = bag.signedDealIds.includes(deal.id);
   const disabled = !gate.ok || signed;
   const title = gate.ok && !signed ? '' : ` title="${escapeHtml(gate.reason ?? 'Unavailable')}"`;
   const bonus = deal.signingBonus ? ` Signing ${formatMoney(deal.signingBonus)}.` : '';
+  const revRange = sponsorRevenueRangeLabel(deal);
   const tags = [
     deal.requiresPublic ? 'Public' : null,
     deal.requiresSeed ? 'Post-seed' : 'Pre-seed OK',
@@ -481,18 +584,17 @@ function renderDealCard(state, deal) {
     .filter(Boolean)
     .join(' · ');
   return `<div class="finance-action treasury-sponsor-deal">
-    <p><strong>${escapeHtml(deal.label)}</strong> — ${formatMoney(deal.annualPayment)}/yr · ${deal.termYears} yr · +${formatMoney(monthly)}/mo MRR</p>
+    <p><strong>${escapeHtml(deal.label)}</strong> — ${formatMoney(deal.annualPayment)} upfront · ${deal.termYears} yr</p>
+    <p class="fine-print">Contracted revenue (typical): <strong>${revRange}</strong> — not 1:1 with the fee; books monthly at month close.</p>
     <p class="fine-print">${escapeHtml(deal.blurb ?? '')}${deal.minArr ? ` Min ARR ${formatMoney(deal.minArr)}.` : ''}${bonus}</p>
     <p class="fine-print treasury-sponsor-tags">${escapeHtml(tags)}</p>
-    <button type="button" class="btn btn-ghost btn-small" data-sign-sponsorship="${escapeHtml(deal.id)}" ${disabled ? 'disabled' : ''}${title}>${signed ? 'Signed this run' : 'Sign contract'}</button>
+    <button type="button" class="btn btn-ghost btn-small" data-sign-sponsorship="${escapeHtml(deal.id)}" ${disabled ? 'disabled' : ''}${title}>${signed ? 'Signed this run' : 'Sign & pay upfront'}</button>
   </div>`;
 }
 
 export function renderTreasurySponsorshipPanel(state) {
   const deals = getTreasurySponsorshipDealsSync();
-  const bag = ensureSponsorships(state);
   const grant = sponsoredMrrMonthly(state);
-  const fees = sponsorshipPaymentMonthly(state);
   const book = sponsorshipBookSummary(state);
 
   const byCategory = {};
@@ -512,19 +614,18 @@ export function renderTreasurySponsorshipPanel(state) {
   return `<section class="finance-section finance-card" aria-label="Sponsorship and naming rights">
     <div class="finance-section-head">
       <h3 class="finance-section-title">Sponsorship & naming rights</h3>
-      <span class="fine-print">Guaranteed MRR · brand · up to ${MAX_ACTIVE_CONTRACTS} active</span>
+      <span class="fine-print">Upfront fee · contracted revenue · up to ${MAX_ACTIVE_CONTRACTS} active</span>
     </div>
-    <p class="fine-print">Pay a monthly sponsor fee at <strong>month close</strong>; receive the same amount as <strong>guaranteed MRR</strong> (e.g. ${formatMoney(48_000_000)}/yr → ${formatMoney(4_000_000)}/mo). Signing bonuses and break fees hit cash immediately. Active deals step up ~${Math.round(SPONSOR_ANNUAL_ESCALATION_RATE * 1000) / 10}% each January (fee & MRR stay matched). Renew in the last 3 months (+5% fee) or exit early (3× monthly break fee).</p>
+    <p class="fine-print">Sign from the catalog and pay the <strong>upfront sponsorship fee</strong> immediately (e.g. ${formatMoney(48_000_000)} on a flagship stadium deal). Over the term, <strong>contracted sponsor revenue</strong> recognizes at month close — typically <strong>more than the fee</strong> (often ~${Math.round(SPONSOR_REVENUE_MULTIPLE_MIN * 100)}–${Math.round(SPONSOR_REVENUE_MULTIPLE_MAX * 100)}% of upfront, e.g. ~${formatMoney(50_000_000)}–${formatMoney(100_000_000)} on $48M over 5 years). No monthly sponsor fees. January indexes remaining revenue ~${Math.round(SPONSOR_ANNUAL_ESCALATION_RATE * 1000) / 10}%. Renew in the last 3 months (+5% upfront) or exit early (3× monthly grant break fee).</p>
     ${panelMetricGrid('4', [
-      panelStatCard('Active guaranteed MRR', grant > 0 ? `+${formatMoney(grant)}/mo` : '—', { hero: grant > 0 }),
-      panelStatCard('Active monthly fees', fees > 0 ? formatMoney(fees) : '—'),
-      panelStatCard('Remaining fees (book)', formatMoney(book.remainingFees)),
-      panelStatCard('Remaining MRR (book)', formatMoney(book.remainingMrrMonths))
-    ])}
-    ${panelMetricGrid('3', [
-      panelStatCard('Active contracts', String(book.activeCount)),
+      panelStatCard('Active grant pace', grant > 0 ? `~${formatMoney(grant)}/mo` : '—', { hero: grant > 0 }),
+      panelStatCard('Revenue left on book', formatMoney(book.remainingMrrMonths)),
       panelStatCard('Lifetime fees paid', formatMoney(book.lifetimeFees)),
-      panelStatCard('Lifetime MRR booked', formatMoney(book.lifetimeMrr))
+      panelStatCard('Lifetime revenue booked', formatMoney(book.lifetimeMrr))
+    ])}
+    ${panelMetricGrid('2', [
+      panelStatCard('Active contracts', String(book.activeCount)),
+      panelStatCard('Recurring sponsor fees', '$0/mo (upfront deals)')
     ])}
     <h4 class="finance-subhead">Active contracts</h4>
     ${renderActiveContracts(state)}
