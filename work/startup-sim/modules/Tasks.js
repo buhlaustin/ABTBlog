@@ -19,6 +19,7 @@ import bundledCatalogExpansion from '../data/tasks-catalog-expansion.json' with 
 import bundledPublicLate from '../data/tasks-public-late-game.json' with { type: 'json' };
 import bundledPublicLateExtra from '../data/tasks-public-late-game-extra.json' with { type: 'json' };
 import bundledPublicWhaleHandcrafted from '../data/tasks-public-whale-handcrafted.json' with { type: 'json' };
+import bundledPublicMegawhaleHandcrafted from '../data/tasks-public-megawhale-handcrafted.json' with { type: 'json' };
 import bundledPublicLateHandcrafted from '../data/tasks-public-late-handcrafted-pack.json' with { type: 'json' };
 import bundledPublicPostIpoHandcrafted from '../data/tasks-public-post-ipo-handcrafted-pack.json' with { type: 'json' };
 import bundledMidGameHandcrafted from '../data/tasks-mid-game-handcrafted-pack.json' with { type: 'json' };
@@ -32,6 +33,8 @@ import {
   CONFERENCE_KEYNOTE_TASK_ID,
   isConferenceKeynoteMandatory
 } from './StartupConference.js';
+import { isPublicCompany } from './IPO.js';
+import { isMegawhalePlay } from './WhaleScale.js';
 import {
   isXcDemoDayMonth,
   isAiPostBatchApiReleaseMonth,
@@ -148,10 +151,13 @@ function mergePublicLateGameTasks(base) {
     mergeTaskPack(
       mergeTaskPack(
         mergeTaskPack(
-          mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
-          bundledPublicLateExtra?.tasks ?? []
+          mergeTaskPack(
+            mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
+            bundledPublicLateExtra?.tasks ?? []
+          ),
+          bundledPublicWhaleHandcrafted?.tasks ?? []
         ),
-        bundledPublicWhaleHandcrafted?.tasks ?? []
+        bundledPublicMegawhaleHandcrafted?.tasks ?? []
       ),
       bundledPublicLateHandcrafted?.tasks ?? []
     ),
@@ -530,6 +536,15 @@ export function dealMonthlyTasks(state) {
   if (isConferenceKeynoteMandatory(state)) {
     const keynote = pool.find((t) => t.id === CONFERENCE_KEYNOTE_TASK_ID);
     if (keynote) offered = mergeUniqueTaskOffers(offered, keynote, offerCount);
+  }
+  if ((isPublicCompany(state) || taskStage === STAGES.PUBLIC) && !offered.some(isMegawhalePlay)) {
+    const megaPool = pool.filter(isMegawhalePlay);
+    if (megaPool.length) {
+      const recentIds = new Set(state.calendar.recentTaskIds ?? []);
+      const fresh = megaPool.filter((t) => !recentIds.has(t.id));
+      const pickFrom = fresh.length ? fresh : megaPool;
+      offered = mergeUniqueTaskOffers(offered, shuffle(pickFrom)[0], offerCount);
+    }
   }
   if (!launchLifecycleActive(state)) {
     const sigPool = pool.filter((t) => t.signature);

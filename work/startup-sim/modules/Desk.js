@@ -23,6 +23,7 @@ import {
   CONFERENCE_KEYNOTE_TASK_ID,
   isConferenceKeynoteMandatory
 } from './StartupConference.js';
+import { isMegawhalePlay } from './WhaleScale.js';
 
 /** Why the month may not close yet — for the Desk checklist UI. */
 export function deskMonthCloseChecklist(state) {
@@ -125,7 +126,8 @@ export function autoSelectRecommendedLineup(state) {
       const band = estimateTaskPayoutBand(def, state);
       const mrr = estimateTaskMrrBand(def);
       let score = band.max;
-      if (def.whale) score += band.max * 0.15;
+      if (isMegawhalePlay(def)) score += band.max * 0.35;
+      else if (def.whale) score += band.max * 0.15;
       if (def.signature) score += 25_000;
       if (mrr) score += mrr.max * 6;
       if (def.scheduleLaunch) score += 15_000;

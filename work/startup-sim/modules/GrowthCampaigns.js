@@ -6,6 +6,8 @@ import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { ty
 import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json' with { type: 'json' };
 import bundledPublicLate from '../data/growth-campaigns-public-late.json' with { type: 'json' };
 import bundledPublicWhale from '../data/growth-campaigns-public-whale.json' with { type: 'json' };
+import bundledPublicMegawhale from '../data/growth-campaigns-public-megawhale.json' with { type: 'json' };
+import { isMegawhalePlay } from './WhaleScale.js';
 import { fetchGameJson } from './utils.js';
 import { progressionTier, progressionTierForUnlocks } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
@@ -38,7 +40,8 @@ const bundledExtras = [
   bundledSpaceGrowth,
   bundledSpaceGrowthExtra,
   bundledPublicLate,
-  bundledPublicWhale
+  bundledPublicWhale,
+  bundledPublicMegawhale
 ];
 
 /** Months before the same paid growth play can appear in the monthly roster again. */
@@ -132,10 +135,23 @@ export function refreshGrowthCampaignOffers(state) {
       offers = mergeUniqueCampaignOffers(offers, pick, offerCount);
       whalesOnRoster += 1;
     }
+
+    const megaPool = pool.filter((c) => isMegawhalePlay(c));
+    let megasOnRoster = offers.filter((c) => isMegawhalePlay(c)).length;
+    while (megasOnRoster < 1 && megaPool.length) {
+      const candidates = megaPool.filter((c) => !offers.some((o) => o.id === c.id));
+      if (!candidates.length) break;
+      const fresh = candidates.filter((c) => !recentSet.has(c.id));
+      const pickFrom = fresh.length ? fresh : candidates;
+      const pick = shuffle(pickFrom)[0];
+      offers = mergeUniqueCampaignOffers(offers, pick, offerCount);
+      megasOnRoster += 1;
+    }
   }
 
   state.growth.monthCampaignOffers = offers.map((c) => c.id);
   state.growth.lastRosterWhaleCount = offers.filter((c) => c.whale === true).length;
+  state.growth.lastRosterMegawhaleCount = offers.filter((c) => isMegawhalePlay(c)).length;
   return offers;
 }
 
@@ -143,8 +159,15 @@ export function refreshGrowthCampaignOffers(state) {
 export function growthRosterRefreshLine(state) {
   const ids = state.growth?.monthCampaignOffers ?? [];
   const whales = state.growth?.lastRosterWhaleCount ?? 0;
+  const megas = state.growth?.lastRosterMegawhaleCount ?? 0;
   if (!ids.length) return 'Growth roster: no paid plays unlocked this month.';
-  return `Growth roster: ${ids.length} paid play${ids.length === 1 ? '' : 's'} available${whales ? ` (${whales} whale-scale)` : ''}.`;
+  const scale =
+    megas > 0
+      ? ` (${megas} megawhale${megas === 1 ? '' : 's'}${whales > megas ? `, ${whales} whale-scale` : ''})`
+      : whales
+        ? ` (${whales} whale-scale)`
+        : '';
+  return `Growth roster: ${ids.length} paid play${ids.length === 1 ? '' : 's'} available${scale}.`;
 }
 
 let catalog = mergeCampaignCatalog(bundled, ...bundledExtras);
@@ -343,8 +366,9 @@ export function renderGrowthCampaignsBlock(state, options = {}) {
     .map((c) => {
       const r0 = Math.round((c.revenue?.[0] ?? 0) * mult * 0.5);
       const r1 = Math.round((c.revenue?.[1] ?? 0) * mult);
-      const whaleTag =
-        c.whale || (c.revenue?.[1] ?? 0) >= 500_000_000
+      const whaleTag = isMegawhalePlay(c)
+        ? ' <span class="task-tag">Megawhale</span>'
+        : c.whale || (c.revenue?.[1] ?? 0) >= 500_000_000
           ? ' <span class="task-tag">Whale</span>'
           : '';
       const stockHint =

@@ -90,6 +90,18 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
 } else if (!failed) {
   console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
 }
+const publicMegawhales = getTaskDefinitions().filter(
+  (t) => t.megawhale === true && t.stages?.includes('public')
+);
+if (!getTaskDefinitions().some((t) => t.id === 'megawhale-federal-cloud-continuity-mandate')) {
+  console.error('FAIL: handcrafted public megawhale desk pack not merged');
+  failed = true;
+} else if (publicMegawhales.length < 18) {
+  console.error(`FAIL: expected 18+ public megawhale desk tasks, got ${publicMegawhales.length}`);
+  failed = true;
+} else if (!failed) {
+  console.log(`OK: public megawhale desk tasks (${publicMegawhales.length} multi-billion)`);
+}
 
 const genericPool = getTaskDefinitions().filter((t) => !t.categories?.length && !t.launchPhase);
 for (let i = 0; i < 80; i += 1) {
@@ -2177,8 +2189,15 @@ if (roster.length < 1 || roster.length > expectedOffers) {
           const def = getGrowthCampaigns().find((c) => c.id === id);
           return def?.whale === true;
         });
+        const megaOnRoster = roster.some((id) => {
+          const def = getGrowthCampaigns().find((c) => c.id === id);
+          return def?.megawhale === true;
+        });
         if (!whaleOnRoster) {
           console.error('FAIL: public growth roster should include at least one whale paid play');
+          failed = true;
+        } else if (!megaOnRoster) {
+          console.error('FAIL: public growth roster should include at least one megawhale paid play');
           failed = true;
         } else {
           console.log(`OK: growth roster + cooldown (${roster.length}/mo, era-scaled payouts)`);
@@ -2190,11 +2209,17 @@ if (roster.length < 1 || roster.length > expectedOffers) {
 
 const productSideBank = sideTaskBankSize(['product', 'both']);
 const publicGrowthWhales = getGrowthCampaigns().filter((c) => c.whale === true && (c.tierMin ?? 0) >= 7);
+const publicGrowthMegawhales = getGrowthCampaigns().filter(
+  (c) => c.megawhale === true && (c.tierMin ?? 0) >= 7
+);
 if (publicGrowthWhales.length < 20) {
   console.error(`FAIL: expected 20+ post-IPO whale growth campaigns (got ${publicGrowthWhales.length})`);
   failed = true;
-} else if (growthCampaignCatalogSize() < 295) {
-  console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()}, want ≥295)`);
+} else if (publicGrowthMegawhales.length < 15) {
+  console.error(`FAIL: expected 15+ post-IPO megawhale growth campaigns (got ${publicGrowthMegawhales.length})`);
+  failed = true;
+} else if (growthCampaignCatalogSize() < 315) {
+  console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()}, want ≥315)`);
   failed = true;
 } else if (getProductActions().length < 75) {
   console.error(`FAIL: side-task lever bank too small (${getProductActions().length})`);

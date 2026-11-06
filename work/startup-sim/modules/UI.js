@@ -61,6 +61,7 @@ import { sentimentLabel, marketTrustLabel, hasInstitutionalBoard } from './Senti
 import { runwayLabel, runwayDetail } from './MonthSummary.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js';
+import { isMegawhalePlay } from './WhaleScale.js';
 import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
 import {
   getTaskRevenueMultiplierPreview,
@@ -295,9 +296,11 @@ export function renderDeskPanel(state) {
           if (!def) return '';
           const sel = offer.selected ? 'task-offer selected' : 'task-offer';
           const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
-          const whale = def.whale === true
-              ? ' <span class="task-tag">Whale</span>'
-              : '';
+          const whale = isMegawhalePlay(def)
+              ? ' <span class="task-tag">Megawhale</span>'
+              : def.whale === true
+                ? ' <span class="task-tag">Whale</span>'
+                : '';
           const confTag = def.conferenceKeynote
             ? ' <span class="task-tag">Keynote</span>'
             : def.startupConference
@@ -335,9 +338,11 @@ export function renderDeskPanel(state) {
       const band = estimateTaskPayoutBand(def, state);
       const mrrBand = estimateTaskMrrBand(def);
       const sig = def.signature ? ' <span class="task-tag">Signature</span>' : '';
-      const whale = def.whale === true
-          ? ' <span class="task-tag">Whale</span>'
-          : '';
+      const whale = isMegawhalePlay(def)
+          ? ' <span class="task-tag">Megawhale</span>'
+          : def.whale === true
+            ? ' <span class="task-tag">Whale</span>'
+            : '';
       const crowd = def.crowdfunding ? ' <span class="task-tag">Crowdfunding</span>' : '';
       const confTag = def.conferenceKeynote
         ? ' <span class="task-tag">Keynote</span>'
