@@ -24,6 +24,7 @@ test.describe('Startup Simulator', () => {
     await page.locator('#company-name').fill('Playwright Test Co');
     await page.locator('#ceo-first-name').fill('Alex');
     await page.locator('#ceo-last-name').fill('Founder');
+    await page.locator('#ceo-alma-mater').selectOption('stanford');
     await page.locator('#startup-category').selectOption('b2b-saas');
     await page.locator('#btn-start-game').click();
     await expect(page.locator('#screen-game')).toBeVisible();
@@ -62,6 +63,7 @@ test.describe('Startup Simulator', () => {
     await page.locator('#company-name').fill('Tab Audit Co');
     await page.locator('#ceo-first-name').fill('Sam');
     await page.locator('#ceo-last-name').fill('Tabler');
+    await page.locator('#ceo-alma-mater').selectOption('stanford');
     await page.locator('#startup-category').selectOption('b2b-saas');
     await page.locator('#btn-start-game').click();
     await expect(page.locator('#screen-game')).toBeVisible();
@@ -127,6 +129,7 @@ test.describe('Startup Simulator', () => {
     await page.locator('#company-name').fill('Mobile Co');
     await page.locator('#ceo-first-name').fill('Mo');
     await page.locator('#ceo-last-name').fill('Bile');
+    await page.locator('#ceo-alma-mater').selectOption('stanford');
     await page.locator('#startup-category').selectOption('b2b-saas');
     await page.locator('#btn-start-game').click();
     await expect(page.locator('#screen-game')).toBeVisible();
@@ -187,6 +190,7 @@ test.describe('Startup Simulator', () => {
     await page.locator('#company-name').fill('Sandbox Mobile Co With A Long Name');
     await page.locator('#ceo-first-name').fill('Alex');
     await page.locator('#ceo-last-name').fill('Founder');
+    await page.locator('#ceo-alma-mater').selectOption('stanford');
     await page.locator('#startup-category').selectOption('b2b-saas');
     await page.locator('#btn-start-game').click();
     await expect(page.locator('#screen-game')).toBeVisible();
