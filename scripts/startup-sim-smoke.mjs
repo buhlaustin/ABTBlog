@@ -349,7 +349,9 @@ const {
   getRawTaskRevenueMultiplier,
   REV_MULT_CAP_CAREER,
   REV_MULT_CAP_SANDBOX,
-  getTaskRevenueCap
+  REV_MULT_CAP_SANDBOX_HUB,
+  getTaskRevenueCap,
+  sandboxRevMultTierBase
 } = await import(`file://${join(sim, 'modules/Finance.js')}`);
 const careerMult = getTaskRevenueMultiplierPreview(state);
 if (careerMult < 0.9 || careerMult > 2.5) {
@@ -438,7 +440,8 @@ const coreCareer = getCoreTaskRevenueMult({
 const coreSand = getCoreTaskRevenueMult(overlayState);
 const totalSand = getTaskRevenueMultiplierPreview(overlayState);
 const expectedUncapped = Math.round(coreSand * 2 * 100) / 100;
-const expected = Math.min(expectedUncapped, REV_MULT_CAP_SANDBOX);
+const overlayCapBase = sandboxRevMultTierBase(overlayState);
+const expected = Math.min(expectedUncapped, Math.round(overlayCapBase * 0.3 * 100) / 100);
 if (Math.abs(totalSand - expected) > 0.05) {
   console.error(
     `FAIL: sandbox overlay expected ~${expected} (core ${coreSand} × 2 capped), got ${totalSand}`
@@ -652,11 +655,24 @@ const cappedSand = getTaskRevenueMultiplierPreview(maxedSand);
 if (cappedSand > sandCap + 0.01) {
   console.error(`FAIL: sandbox cap exceeded: ${cappedSand} > ${sandCap}`);
   failed = true;
-} else if (sandCap < REV_MULT_CAP_SANDBOX - 1) {
-  console.error(`FAIL: expected full sandbox workforce cap ${REV_MULT_CAP_SANDBOX}× got ${sandCap}×`);
+} else if (sandCap < REV_MULT_CAP_SANDBOX_HUB - 1) {
+  console.error(`FAIL: expected hub sandbox workforce cap ~${REV_MULT_CAP_SANDBOX_HUB}× got ${sandCap}×`);
   failed = true;
 } else {
-  console.log(`OK: sandbox rev mult cap ${cappedSand}× (workforce ceiling ${sandCap}×)`);
+  console.log(`OK: sandbox rev mult cap ${cappedSand}× (hub workforce ceiling ${sandCap}×)`);
+}
+const garageCapState = createInitialState({
+  companyName: 'GarageCap',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+const garageCap = getTaskRevenueCap(garageCapState);
+const garageTierBase = sandboxRevMultTierBase(garageCapState);
+if (garageTierBase !== REV_MULT_CAP_SANDBOX || garageCap !== Math.round(REV_MULT_CAP_SANDBOX * 0.3 * 100) / 100) {
+  console.error(`FAIL: garage rev× cap expected tier ${REV_MULT_CAP_SANDBOX}× / effective ${REV_MULT_CAP_SANDBOX * 0.3}× got ${garageTierBase}× / ${garageCap}×`);
+  failed = true;
+} else if (!failed) {
+  console.log(`OK: garage rev× cap unchanged (${garageCap}× at empty HC, tier base ${garageTierBase}×)`);
 }
 
 const { completeBoardTask, dealBoardTasks, getBoardTaskDefs, ensureBoardRoster } = await import(
