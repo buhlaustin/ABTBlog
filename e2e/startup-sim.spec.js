@@ -85,6 +85,8 @@ test.describe('Startup Simulator', () => {
     await expect(page.locator('#btn-toggle-news-archive')).toBeVisible();
 
     await page.locator('#tab-ceo').click();
+    await expect(page.locator('#panel-ceo')).toContainText('Age');
+    await expect(page.locator('#panel-ceo')).toContainText('born');
     await expect(page.locator('#panel-ceo')).toContainText('Personal debits');
     await expect(page.locator('#panel-ceo')).toContainText('Est. net worth');
     await expect(page.locator('#panel-ceo')).toContainText('Personal bank');

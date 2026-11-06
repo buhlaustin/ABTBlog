@@ -1782,6 +1782,28 @@ if ((ensureCeoPersonalTax(accrualState).current.income ?? 0) !== ceoSalaryMonthl
   console.log('OK: CEO taxable income accrual');
 }
 
+const { ceoAgeOnCalendar, ceoAgeInGame } = await import(`file://${join(sim, 'modules/CeoProfile.js')}`);
+if (ceoAgeOnCalendar(1998, 6, 2026, 6) !== 28 || ceoAgeOnCalendar(1998, 6, 2026, 5) !== 27) {
+  console.error('FAIL: CEO birthday age should respect in-game month');
+  failed = true;
+} else {
+  const ageState = createInitialState({
+    companyName: 'Age Co',
+    categoryId: 'b2b-saas',
+    mode: 'career',
+    ceoBirthMonth: 6,
+    ceoBirthYear: 1998
+  });
+  ageState.calendar.year = 2026;
+  ageState.calendar.monthIndex = 5;
+  if (ceoAgeInGame(ageState) !== 27) {
+    console.error('FAIL: ceoAgeInGame from state calendar');
+    failed = true;
+  } else {
+    console.log('OK: CEO age from birthday + in-game calendar');
+  }
+}
+
 const charityState = createInitialState({ companyName: 'Give Co', categoryId: 'b2b-saas', mode: 'career' });
 charityState.finance.cash = 50_000;
 const beforeCash = charityState.finance.cash;

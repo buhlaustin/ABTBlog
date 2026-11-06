@@ -35,6 +35,7 @@ import {
 import { isPublicCompany, canSellFounderStock } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
+import { ceoAgeDisplayLine } from './CeoProfile.js';
 
 function escapeHtml(s) {
   return String(s)
@@ -174,8 +175,10 @@ function buildCeoPanelContext(state) {
   const netWorth = ceoNetWorth(state);
   const section = activeCeoSection(state);
   const personalTax = ceoPersonalTaxDisplay(state);
+  const ageLine = ceoAgeDisplayLine(state);
   return {
     name,
+    ageLine,
     annual,
     monthly,
     comp,
@@ -637,6 +640,7 @@ export function renderCeoPanel(container, state) {
     <div class="ceo-panel people-panel finance-panel">
       <header class="ceo-hero">
         <p class="ceo-name-chip">${escapeHtml(ctx.name)}</p>
+        ${ctx.ageLine ? `<p class="ceo-age-line fine-print">${escapeHtml(ctx.ageLine)}</p>` : ''}
         <p class="panel-lede">Personal bank, salary band debits, draws, and equity. Company cash lives on Finance.</p>
       </header>
       <nav class="people-subtabs ceo-subtabs" aria-label="CEO sections">
