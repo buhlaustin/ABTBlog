@@ -35,6 +35,7 @@ import {
 import { prepareCompanyOverheadForMonth } from './CompanyOverhead.js';
 import { createInitialCooState, hireCoo, isCooHired } from './Coo.js';
 import { clampCeoBirthMonth, clampCeoBirthYear } from './CeoProfile.js';
+import { defaultAlmaMaterId, getAlmaMaterById } from './CeoAlumniGiving.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -96,6 +97,10 @@ export function createInitialState(options) {
       ceoLastName: String(options.ceoLastName || '').trim(),
       ceoBirthMonth: clampCeoBirthMonth(options.ceoBirthMonth),
       ceoBirthYear: clampCeoBirthYear(options.ceoBirthYear),
+      almaMaterId: (() => {
+        const id = String(options.almaMaterId || '').trim() || defaultAlmaMaterId();
+        return getAlmaMaterById(id) ? id : defaultAlmaMaterId();
+      })(),
       categoryId: category.id,
       categoryLabel: category.label,
       economics
@@ -219,6 +224,8 @@ export function normalizeSave(raw) {
     if (state.ceo) {
       if (!state.ceo.section) state.ceo.section = 'overview';
       if (state.ceo.personalGivingLifetime == null) state.ceo.personalGivingLifetime = 0;
+      if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
+      if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
       if (!state.ceo.netWorthHistory) state.ceo.netWorthHistory = [];
       if (state.ceo.investmentBalance == null) state.ceo.investmentBalance = 0;
       if (state.ceo.careerInvestmentReturns == null) state.ceo.careerInvestmentReturns = 0;
@@ -366,6 +373,9 @@ export function normalizeSave(raw) {
     if (state.company.ceoBirthYear == null) state.company.ceoBirthYear = 1990;
     state.company.ceoBirthMonth = clampCeoBirthMonth(state.company.ceoBirthMonth);
     state.company.ceoBirthYear = clampCeoBirthYear(state.company.ceoBirthYear);
+    if (!state.company.almaMaterId || !getAlmaMaterById(state.company.almaMaterId)) {
+      state.company.almaMaterId = defaultAlmaMaterId();
+    }
     {
       const cat = getCategoryById(state.company?.categoryId);
       if (!cat) return null;
@@ -432,6 +442,8 @@ export function normalizeSave(raw) {
       }
       if (!state.ceo.lifestyleOwned) state.ceo.lifestyleOwned = [];
       if (state.ceo.lifestyleDebitBump == null) state.ceo.lifestyleDebitBump = 0;
+      if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
+      if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
     }
     ensureCeoPersonalBank(state);
     preparePersonalExpensesForMonth(state);

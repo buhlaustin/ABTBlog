@@ -42,6 +42,7 @@ import { isPublicCompany, canSellFounderStock } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
 import { ceoAgeDisplayLine } from './CeoProfile.js';
+import { renderCeoAlumniSection, resolveCompanyAlmaMater } from './CeoAlumniGiving.js';
 import {
   escapeHtml,
   panelStatCard,
@@ -53,7 +54,7 @@ import {
 
 export { setCeoSalaryAnnual, takeOwnerDraw };
 
-const CEO_SECTIONS = new Set(['overview', 'wealth', 'comp', 'lifestyle']);
+const CEO_SECTIONS = new Set(['overview', 'wealth', 'comp', 'lifestyle', 'alumni']);
 
 export function setCeoSection(state, section) {
   if (!state.ceo) return;
@@ -221,6 +222,7 @@ function renderCeoSectionHtml(ctx) {
   if (section === 'wealth') return renderCeoWealthSection(ctx);
   if (section === 'comp') return renderCeoCompSection(ctx);
   if (section === 'lifestyle') return renderCeoLifestyleSection(ctx);
+  if (section === 'alumni') return renderCeoAlumniSection(state, { disabled: ctx.disabled });
   return renderCeoOverviewSection(ctx);
 }
 
@@ -724,6 +726,11 @@ export function renderCeoPanel(container, state) {
       <header class="ceo-hero">
         <p class="ceo-name-chip">${escapeHtml(ctx.name)}</p>
         ${ctx.ageLine ? `<p class="ceo-age-line fine-print">${escapeHtml(ctx.ageLine)}</p>` : ''}
+        ${
+          resolveCompanyAlmaMater(state)
+            ? `<p class="fine-print ceo-alma-line">Alma mater: ${escapeHtml(resolveCompanyAlmaMater(state).label)}</p>`
+            : ''
+        }
         <p class="panel-lede">Personal bank, salary band debits, draws, and equity. Company cash lives on Finance.</p>
       </header>
       <nav class="people-subtabs ceo-subtabs" aria-label="CEO sections">
@@ -731,6 +738,7 @@ export function renderCeoPanel(container, state) {
         ${tab('wealth', 'Wealth & exit')}
         ${tab('comp', 'Comp & draws')}
         ${tab('lifestyle', 'Homes & splurges')}
+        ${tab('alumni', 'Alma mater')}
       </nav>
       <div id="ceo-section-mount">${renderCeoSectionHtml(ctx)}</div>
       <p id="ceo-feedback" class="desk-feedback" hidden></p>

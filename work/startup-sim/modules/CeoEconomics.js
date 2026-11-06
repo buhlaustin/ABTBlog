@@ -83,6 +83,8 @@ export function createInitialCeoState() {
     lifestyleDebitBump: 0,
     section: 'overview',
     personalGivingLifetime: 0,
+    alumniGivingLifetime: 0,
+    alumniDonationLog: [],
     netWorthHistory: [],
     investmentBalance: 0,
     careerInvestmentReturns: 0,
@@ -309,7 +311,7 @@ function creditPersonalBank(state, amount, label, kind) {
   return pay;
 }
 
-function debitPersonalBank(state, amount, label, kind) {
+export function payFromPersonalBank(state, amount, label, kind) {
   const pay = Math.round(Number(amount) || 0);
   if (pay <= 0) return 0;
   const ceo = ceoState(state);
@@ -325,6 +327,10 @@ function debitPersonalBank(state, amount, label, kind) {
     ...logStamp(state)
   });
   return applied;
+}
+
+function debitPersonalBank(state, amount, label, kind) {
+  return payFromPersonalBank(state, amount, label, kind);
 }
 
 export function ceoPersonalBankBalance(state) {

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "stanford",
+    "label": "Stanford University",
+    "shortLabel": "Stanford",
+    "region": "West"
+  },
+  {
+    "id": "mit",
+    "label": "Massachusetts Institute of Technology",
+    "shortLabel": "MIT",
+    "region": "Northeast"
+  },
+  {
+    "id": "berkeley",
+    "label": "UC Berkeley",
+    "shortLabel": "Berkeley",
+    "region": "West"
+  },
+  {
+    "id": "michigan",
+    "label": "University of Michigan",
+    "shortLabel": "Michigan",
+    "region": "Midwest"
+  },
+  {
+    "id": "texas-austin",
+    "label": "University of Texas at Austin",
+    "shortLabel": "UT Austin",
+    "region": "South"
+  },
+  {
+    "id": "georgia-tech",
+    "label": "Georgia Institute of Technology",
+    "shortLabel": "Georgia Tech",
+    "region": "South"
+  },
+  {
+    "id": "waterloo",
+    "label": "University of Waterloo",
+    "shortLabel": "Waterloo",
+    "region": "Canada"
+  },
+  {
+    "id": "state-flagship",
+    "label": "State flagship university",
+    "shortLabel": "State U",
+    "region": "Regional"
+  },
+  {
+    "id": "liberal-arts",
+    "label": "Liberal arts college",
+    "shortLabel": "Liberal arts",
+    "region": "Regional"
+  },
+  {
+    "id": "community-college",
+    "label": "Community college",
+    "shortLabel": "Community college",
+    "region": "Regional"
+  }
+]

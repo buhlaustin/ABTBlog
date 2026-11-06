@@ -2109,6 +2109,14 @@ h1 {
   margin-right: 0.25rem;
 }
 
+.ceo-alumni-section .ceo-alumni-fund {
+  margin-bottom: 0.75rem;
+}
+
+.ceo-alumni-section .finance-inline-form select {
+  min-width: 10rem;
+}
+
 .finance-panel {
   display: flex;
   flex-direction: column;

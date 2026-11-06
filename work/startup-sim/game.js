@@ -119,6 +119,11 @@ import {
   CEO_LIFESTYLE_PURCHASES
 } from './modules/CeoLifestyle.js';
 import {
+  preloadCeoAlmaMaterCatalog,
+  populateAlmaMaterSelect,
+  donateToAlmaMater
+} from './modules/CeoAlumniGiving.js';
+import {
   preparePersonalExpensesForMonth,
   takeOwnerDrawFraction,
   donateFromPersonalBank,
@@ -1512,6 +1517,33 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const alumniGiveBtn = e.target.closest('[data-ceo-alumni-give]');
+    if (alumniGiveBtn && sessionState) {
+      const result = donateToAlmaMater(
+        sessionState,
+        alumniGiveBtn.getAttribute('data-ceo-alumni-give'),
+        alumniGiveBtn.getAttribute('data-ceo-alumni-fund') || 'annual-fund'
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Alumni gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-ceo-alumni-give-custom' && sessionState) {
+      const input = document.getElementById('ceo-alumni-give-input');
+      const fund = document.getElementById('ceo-alumni-fund-select')?.value || 'annual-fund';
+      const result = donateToAlmaMater(sessionState, input?.value, fund);
+      if (!result.ok) showCeoFeedback(result.reason || 'Alumni gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     const investDepositBtn = e.target.closest('[data-ceo-invest-deposit]');
     if (investDepositBtn && sessionState) {
       const result = depositPersonalInvestment(
@@ -2025,6 +2057,7 @@ async function init() {
   const categories = getCategoriesSync();
   const categorySelect = document.getElementById('startup-category');
   populateCategorySelect(categorySelect, categories);
+  populateAlmaMaterSelect(document.getElementById('ceo-alma-mater'));
 
   const setupForm = document.getElementById('setup-form');
   bindSandboxCashToggle(setupForm);
@@ -2110,11 +2143,12 @@ async function init() {
     const ceoLastName = String(fd.get('ceoLastName') || '').trim();
     const ceoBirthMonth = fd.get('ceoBirthMonth');
     const ceoBirthYear = fd.get('ceoBirthYear');
+    const almaMaterId = String(fd.get('almaMaterId') || '').trim();
     const categoryId = String(fd.get('category') || '');
     const mode = String(fd.get('mode') || 'career');
     const sandboxCash = fd.get('sandboxCash');
 
-    if (!companyName || !ceoFirstName || !ceoLastName || !categoryId) return;
+    if (!companyName || !ceoFirstName || !ceoLastName || !categoryId || !almaMaterId) return;
 
     if (!getTaskDefinitions().length) {
       const el = document.getElementById('setup-form');
@@ -2140,6 +2174,7 @@ async function init() {
         ceoLastName,
         ceoBirthMonth,
         ceoBirthYear,
+        almaMaterId,
         categoryId,
         mode,
         sandboxCash,
@@ -2166,9 +2201,11 @@ async function init() {
         preloadDecisionEvents(),
         preloadAcquisitionCatalog(),
         preloadTreasurySponsorshipDeals(),
+        preloadCeoAlmaMaterCatalog(),
         preloadNewsTimeline()
       ]);
       populateCategorySelect(categorySelect, getCategoriesSync());
+      populateAlmaMaterSelect(document.getElementById('ceo-alma-mater'));
     } catch {
       /* bundled data already playable */
     }

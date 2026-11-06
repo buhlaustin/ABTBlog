@@ -2904,4 +2904,28 @@ if (!signConf.ok) {
   }
 }
 
+{
+  const { preloadCeoAlmaMaterCatalog, donateToAlmaMater, alumniRecognitionLabel } = await import(
+    `file://${join(sim, 'modules/CeoAlumniGiving.js')}`
+  );
+  await preloadCeoAlmaMaterCatalog();
+  const alumniState = createInitialState({
+    companyName: 'Alumni Co',
+    categoryId: 'b2b-saas',
+    mode: 'sandbox',
+    almaMaterId: 'mit'
+  });
+  alumniState.ceo.bankBalance = 200_000;
+  const gift = donateToAlmaMater(alumniState, 25_000, 'annual-fund');
+  if (!gift.ok || alumniState.ceo.alumniGivingLifetime !== 25_000) {
+    console.error(`FAIL: CEO alumni donation: ${gift.reason ?? 'amount'}`);
+    failed = true;
+  } else if (alumniRecognitionLabel(alumniState.ceo.alumniGivingLifetime) !== 'Annual fund donor') {
+    console.error('FAIL: CEO alumni recognition tier');
+    failed = true;
+  } else {
+    console.log('OK: CEO alma mater alumni giving');
+  }
+}
+
 process.exit(failed ? 1 : 0);
