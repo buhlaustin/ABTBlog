@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "catalogSize": 165,
+  "catalogSize": 185,
   "companies": [
     {
       "id": "acq-rival-b2b-saas",
@@ -1496,6 +1496,186 @@
       "baseMrr": 11500000,
       "basePrice": 1863000000,
       "description": "Publisher with mobile portfolio — IAP and ads mix.",
+      "marketCategory": "gaming-media"
+    },
+    {
+      "id": "acq-166-google",
+      "name": "Google",
+      "segment": "giant",
+      "baseMrr": 188000000,
+      "basePrice": 45120000000,
+      "description": "Search, ads, and cloud at global scale — strategic integrations run long.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-167-meta",
+      "name": "Meta",
+      "segment": "giant",
+      "baseMrr": 176000000,
+      "basePrice": 42240000000,
+      "description": "Social graph and Reality Labs — mega-cap consumer distribution.",
+      "marketCategory": "consumer-social"
+    },
+    {
+      "id": "acq-168-microsoft",
+      "name": "Microsoft",
+      "segment": "giant",
+      "baseMrr": 191000000,
+      "basePrice": 45840000000,
+      "description": "Productivity, Azure, and enterprise AI — decades-long install base.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-169-apple",
+      "name": "Apple",
+      "segment": "giant",
+      "baseMrr": 205000000,
+      "basePrice": 49200000000,
+      "description": "Devices, silicon, and services — premium hardware meets recurring revenue.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-170-amazon",
+      "name": "Amazon",
+      "segment": "giant",
+      "baseMrr": 199000000,
+      "basePrice": 47760000000,
+      "description": "E-commerce, logistics, and AWS — operational scale rivals nations.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-171-nvidia",
+      "name": "Nvidia",
+      "segment": "giant",
+      "baseMrr": 172000000,
+      "basePrice": 41280000000,
+      "description": "Accelerated compute and data-center GPUs — capex-heavy, deeply strategic.",
+      "marketCategory": "ai-tools"
+    },
+    {
+      "id": "acq-172-sony",
+      "name": "Sony",
+      "segment": "giant",
+      "baseMrr": 170000000,
+      "basePrice": 40800000000,
+      "description": "PlayStation, imaging, music, and film — diversified global IP and hardware.",
+      "marketCategory": "gaming-media"
+    },
+    {
+      "id": "acq-173-oracle",
+      "name": "Oracle",
+      "segment": "giant",
+      "baseMrr": 169000000,
+      "basePrice": 40560000000,
+      "description": "Database and cloud applications — mission-critical workloads and lock-in.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-174-samsung-electronics",
+      "name": "Samsung Electronics",
+      "segment": "giant",
+      "baseMrr": 177000000,
+      "basePrice": 42480000000,
+      "description": "Smartphones, memory, and displays — manufacturing scale at tier-one OEMs.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-175-cisco",
+      "name": "Cisco",
+      "segment": "giant",
+      "baseMrr": 171000000,
+      "basePrice": 41040000000,
+      "description": "Networking and security infrastructure — backbone of enterprise connectivity.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-176-tesla",
+      "name": "Tesla",
+      "segment": "giant",
+      "baseMrr": 183000000,
+      "basePrice": 43920000000,
+      "description": "EVs, energy storage, and autonomy — vert integrated manufacturing at continental scale.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-177-toyota",
+      "name": "Toyota",
+      "segment": "giant",
+      "baseMrr": 178000000,
+      "basePrice": 42720000000,
+      "description": "Global auto leader and hybrid powertrains — supply chain depth and brand trust.",
+      "marketCategory": "hardware"
+    },
+    {
+      "id": "acq-178-walmart",
+      "name": "Walmart",
+      "segment": "giant",
+      "baseMrr": 198000000,
+      "basePrice": 47520000000,
+      "description": "Retail, grocery, and marketplace — US footprint plus logistics density.",
+      "marketCategory": "marketplace"
+    },
+    {
+      "id": "acq-179-mastercard",
+      "name": "Mastercard",
+      "segment": "giant",
+      "baseMrr": 168000000,
+      "basePrice": 40320000000,
+      "description": "Global payments network — interchange rails and issuer relationships worldwide.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-180-visa",
+      "name": "Visa",
+      "segment": "giant",
+      "baseMrr": 173000000,
+      "basePrice": 41520000000,
+      "description": "Card network and digital wallet plumbing — two-sided liquidity at planet scale.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-181-netflix",
+      "name": "Netflix",
+      "segment": "giant",
+      "baseMrr": 166000000,
+      "basePrice": 39840000000,
+      "description": "Streaming and originals — global subs base plus content amortization machine.",
+      "marketCategory": "gaming-media"
+    },
+    {
+      "id": "acq-182-jpmorgan-chase",
+      "name": "JPMorgan Chase",
+      "segment": "giant",
+      "baseMrr": 175000000,
+      "basePrice": 42000000000,
+      "description": "Universal bank and wholesale markets — balance sheet and deal flow for the Fortune 500.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-183-bank-of-america",
+      "name": "Bank of America",
+      "segment": "giant",
+      "baseMrr": 170000000,
+      "basePrice": 40800000000,
+      "description": "Retail and commercial banking — branch network plus card and treasury services.",
+      "marketCategory": "fintech"
+    },
+    {
+      "id": "acq-184-ibm",
+      "name": "IBM",
+      "segment": "giant",
+      "baseMrr": 169000000,
+      "basePrice": 40560000000,
+      "description": "Hybrid cloud and services — mainframe estate plus Red Hat–era platform bets.",
+      "marketCategory": "b2b-saas"
+    },
+    {
+      "id": "acq-185-comcast",
+      "name": "Comcast",
+      "segment": "giant",
+      "baseMrr": 171000000,
+      "basePrice": 41040000000,
+      "description": "Cable broadband and NBCUniversal — pipes plus content under one roof.",
       "marketCategory": "gaming-media"
     }
   ]

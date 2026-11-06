@@ -137,7 +137,7 @@ export function marketBrief(state) {
 }
 
 export function portfolioMix(state) {
-  const mix = { small: 0, mid: 0, enterprise: 0 };
+  const mix = { small: 0, mid: 0, enterprise: 0, giant: 0 };
   for (const h of state.acquisitions?.owned ?? []) {
     const def = catalog.find((c) => c.id === h.id);
     if (!def) continue;
@@ -178,6 +178,7 @@ export function portfolioSynergyMult(state) {
 
 function integrationMonthsForSegment(segment, isRival) {
   if (isRival) return 3;
+  if (segment === 'giant') return 4;
   if (segment === 'enterprise') return 2;
   if (segment === 'mid') return 1;
   return 0;
@@ -213,7 +214,10 @@ export function targetAskPrice(state, company) {
 
 export function fairValueEstimate(state, company) {
   const annual = Math.max(1, company.baseMrr * 12);
-  const multiple = company.segment === 'enterprise' ? 14 : company.segment === 'mid' ? 9 : 5.5;
+  let multiple = 5.5;
+  if (company.segment === 'giant') multiple = 20;
+  else if (company.segment === 'enterprise') multiple = 14;
+  else if (company.segment === 'mid') multiple = 9;
   const synergy = categorySynergyMult(state, company);
   return Math.round(annual * multiple * synergy);
 }

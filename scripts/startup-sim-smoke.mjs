@@ -108,11 +108,20 @@ const publicMegawhales = getTaskDefinitions().filter(
 if (!getTaskDefinitions().some((t) => t.id === 'megawhale-federal-cloud-continuity-mandate')) {
   console.error('FAIL: handcrafted public megawhale desk pack not merged');
   failed = true;
-} else if (publicMegawhales.length < 18) {
-  console.error(`FAIL: expected 18+ public megawhale desk tasks, got ${publicMegawhales.length}`);
+} else if (publicMegawhales.length < 36) {
+  console.error(`FAIL: expected 36+ public megawhale desk tasks, got ${publicMegawhales.length}`);
   failed = true;
-} else if (!failed) {
-  console.log(`OK: public megawhale desk tasks (${publicMegawhales.length} multi-billion)`);
+} else if (!getTaskDefinitions().some((t) => t.id === 'megawhale-ai-doe-exascale-ops')) {
+  console.error('FAIL: AI public megawhale gov pack not merged');
+  failed = true;
+} else {
+  const aiGovMegas = publicMegawhales.filter((t) => t.id.startsWith('megawhale-ai-'));
+  if (aiGovMegas.length < 18) {
+    console.error(`FAIL: expected 18+ AI gov megawhale desk tasks, got ${aiGovMegas.length}`);
+    failed = true;
+  } else if (!failed) {
+    console.log(`OK: public megawhale desk tasks (${publicMegawhales.length} multi-billion, ${aiGovMegas.length} AI gov)`);
+  }
 }
 
 const genericPool = getTaskDefinitions().filter((t) => !t.categories?.length && !t.launchPhase);
@@ -1138,8 +1147,8 @@ const { portfolioPulseSummary } = await import(`file://${join(sim, 'modules/Comp
 await preloadAcquisitionCatalog();
 const acqCatalog = getAcquisitionCatalog();
 const acqCatalogSize = acqCatalog.length;
-if (acqCatalogSize !== 165) {
-  console.error(`FAIL: expected 165 acquisition targets, got ${acqCatalogSize}`);
+if (acqCatalogSize !== 185) {
+  console.error(`FAIL: expected 185 acquisition targets, got ${acqCatalogSize}`);
   failed = true;
 } else {
   console.log(`OK: acquisition catalog has ${acqCatalogSize} handcrafted companies`);
@@ -1159,6 +1168,21 @@ if (maxEntAcqMrr < 5_000_000) {
   failed = true;
 } else {
   console.log(`OK: enterprise acquisition MRR scales to ${formatMoney(maxEntAcqMrr)}/mo`);
+}
+const giants = acqCatalog.filter((c) => c.segment === 'giant');
+if (giants.length < 18) {
+  console.error(`FAIL: expected 18+ giant (mega-cap) acquisition targets, got ${giants.length}`);
+  failed = true;
+} else {
+  const minGiantAsk = Math.min(...giants.map((c) => c.basePrice));
+  if (minGiantAsk < 35_000_000_000) {
+    console.error(`FAIL: giant catalog basePrice should reflect ~$40B+ EV scale, min was ${minGiantAsk}`);
+    failed = true;
+  } else {
+    console.log(
+      `OK: ${giants.length} giant targets (mega-cap asks from ~${formatMoney(minGiantAsk)})`
+    );
+  }
 }
 const acqState = createInitialState({
   companyName: 'HoldCo',

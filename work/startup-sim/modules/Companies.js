@@ -39,6 +39,7 @@ export { setCompaniesSection, portfolioPulseSummary };
 const catalog = () => getAcquisitionCatalog();
 
 function segmentLabel(segment) {
+  if (segment === 'giant') return 'Giant';
   if (segment === 'enterprise') return 'Enterprise';
   if (segment === 'mid') return 'Mid-market';
   return 'Small';
@@ -73,15 +74,16 @@ function markDriftChip(holding) {
 }
 
 function renderPortfolioMixBar(mix) {
-  const total = (mix.small ?? 0) + (mix.mid ?? 0) + (mix.enterprise ?? 0);
+  const total = (mix.small ?? 0) + (mix.mid ?? 0) + (mix.enterprise ?? 0) + (mix.giant ?? 0);
   if (total <= 0) return '';
   const pct = (n) => Math.max(4, Math.round((n / total) * 100));
   return `<div class="companies-mix-bar" role="img" aria-label="MRR mix by segment">
     <span class="companies-mix-seg companies-mix-seg--small" style="width:${pct(mix.small)}%" title="Small ${formatMoney(mix.small)}/mo"></span>
     <span class="companies-mix-seg companies-mix-seg--mid" style="width:${pct(mix.mid)}%" title="Mid ${formatMoney(mix.mid)}/mo"></span>
     <span class="companies-mix-seg companies-mix-seg--ent" style="width:${pct(mix.enterprise)}%" title="Enterprise ${formatMoney(mix.enterprise)}/mo"></span>
+    <span class="companies-mix-seg companies-mix-seg--giant" style="width:${pct(mix.giant)}%" title="Giant ${formatMoney(mix.giant)}/mo"></span>
   </div>
-  <p class="fine-print companies-mix-legend">Small ${formatMoney(mix.small)} · Mid ${formatMoney(mix.mid)} · Enterprise ${formatMoney(mix.enterprise)}</p>`;
+  <p class="fine-print companies-mix-legend">Small ${formatMoney(mix.small)} · Mid ${formatMoney(mix.mid)} · Enterprise ${formatMoney(mix.enterprise)} · Giant ${formatMoney(mix.giant)}</p>`;
 }
 
 function renderHoldingCard(state, h) {
@@ -240,6 +242,7 @@ function renderMarketSection(state) {
       ${filterBtn('small', 'Small')}
       ${filterBtn('mid', 'Mid')}
       ${filterBtn('enterprise', 'Enterprise')}
+      ${filterBtn('giant', 'Giants')}
       ${filterBtn('rival', 'Rival')}
     </nav>
     <div class="companies-toolbar">

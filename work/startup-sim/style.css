@@ -1154,6 +1154,10 @@ h1 {
   background: #34d399;
 }
 
+.companies-mix-seg--giant {
+  background: #fbbf24;
+}
+
 .companies-mix-legend {
   margin: 0 0 0.5rem;
 }
