@@ -6,13 +6,18 @@ import { calendarTurn } from './GameCalendar.js';
 import { escapeHtml, panelStatCard, panelMetricGrid } from './PanelChrome.js';
 import bundledWlb from '../data/ceo-wlb-tasks.json' with { type: 'json' };
 
-const WLB_OFFERS_PER_MONTH = 3;
+const WLB_OFFERS_PER_MONTH = 4;
 const WLB_MAX_COMPLETE_PER_MONTH = 1;
 const HAPPINESS_MIN = 0;
 const HAPPINESS_MAX = 100;
 const DEFAULT_HAPPINESS = 62;
 const MONTHLY_DRIFT_NO_WLB = 2;
-const RECENT_WLB_IDS_CAP = 12;
+const RECENT_WLB_IDS_CAP = 16;
+const WLB_LOG_CAP = 20;
+const LOW_HAPPINESS_RECOVERY_THRESHOLD = 45;
+const RECOVERY_BONUS_HAPPINESS = 2;
+const STREAK_BONUS_THRESHOLD = 3;
+const STREAK_BONUS_HAPPINESS = 1;
 
 const HAPPINESS_TIERS = [
   { min: 90, label: 'Thriving', tone: 'pos' },
@@ -60,6 +65,8 @@ function ensureCeoHappiness(state) {
   if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];
   if (!state.ceo.wlbLog) state.ceo.wlbLog = [];
   if (state.ceo.wlbCompletedThisMonth == null) state.ceo.wlbCompletedThisMonth = 0;
+  if (state.ceo.wlbLifetimeCompleted == null) state.ceo.wlbLifetimeCompleted = 0;
+  if (state.ceo.wlbStreakMonths == null) state.ceo.wlbStreakMonths = 0;
   return state.ceo;
 }
 
@@ -117,7 +124,36 @@ function pushWlbLog(state, entry) {
     month: state.calendar?.monthIndex,
     year: state.calendar?.year
   });
-  if (ceo.wlbLog.length > 14) ceo.wlbLog.length = 14;
+  if (ceo.wlbLog.length > WLB_LOG_CAP) ceo.wlbLog.length = WLB_LOG_CAP;
+}
+
+/** Prefer one offer per tag, then fill remaining slots at random. */
+function pickDiverseWlbOffers(pool, count) {
+  if (pool.length <= count) return shuffle(pool);
+  const ordered = shuffle(pool);
+  const picked = [];
+  const usedTags = new Set();
+  for (const task of ordered) {
+    if (picked.length >= count) break;
+    const tag = task.tag ?? 'Balance';
+    if (usedTags.has(tag)) continue;
+    usedTags.add(tag);
+    picked.push(task);
+  }
+  if (picked.length < count) {
+    const pickedIds = new Set(picked.map((t) => t.id));
+    for (const task of ordered) {
+      if (picked.length >= count) break;
+      if (!pickedIds.has(task.id)) picked.push(task);
+    }
+  }
+  return picked.slice(0, count);
+}
+
+function wlbIntensityLabel(intensity) {
+  if (intensity === 'deep') return 'Deep reset';
+  if (intensity === 'light') return 'Light touch';
+  return 'Standard';
 }
 
 /** Fresh WLB picks at month start (CEO tab — not desk lineup). */
@@ -134,7 +170,7 @@ export function dealCeoWlbOffers(state) {
   }
   const fresh = pool.filter((t) => !recent.has(t.id));
   const pickFrom = fresh.length >= WLB_OFFERS_PER_MONTH ? fresh : pool;
-  const picked = shuffle(pickFrom).slice(0, WLB_OFFERS_PER_MONTH);
+  const picked = pickDiverseWlbOffers(pickFrom, WLB_OFFERS_PER_MONTH);
   ceo.wlbOffers = picked.map((t) => ({ taskId: t.id, completed: false }));
 }
 
@@ -166,7 +202,18 @@ export function completeCeoWlbTask(state, taskId) {
     const paid = payFromPersonalBank(state, cost, task.title, 'wlb');
     if (paid <= 0) return { ok: false, reason: 'Personal bank is empty.' };
   }
-  const gain = rollHappinessGain(task);
+  const ceo = ensureCeoHappiness(state);
+  const scoreBefore = personalHappinessScore(state);
+  let gain = rollHappinessGain(task);
+  const bonusLines = [];
+  if (scoreBefore < LOW_HAPPINESS_RECOVERY_THRESHOLD || task.recovery) {
+    gain += RECOVERY_BONUS_HAPPINESS;
+    bonusLines.push(`recovery +${RECOVERY_BONUS_HAPPINESS}`);
+  }
+  if ((ceo.wlbStreakMonths ?? 0) >= STREAK_BONUS_THRESHOLD) {
+    gain += STREAK_BONUS_HAPPINESS;
+    bonusLines.push(`streak +${STREAK_BONUS_HAPPINESS}`);
+  }
   const applied = applyPersonalHappinessDelta(state, gain, task.title);
   const score = personalHappinessScore(state);
   const trade = task.tradeoff ?? {};
@@ -182,27 +229,30 @@ export function completeCeoWlbTask(state, taskId) {
     tradeLines.push(`Sentiment ${trade.sentiment > 0 ? '+' : ''}${trade.sentiment}.`);
   }
 
-  const ceo = ensureCeoHappiness(state);
   const offer = ceo.wlbOffers.find((o) => o.taskId === taskId);
   if (offer) offer.completed = true;
   ceo.wlbCompletedThisMonth = (ceo.wlbCompletedThisMonth ?? 0) + 1;
+  ceo.wlbLifetimeCompleted = (ceo.wlbLifetimeCompleted ?? 0) + 1;
   ceo.wlbRecentIds = [taskId, ...(ceo.wlbRecentIds ?? [])].slice(0, RECENT_WLB_IDS_CAP);
   pushWlbLog(state, {
     taskId: task.id,
     title: task.title,
     happinessGain: applied,
     personalCost: cost,
-    scoreAfter: score
+    scoreAfter: score,
+    tag: task.tag,
+    intensity: task.intensity
   });
 
   const label = personalHappinessLabel(score);
+  const bonusNote = bonusLines.length ? ` (${bonusLines.join(', ')})` : '';
   return {
     ok: true,
     gain: applied,
     score,
     label,
     tradeLines,
-    summary: `Balance: “${task.title}” — personal happiness +${applied} (${score} · ${label}).${tradeLines.length ? ` ${tradeLines.join(' ')}` : ''}`
+    summary: `Balance: “${task.title}” — personal happiness +${applied}${bonusNote} (${score} · ${label}).${tradeLines.length ? ` ${tradeLines.join(' ')}` : ''}`
   };
 }
 
@@ -211,7 +261,16 @@ export function tickPersonalHappinessAtMonthEnd(state) {
   const ceo = ensureCeoHappiness(state);
   if (!ceo) return [];
   const lines = [];
-  if ((ceo.wlbCompletedThisMonth ?? 0) < 1) {
+  if ((ceo.wlbCompletedThisMonth ?? 0) >= 1) {
+    ceo.wlbStreakMonths = (ceo.wlbStreakMonths ?? 0) + 1;
+    if (ceo.wlbStreakMonths >= STREAK_BONUS_THRESHOLD) {
+      lines.push(`Balance streak: ${ceo.wlbStreakMonths} months — +${STREAK_BONUS_HAPPINESS} happiness on your next task.`);
+    }
+  } else {
+    if ((ceo.wlbStreakMonths ?? 0) > 0) {
+      lines.push(`Balance streak ended at ${ceo.wlbStreakMonths} month(s).`);
+    }
+    ceo.wlbStreakMonths = 0;
     const lost = applyPersonalHappinessDelta(state, -MONTHLY_DRIFT_NO_WLB, 'Month without balance');
     if (lost < 0) {
       lines.push(`No balance task this month — personal happiness ${lost} (${personalHappinessScore(state)} · ${personalHappinessLabel(personalHappinessScore(state))}).`);
@@ -245,6 +304,8 @@ export function renderCeoBalanceSection(state, { disabled = '' } = {}) {
   const offers = ceo?.wlbOffers ?? [];
   const completedMo = ceo?.wlbCompletedThisMonth ?? 0;
   const slotsLeft = Math.max(0, WLB_MAX_COMPLETE_PER_MONTH - completedMo);
+  const streak = ceo?.wlbStreakMonths ?? 0;
+  const lifetime = ceo?.wlbLifetimeCompleted ?? 0;
 
   const offerCards = offers.length
     ? offers
@@ -254,14 +315,22 @@ export function renderCeoBalanceSection(state, { disabled = '' } = {}) {
           const cost = Math.max(0, task.personalCost ?? 0);
           const costLine = cost > 0 ? ` · ${formatMoney(cost)} personal` : '';
           const gainLine = `+${task.happiness?.[0] ?? 3}–${task.happiness?.[1] ?? 6} happiness`;
+          const intensity = task.intensity ?? 'standard';
+          const intensityLine = intensity !== 'standard' ? ` · ${wlbIntensityLabel(intensity)}` : '';
+          const recoveryHint =
+            score < LOW_HAPPINESS_RECOVERY_THRESHOLD || task.recovery
+              ? ` · +${RECOVERY_BONUS_HAPPINESS} recovery bonus`
+              : '';
+          const streakHint =
+            streak >= STREAK_BONUS_THRESHOLD ? ` · +${STREAK_BONUS_HAPPINESS} streak bonus` : '';
           const done = o.completed;
           const btnDisabled =
             disabled || done || slotsLeft <= 0 ? ' disabled' : '';
           return `<article class="finance-card ceo-wlb-card${done ? ' ceo-wlb-card--done' : ''}">
-            <p class="ceo-wlb-tag">${escapeHtml(task.tag ?? 'Balance')}</p>
+            <p class="ceo-wlb-tag">${escapeHtml(task.tag ?? 'Balance')}${intensity !== 'standard' ? ` · <span class="ceo-wlb-intensity ceo-wlb-intensity--${escapeHtml(intensity)}">${escapeHtml(wlbIntensityLabel(intensity))}</span>` : ''}</p>
             <p><strong>${escapeHtml(task.title)}</strong></p>
             <p class="fine-print">${escapeHtml(task.description)}</p>
-            <p class="fine-print">${escapeHtml(gainLine)}${escapeHtml(costLine)}${task.tradeoff ? ' · tradeoffs apply' : ''}</p>
+            <p class="fine-print">${escapeHtml(gainLine)}${escapeHtml(costLine)}${escapeHtml(intensityLine)}${escapeHtml(recoveryHint)}${escapeHtml(streakHint)}${task.tradeoff ? ' · tradeoffs apply' : ''}</p>
             ${
               done
                 ? '<p class="fine-print"><em>Done this month</em></p>'
@@ -285,14 +354,21 @@ export function renderCeoBalanceSection(state, { disabled = '' } = {}) {
   return `
     <section class="finance-section finance-card" aria-label="Personal happiness">
       <h3 class="finance-section-title">Personal happiness</h3>
-      <p class="fine-print">Separate from company sentiment — how sustainable your founder life feels. Pick up to <strong>${WLB_MAX_COMPLETE_PER_MONTH}</strong> balance task per month from the rotating pool below.</p>
+      <p class="fine-print">Separate from company sentiment — how sustainable your founder life feels. Each month you get <strong>${WLB_OFFERS_PER_MONTH}</strong> options (mixed tags) and may complete <strong>${WLB_MAX_COMPLETE_PER_MONTH}</strong>. Below ${LOW_HAPPINESS_RECOVERY_THRESHOLD} happiness, tasks grant a recovery bonus; a ${STREAK_BONUS_THRESHOLD}-month streak adds +${STREAK_BONUS_HAPPINESS} on completion.</p>
       ${renderHappinessMeter(score)}
-      ${panelMetricGrid('3', [
+      ${panelMetricGrid('4', [
         panelStatCard('Happiness', `${score}/100`, { hero: true, tone }),
         panelStatCard('Status', label, { tone }),
-        panelStatCard('This month', slotsLeft > 0 ? `${slotsLeft} task left` : 'Done', {
+        panelStatCard('Streak', streak > 0 ? `${streak} mo` : '—', {
+          tone: streak >= STREAK_BONUS_THRESHOLD ? 'pos' : null
+        }),
+        panelStatCard('Lifetime', `${lifetime} tasks`, { tone: lifetime > 0 ? 'pos' : null })
+      ])}
+      ${panelMetricGrid('2', [
+        panelStatCard('This month', slotsLeft > 0 ? `${slotsLeft} slot left` : 'Done', {
           tone: slotsLeft > 0 ? null : 'pos'
-        })
+        }),
+        panelStatCard('Skip cost', `−${MONTHLY_DRIFT_NO_WLB}/mo`, { tone: 'neg' })
       ])}
     </section>
     <section class="finance-section" aria-label="Work-life balance tasks">

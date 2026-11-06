@@ -3002,11 +3002,12 @@ if (!signConf.ok) {
     dealCeoWlbOffers,
     completeCeoWlbTask,
     personalHappinessScore,
-    getCeoWlbCatalogCount
+    getCeoWlbCatalogCount,
+    getCeoWlbTaskById
   } = await import(`file://${join(sim, 'modules/CeoHappiness.js')}`);
   await preloadCeoWlbCatalog();
-  if (getCeoWlbCatalogCount() < 28) {
-    console.error('FAIL: CEO WLB task catalog (expected 28+ handcrafted tasks)');
+  if (getCeoWlbCatalogCount() < 48) {
+    console.error('FAIL: CEO WLB task catalog (expected 48+ handcrafted tasks)');
     failed = true;
   } else {
     const wlbState = createInitialState({
@@ -3017,6 +3018,19 @@ if (!signConf.ok) {
     wlbState.ceo.bankBalance = 50_000;
     const before = personalHappinessScore(wlbState);
     dealCeoWlbOffers(wlbState);
+    const offers = wlbState.ceo.wlbOffers ?? [];
+    if (offers.length !== 4) {
+      console.error(`FAIL: CEO WLB monthly offers (expected 4, got ${offers.length})`);
+      failed = true;
+    } else {
+      const tags = new Set(
+        offers.map((o) => getCeoWlbTaskById(o.taskId)?.tag ?? 'Balance')
+      );
+      if (tags.size < 3) {
+        console.error('FAIL: CEO WLB offers should span diverse tags');
+        failed = true;
+      }
+    }
     const offerId = wlbState.ceo.wlbOffers?.[0]?.taskId;
     if (!offerId) {
       console.error('FAIL: CEO WLB monthly offers');
@@ -3026,8 +3040,21 @@ if (!signConf.ok) {
       if (!done.ok || personalHappinessScore(wlbState) <= before) {
         console.error(`FAIL: CEO WLB task completion: ${done.reason ?? 'happiness'}`);
         failed = true;
+      } else if ((wlbState.ceo.wlbLifetimeCompleted ?? 0) !== 1) {
+        console.error('FAIL: CEO WLB lifetime completion counter');
+        failed = true;
       } else {
-        console.log('OK: CEO personal happiness & work-life balance tasks');
+        wlbState.ceo.wlbStreakMonths = 3;
+        dealCeoWlbOffers(wlbState);
+        const streakOffer = wlbState.ceo.wlbOffers?.find((o) => !o.completed)?.taskId;
+        if (streakOffer) {
+          const streakDone = completeCeoWlbTask(wlbState, streakOffer);
+          if (!streakDone.ok || !String(streakDone.summary ?? '').includes('streak')) {
+            console.error('FAIL: CEO WLB streak bonus on completion');
+            failed = true;
+          }
+        }
+        if (!failed) console.log('OK: CEO personal happiness & work-life balance tasks');
       }
     }
   }

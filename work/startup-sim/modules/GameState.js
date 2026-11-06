@@ -237,6 +237,8 @@ export function normalizeSave(raw) {
       if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];
       if (!state.ceo.wlbLog) state.ceo.wlbLog = [];
       if (state.ceo.wlbCompletedThisMonth == null) state.ceo.wlbCompletedThisMonth = 0;
+      if (state.ceo.wlbLifetimeCompleted == null) state.ceo.wlbLifetimeCompleted = 0;
+      if (state.ceo.wlbStreakMonths == null) state.ceo.wlbStreakMonths = 0;
       if (!state.ceo.netWorthHistory) state.ceo.netWorthHistory = [];
       if (state.ceo.investmentBalance == null) state.ceo.investmentBalance = 0;
       if (state.ceo.careerInvestmentReturns == null) state.ceo.careerInvestmentReturns = 0;
@@ -462,6 +464,8 @@ export function normalizeSave(raw) {
       if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];
       if (!state.ceo.wlbLog) state.ceo.wlbLog = [];
       if (state.ceo.wlbCompletedThisMonth == null) state.ceo.wlbCompletedThisMonth = 0;
+      if (state.ceo.wlbLifetimeCompleted == null) state.ceo.wlbLifetimeCompleted = 0;
+      if (state.ceo.wlbStreakMonths == null) state.ceo.wlbStreakMonths = 0;
     }
     ensureCeoPersonalBank(state);
     preparePersonalExpensesForMonth(state);

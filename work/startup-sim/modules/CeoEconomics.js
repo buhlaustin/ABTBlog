@@ -96,7 +96,9 @@ export function createInitialCeoState() {
     wlbOffers: [],
     wlbRecentIds: [],
     wlbLog: [],
-    wlbCompletedThisMonth: 0
+    wlbCompletedThisMonth: 0,
+    wlbLifetimeCompleted: 0,
+    wlbStreakMonths: 0
   };
 }
 

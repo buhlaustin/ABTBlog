@@ -269,7 +269,243 @@
       "stages": ["garage", "office", "xc", "post_xc", "public"],
       "happiness": [8, 13],
       "personalCost": 0,
-      "tag": "Rest"
+      "tag": "Rest",
+      "intensity": "deep"
+    },
+    {
+      "id": "wlb-digital-detox-weekend",
+      "title": "Digital detox weekend",
+      "description": "Laptop in a drawer, phone on grayscale, and zero founder Twitter.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [7, 12],
+      "personalCost": 0,
+      "tag": "Rest",
+      "intensity": "deep"
+    },
+    {
+      "id": "wlb-parents-unplugged-visit",
+      "title": "Parents visit — no work laptop",
+      "description": "They raised you before term sheets existed. Be present for it.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [6, 10],
+      "personalCost": 250,
+      "tag": "Family",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-morning-pages-journal",
+      "title": "Morning pages for two weeks",
+      "description": "Three pages longhand before you open Slack. Complaint dump included.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [4, 8],
+      "personalCost": 12,
+      "tag": "Mindfulness",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-sleep-coach-block",
+      "title": "Sleep coach consult + plan",
+      "description": "Oura guilt trips become actionable — bedtime you actually hit.",
+      "stages": ["office", "xc", "post_xc", "public"],
+      "happiness": [5, 9],
+      "personalCost": 320,
+      "tag": "Health",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-local-running-club",
+      "title": "Join a local running club",
+      "description": "Six a.m. strangers who don't ask your ARR. Show up three times.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [4, 8],
+      "personalCost": 45,
+      "tag": "Health",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-fiction-audiobook-commute",
+      "title": "Fiction-only audiobook commute",
+      "description": "No founder memoirs, no market podcasts — just a plot.",
+      "stages": ["office", "xc", "post_xc", "public"],
+      "happiness": [3, 6],
+      "personalCost": 25,
+      "tag": "Recharge",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-decline-podcast-tour",
+      "title": "Decline a podcast tour week",
+      "description": "Your hot take can wait. Inbox autoresponder: 'in heads-down mode.'",
+      "stages": ["post_xc", "public"],
+      "happiness": [4, 7],
+      "personalCost": 0,
+      "tag": "Boundaries",
+      "intensity": "standard",
+      "tradeoff": { "buzz": -2 }
+    },
+    {
+      "id": "wlb-kids-breakfast-week",
+      "title": "Kids breakfast every day this week",
+      "description": "Cereal, questions about dinosaurs, leave before the first standup.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [5, 9],
+      "personalCost": 0,
+      "tag": "Family",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-couples-counseling-session",
+      "title": "Couples counseling session",
+      "description": "Fix the thing you keep arguing about after midnight fundraise calls.",
+      "stages": ["xc", "post_xc", "public"],
+      "happiness": [7, 11],
+      "personalCost": 280,
+      "tag": "Family",
+      "intensity": "deep"
+    },
+    {
+      "id": "wlb-music-lessons-month",
+      "title": "Four music lessons this month",
+      "description": "Piano, guitar, or voice — progress measured in joy, not KPIs.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [5, 9],
+      "personalCost": 220,
+      "tag": "Recharge",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-national-park-camping",
+      "title": "National park camping trip",
+      "description": "No cell service on purpose. Bears don't care about your pipeline.",
+      "stages": ["post_xc", "public"],
+      "happiness": [9, 14],
+      "personalCost": 650,
+      "tag": "Recharge",
+      "intensity": "deep"
+    },
+    {
+      "id": "wlb-nonfiction-book-club",
+      "title": "Join a non-business book club",
+      "description": "Actual novels. Wine. Nobody mentions cap tables.",
+      "stages": ["office", "xc", "post_xc", "public"],
+      "happiness": [4, 7],
+      "personalCost": 55,
+      "tag": "Community",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-social-media-logoff-week",
+      "title": "Log off social for a week",
+      "description": "Delete the apps. Tell PR you'll be unreachable on the timeline.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [5, 10],
+      "personalCost": 0,
+      "tag": "Boundaries",
+      "intensity": "standard",
+      "tradeoff": { "buzz": -1 }
+    },
+    {
+      "id": "wlb-float-tank-series",
+      "title": "Three float tank sessions",
+      "description": "Sensory deprivation beats another late-night spreadsheet.",
+      "stages": ["post_xc", "public"],
+      "happiness": [6, 10],
+      "personalCost": 210,
+      "tag": "Mindfulness",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-walking-1-1-board-member",
+      "title": "Walking 1:1 with a board member",
+      "description": "Park loop instead of steak dinner. Same governance, fewer calories.",
+      "stages": ["post_xc", "public"],
+      "happiness": [4, 7],
+      "personalCost": 0,
+      "tag": "Boundaries",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-stock-app-blackout",
+      "title": "Hide the stock app for two weeks",
+      "description": "Let IR watch the tape. You watch your kid's soccer game.",
+      "stages": ["public"],
+      "happiness": [5, 9],
+      "personalCost": 0,
+      "tag": "Mindfulness",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-sabbatical-planning-day",
+      "title": "Sabbatical planning day (personal)",
+      "description": "Map six weeks off — even if it's three years out. Hope counts.",
+      "stages": ["post_xc", "public"],
+      "happiness": [4, 8],
+      "personalCost": 0,
+      "tag": "Mindfulness",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-ceo-peer-retreat",
+      "title": "CEO peer retreat (no shop talk)",
+      "description": "Small group, Chatham House rules, zero pitch decks allowed.",
+      "stages": ["post_xc", "public"],
+      "happiness": [6, 11],
+      "personalCost": 1800,
+      "tag": "Community",
+      "intensity": "deep"
+    },
+    {
+      "id": "wlb-late-start-two-weeks",
+      "title": "10am starts for two weeks",
+      "description": "Team knows you're offline until standup. Sleep debt recovery mode.",
+      "stages": ["office", "xc", "post_xc", "public"],
+      "happiness": [5, 8],
+      "personalCost": 0,
+      "tag": "Rest",
+      "intensity": "standard",
+      "tradeoff": { "sentiment": -1 }
+    },
+    {
+      "id": "wlb-volunteer-youth-mentor",
+      "title": "Youth mentor session series",
+      "description": "Four Saturdays with students who want careers, not your cap table story.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [5, 9],
+      "personalCost": 0,
+      "tag": "Community",
+      "intensity": "standard",
+      "tradeoff": { "sentiment": 1 }
+    },
+    {
+      "id": "wlb-alma-mater-walk-no-donation",
+      "title": "Walk campus — no donation ask",
+      "description": "Visit your alma mater for nostalgia, not a giving officer meeting.",
+      "stages": ["post_xc", "public"],
+      "happiness": [4, 7],
+      "personalCost": 40,
+      "tag": "Recharge",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-home-cooking-lessons",
+      "title": "Home cooking class with partner",
+      "description": "A instructor in your kitchen — phones in another room.",
+      "stages": ["post_xc", "public"],
+      "happiness": [5, 8],
+      "personalCost": 175,
+      "tag": "Family",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-grief-or-stress-leave-day",
+      "title": "Take a real mental health day",
+      "description": "Company calendar shows OOO. You actually rest, not 'catch up email'.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [6, 11],
+      "personalCost": 0,
+      "tag": "Health",
+      "intensity": "deep",
+      "recovery": true
     }
   ]
 }

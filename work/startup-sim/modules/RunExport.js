@@ -26,6 +26,11 @@ export function buildRunExportText(state) {
 
   const happiness = personalHappinessScore(state);
   lines.push(`Personal happiness: ${happiness}/100 — ${personalHappinessLabel(happiness)}`);
+  const wlbDone = state.ceo?.wlbLifetimeCompleted ?? 0;
+  const wlbStreak = state.ceo?.wlbStreakMonths ?? 0;
+  if (wlbDone > 0 || wlbStreak > 0) {
+    lines.push(`Work-life balance: ${wlbDone} task(s) completed · ${wlbStreak}-month streak`);
+  }
 
   if (isConferenceConfigured(state)) {
     const conf = ensureStartupConference(state);
