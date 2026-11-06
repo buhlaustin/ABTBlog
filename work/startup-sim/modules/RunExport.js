@@ -37,7 +37,7 @@ export function buildRunExportText(state) {
   if (sponsorMrr > 0) {
     const book = sponsorshipBookSummary(state);
     lines.push(
-      `Sponsor contracts: +${formatMoney(sponsorMrr)}/mo guaranteed MRR (${book.activeCount} active; ${formatMoney(book.remainingMrrMonths)} MRR still on book)`
+      `Sponsor contracts: ~${formatMoney(sponsorMrr)}/mo grant pace (${book.activeCount} active; ${formatMoney(book.remainingMrrMonths)} revenue left on book)`
     );
   }
 
