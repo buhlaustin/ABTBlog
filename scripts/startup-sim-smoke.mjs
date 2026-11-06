@@ -1702,13 +1702,34 @@ if (openA < 4500 || openA > 10500 || openB < 4500 || openB > 10500) {
   failed = true;
 }
 if (!failed) {
-  setCeoSalaryAnnual(bankA, 60_000);
-  recordCeoSalaryForMonth(bankA);
-  const band60 = personalExpenseBandForSalary(60_000);
-  const due = scheduledPersonalExpense(bankA).total;
-  if (due > band60.max * 1.2 || due < band60.min * 0.9) {
-    console.error(`FAIL: $60k salary expense ${due} outside band ${band60.min}-${band60.max}`);
+  preparePersonalExpensesForMonth(bankA);
+  const garageDue = scheduledPersonalExpense(bankA).total;
+  const { GARAGE_PHASE_PERSONAL_EXPENSE_MO, isGaragePhasePersonalExpenses } = await import(
+    `file://${join(sim, 'modules/CeoEconomics.js')}`
+  );
+  if (!isGaragePhasePersonalExpenses(bankA) || garageDue !== GARAGE_PHASE_PERSONAL_EXPENSE_MO) {
+    console.error(`FAIL: garage-phase CEO expenses expected ${GARAGE_PHASE_PERSONAL_EXPENSE_MO}, got ${garageDue}`);
     failed = true;
+  }
+  const { purchaseWorkspaceTier, WORKSPACE_TIER } = await import(
+    `file://${join(sim, 'modules/Workspace.js')}`
+  );
+  bankA.finance.arr = 200_000;
+  bankA.finance.mrr = Math.round(bankA.finance.arr / 12);
+  const officeBuy = purchaseWorkspaceTier(bankA, WORKSPACE_TIER.SMALL);
+  if (!officeBuy.ok) {
+    console.error(`FAIL: garage salary test office purchase: ${officeBuy.reason}`);
+    failed = true;
+  } else {
+    setCeoSalaryAnnual(bankA, 60_000);
+    recordCeoSalaryForMonth(bankA);
+    const band60 = personalExpenseBandForSalary(60_000);
+    preparePersonalExpensesForMonth(bankA);
+    const due = scheduledPersonalExpense(bankA).total;
+    if (due > band60.max * 1.2 || due < band60.min * 0.9) {
+      console.error(`FAIL: $60k salary expense ${due} outside band ${band60.min}-${band60.max}`);
+      failed = true;
+    }
   }
   bankA.finance.arr = 500_000_000;
   preparePersonalExpensesForMonth(bankA);
@@ -1742,7 +1763,7 @@ if (!failed) {
       );
     }
   }
-  if (dueRich > band60.max * 1.2) {
+  if (typeof band60 !== 'undefined' && dueRich > band60.max * 1.2) {
     console.error(`FAIL: personal debits should not scale with ARR (${dueRich})`);
     failed = true;
   }

@@ -292,7 +292,11 @@ function renderCeoOverviewSection(ctx) {
         <h3 class="finance-section-title">Personal debits</h3>
         <span class="fine-print">Auto · not editable</span>
       </div>
-      <p class="fine-print">${escapeHtml(expenseBand.label)} · ${formatMoney(annual)}/yr salary → ${formatMoney(expenseBand.min)}–${formatMoney(expenseBand.max)}/mo band</p>
+      <p class="fine-print">${escapeHtml(expenseBand.label)} · ${
+        expenseBand.min === expenseBand.max
+          ? `${formatMoney(expenseBand.min)}/mo fixed`
+          : `${formatMoney(annual)}/yr salary → ${formatMoney(expenseBand.min)}–${formatMoney(expenseBand.max)}/mo band`
+      }</p>
       ${panelMetricGrid('4', [
         panelStatCard('This month', formatMoney(scheduled.total)),
         panelStatCard('Typical / mo', formatMoney(typicalBurn)),

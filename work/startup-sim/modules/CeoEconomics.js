@@ -20,6 +20,27 @@ import { formatCalendarStamp, twelveMonthCooldownStatus } from './GameCalendar.j
 
 export const CEO_ARR_BONUS_PCTS = [2, 5, 10, 20];
 
+/** Personal burn while still working from the garage — dorm / parents, until first office lease. */
+export const GARAGE_PHASE_PERSONAL_EXPENSE_MO = 350;
+
+const GARAGE_PHASE_EXPENSE_BREAKDOWN = [
+  { label: 'Food & household', amount: 165 },
+  { label: 'Transport', amount: 85 },
+  { label: 'Phone & subscriptions', amount: 55 },
+  { label: 'Discretionary', amount: 45 }
+];
+
+export function isGaragePhasePersonalExpenses(state) {
+  const w = state.workspace ?? {};
+  return (
+    !w.smallOfficeOwned &&
+    !w.mediumOfficeOwned &&
+    !w.largeOfficeOwned &&
+    !w.campusOwned &&
+    !w.hubOwned
+  );
+}
+
 const EXPENSE_DEBIT_CATEGORIES = [
   'Housing',
   'Food & household',
@@ -76,6 +97,8 @@ function ceoState(state) {
   if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];
   if (!state.ceo.salaryChangeLog) state.ceo.salaryChangeLog = [];
   if (!state.ceo.bankLog) state.ceo.bankLog = [];
+  if (!state.ceo.lifestyleOwned) state.ceo.lifestyleOwned = [];
+  if (state.ceo.lifestyleDebitBump == null) state.ceo.lifestyleDebitBump = 0;
   return state.ceo;
 }
 
@@ -166,6 +189,13 @@ export function personalExpenseBandForSalary(annualSalary) {
 }
 
 export function personalExpenseBand(state) {
+  if (isGaragePhasePersonalExpenses(state)) {
+    return {
+      min: GARAGE_PHASE_PERSONAL_EXPENSE_MO,
+      max: GARAGE_PHASE_PERSONAL_EXPENSE_MO,
+      label: 'At home / dorm — fixed lean burn until you lease an office'
+    };
+  }
   return personalExpenseBandForSalary(ceoState(state).salaryAnnual ?? 0);
 }
 
@@ -193,6 +223,9 @@ function buildPersonalExpenseBreakdown(state, total) {
 
 /** Deterministic for this calendar month + salary — still varies month to month. */
 export function rollPersonalExpenseTotal(state) {
+  if (isGaragePhasePersonalExpenses(state)) {
+    return GARAGE_PHASE_PERSONAL_EXPENSE_MO;
+  }
   const band = personalExpenseBand(state);
   const u = personalExpenseRollUnit(state, 0);
   let total = Math.round(band.min + u * (band.max - band.min));
@@ -208,6 +241,18 @@ export function rollPersonalExpenseTotal(state) {
 export function preparePersonalExpensesForMonth(state) {
   const ceo = ceoState(state);
   const turn = calendarTurn(state);
+  if (isGaragePhasePersonalExpenses(state)) {
+    ceo.personalExpenseScheduled = {
+      turn,
+      total: GARAGE_PHASE_PERSONAL_EXPENSE_MO,
+      breakdown: GARAGE_PHASE_EXPENSE_BREAKDOWN.map((p) => ({ ...p })),
+      salaryAnnual: ceo.salaryAnnual ?? 0,
+      month: state.calendar?.monthIndex,
+      year: state.calendar?.year,
+      garagePhase: true
+    };
+    return ceo.personalExpenseScheduled;
+  }
   const totalRaw = rollPersonalExpenseTotal(state);
   const breakdownRaw = buildPersonalExpenseBreakdown(state, totalRaw);
   const { breakdown, total } = applyHousingToPersonalExpenses(state, breakdownRaw, totalRaw);

@@ -209,6 +209,9 @@ export function purchaseWorkspaceTier(state, tier) {
   if (tier !== WORKSPACE_TIER.GARAGE && tier !== WORKSPACE_TIER.HUB) {
     state.stage = STAGES.OFFICE;
   }
+  if (tier === WORKSPACE_TIER.SMALL && state.ceo) {
+    state.ceo.personalExpenseScheduled = null;
+  }
   return { ok: true, tier };
 }
 
@@ -219,6 +222,7 @@ export function restorePostXcWorkspace(state) {
   state.workspace.smallOfficeOwned = true;
   applyWorkspaceBurn(state);
   state.stage = STAGES.OFFICE;
+  if (state.ceo) state.ceo.personalExpenseScheduled = null;
 }
 
 export function workspaceLabel(tier) {
