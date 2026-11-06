@@ -66,6 +66,9 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
 } else if (!getTaskDefinitions().some((t) => t.id === 'public-esg-metrics-audit-defense')) {
   console.error('FAIL: public late handcrafted pack not merged');
   failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'public-ipo-first-earnings-dry-run')) {
+  console.error('FAIL: public post-IPO handcrafted pack not merged');
+  failed = true;
 } else if (!getTaskDefinitions().some((t) => t.id === 'mid-soc2-type2-evidence-sprint')) {
   console.error('FAIL: mid-game handcrafted pack not merged');
   failed = true;

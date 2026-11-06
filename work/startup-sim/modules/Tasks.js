@@ -20,6 +20,7 @@ import bundledPublicLate from '../data/tasks-public-late-game.json' with { type:
 import bundledPublicLateExtra from '../data/tasks-public-late-game-extra.json' with { type: 'json' };
 import bundledPublicWhaleHandcrafted from '../data/tasks-public-whale-handcrafted.json' with { type: 'json' };
 import bundledPublicLateHandcrafted from '../data/tasks-public-late-handcrafted-pack.json' with { type: 'json' };
+import bundledPublicPostIpoHandcrafted from '../data/tasks-public-post-ipo-handcrafted-pack.json' with { type: 'json' };
 import bundledMidGameHandcrafted from '../data/tasks-mid-game-handcrafted-pack.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
@@ -140,12 +141,15 @@ function mergePublicLateGameTasks(base) {
   return mergeTaskPack(
     mergeTaskPack(
       mergeTaskPack(
-        mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
-        bundledPublicLateExtra?.tasks ?? []
+        mergeTaskPack(
+          mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
+          bundledPublicLateExtra?.tasks ?? []
+        ),
+        bundledPublicWhaleHandcrafted?.tasks ?? []
       ),
-      bundledPublicWhaleHandcrafted?.tasks ?? []
+      bundledPublicLateHandcrafted?.tasks ?? []
     ),
-    bundledPublicLateHandcrafted?.tasks ?? []
+    bundledPublicPostIpoHandcrafted?.tasks ?? []
   );
 }
 
