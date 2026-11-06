@@ -14,6 +14,7 @@ import {
   buildCompLedger,
   cashOutPreview,
   maxOwnerDrawAmount,
+  ownerDrawsUnlocked,
   CEO_ARR_BONUS_PCTS,
   estimateCeoArrBonus,
   ceoArrBonusUiState,
@@ -256,8 +257,10 @@ function renderCeoOverviewSection(ctx) {
     opening != null
       ? `Opened ${formatMoney(opening)} · typical spend ${formatMoney(typicalBurn)}/mo`
       : `Typical spend ${formatMoney(typicalBurn)}/mo from salary band`;
+  const drawsOpen = ownerDrawsUnlocked(state);
+  const compTabLabel = drawsOpen ? 'Comp &amp; draws' : 'Comp &amp; pay';
   const bankAlert = bankLow
-    ? `<p class="finance-alert finance-alert--tax" role="status"><strong>Low personal runway</strong> — ${escapeHtml(personalRunway.label)} at ~${formatMoney(typicalBurn)}/mo spend. Raise salary or draw from the company on <strong>Comp &amp; draws</strong>.</p>`
+    ? `<p class="finance-alert finance-alert--tax" role="status"><strong>Low personal runway</strong> — ${escapeHtml(personalRunway.label)} at ~${formatMoney(typicalBurn)}/mo spend. Raise CEO salary on <strong>${compTabLabel}</strong>${drawsOpen ? ' or take an owner draw' : ''}.</p>`
     : '';
   const personalTaxAlert =
     ctx.personalTax?.filingRequired && !ctx.personalTax?.taxPaid
@@ -318,9 +321,11 @@ function renderCeoOverviewSection(ctx) {
       ${panelMetricStack(
         panelMetricGroup(
           'Cash compensation (career)',
-          panelMetricGrid('4', [
+          panelMetricGrid(drawsOpen || comp.draws > 0 ? '4' : '3', [
             panelStatCard('Career salary', formatMoney(comp.salary)),
-            panelStatCard('Owner draws', formatMoney(comp.draws)),
+            ...(drawsOpen || comp.draws > 0
+              ? [panelStatCard('Owner draws', formatMoney(comp.draws))]
+              : []),
             panelStatCard('Bonuses', formatMoney(comp.bonuses)),
             panelStatCard('Stock sales', formatMoney(comp.stockSales)),
             panelStatCard('Cash comp', formatMoney(ceoPersonalCashComp(state)))
@@ -497,6 +502,7 @@ function renderCeoWealthSection(ctx) {
 
 function renderCeoCompSection(ctx) {
   const { band, boardNote, annual, disabled, maxDraw, ledger, state } = ctx;
+  const drawsOpen = ownerDrawsUnlocked(state);
   const arrBonus = ceoArrBonusUiState(state);
   const arrBonusBtns = CEO_ARR_BONUS_PCTS.map((pct) => {
     const est = estimateCeoArrBonus(state, pct);
@@ -550,8 +556,11 @@ function renderCeoCompSection(ctx) {
         </div>
         ${salaryChanges ? `<details class="ceo-salary-history"><summary>Salary history</summary><ul class="instrument-list">${salaryChanges}</ul></details>` : ''}
       </div>
-      <div class="finance-action finance-card">
+      ${
+        drawsOpen
+          ? `<div class="finance-action finance-card">
         <p><strong>Owner draws</strong> — company cash → personal bank (max ${formatMoney(maxDraw)} today)</p>
+        <p class="fine-print">Bootstrap only — owner draws lock when seed closes; use salary and ARR bonuses afterward.</p>
         <div class="finance-charity-chips">
           <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-owner-draw="5000" ${disabled}>${formatMoney(5_000)}</button>
           <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-owner-draw="10000" ${disabled}>${formatMoney(10_000)}</button>
@@ -570,7 +579,9 @@ function renderCeoCompSection(ctx) {
           <input id="ceo-draw-input" type="number" min="500" step="500" placeholder="Custom amount" ${disabled}>
           <button type="button" class="btn btn-ghost btn-small" id="btn-ceo-draw-custom" ${disabled}>Draw</button>
         </div>
-      </div>
+      </div>`
+          : ''
+      }
       <div class="finance-action finance-card">
         <p><strong>CEO ARR bonus</strong> — % of prior fiscal-year revenue (company cash → personal bank)</p>
         <p class="fine-print">${escapeHtml(arrBonusNote)}</p>
@@ -738,6 +749,11 @@ export function renderCeoPanel(container, state) {
   if (!container) return;
   if (!state.ceo) return;
   const ctx = buildCeoPanelContext(state);
+  const drawsOpen = ownerDrawsUnlocked(state);
+  const compTabLabel = drawsOpen ? 'Comp & draws' : 'Comp & pay';
+  const panelLede = drawsOpen
+    ? 'Personal bank, salary band debits, owner draws, and equity. Company cash lives on Finance.'
+    : 'Personal bank, salary band debits, and equity. Company cash lives on Finance.';
   const tab = (id, label) =>
     `<button type="button" class="${ctx.section === id ? 'active' : ''}" data-ceo-tab="${id}">${label}</button>`;
 
@@ -751,12 +767,12 @@ export function renderCeoPanel(container, state) {
             ? `<p class="fine-print ceo-alma-line">Alma mater: ${escapeHtml(resolveCompanyAlmaMater(state).label)}</p>`
             : ''
         }
-        <p class="panel-lede">Personal bank, salary band debits, draws, and equity. Company cash lives on Finance.</p>
+        <p class="panel-lede">${panelLede}</p>
       </header>
       <nav class="people-subtabs ceo-subtabs" aria-label="CEO sections">
         ${tab('overview', 'Overview')}
         ${tab('wealth', 'Wealth & exit')}
-        ${tab('comp', 'Comp & draws')}
+        ${tab('comp', compTabLabel)}
         ${tab('lifestyle', 'Homes & splurges')}
         ${tab('alumni', 'Alma mater')}
       </nav>

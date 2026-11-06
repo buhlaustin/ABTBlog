@@ -1524,6 +1524,8 @@ if (!rbf.ok) {
 const {
   setCeoSalaryAnnual,
   takeOwnerDraw,
+  ownerDrawsUnlocked,
+  canTakeOwnerDraw,
   ceoSalaryMonthly,
   recordCeoSalaryForMonth,
   wealthMix,
@@ -1587,10 +1589,27 @@ if (!sal.ok) {
 }
 if (!failed) {
   ceoState.finance.cash = 50_000;
-  const od = takeOwnerDraw(ceoState, 5_000);
-  if (!od.ok || ceoState.ceo.careerOwnerDraws !== 5_000) {
-    console.error('FAIL: owner draw');
+  if (!ownerDrawsUnlocked(ceoState)) {
+    console.error('FAIL: owner draws should unlock before seed');
     failed = true;
+  } else {
+    const od = takeOwnerDraw(ceoState, 5_000);
+    if (!od.ok || ceoState.ceo.careerOwnerDraws !== 5_000) {
+      console.error('FAIL: owner draw');
+      failed = true;
+    }
+  }
+}
+if (!failed) {
+  const postSeed = createInitialState({ companyName: 'CEO Pay Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+  postSeed.flags.seedRoundClosed = true;
+  postSeed.finance.cash = 100_000;
+  const blocked = canTakeOwnerDraw(postSeed, 5_000);
+  if (blocked.ok || ownerDrawsUnlocked(postSeed)) {
+    console.error('FAIL: owner draw should block after seed close');
+    failed = true;
+  } else {
+    console.log('OK: owner draws pre-seed only (hidden after seed close)');
   }
 }
 if (!failed) {

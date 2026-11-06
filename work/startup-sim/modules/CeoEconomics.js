@@ -550,14 +550,24 @@ export function settlePersonalExpensesAtMonthEnd(state) {
   }
   const typical = typicalPersonalExpenseMonthly(state);
   if ((ceo.bankBalance ?? 0) <= 0 && paid > 0) {
-    lines.push('Personal bank at $0 — raise salary or take an owner draw before next month.');
+    lines.push(
+      state.flags?.seedRoundClosed
+        ? 'Personal bank at $0 — raise CEO salary before next month (owner draws end after seed close).'
+        : 'Personal bank at $0 — raise salary or take an owner draw before next month.'
+    );
   } else if ((ceo.bankBalance ?? 0) < typical * 0.5) {
     lines.push('Personal cash is tight versus your typical salary band.');
   }
   return lines;
 }
 
+/** Owner draws are pre-seed only; career totals still accrue for draws taken before seed close. */
+export function ownerDrawsUnlocked(state) {
+  return !state.flags?.seedRoundClosed;
+}
+
 export function maxOwnerDrawAmount(state) {
+  if (!ownerDrawsUnlocked(state)) return 0;
   return Math.max(0, Math.floor(state.finance?.cash ?? 0));
 }
 
@@ -612,6 +622,12 @@ export function recordCeoNetWorthSnapshot(state) {
 
 export function canTakeOwnerDraw(state, amount) {
   if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
+  if (!ownerDrawsUnlocked(state)) {
+    return {
+      ok: false,
+      reason: 'Owner draws end when seed closes — use CEO salary and bonuses instead.'
+    };
+  }
   const draw = Math.round(Number(amount) || 0);
   if (draw < 500) return { ok: false, reason: 'Minimum owner draw is $500.' };
   const cash = state.finance?.cash ?? 0;

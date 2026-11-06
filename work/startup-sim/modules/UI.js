@@ -11,7 +11,7 @@ import { renderFinancePanel } from './Fundraising.js';
 import { renderCompaniesPanel } from './Companies.js';
 import { renderPeoplePanel } from './EmployeeBenefits.js';
 import { renderCeoPanel } from './Ceo.js';
-import { ceoPersonalCashComp } from './CeoEconomics.js';
+import { ceoPersonalCashComp, ownerDrawsUnlocked } from './CeoEconomics.js';
 import { ceoPersonalWealthEndgame } from './FacilitiesEconomics.js';
 import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
 import {
@@ -871,7 +871,9 @@ export function renderGameOver(state) {
             panelMetricGrid('3', [
               panelStatCard('Stock cash-out', formatMoney(e.payout), { hero: true }),
               panelStatCard('CEO salary (career)', formatMoney(e.ceoSalaryCareer ?? 0)),
-              panelStatCard('Owner draws', formatMoney(e.ceoOwnerDraws ?? 0)),
+              ...(e.ceoOwnerDraws > 0
+                ? [panelStatCard('Owner draws (pre-seed)', formatMoney(e.ceoOwnerDraws ?? 0))]
+                : []),
               panelStatCard('Personal bank', formatMoney(e.ceoBankBalance ?? 0)),
               panelStatCard('Personal portfolio', formatMoney(e.ceoPortfolioBalance ?? 0)),
               ...(e.ceoHomeMarketValue > 0
@@ -907,7 +909,7 @@ export function renderGameOver(state) {
         }
         <p>${escapeHtml(state.flags.gameOverReason || 'Your run ended.')}</p>
         <p>Lifetime revenue: <strong>${formatMoney(state.finance.lifetimeRevenue)}</strong></p>
-        <p>CEO cash comp this run: <strong>${formatMoney(ceoPersonalCashComp(state))}</strong> (salary + owner draws)</p>
+        <p>CEO cash comp this run: <strong>${formatMoney(ceoPersonalCashComp(state))}</strong>${ownerDrawsUnlocked(state) || (state.ceo?.careerOwnerDraws ?? 0) > 0 ? ' (includes salary and any pre-seed owner draws)' : ' (salary, bonuses, and stock sales)'}</p>
         ${(() => {
           const w = ceoPersonalWealthEndgame(state);
           const bits = [];
