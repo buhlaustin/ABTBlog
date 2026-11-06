@@ -3,6 +3,8 @@ import { formatStateMonth } from './GameCalendar.js';
 import { totalHeadcount } from './Staff.js';
 import { projectMonthlyBurn, founderEquityPct, initialInvestmentCash, founderValuationStake } from './Finance.js';
 import { getWorkspaceTier } from './Workspace.js';
+import { isConferenceConfigured, ensureStartupConference } from './StartupConference.js';
+import { propertyHoldingsSummary, getPropertyProgram } from './FinanceProperty.js';
 const WORKSPACE_PRESS_LABEL = {
   garage: 'a home garage',
   small: 'a small leased office',
@@ -65,6 +67,16 @@ export function buildNarrativeContext(state) {
     ticker: state.publicMarket?.ticker ?? null,
     sharePrice: state.publicMarket?.sharePrice ?? null,
     competitorName: state.world?.competitor?.name ?? null,
+    competitorProduct: state.world?.competitor?.product ?? null,
+    launchPhase: state.launch?.phase ?? null,
+    waitlistSignups: state.launch?.waitlistSignups ?? 0,
+    startupConferenceName: isConferenceConfigured(state) ? ensureStartupConference(state).name : null,
+    propertyFootnote: (() => {
+      const prog = getPropertyProgram(state);
+      const sum = propertyHoldingsSummary(state);
+      if (!prog || sum.totalUnits <= 0) return null;
+      return `${sum.totalUnits} ${prog.unitPlural ?? 'units'} (${prog.tabTitle})`;
+    })(),
     recentLayoffEvents: (state.news?.layoffQueue ?? [])
       .filter((e) => !e.consumed)
       .map((e) => ({
@@ -83,7 +95,8 @@ export function buildNarrativeContext(state) {
       'Never mention sandbox, career mode, game levels, ARR gates, desk tasks, save files, or UI tabs.',
       'Do not invent layoffs unless recentLayoffEvents is non-empty this month.',
       'Use parody company names only (Macrohard, Financier Times, Chirp).',
-      'Headcount numbers must match context; do not exaggerate staff cuts on tiny teams.'
+      'Headcount numbers must match context; do not exaggerate staff cuts on tiny teams.',
+      'Each month must use different headline shapes and story angles — avoid generic "books revenue month" ledes.'
     ]
   };
 }

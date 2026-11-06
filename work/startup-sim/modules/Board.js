@@ -1,4 +1,7 @@
 import bundledBoard from '../data/board-tasks.json' with { type: 'json' };
+import bundledMeetingBoard from '../data/board-meeting-tasks.json' with { type: 'json' };
+import bundledSeatCandidates from '../data/board-seat-candidates.json' with { type: 'json' };
+import { applyPersonalHappinessDelta } from './CeoHappiness.js';
 import { formatMoney } from './constants.js';
 import { recordCashOutflow, companyRunwayDisplay } from './Finance.js';
 import { getArr } from './Workspace.js';
@@ -24,6 +27,9 @@ import {
 } from './PanelChrome.js';
 
 let boardCatalog = bundledBoard;
+let boardMeetingCatalog = bundledMeetingBoard;
+
+const BOARD_SECTIONS = new Set(['governance', 'meeting']);
 
 const LEAD_INVESTOR_NAMES = [
   'Redwood Horizon Partners',
@@ -73,6 +79,27 @@ const MONTHLY_MANDATES = [
     detail: 'Complete “Pre-earnings board preview” for an extra +3 approval.',
     taskId: 'board-earnings-preview',
     bonusSentiment: 3
+  },
+  {
+    id: 'mandate-ai-safety',
+    title: 'Governance wants AI safety packet',
+    detail: 'Complete “AI product safety review packet” for an extra +2 approval.',
+    taskId: 'board-ai-product-review',
+    bonusSentiment: 2
+  },
+  {
+    id: 'mandate-churn',
+    title: 'Lead asked for churn saves',
+    detail: 'Complete “Enterprise churn intervention plan” for an extra +2 approval.',
+    taskId: 'board-churn-intervention',
+    bonusSentiment: 2
+  },
+  {
+    id: 'mandate-option-pool',
+    title: 'Comp wants option pool math',
+    detail: 'Complete “Option pool refresh memo” for an extra +2 approval.',
+    taskId: 'board-option-pool-refresh',
+    bonusSentiment: 2
   }
 ];
 
@@ -86,12 +113,119 @@ export function createInitialBoard() {
     sentimentHistory: [],
     monthlyMandate: null,
     mandateBonusClaimed: false,
-    meetingsHeld: 0
+    meetingsHeld: 0,
+    seatsAddedByPlayer: 0,
+    seatSearchSpendLifetime: 0,
+    meetingTasks: [],
+    meetingsCompletedThisMonth: 0,
+    recentMeetingTaskIds: [],
+    boardSection: 'governance'
+  };
+}
+
+export function setBoardSection(state, section) {
+  if (!state.board) state.board = createInitialBoard();
+  state.board.boardSection = BOARD_SECTIONS.has(section) ? section : 'governance';
+}
+
+function activeBoardSection(state) {
+  const s = state.board?.boardSection ?? 'governance';
+  return BOARD_SECTIONS.has(s) ? s : 'governance';
+}
+
+const BOARD_SEAT_CANDIDATES = bundledSeatCandidates?.candidates ?? [];
+
+export function getBoardSeatCandidates() {
+  return BOARD_SEAT_CANDIDATES;
+}
+
+/** Max directors on the board at the current company stage. */
+export function boardSeatCapacity(state) {
+  const tier = progressionTier(state);
+  if (tier >= 7) return 11;
+  if (tier >= 5) return 9;
+  if (tier >= 4) return 8;
+  return 7;
+}
+
+export function boardSeatSearchFee(state, candidate) {
+  const base = candidate?.searchFee ?? 75_000;
+  const tier = progressionTier(state);
+  const mult = tier >= 7 ? 2.15 : tier >= 5 ? 1.45 : tier >= 4 ? 1.15 : 1;
+  return Math.round(base * mult);
+}
+
+export function availableBoardSeatCandidates(state) {
+  if (!hasInstitutionalBoard(state)) return [];
+  ensureBoardRoster(state);
+  const seated = new Set((state.board?.members ?? []).map((m) => m.id));
+  return BOARD_SEAT_CANDIDATES.filter((c) => !seated.has(c.id));
+}
+
+/** Add an independent director from the search pool (company cash, one-time fee). */
+export function addBoardSeat(state, candidateId) {
+  if (!hasInstitutionalBoard(state)) {
+    return { ok: false, reason: 'Seat a board first — close Series A or go public.' };
+  }
+  ensureBoardRoster(state);
+  const cap = boardSeatCapacity(state);
+  const members = state.board.members ?? [];
+  if (members.length >= cap) {
+    return {
+      ok: false,
+      reason: `Board is at ${cap} seats for your stage — expand again after the next funding tier or IPO scale.`
+    };
+  }
+  const candidate = BOARD_SEAT_CANDIDATES.find((c) => c.id === candidateId);
+  if (!candidate) return { ok: false, reason: 'Pick a director from the search list.' };
+  if (members.some((m) => m.id === candidate.id)) {
+    return { ok: false, reason: `${candidate.name} is already on the board.` };
+  }
+  const fee = boardSeatSearchFee(state, candidate);
+  if ((state.finance?.cash ?? 0) < fee) {
+    return { ok: false, reason: `Need ${formatMoney(fee)} company cash for search & onboarding.` };
+  }
+
+  state.finance.cash -= fee;
+  recordCashOutflow(state, fee, 'board');
+  state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + fee;
+
+  const boost = candidate.approvalBoost ?? 1;
+  if (boost) onBoardSentiment(state, boost);
+
+  const entry = {
+    id: candidate.id,
+    name: candidate.name,
+    role: 'Independent',
+    seat: candidate.seat,
+    since: `Added ${state.calendar?.monthIndex ?? 1}/${state.calendar?.year ?? 2026}`,
+    votes: 'Independent',
+    committee: candidate.committee ?? 'governance',
+    playerAdded: true
+  };
+  members.push(entry);
+  state.board.seatsAddedByPlayer = (state.board.seatsAddedByPlayer ?? 0) + 1;
+  state.board.seatSearchSpendLifetime = (state.board.seatSearchSpendLifetime ?? 0) + fee;
+
+  return {
+    ok: true,
+    member: entry,
+    fee,
+    approvalBoost: boost,
+    summary: `Seated ${candidate.name} (${formatMoney(fee)} search fee, approval +${boost}).`
   };
 }
 
 export function getBoardTaskDefs() {
   return boardCatalog?.tasks ?? [];
+}
+
+export function getBoardMeetingTaskDefs() {
+  return boardMeetingCatalog?.tasks ?? [];
+}
+
+export function getBoardMeetingTaskDef(taskId) {
+  return getBoardMeetingTaskDefs().find((t) => t.id === taskId);
 }
 
 function shuffle(arr) {
@@ -103,7 +237,8 @@ function shuffle(arr) {
   return a;
 }
 
-const BOARD_TASK_COOLDOWN = 4;
+const BOARD_TASK_COOLDOWN = 5;
+const BOARD_MEETING_COOLDOWN = 5;
 
 function boardTaskAllowed(def, state) {
   const tier = progressionTier(state);
@@ -175,6 +310,41 @@ function pickMonthlyMandate(state, taskIds) {
   return { ...pick };
 }
 
+export function dealBoardMeetingTasks(state) {
+  if (!state.board) state.board = createInitialBoard();
+  if (!hasInstitutionalBoard(state)) {
+    state.board.meetingTasks = [];
+    state.board.meetingsCompletedThisMonth = 0;
+    return;
+  }
+  ensureBoardRoster(state);
+
+  let pool = getBoardMeetingTaskDefs().filter((t) => boardTaskAllowed(t, state));
+  if (!pool.length) pool = getBoardMeetingTaskDefs();
+  const recent = new Set((state.board.recentMeetingTaskIds ?? []).slice(-BOARD_MEETING_COOLDOWN * 3));
+  const fresh = pool.filter((t) => !recent.has(t.id));
+  const source = fresh.length >= 2 ? fresh : pool;
+  const tier = progressionTier(state);
+  const slotCount = tier >= 7 ? 4 : tier >= 5 ? 3 : 2;
+  const picked = [];
+  const formal = source.find((t) => t.id === 'meet-monthly-formal');
+  if (formal) picked.push(formal);
+  for (const def of shuffle(source.filter((t) => !picked.some((p) => p.id === t.id)))) {
+    if (picked.length >= slotCount) break;
+    picked.push(def);
+  }
+  state.board.recentMeetingTaskIds = [
+    ...(state.board.recentMeetingTaskIds ?? []),
+    ...picked.map((p) => p.id)
+  ].slice(-BOARD_MEETING_COOLDOWN * 3);
+  state.board.meetingTasks = picked.map((def, index) => ({
+    instanceId: `board-meet-${state.calendar.year}-${state.calendar.monthIndex}-${def.id}-${index}`,
+    taskId: def.id,
+    status: 'pending'
+  }));
+  state.board.meetingsCompletedThisMonth = 0;
+}
+
 export function dealBoardTasks(state) {
   if (!state.board) state.board = createInitialBoard();
   if (!hasInstitutionalBoard(state)) {
@@ -182,6 +352,7 @@ export function dealBoardTasks(state) {
     state.board.completedThisMonth = 0;
     state.board.monthlyMandate = null;
     state.board.mandateBonusClaimed = false;
+    dealBoardMeetingTasks(state);
     return;
   }
   ensureBoardRoster(state);
@@ -191,7 +362,8 @@ export function dealBoardTasks(state) {
   const recent = new Set((state.board.recentTaskIds ?? []).slice(-BOARD_TASK_COOLDOWN * 3));
   const fresh = pool.filter((t) => !recent.has(t.id));
   const source = fresh.length >= 3 ? fresh : pool;
-  const slotCount = progressionTier(state) >= 5 ? 4 : 3;
+  const tier = progressionTier(state);
+  const slotCount = tier >= 7 ? 5 : tier >= 5 ? 4 : 3;
   const picked = shuffle(source).slice(0, slotCount);
   state.board.recentTaskIds = [...(state.board.recentTaskIds ?? []), ...picked.map((p) => p.id)].slice(
     -BOARD_TASK_COOLDOWN * 3
@@ -207,6 +379,7 @@ export function dealBoardTasks(state) {
     state,
     picked.map((p) => p.id)
   );
+  dealBoardMeetingTasks(state);
 }
 
 export function getBoardTaskDef(taskId) {
@@ -217,7 +390,14 @@ export function getBoardTaskDef(taskId) {
 export function migrateBoardForPublicSave(state) {
   if (!hasInstitutionalBoard(state)) return;
   if (!state.board) state.board = createInitialBoard();
-  if (state.flags?.ipoFiled && !state.flags?.seriesAClosed && state.sentiment?.lastReason == null) {
+  const members = state.board.members ?? [];
+  const hasLead = members.some((m) => m.id === 'lead-series-a' || m.id === 'lead-public-chair');
+  if (
+    state.flags?.ipoFiled &&
+    !state.flags?.seriesAClosed &&
+    !hasLead &&
+    state.sentiment?.lastReason == null
+  ) {
     seatInstitutionalBoard(
       state,
       'Public listing seated an independent board and approval tracking.'
@@ -255,6 +435,9 @@ export function boardGovernanceSnapshot(state) {
   const tasks = state.board?.monthTasks ?? [];
   const pending = tasks.filter((t) => t.status === 'pending').length;
   const done = tasks.filter((t) => t.status === 'done').length;
+  const meetTasks = state.board?.meetingTasks ?? [];
+  const meetDone = meetTasks.filter((t) => t.status === 'done').length;
+  const meetPending = meetTasks.filter((t) => t.status === 'pending').length;
   const runway = companyRunwayDisplay(state);
   return {
     approval: state.sentiment?.score ?? 68,
@@ -265,6 +448,9 @@ export function boardGovernanceSnapshot(state) {
     tasksDone: done,
     tasksTotal: tasks.length,
     tasksPending: pending,
+    meetingsDone: meetDone,
+    meetingsTotal: meetTasks.length,
+    meetingsPending: meetPending,
     mandate: state.board?.monthlyMandate,
     mandateClaimed: state.board?.mandateBonusClaimed,
     arr: getArr(state),
@@ -330,6 +516,59 @@ export function completeBoardTask(state, instanceId) {
   };
 }
 
+export function completeBoardMeetingTask(state, instanceId) {
+  const inst = state.board?.meetingTasks?.find((t) => t.instanceId === instanceId);
+  if (!inst || inst.status !== 'pending') return { ok: false, reason: 'Meeting not on this month’s agenda.' };
+  const def = getBoardMeetingTaskDef(inst.taskId);
+  if (!def) return { ok: false, reason: 'Unknown board meeting.' };
+
+  const cost = def.cost ?? 0;
+  if ((state.finance?.cash ?? 0) < cost) {
+    return { ok: false, reason: `Need ${formatMoney(cost)} company cash to run this session.` };
+  }
+
+  const sentimentBefore = state.sentiment?.score ?? 68;
+  state.finance.cash -= cost;
+  if (cost > 0) recordCashOutflow(state, cost, 'board');
+  state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
+
+  let sentimentDelta = def.sentiment ?? 0;
+  if (sentimentDelta) onBoardSentiment(state, sentimentDelta);
+
+  const wlbCost = def.wlbCost ?? 0;
+  let happinessDelta = 0;
+  if (wlbCost) {
+    happinessDelta = applyPersonalHappinessDelta(state, -wlbCost, `Board meeting: ${def.title}`);
+  }
+
+  const buzzDelta = def.buzz ?? 0;
+  if (buzzDelta) state.product.buzz = (state.product.buzz ?? 0) + buzzDelta;
+
+  let stockPct = null;
+  if (def.stockPct && isPublicCompany(state)) {
+    stockPct = Number(def.stockPct);
+    applyStockPctMove(state, stockPct);
+  }
+
+  inst.status = 'done';
+  state.board.meetingsCompletedThisMonth = (state.board.meetingsCompletedThisMonth ?? 0) + 1;
+  state.board.meetingsHeld = (state.board.meetingsHeld ?? 0) + 1;
+
+  return {
+    ok: true,
+    def,
+    isMeeting: true,
+    sentimentDelta,
+    mandateBonus: 0,
+    sentimentBefore,
+    sentimentAfter: state.sentiment?.score ?? sentimentBefore,
+    buzzDelta,
+    stockPct,
+    happinessDelta,
+    wlbCost
+  };
+}
+
 function committeeLabel(committee) {
   const map = {
     audit: 'Audit',
@@ -381,10 +620,38 @@ export function renderBoardPanel(container, state) {
     })
   );
 
+  const seatCap = boardSeatCapacity(state);
+  const seatCandidates = availableBoardSeatCandidates(state);
+  const defaultCandidate = seatCandidates[0];
+  const candidateOptions = seatCandidates
+    .map((c) => {
+      const fee = boardSeatSearchFee(state, c);
+      return `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)} — ${escapeHtml(c.seat)} (${formatMoney(fee)}, +${c.approvalBoost ?? 1} approval)</option>`;
+    })
+    .join('');
+  const expandBlock =
+    seatCandidates.length && members.length < seatCap
+      ? `<section class="finance-section finance-card board-expand-section">
+      <h3 class="finance-section-title">Add a board seat</h3>
+      <p class="fine-print">${members.length}/${seatCap} seats filled. Run a director search (company cash) to add an independent — investors like a real committee bench.</p>
+      <div class="board-seat-add satellite-add">
+        <select id="board-seat-candidate" aria-label="Director candidate">${candidateOptions}</select>
+        <button type="button" class="btn btn-primary btn-small" id="btn-add-board-seat">Add director</button>
+      </div>
+      ${
+        defaultCandidate
+          ? `<p class="fine-print" id="board-seat-candidate-blurb">${escapeHtml(defaultCandidate.blurb)}</p>`
+          : ''
+      }
+    </section>`
+      : members.length >= seatCap
+        ? `<p class="fine-print">Board at ${seatCap}-seat cap for this stage. More seats unlock with hub HQ / public scale.</p>`
+        : '';
+
   const rosterRows = members
     .map(
       (m) =>
-        `<tr><td>${escapeHtml(m.name)}</td><td>${escapeHtml(m.seat)}</td><td class="fine-print">${escapeHtml(m.since ?? '—')}</td></tr>`
+        `<tr><td>${escapeHtml(m.name)}${m.playerAdded ? ' <span class="board-committee-tag">Added</span>' : ''}</td><td>${escapeHtml(m.seat)}</td><td class="fine-print">${escapeHtml(m.since ?? '—')}</td></tr>`
     )
     .join('');
 
@@ -398,6 +665,14 @@ export function renderBoardPanel(container, state) {
       : snap.mandate && snap.mandateClaimed
         ? `<p class="fine-print positive">Lead director ask fulfilled this month (+ bonus approval).</p>`
         : '';
+
+  const section = activeBoardSection(state);
+  const subnav = (id, label) =>
+    `<button type="button" class="${section === id ? 'active' : ''}" data-board-subtab="${id}">${label}</button>`;
+  const subnavBlock = `<nav class="finance-subtabs people-subtabs board-inner-subtabs" aria-label="Board sections">
+    ${subnav('governance', 'Governance & prep')}
+    ${subnav('meeting', 'Board meeting')}
+  </nav>`;
 
   const cards = tasks
     .map((inst) => {
@@ -426,6 +701,34 @@ export function renderBoardPanel(container, state) {
     })
     .join('');
 
+  const meetingTasks = state.board?.meetingTasks ?? [];
+  const meetingCards = meetingTasks
+    .map((inst) => {
+      const def = getBoardMeetingTaskDef(inst.taskId);
+      if (!def) return '';
+      const done = inst.status === 'done';
+      const btn = done
+        ? '<span class="task-done-label">Held</span>'
+        : `<button type="button" class="btn btn-primary btn-small" data-complete-board-meeting="${escapeHtml(inst.instanceId)}">Hold meeting</button>`;
+      const approvalHint =
+        def.sentiment != null && def.sentiment !== 0 ? ` · approval +${def.sentiment}` : '';
+      const stockHint =
+        def.stockPct && isPublicCompany(state)
+          ? ` · stock ${def.stockPct > 0 ? '+' : ''}${Math.round(Number(def.stockPct) * 100)}%`
+          : '';
+      const wlbHint = def.wlbCost ? ` · personal happiness −${def.wlbCost}` : '';
+      const committee = def.committee
+        ? `<span class="board-committee-tag">${escapeHtml(committeeLabel(def.committee))}</span>`
+        : '';
+      return `<article class="task-card board-meeting-card ${done ? 'done' : ''}">
+        <h3>${escapeHtml(def.title)} ${committee}</h3>
+        <p>${escapeHtml(def.description)}</p>
+        <p class="task-meta">Cost ~${formatMoney(def.cost)}${approvalHint}${def.buzz ? ` · buzz +${def.buzz}` : ''}${stockHint}${wlbHint}</p>
+        ${btn}
+      </article>`;
+    })
+    .join('');
+
   const historyList = history.length
     ? `<ul class="board-history-list">${history
         .map(
@@ -435,11 +738,52 @@ export function renderBoardPanel(container, state) {
         .join('')}</ul>`
     : '<p class="fine-print">Approval history fills in as the board reacts to your month.</p>';
 
+  const governanceBody =
+    section === 'governance'
+      ? `${mandateBlock}
+      <section class="finance-section">
+        <h3 class="finance-section-title">Board roster</h3>
+        <div class="table-scroll finance-cap-scroll">
+          <table class="data-table board-roster-table">
+            <thead><tr><th>Director</th><th>Seat</th><th>Since</th></tr></thead>
+            <tbody>${rosterRows}</tbody>
+          </table>
+        </div>
+        <p class="fine-print">Committees: Audit, Comp, Governance — tags on tasks show who cares.</p>
+      </section>
+      ${expandBlock}
+      <section class="finance-section">
+        <h3 class="finance-section-title">This month’s board prep</h3>
+        <p class="fine-print">Async packets and committee prep — not live meetings (see <strong>Board meeting</strong> tab).</p>
+        <div class="task-list">${cards || '<div class="tab-placeholder">New board tasks appear each month.</div>'}</div>
+      </section>
+      <details class="finance-details board-history-details"><summary>Approval history</summary>${historyList}</details>`
+      : '';
+
+  const meetingBody =
+    section === 'meeting'
+      ? `<section class="finance-section finance-card">
+        <h3 class="finance-section-title">This month’s live agenda</h3>
+        <p class="fine-print">${members.length} directors seated · ${snap.meetingsDone}/${snap.meetingsTotal} meetings held. Live sessions cost CEO time (happiness) but move approval faster than prep alone. Skip every meeting in a month → −2 approval at month close.</p>
+        <div class="task-list">${meetingCards || '<div class="tab-placeholder">Board meetings appear each month after Series A.</div>'}</div>
+      </section>
+      <section class="finance-section">
+        <h3 class="finance-section-title">Who’s in the room</h3>
+        <div class="table-scroll finance-cap-scroll">
+          <table class="data-table board-roster-table">
+            <thead><tr><th>Director</th><th>Seat</th><th>Since</th></tr></thead>
+            <tbody>${rosterRows}</tbody>
+          </table>
+        </div>
+      </section>`
+      : '';
+
   container.innerHTML = `
     <div class="board-panel finance-panel">
       <div class="finance-hero">
-        <p class="panel-lede">Board governance — optional prep each month (not desk slots). Mood: <strong>${escapeHtml(snap.label)}</strong>.</p>
+        <p class="panel-lede">Board governance — prep packets and live meetings each month (not desk slots). Mood: <strong>${escapeHtml(snap.label)}</strong>.</p>
       </div>
+      ${subnavBlock}
       <div class="board-dashboard capital-stack" role="region" aria-label="Board approval">
         <div class="board-dashboard-head">
           <p class="prelaunch-progress-title"><strong>Board approval</strong></p>
@@ -453,8 +797,8 @@ export function renderBoardPanel(container, state) {
             'This month’s prep',
             panelMetricGrid('3', [
               panelStatCard('Prep done', `${snap.tasksDone}/${snap.tasksTotal}`, { hero: true }),
-              panelStatCard('Streak', `${snap.streak} mo`),
-              panelStatCard('Meetings (career)', String(state.board?.meetingsHeld ?? 0))
+              panelStatCard('Meetings', `${snap.meetingsDone}/${snap.meetingsTotal}`, { hero: section === 'meeting' }),
+              panelStatCard('Streak', `${snap.streak} mo`)
             ])
           ),
           panelMetricGroup(
@@ -471,24 +815,10 @@ export function renderBoardPanel(container, state) {
       <details class="finance-details board-gates-details">
         <summary>Round gates &amp; sentiment targets</summary>
         ${panelMetricGrid('3', gateCards)}
-        <p class="fine-print">${escapeHtml(snap.runwayDetail)} · Skip <em>all</em> prep in a month → −4 approval and rival heat.</p>
+        <p class="fine-print">${escapeHtml(snap.runwayDetail)} · Skip <em>all</em> prep → −4 approval; skip <em>all</em> live meetings → −2 approval.</p>
       </details>
-      ${mandateBlock}
-      <section class="finance-section">
-        <h3 class="finance-section-title">Board roster</h3>
-        <div class="table-scroll finance-cap-scroll">
-          <table class="data-table board-roster-table">
-            <thead><tr><th>Director</th><th>Seat</th><th>Since</th></tr></thead>
-            <tbody>${rosterRows}</tbody>
-          </table>
-        </div>
-        <p class="fine-print">Committees: Audit, Comp, Governance — tags on tasks show who cares.</p>
-      </section>
-      <section class="finance-section">
-        <h3 class="finance-section-title">This month’s board prep</h3>
-        <div class="task-list">${cards || '<div class="tab-placeholder">New board tasks appear each month.</div>'}</div>
-      </section>
-      <details class="finance-details board-history-details"><summary>Approval history</summary>${historyList}</details>
+      ${governanceBody}
+      ${meetingBody}
     </div>
   `;
 }

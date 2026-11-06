@@ -2,7 +2,7 @@ import { STAGES, formatMoney } from './constants.js';
 import { advanceRealCalendarMonth, realClockNow } from './GameCalendar.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
-import { resolveMonthEndBurn } from './Finance.js';
+import { resolveMonthEndBurn, recordCashOutflow } from './Finance.js';
 import { closeFiscalYearOnDecember } from './CorporateTax.js';
 import { closeCeoPersonalTaxYearOnDecember } from './CeoPersonalTax.js';
 import { serviceLoanAtMonthEnd } from './BankLoan.js';
@@ -16,7 +16,13 @@ import {
 } from './CeoEconomics.js';
 import { prepareCompanyOverheadForMonth } from './CompanyOverhead.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
-import { tickPublicMarket, tickIpoLockup, tickPublicMarketAtMonthStart, isPublicCompany } from './IPO.js';
+import {
+  tickPublicMarket,
+  tickIpoLockup,
+  tickPublicMarketAtMonthStart,
+  isPublicCompany,
+  refreshMarketValuationFromFundamentals
+} from './IPO.js';
 import { resetPublicMarketEventsAtMonthStart } from './PublicMarkets.js';
 import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
 import { syncDraftFromFinalized, tickMarketSalaryDemand } from './Staff.js';
@@ -28,6 +34,11 @@ import { tickCooCompensationReview } from './Coo.js';
 import { resetGrowthCampaignsMonth, growthRosterRefreshLine } from './GrowthCampaigns.js';
 import { resetProductActionsMonth } from './ProductActions.js';
 import { resetEmployeeBenefitsMonth } from './EmployeeBenefits.js';
+import { tickAnnualFacilitiesAtMonthStart } from './FacilitiesEconomics.js';
+import {
+  settleTreasurySponsorshipsAtMonthEnd,
+  tickSponsorshipEscalationAtMonthStart
+} from './TreasurySponsorships.js';
 import {
   tickLaunchAtMonthStart,
   tickPreLaunchAtMonthStart,
@@ -42,6 +53,12 @@ import {
 } from './WorldDynamics.js';
 import { tickScenarioModifiers } from './ScenarioEffects.js';
 import { applySubsidiaryMrrPayout, tickAcquisitionsAtMonthStart } from './Acquisitions.js';
+import { dealCeoWlbOffers, tickPersonalHappinessAtMonthEnd } from './CeoHappiness.js';
+import {
+  tickStartupConferenceAtMonthStart,
+  settleStartupConferenceAtMonthEnd
+} from './StartupConference.js';
+import { tickFinancePropertyAtMonthStart } from './FinanceProperty.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -99,6 +116,12 @@ export function startMonth(state) {
   for (const line of tickPreLaunchAtMonthStart(state)) {
     appendLog(state, line);
   }
+  for (const line of tickAnnualFacilitiesAtMonthStart(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickSponsorshipEscalationAtMonthStart(state)) {
+    appendLog(state, line);
+  }
   for (const line of tickAcquisitionsAtMonthStart(state)) {
     appendLog(state, line);
   }
@@ -106,7 +129,18 @@ export function startMonth(state) {
   for (const line of tickPublicMarketAtMonthStart(state)) {
     appendLog(state, line);
   }
+  {
+    const confStart = tickStartupConferenceAtMonthStart(state);
+    if (confStart.budgetCharge > 0) {
+      recordCashOutflow(state, confStart.budgetCharge, 'startup_conference');
+    }
+    for (const line of confStart.lines) appendLog(state, line);
+  }
+  for (const line of tickFinancePropertyAtMonthStart(state)) {
+    appendLog(state, line);
+  }
   dealMonthlyTasks(state);
+  dealCeoWlbOffers(state);
   dealBoardTasks(state);
   preparePersonalExpensesForMonth(state);
   prepareCompanyOverheadForMonth(state);
@@ -140,6 +174,9 @@ export function endMonth(state) {
   for (const line of settlePersonalExpensesAtMonthEnd(state)) {
     appendLog(state, line);
   }
+  for (const line of tickPersonalHappinessAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
   for (const line of settlePersonalInvestmentsAtMonthEnd(state)) {
     appendLog(state, line);
   }
@@ -148,6 +185,9 @@ export function endMonth(state) {
     appendLog(state, line);
   }
   for (const line of serviceLoanAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
+  for (const line of settleTreasurySponsorshipsAtMonthEnd(state)) {
     appendLog(state, line);
   }
   const portfolio = applySubsidiaryMrrPayout(state);
@@ -199,6 +239,7 @@ export function endMonth(state) {
       appendLog(state, line);
     }
   }
+  refreshMarketValuationFromFundamentals(state);
 
   for (const line of tickXcResidency(state)) {
     appendLog(state, line);
@@ -248,6 +289,9 @@ export function endMonth(state) {
       state,
       `Personal tax year ${closedYear} closed — taxable income ${formatMoney(closedPersonalTax.income)} (April filing).`
     );
+  }
+  for (const line of settleStartupConferenceAtMonthEnd(state, closedMonthIndex, closedYear)) {
+    appendLog(state, line);
   }
   archiveCurrentNews(state);
   advanceCalendarMonth(state);

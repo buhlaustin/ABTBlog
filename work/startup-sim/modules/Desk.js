@@ -1,4 +1,4 @@
-import { getMonthlyTaskSlots } from './constants.js';
+import { getMonthlyTaskSlotsForState } from './LaunchLifecycle.js';
 import { getTaskStage } from './Workspace.js';
 import { getArr } from './Workspace.js';
 import {
@@ -19,6 +19,11 @@ import {
   CEO_PERSONAL_TAX_FILING_TASK_ID
 } from './CeoPersonalTax.js';
 import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
+import {
+  CONFERENCE_KEYNOTE_TASK_ID,
+  isConferenceKeynoteMandatory
+} from './StartupConference.js';
+import { isMegawhalePlay } from './WhaleScale.js';
 
 /** Why the month may not close yet — for the Desk checklist UI. */
 export function deskMonthCloseChecklist(state) {
@@ -35,7 +40,7 @@ export function deskMonthCloseChecklist(state) {
   }
 
   const lineupOpen = needsTaskLineup(state);
-  const slotTarget = state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+  const slotTarget = state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlotsForState(state);
   const selected = selectedOfferCount(state);
   items.push({
     id: 'lineup',
@@ -91,7 +96,7 @@ export function autoSelectRecommendedLineup(state) {
     return { ok: false, reason: 'No task offers this month.' };
   }
   const slots =
-    state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+    state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlotsForState(state);
   const mandatoryIds = [];
   if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
     mandatoryIds.push(XC_DEMO_DAY_TASK_ID);
@@ -99,6 +104,9 @@ export function autoSelectRecommendedLineup(state) {
   if (isTaxFilingRequired(state)) mandatoryIds.push(TAX_FILING_TASK_ID);
   if (isCeoPersonalTaxFilingRequired(state)) {
     mandatoryIds.push(CEO_PERSONAL_TAX_FILING_TASK_ID);
+  }
+  if (isConferenceKeynoteMandatory(state)) {
+    mandatoryIds.push(CONFERENCE_KEYNOTE_TASK_ID);
   }
   for (const o of offers) o.selected = false;
   let picked = 0;
@@ -118,7 +126,8 @@ export function autoSelectRecommendedLineup(state) {
       const band = estimateTaskPayoutBand(def, state);
       const mrr = estimateTaskMrrBand(def);
       let score = band.max;
-      if (def.whale) score += band.max * 0.15;
+      if (isMegawhalePlay(def)) score += band.max * 0.35;
+      else if (def.whale) score += band.max * 0.15;
       if (def.signature) score += 25_000;
       if (mrr) score += mrr.max * 6;
       if (def.scheduleLaunch) score += 15_000;

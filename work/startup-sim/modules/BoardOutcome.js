@@ -7,7 +7,9 @@ export function openBoardTaskOutcomeDialog({
   sentimentAfter,
   buzzDelta,
   mandateBonus,
-  stockPct
+  stockPct,
+  happinessDelta,
+  isMeeting
 }) {
   const dialog = document.getElementById('board-outcome-dialog');
   const body = document.getElementById('board-outcome-body');
@@ -28,9 +30,13 @@ export function openBoardTaskOutcomeDialog({
     stockPct != null && stockPct !== 0
       ? `<p class="fine-print">Public stock ${stockPct > 0 ? '+' : ''}${Math.round(Number(stockPct) * 100)}% on the read-through.</p>`
       : '';
+  const happinessLine =
+    happinessDelta != null && happinessDelta !== 0
+      ? `<p class="fine-print">Personal happiness ${happinessDelta} from CEO time in the room.</p>`
+      : '';
 
   body.innerHTML = `
-    <p class="eyebrow">Board task complete</p>
+    <p class="eyebrow">${isMeeting ? 'Board meeting held' : 'Board task complete'}</p>
     <h2 id="board-outcome-title" class="month-summary-title">${escapeHtml(title)}</h2>
     <div class="dialog-metric-panel">${panelMetricGrid('2', [
       panelStatCard('Board approval', `${deltaLabel}${delta !== 0 ? ' pts' : ''}`, { tone: deltaTone }),
@@ -39,6 +45,7 @@ export function openBoardTaskOutcomeDialog({
     ${buzzLine}
     ${mandateLine}
     ${stockLine}
+    ${happinessLine}
     <p class="fine-print">Board approval gates follow-on rounds after Series A.</p>
   `;
 

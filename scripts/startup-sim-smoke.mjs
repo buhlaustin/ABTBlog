@@ -25,6 +25,7 @@ const {
   selectedOfferCount,
   needsTaskLineup,
   getTaskPoolSize,
+  getEligibleDeskTasks,
   getTaskDefinitions,
   taskCatalogSize,
   RECENT_TASK_COOLDOWN_MONTHS
@@ -65,14 +66,53 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
 } else if (!getTaskDefinitions().some((t) => t.id === 'public-esg-metrics-audit-defense')) {
   console.error('FAIL: public late handcrafted pack not merged');
   failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'public-ipo-first-earnings-dry-run')) {
+  console.error('FAIL: public post-IPO handcrafted pack not merged');
+  failed = true;
 } else if (!getTaskDefinitions().some((t) => t.id === 'mid-soc2-type2-evidence-sprint')) {
   console.error('FAIL: mid-game handcrafted pack not merged');
+  failed = true;
+} else if (getTaskDefinitions().filter((t) => t.id.startsWith('mid-')).length < 42) {
+  const midCount = getTaskDefinitions().filter((t) => t.id.startsWith('mid-')).length;
+  console.error(`FAIL: expected 42+ mid-game desk tasks, got ${midCount}`);
+  failed = true;
+} else if (getTaskDefinitions().filter((t) => t.id.startsWith('mid-') && t.whale).length < 4) {
+  const midWhaleCount = getTaskDefinitions().filter((t) => t.id.startsWith('mid-') && t.whale).length;
+  console.error(`FAIL: expected 4+ mid-game whale desk tasks, got ${midWhaleCount}`);
   failed = true;
 } else if (!getTaskDefinitions().some((t) => t.id === 'launch-post-handcrafted-churn-interviews')) {
   console.error('FAIL: post-launch handcrafted pack not merged');
   failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'launch-pre-cat-ai-tools-pretrain-shard-mix')) {
+  console.error('FAIL: ai-tools pre-launch pack not merged');
+  failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'launch-chatxgpt-ga-flip')) {
+  console.error('FAIL: ChatXGPT launch pack not merged');
+  failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'cat-ai-tools-post-batch-api-release')) {
+  console.error('FAIL: AI post-batch API release task not merged');
+  failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'whale-ai-tools-hyperscaler-marketplace-credits')) {
+  console.error('FAIL: AI post-XC API credit whale pack not merged');
+  failed = true;
 } else if (!failed) {
-  console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
+  const midDeskTasks = getTaskDefinitions().filter((t) => t.id.startsWith('mid-'));
+  const midWhales = midDeskTasks.filter((t) => t.whale);
+  console.log(
+    `OK: mid-game desk pack (${midDeskTasks.length} tasks, ${midWhales.length} whales); public whale desk tasks (${publicWhales.length} flagged whale)`
+  );
+}
+const publicMegawhales = getTaskDefinitions().filter(
+  (t) => t.megawhale === true && t.stages?.includes('public')
+);
+if (!getTaskDefinitions().some((t) => t.id === 'megawhale-federal-cloud-continuity-mandate')) {
+  console.error('FAIL: handcrafted public megawhale desk pack not merged');
+  failed = true;
+} else if (publicMegawhales.length < 18) {
+  console.error(`FAIL: expected 18+ public megawhale desk tasks, got ${publicMegawhales.length}`);
+  failed = true;
+} else if (!failed) {
+  console.log(`OK: public megawhale desk tasks (${publicMegawhales.length} multi-billion)`);
 }
 
 const genericPool = getTaskDefinitions().filter((t) => !t.categories?.length && !t.launchPhase);
@@ -292,6 +332,216 @@ if (crowdDef) {
     failed = true;
   } else {
     console.log(`OK: pre-launch crowdfunding desk tasks (${crowdPreLaunch.length} in bank)`);
+  }
+}
+
+const aiPreLaunch = getTaskDefinitions().filter(
+  (t) => t.launchPhase === 'pre_launch' && t.categories?.includes('ai-tools')
+);
+if (aiPreLaunch.length < 9) {
+  console.error(`FAIL: ai-tools pre-launch bank ${aiPreLaunch.length} < 9`);
+  failed = true;
+} else {
+  const aiLaunchState = createInitialState({
+    companyName: 'ModelCo',
+    categoryId: 'ai-tools',
+    mode: 'career'
+  });
+  if (getTaskPoolSize(aiLaunchState) < getMonthlyTaskOfferCount(STAGES.GARAGE)) {
+    console.error(`FAIL: ai-tools garage pre-launch pool ${getTaskPoolSize(aiLaunchState)} too small`);
+    failed = true;
+  } else {
+    console.log(`OK: ai-tools pre-launch tasks (${aiPreLaunch.length} in bank)`);
+  }
+}
+
+const {
+  usesChatXgptLaunchPlaybook,
+  CHATXGPT_PRODUCT_NAME,
+  launchPhaseLabel,
+  LAUNCH_MONTH_GARAGE_TASK_SLOTS,
+  getMonthlyTaskSlotsForState,
+  getMonthlyTaskOfferCountForState,
+  isLaunchMonthGarage
+} = await import(`file://${join(sim, 'modules/LaunchLifecycle.js')}`);
+const launchWeekGarageState = createInitialState({
+  companyName: 'LaunchWeekCo',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+launchWeekGarageState.launch.phase = 'launch_month';
+if (!isLaunchMonthGarage(launchWeekGarageState)) {
+  console.error('FAIL: launch_month garage detection');
+  failed = true;
+} else if (getMonthlyTaskSlotsForState(launchWeekGarageState) !== LAUNCH_MONTH_GARAGE_TASK_SLOTS) {
+  console.error(
+    `FAIL: launch month garage slots expected ${LAUNCH_MONTH_GARAGE_TASK_SLOTS}, got ${getMonthlyTaskSlotsForState(launchWeekGarageState)}`
+  );
+  failed = true;
+} else {
+  dealMonthlyTasks(launchWeekGarageState);
+  if (launchWeekGarageState.calendar.monthTaskSlotTarget !== LAUNCH_MONTH_GARAGE_TASK_SLOTS) {
+    console.error('FAIL: launch month deal should set 6 slot target');
+    failed = true;
+  } else if ((launchWeekGarageState.calendar.monthTaskOffers?.length ?? 0) < LAUNCH_MONTH_GARAGE_TASK_SLOTS) {
+    console.error('FAIL: launch month offer board smaller than slot target');
+    failed = true;
+  } else {
+    console.log(`OK: launch month garage desk (${LAUNCH_MONTH_GARAGE_TASK_SLOTS} slots, ${getMonthlyTaskOfferCountForState(launchWeekGarageState)} offers)`);
+  }
+}
+
+const aiLaunchMonthState = createInitialState({
+  companyName: 'ModelCo',
+  categoryId: 'ai-tools',
+  mode: 'career'
+});
+aiLaunchMonthState.launch.phase = 'launch_month';
+if (!usesChatXgptLaunchPlaybook(aiLaunchMonthState)) {
+  console.error('FAIL: ai-tools should use ChatXGPT launch playbook');
+  failed = true;
+} else if (!launchPhaseLabel(aiLaunchMonthState)?.includes(CHATXGPT_PRODUCT_NAME)) {
+  console.error('FAIL: ChatXGPT launch phase label');
+  failed = true;
+} else if (getTaskPoolSize(aiLaunchMonthState) < getMonthlyTaskOfferCount(STAGES.GARAGE)) {
+  console.error(`FAIL: ChatXGPT launch-month pool ${getTaskPoolSize(aiLaunchMonthState)} too small`);
+  failed = true;
+} else {
+  const aiLaunchDeskIds = getEligibleDeskTasks(aiLaunchMonthState).map((t) => t.id);
+  const aiLaunchDesk = getTaskDefinitions().filter(
+    (t) => t.launchPhase === 'launch' && t.categories?.includes('ai-tools')
+  );
+  if (aiLaunchDesk.length < 6) {
+    console.error(`FAIL: ChatXGPT launch-month bank ${aiLaunchDesk.length} < 6`);
+    failed = true;
+  } else if (aiLaunchDeskIds.includes('launch-day-product-hunt')) {
+    console.error('FAIL: ai-tools launch month should not offer generic Product Hunt task');
+    failed = true;
+  } else if (!aiLaunchDeskIds.includes('launch-chatxgpt-ga-flip')) {
+    console.error('FAIL: ChatXGPT GA task missing from ai-tools launch-month pool');
+    failed = true;
+  } else {
+    const b2bLaunchState = createInitialState({
+      companyName: 'SaaSCo',
+      categoryId: 'b2b-saas',
+      mode: 'career'
+    });
+    b2bLaunchState.launch.phase = 'launch_month';
+    const b2bIds = getEligibleDeskTasks(b2bLaunchState).map((t) => t.id);
+    if (!b2bIds.includes('launch-day-product-hunt')) {
+      console.error('FAIL: b2b-saas should still get generic launch-month tasks');
+      failed = true;
+    } else if (b2bIds.includes('launch-chatxgpt-ga-flip')) {
+      console.error('FAIL: ChatXGPT tasks should not appear for b2b-saas launch month');
+      failed = true;
+    } else {
+      console.log(`OK: ChatXGPT launch playbook (${aiLaunchDesk.length} launch-month tasks)`);
+    }
+  }
+}
+
+const {
+  isAiPostBatchApiReleaseMonth,
+  AI_POST_BATCH_API_RELEASE_TASK_ID,
+  onPostBatchApiReleaseTaskCompleted
+} = await import(`file://${join(sim, 'modules/XC.js')}`);
+const aiPostBatchState = createInitialState({
+  companyName: 'BatchAPI',
+  categoryId: 'ai-tools',
+  mode: 'career'
+});
+aiPostBatchState.flags.xcResidencyComplete = true;
+aiPostBatchState.flags.xcBatchActive = false;
+aiPostBatchState.xc.demoDayTaskDone = true;
+aiPostBatchState.xc.postBatchApiReleasePending = true;
+if (!isAiPostBatchApiReleaseMonth(aiPostBatchState)) {
+  console.error('FAIL: AI post-batch API release month gate');
+  failed = true;
+} else {
+  dealMonthlyTasks(aiPostBatchState);
+  const offers = aiPostBatchState.calendar.monthTaskOffers ?? [];
+  if (!offers.some((o) => o.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID)) {
+    console.error('FAIL: post-batch API release task not on desk offers');
+    failed = true;
+  } else {
+    const slots = aiPostBatchState.calendar.monthTaskSlotTarget ?? 4;
+    for (const offer of offers.slice(0, slots)) {
+      offer.selected = offer.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID;
+    }
+    let picked = offers.filter((o) => o.selected).length;
+    for (const offer of offers) {
+      if (picked >= slots) break;
+      if (!offer.selected) {
+        offer.selected = true;
+        picked += 1;
+      }
+    }
+    const withoutApi = offers.map((o) => ({
+      ...o,
+      selected: o.selected && o.taskId !== AI_POST_BATCH_API_RELEASE_TASK_ID
+    }));
+    aiPostBatchState.calendar.monthTaskOffers = withoutApi;
+    const blocked = confirmTaskLineup(aiPostBatchState);
+    if (blocked.ok) {
+      console.error('FAIL: lineup should require post-batch API release task');
+      failed = true;
+    } else {
+      aiPostBatchState.calendar.monthTaskOffers = offers;
+      for (const offer of offers) {
+        offer.selected = offers.indexOf(offer) < slots;
+      }
+      if (!offers.some((o) => o.selected && o.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID)) {
+        offers[0].selected = true;
+        offers.find((o) => o.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID).selected = true;
+      }
+      confirmTaskLineup(aiPostBatchState);
+      onPostBatchApiReleaseTaskCompleted(aiPostBatchState);
+      if (aiPostBatchState.xc.postBatchApiReleaseDone !== true || isAiPostBatchApiReleaseMonth(aiPostBatchState)) {
+        console.error('FAIL: post-batch API release completion flags');
+        failed = true;
+      } else {
+        console.log('OK: AI post-batch ChatXGPT API release desk task');
+      }
+    }
+  }
+}
+
+const aiCreditWhales = getTaskDefinitions().filter(
+  (t) => t.whale && t.apiCreditsWhale && t.categories?.includes('ai-tools')
+);
+if (aiCreditWhales.length < 10) {
+  console.error(`FAIL: expected 10+ AI API credit whales, got ${aiCreditWhales.length}`);
+  failed = true;
+} else {
+  const aiWhaleFreqState = createInitialState({
+    companyName: 'CreditWhaleCo',
+    categoryId: 'ai-tools',
+    mode: 'career'
+  });
+  aiWhaleFreqState.flags.xcResidencyComplete = true;
+  aiWhaleFreqState.flags.seedRoundClosed = true;
+  aiWhaleFreqState.flags.seriesAClosed = true;
+  aiWhaleFreqState.xc.postBatchApiReleaseDone = true;
+  aiWhaleFreqState.launch.phase = 'graduated';
+  aiWhaleFreqState.stage = STAGES.OFFICE;
+  aiWhaleFreqState.finance.mrr = 85000;
+  const whaleIds = new Set(aiCreditWhales.map((t) => t.id));
+  let monthsWithWhale = 0;
+  for (let i = 0; i < 18; i += 1) {
+    dealMonthlyTasks(aiWhaleFreqState);
+    const offerIds = (aiWhaleFreqState.calendar.monthTaskOffers ?? []).map((o) => o.taskId);
+    if (offerIds.some((id) => whaleIds.has(id))) monthsWithWhale += 1;
+    aiWhaleFreqState.calendar.monthIndex = (aiWhaleFreqState.calendar.monthIndex ?? 1) + 1;
+    if (aiWhaleFreqState.calendar.monthIndex > 12) {
+      aiWhaleFreqState.calendar.monthIndex = 1;
+      aiWhaleFreqState.calendar.year = (aiWhaleFreqState.calendar.year ?? 2026) + 1;
+    }
+  }
+  if (monthsWithWhale < 12) {
+    console.error(`FAIL: AI API credit whales should appear often (${monthsWithWhale}/18 months)`);
+    failed = true;
+  } else {
+    console.log(`OK: AI post-XC API credit whales (${aiCreditWhales.length}, ${monthsWithWhale}/18 offer boards)`);
   }
 }
 
@@ -675,11 +925,24 @@ if (garageTierBase !== REV_MULT_CAP_SANDBOX || garageCap !== Math.round(REV_MULT
   console.log(`OK: garage rev× cap unchanged (${garageCap}× at empty HC, tier base ${garageTierBase}×)`);
 }
 
-const { completeBoardTask, dealBoardTasks, getBoardTaskDefs, ensureBoardRoster } = await import(
-  `file://${join(sim, 'modules/Board.js')}`
-);
-if (getBoardTaskDefs().length < 18) {
+const {
+  completeBoardTask,
+  dealBoardTasks,
+  getBoardTaskDefs,
+  ensureBoardRoster,
+  addBoardSeat,
+  availableBoardSeatCandidates,
+  boardSeatCapacity,
+  dealBoardMeetingTasks,
+  completeBoardMeetingTask,
+  getBoardMeetingTaskDefs
+} = await import(`file://${join(sim, 'modules/Board.js')}`);
+if (getBoardTaskDefs().length < 40) {
   console.error(`FAIL: board task catalog too small (${getBoardTaskDefs().length})`);
+  failed = true;
+}
+if (getBoardMeetingTaskDefs().length < 44) {
+  console.error(`FAIL: board meeting catalog too small (${getBoardMeetingTaskDefs().length})`);
   failed = true;
 }
 const boardState = createInitialState({
@@ -690,6 +953,7 @@ const boardState = createInitialState({
 boardState.flags.seriesAClosed = true;
 boardState.finance.cash = 500_000;
 dealBoardTasks(boardState);
+dealBoardMeetingTasks(boardState);
 ensureBoardRoster(boardState);
 if ((boardState.board?.members?.length ?? 0) < 2) {
   console.error('FAIL: board roster should include lead + founder after Series A');
@@ -710,6 +974,42 @@ if (!inst) {
     failed = true;
   } else {
     console.log('OK: board task outcome fields');
+  }
+}
+const meetInst = boardState.board?.meetingTasks?.[0];
+if (!meetInst) {
+  console.error('FAIL: board meeting tasks not dealt');
+  failed = true;
+} else {
+  boardState.finance.cash = Math.max(boardState.finance.cash ?? 0, 500_000);
+  const meetResult = completeBoardMeetingTask(boardState, meetInst.instanceId);
+  if (!meetResult.ok || meetResult.isMeeting !== true) {
+    console.error(`FAIL: board meeting task: ${meetResult.reason ?? 'unknown'}`);
+    failed = true;
+  } else {
+    console.log('OK: board meeting task outcome');
+  }
+}
+boardState.finance.cash = 2_000_000;
+const boardSeatPool = availableBoardSeatCandidates(boardState);
+const cap = boardSeatCapacity(boardState);
+if (boardSeatPool.length < 8) {
+  console.error(`FAIL: expected 8+ board seat candidates (got ${boardSeatPool.length})`);
+  failed = true;
+} else {
+  const beforeCount = boardState.board.members.length;
+  const seatAdd = addBoardSeat(boardState, boardSeatPool[0].id);
+  if (!seatAdd.ok || boardState.board.members.length !== beforeCount + 1) {
+    console.error(`FAIL: add board seat: ${seatAdd.reason ?? 'unknown'}`);
+    failed = true;
+  } else if (boardState.board.seatsAddedByPlayer !== 1) {
+    console.error('FAIL: board should track player-added seats');
+    failed = true;
+  } else if (beforeCount + 1 > cap) {
+    console.error('FAIL: board seat add exceeded capacity');
+    failed = true;
+  } else {
+    console.log(`OK: add board seat (${boardState.board.members.length}/${cap} directors)`);
   }
 }
 
@@ -934,7 +1234,9 @@ if (!buy.ok) {
 }
 
 const { STAGES: ST } = await import(`file://${join(sim, 'modules/constants.js')}`);
-const { PUBLIC_FLOAT_ROW_ID, getFounderRow } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
+const { PUBLIC_FLOAT_ROW_ID, getFounderRow, totalOutstandingShares } = await import(
+  `file://${join(sim, 'modules/CapTable.js')}`
+);
 const {
   fileIpo,
   tickPublicMarket,
@@ -943,7 +1245,11 @@ const {
   executeStockSplit,
   whisperRevenueTarget,
   sellFounderSharesPartial,
-  ytdSmoothedMonthlyRevenue
+  ytdSmoothedMonthlyRevenue,
+  computeFundamentalSharePrice,
+  marketCap,
+  treasuryNetCash,
+  estimateEquityValue
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
 const { calendarTurn } = await import(`file://${join(sim, 'modules/XC.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
@@ -988,6 +1294,18 @@ if (!ipo.ok) {
     console.log(
       `OK: IPO primary + float (${formatMoney(ipo.primaryProceeds)} primary, float ${floatPct}%, founder ${founder?.pct}%, ${formatMoney(listPrice)}/share)`
     );
+    pub.finance.cash = 1_000_000_000_000;
+    pub.finance.mrr = 250_000;
+    const fundPx = computeFundamentalSharePrice(pub);
+    const shares = totalOutstandingShares(pub);
+    const modelCap = Math.round(fundPx * shares);
+    const net = treasuryNetCash(pub);
+    if (modelCap < net * 0.9) {
+      console.error(`FAIL: model cap ${modelCap} should reflect net cash ${net}`);
+      failed = true;
+    } else {
+      console.log(`OK: valuation model includes balance sheet cash (model cap ${formatMoney(modelCap)})`);
+    }
   }
   const { hasInstitutionalBoard, meetsHubInvestorGate } = await import(
     `file://${join(sim, 'modules/Sentiment.js')}`
@@ -1280,6 +1598,8 @@ if (!rbf.ok) {
 const {
   setCeoSalaryAnnual,
   takeOwnerDraw,
+  ownerDrawsUnlocked,
+  canTakeOwnerDraw,
   ceoSalaryMonthly,
   recordCeoSalaryForMonth,
   wealthMix,
@@ -1343,10 +1663,27 @@ if (!sal.ok) {
 }
 if (!failed) {
   ceoState.finance.cash = 50_000;
-  const od = takeOwnerDraw(ceoState, 5_000);
-  if (!od.ok || ceoState.ceo.careerOwnerDraws !== 5_000) {
-    console.error('FAIL: owner draw');
+  if (!ownerDrawsUnlocked(ceoState)) {
+    console.error('FAIL: owner draws should unlock before seed');
     failed = true;
+  } else {
+    const od = takeOwnerDraw(ceoState, 5_000);
+    if (!od.ok || ceoState.ceo.careerOwnerDraws !== 5_000) {
+      console.error('FAIL: owner draw');
+      failed = true;
+    }
+  }
+}
+if (!failed) {
+  const postSeed = createInitialState({ companyName: 'CEO Pay Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+  postSeed.flags.seedRoundClosed = true;
+  postSeed.finance.cash = 100_000;
+  const blocked = canTakeOwnerDraw(postSeed, 5_000);
+  if (blocked.ok || ownerDrawsUnlocked(postSeed)) {
+    console.error('FAIL: owner draw should block after seed close');
+    failed = true;
+  } else {
+    console.log('OK: owner draws pre-seed only (hidden after seed close)');
   }
 }
 if (!failed) {
@@ -1476,13 +1813,34 @@ if (openA < 4500 || openA > 10500 || openB < 4500 || openB > 10500) {
   failed = true;
 }
 if (!failed) {
-  setCeoSalaryAnnual(bankA, 60_000);
-  recordCeoSalaryForMonth(bankA);
-  const band60 = personalExpenseBandForSalary(60_000);
-  const due = scheduledPersonalExpense(bankA).total;
-  if (due > band60.max * 1.2 || due < band60.min * 0.9) {
-    console.error(`FAIL: $60k salary expense ${due} outside band ${band60.min}-${band60.max}`);
+  preparePersonalExpensesForMonth(bankA);
+  const garageDue = scheduledPersonalExpense(bankA).total;
+  const { GARAGE_PHASE_PERSONAL_EXPENSE_MO, isGaragePhasePersonalExpenses } = await import(
+    `file://${join(sim, 'modules/CeoEconomics.js')}`
+  );
+  if (!isGaragePhasePersonalExpenses(bankA) || garageDue !== GARAGE_PHASE_PERSONAL_EXPENSE_MO) {
+    console.error(`FAIL: garage-phase CEO expenses expected ${GARAGE_PHASE_PERSONAL_EXPENSE_MO}, got ${garageDue}`);
     failed = true;
+  }
+  const { purchaseWorkspaceTier, WORKSPACE_TIER } = await import(
+    `file://${join(sim, 'modules/Workspace.js')}`
+  );
+  bankA.finance.arr = 200_000;
+  bankA.finance.mrr = Math.round(bankA.finance.arr / 12);
+  const officeBuy = purchaseWorkspaceTier(bankA, WORKSPACE_TIER.SMALL);
+  if (!officeBuy.ok) {
+    console.error(`FAIL: garage salary test office purchase: ${officeBuy.reason}`);
+    failed = true;
+  } else {
+    setCeoSalaryAnnual(bankA, 60_000);
+    recordCeoSalaryForMonth(bankA);
+    const band60 = personalExpenseBandForSalary(60_000);
+    preparePersonalExpensesForMonth(bankA);
+    const due = scheduledPersonalExpense(bankA).total;
+    if (due > band60.max * 1.2 || due < band60.min * 0.9) {
+      console.error(`FAIL: $60k salary expense ${due} outside band ${band60.min}-${band60.max}`);
+      failed = true;
+    }
   }
   bankA.finance.arr = 500_000_000;
   preparePersonalExpensesForMonth(bankA);
@@ -1516,7 +1874,7 @@ if (!failed) {
       );
     }
   }
-  if (dueRich > band60.max * 1.2) {
+  if (typeof band60 !== 'undefined' && dueRich > band60.max * 1.2) {
     console.error(`FAIL: personal debits should not scale with ARR (${dueRich})`);
     failed = true;
   }
@@ -1631,10 +1989,23 @@ if (!failed) {
   } else if (knoxMed.rentMonthly >= laMed.rentMonthly) {
     console.error('FAIL: Knoxville should rent cheaper than Los Angeles at the same footprint size');
     failed = true;
-  } else if (!failed) {
-    console.log(
-      `OK: satellite sizing (Knoxville medium ${knoxMed.seats}/${knoxMed.rentMonthly}, LA medium ${laMed.seats}/${laMed.rentMonthly})`
-    );
+  } else {
+    const laLarge = computeSatelliteOffice(laTpl, 'large');
+    const laXl = computeSatelliteOffice(laTpl, 'xlarge');
+    if (laMed.seats < 16 || laMed.seats > 24) {
+      console.error(`FAIL: LA medium satellite should land ~19 seats (got ${laMed.seats})`);
+      failed = true;
+    } else if (laLarge.seats <= laMed.seats + 10) {
+      console.error(`FAIL: LA large satellite should exceed medium by a wide margin (${laLarge.seats} vs ${laMed.seats})`);
+      failed = true;
+    } else if (laXl.seats <= laLarge.seats) {
+      console.error('FAIL: extra-large satellite should beat large on seats');
+      failed = true;
+    } else if (!failed) {
+      console.log(
+        `OK: satellite sizing (Knoxville medium ${knoxMed.seats}/${knoxMed.rentMonthly}, LA medium/large/xl ${laMed.seats}/${laLarge.seats}/${laXl.seats} seats)`
+      );
+    }
   }
 
   const { totalHeadcountCap, headcountCapBreakdown } = await import(
@@ -1876,25 +2247,81 @@ if (roster.length < 1 || roster.length > expectedOffers) {
         console.error('FAIL: ran growth campaign should stay off roster until cooldown');
         failed = true;
       } else {
-        console.log(`OK: growth roster + cooldown (${roster.length}/mo, era-scaled payouts)`);
+        const whaleOnRoster = roster.some((id) => {
+          const def = getGrowthCampaigns().find((c) => c.id === id);
+          return def?.whale === true;
+        });
+        const megaOnRoster = roster.some((id) => {
+          const def = getGrowthCampaigns().find((c) => c.id === id);
+          return def?.megawhale === true;
+        });
+        if (!whaleOnRoster) {
+          console.error('FAIL: public growth roster should include at least one whale paid play');
+          failed = true;
+        } else if (!megaOnRoster) {
+          console.error('FAIL: public growth roster should include at least one megawhale paid play');
+          failed = true;
+        } else {
+          console.log(`OK: growth roster + cooldown (${roster.length}/mo, era-scaled payouts)`);
+        }
       }
     }
   }
 }
 
-const productSideBank = sideTaskBankSize(['product', 'both']);
-if (growthCampaignCatalogSize() < 270) {
-  console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()})`);
+const midGrowthRosterState = createInitialState({
+  companyName: 'MidGrowthCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+midGrowthRosterState.flags.xcResidencyComplete = true;
+midGrowthRosterState.flags.seedRoundClosed = true;
+midGrowthRosterState.flags.seriesAClosed = true;
+midGrowthRosterState.finance.cash = 5_000_000;
+resetGrowthCampaignsMonth(midGrowthRosterState);
+const midGrowthRoster = midGrowthRosterState.growth.monthCampaignOffers ?? [];
+if (!midGrowthRoster.some((id) => id.startsWith('growth-mid-'))) {
+  console.error('FAIL: mid-game growth roster should pin a growth-mid- campaign');
   failed = true;
-} else if (getProductActions().length < 75) {
+} else {
+  console.log('OK: mid-game growth roster pinning (Series A band)');
+}
+
+const productSideBank = sideTaskBankSize(['product', 'both']);
+const publicGrowthWhales = getGrowthCampaigns().filter((c) => c.whale === true && (c.tierMin ?? 0) >= 7);
+const publicGrowthMegawhales = getGrowthCampaigns().filter(
+  (c) => c.megawhale === true && (c.tierMin ?? 0) >= 7
+);
+if (publicGrowthWhales.length < 20) {
+  console.error(`FAIL: expected 20+ post-IPO whale growth campaigns (got ${publicGrowthWhales.length})`);
+  failed = true;
+} else if (publicGrowthMegawhales.length < 15) {
+  console.error(`FAIL: expected 15+ post-IPO megawhale growth campaigns (got ${publicGrowthMegawhales.length})`);
+  failed = true;
+} else if (growthCampaignCatalogSize() < 350) {
+  console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()}, want ≥350)`);
+  failed = true;
+} else {
+  const midGrowth = getGrowthCampaigns().filter((c) => c.id.startsWith('growth-mid-'));
+  const midGrowthWhales = midGrowth.filter((c) => c.whale);
+  if (midGrowth.length < 34) {
+    console.error(`FAIL: expected 34+ mid-game growth campaigns (got ${midGrowth.length})`);
+    failed = true;
+  } else if (midGrowthWhales.length < 4) {
+    console.error(`FAIL: expected 4+ mid-game growth whales (got ${midGrowthWhales.length})`);
+    failed = true;
+  }
+}
+if (!failed && getProductActions().length < 75) {
   console.error(`FAIL: side-task lever bank too small (${getProductActions().length})`);
   failed = true;
 } else if (productSideBank < 32) {
   console.error(`FAIL: product side-task bank too small (${productSideBank})`);
   failed = true;
-} else {
+} else if (!failed) {
+  const midGrowthCount = getGrowthCampaigns().filter((c) => c.id.startsWith('growth-mid-')).length;
   console.log(
-    `OK: side-task banks (${growthCampaignCatalogSize()} paid campaigns, ${getProductActions().length} levers, ${productSideBank} product-focused)`
+    `OK: side-task banks (${growthCampaignCatalogSize()} paid campaigns incl. ${midGrowthCount} mid-game, ${getProductActions().length} levers, ${productSideBank} product-focused)`
   );
 }
 
@@ -2290,6 +2717,23 @@ if (!needsTaskLineup(deskState) || !(deskState.calendar.monthTaskOffers?.length 
   }
 }
 
+const midPinState = createInitialState({
+  companyName: 'MidPinCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+midPinState.flags.xcResidencyComplete = true;
+midPinState.flags.seedRoundClosed = true;
+midPinState.flags.seriesAClosed = true;
+dealMonthlyTasks(midPinState);
+const midOffers = (midPinState.calendar.monthTaskOffers ?? []).map((o) => o.taskId);
+if (!midOffers.some((id) => id.startsWith('mid-'))) {
+  console.error('FAIL: mid-game tier should pin a mid- desk offer each month');
+  failed = true;
+} else {
+  console.log('OK: mid-game desk offer pinning (Series A band)');
+}
+
 if (getTaskDefinitions().some((t) => t.id === TAX_FILING_TASK_ID)) {
   console.log('OK: tax filing desk task in catalog');
 } else {
@@ -2318,9 +2762,26 @@ const {
   purchaseCeoHomeMortgage,
   prepayCeoMortgage,
   purchaseCeoLifestyle,
+  sellCeoLifestyle,
+  preloadCeoLifestyleCatalog,
   getCeoHomeTier,
-  ceoLifestyleMonthlyDebit
+  ceoLifestyleMonthlyDebit,
+  ceoLifestyleLifetimeSpend,
+  getCeoLifestylePurchasesSync,
+  getCeoLifestyleCategoriesSync
 } = await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
+await preloadCeoLifestyleCatalog();
+const lifestyleCatalogCount = getCeoLifestylePurchasesSync().length;
+const lifestyleCategoryCount = getCeoLifestyleCategoriesSync().length;
+if (lifestyleCatalogCount < 68) {
+  console.error(`FAIL: CEO lifestyle catalog too small (${lifestyleCatalogCount})`);
+  failed = true;
+} else if (lifestyleCategoryCount < 9) {
+  console.error(`FAIL: CEO lifestyle categories too few (${lifestyleCategoryCount})`);
+  failed = true;
+} else {
+  console.log(`OK: CEO lifestyle catalog (${lifestyleCatalogCount} purchases, ${lifestyleCategoryCount} categories)`);
+}
 const {
   donateFromPersonalBank,
   recordCeoNetWorthSnapshot,
@@ -2387,10 +2848,22 @@ if (!bought.ok) {
             categoryId: 'b2b-saas',
             mode: 'sandbox'
           });
-          lifestyleState.ceo.bankBalance = 50_000;
+          lifestyleState.ceo.bankBalance = 300_000;
           const gym = purchaseCeoLifestyle(lifestyleState, 'premium-gym');
+          const car = purchaseCeoLifestyle(lifestyleState, 'electric-sedan');
+          const carClash = purchaseCeoLifestyle(lifestyleState, 'sports-car');
+          const resale = sellCeoLifestyle(lifestyleState, 'electric-sedan');
           if (!gym.ok || ceoLifestyleMonthlyDebit(lifestyleState) !== 380) {
             console.error(`FAIL: CEO lifestyle purchase: ${gym.reason ?? 'debit bump'}`);
+            failed = true;
+          } else if (!car.ok || carClash.ok) {
+            console.error('FAIL: CEO lifestyle exclusive vehicle group');
+            failed = true;
+          } else if (!resale.ok || resale.proceeds <= 0) {
+            console.error(`FAIL: CEO lifestyle resale: ${resale.reason ?? 'proceeds'}`);
+            failed = true;
+          } else if (ceoLifestyleLifetimeSpend(lifestyleState) !== 4200 + 78000) {
+            console.error('FAIL: CEO lifestyle lifetime spend');
             failed = true;
           } else {
             console.log(
@@ -2469,6 +2942,442 @@ if (DEPARTMENTS.length < 15) {
           failed = true;
         } else {
           console.log(`OK: departments (${DEPARTMENTS.length}, ${open} open at office tier)`);
+        }
+      }
+    }
+  }
+}
+
+const { workspaceRentMonthly } = await import(`file://${join(sim, 'modules/Workspace.js')}`);
+const { tickAnnualFacilitiesAtMonthStart } = await import(
+  `file://${join(sim, 'modules/FacilitiesEconomics.js')}`
+);
+const { HOUSING_MODE } = await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
+const { setFinanceSection, activeFinanceSection } = await import(
+  `file://${join(sim, 'modules/PublicMarkets.js')}`
+);
+
+const rentEscState = createInitialState({ companyName: 'Rent Esc', categoryId: 'b2b-saas', mode: 'sandbox' });
+rentEscState.workspace.tier = WORKSPACE_TIER.SMALL;
+rentEscState.workspace.smallOfficeOwned = true;
+rentEscState.meta.calendarStartYear = 1;
+rentEscState.meta.calendarStartMonth = 1;
+rentEscState.calendar.year = 2;
+rentEscState.calendar.monthIndex = 1;
+if (calendarTurn(rentEscState) <= 1) {
+  console.error('FAIL: rent escalation fixture should be past founding month');
+  failed = true;
+} else {
+  const rentBefore = workspaceRentMonthly(rentEscState);
+  const escLines = tickAnnualFacilitiesAtMonthStart(rentEscState);
+  const rentAfter = workspaceRentMonthly(rentEscState);
+  if (escLines.length === 0 || rentAfter <= rentBefore) {
+    console.error(`FAIL: annual rent escalation (${rentBefore} → ${rentAfter})`);
+    failed = true;
+  } else {
+    rentEscState.finance.hubRentMonthly = 100_000;
+    rentEscState.offices.hubId = 'sf';
+    rentEscState.workspace.tier = WORKSPACE_TIER.HUB;
+    const hubBefore = workspaceRentMonthly(rentEscState);
+    rentEscState.calendar.year = 3;
+    rentEscState.finance.lastRentEscalationYear = 2;
+    tickAnnualFacilitiesAtMonthStart(rentEscState);
+    const hubAfter = workspaceRentMonthly(rentEscState);
+    if (hubAfter <= hubBefore) {
+      console.error(`FAIL: hub rent escalation (${hubBefore} → ${hubAfter})`);
+      failed = true;
+    } else {
+      console.log('OK: annual rent escalation (HQ + hub)');
+    }
+  }
+}
+
+const homeEscState = createInitialState({ companyName: 'Home Esc', categoryId: 'b2b-saas', mode: 'sandbox' });
+homeEscState.meta.calendarStartYear = 1;
+homeEscState.meta.calendarStartMonth = 1;
+homeEscState.calendar.year = 2;
+homeEscState.calendar.monthIndex = 1;
+homeEscState.ceo.housing = {
+  mode: HOUSING_MODE.OWNED,
+  tierId: 'penthouse',
+  purchasePrice: 1_000_000,
+  costBasis: 1_000_000,
+  mortgageBalance: 0
+};
+tickAnnualFacilitiesAtMonthStart(homeEscState);
+if ((homeEscState.ceo.housing.purchasePrice ?? 0) <= 1_000_000) {
+  console.error('FAIL: CEO home annual appreciation');
+  failed = true;
+} else {
+  console.log('OK: CEO home annual appreciation');
+}
+
+setFinanceSection({ finance: {} }, 'treasury');
+if (activeFinanceSection({ finance: { section: 'treasury' } }) !== 'treasury') {
+  console.error('FAIL: finance treasury section');
+  failed = true;
+} else {
+  const { renderFinanceTreasuryPanel, treasuryObligationsSummary } = await import(
+    `file://${join(sim, 'modules/FacilitiesEconomics.js')}`
+  );
+  const { renderFinanceSummary } = await import(`file://${join(sim, 'modules/Finance.js')}`);
+  const treasuryState = createInitialState({ companyName: 'Treasury UI', categoryId: 'b2b-saas', mode: 'sandbox' });
+  treasuryState.workspace.tier = WORKSPACE_TIER.SMALL;
+  treasuryState.workspace.smallOfficeOwned = true;
+  treasuryState.finance.arr = 500_000;
+  treasuryState.finance.mrr = 40_000;
+  const html = renderFinanceTreasuryPanel(treasuryState, {
+    sum: renderFinanceSummary(treasuryState),
+    creditBlocksHtml: ''
+  });
+  const ob = treasuryObligationsSummary(treasuryState);
+  if (
+    !html.includes('Recurring obligations') ||
+    !html.includes('Corporate liquidity') ||
+    ob.rent.hqEffective <= 0
+  ) {
+    console.error('FAIL: treasury panel content');
+    failed = true;
+  } else {
+    console.log('OK: finance treasury section');
+  }
+}
+
+const {
+  preloadTreasurySponsorshipDeals,
+  signTreasurySponsorship,
+  settleTreasurySponsorshipsAtMonthEnd,
+  sponsoredMrrMonthly,
+  renewTreasurySponsorship,
+  sponsorshipBookSummary,
+  tickSponsorshipEscalationAtMonthStart
+} = await import(`file://${join(sim, 'modules/TreasurySponsorships.js')}`);
+await preloadTreasurySponsorshipDeals();
+const sponsorState = createInitialState({
+  companyName: 'Sponsor Co',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+sponsorState.flags.seedRoundClosed = true;
+sponsorState.finance.cash = 500_000_000;
+sponsorState.finance.mrr = 5_000_000;
+sponsorState.finance.arr = 60_000_000;
+const signConf = signTreasurySponsorship(sponsorState, 'nra-stadium-flagship');
+const active = sponsorState.treasurySponsorships?.active?.[0];
+const grantPace = active?.monthlyGrant ?? 0;
+const totalRev = active?.totalRevenueCommit ?? 0;
+if (!signConf.ok) {
+  console.error(`FAIL: sign sponsorship: ${signConf.reason}`);
+  failed = true;
+} else if (totalRev < 50_000_000 || totalRev > 101_000_000) {
+  console.error(`FAIL: sponsorship total revenue expected ~50-100M on 48M upfront, got ${totalRev}`);
+  failed = true;
+} else if (grantPace <= 0 || Math.abs(grantPace * 60 - totalRev) > 60_000) {
+  console.error('FAIL: sponsorship grant pace vs total revenue');
+  failed = true;
+} else if (sponsorState.finance.cash > 500_000_000 - 48_000_000 - 2_500_000 + 1_000_000) {
+  console.error('FAIL: sponsorship upfront fee not debited from cash');
+  failed = true;
+} else {
+  sponsorState.calendar.monthRevenue = 100_000;
+  const revBefore = sponsorState.calendar.monthRevenue;
+  const lines = settleTreasurySponsorshipsAtMonthEnd(sponsorState);
+  if (lines.length === 0 || sponsorState.calendar.monthRevenue !== revBefore + grantPace) {
+    console.error('FAIL: sponsorship month-end revenue recognition');
+    failed = true;
+  } else {
+    const book = sponsorshipBookSummary(sponsorState);
+    if (book.remainingMrrMonths <= 0) {
+      console.error('FAIL: sponsorship book remaining revenue');
+      failed = true;
+    } else {
+      sponsorState.treasurySponsorships.active[0].monthsRemaining = 2;
+      const renew = renewTreasurySponsorship(sponsorState, 'nra-stadium-flagship');
+      if (!renew.ok || sponsorState.treasurySponsorships.active[0].monthsRemaining !== 14) {
+        console.error(`FAIL: sponsorship renewal: ${renew.reason ?? 'months'}`);
+        failed = true;
+      } else {
+        const { advanceRealCalendarMonth } = await import(
+          `file://${join(sim, 'modules/GameCalendar.js')}`
+        );
+        for (let i = 0; i < 14; i++) advanceRealCalendarMonth(sponsorState);
+        while (sponsorState.calendar.monthIndex !== 1) advanceRealCalendarMonth(sponsorState);
+        if (calendarTurn(sponsorState) <= 1) {
+          console.error('FAIL: sponsorship escalation calendar turn');
+          failed = true;
+        } else {
+          sponsorState.treasurySponsorships.lastEscalationYear = null;
+          const before = sponsorState.treasurySponsorships.active[0].monthlyGrant;
+          tickSponsorshipEscalationAtMonthStart(sponsorState);
+          if (sponsorState.treasurySponsorships.active[0].monthlyGrant <= before) {
+            console.error('FAIL: sponsorship January revenue index');
+            failed = true;
+          } else {
+            console.log('OK: treasury sponsorship (upfront fee, contracted revenue, renew, index)');
+          }
+        }
+      }
+    }
+  }
+}
+
+{
+  const {
+    preloadCeoAlmaMaterCatalog,
+    donateToAlmaMater,
+    donateToAlmaMaterAthletics,
+    alumniRecognitionLabel,
+    athleticsBoosterLabel,
+    getAlmaMaterCatalogCount,
+    getAlmaMaterById
+  } = await import(`file://${join(sim, 'modules/CeoAlumniGiving.js')}`);
+  await preloadCeoAlmaMaterCatalog();
+  if (getAlmaMaterCatalogCount() < 120 || !getAlmaMaterById('maryville-college')) {
+    console.error('FAIL: alma mater catalog (expected 120+ schools incl. Maryville College)');
+    failed = true;
+  }
+  const alumniState = createInitialState({
+    companyName: 'Alumni Co',
+    categoryId: 'b2b-saas',
+    mode: 'sandbox',
+    almaMaterId: 'maryville-college'
+  });
+  alumniState.ceo.bankBalance = 200_000;
+  const gift = donateToAlmaMater(alumniState, 25_000, 'annual-fund');
+  if (alumniState.company.almaMaterId !== 'maryville-college') {
+    console.error('FAIL: alma mater not stored on company');
+    failed = true;
+  } else if (!gift.ok || alumniState.ceo.alumniGivingLifetime !== 25_000) {
+    console.error(`FAIL: CEO alumni donation: ${gift.reason ?? 'amount'}`);
+    failed = true;
+  } else if (alumniRecognitionLabel(alumniState.ceo.alumniGivingLifetime) !== 'Annual fund donor') {
+    console.error('FAIL: CEO alumni recognition tier');
+    failed = true;
+  } else {
+    const athleticsGift = donateToAlmaMaterAthletics(alumniState, 50_000, 'boosters');
+    if (
+      !athleticsGift.ok ||
+      alumniState.ceo.alumniAthleticsLifetime !== 50_000 ||
+      alumniState.ceo.alumniGivingLifetime !== 75_000 ||
+      athleticsBoosterLabel(alumniState.ceo.alumniAthleticsLifetime) !== 'Varsity booster club'
+    ) {
+      console.error(`FAIL: CEO athletics alumni donation: ${athleticsGift.reason ?? 'amount/tiers'}`);
+      failed = true;
+    } else {
+      console.log('OK: CEO alma mater alumni giving (incl. athletics funding)');
+    }
+  }
+}
+
+{
+  const {
+    preloadCeoWlbCatalog,
+    dealCeoWlbOffers,
+    completeCeoWlbTask,
+    personalHappinessScore,
+    getCeoWlbCatalogCount,
+    getCeoWlbTaskById
+  } = await import(`file://${join(sim, 'modules/CeoHappiness.js')}`);
+  await preloadCeoWlbCatalog();
+  if (getCeoWlbCatalogCount() < 75) {
+    console.error('FAIL: CEO WLB task catalog (expected 75+ handcrafted tasks)');
+    failed = true;
+  } else {
+    const wlbState = createInitialState({
+      companyName: 'Balance Co',
+      categoryId: 'b2b-saas',
+      mode: 'sandbox'
+    });
+    wlbState.ceo.bankBalance = 50_000;
+    const before = personalHappinessScore(wlbState);
+    dealCeoWlbOffers(wlbState);
+    const offers = wlbState.ceo.wlbOffers ?? [];
+    if (offers.length !== 4) {
+      console.error(`FAIL: CEO WLB monthly offers (expected 4, got ${offers.length})`);
+      failed = true;
+    } else {
+      const tags = new Set(
+        offers.map((o) => getCeoWlbTaskById(o.taskId)?.tag ?? 'Balance')
+      );
+      if (tags.size < 3) {
+        console.error('FAIL: CEO WLB offers should span diverse tags');
+        failed = true;
+      }
+    }
+    const offerId = wlbState.ceo.wlbOffers?.[0]?.taskId;
+    if (!offerId) {
+      console.error('FAIL: CEO WLB monthly offers');
+      failed = true;
+    } else {
+      const done = completeCeoWlbTask(wlbState, offerId);
+      if (!done.ok || personalHappinessScore(wlbState) <= before) {
+        console.error(`FAIL: CEO WLB task completion: ${done.reason ?? 'happiness'}`);
+        failed = true;
+      } else if ((wlbState.ceo.wlbLifetimeCompleted ?? 0) !== 1) {
+        console.error('FAIL: CEO WLB lifetime completion counter');
+        failed = true;
+      } else {
+        wlbState.ceo.wlbStreakMonths = 3;
+        dealCeoWlbOffers(wlbState);
+        const streakOffer = wlbState.ceo.wlbOffers?.find((o) => !o.completed)?.taskId;
+        if (streakOffer) {
+          const streakDone = completeCeoWlbTask(wlbState, streakOffer);
+          if (!streakDone.ok || !String(streakDone.summary ?? '').includes('streak')) {
+            console.error('FAIL: CEO WLB streak bonus on completion');
+            failed = true;
+          }
+        }
+        if (!failed) console.log('OK: CEO personal happiness & work-life balance tasks');
+      }
+    }
+  }
+}
+
+{
+  const {
+    saveStartupConferenceConfig,
+    tickStartupConferenceAtMonthStart,
+    CONFERENCE_KEYNOTE_TASK_ID
+  } = await import(`file://${join(sim, 'modules/StartupConference.js')}`);
+  const { dealMonthlyTasks, getEligibleDeskTasks, confirmTaskLineup } = await import(
+    `file://${join(sim, 'modules/Tasks.js')}`
+  );
+  const confState = createInitialState({
+    companyName: 'Conf Co',
+    categoryId: 'b2b-saas',
+    mode: 'sandbox'
+  });
+  confState.flags.seedRoundClosed = true;
+  confState.flags.xcResidencyComplete = true;
+  confState.stage = 'post_xc';
+  confState.finance.cash = 2_000_000;
+  confState.finance.arr = 2_000_000;
+  confState.finance.mrr = Math.round(2_000_000 / 12);
+  const saved = saveStartupConferenceConfig(confState, {
+    name: 'Nexus Summit',
+    budgetRaw: 350_000,
+    monthIndexRaw: 6,
+    sponsorTier: 'flagship',
+    ticketTier: 'paid'
+  });
+  if (!saved.ok) {
+    console.error(`FAIL: save startup conference: ${saved.reason}`);
+    failed = true;
+  } else {
+    confState.calendar.monthIndex = 6;
+    const start = tickStartupConferenceAtMonthStart(confState);
+    const expectedCharge = Math.round(350_000 * 1.38);
+    if (start.budgetCharge !== expectedCharge || confState.startupConference.budgetPaidYear !== confState.calendar.year) {
+      console.error(`FAIL: startup conference budget charge at month start (got ${start.budgetCharge}, want ${expectedCharge})`);
+      failed = true;
+    } else {
+      dealMonthlyTasks(confState);
+      const pool = getEligibleDeskTasks(confState);
+      if (!pool.length || pool.some((t) => !t.startupConference && !t.taxFiling && !t.ceoPersonalTaxFiling)) {
+        console.error('FAIL: conference month desk pool should be conference tasks only');
+        failed = true;
+      } else if (!pool.some((t) => t.id === CONFERENCE_KEYNOTE_TASK_ID)) {
+        console.error('FAIL: conference month desk pool must include mandatory keynote task');
+        failed = true;
+      } else {
+        const offers = confState.calendar.monthTaskOffers ?? [];
+        if (!offers.some((o) => o.taskId === CONFERENCE_KEYNOTE_TASK_ID)) {
+          console.error('FAIL: conference month offers must include mandatory keynote');
+          failed = true;
+        } else {
+          const slots = confState.calendar.monthTaskSlotTarget ?? 3;
+          for (const o of offers) o.selected = false;
+          let picked = 0;
+          for (const o of offers) {
+            if (o.taskId === CONFERENCE_KEYNOTE_TASK_ID) continue;
+            if (picked >= slots) break;
+            o.selected = true;
+            picked += 1;
+          }
+          const withoutKeynote = confirmTaskLineup(confState);
+          if (withoutKeynote.ok || !String(withoutKeynote.reason || '').includes('keynote')) {
+            console.error('FAIL: lineup should require main stage keynote');
+            failed = true;
+          } else {
+            for (const o of offers) o.selected = false;
+            picked = 0;
+            for (const o of offers) {
+              if (picked >= slots) break;
+              o.selected = true;
+              picked += 1;
+            }
+            if (!confirmTaskLineup(confState).ok) {
+              console.error('FAIL: lineup with keynote should lock');
+              failed = true;
+            } else {
+              console.log('OK: startup conference (schedule, budget, conference-only desk, mandatory keynote)');
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+{
+  const {
+    preloadFinancePropertyPrograms,
+    acquireFinanceProperty,
+    propertyHoldingsSummary,
+    propertyRevenueMultBonus,
+    tickFinancePropertyAtMonthStart
+  } = await import(`file://${join(sim, 'modules/FinanceProperty.js')}`);
+  await preloadFinancePropertyPrograms();
+  const aiState = createInitialState({
+    companyName: 'GPU Co',
+    categoryId: 'ai-tools',
+    mode: 'sandbox'
+  });
+  aiState.flags.seedRoundClosed = true;
+  aiState.finance.cash = 50_000_000;
+  aiState.finance.mrr = 50_000;
+  aiState.finance.arr = 600_000;
+  const bought = acquireFinanceProperty(aiState, { tierId: 'ai-tools-edge-pod', quantityRaw: 2 });
+  if (!bought.ok) {
+    console.error(`FAIL: finance property acquire (ai): ${bought.reason}`);
+    failed = true;
+  } else if (propertyHoldingsSummary(aiState).totalUnits !== 2) {
+    console.error('FAIL: finance property holdings count');
+    failed = true;
+  } else if (propertyRevenueMultBonus(aiState) <= 0) {
+    console.error('FAIL: finance property revenue mult bonus');
+    failed = true;
+  } else {
+    const edState = createInitialState({
+      companyName: 'Learn Co',
+      categoryId: 'edtech',
+      mode: 'sandbox'
+    });
+    edState.flags.seedRoundClosed = true;
+    edState.finance.cash = 5_000_000;
+    edState.finance.mrr = 30_000;
+    edState.finance.arr = 360_000;
+    const emo = acquireFinanceProperty(edState, { tierId: 'edtech-virtual-charter', quantityRaw: 1 });
+    if (!emo.ok) {
+      console.error(`FAIL: finance property acquire (edtech): ${emo.reason}`);
+      failed = true;
+    } else {
+      const mrrAfterBuy = edState.finance.mrr;
+      tickFinancePropertyAtMonthStart(edState);
+      tickFinancePropertyAtMonthStart(edState);
+      if (edState.finance.mrr !== mrrAfterBuy) {
+        console.error('FAIL: property contracted MRR should not stack each month');
+        failed = true;
+      } else if ((edState.financeProperty?.lifetimeContractedCash ?? 0) < 18500) {
+        console.error('FAIL: property contracted cash yield at month start');
+        failed = true;
+      } else {
+        const gated = acquireFinanceProperty(edState, { tierId: 'edtech-regional-emo', quantityRaw: 1 });
+        if (gated.ok) {
+          console.error('FAIL: edtech regional EMO should require virtual charters');
+          failed = true;
+        } else {
+          console.log('OK: finance property (category tiers, capex, rev× / EMO MRR)');
         }
       }
     }

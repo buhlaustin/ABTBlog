@@ -23,6 +23,13 @@ import { applyTaskRivalEffects } from './WorldDynamics.js';
 import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 import { accrueFiscalExpense, accrueFiscalRevenue, fiscalYearDisplay } from './CorporateTax.js';
 import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
+import { conferenceMonthActive, conferenceTaskRevenueMultiplier } from './StartupConference.js';
+import { propertyRevenueMultBonus } from './FinanceProperty.js';
+
+function startupConferenceDeskRevenueMult(state, taskDef) {
+  if (!taskDef?.startupConference || !conferenceMonthActive(state)) return 1;
+  return conferenceTaskRevenueMultiplier(state, taskDef);
+}
 import { totalHeadcount } from './Staff.js';
 import { totalHeadcountCap } from './Offices.js';
 import {
@@ -105,7 +112,8 @@ export function getCoreTaskRevenueMult(state) {
     acceleratorRevenueMult(state) *
     productBuzzRevenueMult(state) *
     staffRevenueMultiplier(state) *
-    scenarioRevenueMult(state);
+    scenarioRevenueMult(state) *
+    (1 + propertyRevenueMultBonus(state));
   return Math.round(m * 100) / 100;
 }
 
@@ -186,9 +194,10 @@ export function estimateTaskPayoutBand(taskDef, state) {
   const [rMin, rMax] = taskDef?.revenue ?? [0, 0];
   const eff = getTaskRevenueMultiplierPreview(state);
   const era = eraBaseRevenueScaleForTask(taskDef, state);
+  const conf = startupConferenceDeskRevenueMult(state, taskDef);
   return {
-    min: Math.round(rMin * era * eff * 0.45),
-    max: Math.round(rMax * era * eff * 1.05)
+    min: Math.round(rMin * era * eff * conf * 0.45),
+    max: Math.round(rMax * era * eff * conf * 1.05)
   };
 }
 
@@ -316,7 +325,8 @@ export function rollTaskOutcome(taskDef, state) {
   const base = rMin + Math.random() * Math.max(0, rMax - rMin);
   const mult = headcountExecutionScale(state, taskDef) * departmentTaskMultiplier(state, taskDef);
   const era = eraBaseRevenueScaleForTask(taskDef, state);
-  const revenue = Math.round(base * mult * era);
+  const conf = startupConferenceDeskRevenueMult(state, taskDef);
+  const revenue = Math.round(base * mult * era * conf);
   let mrrGain = 0;
   const mrrSpec = taskDef.mrrGain;
   if (Array.isArray(mrrSpec) && mrrSpec.length >= 2) {

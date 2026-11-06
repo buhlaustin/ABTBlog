@@ -1,17 +1,19 @@
 import { formatMoney } from './constants.js';
 
-/** Satellite city market + small/medium/large footprint sizing. */
+/** Satellite city market + small/medium/large/xlarge footprint sizing. */
 
-export const SATELLITE_SIZE_IDS = ['small', 'medium', 'large'];
+export const SATELLITE_SIZE_IDS = ['small', 'medium', 'large', 'xlarge'];
 
 export const SATELLITE_SIZES = {
-  small: { label: 'Small', seatMult: 0.62, rentMult: 0.72 },
+  small: { label: 'Small', seatMult: 0.55, rentMult: 0.66 },
   medium: { label: 'Medium', seatMult: 1, rentMult: 1 },
-  large: { label: 'Large', seatMult: 1.48, rentMult: 1.38 }
+  large: { label: 'Large', seatMult: 1.95, rentMult: 1.58 },
+  xlarge: { label: 'Extra-large', seatMult: 3.05, rentMult: 2.12 }
 };
 
-const BASE_SEATS = 9;
-const BASE_RENT = 9500;
+/** Tier-5 alpha city medium footprint targets ~19 seats (old “large” scale). */
+const BASE_SEATS = 13;
+const BASE_RENT = 10_500;
 
 function clampTier(n) {
   return Math.min(5, Math.max(1, Math.round(Number(n) || 3)));

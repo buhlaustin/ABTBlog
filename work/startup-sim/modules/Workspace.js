@@ -84,9 +84,10 @@ export function workspaceRentMonthly(state) {
   let rent = RENT_BY_TIER[tier] ?? RENT_BY_TIER[WORKSPACE_TIER.GARAGE];
   if (tier === WORKSPACE_TIER.HUB && state.offices?.hubId) {
     const hubRent = state.finance?.hubRentMonthly;
-    if (typeof hubRent === 'number') rent = hubRent;
+    if (typeof hubRent === 'number') return hubRent;
   }
-  return rent;
+  const indexMult = state.finance?.rentIndexMult ?? 1;
+  return Math.round(rent * indexMult);
 }
 
 export function applyWorkspaceBurn(state) {
@@ -208,6 +209,9 @@ export function purchaseWorkspaceTier(state, tier) {
   if (tier !== WORKSPACE_TIER.GARAGE && tier !== WORKSPACE_TIER.HUB) {
     state.stage = STAGES.OFFICE;
   }
+  if (tier === WORKSPACE_TIER.SMALL && state.ceo) {
+    state.ceo.personalExpenseScheduled = null;
+  }
   return { ok: true, tier };
 }
 
@@ -218,6 +222,7 @@ export function restorePostXcWorkspace(state) {
   state.workspace.smallOfficeOwned = true;
   applyWorkspaceBurn(state);
   state.stage = STAGES.OFFICE;
+  if (state.ceo) state.ceo.personalExpenseScheduled = null;
 }
 
 export function workspaceLabel(tier) {

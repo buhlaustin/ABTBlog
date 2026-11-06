@@ -19,6 +19,7 @@ import {
   depositStockCashOutToPersonalBank,
   creditCeoStockSale
 } from './CeoEconomics.js';
+import { ceoPersonalWealthEndgame } from './FacilitiesEconomics.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
@@ -74,12 +75,42 @@ export function isPublicCompany(state) {
   return Boolean(state.flags?.ipoFiled && state.stage === STAGES.PUBLIC);
 }
 
-function computeIpoValuation(state) {
+/** Cash minus bank debt and revenue-advance balance (counts toward equity value in the model). */
+export function treasuryNetCash(state) {
+  const cash = state.finance?.cash ?? 0;
+  const loan = state.finance?.loan?.balance ?? 0;
+  const rbf = state.finance?.rbf?.active ? state.finance?.rbf?.owed ?? 0 : 0;
+  return Math.round(cash - loan - rbf);
+}
+
+/** Operating + balance-sheet cash — used for IPO sizing and private valuation marks. */
+export function estimateEquityValue(state) {
   const revenue = state.finance?.lifetimeRevenue ?? 0;
   const mrr = state.finance?.mrr ?? 0;
   const lastVal = state.finance?.valuation ?? 15_000_000;
-  const revenueImplied = Math.max(lastVal, revenue * 4 + mrr * 48);
-  return Math.min(80_000_000_000, Math.round(revenueImplied));
+  const lastRound = state.finance?.lastRound?.postMoney ?? 0;
+  const portArr = totalSubsidiaryMrr(state) * 12;
+  const arr = Math.max(getArr(state), mrr * 12) + portArr;
+  const revenueImplied = Math.max(lastVal, lastRound, revenue * 4 + mrr * 48, arr * 5);
+  const netCash = Math.max(0, treasuryNetCash(state));
+  return Math.min(2_000_000_000_000, Math.round(revenueImplied + netCash));
+}
+
+function computeIpoValuation(state) {
+  return estimateEquityValue(state);
+}
+
+/** Keep finance.valuation aligned with operations + treasury (public: market cap). */
+export function refreshMarketValuationFromFundamentals(state) {
+  if (isPublicCompany(state)) {
+    computeFundamentalSharePrice(state);
+    const cap = marketCap(state);
+    if (cap > 0) state.finance.valuation = cap;
+    return cap;
+  }
+  const est = estimateEquityValue(state);
+  state.finance.valuation = est;
+  return est;
 }
 
 export function fileIpo(state) {
@@ -228,7 +259,11 @@ export function computeFundamentalSharePrice(state) {
   ps = Math.max(4, Math.min(26, ps));
 
   pm.priceSalesMultiple = Math.round(ps * 10) / 10;
-  const fairCap = arr * ps;
+  const operatingCap = arr * ps;
+  const netCash = Math.max(0, treasuryNetCash(state));
+  const fairCap = operatingCap + netCash;
+  pm.fundamentalOperatingCap = Math.round(operatingCap);
+  pm.treasuryNetCashInModel = netCash;
   const floor = priceFloor(state, pm.sharePrice ?? pm.ipoPrice ?? 1);
   const px = Math.round((fairCap / shares) * 100) / 100;
   pm.fundamentalPrice = Math.max(floor, px);
@@ -256,6 +291,8 @@ export function publicStockMetrics(state) {
     sessionCh,
     lastDelta: pm.lastMonthDeltaPct,
     modelPs: pm.priceSalesMultiple,
+    treasuryNetCash: pm.treasuryNetCashInModel ?? Math.max(0, treasuryNetCash(state)),
+    operatingCap: pm.fundamentalOperatingCap ?? null,
     drivers: pm.lastTickDrivers ?? []
   };
 }
@@ -565,7 +602,15 @@ export function tickPublicMarket(state) {
 
   const burn = state.finance?.monthlyBurn ?? 0;
   const cash = state.finance?.cash ?? 0;
-  const runwayStress = burn > 0 && cash / burn < 3 ? -0.045 : burn > 0 && cash / burn < 6 ? -0.015 : 0;
+  const netCash = treasuryNetCash(state);
+  let runwayStress = burn > 0 && cash / burn < 3 ? -0.045 : burn > 0 && cash / burn < 6 ? -0.015 : 0;
+  let cashTailwind = 0;
+  const capNow = marketCap(state);
+  if (netCash > 25_000_000 && capNow > 0 && netCash > capNow * 0.25) {
+    cashTailwind = Math.min(0.035, (netCash / capNow - 0.25) * 0.05);
+  } else if (netCash > 0 && burn > 0 && netCash / burn > 36) {
+    cashTailwind = 0.012;
+  }
   const buzz = Math.min(0.035, (state.product?.buzz ?? 0) * 0.0045);
   const noise = (Math.random() - 0.5) * 0.08;
   const sentiment = readNewsSentiment(state);
@@ -581,6 +626,7 @@ export function tickPublicMarket(state) {
     growthTerm +
     meanRevert +
     runwayStress +
+    cashTailwind +
     buzz +
     noise +
     sentiment +
@@ -594,7 +640,8 @@ export function tickPublicMarket(state) {
     { label: 'YTD revenue pace', pct: growthTerm },
     { label: 'Valuation vs model', pct: meanRevert },
     { label: 'Guidance streak', pct: guidanceBeat },
-    { label: 'Runway / cash', pct: runwayStress },
+    { label: 'Runway / cash stress', pct: runwayStress },
+    { label: 'Balance sheet cash', pct: cashTailwind },
     { label: 'Buzz & news', pct: buzz + sentiment },
     { label: 'Rival & shorts', pct: -(rivalHeat + shortDrag) },
     { label: 'Street credibility', pct: credNudge }
@@ -800,6 +847,8 @@ export function cashOut(state) {
   const payout = founderStakeValue(state);
   const founder = getFounderRow(state);
   const comp = ceoEndgameCompSnapshot(state);
+  const personalWealth = ceoPersonalWealthEndgame(state);
+  const bankAfter = depositStockCashOutToPersonalBank(state, payout);
   state.ending = {
     type: 'cash_out',
     payout,
@@ -812,7 +861,11 @@ export function cashOut(state) {
     pressDek: state.publicMarket?.pressDek ?? null,
     ceoSalaryCareer: comp.salary,
     ceoOwnerDraws: comp.draws,
-    ceoBankBalance: depositStockCashOutToPersonalBank(state, payout),
+    ceoBankBalance: bankAfter,
+    ceoPortfolioBalance: personalWealth.portfolio,
+    ceoHomeMarketValue: personalWealth.homeMarketValue,
+    ceoHomeEquity: personalWealth.homeEquity,
+    ceoHomeLabel: personalWealth.homeLabel,
     totalCareerCashComp: comp.salary + comp.draws + payout
   };
 
@@ -926,6 +979,8 @@ export function renderPublicStockPanel(mount, state) {
               }),
               panelStatCard('Trading P/S (ARR)', metrics.tradingPs != null ? `${metrics.tradingPs.toFixed(1)}×` : '—'),
               panelStatCard('Model P/S', pm.priceSalesMultiple != null ? `${pm.priceSalesMultiple}×` : '—'),
+              panelStatCard('Net cash in model', formatMoney(metrics.treasuryNetCash ?? 0)),
+              panelStatCard('Operating cap (model)', formatMoney(metrics.operatingCap ?? 0)),
               panelStatCard('Last month move', pm.lastMonthDeltaPct != null ? formatDriverPct(pm.lastMonthDeltaPct) : '—'),
               panelStatCard('IPO open', formatMoney(pm.ipoPrice ?? 0))
             ])

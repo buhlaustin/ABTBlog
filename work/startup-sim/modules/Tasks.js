@@ -2,11 +2,21 @@ import { fetchGameJson } from './utils.js';
 import { STAGES, getMonthlyTaskSlots, getMonthlyTaskOfferCount } from './constants.js';
 import { getTaskStage } from './Workspace.js';
 import { progressionTierForUnlocks } from './ProgressionEconomy.js';
+
+const MID_GAME_TASK_ID_PREFIX = 'mid-';
+
+function isMidGameHandcraftedTask(task) {
+  return typeof task?.id === 'string' && task.id.startsWith(MID_GAME_TASK_ID_PREFIX);
+}
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
 import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
 import bundledLaunchCrowd from '../data/launch-crowdfunding-tasks.json' with { type: 'json' };
 import bundledLaunchPostHandcrafted from '../data/launch-post-handcrafted-pack.json' with { type: 'json' };
+import bundledAiToolsPrelaunch from '../data/ai-tools-prelaunch-tasks.json' with { type: 'json' };
+import bundledAiToolsChatXgptLaunch from '../data/ai-tools-chatxgpt-launch-tasks.json' with { type: 'json' };
+import bundledAiToolsPostXc from '../data/ai-tools-post-xc-tasks.json' with { type: 'json' };
+import bundledAiToolsPostXcWhales from '../data/ai-tools-post-xc-whale-tasks.json' with { type: 'json' };
 import bundledSpaceExploration from '../data/space-exploration-tasks.json' with { type: 'json' };
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
 import bundledAiToolsDeskExtra from '../data/ai-tools-desk-tasks-extra.json' with { type: 'json' };
@@ -15,13 +25,28 @@ import bundledCatalogExpansion from '../data/tasks-catalog-expansion.json' with 
 import bundledPublicLate from '../data/tasks-public-late-game.json' with { type: 'json' };
 import bundledPublicLateExtra from '../data/tasks-public-late-game-extra.json' with { type: 'json' };
 import bundledPublicWhaleHandcrafted from '../data/tasks-public-whale-handcrafted.json' with { type: 'json' };
+import bundledPublicMegawhaleHandcrafted from '../data/tasks-public-megawhale-handcrafted.json' with { type: 'json' };
 import bundledPublicLateHandcrafted from '../data/tasks-public-late-handcrafted-pack.json' with { type: 'json' };
+import bundledPublicPostIpoHandcrafted from '../data/tasks-public-post-ipo-handcrafted-pack.json' with { type: 'json' };
 import bundledMidGameHandcrafted from '../data/tasks-mid-game-handcrafted-pack.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import bundledTaxFiling from '../data/tax-filing-task.json' with { type: 'json' };
 import bundledCeoPersonalTaxFiling from '../data/ceo-personal-tax-task.json' with { type: 'json' };
-import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
+import bundledStartupConference from '../data/startup-conference-tasks.json' with { type: 'json' };
+import {
+  conferenceMonthActive,
+  CONFERENCE_KEYNOTE_TASK_ID,
+  isConferenceKeynoteMandatory
+} from './StartupConference.js';
+import { isPublicCompany } from './IPO.js';
+import { isMegawhalePlay } from './WhaleScale.js';
+import {
+  isXcDemoDayMonth,
+  isAiPostBatchApiReleaseMonth,
+  XC_DEMO_DAY_TASK_ID,
+  AI_POST_BATCH_API_RELEASE_TASK_ID
+} from './XC.js';
 import { isTaxFilingRequired, TAX_FILING_TASK_ID } from './CorporateTax.js';
 import {
   isCeoPersonalTaxFilingRequired,
@@ -31,7 +56,10 @@ import {
   currentLaunchTaskPhase,
   launchPhaseAllowed,
   launchLifecycleActive,
-  canSchedulePublicLaunch
+  canSchedulePublicLaunch,
+  CHATXGPT_LAUNCH_CATEGORY,
+  getMonthlyTaskSlotsForState,
+  getMonthlyTaskOfferCountForState
 } from './LaunchLifecycle.js';
 
 /** Shipped catalog — always available with the game bundle. */
@@ -50,7 +78,9 @@ function mergeLaunchTasks(base) {
   const launch = [
     ...(bundledLaunch?.tasks ?? []),
     ...(bundledLaunchCrowd?.tasks ?? []),
-    ...(bundledLaunchPostHandcrafted?.tasks ?? [])
+    ...(bundledLaunchPostHandcrafted?.tasks ?? []),
+    ...(bundledAiToolsPrelaunch?.tasks ?? []),
+    ...(bundledAiToolsChatXgptLaunch?.tasks ?? [])
   ];
   if (!launch.length) return base;
   const ids = new Set((base.tasks ?? []).map((t) => t.id));
@@ -109,6 +139,8 @@ function mergeSpaceExplorationTasks(base) {
 function mergeAiToolsDeskTasks(base) {
   let out = mergeTaskPack(base, bundledAiToolsDeskExtra?.tasks ?? []);
   out = mergeTaskPack(out, bundledAiToolsModelLab?.tasks ?? []);
+  out = mergeTaskPack(out, bundledAiToolsPostXc?.tasks ?? []);
+  out = mergeTaskPack(out, bundledAiToolsPostXcWhales?.tasks ?? []);
   return out;
 }
 
@@ -124,24 +156,36 @@ function mergePublicLateGameTasks(base) {
   return mergeTaskPack(
     mergeTaskPack(
       mergeTaskPack(
-        mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
-        bundledPublicLateExtra?.tasks ?? []
+        mergeTaskPack(
+          mergeTaskPack(
+            mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
+            bundledPublicLateExtra?.tasks ?? []
+          ),
+          bundledPublicWhaleHandcrafted?.tasks ?? []
+        ),
+        bundledPublicMegawhaleHandcrafted?.tasks ?? []
       ),
-      bundledPublicWhaleHandcrafted?.tasks ?? []
+      bundledPublicLateHandcrafted?.tasks ?? []
     ),
-    bundledPublicLateHandcrafted?.tasks ?? []
+    bundledPublicPostIpoHandcrafted?.tasks ?? []
   );
 }
 
+function mergeStartupConferenceTasks(base) {
+  return mergeTaskPack(base, bundledStartupConference?.tasks ?? []);
+}
+
 function mergeCatalog(base) {
-  return mergeTaxFilingTasks(
-    mergeXcDemoDayTasks(
-      mergePostXcPreSeedTasks(
-        mergeLaunchTasks(
-          mergeAiToolsDeskTasks(
-            mergeSpaceExplorationTasks(
-              mergePublicLateGameTasks(
-                mergeMidGameHandcrafted(mergeCatalogExpansion(mergeSignatureTasks(base)))
+  return mergeStartupConferenceTasks(
+    mergeTaxFilingTasks(
+      mergeXcDemoDayTasks(
+        mergePostXcPreSeedTasks(
+          mergeLaunchTasks(
+            mergeAiToolsDeskTasks(
+              mergeSpaceExplorationTasks(
+                mergePublicLateGameTasks(
+                  mergeMidGameHandcrafted(mergeCatalogExpansion(mergeSignatureTasks(base)))
+                )
               )
             )
           )
@@ -180,6 +224,11 @@ export function taskCatalogSize() {
 /** Headless tests — eligible desk pool for the current run state. */
 export function getTaskPoolSize(state) {
   return buildTaskPool(state).length;
+}
+
+/** Eligible desk tasks for tests and diagnostics. */
+export function getEligibleDeskTasks(state) {
+  return buildTaskPool(state);
 }
 
 export function isTaskCatalogReady() {
@@ -282,6 +331,15 @@ export function monthDealHasDuplicateTaskIds(picked) {
 }
 
 function categoryAllowed(task, categoryId) {
+  const phase = task.launchPhase;
+  if (phase === 'launch' || phase === 'post_launch') {
+    if (categoryId === CHATXGPT_LAUNCH_CATEGORY) {
+      return task.categories?.includes(CHATXGPT_LAUNCH_CATEGORY) === true;
+    }
+    if (task.categories?.includes(CHATXGPT_LAUNCH_CATEGORY)) return false;
+    if (task.categories?.length) return task.categories.includes(categoryId);
+    return true;
+  }
   const cats = task.categories;
   if (!cats?.length) return true;
   return cats.includes(categoryId);
@@ -342,30 +400,89 @@ function taskTierAllowed(task, state) {
   return tier >= min && tier <= max;
 }
 
+function mandatoryDeskTasks(state) {
+  const defs = getTaskDefinitions();
+  const pick = (id) => defs.find((t) => t.id === id);
+  const out = [];
+  if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
+    const t = pick(XC_DEMO_DAY_TASK_ID);
+    if (t) out.push(t);
+  }
+  if (isAiPostBatchApiReleaseMonth(state)) {
+    const t = pick(AI_POST_BATCH_API_RELEASE_TASK_ID);
+    if (t) out.push(t);
+  }
+  if (isTaxFilingRequired(state)) {
+    const t = pick(TAX_FILING_TASK_ID);
+    if (t) out.push(t);
+  }
+  if (isCeoPersonalTaxFilingRequired(state)) {
+    const t = pick(CEO_PERSONAL_TAX_FILING_TASK_ID);
+    if (t) out.push(t);
+  }
+  if (isConferenceKeynoteMandatory(state)) {
+    const t = pick(CONFERENCE_KEYNOTE_TASK_ID);
+    if (t) out.push(t);
+  }
+  return out;
+}
+
+function dedupeTasksById(tasks) {
+  const seen = new Set();
+  const out = [];
+  for (const t of tasks) {
+    if (!t?.id || seen.has(t.id)) continue;
+    seen.add(t.id);
+    out.push(t);
+  }
+  return out;
+}
+
+function taskEligibleForState(t, state, taskStage, categoryId) {
+  const demoMonth = isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone;
+  if (t.xcDemoDay && !demoMonth) return false;
+  if (t.aiPostBatchApiRelease && !isAiPostBatchApiReleaseMonth(state)) return false;
+  if (t.taxFiling && !isTaxFilingRequired(state)) return false;
+  if (t.ceoPersonalTaxFiling && !isCeoPersonalTaxFilingRequired(state)) return false;
+  const launchOk = t.startupConference ? true : launchPhaseAllowed(t, state);
+  const tierOk = t.startupConference ? true : taskTierAllowed(t, state);
+  return (
+    stageAllowed(t, taskStage) &&
+    categoryAllowed(t, categoryId) &&
+    tierOk &&
+    launchOk
+  );
+}
+
 function buildTaskPool(state) {
   const taskStage = getTaskStage(state);
   const categoryId = state.company?.categoryId;
-  const demoMonth = isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone;
+  const mandatory = mandatoryDeskTasks(state);
+  const mandatoryIds = new Set(mandatory.map((t) => t.id));
+
+  if (conferenceMonthActive(state)) {
+    const conference = getTaskDefinitions().filter(
+      (t) =>
+        t.startupConference &&
+        !mandatoryIds.has(t.id) &&
+        taskEligibleForState(t, state, taskStage, categoryId)
+    );
+    return dedupeTasksById([...mandatory, ...conference]);
+  }
+
   return getTaskDefinitions().filter(
-    (t) => {
-      if (t.xcDemoDay && !demoMonth) return false;
-      if (t.taxFiling && !isTaxFilingRequired(state)) return false;
-      if (t.ceoPersonalTaxFiling && !isCeoPersonalTaxFilingRequired(state)) return false;
-      return (
-        stageAllowed(t, taskStage) &&
-        categoryAllowed(t, categoryId) &&
-        taskTierAllowed(t, state) &&
-        launchPhaseAllowed(t, state)
-      );
-    }
+    (t) =>
+      !t.startupConference &&
+      taskEligibleForState(t, state, taskStage, categoryId)
   );
 }
 
 /** Offer extra tasks; player confirms lineup before work counts. */
 export function dealMonthlyTasks(state) {
   const taskStage = getTaskStage(state);
-  const slots = getMonthlyTaskSlots(taskStage);
-  const offerCount = getMonthlyTaskOfferCount(taskStage);
+  const categoryId = state.company?.categoryId;
+  const slots = getMonthlyTaskSlotsForState(state);
+  const offerCount = getMonthlyTaskOfferCountForState(state);
   const pool = buildTaskPool(state);
   if (!pool.length) {
     state.calendar.taskCatalogError = true;
@@ -396,6 +513,24 @@ export function dealMonthlyTasks(state) {
     const demo = pool.find((t) => t.id === XC_DEMO_DAY_TASK_ID);
     if (demo) offered = mergeUniqueTaskOffers(offered, demo, offerCount);
   }
+  if (isAiPostBatchApiReleaseMonth(state)) {
+    const apiRelease = pool.find((t) => t.id === AI_POST_BATCH_API_RELEASE_TASK_ID);
+    if (apiRelease) offered = mergeUniqueTaskOffers(offered, apiRelease, offerCount);
+  }
+  if (
+    taskStage === STAGES.POST_XC &&
+    categoryId === CHATXGPT_LAUNCH_CATEGORY &&
+    !launchLifecycleActive(state) &&
+    !offered.some((t) => t.apiCreditsWhale)
+  ) {
+    const creditWhales = pool.filter((t) => t.apiCreditsWhale && t.whale);
+    if (creditWhales.length) {
+      const recentIds = new Set(state.calendar.recentTaskIds ?? []);
+      const freshWhales = creditWhales.filter((t) => !recentIds.has(t.id));
+      const pickFrom = freshWhales.length ? freshWhales : creditWhales;
+      offered = mergeUniqueTaskOffers(offered, shuffle(pickFrom)[0], offerCount);
+    }
+  }
   if (isTaxFilingRequired(state)) {
     const taxTask = pool.find((t) => t.id === TAX_FILING_TASK_ID);
     if (taxTask) offered = mergeUniqueTaskOffers(offered, taxTask, offerCount);
@@ -403,6 +538,48 @@ export function dealMonthlyTasks(state) {
   if (isCeoPersonalTaxFilingRequired(state)) {
     const ceoTax = pool.find((t) => t.id === CEO_PERSONAL_TAX_FILING_TASK_ID);
     if (ceoTax) offered = mergeUniqueTaskOffers(offered, ceoTax, offerCount);
+  }
+  if (isConferenceKeynoteMandatory(state)) {
+    const keynote = pool.find((t) => t.id === CONFERENCE_KEYNOTE_TASK_ID);
+    if (keynote) offered = mergeUniqueTaskOffers(offered, keynote, offerCount);
+  }
+  const midTier = progressionTierForUnlocks(state);
+  if (
+    taskStage === STAGES.POST_XC &&
+    midTier >= 2 &&
+    midTier <= 5 &&
+    !offered.some(isMidGameHandcraftedTask)
+  ) {
+    const midPool = pool.filter(isMidGameHandcraftedTask);
+    if (midPool.length) {
+      const recentIds = new Set(state.calendar.recentTaskIds ?? []);
+      const fresh = midPool.filter((t) => !recentIds.has(t.id));
+      const pickFrom = fresh.length ? fresh : midPool;
+      offered = mergeUniqueTaskOffers(offered, shuffle(pickFrom)[0], offerCount);
+    }
+  }
+  if (
+    taskStage === STAGES.POST_XC &&
+    midTier >= 4 &&
+    midTier <= 5 &&
+    !offered.some((t) => isMidGameHandcraftedTask(t) && t.whale)
+  ) {
+    const midWhales = pool.filter((t) => isMidGameHandcraftedTask(t) && t.whale);
+    if (midWhales.length) {
+      const recentIds = new Set(state.calendar.recentTaskIds ?? []);
+      const fresh = midWhales.filter((t) => !recentIds.has(t.id));
+      const pickFrom = fresh.length ? fresh : midWhales;
+      offered = mergeUniqueTaskOffers(offered, shuffle(pickFrom)[0], offerCount);
+    }
+  }
+  if ((isPublicCompany(state) || taskStage === STAGES.PUBLIC) && !offered.some(isMegawhalePlay)) {
+    const megaPool = pool.filter(isMegawhalePlay);
+    if (megaPool.length) {
+      const recentIds = new Set(state.calendar.recentTaskIds ?? []);
+      const fresh = megaPool.filter((t) => !recentIds.has(t.id));
+      const pickFrom = fresh.length ? fresh : megaPool;
+      offered = mergeUniqueTaskOffers(offered, shuffle(pickFrom)[0], offerCount);
+    }
   }
   if (!launchLifecycleActive(state)) {
     const sigPool = pool.filter((t) => t.signature);
@@ -452,7 +629,7 @@ export function selectedOfferCount(state) {
 }
 
 export function toggleTaskOffer(state, offerId) {
-  const slots = state.calendar.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+  const slots = state.calendar.monthTaskSlotTarget ?? getMonthlyTaskSlotsForState(state);
   if (state.calendar.taskLineupConfirmed) {
     return { ok: false, reason: 'Lineup locked — complete tasks or finish the month.' };
   }
@@ -470,7 +647,7 @@ export function toggleTaskOffer(state, offerId) {
 }
 
 export function confirmTaskLineup(state) {
-  const slots = state.calendar.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+  const slots = state.calendar.monthTaskSlotTarget ?? getMonthlyTaskSlotsForState(state);
   const selected = (state.calendar.monthTaskOffers ?? []).filter((o) => o.selected);
   if (selected.length !== slots) {
     return { ok: false, reason: `Select exactly ${slots} tasks for this month.` };
@@ -478,6 +655,14 @@ export function confirmTaskLineup(state) {
   if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
     if (!selected.some((o) => o.taskId === XC_DEMO_DAY_TASK_ID)) {
       return { ok: false, reason: 'Demo Day is mandatory in your final batch month — include it in your lineup.' };
+    }
+  }
+  if (isAiPostBatchApiReleaseMonth(state)) {
+    if (!selected.some((o) => o.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID)) {
+      return {
+        ok: false,
+        reason: 'Post-batch month — release the ChatXGPT API is mandatory in your lineup.'
+      };
     }
   }
   if (isTaxFilingRequired(state)) {
@@ -488,6 +673,14 @@ export function confirmTaskLineup(state) {
   if (isCeoPersonalTaxFilingRequired(state)) {
     if (!selected.some((o) => o.taskId === CEO_PERSONAL_TAX_FILING_TASK_ID)) {
       return { ok: false, reason: 'April CEO personal tax filing is mandatory — include it in your lineup.' };
+    }
+  }
+  if (isConferenceKeynoteMandatory(state)) {
+    if (!selected.some((o) => o.taskId === CONFERENCE_KEYNOTE_TASK_ID)) {
+      return {
+        ok: false,
+        reason: 'Conference month — the main stage keynote / presentation is mandatory in your lineup.'
+      };
     }
   }
   const recent = state.calendar.recentTaskIds ?? [];

@@ -1,6 +1,16 @@
 import { formatMoney, stageLabel } from './constants.js';
 import { formatStateMonth } from './GameCalendar.js';
 import { calendarTurn } from './XC.js';
+import { sponsoredMrrMonthly, sponsorshipBookSummary } from './TreasurySponsorships.js';
+import {
+  resolveCompanyAlmaMater,
+  alumniRecognitionLabel,
+  athleticsBoosterLabel
+} from './CeoAlumniGiving.js';
+import { personalHappinessScore, personalHappinessLabel } from './CeoHappiness.js';
+import { isConferenceConfigured, ensureStartupConference } from './StartupConference.js';
+import { propertyHoldingsSummary, getPropertyProgram } from './FinanceProperty.js';
+import { ceoLifestyleLifetimeSpend, ceoLifestyleOwnedDetails } from './CeoLifestyle.js';
 
 export function buildRunExportText(state) {
   const lines = [];
@@ -15,6 +25,58 @@ export function buildRunExportText(state) {
   lines.push(`Lifetime revenue: ${formatMoney(state.finance?.lifetimeRevenue ?? 0)}`);
   lines.push(`Cash: ${formatMoney(state.finance?.cash ?? 0)}`);
 
+  const happiness = personalHappinessScore(state);
+  lines.push(`Personal happiness: ${happiness}/100 — ${personalHappinessLabel(happiness)}`);
+  const wlbDone = state.ceo?.wlbLifetimeCompleted ?? 0;
+  const wlbStreak = state.ceo?.wlbStreakMonths ?? 0;
+  if (wlbDone > 0 || wlbStreak > 0) {
+    lines.push(`Work-life balance: ${wlbDone} task(s) completed · ${wlbStreak}-month streak`);
+  }
+
+  if (isConferenceConfigured(state)) {
+    const conf = ensureStartupConference(state);
+    lines.push(
+      `Startup conference “${conf.name}”: ${conf.editionsHeld ?? 0} edition(s) · ${formatMoney(conf.lifetimeRevenue ?? 0)} lifetime yield`
+    );
+  }
+
+  const propProgram = getPropertyProgram(state);
+  const propSum = propertyHoldingsSummary(state);
+  if (propProgram && propSum.totalUnits > 0) {
+    lines.push(
+      `Category property (${propProgram.tabTitle}): ${propSum.totalUnits} units · ${formatMoney(propSum.lifetimeCapex)} capex · +${(propSum.revenueMultBonus * 100).toFixed(1)}% desk rev×${propSum.ladderComplete ? ' (ladder synergy)' : ''} · ${formatMoney(propSum.mrrGrantMonthly)}/mo yield cash · ${formatMoney(propSum.lifetimeContractedCash)} collected`
+    );
+  }
+
+  const lifestyleOwned = ceoLifestyleOwnedDetails(state);
+  if (lifestyleOwned.length > 0) {
+    lines.push(
+      `CEO splurges: ${lifestyleOwned.length} owned · ${formatMoney(ceoLifestyleLifetimeSpend(state))} lifetime spend`
+    );
+  }
+
+  const school = resolveCompanyAlmaMater(state);
+  const alumniLifetime = state.ceo?.alumniGivingLifetime ?? 0;
+  if (school && alumniLifetime > 0) {
+    lines.push(
+      `Alma mater (${school.shortLabel ?? school.label}): ${formatMoney(alumniLifetime)} lifetime — ${alumniRecognitionLabel(alumniLifetime)}`
+    );
+    const athleticsLifetime = state.ceo?.alumniAthleticsLifetime ?? 0;
+    if (athleticsLifetime > 0) {
+      lines.push(
+        `  Athletics: ${formatMoney(athleticsLifetime)} — ${athleticsBoosterLabel(athleticsLifetime)}`
+      );
+    }
+  }
+
+  const sponsorMrr = sponsoredMrrMonthly(state);
+  if (sponsorMrr > 0) {
+    const book = sponsorshipBookSummary(state);
+    lines.push(
+      `Sponsor contracts: ~${formatMoney(sponsorMrr)}/mo grant pace (${book.activeCount} active; ${formatMoney(book.remainingMrrMonths)} revenue left on book)`
+    );
+  }
+
   if (state.ending?.type === 'cash_out') {
     const e = state.ending;
     lines.push('');
@@ -25,6 +87,14 @@ export function buildRunExportText(state) {
     lines.push(`CEO salary (career): ${formatMoney(e.ceoSalaryCareer ?? 0)}`);
     lines.push(`Owner draws: ${formatMoney(e.ceoOwnerDraws ?? 0)}`);
     lines.push(`Personal bank at exit: ${formatMoney(e.ceoBankBalance ?? 0)}`);
+    if (e.ceoPortfolioBalance > 0) {
+      lines.push(`Personal portfolio: ${formatMoney(e.ceoPortfolioBalance)}`);
+    }
+    if (e.ceoHomeMarketValue > 0) {
+      lines.push(
+        `${e.ceoHomeLabel ?? 'Home'} (market): ${formatMoney(e.ceoHomeMarketValue)} · equity ${formatMoney(e.ceoHomeEquity ?? 0)}`
+      );
+    }
     lines.push(`Total personal cash comp: ${formatMoney(e.totalCareerCashComp ?? e.payout)}`);
     if (e.pressHeadline) lines.push(`Press: ${e.pressHeadline}`);
   } else if (state.flags?.gameOver) {

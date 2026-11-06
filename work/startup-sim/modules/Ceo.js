@@ -14,6 +14,7 @@ import {
   buildCompLedger,
   cashOutPreview,
   maxOwnerDrawAmount,
+  ownerDrawsUnlocked,
   CEO_ARR_BONUS_PCTS,
   estimateCeoArrBonus,
   ceoArrBonusUiState,
@@ -30,11 +31,13 @@ import {
 } from './CeoEconomics.js';
 import {
   CEO_HOME_TIERS,
-  CEO_LIFESTYLE_PURCHASES,
-  CEO_LIFESTYLE_CATEGORIES,
+  getCeoLifestylePurchasesSync,
+  getCeoLifestyleCategoriesSync,
   ceoHousingSummary,
   ceoLifestyleMonthlyDebit,
   ceoLifestyleOwnedDetails,
+  ceoLifestyleLifetimeSpend,
+  lifestylePurchaseGate,
   standardMortgagePayment,
   HOUSING_MODE
 } from './CeoLifestyle.js';
@@ -42,6 +45,13 @@ import { isPublicCompany, canSellFounderStock } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
 import { ceoAgeDisplayLine } from './CeoProfile.js';
+import { renderCeoAlumniSection, resolveCompanyAlmaMater } from './CeoAlumniGiving.js';
+import {
+  renderCeoBalanceSection,
+  personalHappinessScore,
+  personalHappinessLabel,
+  personalHappinessTone
+} from './CeoHappiness.js';
 import {
   escapeHtml,
   panelStatCard,
@@ -53,7 +63,7 @@ import {
 
 export { setCeoSalaryAnnual, takeOwnerDraw };
 
-const CEO_SECTIONS = new Set(['overview', 'wealth', 'comp', 'lifestyle']);
+const CEO_SECTIONS = new Set(['overview', 'wealth', 'comp', 'balance', 'lifestyle', 'alumni']);
 
 export function setCeoSection(state, section) {
   if (!state.ceo) return;
@@ -221,6 +231,8 @@ function renderCeoSectionHtml(ctx) {
   if (section === 'wealth') return renderCeoWealthSection(ctx);
   if (section === 'comp') return renderCeoCompSection(ctx);
   if (section === 'lifestyle') return renderCeoLifestyleSection(ctx);
+  if (section === 'balance') return renderCeoBalanceSection(state, { disabled: ctx.disabled });
+  if (section === 'alumni') return renderCeoAlumniSection(state, { disabled: ctx.disabled });
   return renderCeoOverviewSection(ctx);
 }
 
@@ -244,6 +256,9 @@ function renderCeoOverviewSection(ctx) {
     portfolio,
     state
   } = ctx;
+  const happiness = personalHappinessScore(state);
+  const happinessLabel = personalHappinessLabel(happiness);
+  const happinessTone = personalHappinessTone(happiness);
   const runwaySalaryNoteInner =
     runway.ceoMo > 0 && runway.deltaMo
       ? `<p class="fine-print finance-details-note">CEO salary adds ~${formatMoney(runway.ceoMo)}/mo company overhead (≈${runway.deltaMo} mo less runway vs $0).</p>`
@@ -252,8 +267,10 @@ function renderCeoOverviewSection(ctx) {
     opening != null
       ? `Opened ${formatMoney(opening)} · typical spend ${formatMoney(typicalBurn)}/mo`
       : `Typical spend ${formatMoney(typicalBurn)}/mo from salary band`;
+  const drawsOpen = ownerDrawsUnlocked(state);
+  const compTabLabel = drawsOpen ? 'Comp &amp; draws' : 'Comp &amp; pay';
   const bankAlert = bankLow
-    ? `<p class="finance-alert finance-alert--tax" role="status"><strong>Low personal runway</strong> — ${escapeHtml(personalRunway.label)} at ~${formatMoney(typicalBurn)}/mo spend. Raise salary or draw from the company on <strong>Comp &amp; draws</strong>.</p>`
+    ? `<p class="finance-alert finance-alert--tax" role="status"><strong>Low personal runway</strong> — ${escapeHtml(personalRunway.label)} at ~${formatMoney(typicalBurn)}/mo spend. Raise CEO salary on <strong>${compTabLabel}</strong>${drawsOpen ? ' or take an owner draw' : ''}.</p>`
     : '';
   const personalTaxAlert =
     ctx.personalTax?.filingRequired && !ctx.personalTax?.taxPaid
@@ -268,14 +285,17 @@ function renderCeoOverviewSection(ctx) {
     ${panelSnapshotSection(
       panelMetricGroup(
         'Personal snapshot',
-        panelMetricGrid('4', [
+        `${panelMetricGrid('4', [
           panelStatCard('Personal bank', formatMoney(bank), { hero: true }),
           panelStatCard('Est. net worth', formatMoney(ceoNetWorth(state))),
+          panelStatCard('Personal happiness', `${happiness}/100`, { tone: happinessTone }),
+          panelStatCard('Balance', happinessLabel, { tone: happinessTone })
+        ])}${panelMetricGrid('2', [
           panelStatCard('Personal runway', escapeHtml(personalRunway.label)),
           panelStatCard('Liquidity', escapeHtml(health.label), {
             tone: health.tone === 'pos' ? 'pos' : health.tone === 'neg' ? 'neg' : null
           })
-        ])
+        ])}`
       ),
       { ariaLabel: 'Personal snapshot' }
     )}
@@ -292,7 +312,11 @@ function renderCeoOverviewSection(ctx) {
         <h3 class="finance-section-title">Personal debits</h3>
         <span class="fine-print">Auto · not editable</span>
       </div>
-      <p class="fine-print">${escapeHtml(expenseBand.label)} · ${formatMoney(annual)}/yr salary → ${formatMoney(expenseBand.min)}–${formatMoney(expenseBand.max)}/mo band</p>
+      <p class="fine-print">${escapeHtml(expenseBand.label)} · ${
+        expenseBand.min === expenseBand.max
+          ? `${formatMoney(expenseBand.min)}/mo fixed`
+          : `${formatMoney(annual)}/yr salary → ${formatMoney(expenseBand.min)}–${formatMoney(expenseBand.max)}/mo band`
+      }</p>
       ${panelMetricGrid('4', [
         panelStatCard('This month', formatMoney(scheduled.total)),
         panelStatCard('Typical / mo', formatMoney(typicalBurn)),
@@ -310,9 +334,11 @@ function renderCeoOverviewSection(ctx) {
       ${panelMetricStack(
         panelMetricGroup(
           'Cash compensation (career)',
-          panelMetricGrid('4', [
+          panelMetricGrid(drawsOpen || comp.draws > 0 ? '4' : '3', [
             panelStatCard('Career salary', formatMoney(comp.salary)),
-            panelStatCard('Owner draws', formatMoney(comp.draws)),
+            ...(drawsOpen || comp.draws > 0
+              ? [panelStatCard('Owner draws', formatMoney(comp.draws))]
+              : []),
             panelStatCard('Bonuses', formatMoney(comp.bonuses)),
             panelStatCard('Stock sales', formatMoney(comp.stockSales)),
             panelStatCard('Cash comp', formatMoney(ceoPersonalCashComp(state)))
@@ -336,7 +362,7 @@ function renderCeoOverviewSection(ctx) {
         )
       )}
     </section>
-    <p class="fine-print finance-ceo-pointer">Company cash, loans, and charity → <strong>Finance</strong>. Liquid exit and secondary sales → <strong>Wealth &amp; exit</strong>.</p>
+    <p class="fine-print finance-ceo-pointer">Work-life balance tasks → <strong>Balance</strong>. Company cash, loans, and charity → <strong>Finance</strong>. Liquid exit and secondary sales → <strong>Wealth &amp; exit</strong>.</p>
   `;
 }
 
@@ -489,6 +515,7 @@ function renderCeoWealthSection(ctx) {
 
 function renderCeoCompSection(ctx) {
   const { band, boardNote, annual, disabled, maxDraw, ledger, state } = ctx;
+  const drawsOpen = ownerDrawsUnlocked(state);
   const arrBonus = ceoArrBonusUiState(state);
   const arrBonusBtns = CEO_ARR_BONUS_PCTS.map((pct) => {
     const est = estimateCeoArrBonus(state, pct);
@@ -542,8 +569,11 @@ function renderCeoCompSection(ctx) {
         </div>
         ${salaryChanges ? `<details class="ceo-salary-history"><summary>Salary history</summary><ul class="instrument-list">${salaryChanges}</ul></details>` : ''}
       </div>
-      <div class="finance-action finance-card">
+      ${
+        drawsOpen
+          ? `<div class="finance-action finance-card">
         <p><strong>Owner draws</strong> — company cash → personal bank (max ${formatMoney(maxDraw)} today)</p>
+        <p class="fine-print">Bootstrap only — owner draws lock when seed closes; use salary and ARR bonuses afterward.</p>
         <div class="finance-charity-chips">
           <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-owner-draw="5000" ${disabled}>${formatMoney(5_000)}</button>
           <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-owner-draw="10000" ${disabled}>${formatMoney(10_000)}</button>
@@ -562,7 +592,9 @@ function renderCeoCompSection(ctx) {
           <input id="ceo-draw-input" type="number" min="500" step="500" placeholder="Custom amount" ${disabled}>
           <button type="button" class="btn btn-ghost btn-small" id="btn-ceo-draw-custom" ${disabled}>Draw</button>
         </div>
-      </div>
+      </div>`
+          : ''
+      }
       <div class="finance-action finance-card">
         <p><strong>CEO ARR bonus</strong> — % of prior fiscal-year revenue (company cash → personal bank)</p>
         <p class="fine-print">${escapeHtml(arrBonusNote)}</p>
@@ -605,25 +637,38 @@ function renderCeoLifestyleSection(ctx) {
 
   const renderLifestyleCard = (item) => {
     const owned = lifestyleOwned.has(item.id);
-    const gatedNw = item.minNetWorth && netWorth < item.minNetWorth;
-    const gatedPublic = item.requiresPublic && !isPublicCompany(state);
-    const gated = gatedNw || gatedPublic;
-    const gateNote = gatedPublic
-      ? 'Public company only'
-      : gatedNw
-        ? `Requires ≈ ${formatMoney(item.minNetWorth)} net worth`
+    const gate = lifestylePurchaseGate(state, item, { ok: !item.minNetWorth || netWorth >= item.minNetWorth });
+    const canBuy = gate.ok && !disabled;
+    const tags = [
+      item.exclusiveGroup ? 'One per category' : null,
+      item.requiresPublic ? 'Public co.' : null,
+      item.resalePct ? `Resell ~${Math.round(item.resalePct * 100)}%` : null,
+      item.buzzOnPurchase ? `+${item.buzzOnPurchase} buzz` : null,
+      item.sentimentOnPurchase ? `+${item.sentimentOnPurchase} sentiment` : null,
+      item.requiresOwned?.length ? 'Requires prior purchase' : null,
+      item.minHomeEquity ? `≥${formatMoney(item.minHomeEquity)} home equity` : null
+    ]
+      .filter(Boolean)
+      .join(' · ');
+    const sellBtn =
+      owned && item.resalePct
+        ? `<button type="button" class="btn btn-ghost btn-small" data-ceo-lifestyle-sell="${escapeHtml(item.id)}" ${disabled}>Sell</button>`
         : '';
-    return `<div class="finance-action people-perk-card">
+    return `<div class="finance-action people-perk-card ceo-lifestyle-card">
       <p><strong>${escapeHtml(item.label)}</strong> — ${formatMoney(item.cost)}${owned ? ' <span class="task-tag">Owned</span>' : ''}</p>
       <p class="fine-print">${escapeHtml(item.blurb)}</p>
-      ${gateNote ? `<p class="fine-print people-perk-effects">${escapeHtml(gateNote)}</p>` : ''}
+      ${tags ? `<p class="fine-print ceo-lifestyle-tags">${escapeHtml(tags)}</p>` : ''}
+      ${item.minNetWorth ? `<p class="fine-print people-perk-effects">≈ ${formatMoney(item.minNetWorth)} net worth</p>` : ''}
       ${item.monthlyDebitBump ? `<p class="fine-print people-perk-effects">+${formatMoney(item.monthlyDebitBump)}/mo discretionary debits</p>` : ''}
-      <button type="button" class="btn btn-primary btn-small" data-ceo-lifestyle="${escapeHtml(item.id)}" ${owned || disabled || gated ? 'disabled' : ''}>Buy</button>
+      <div class="ceo-lifestyle-card-actions">
+        <button type="button" class="btn btn-primary btn-small" data-ceo-lifestyle="${escapeHtml(item.id)}" ${owned || !canBuy ? 'disabled' : ''}${!canBuy && !owned ? ` title="${escapeHtml(gate.reason ?? '')}"` : ''}>Buy</button>
+        ${sellBtn}
+      </div>
     </div>`;
   };
 
-  const lifestyleByCategory = CEO_LIFESTYLE_CATEGORIES.map((cat) => {
-    const items = CEO_LIFESTYLE_PURCHASES.filter((p) => (p.category ?? 'other') === cat.id);
+  const lifestyleByCategory = getCeoLifestyleCategoriesSync().map((cat) => {
+    const items = getCeoLifestylePurchasesSync().filter((p) => (p.category ?? 'other') === cat.id);
     if (!items.length) return '';
     return `<div class="ceo-lifestyle-category">
       <h5 class="finance-section-title">${escapeHtml(cat.label)}</h5>
@@ -633,15 +678,19 @@ function renderCeoLifestyleSection(ctx) {
 
   const ownedDetails = ceoLifestyleOwnedDetails(state);
   const lifestyleMo = ceoLifestyleMonthlyDebit(state);
+  const lifestyleSpend = ceoLifestyleLifetimeSpend(state);
   const ownedList =
     ownedDetails.length > 0
       ? `<ul class="instrument-list fine-print">${ownedDetails
-          .map(
-            (p) =>
-              `<li><strong>${escapeHtml(p.label)}</strong>${p.monthlyDebitBump ? ` · +${formatMoney(p.monthlyDebitBump)}/mo` : ''}</li>`
-          )
+          .map((p) => {
+            const sell =
+              p.resalePct && !disabled
+                ? ` <button type="button" class="btn btn-ghost btn-small" data-ceo-lifestyle-sell="${escapeHtml(p.id)}">Sell</button>`
+                : '';
+            return `<li><strong>${escapeHtml(p.label)}</strong>${p.monthlyDebitBump ? ` · +${formatMoney(p.monthlyDebitBump)}/mo` : ''}${sell}</li>`;
+          })
           .join('')}</ul>`
-      : '<p class="fine-print">No splurges yet — early picks like the e-bike pack or premium gym are affordable on a modest personal bank.</p>';
+      : '<p class="fine-print">No splurges yet — e-bike, standing desk, or premium gym are affordable early; cars and clubs are exclusive picks.</p>';
 
   const housingStatusLine =
     housing.mode === HOUSING_MODE.RENT
@@ -689,10 +738,11 @@ function renderCeoLifestyleSection(ctx) {
       ${mortgageBlock}
       ${panelMetricGroup(
         'Lifestyle snapshot',
-        panelMetricGrid('4', [
+        panelMetricGrid('5', [
           panelStatCard('Home equity', formatMoney(housing.equity), { hero: housing.equity > 0 }),
           panelStatCard('Est. net worth', formatMoney(netWorth)),
           panelStatCard('Splurges owned', String(lifestyleOwned.size)),
+          panelStatCard('Lifetime splurge spend', lifestyleSpend > 0 ? formatMoney(lifestyleSpend) : '—'),
           panelStatCard('Lifestyle debits', lifestyleMo > 0 ? `${formatMoney(lifestyleMo)}/mo` : '—', {
             hero: lifestyleMo > 0
           })
@@ -702,7 +752,7 @@ function renderCeoLifestyleSection(ctx) {
       <h4 class="finance-section-title">Homes</h4>
       <div class="people-perk-grid ceo-home-grid">${homeCards}</div>
       <h4 class="finance-section-title">Splurge catalog</h4>
-      <p class="fine-print">${CEO_LIFESTYLE_PURCHASES.length} purchases across ${CEO_LIFESTYLE_CATEGORIES.length} categories — some add recurring discretionary debits on top of your salary band.</p>
+      <p class="fine-print">${getCeoLifestylePurchasesSync().length} purchases across ${getCeoLifestyleCategoriesSync().length} categories — exclusive groups (one car, one club), prerequisites, resell on select items, optional buzz/sentiment on flagship buys.</p>
       ${lifestyleByCategory}
     </section>
   `;
@@ -712,6 +762,11 @@ export function renderCeoPanel(container, state) {
   if (!container) return;
   if (!state.ceo) return;
   const ctx = buildCeoPanelContext(state);
+  const drawsOpen = ownerDrawsUnlocked(state);
+  const compTabLabel = drawsOpen ? 'Comp & draws' : 'Comp & pay';
+  const panelLede = drawsOpen
+    ? 'Personal bank, salary band debits, owner draws, and equity. Company cash lives on Finance.'
+    : 'Personal bank, salary band debits, and equity. Company cash lives on Finance.';
   const tab = (id, label) =>
     `<button type="button" class="${ctx.section === id ? 'active' : ''}" data-ceo-tab="${id}">${label}</button>`;
 
@@ -720,13 +775,20 @@ export function renderCeoPanel(container, state) {
       <header class="ceo-hero">
         <p class="ceo-name-chip">${escapeHtml(ctx.name)}</p>
         ${ctx.ageLine ? `<p class="ceo-age-line fine-print">${escapeHtml(ctx.ageLine)}</p>` : ''}
-        <p class="panel-lede">Personal bank, salary band debits, draws, and equity. Company cash lives on Finance.</p>
+        ${
+          resolveCompanyAlmaMater(state)
+            ? `<p class="fine-print ceo-alma-line">Alma mater: ${escapeHtml(resolveCompanyAlmaMater(state).label)}</p>`
+            : ''
+        }
+        <p class="panel-lede">${panelLede}</p>
       </header>
       <nav class="people-subtabs ceo-subtabs" aria-label="CEO sections">
         ${tab('overview', 'Overview')}
         ${tab('wealth', 'Wealth & exit')}
-        ${tab('comp', 'Comp & draws')}
+        ${tab('comp', compTabLabel)}
+        ${tab('balance', 'Balance')}
         ${tab('lifestyle', 'Homes & splurges')}
+        ${tab('alumni', 'Alma mater')}
       </nav>
       <div id="ceo-section-mount">${renderCeoSectionHtml(ctx)}</div>
       <p id="ceo-feedback" class="desk-feedback" hidden></p>

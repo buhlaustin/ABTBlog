@@ -104,9 +104,24 @@ Context: ${ctx}`;
   }
 
   if (kind === 'startup_news_month') {
-    return `You write in-world news for the fictional tech economy in "Startup Simulator". Return ONLY valid JSON:
-{"articles":[{"headline":"...","dek":"...","body":"2-4 sentences","source":"parody outlet name","date":"Year Y, month M"}]}
-Rules: exactly 3 or 4 articles. Use parody names (Macrohard, Financier Times, Chirp Business). NO real companies or living public figures. Use context.narrative for company facts (headcount, revenue, workspace). Mix context.timelineEvents when present. Include at most ONE layoff article and ONLY if context.narrative.recentLayoffEvents is non-empty; use exact headcount numbers from that array. NEVER mention sandbox, game levels, desk tasks, ARR gates, or other game UI/meta.
+    return `You are a rotating desk of satirical tech reporters covering ONE fictional startup this month. Return ONLY valid JSON:
+{"articles":[{"headline":"...","dek":"...","body":"2-4 sentences","source":"parody outlet name","date":"..."}]}
+
+UNIQUENESS (most important):
+- Read context.forbiddenHeadlines and context.forbiddenOpeningPhrases — do NOT reuse them or any headline that shares the same first five words.
+- context.assignedAngles lists exactly one required story lens per article (same order). Each article must clearly match its assigned angle; no two articles may share the same narrative beat.
+- If context.seedArticles exists, treat them as stale boilerplate to REWRITE — new headlines, new ledes, new quotes; keep only factual numbers from context.closedMonth or context.narrative.
+- Vary structure: forbid repeating patterns like "<Company> books <money> month" or "Runway watch:" across articles. At most one article may lead with the company name; others should lead with rivals, regulators, employees, category trend, or macro.
+- Use distinct parody outlets per article (pick from Macrohard Newsdesk, The Financier Times, Chirp Business, Patty Fundsworth Substack, Terminal Chatter, Global Tech Ledger, IPO Watch (Parody), Founder Daily, Parody Wire, Startup Chirp).
+
+FACTS:
+- Exactly 3 or 4 articles. Use context.narrative for headcount, funding stage, workspace, competitorName, ARR/revenue figures from context.closedMonth when present.
+- Weave context.timelineEvents into at most ONE macro/world article (not every piece).
+- At most ONE layoff story and ONLY if context.narrative.recentLayoffEvents is non-empty; use exact headcount numbers from that array.
+- NO real companies or living public figures. NEVER mention sandbox, career mode, desk tasks, game levels, ARR gates, UI tabs, or save files.
+
+TONE: sharp, specific, lightly absurd — concrete details (anonymized sources, petty quotes, small-bore drama).
+
 Context: ${ctx}`;
   }
 
@@ -205,18 +220,26 @@ async function callOpenAI(apiKey, kind, context) {
     },
     body: JSON.stringify({
       model,
-      temperature: isEerInbox ? 0.9 : 0.85,
+      temperature:
+        kind === 'startup_news_month'
+          ? 0.93
+          : isEerInbox
+            ? 0.9
+            : 0.85,
       max_tokens: isEerInbox
         ? 2200
         : kind === 'startup_news_month' || kind === 'startup_social_month'
-          ? 1800
+          ? 2200
           : isStartupJson
             ? 400
             : 120,
       messages: [
         {
           role: 'system',
-          content: isEerInbox || isStartupJson
+          content:
+            kind === 'startup_news_month'
+              ? 'You output strict JSON only. Every headline must be fresh — never recycle phrasing from forbiddenHeadlines in the user message.'
+              : isEerInbox || isStartupJson
             ? 'You output strict JSON only for Startup Simulator and EER.'
             : kind.startsWith('eer_')
               ? 'You write sharp corporate satire.'

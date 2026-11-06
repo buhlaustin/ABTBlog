@@ -59,11 +59,22 @@ function seededRand(state, salt = 0) {
   };
 }
 
+function newsDateLabel(state) {
+  const snap = state.news?.closedMonthSnapshot;
+  if (snap?.closedYear != null && snap?.closedMonthIndex != null) {
+    return formatCalendarStamp(snap.closedYear, snap.closedMonthIndex);
+  }
+  return monthLabel(state);
+}
+
 function newsContext(state) {
   const narrative = buildNarrativeContext(state);
   const company = state.company?.name ?? 'Startup';
-  const rev = formatMoney(state.calendar?.monthRevenue ?? state.finance?.monthlyRevenue ?? 0);
-  const arr = formatMoney(getArr(state));
+  const snap = state.news?.closedMonthSnapshot;
+  const rev = formatMoney(
+    snap?.monthRevenue ?? state.calendar?.monthRevenue ?? state.finance?.monthlyRevenue ?? 0
+  );
+  const arr = formatMoney(snap?.arrAfter ?? getArr(state));
   const rival = state.world?.competitor?.name ?? 'a rival';
   const rivalProduct = state.world?.competitor?.product ?? 'a similar product';
   const hub = state.offices?.hubLabel ?? narrative.cityOrHub;
@@ -307,6 +318,99 @@ function recentHeadlinesSet(state) {
   return set;
 }
 
+const NEWS_STORY_ANGLES = [
+  'Anonymized employee / glassdoor-style culture beat',
+  'Rival comparison sidebar (competitor in the lede, not the company)',
+  'Regulatory, compliance, or procurement friction whisper',
+  'Category trend piece with the company as one datapoint',
+  'Macro timeline event reaction (only if timelineEvents provided)',
+  'Founder human-interest (habits, quotes, myth-making) without hero worship',
+  'Enterprise customer logo hunt / deal rumor with NDA tension',
+  'Workplace facilities or real-estate symbolism (office, hub, garage)',
+  'Product ship cycle — specific feature chatter, not generic "shipping"',
+  'Investor / board dynamics and term-sheet theater',
+  'Pre-launch waitlist or launch-week energy (if launchPhase fits)',
+  'Public-market tape, guidance, or short interest (if public)',
+  'Category property / infrastructure spend (data center, EMO, etc.)',
+  'Conference, expo, or brand-event circus (if conference configured)',
+  'Talent market poaching war in the category',
+  'Security incident or near-miss that stayed internal',
+  'Partnership or integration rumor with a parody mega-vendor',
+  'Efficiency, layoffs, or "year of discipline" (only if layoffs in context)',
+  'International expansion whispers',
+  'Marketing buzz / social screenshot economy'
+];
+
+function pickAssignedNewsAngles(state, count) {
+  const rand = seededRand(state, 41);
+  const pool = [...NEWS_STORY_ANGLES];
+  for (let i = pool.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rand() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, Math.min(count, pool.length));
+}
+
+function collectForbiddenHeadlines(state, limit = 32) {
+  const headlines = [];
+  for (const block of state.news?.archive ?? []) {
+    for (const a of block.articles ?? []) {
+      if (a.headline) headlines.push(a.headline);
+    }
+  }
+  for (const a of state.news?.currentMonthArticles ?? []) {
+    if (a.headline) headlines.push(a.headline);
+  }
+  return headlines.slice(0, limit);
+}
+
+function forbiddenOpeningPhrases(headlines) {
+  const phrases = new Set();
+  for (const h of headlines) {
+    const words = String(h)
+      .replace(/[^\w\s]/g, ' ')
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 6)
+      .join(' ');
+    if (words.length > 10) phrases.add(words);
+  }
+  return [...phrases].slice(0, 24);
+}
+
+function normalizeHeadlineText(h) {
+  return String(h ?? '')
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function headlineTooSimilar(candidate, forbidden) {
+  const c = normalizeHeadlineText(candidate);
+  if (!c) return true;
+  for (const f of forbidden) {
+    const n = normalizeHeadlineText(f);
+    if (!n) continue;
+    if (c === n) return true;
+    const cWords = c.split(' ').slice(0, 5).join(' ');
+    const fWords = n.split(' ').slice(0, 5).join(' ');
+    if (cWords.length > 12 && cWords === fWords) return true;
+  }
+  return false;
+}
+
+function filterUniqueAiArticles(articles, forbidden) {
+  const kept = [];
+  const seen = [...forbidden];
+  for (const a of articles) {
+    if (headlineTooSimilar(a.headline, seen)) continue;
+    kept.push(a);
+    seen.push(a.headline);
+  }
+  return kept;
+}
+
 function buildTemplateArticle(template, ctx, state) {
   const built = template.build(ctx);
   return {
@@ -315,7 +419,7 @@ function buildTemplateArticle(template, ctx, state) {
     dek: built.dek,
     body: built.body,
     source: template.source,
-    date: monthLabel(state)
+    date: newsDateLabel(state)
   };
 }
 
@@ -393,7 +497,7 @@ function timelineArticles(state, events) {
     dek: 'Macro backdrop for operators.',
     body: `${company} operators tracked "${e.headline}" while closing their own month. Investors asked whether ${e.tag ?? 'macro'} trends help or hurt ${state.company?.categoryLabel ?? 'the category'}.`,
     source: 'World Desk (Parody)',
-    date: monthLabel(state)
+    date: newsDateLabel(state)
   }));
 }
 
@@ -455,7 +559,7 @@ function offlineNewsArticles(state, timelineEvents = []) {
       dek: 'Leadership cites focus and runway.',
       body: `Macrohard Newsdesk confirmed ${company} lowered headcount from ${layoff.priorHeadcount} to ${layoff.newHeadcount} employees. The move represents about ${layoff.layoffPct}% of the prior team. Executives declined to comment on further changes.`,
       source: 'Macrohard Newsdesk',
-      date: monthLabel(state)
+      date: newsDateLabel(state)
     };
     articles.push(a);
     reserved.add(a.headline);
@@ -475,7 +579,7 @@ function offlineNewsArticles(state, timelineEvents = []) {
       dek: 'Valuation haircut, morale optional.',
       body: 'The Financier Times notes terms were "creative." Your cap table spreadsheet weeps quietly.',
       source: 'The Financier Times',
-      date: monthLabel(state)
+      date: newsDateLabel(state)
     };
     articles.push(a);
     reserved.add(a.headline);
@@ -490,7 +594,7 @@ function offlineNewsArticles(state, timelineEvents = []) {
       dek: 'Term sheets or it did not happen.',
       body: 'Patty Fundsworth posted six threads and zero confirmations. Chirp remains undefeated as a source of truth.',
       source: 'Chirp Business',
-      date: monthLabel(state)
+      date: newsDateLabel(state)
     };
     articles.push(a);
     reserved.add(a.headline);
@@ -519,12 +623,21 @@ function sanitizeArticles(raw, state) {
     dek: sanitizeNarrativeText(String(a.dek ?? '')).slice(0, 200),
     body: sanitizeNarrativeText(String(a.body ?? '')).slice(0, 1200),
     source: String(a.source ?? 'Parody Wire').slice(0, 80),
-    date: String(a.date ?? monthLabel(state)).slice(0, 40)
+    date: String(a.date ?? newsDateLabel(state)).slice(0, 40)
   }));
 }
 
-export function applyOfflineMonthlyNews(state) {
+export function applyOfflineMonthlyNews(state, monthSummary = null) {
   if (!state.news) state.news = createInitialNews();
+  if (monthSummary) {
+    state.news.closedMonthSnapshot = {
+      closedYear: monthSummary.closedYear,
+      closedMonthIndex: monthSummary.closedMonthIndex,
+      monthRevenue: monthSummary.monthRevenue,
+      burn: monthSummary.burn,
+      arrAfter: monthSummary.arrAfter
+    };
+  }
   const seed = timelineSeed?.events ?? [];
   assignCurrentArticles(state, offlineNewsArticles(state, seed));
 }
@@ -536,18 +649,37 @@ export async function enrichMonthlyNewsWithAi(state) {
 
   const seed = await loadTimelineSeed();
   const timeline = matchingTimelineEvents(state, seed.events ?? []);
+  const seedArticles = (state.news.currentMonthArticles ?? []).map((a) => ({
+    headline: a.headline,
+    dek: a.dek,
+    source: a.source
+  }));
+  const articleCount = Math.max(3, Math.min(4, seedArticles.length || 3));
+  const forbiddenHeadlines = collectForbiddenHeadlines(state);
   const context = {
     narrative: buildNarrativeContext(state),
+    closedMonth: state.news.closedMonthSnapshot ?? null,
+    calendarLabel: newsDateLabel(state),
     timelineEvents: timeline,
+    seedArticles,
+    forbiddenHeadlines,
+    forbiddenOpeningPhrases: forbiddenOpeningPhrases(forbiddenHeadlines),
+    assignedAngles: pickAssignedNewsAngles(state, articleCount),
     rules:
-      'In-world journalism only. Use narrative.recentLayoffEvents for layoff stories (at most one). Never reference game mechanics listed in narrative.narrativeRules. Do not repeat headlines from prior months verbatim.'
+      'Rewrite seedArticles completely. Match assignedAngles order to output articles. Obey narrative.narrativeRules.'
   };
 
   try {
     const res = await requestNarrative('startup_news_month', context);
     const articles = res?.articles ?? res?.result?.articles;
     if (Array.isArray(articles) && articles.length) {
-      assignCurrentArticles(state, sanitizeArticles(articles, state));
+      const sanitized = sanitizeArticles(articles, state);
+      const unique = filterUniqueAiArticles(sanitized, forbiddenHeadlines);
+      if (unique.length < 2) return false;
+      for (const a of unique) {
+        a.date = newsDateLabel(state);
+      }
+      assignCurrentArticles(state, unique);
       if ((state.news.layoffQueue ?? []).some((e) => !e.consumed)) {
         consumeNextLayoff(state);
       }

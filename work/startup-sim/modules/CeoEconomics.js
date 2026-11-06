@@ -12,6 +12,8 @@ import { calendarTurn } from './XC.js';
 import {
   applyHousingToPersonalExpenses,
   ceoHomeEquity,
+  ceoHousingSummary,
+  HOUSING_MODE,
   serviceCeoMortgageAtMonthEnd
 } from './CeoLifestyle.js';
 import { accrueCeoTaxableIncome, createInitialCeoPersonalTax } from './CeoPersonalTax.js';
@@ -19,6 +21,27 @@ import { ensureFiscal } from './CorporateTax.js';
 import { formatCalendarStamp, twelveMonthCooldownStatus } from './GameCalendar.js';
 
 export const CEO_ARR_BONUS_PCTS = [2, 5, 10, 20];
+
+/** Personal burn while still working from the garage — dorm / parents, until first office lease. */
+export const GARAGE_PHASE_PERSONAL_EXPENSE_MO = 350;
+
+const GARAGE_PHASE_EXPENSE_BREAKDOWN = [
+  { label: 'Food & household', amount: 165 },
+  { label: 'Transport', amount: 85 },
+  { label: 'Phone & subscriptions', amount: 55 },
+  { label: 'Discretionary', amount: 45 }
+];
+
+export function isGaragePhasePersonalExpenses(state) {
+  const w = state.workspace ?? {};
+  return (
+    !w.smallOfficeOwned &&
+    !w.mediumOfficeOwned &&
+    !w.largeOfficeOwned &&
+    !w.campusOwned &&
+    !w.hubOwned
+  );
+}
 
 const EXPENSE_DEBIT_CATEGORIES = [
   'Housing',
@@ -60,13 +83,24 @@ export function createInitialCeoState() {
     },
     lifestyleOwned: [],
     lifestyleDebitBump: 0,
+    lifestyleLifetimeSpend: 0,
     section: 'overview',
     personalGivingLifetime: 0,
+    alumniGivingLifetime: 0,
+    alumniAthleticsLifetime: 0,
+    alumniDonationLog: [],
     netWorthHistory: [],
     investmentBalance: 0,
     careerInvestmentReturns: 0,
     lastInvestmentReturn: 0,
-    personalTax: createInitialCeoPersonalTax()
+    personalTax: createInitialCeoPersonalTax(),
+    personalHappiness: 62,
+    wlbOffers: [],
+    wlbRecentIds: [],
+    wlbLog: [],
+    wlbCompletedThisMonth: 0,
+    wlbLifetimeCompleted: 0,
+    wlbStreakMonths: 0
   };
 }
 
@@ -76,6 +110,8 @@ function ceoState(state) {
   if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];
   if (!state.ceo.salaryChangeLog) state.ceo.salaryChangeLog = [];
   if (!state.ceo.bankLog) state.ceo.bankLog = [];
+  if (!state.ceo.lifestyleOwned) state.ceo.lifestyleOwned = [];
+  if (state.ceo.lifestyleDebitBump == null) state.ceo.lifestyleDebitBump = 0;
   return state.ceo;
 }
 
@@ -166,6 +202,13 @@ export function personalExpenseBandForSalary(annualSalary) {
 }
 
 export function personalExpenseBand(state) {
+  if (isGaragePhasePersonalExpenses(state)) {
+    return {
+      min: GARAGE_PHASE_PERSONAL_EXPENSE_MO,
+      max: GARAGE_PHASE_PERSONAL_EXPENSE_MO,
+      label: 'At home / dorm — fixed lean burn until you lease an office'
+    };
+  }
   return personalExpenseBandForSalary(ceoState(state).salaryAnnual ?? 0);
 }
 
@@ -193,6 +236,9 @@ function buildPersonalExpenseBreakdown(state, total) {
 
 /** Deterministic for this calendar month + salary — still varies month to month. */
 export function rollPersonalExpenseTotal(state) {
+  if (isGaragePhasePersonalExpenses(state)) {
+    return GARAGE_PHASE_PERSONAL_EXPENSE_MO;
+  }
   const band = personalExpenseBand(state);
   const u = personalExpenseRollUnit(state, 0);
   let total = Math.round(band.min + u * (band.max - band.min));
@@ -208,6 +254,21 @@ export function rollPersonalExpenseTotal(state) {
 export function preparePersonalExpensesForMonth(state) {
   const ceo = ceoState(state);
   const turn = calendarTurn(state);
+  const housingMode = ceoHousingSummary(state).mode;
+  const garageLeanBurn =
+    isGaragePhasePersonalExpenses(state) && housingMode === HOUSING_MODE.RENT;
+  if (garageLeanBurn) {
+    ceo.personalExpenseScheduled = {
+      turn,
+      total: GARAGE_PHASE_PERSONAL_EXPENSE_MO,
+      breakdown: GARAGE_PHASE_EXPENSE_BREAKDOWN.map((p) => ({ ...p })),
+      salaryAnnual: ceo.salaryAnnual ?? 0,
+      month: state.calendar?.monthIndex,
+      year: state.calendar?.year,
+      garagePhase: true
+    };
+    return ceo.personalExpenseScheduled;
+  }
   const totalRaw = rollPersonalExpenseTotal(state);
   const breakdownRaw = buildPersonalExpenseBreakdown(state, totalRaw);
   const { breakdown, total } = applyHousingToPersonalExpenses(state, breakdownRaw, totalRaw);
@@ -264,7 +325,7 @@ function creditPersonalBank(state, amount, label, kind) {
   return pay;
 }
 
-function debitPersonalBank(state, amount, label, kind) {
+export function payFromPersonalBank(state, amount, label, kind) {
   const pay = Math.round(Number(amount) || 0);
   if (pay <= 0) return 0;
   const ceo = ceoState(state);
@@ -280,6 +341,10 @@ function debitPersonalBank(state, amount, label, kind) {
     ...logStamp(state)
   });
   return applied;
+}
+
+function debitPersonalBank(state, amount, label, kind) {
+  return payFromPersonalBank(state, amount, label, kind);
 }
 
 export function ceoPersonalBankBalance(state) {
@@ -497,14 +562,24 @@ export function settlePersonalExpensesAtMonthEnd(state) {
   }
   const typical = typicalPersonalExpenseMonthly(state);
   if ((ceo.bankBalance ?? 0) <= 0 && paid > 0) {
-    lines.push('Personal bank at $0 — raise salary or take an owner draw before next month.');
+    lines.push(
+      state.flags?.seedRoundClosed
+        ? 'Personal bank at $0 — raise CEO salary before next month (owner draws end after seed close).'
+        : 'Personal bank at $0 — raise salary or take an owner draw before next month.'
+    );
   } else if ((ceo.bankBalance ?? 0) < typical * 0.5) {
     lines.push('Personal cash is tight versus your typical salary band.');
   }
   return lines;
 }
 
+/** Owner draws are pre-seed only; career totals still accrue for draws taken before seed close. */
+export function ownerDrawsUnlocked(state) {
+  return !state.flags?.seedRoundClosed;
+}
+
 export function maxOwnerDrawAmount(state) {
+  if (!ownerDrawsUnlocked(state)) return 0;
   return Math.max(0, Math.floor(state.finance?.cash ?? 0));
 }
 
@@ -559,6 +634,12 @@ export function recordCeoNetWorthSnapshot(state) {
 
 export function canTakeOwnerDraw(state, amount) {
   if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
+  if (!ownerDrawsUnlocked(state)) {
+    return {
+      ok: false,
+      reason: 'Owner draws end when seed closes — use CEO salary and bonuses instead.'
+    };
+  }
   const draw = Math.round(Number(amount) || 0);
   if (draw < 500) return { ok: false, reason: 'Minimum owner draw is $500.' };
   const cash = state.finance?.cash ?? 0;

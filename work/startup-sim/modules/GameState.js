@@ -4,7 +4,11 @@ import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
 import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './CapTable.js';
-import { createInitialOffices, satelliteTemplateIdFromEntry } from './Offices.js';
+import {
+  createInitialOffices,
+  satelliteTemplateIdFromEntry,
+  refreshSatelliteFootprints
+} from './Offices.js';
 import {
   createInitialWorkspace,
   applyWorkspaceBurn,
@@ -16,6 +20,12 @@ import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
 import { createInitialAcquisitionsState } from './Acquisitions.js';
+import {
+  createInitialTreasurySponsorshipsState,
+  migrateLegacySponsorshipContract
+} from './TreasurySponsorships.js';
+import { createInitialStartupConferenceState } from './StartupConference.js';
+import { createInitialFinancePropertyState } from './FinanceProperty.js';
 import { createInitialCrisisState } from './Crisis.js';
 import { createInitialDecisionState } from './DecisionEvents.js';
 import { createInitialModifiers } from './ScenarioEffects.js';
@@ -34,6 +44,7 @@ import {
 import { prepareCompanyOverheadForMonth } from './CompanyOverhead.js';
 import { createInitialCooState, hireCoo, isCooHired } from './Coo.js';
 import { clampCeoBirthMonth, clampCeoBirthYear } from './CeoProfile.js';
+import { defaultAlmaMaterId, getAlmaMaterById } from './CeoAlumniGiving.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -95,6 +106,10 @@ export function createInitialState(options) {
       ceoLastName: String(options.ceoLastName || '').trim(),
       ceoBirthMonth: clampCeoBirthMonth(options.ceoBirthMonth),
       ceoBirthYear: clampCeoBirthYear(options.ceoBirthYear),
+      almaMaterId: (() => {
+        const id = String(options.almaMaterId || '').trim() || defaultAlmaMaterId();
+        return getAlmaMaterById(id) ? id : defaultAlmaMaterId();
+      })(),
       categoryId: category.id,
       categoryLabel: category.label,
       economics
@@ -120,14 +135,7 @@ export function createInitialState(options) {
       fiscal: createInitialFiscal(),
       section: 'overview'
     },
-    ceo: {
-      salaryAnnual: 0,
-      careerSalaryPaid: 0,
-      careerOwnerDraws: 0,
-      drawLog: [],
-      salaryPayLog: [],
-      salaryChangeLog: []
-    },
+    ceo: createInitialCeoState(),
     staff: createInitialStaff(),
     product: { level: 0, buzz: 0, actionsThisMonth: 0 },
     news: createInitialNews(),
@@ -137,6 +145,9 @@ export function createInitialState(options) {
     sentiment: createInitialSentiment(),
     world: { competitor: createCompetitorForCategory(category.id), competitorAcquired: false },
     acquisitions: createInitialAcquisitionsState(),
+    treasurySponsorships: createInitialTreasurySponsorshipsState(),
+    startupConference: createInitialStartupConferenceState(),
+    financeProperty: createInitialFinancePropertyState(),
     crisis: createInitialCrisisState(),
     decision: createInitialDecisionState(),
     modifiers: createInitialModifiers(),
@@ -217,13 +228,20 @@ export function normalizeSave(raw) {
     if (state.ceo) {
       if (!state.ceo.section) state.ceo.section = 'overview';
       if (state.ceo.personalGivingLifetime == null) state.ceo.personalGivingLifetime = 0;
+      if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
+      if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
+      if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
+      if (state.ceo.personalHappiness == null) state.ceo.personalHappiness = 62;
+      if (!state.ceo.wlbOffers) state.ceo.wlbOffers = [];
+      if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];
+      if (!state.ceo.wlbLog) state.ceo.wlbLog = [];
+      if (state.ceo.wlbCompletedThisMonth == null) state.ceo.wlbCompletedThisMonth = 0;
+      if (state.ceo.wlbLifetimeCompleted == null) state.ceo.wlbLifetimeCompleted = 0;
+      if (state.ceo.wlbStreakMonths == null) state.ceo.wlbStreakMonths = 0;
       if (!state.ceo.netWorthHistory) state.ceo.netWorthHistory = [];
       if (state.ceo.investmentBalance == null) state.ceo.investmentBalance = 0;
       if (state.ceo.careerInvestmentReturns == null) state.ceo.careerInvestmentReturns = 0;
       if (state.ceo.lastInvestmentReturn == null) state.ceo.lastInvestmentReturn = 0;
-      if (state.ceo.housing?.mortgageOriginalPrincipal == null) {
-        state.ceo.housing.mortgageOriginalPrincipal = 0;
-      }
       ensureCeoPersonalTax(state);
     }
     if (state.staff.companyBonusAnnualMode === undefined) state.staff.companyBonusAnnualMode = false;
@@ -304,6 +322,14 @@ export function normalizeSave(raw) {
     if (!state.board.sentimentHistory) state.board.sentimentHistory = [];
     if (state.board.mandateBonusClaimed === undefined) state.board.mandateBonusClaimed = false;
     if (state.board.meetingsHeld === undefined) state.board.meetingsHeld = 0;
+    if (state.board.seatsAddedByPlayer === undefined) state.board.seatsAddedByPlayer = 0;
+    if (state.board.seatSearchSpendLifetime === undefined) state.board.seatSearchSpendLifetime = 0;
+    if (!state.board.meetingTasks) state.board.meetingTasks = [];
+    if (state.board.meetingsCompletedThisMonth === undefined) state.board.meetingsCompletedThisMonth = 0;
+    if (!state.board.recentMeetingTaskIds) state.board.recentMeetingTaskIds = [];
+    if (!state.board.boardSection || !['governance', 'meeting'].includes(state.board.boardSection)) {
+      state.board.boardSection = 'governance';
+    }
     if (state.publicMarket && state.publicMarket.guidanceBeatStreak === undefined) {
       state.publicMarket.guidanceBeatStreak = 0;
     }
@@ -364,6 +390,9 @@ export function normalizeSave(raw) {
     if (state.company.ceoBirthYear == null) state.company.ceoBirthYear = 1990;
     state.company.ceoBirthMonth = clampCeoBirthMonth(state.company.ceoBirthMonth);
     state.company.ceoBirthYear = clampCeoBirthYear(state.company.ceoBirthYear);
+    if (!state.company.almaMaterId || !getAlmaMaterById(state.company.almaMaterId)) {
+      state.company.almaMaterId = defaultAlmaMaterId();
+    }
     {
       const cat = getCategoryById(state.company?.categoryId);
       if (!cat) return null;
@@ -418,18 +447,24 @@ export function normalizeSave(raw) {
       delete state.ceo.personalBurnMonthly;
       delete state.ceo.personalBurnCustom;
       if (!state.ceo.housing) {
-        state.ceo.housing = {
-          mode: 'rent',
-          tierId: 'rent',
-          purchasePrice: 0,
-          mortgageBalance: 0,
-          mortgagePaymentMonthly: 0,
-          maintenanceMonthly: 0,
-          purchasedTurn: null
-        };
+        state.ceo.housing = { ...createInitialCeoState().housing };
+      }
+      if (state.ceo.housing.mortgageOriginalPrincipal == null) {
+        state.ceo.housing.mortgageOriginalPrincipal = 0;
       }
       if (!state.ceo.lifestyleOwned) state.ceo.lifestyleOwned = [];
       if (state.ceo.lifestyleDebitBump == null) state.ceo.lifestyleDebitBump = 0;
+      if (state.ceo.lifestyleLifetimeSpend == null) state.ceo.lifestyleLifetimeSpend = 0;
+      if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
+      if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
+      if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
+      if (state.ceo.personalHappiness == null) state.ceo.personalHappiness = 62;
+      if (!state.ceo.wlbOffers) state.ceo.wlbOffers = [];
+      if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];
+      if (!state.ceo.wlbLog) state.ceo.wlbLog = [];
+      if (state.ceo.wlbCompletedThisMonth == null) state.ceo.wlbCompletedThisMonth = 0;
+      if (state.ceo.wlbLifetimeCompleted == null) state.ceo.wlbLifetimeCompleted = 0;
+      if (state.ceo.wlbStreakMonths == null) state.ceo.wlbStreakMonths = 0;
     }
     ensureCeoPersonalBank(state);
     preparePersonalExpensesForMonth(state);
@@ -453,6 +488,9 @@ export function normalizeSave(raw) {
           state.offices.usedSatelliteTemplateIds.push(tid);
         }
       }
+    }
+    if ((state.offices?.satellites?.length ?? 0) > 0) {
+      refreshSatelliteFootprints(state);
     }
     if (!state.xc) state.xc = createInitialXcState();
     if (state.xc.retryAvailableTurn === undefined) state.xc.retryAvailableTurn = null;
@@ -543,7 +581,66 @@ export function normalizeSave(raw) {
     if (state.xc && state.xc.demoDayTaskDone === undefined) state.xc.demoDayTaskDone = false;
     if (state.xc && state.xc.demoDayPitch === undefined) state.xc.demoDayPitch = null;
     if (state.xc && state.xc.demoDayBoldHit === undefined) state.xc.demoDayBoldHit = null;
+    if (state.xc && state.xc.postBatchApiReleasePending === undefined) {
+      state.xc.postBatchApiReleasePending = false;
+    }
+    if (state.xc && state.xc.postBatchApiReleaseDone === undefined) {
+      state.xc.postBatchApiReleaseDone = false;
+    }
     if (state.xc && state.xc.seedRoundTerms === undefined) state.xc.seedRoundTerms = null;
+    if (!state.financeProperty) {
+      state.financeProperty = createInitialFinancePropertyState();
+    } else {
+      const fp = state.financeProperty;
+      if (!fp.holdings) fp.holdings = [];
+      if (!fp.history) fp.history = [];
+      if (fp.lifetimeCapex == null) fp.lifetimeCapex = 0;
+      if (fp.lifetimeOpex == null) fp.lifetimeOpex = 0;
+      if (fp.lifetimeMrrGranted == null) fp.lifetimeMrrGranted = 0;
+      if (fp.lifetimeContractedCash == null) fp.lifetimeContractedCash = 0;
+    }
+    if (!state.startupConference) {
+      state.startupConference = createInitialStartupConferenceState();
+    } else {
+      const sc = state.startupConference;
+      if (sc.budget == null) sc.budget = 150_000;
+      if (sc.monthIndex == null) sc.monthIndex = 10;
+      if (sc.configured == null) sc.configured = false;
+      if (sc.budgetPaidYear === undefined) sc.budgetPaidYear = null;
+      if (sc.lifetimeAttendees == null) sc.lifetimeAttendees = 0;
+      if (sc.lifetimeRevenue == null) sc.lifetimeRevenue = 0;
+      if (sc.lifetimeBudgetSpend == null) sc.lifetimeBudgetSpend = 0;
+      if (sc.sponsorTier == null) sc.sponsorTier = 'regional';
+      if (sc.ticketTier == null) sc.ticketTier = 'paid';
+      if (sc.editionsHeld == null) sc.editionsHeld = 0;
+      if (!sc.history) sc.history = [];
+      if (sc.lifetimeTicketRevenue == null) sc.lifetimeTicketRevenue = 0;
+      if (sc.lifetimeSponsorRevenue == null) sc.lifetimeSponsorRevenue = 0;
+      if (sc.lastTicketRevenue == null) sc.lastTicketRevenue = 0;
+      if (sc.lastSponsorRevenue == null) sc.lastSponsorRevenue = 0;
+      if (sc.lastDeskRevenue == null) sc.lastDeskRevenue = 0;
+    }
+    if (!state.treasurySponsorships) {
+      state.treasurySponsorships = createInitialTreasurySponsorshipsState();
+    } else {
+      if (!state.treasurySponsorships.active) state.treasurySponsorships.active = [];
+      if (!state.treasurySponsorships.signedDealIds) state.treasurySponsorships.signedDealIds = [];
+      if (state.treasurySponsorships.lifetimeFeesPaid === undefined) {
+        state.treasurySponsorships.lifetimeFeesPaid = 0;
+      }
+      if (state.treasurySponsorships.lifetimeMrrGranted === undefined) {
+        state.treasurySponsorships.lifetimeMrrGranted = 0;
+      }
+      if (!state.treasurySponsorships.history) state.treasurySponsorships.history = [];
+      if (state.treasurySponsorships.lastEscalationYear === undefined) {
+        state.treasurySponsorships.lastEscalationYear = null;
+      }
+      for (const c of state.treasurySponsorships.active) {
+        if (c.monthsTotal == null && c.monthsRemaining != null) c.monthsTotal = c.monthsRemaining;
+        if (c.buzzPerMonth == null) c.buzzPerMonth = 0;
+        migrateLegacySponsorshipContract(c, state);
+      }
+    }
     if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
     if (!state.acquisitions.owned) state.acquisitions.owned = [];
     if (!state.acquisitions.dealLog) state.acquisitions.dealLog = [];

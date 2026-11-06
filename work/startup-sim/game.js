@@ -10,7 +10,16 @@ import {
   confirmTaskLineup
 } from './modules/Tasks.js';
 import { autoSelectRecommendedLineup } from './modules/Desk.js';
-import { completeBoardTask, ensureBoardRoster, dealBoardTasks } from './modules/Board.js';
+import {
+  addBoardSeat,
+  completeBoardTask,
+  completeBoardMeetingTask,
+  ensureBoardRoster,
+  dealBoardTasks,
+  getBoardSeatCandidates,
+  boardSeatSearchFee,
+  setBoardSection
+} from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
 import {
@@ -50,7 +59,9 @@ import {
   canSchedulePublicLaunch,
   PRE_LAUNCH_BUZZ_REQUIRED,
   PRE_LAUNCH_PRODUCT_REQUIRED,
-  recordPreLaunchTaskOutcome
+  recordPreLaunchTaskOutcome,
+  usesChatXgptLaunchPlaybook,
+  CHATXGPT_PRODUCT_NAME
 } from './modules/LaunchLifecycle.js';
 import { formatMoney } from './modules/GameState.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './modules/Progression.js';
@@ -98,18 +109,35 @@ import {
   showFinanceFeedback,
   setFinanceSection
 } from './modules/Fundraising.js';
+import {
+  preloadTreasurySponsorshipDeals,
+  signTreasurySponsorship,
+  renewTreasurySponsorship,
+  terminateTreasurySponsorship
+} from './modules/TreasurySponsorships.js';
 import { runPublicMarketEvent, runPreIpoIrPrep, setPublicSection } from './modules/PublicMarkets.js';
+import { saveStartupConferenceConfig } from './modules/StartupConference.js';
+import { acquireFinanceProperty, preloadFinancePropertyPrograms } from './modules/FinanceProperty.js';
 import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback, setCeoSection } from './modules/Ceo.js';
 import {
   purchaseCeoHomeCash,
   purchaseCeoHomeMortgage,
   purchaseCeoLifestyle,
+  sellCeoLifestyle,
   sellCeoHome,
   prepayCeoMortgage,
   payOffCeoMortgage,
   getCeoHomeTier,
-  CEO_LIFESTYLE_PURCHASES
+  getCeoLifestylePurchase,
+  preloadCeoLifestyleCatalog
 } from './modules/CeoLifestyle.js';
+import {
+  preloadCeoAlmaMaterCatalog,
+  populateAlmaMaterSelect,
+  donateToAlmaMater,
+  donateToAlmaMaterAthletics
+} from './modules/CeoAlumniGiving.js';
+import { preloadCeoWlbCatalog, completeCeoWlbTask } from './modules/CeoHappiness.js';
 import {
   preparePersonalExpensesForMonth,
   takeOwnerDrawFraction,
@@ -160,6 +188,8 @@ import {
   calendarTurn,
   XC_DEMO_DAY_TASK_ID,
   XC_DEMO_DAY_DECISION_ID,
+  AI_POST_BATCH_API_RELEASE_TASK_ID,
+  onPostBatchApiReleaseTaskCompleted,
   onDemoDayTaskCompleted,
   applyDemoDayPitchChoice
 } from './modules/XC.js';
@@ -407,6 +437,13 @@ function handleCompleteTask(instanceId) {
     refresh();
     return;
   }
+  if (inst.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID) {
+    const apiRelease = onPostBatchApiReleaseTaskCompleted(sessionState);
+    appendLog(sessionState, apiRelease.summary);
+    showDeskFeedback(apiRelease.summary);
+    refresh();
+    return;
+  }
   for (const line of recordPreLaunchTaskOutcome(sessionState, def, revenue, rolled)) {
     appendLog(sessionState, line);
   }
@@ -418,7 +455,11 @@ function handleCompleteTask(instanceId) {
       for (const line of sched.lines ?? []) {
         appendLog(sessionState, line);
       }
-      showDeskFeedback('Public launch scheduled for next month.');
+      showDeskFeedback(
+        usesChatXgptLaunchPlaybook(sessionState)
+          ? `${CHATXGPT_PRODUCT_NAME} ships next month.`
+          : 'Public launch scheduled for next month.'
+      );
     }
   }
 
@@ -467,7 +508,7 @@ async function handleEndMonth() {
       await rollDeskDecision(sessionState);
     }
 
-    applyOfflineMonthlyNews(sessionState);
+    applyOfflineMonthlyNews(sessionState, result.monthSummary);
     const newArticles = unreadNewsCount(sessionState);
     if (newArticles > 0) {
       appendLog(
@@ -971,6 +1012,60 @@ function handleAddSatellite() {
 function bindGameInteractions() {
   const app = document.getElementById('app');
   app?.addEventListener('click', (e) => {
+    if (e.target.id === 'btn-add-board-seat' && sessionState) {
+      const select = document.getElementById('board-seat-candidate');
+      const result = addBoardSeat(sessionState, select?.value);
+      if (!result.ok) {
+        setGameFeedback(result.reason || 'Could not add board seat.', true);
+      } else {
+        appendLog(sessionState, `Board: ${result.summary}`);
+        setGameFeedback(result.summary, false);
+      }
+      refresh();
+      return;
+    }
+
+    const boardSubtab = e.target.closest('[data-board-subtab]');
+    if (boardSubtab && sessionState) {
+      setBoardSection(sessionState, boardSubtab.getAttribute('data-board-subtab'));
+      refresh();
+      return;
+    }
+
+    const boardMeetBtn = e.target.closest('[data-complete-board-meeting]');
+    if (boardMeetBtn && sessionState) {
+      void (async () => {
+        const result = completeBoardMeetingTask(
+          sessionState,
+          boardMeetBtn.getAttribute('data-complete-board-meeting')
+        );
+        if (!result.ok) {
+          setGameFeedback(result.reason || 'Could not hold board meeting.', true);
+          refresh();
+          return;
+        }
+        appendLog(sessionState, `Board meeting: “${result.def.title}”.`);
+        if (result.stockPct) {
+          appendLog(
+            sessionState,
+            `Board read-through: stock ${result.stockPct > 0 ? '+' : ''}${Math.round(Number(result.stockPct) * 100)}%.`
+          );
+        }
+        refresh();
+        await openBoardTaskOutcomeDialog({
+          title: result.def.title,
+          sentimentDelta: result.sentimentDelta ?? 0,
+          sentimentAfter: result.sentimentAfter ?? 0,
+          buzzDelta: result.buzzDelta ?? 0,
+          mandateBonus: 0,
+          stockPct: result.stockPct,
+          happinessDelta: result.happinessDelta ?? 0,
+          isMeeting: true
+        });
+      })();
+      return;
+    }
+
     const boardBtn = e.target.closest('[data-complete-board-task]');
     if (boardBtn && sessionState) {
       void (async () => {
@@ -1193,6 +1288,41 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const confBudgetPreset = e.target.closest('[data-conference-budget-preset]');
+    if (confBudgetPreset && sessionState) {
+      const input = document.getElementById('conference-budget-input');
+      if (input) input.value = confBudgetPreset.getAttribute('data-conference-budget-preset');
+      return;
+    }
+    if (e.target.id === 'btn-save-conference-config' && sessionState) {
+      const result = saveStartupConferenceConfig(sessionState, {
+        name: document.getElementById('conference-name-input')?.value,
+        budgetRaw: document.getElementById('conference-budget-input')?.value,
+        monthIndexRaw: document.getElementById('conference-month-select')?.value,
+        sponsorTier: document.getElementById('conference-sponsor-select')?.value,
+        ticketTier: document.getElementById('conference-ticket-select')?.value
+      });
+      if (!result.ok) showFinanceFeedback(result.reason || 'Could not save conference.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-acquire-property' && sessionState) {
+      const result = acquireFinanceProperty(sessionState, {
+        tierId: document.getElementById('property-tier-select')?.value,
+        quantityRaw: document.getElementById('property-qty-input')?.value
+      });
+      if (!result.ok) showFinanceFeedback(result.reason || 'Could not acquire property.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     const publicEventBtn = e.target.closest('[data-public-event]');
     if (publicEventBtn && sessionState) {
       const result = runPublicMarketEvent(sessionState, publicEventBtn.getAttribute('data-public-event'));
@@ -1410,10 +1540,23 @@ function bindGameInteractions() {
     const lifestyleBtn = e.target.closest('[data-ceo-lifestyle]');
     if (lifestyleBtn && sessionState) {
       const purchaseId = lifestyleBtn.getAttribute('data-ceo-lifestyle');
-      const def = CEO_LIFESTYLE_PURCHASES.find((p) => p.id === purchaseId);
+      const def = getCeoLifestylePurchase(purchaseId);
       const gate = assertCeoNetWorthGate(sessionState, def?.minNetWorth);
       const result = purchaseCeoLifestyle(sessionState, purchaseId, gate);
       if (!result.ok) showCeoFeedback(result.reason || 'Purchase failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    const lifestyleSellBtn = e.target.closest('[data-ceo-lifestyle-sell]');
+    if (lifestyleSellBtn && sessionState) {
+      const purchaseId = lifestyleSellBtn.getAttribute('data-ceo-lifestyle-sell');
+      const result = sellCeoLifestyle(sessionState, purchaseId);
+      if (!result.ok) showCeoFeedback(result.reason || 'Sale failed.', true);
       else {
         appendLog(sessionState, result.summary);
         showCeoFeedback(result.summary);
@@ -1484,6 +1627,64 @@ function bindGameInteractions() {
       const input = document.getElementById('ceo-personal-give-input');
       const result = donateFromPersonalBank(sessionState, input?.value);
       if (!result.ok) showCeoFeedback(result.reason || 'Gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const wlbBtn = e.target.closest('[data-ceo-wlb-complete]');
+    if (wlbBtn && sessionState) {
+      const result = completeCeoWlbTask(sessionState, wlbBtn.getAttribute('data-ceo-wlb-complete'));
+      if (!result.ok) showCeoFeedback(result.reason || 'Balance task failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const alumniAthleticsBtn = e.target.closest('[data-ceo-alumni-athletics-give]');
+    if (alumniAthleticsBtn && sessionState) {
+      const result = donateToAlmaMaterAthletics(
+        sessionState,
+        alumniAthleticsBtn.getAttribute('data-ceo-alumni-athletics-give'),
+        alumniAthleticsBtn.getAttribute('data-ceo-alumni-athletics-program') || 'boosters'
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Athletics gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const alumniGiveBtn = e.target.closest('[data-ceo-alumni-give]');
+    if (alumniGiveBtn && sessionState) {
+      const result = donateToAlmaMater(
+        sessionState,
+        alumniGiveBtn.getAttribute('data-ceo-alumni-give'),
+        alumniGiveBtn.getAttribute('data-ceo-alumni-fund') || 'annual-fund'
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Alumni gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    if (e.target.id === 'btn-ceo-alumni-give-custom' && sessionState) {
+      const input = document.getElementById('ceo-alumni-give-input');
+      const fund = document.getElementById('ceo-alumni-fund-select')?.value || 'annual-fund';
+      let result;
+      if (fund.startsWith('athletics:')) {
+        result = donateToAlmaMaterAthletics(sessionState, input?.value, fund.slice('athletics:'.length));
+      } else {
+        result = donateToAlmaMater(sessionState, input?.value, fund);
+      }
+      if (!result.ok) showCeoFeedback(result.reason || 'Alumni gift failed.', true);
       else {
         appendLog(sessionState, result.summary);
         showCeoFeedback(result.summary);
@@ -1563,6 +1764,49 @@ function bindGameInteractions() {
         appendLog(sessionState, result.summary);
         showCeoFeedback(result.summary);
         preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    const sponsorBtn = e.target.closest('[data-sign-sponsorship]');
+    if (sponsorBtn && sessionState) {
+      const result = signTreasurySponsorship(
+        sessionState,
+        sponsorBtn.getAttribute('data-sign-sponsorship')
+      );
+      if (!result.ok) showFinanceFeedback(result.reason || 'Could not sign.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        for (const line of result.brandLines ?? []) appendLog(sessionState, line);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const renewSponsorBtn = e.target.closest('[data-renew-sponsorship]');
+    if (renewSponsorBtn && sessionState) {
+      const result = renewTreasurySponsorship(
+        sessionState,
+        renewSponsorBtn.getAttribute('data-renew-sponsorship')
+      );
+      if (!result.ok) showFinanceFeedback(result.reason || 'Renewal blocked.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const termSponsorBtn = e.target.closest('[data-terminate-sponsorship]');
+    if (termSponsorBtn && sessionState) {
+      const result = terminateTreasurySponsorship(
+        sessionState,
+        termSponsorBtn.getAttribute('data-terminate-sponsorship')
+      );
+      if (!result.ok) showFinanceFeedback(result.reason || 'Could not exit.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
       }
       refresh();
       return;
@@ -1842,6 +2086,11 @@ function bindGameInteractions() {
     if (e.target.id === 'satellite-template' || e.target.id === 'satellite-size') {
       paintSatelliteOpenPreview();
     }
+    if (e.target.id === 'board-seat-candidate') {
+      const candidate = getBoardSeatCandidates().find((c) => c.id === e.target.value);
+      const blurb = document.getElementById('board-seat-candidate-blurb');
+      if (blurb && candidate?.blurb) blurb.textContent = candidate.blurb;
+    }
   });
 
   app?.addEventListener('change', (e) => {
@@ -1961,6 +2210,7 @@ async function init() {
   const categories = getCategoriesSync();
   const categorySelect = document.getElementById('startup-category');
   populateCategorySelect(categorySelect, categories);
+  populateAlmaMaterSelect(document.getElementById('ceo-alma-mater'));
 
   const setupForm = document.getElementById('setup-form');
   bindSandboxCashToggle(setupForm);
@@ -2046,11 +2296,12 @@ async function init() {
     const ceoLastName = String(fd.get('ceoLastName') || '').trim();
     const ceoBirthMonth = fd.get('ceoBirthMonth');
     const ceoBirthYear = fd.get('ceoBirthYear');
+    const almaMaterId = String(fd.get('almaMaterId') || '').trim();
     const categoryId = String(fd.get('category') || '');
     const mode = String(fd.get('mode') || 'career');
     const sandboxCash = fd.get('sandboxCash');
 
-    if (!companyName || !ceoFirstName || !ceoLastName || !categoryId) return;
+    if (!companyName || !ceoFirstName || !ceoLastName || !categoryId || !almaMaterId) return;
 
     if (!getTaskDefinitions().length) {
       const el = document.getElementById('setup-form');
@@ -2076,6 +2327,7 @@ async function init() {
         ceoLastName,
         ceoBirthMonth,
         ceoBirthYear,
+        almaMaterId,
         categoryId,
         mode,
         sandboxCash,
@@ -2101,9 +2353,15 @@ async function init() {
         preloadCrisisCatalog(),
         preloadDecisionEvents(),
         preloadAcquisitionCatalog(),
+        preloadTreasurySponsorshipDeals(),
+        preloadCeoAlmaMaterCatalog(),
+        preloadCeoLifestyleCatalog(),
+        preloadCeoWlbCatalog(),
+        preloadFinancePropertyPrograms(),
         preloadNewsTimeline()
       ]);
       populateCategorySelect(categorySelect, getCategoriesSync());
+      populateAlmaMaterSelect(document.getElementById('ceo-alma-mater'));
     } catch {
       /* bundled data already playable */
     }
