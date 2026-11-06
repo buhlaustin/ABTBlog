@@ -234,6 +234,7 @@ export function lockedDepartments(state) {
 }
 
 export function hiringAllowed(state) {
+  if (state.offices?.hubId) return true;
   return getWorkspaceTier(state) !== WORKSPACE_TIER.GARAGE;
 }
 

@@ -1506,6 +1506,60 @@ if (!failed) {
   } else {
     console.log(`OK: hub HQ cap ${HUB_HEADCOUNT_CAP} + satellite seats (${totalHeadcountCap(hubCapState)} hiring cap)`);
   }
+  const { headcountCap, getWorkspaceTier } = await import(`file://${join(sim, 'modules/Workspace.js')}`);
+  const { hiringAllowed } = await import(`file://${join(sim, 'modules/Staff.js')}`);
+  const driftHubState = createInitialState({
+    companyName: 'Drift Hub',
+    categoryId: 'b2b-saas',
+    mode: 'career'
+  });
+  driftHubState.workspace = {
+    ...(driftHubState.workspace ?? {}),
+    tier: WS_TIER.CAMPUS,
+    campusOwned: true
+  };
+  driftHubState.offices = {
+    hubId: 'atlanta',
+    hubLabel: 'Atlanta',
+    satellites: [{ id: 'sat-denver', templateId: 'sat-denver', label: 'Denver', seats: denverMed.seats }],
+    usedSatelliteTemplateIds: ['sat-denver']
+  };
+  const driftTotal = totalHeadcountCap(driftHubState);
+  if (headcountCap(driftHubState) !== HUB_HEADCOUNT_CAP || driftTotal !== HUB_HEADCOUNT_CAP + denverMed.seats) {
+    console.error(
+      `FAIL: hub city should set hub cap even when workspace tier drifted (got ${headcountCap(driftHubState)}/${driftTotal})`
+    );
+    failed = true;
+  } else if (!hiringAllowed(driftHubState)) {
+    console.error('FAIL: hub city should allow hiring when workspace tier drifted');
+    failed = true;
+  } else {
+    const migratedDrift = normalizeSave(JSON.parse(JSON.stringify(driftHubState)));
+    if (getWorkspaceTier(migratedDrift) !== WS_TIER.HUB) {
+      console.error('FAIL: normalizeSave should restore hub workspace tier when hubId is set');
+      failed = true;
+    } else {
+      console.log('OK: hub headcount cap follows hub city + save migrate fixes tier drift');
+    }
+  }
+  const sandPostXc = createInitialState({
+    companyName: 'Sandbox Hub Start',
+    categoryId: 'b2b-saas',
+    mode: 'sandbox',
+    sandboxTuning: { startingStage: 'post_xc', revenueMult: 1, ipoGateArr: 50_000_000 }
+  });
+  if (!sandPostXc.offices?.hubId) {
+    console.error('FAIL: sandbox post_xc start should open a hub city');
+    failed = true;
+  } else if (getWorkspaceTier(sandPostXc) !== WS_TIER.HUB) {
+    console.error(`FAIL: sandbox post_xc start should set hub workspace tier (got ${getWorkspaceTier(sandPostXc)})`);
+    failed = true;
+  } else if (!hiringAllowed(sandPostXc) || totalHeadcountCap(sandPostXc) !== 10_000) {
+    console.error('FAIL: sandbox post_xc start hiring cap / allow hire');
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: sandbox post_xc hub start (hire allowed, 10k cap, hub tier)');
+  }
 }
 if (!failed) {
   const publicCoo = createInitialState({ companyName: 'Public COO', categoryId: 'b2b-saas', mode: 'sandbox' });

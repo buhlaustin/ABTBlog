@@ -5,7 +5,12 @@ import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
 import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices, satelliteTemplateIdFromEntry } from './Offices.js';
-import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
+import {
+  createInitialWorkspace,
+  applyWorkspaceBurn,
+  getWorkspaceTier,
+  WORKSPACE_TIER
+} from './Workspace.js';
 import { createInitialBoard, migrateBoardForPublicSave } from './Board.js';
 import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart } from './XC.js';
 import { createInitialSentiment } from './Sentiment.js';
@@ -417,6 +422,12 @@ export function normalizeSave(raw) {
     if (state.flags.gameOver === undefined) state.flags.gameOver = false;
     if (state.flags.seedRoundClosed === undefined) state.flags.seedRoundClosed = false;
     if (!state.offices) state.offices = createInitialOffices();
+    if (state.offices?.hubId && getWorkspaceTier(state) !== WORKSPACE_TIER.HUB) {
+      if (!state.workspace) state.workspace = createInitialWorkspace();
+      state.workspace.tier = WORKSPACE_TIER.HUB;
+      state.workspace.hubOwned = true;
+      applyWorkspaceBurn(state);
+    }
     if (state.offices && !state.offices.usedSatelliteTemplateIds) {
       state.offices.usedSatelliteTemplateIds = [];
       for (const s of state.offices.satellites ?? []) {
