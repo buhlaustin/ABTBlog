@@ -2173,15 +2173,28 @@ if (roster.length < 1 || roster.length > expectedOffers) {
         console.error('FAIL: ran growth campaign should stay off roster until cooldown');
         failed = true;
       } else {
-        console.log(`OK: growth roster + cooldown (${roster.length}/mo, era-scaled payouts)`);
+        const whaleOnRoster = roster.some((id) => {
+          const def = getGrowthCampaigns().find((c) => c.id === id);
+          return def?.whale === true;
+        });
+        if (!whaleOnRoster) {
+          console.error('FAIL: public growth roster should include at least one whale paid play');
+          failed = true;
+        } else {
+          console.log(`OK: growth roster + cooldown (${roster.length}/mo, era-scaled payouts)`);
+        }
       }
     }
   }
 }
 
 const productSideBank = sideTaskBankSize(['product', 'both']);
-if (growthCampaignCatalogSize() < 270) {
-  console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()})`);
+const publicGrowthWhales = getGrowthCampaigns().filter((c) => c.whale === true && (c.tierMin ?? 0) >= 7);
+if (publicGrowthWhales.length < 20) {
+  console.error(`FAIL: expected 20+ post-IPO whale growth campaigns (got ${publicGrowthWhales.length})`);
+  failed = true;
+} else if (growthCampaignCatalogSize() < 295) {
+  console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()}, want ≥295)`);
   failed = true;
 } else if (getProductActions().length < 75) {
   console.error(`FAIL: side-task lever bank too small (${getProductActions().length})`);

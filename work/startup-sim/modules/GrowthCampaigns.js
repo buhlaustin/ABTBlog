@@ -5,6 +5,7 @@ import bundledExtra3 from '../data/growth-campaigns-extra3.json' with { type: 'j
 import bundledSpaceGrowth from '../data/space-exploration-growth.json' with { type: 'json' };
 import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json' with { type: 'json' };
 import bundledPublicLate from '../data/growth-campaigns-public-late.json' with { type: 'json' };
+import bundledPublicWhale from '../data/growth-campaigns-public-whale.json' with { type: 'json' };
 import { fetchGameJson } from './utils.js';
 import { progressionTier, progressionTierForUnlocks } from './ProgressionEconomy.js';
 import { recordCashOutflow, getTaskRevenueMultiplierPreview } from './Finance.js';
@@ -36,7 +37,8 @@ const bundledExtras = [
   bundledExtra3,
   bundledSpaceGrowth,
   bundledSpaceGrowthExtra,
-  bundledPublicLate
+  bundledPublicLate,
+  bundledPublicWhale
 ];
 
 /** Months before the same paid growth play can appear in the monthly roster again. */
@@ -114,6 +116,23 @@ export function refreshGrowthCampaignOffers(state) {
   const recent = state.growth.recentCampaignIds ?? [];
   const offerCount = growthMonthlyOfferCount(state);
   let offers = pickMonthlyCampaignDefs(pool, offerCount, recent);
+
+  if (isPublicCompany(state)) {
+    const whalePool = pool.filter((c) => c.whale === true);
+    const whaleTarget = whalePool.length >= 2 ? 2 : whalePool.length ? 1 : 0;
+    let whalesOnRoster = offers.filter((c) => c.whale).length;
+    const cooldownLen = offerCount * GROWTH_CAMPAIGN_COOLDOWN_MONTHS;
+    const recentSet = new Set((recent ?? []).slice(-cooldownLen));
+    while (whalesOnRoster < whaleTarget && whalePool.length) {
+      const candidates = whalePool.filter((c) => !offers.some((o) => o.id === c.id));
+      if (!candidates.length) break;
+      const fresh = candidates.filter((c) => !recentSet.has(c.id));
+      const pickFrom = fresh.length ? fresh : candidates;
+      const pick = shuffle(pickFrom)[0];
+      offers = mergeUniqueCampaignOffers(offers, pick, offerCount);
+      whalesOnRoster += 1;
+    }
+  }
 
   state.growth.monthCampaignOffers = offers.map((c) => c.id);
   state.growth.lastRosterWhaleCount = offers.filter((c) => c.whale === true).length;
