@@ -55,6 +55,16 @@ if (taskCatalogSize() < 1200) {
 } else {
   console.log(`OK: task catalog size ${taskCatalogSize()} (cooldown ${RECENT_TASK_COOLDOWN_MONTHS} months)`);
 }
+const publicWhales = getTaskDefinitions().filter((t) => t.whale === true && t.stages?.includes('public'));
+if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal')) {
+  console.error('FAIL: handcrafted public whale pack not merged into catalog');
+  failed = true;
+} else if (publicWhales.length < 20) {
+  console.error(`FAIL: expected 20+ public whale desk tasks, got ${publicWhales.length}`);
+  failed = true;
+} else if (!failed) {
+  console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
+}
 
 const genericPool = getTaskDefinitions().filter((t) => !t.categories?.length && !t.launchPhase);
 for (let i = 0; i < 80; i += 1) {
@@ -1589,11 +1599,28 @@ if (!failed) {
   } else if (getWorkspaceTier(sandPostXc) !== WS_TIER.HUB) {
     console.error(`FAIL: sandbox post_xc start should set hub workspace tier (got ${getWorkspaceTier(sandPostXc)})`);
     failed = true;
-  } else if (!hiringAllowed(sandPostXc) || totalHeadcountCap(sandPostXc) !== 10_000) {
-    console.error('FAIL: sandbox post_xc start hiring cap / allow hire');
+  } else if (!hiringAllowed(sandPostXc) || totalHeadcountCap(sandPostXc) !== HUB_HEADCOUNT_CAP) {
+    console.error(
+      `FAIL: sandbox post_xc hub cap should be hub HQ (${HUB_HEADCOUNT_CAP}), got ${totalHeadcountCap(sandPostXc)}`
+    );
     failed = true;
-  } else if (!failed) {
-    console.log('OK: sandbox post_xc hub start (hire allowed, 10k cap, hub tier)');
+  } else {
+    sandPostXc.offices.satellites = [
+      {
+        id: 'sat-denver',
+        templateId: 'sat-denver',
+        label: 'Denver',
+        seats: denverMed.seats,
+        rentMonthly: denverMed.rentMonthly
+      }
+    ];
+    const sandHubTotal = totalHeadcountCap(sandPostXc);
+    if (sandHubTotal <= 10_000) {
+      console.error(`FAIL: sandbox hub + satellite cap should exceed 10k (got ${sandHubTotal})`);
+      failed = true;
+    } else if (!failed) {
+      console.log(`OK: sandbox hub cap ${HUB_HEADCOUNT_CAP} + satellites (${sandHubTotal}, not flat 10k)`);
+    }
   }
 }
 if (!failed) {

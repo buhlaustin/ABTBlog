@@ -513,7 +513,11 @@ export function renderPeopleStaffingPanel(container, state) {
     <section class="finance-section people-staffing-section">
       ${orgMount}
       <div id="org-chart-mount"></div>
-      <p class="fine-print">Hire a named <strong>COO</strong> in the org chart (garage onward). Department headcount unlocks after a small office ($10k ARR).${state.mode === 'sandbox' ? ' Sandbox cap <strong>10,000</strong> headcount.' : ''}${capHint ? ` ${capHint}` : ''}${
+      <p class="fine-print">Hire a named <strong>COO</strong> in the org chart (garage onward). Department headcount unlocks after a small office ($10k ARR).${
+        state.mode === 'sandbox' && !capBreakdown.atHub
+          ? ' Sandbox default cap <strong>10,000</strong> until a hub city (then HQ + satellites).'
+          : ''
+      }${capHint ? ` ${capHint}` : ''}${
         marketSalaryMult(state) > 1.001
           ? ` Market comp index <strong>×${marketSalaryMult(state).toFixed(3)}</strong> (annual reset).`
           : ' Base pay resets every 12 months for market demand.'

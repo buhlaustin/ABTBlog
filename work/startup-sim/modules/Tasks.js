@@ -13,6 +13,7 @@ import bundledAiToolsModelLab from '../data/ai-tools-model-lab-desk-tasks.json' 
 import bundledCatalogExpansion from '../data/tasks-catalog-expansion.json' with { type: 'json' };
 import bundledPublicLate from '../data/tasks-public-late-game.json' with { type: 'json' };
 import bundledPublicLateExtra from '../data/tasks-public-late-game-extra.json' with { type: 'json' };
+import bundledPublicWhaleHandcrafted from '../data/tasks-public-whale-handcrafted.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import bundledTaxFiling from '../data/tax-filing-task.json' with { type: 'json' };
@@ -113,8 +114,11 @@ function mergeCatalogExpansion(base) {
 
 function mergePublicLateGameTasks(base) {
   return mergeTaskPack(
-    mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
-    bundledPublicLateExtra?.tasks ?? []
+    mergeTaskPack(
+      mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
+      bundledPublicLateExtra?.tasks ?? []
+    ),
+    bundledPublicWhaleHandcrafted?.tasks ?? []
   );
 }
 

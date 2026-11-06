@@ -28,6 +28,7 @@ import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
 import { ceoSalaryMonthly } from './CeoEconomics.js';
 import { cooSalaryMonthly } from './Coo.js';
 import { totalHeadcount } from './Staff.js';
+import { totalHeadcountCap } from './Offices.js';
 
 /** Hard caps on desk + growth payout multiplier (after sandbox tuning overlay). */
 export const REV_MULT_CAP_CAREER = 60;
@@ -91,10 +92,15 @@ export function getSandboxTuningMult(state) {
   return state.mode === 'sandbox' ? getSandboxExtraRevenueMult(state) : 1;
 }
 
+function sandboxWorkforceHeadcountFull(state) {
+  return Math.max(SANDBOX_WORKFORCE_HEADCOUNT_FULL, totalHeadcountCap(state));
+}
+
 export function getTaskRevenueCap(state) {
   if (state.mode !== 'sandbox') return REV_MULT_CAP_CAREER;
   const hc = totalHeadcount(state.staff?.headcountByDept);
-  const scale = Math.min(1, hc / SANDBOX_WORKFORCE_HEADCOUNT_FULL);
+  const workforceFull = sandboxWorkforceHeadcountFull(state);
+  const scale = Math.min(1, hc / workforceFull);
   /** 30% of cap at zero headcount → 100% at 10k employees (sandbox only). */
   const workforceScale = 0.3 + scale * 0.7;
   return Math.round(REV_MULT_CAP_SANDBOX * workforceScale * 100) / 100;
@@ -126,7 +132,7 @@ export function taskRevenueMultHud(state) {
   const cap = getTaskRevenueCap(state);
   const workforceNote =
     state.mode === 'sandbox'
-      ? ` Sandbox workforce cap ${cap}× (scales to ${REV_MULT_CAP_SANDBOX}× at ${SANDBOX_WORKFORCE_HEADCOUNT_FULL.toLocaleString()} staff).`
+      ? ` Sandbox workforce cap ${cap}× (scales to ${REV_MULT_CAP_SANDBOX}× at ${sandboxWorkforceHeadcountFull(state).toLocaleString()} staff).`
       : '';
   if (isTaskRevenueMultCapped(state)) {
     return {
