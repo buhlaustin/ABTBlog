@@ -621,6 +621,311 @@
           }
         }
       ]
+    },
+    {
+      "id": "office-landlord-nonrenew",
+      "title": "Non-renewal notice",
+      "description": "The landlord declined extension — you have 90 days. Real estate says month-to-month is available at a premium, or you clear the floor.",
+      "weight": 2,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Bridge month-to-month at 1.4× rent",
+          "effects": {
+            "cash": -96000,
+            "sentiment": 4,
+            "buzz": 1,
+            "modifier": {
+              "id": "m2m-bridge",
+              "label": "Short-term lease premium",
+              "costMult": 1.1,
+              "months": 3
+            }
+          }
+        },
+        {
+          "label": "Vacate — full remote + smaller coworking drop-in",
+          "effects": {
+            "cash": -34000,
+            "headcountDelta": -3,
+            "sentiment": 1,
+            "modifier": {
+              "id": "remote-cowork",
+              "label": "Distributed footprint",
+              "costMult": 1.05,
+              "months": 4
+            }
+          }
+        },
+        {
+          "label": "Accelerate HQ expansion — absorb the whole team",
+          "effects": {
+            "cash": -185000,
+            "sentiment": 5,
+            "product": 1,
+            "modifier": {
+              "id": "hq-swallow",
+              "label": "Consolidation crunch",
+              "costMult": 1.09,
+              "months": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "rto-mandate-pushback",
+      "title": "Return-to-office pushback",
+      "description": "You announced three days on-site. A third of engineers signed an open letter — quit, flexible hybrid, or hold the line?",
+      "weight": 2,
+      "minTier": 3,
+      "choices": [
+        {
+          "label": "Hold the mandate — backfill churn",
+          "effects": {
+            "headcountDelta": -6,
+            "cash": -45000,
+            "sentiment": -5,
+            "buzz": -2,
+            "modifier": {
+              "id": "rto-churn",
+              "label": "Talent bleed & backfill cost",
+              "revenueMult": 0.95,
+              "costMult": 1.06,
+              "months": 3
+            }
+          }
+        },
+        {
+          "label": "Core days hybrid — one WFH anchor day",
+          "effects": {
+            "cash": -18000,
+            "sentiment": 6,
+            "buzz": 2,
+            "modifier": {
+              "id": "hybrid-core",
+              "label": "Hybrid ops overhead",
+              "costMult": 1.04,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Remote-first — downsize office footprint",
+          "effects": {
+            "cash": 72000,
+            "sentiment": 3,
+            "modifier": {
+              "id": "remote-downsize",
+              "label": "Smaller lease run-rate",
+              "costMult": 0.97,
+              "months": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "coworking-provider-collapse",
+      "title": "Coworking provider in distress",
+      "description": "Your block-booked floors may go dark. Facilities needs a plan this week: hotel conference rooms, competitor building, or permanent lease?",
+      "weight": 1,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Blitz hotel day-rates + parking stipends",
+          "effects": {
+            "cash": -62000,
+            "sentiment": 2,
+            "modifier": {
+              "id": "hotel-blitz",
+              "label": "Scattered meeting rooms",
+              "costMult": 1.08,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Short nod with a rival's surplus sublease",
+          "effects": {
+            "cash": -74000,
+            "sentiment": -2,
+            "competitor": 2,
+            "modifier": {
+              "id": "rival-sublease",
+              "label": "Awkward neighbor optics",
+              "revenueMult": 0.98,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Sign a 36-month anchor lease elsewhere",
+          "effects": {
+            "cash": -125000,
+            "sentiment": 4,
+            "modifier": {
+              "id": "new-lease-lock",
+              "label": "Long lease commitment",
+              "costMult": 1.06,
+              "months": 4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "weather-office-unusable",
+      "title": "Site unusable — flooding",
+      "description": "The basement server-adjacent space is condemned after a main break. Ops can failover, but humans need a plan for three weeks minimum.",
+      "weight": 1,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Unpaid leave for hourly shifts you cannot staff",
+          "effects": {
+            "headcountDelta": -4,
+            "cash": 38000,
+            "sentiment": -9,
+            "modifier": {
+              "id": "flood-unpaid",
+              "label": "Morale hit & press risk",
+              "revenueMult": 0.92,
+              "months": 2,
+              "fundraisingBlocked": true
+            }
+          }
+        },
+        {
+          "label": "Pay continuity — hourly + overtime at swing site",
+          "effects": {
+            "cash": -68000,
+            "sentiment": 6,
+            "modifier": {
+              "id": "flood-continuity",
+              "label": "Disaster payroll bridge",
+              "costMult": 1.11,
+              "months": 1
+            }
+          }
+        },
+        {
+          "label": "Split: HQ absorbs ICs, site staff goes remote",
+          "effects": {
+            "cash": -24000,
+            "sentiment": 2,
+            "product": 1,
+            "modifier": {
+              "id": "flood-split",
+              "label": "Split-brain collaboration tax",
+              "costMult": 1.06,
+              "months": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "public-margin-rif",
+      "title": "Board wants a footprint RIF",
+      "description": "The committee slide says occupancy cost per employee is an outlier. They want a number before the call — headcount, space, or both.",
+      "weight": 2,
+      "minTier": 7,
+      "requiresPublic": true,
+      "choices": [
+        {
+          "label": "10% targeted reduction — severance accrual now",
+          "effects": {
+            "headcountDelta": -10,
+            "cash": -320000,
+            "sentiment": -12,
+            "stockPct": -0.04,
+            "modifier": {
+              "id": "public-rif",
+              "label": "Restructuring narrative",
+              "revenueMult": 0.94,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Space-only — sublease half the campus, keep heads",
+          "effects": {
+            "cash": -95000,
+            "sentiment": 3,
+            "stockPct": 0.02,
+            "modifier": {
+              "id": "sublease-half",
+              "label": "Sublease income pipeline",
+              "costMult": 0.96,
+              "months": 3
+            }
+          }
+        },
+        {
+          "label": "Hiring freeze + natural attrition — no headline RIF",
+          "effects": {
+            "sentiment": -3,
+            "stockPct": -0.015,
+            "modifier": {
+              "id": "freeze-attrition",
+              "label": "Growth slows to match floor",
+              "revenueMult": 0.97,
+              "months": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "visa-office-presence-clash",
+      "title": "Visa site-presence clash",
+      "description": "Immigration counsel says a cohort needs continued work at a registered site. That site is the one you're closing — exceptions or transfers?",
+      "weight": 1,
+      "minTier": 3,
+      "choices": [
+        {
+          "label": "Sponsor transfers + legal rush fees",
+          "effects": {
+            "cash": -88000,
+            "sentiment": 3,
+            "buzz": 1,
+            "modifier": {
+              "id": "visa-transfer",
+              "label": "Immigration program burn",
+              "costMult": 1.05,
+              "months": 3
+            }
+          }
+        },
+        {
+          "label": "Keep a micro-site lease for visa cohort only",
+          "effects": {
+            "cash": -54000,
+            "sentiment": 4,
+            "modifier": {
+              "id": "visa-microsite",
+              "label": "Stranded floor cost",
+              "costMult": 1.06,
+              "months": 4
+            }
+          }
+        },
+        {
+          "label": "End assignments — repatriate / part ways",
+          "effects": {
+            "headcountDelta": -5,
+            "cash": -110000,
+            "sentiment": -7,
+            "modifier": {
+              "id": "visa-exit",
+              "label": "Coverage gap & knowledge loss",
+              "revenueMult": 0.96,
+              "months": 2
+            }
+          }
+        }
+      ]
     }
   ]
 }
