@@ -1,6 +1,7 @@
 import { formatMoney, stageLabel } from './constants.js';
 import { formatStateMonth } from './GameCalendar.js';
 import { calendarTurn } from './XC.js';
+import { sponsoredMrrMonthly, sponsorshipBookSummary } from './TreasurySponsorships.js';
 
 export function buildRunExportText(state) {
   const lines = [];
@@ -14,6 +15,14 @@ export function buildRunExportText(state) {
   lines.push(`Months played: ${months}`);
   lines.push(`Lifetime revenue: ${formatMoney(state.finance?.lifetimeRevenue ?? 0)}`);
   lines.push(`Cash: ${formatMoney(state.finance?.cash ?? 0)}`);
+
+  const sponsorMrr = sponsoredMrrMonthly(state);
+  if (sponsorMrr > 0) {
+    const book = sponsorshipBookSummary(state);
+    lines.push(
+      `Sponsor contracts: +${formatMoney(sponsorMrr)}/mo guaranteed MRR (${book.activeCount} active; ${formatMoney(book.remainingMrrMonths)} MRR still on book)`
+    );
+  }
 
   if (state.ending?.type === 'cash_out') {
     const e = state.ending;

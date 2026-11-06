@@ -102,7 +102,9 @@ import {
 } from './modules/Fundraising.js';
 import {
   preloadTreasurySponsorshipDeals,
-  signTreasurySponsorship
+  signTreasurySponsorship,
+  renewTreasurySponsorship,
+  terminateTreasurySponsorship
 } from './modules/TreasurySponsorships.js';
 import { runPublicMarketEvent, runPreIpoIrPrep, setPublicSection } from './modules/PublicMarkets.js';
 import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback, setCeoSection } from './modules/Ceo.js';
@@ -1593,6 +1595,35 @@ function bindGameInteractions() {
         sponsorBtn.getAttribute('data-sign-sponsorship')
       );
       if (!result.ok) showFinanceFeedback(result.reason || 'Could not sign.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        for (const line of result.brandLines ?? []) appendLog(sessionState, line);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const renewSponsorBtn = e.target.closest('[data-renew-sponsorship]');
+    if (renewSponsorBtn && sessionState) {
+      const result = renewTreasurySponsorship(
+        sessionState,
+        renewSponsorBtn.getAttribute('data-renew-sponsorship')
+      );
+      if (!result.ok) showFinanceFeedback(result.reason || 'Renewal blocked.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const termSponsorBtn = e.target.closest('[data-terminate-sponsorship]');
+    if (termSponsorBtn && sessionState) {
+      const result = terminateTreasurySponsorship(
+        sessionState,
+        termSponsorBtn.getAttribute('data-terminate-sponsorship')
+      );
+      if (!result.ok) showFinanceFeedback(result.reason || 'Could not exit.', true);
       else {
         appendLog(sessionState, result.summary);
         showFinanceFeedback(result.summary);

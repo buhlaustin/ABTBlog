@@ -2079,6 +2079,36 @@ h1 {
   background: rgba(91, 156, 255, 0.06);
 }
 
+.treasury-sponsor-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.treasury-sponsor-category .finance-subhead {
+  margin-bottom: 0.5rem;
+}
+
+.treasury-sponsor-deal {
+  margin-bottom: 0.65rem;
+}
+
+.treasury-sponsor-deal:last-child {
+  margin-bottom: 0;
+}
+
+.treasury-sponsor-tags {
+  opacity: 0.85;
+}
+
+.treasury-sponsor-actions {
+  white-space: nowrap;
+}
+
+.treasury-sponsor-actions .btn {
+  margin-right: 0.25rem;
+}
+
 .finance-panel {
   display: flex;
   flex-direction: column;

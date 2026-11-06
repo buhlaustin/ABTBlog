@@ -2839,7 +2839,10 @@ const {
   preloadTreasurySponsorshipDeals,
   signTreasurySponsorship,
   settleTreasurySponsorshipsAtMonthEnd,
-  sponsoredMrrMonthly
+  sponsoredMrrMonthly,
+  renewTreasurySponsorship,
+  sponsorshipBookSummary,
+  tickSponsorshipEscalationAtMonthStart
 } = await import(`file://${join(sim, 'modules/TreasurySponsorships.js')}`);
 await preloadTreasurySponsorshipDeals();
 const sponsorState = createInitialState({
@@ -2866,7 +2869,38 @@ if (!signConf.ok) {
     console.error('FAIL: sponsorship month-end settle');
     failed = true;
   } else {
-    console.log('OK: treasury sponsorship contracts (fee → guaranteed MRR)');
+    const book = sponsorshipBookSummary(sponsorState);
+    if (book.remainingFees <= 0) {
+      console.error('FAIL: sponsorship book remaining fees');
+      failed = true;
+    } else {
+      sponsorState.treasurySponsorships.active[0].monthsRemaining = 2;
+      const renew = renewTreasurySponsorship(sponsorState, 'nra-stadium-flagship');
+      if (!renew.ok || sponsorState.treasurySponsorships.active[0].monthsRemaining !== 14) {
+        console.error(`FAIL: sponsorship renewal: ${renew.reason ?? 'months'}`);
+        failed = true;
+      } else {
+        const { advanceRealCalendarMonth } = await import(
+          `file://${join(sim, 'modules/GameCalendar.js')}`
+        );
+        for (let i = 0; i < 14; i++) advanceRealCalendarMonth(sponsorState);
+        while (sponsorState.calendar.monthIndex !== 1) advanceRealCalendarMonth(sponsorState);
+        if (calendarTurn(sponsorState) <= 1) {
+          console.error('FAIL: sponsorship escalation calendar turn');
+          failed = true;
+        } else {
+          sponsorState.treasurySponsorships.lastEscalationYear = null;
+          const before = sponsorState.treasurySponsorships.active[0].paymentMonthly;
+          tickSponsorshipEscalationAtMonthStart(sponsorState);
+          if (sponsorState.treasurySponsorships.active[0].paymentMonthly <= before) {
+            console.error('FAIL: sponsorship January escalation');
+            failed = true;
+          } else {
+            console.log('OK: treasury sponsorship contracts (fee → guaranteed MRR, renew, escalate)');
+          }
+        }
+      }
+    }
   }
 }
 

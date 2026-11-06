@@ -563,6 +563,14 @@ export function normalizeSave(raw) {
       if (state.treasurySponsorships.lifetimeMrrGranted === undefined) {
         state.treasurySponsorships.lifetimeMrrGranted = 0;
       }
+      if (!state.treasurySponsorships.history) state.treasurySponsorships.history = [];
+      if (state.treasurySponsorships.lastEscalationYear === undefined) {
+        state.treasurySponsorships.lastEscalationYear = null;
+      }
+      for (const c of state.treasurySponsorships.active) {
+        if (c.monthsTotal == null && c.monthsRemaining != null) c.monthsTotal = c.monthsRemaining;
+        if (c.buzzPerMonth == null) c.buzzPerMonth = 0;
+      }
     }
     if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
     if (!state.acquisitions.owned) state.acquisitions.owned = [];
