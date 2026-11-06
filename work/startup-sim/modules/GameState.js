@@ -21,6 +21,7 @@ import {
   migrateLegacySponsorshipContract
 } from './TreasurySponsorships.js';
 import { createInitialStartupConferenceState } from './StartupConference.js';
+import { createInitialFinancePropertyState } from './FinanceProperty.js';
 import { createInitialCrisisState } from './Crisis.js';
 import { createInitialDecisionState } from './DecisionEvents.js';
 import { createInitialModifiers } from './ScenarioEffects.js';
@@ -149,6 +150,7 @@ export function createInitialState(options) {
     acquisitions: createInitialAcquisitionsState(),
     treasurySponsorships: createInitialTreasurySponsorshipsState(),
     startupConference: createInitialStartupConferenceState(),
+    financeProperty: createInitialFinancePropertyState(),
     crisis: createInitialCrisisState(),
     decision: createInitialDecisionState(),
     modifiers: createInitialModifiers(),
@@ -586,6 +588,16 @@ export function normalizeSave(raw) {
       state.xc.postBatchApiReleaseDone = false;
     }
     if (state.xc && state.xc.seedRoundTerms === undefined) state.xc.seedRoundTerms = null;
+    if (!state.financeProperty) {
+      state.financeProperty = createInitialFinancePropertyState();
+    } else {
+      const fp = state.financeProperty;
+      if (!fp.holdings) fp.holdings = [];
+      if (!fp.history) fp.history = [];
+      if (fp.lifetimeCapex == null) fp.lifetimeCapex = 0;
+      if (fp.lifetimeOpex == null) fp.lifetimeOpex = 0;
+      if (fp.lifetimeMrrGranted == null) fp.lifetimeMrrGranted = 0;
+    }
     if (!state.startupConference) {
       state.startupConference = createInitialStartupConferenceState();
     } else {

@@ -1,5 +1,6 @@
 import { formatMoney } from './constants.js';
 import { recordCashOutflow } from './Finance.js';
+import { propertyFinanceTabVisible as categoryPropertyFinanceTabVisible } from './FinanceProperty.js';
 import {
   canFileIpo,
   isPublicCompany,
@@ -21,7 +22,7 @@ import {
   panelMetricStack
 } from './PanelChrome.js';
 
-const FINANCE_SECTIONS = new Set(['overview', 'treasury', 'conference', 'public']);
+const FINANCE_SECTIONS = new Set(['overview', 'treasury', 'property', 'conference', 'public']);
 const PUBLIC_SECTIONS = new Set(['market', 'events', 'calendar']);
 
 const PRE_IPO_IR_STEPS = [
@@ -56,6 +57,10 @@ export function conferenceFinanceTabVisible(state) {
   return Boolean(state.flags?.seedRoundClosed);
 }
 
+export function propertyFinanceTabVisible(state) {
+  return categoryPropertyFinanceTabVisible(state);
+}
+
 export function setFinanceSection(state, section) {
   if (!state.finance) return;
   state.finance.section = FINANCE_SECTIONS.has(section) ? section : 'overview';
@@ -70,6 +75,7 @@ export function activeFinanceSection(state) {
   const s = state.finance?.section ?? 'overview';
   if (s === 'public' && !publicFinanceTabVisible(state)) return 'overview';
   if (s === 'conference' && !conferenceFinanceTabVisible(state)) return 'overview';
+  if (s === 'property' && !propertyFinanceTabVisible(state)) return 'overview';
   return FINANCE_SECTIONS.has(s) ? s : 'overview';
 }
 

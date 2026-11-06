@@ -1,0 +1,511 @@
+{
+  "programs": [
+    {
+      "categoryId": "ai-tools",
+      "tabTitle": "Inference estate",
+      "headline": "Data centers & GPU halls",
+      "blurb": "Own training and inference footprint — pick a site class and how many you build. More sites raise desk revenue multiplier; hyperscale tiers carry serious OPEX.",
+      "unitSingular": "site",
+      "unitPlural": "sites",
+      "quantityLabel": "Sites to build",
+      "minArr": 350000,
+      "requiresSeed": true,
+      "tiers": [
+        {
+          "id": "ai-tools-edge-pod",
+          "label": "Edge GPU pod",
+          "detail": "8-rack regional inference — low latency for enterprise pilots.",
+          "capexEach": 1800000,
+          "opexEachMo": 82000,
+          "revenueMultEach": 0.014,
+          "buzzEach": 1,
+          "maxHoldings": 20
+        },
+        {
+          "id": "ai-tools-regional-dc",
+          "label": "Regional data center",
+          "detail": "Dedicated hall with liquid cooling and redundant power.",
+          "capexEach": 12000000,
+          "opexEachMo": 410000,
+          "revenueMultEach": 0.028,
+          "buzzEach": 2,
+          "maxHoldings": 8
+        },
+        {
+          "id": "ai-tools-hyperscale",
+          "label": "Hyperscale campus",
+          "detail": "100MW-class build — model labs, pre-training, and colo for Fortune 500.",
+          "capexEach": 68000000,
+          "opexEachMo": 1950000,
+          "revenueMultEach": 0.048,
+          "buzzEach": 4,
+          "maxHoldings": 3
+        }
+      ]
+    },
+    {
+      "categoryId": "edtech",
+      "tabTitle": "Schools & EMO",
+      "headline": "Charters, districts, and EMO roll-ups",
+      "blurb": "Buy operating capacity — virtual charters, regional education management orgs, or state-wide EMO platforms. Enrollment becomes contracted MRR; larger deals need scale and cash.",
+      "unitSingular": "campus network",
+      "unitPlural": "campus networks",
+      "quantityLabel": "Networks to add",
+      "minArr": 280000,
+      "requiresSeed": true,
+      "tiers": [
+        {
+          "id": "edtech-virtual-charter",
+          "label": "Virtual charter bundle",
+          "detail": "1–3 online schools under your LMS — state authorizer pending.",
+          "capexEach": 420000,
+          "opexEachMo": 24000,
+          "mrrGrantEach": 18500,
+          "sentimentEach": 1,
+          "maxHoldings": 24
+        },
+        {
+          "id": "edtech-regional-emo",
+          "label": "Regional EMO partnership",
+          "detail": "Operate 8–15 brick-and-mortar sites; you run curriculum and back office.",
+          "capexEach": 2600000,
+          "opexEachMo": 98000,
+          "mrrGrantEach": 92000,
+          "sentimentEach": 2,
+          "maxHoldings": 10
+        },
+        {
+          "id": "edtech-state-emo",
+          "label": "State-wide EMO acquisition",
+          "detail": "Full education management org — tens of thousands of seats on your stack.",
+          "capexEach": 15000000,
+          "opexEachMo": 360000,
+          "mrrGrantEach": 310000,
+          "sentimentEach": 3,
+          "maxHoldings": 4
+        }
+      ]
+    },
+    {
+      "categoryId": "b2b-saas",
+      "tabTitle": "Customer footprint",
+      "headline": "CS hubs & regional success centers",
+      "blurb": "Physical presence where your biggest accounts live — implementation bays, executive briefing centers, and 24/7 follow-the-sun pods.",
+      "unitSingular": "center",
+      "unitPlural": "centers",
+      "quantityLabel": "Centers to open",
+      "minArr": 220000,
+      "requiresSeed": true,
+      "tiers": [
+        {
+          "id": "b2b-saas-cs-pod",
+          "label": "Follow-the-sun CS pod",
+          "detail": "12 seats — renewal calls and escalations in-region.",
+          "capexEach": 380000,
+          "opexEachMo": 28000,
+          "revenueMultEach": 0.01,
+          "maxHoldings": 24
+        },
+        {
+          "id": "b2b-saas-ebc",
+          "label": "Executive briefing center",
+          "detail": "Demo theater + C-suite lounge for six-figure deals.",
+          "capexEach": 2100000,
+          "opexEachMo": 72000,
+          "revenueMultEach": 0.022,
+          "buzzEach": 1,
+          "maxHoldings": 12
+        },
+        {
+          "id": "b2b-saas-global-hub",
+          "label": "Global solutions hub",
+          "detail": "Multi-floor HQ for pro services, training, and certification.",
+          "capexEach": 9800000,
+          "opexEachMo": 290000,
+          "revenueMultEach": 0.038,
+          "maxHoldings": 5
+        }
+      ]
+    },
+    {
+      "categoryId": "consumer-social",
+      "tabTitle": "Edge & studios",
+      "headline": "CDN POPs and creator studios",
+      "blurb": "Feed latency and creator quality — edge caches in key metros plus production studios for your top talent programs.",
+      "unitSingular": "asset",
+      "unitPlural": "assets",
+      "quantityLabel": "Assets to deploy",
+      "minArr": 180000,
+      "requiresSeed": false,
+      "tiers": [
+        {
+          "id": "consumer-social-edge-pop",
+          "label": "Metro edge POP",
+          "detail": "Video and image cache — smoother scroll in one DMA.",
+          "capexEach": 650000,
+          "opexEachMo": 34000,
+          "revenueMultEach": 0.011,
+          "buzzEach": 1,
+          "maxHoldings": 28
+        },
+        {
+          "id": "consumer-social-creator-studio",
+          "label": "Creator studio",
+          "detail": "Sound stage + edit bays for flagship creators.",
+          "capexEach": 1900000,
+          "opexEachMo": 68000,
+          "revenueMultEach": 0.019,
+          "buzzEach": 3,
+          "maxHoldings": 10
+        },
+        {
+          "id": "consumer-social-live-ops",
+          "label": "Live ops broadcast hub",
+          "detail": "24/7 moderation and live event control for tentpole moments.",
+          "capexEach": 7200000,
+          "opexEachMo": 210000,
+          "revenueMultEach": 0.032,
+          "maxHoldings": 4
+        }
+      ]
+    },
+    {
+      "categoryId": "marketplace",
+      "tabTitle": "Trust & logistics",
+      "headline": "Micro-hubs and review centers",
+      "blurb": "Two-sided scale needs places — neighborhood fulfillment micro-hubs and trust & safety campuses for high-volume review.",
+      "unitSingular": "hub",
+      "unitPlural": "hubs",
+      "quantityLabel": "Hubs to stand up",
+      "minArr": 200000,
+      "requiresSeed": true,
+      "tiers": [
+        {
+          "id": "marketplace-micro-hub",
+          "label": "Neighborhood micro-hub",
+          "detail": "Hand-off lockers and light staging for power sellers.",
+          "capexEach": 520000,
+          "opexEachMo": 31000,
+          "revenueMultEach": 0.012,
+          "maxHoldings": 22
+        },
+        {
+          "id": "marketplace-trust-campus",
+          "label": "Trust & safety campus",
+          "detail": "500-seat review floor with escalation labs.",
+          "capexEach": 3400000,
+          "opexEachMo": 115000,
+          "revenueMultEach": 0.024,
+          "sentimentEach": 1,
+          "maxHoldings": 8
+        },
+        {
+          "id": "marketplace-regional-ops",
+          "label": "Regional ops mega-hub",
+          "detail": "Cross-dock + fraud ML war room for a whole country.",
+          "capexEach": 11000000,
+          "opexEachMo": 320000,
+          "revenueMultEach": 0.036,
+          "maxHoldings": 4
+        }
+      ]
+    },
+    {
+      "categoryId": "delivery",
+      "tabTitle": "Last mile",
+      "headline": "Dark stores and dispatch towers",
+      "blurb": "Own the concrete — dark kitchens/stores, dispatch control rooms, and cold-chain yards that make ETAs honest.",
+      "unitSingular": "node",
+      "unitPlural": "nodes",
+      "quantityLabel": "Nodes to build",
+      "minArr": 160000,
+      "requiresSeed": false,
+      "tiers": [
+        {
+          "id": "delivery-dark-store",
+          "label": "Dark store",
+          "detail": "15-minute radius pick/pack for one zone.",
+          "capexEach": 890000,
+          "opexEachMo": 52000,
+          "revenueMultEach": 0.013,
+          "maxHoldings": 20
+        },
+        {
+          "id": "delivery-dispatch-tower",
+          "label": "Dispatch control tower",
+          "detail": "City-wide routing brain + driver pit.",
+          "capexEach": 2400000,
+          "opexEachMo": 88000,
+          "revenueMultEach": 0.021,
+          "maxHoldings": 10
+        },
+        {
+          "id": "delivery-cold-chain",
+          "label": "Cold-chain yard",
+          "detail": "Refrigerated cross-dock for grocery and pharma pilots.",
+          "capexEach": 6500000,
+          "opexEachMo": 175000,
+          "revenueMultEach": 0.034,
+          "maxHoldings": 5
+        }
+      ]
+    },
+    {
+      "categoryId": "fintech",
+      "tabTitle": "Money rails",
+      "headline": "Processing halls and charter paths",
+      "blurb": "Card processing nodes, bank-partner data halls, and (eventually) charter-adjacent trust operations — regulated footprint with contracted interchange yield.",
+      "unitSingular": "node",
+      "unitPlural": "nodes",
+      "quantityLabel": "Nodes to license",
+      "minArr": 400000,
+      "requiresSeed": true,
+      "tiers": [
+        {
+          "id": "fintech-processing-pod",
+          "label": "Processing pod",
+          "detail": "PCI zone for a new BIN sponsor relationship.",
+          "capexEach": 1200000,
+          "opexEachMo": 64000,
+          "mrrGrantEach": 42000,
+          "revenueMultEach": 0.008,
+          "maxHoldings": 16
+        },
+        {
+          "id": "fintech-bank-data-hall",
+          "label": "Bank partner data hall",
+          "detail": "Co-located with sponsor bank — wires and ledger sync.",
+          "capexEach": 5200000,
+          "opexEachMo": 165000,
+          "mrrGrantEach": 125000,
+          "revenueMultEach": 0.018,
+          "maxHoldings": 6
+        },
+        {
+          "id": "fintech-trust-charter",
+          "label": "Trust & charter campus",
+          "detail": "Full regulatory footprint — exam-ready ops center.",
+          "capexEach": 22000000,
+          "opexEachMo": 480000,
+          "mrrGrantEach": 380000,
+          "revenueMultEach": 0.03,
+          "maxHoldings": 3
+        }
+      ]
+    },
+    {
+      "categoryId": "hardware",
+      "tabTitle": "Manufacturing",
+      "headline": "Lines, fabs, and test halls",
+      "blurb": "Stop renting capacity — assembly lines, EMS partnerships, and test & certification halls for your SKUs.",
+      "unitSingular": "line",
+      "unitPlural": "lines",
+      "quantityLabel": "Lines to add",
+      "minArr": 320000,
+      "requiresSeed": true,
+      "tiers": [
+        {
+          "id": "hardware-assembly-line",
+          "label": "Contract assembly line",
+          "detail": "Dedicated SMT line at a tier-1 EMS.",
+          "capexEach": 2800000,
+          "opexEachMo": 95000,
+          "revenueMultEach": 0.016,
+          "buzzEach": 1,
+          "maxHoldings": 14
+        },
+        {
+          "id": "hardware-test-hall",
+          "label": "Test & certification hall",
+          "detail": "RF, drop, and regulatory pre-cert under one roof.",
+          "capexEach": 4500000,
+          "opexEachMo": 130000,
+          "revenueMultEach": 0.026,
+          "maxHoldings": 8
+        },
+        {
+          "id": "hardware-owned-fab",
+          "label": "Owned fab module",
+          "detail": "Clean-room module for your highest-margin SKU.",
+          "capexEach": 38000000,
+          "opexEachMo": 920000,
+          "revenueMultEach": 0.042,
+          "buzzEach": 3,
+          "maxHoldings": 2
+        }
+      ]
+    },
+    {
+      "categoryId": "healthtech",
+      "tabTitle": "Clinical footprint",
+      "headline": "Clinic corridors and hospital links",
+      "blurb": "Pilot sites that become revenue — ambulatory suites, hospital data corridors, and regional clinical networks on your EHR rail.",
+      "unitSingular": "site",
+      "unitPlural": "sites",
+      "quantityLabel": "Sites to activate",
+      "minArr": 380000,
+      "requiresSeed": true,
+      "tiers": [
+        {
+          "id": "healthtech-ambulatory",
+          "label": "Ambulatory pilot suite",
+          "detail": "3-room clinic wired to your stack — HIPAA audit included.",
+          "capexEach": 980000,
+          "opexEachMo": 48000,
+          "mrrGrantEach": 38000,
+          "revenueMultEach": 0.01,
+          "maxHoldings": 18
+        },
+        {
+          "id": "healthtech-hospital-link",
+          "label": "Hospital data corridor",
+          "detail": "Dedicated integration + on-site command for one IDN.",
+          "capexEach": 4200000,
+          "opexEachMo": 142000,
+          "mrrGrantEach": 98000,
+          "revenueMultEach": 0.022,
+          "maxHoldings": 8
+        },
+        {
+          "id": "healthtech-regional-network",
+          "label": "Regional clinical network",
+          "detail": "Multi-hospital rollout — shared services and command center.",
+          "capexEach": 18500000,
+          "opexEachMo": 410000,
+          "mrrGrantEach": 290000,
+          "revenueMultEach": 0.035,
+          "maxHoldings": 3
+        }
+      ]
+    },
+    {
+      "categoryId": "climate",
+      "tabTitle": "Project sites",
+      "headline": "Solar, storage, and grid yards",
+      "blurb": "Project finance meets software — own generation or storage sites that produce contracted yield and de-risk your enterprise sales story.",
+      "unitSingular": "project",
+      "unitPlural": "projects",
+      "quantityLabel": "Projects to commission",
+      "minArr": 450000,
+      "requiresSeed": true,
+      "tiers": [
+        {
+          "id": "climate-community-solar",
+          "label": "Community solar field",
+          "detail": "5MW nameplate — PPAs with local offtakers.",
+          "capexEach": 6200000,
+          "opexEachMo": 88000,
+          "mrrGrantEach": 72000,
+          "revenueMultEach": 0.012,
+          "maxHoldings": 12
+        },
+        {
+          "id": "climate-battery-yard",
+          "label": "Battery storage yard",
+          "detail": "Grid-tied BESS — arbitrage + capacity payments.",
+          "capexEach": 14000000,
+          "opexEachMo": 195000,
+          "mrrGrantEach": 165000,
+          "revenueMultEach": 0.02,
+          "maxHoldings": 6
+        },
+        {
+          "id": "climate-utility-scale",
+          "label": "Utility-scale hybrid site",
+          "detail": "Solar + storage + substation — enterprise anchor tenant.",
+          "capexEach": 52000000,
+          "opexEachMo": 520000,
+          "mrrGrantEach": 420000,
+          "revenueMultEach": 0.034,
+          "maxHoldings": 3
+        }
+      ]
+    },
+    {
+      "categoryId": "gaming-media",
+      "tabTitle": "Live ops estate",
+      "headline": "Server regions and broadcast ingest",
+      "blurb": "Players feel ping — regional game shards, ingest POPs for streamers, and live-ops war rooms for season launches.",
+      "unitSingular": "region",
+      "unitPlural": "regions",
+      "quantityLabel": "Regions to deploy",
+      "minArr": 150000,
+      "requiresSeed": false,
+      "tiers": [
+        {
+          "id": "gaming-media-game-shard",
+          "label": "Dedicated game shard",
+          "detail": "Low-latency matchmaking cluster for one title/region.",
+          "capexEach": 1100000,
+          "opexEachMo": 58000,
+          "revenueMultEach": 0.015,
+          "buzzEach": 2,
+          "maxHoldings": 16
+        },
+        {
+          "id": "gaming-media-ingest-pop",
+          "label": "Streaming ingest POP",
+          "detail": "4K ingest + transcode for partner creators.",
+          "capexEach": 2900000,
+          "opexEachMo": 92000,
+          "revenueMultEach": 0.023,
+          "buzzEach": 2,
+          "maxHoldings": 10
+        },
+        {
+          "id": "gaming-media-live-ops",
+          "label": "Live ops command",
+          "detail": "War room for launches — SRE, community, and monetization.",
+          "capexEach": 8500000,
+          "opexEachMo": 240000,
+          "revenueMultEach": 0.037,
+          "buzzEach": 4,
+          "maxHoldings": 4
+        }
+      ]
+    },
+    {
+      "categoryId": "space-exploration",
+      "tabTitle": "Ground segment",
+      "headline": "Pads, integration, and ground stations",
+      "blurb": "Rockets need concrete — lease-turned-own pad time, integration hangars, and downlink ground stations for your manifest.",
+      "unitSingular": "asset",
+      "unitPlural": "assets",
+      "quantityLabel": "Assets to acquire",
+      "minArr": 800000,
+      "requiresSeed": true,
+      "tiers": [
+        {
+          "id": "space-ground-station",
+          "label": "Ground station cluster",
+          "detail": "S-band/X-band dishes for your constellation slice.",
+          "capexEach": 4200000,
+          "opexEachMo": 125000,
+          "revenueMultEach": 0.018,
+          "mrrGrantEach": 85000,
+          "maxHoldings": 10
+        },
+        {
+          "id": "space-integration-hangar",
+          "label": "Integration hangar",
+          "detail": "Payload processing + fairing prep near the cape.",
+          "capexEach": 16000000,
+          "opexEachMo": 340000,
+          "revenueMultEach": 0.03,
+          "buzzEach": 3,
+          "maxHoldings": 4
+        },
+        {
+          "id": "space-launch-pad-slot",
+          "label": "Dedicated pad slot",
+          "detail": "Long-term pad access — manifest priority and static fire lane.",
+          "capexEach": 75000000,
+          "opexEachMo": 890000,
+          "revenueMultEach": 0.05,
+          "buzzEach": 5,
+          "maxHoldings": 2
+        }
+      ]
+    }
+  ]
+}

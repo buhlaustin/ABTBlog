@@ -9,6 +9,7 @@ import {
 } from './CeoAlumniGiving.js';
 import { personalHappinessScore, personalHappinessLabel } from './CeoHappiness.js';
 import { isConferenceConfigured, ensureStartupConference } from './StartupConference.js';
+import { propertyHoldingsSummary, getPropertyProgram } from './FinanceProperty.js';
 import { ceoLifestyleLifetimeSpend, ceoLifestyleOwnedDetails } from './CeoLifestyle.js';
 
 export function buildRunExportText(state) {
@@ -36,6 +37,14 @@ export function buildRunExportText(state) {
     const conf = ensureStartupConference(state);
     lines.push(
       `Startup conference “${conf.name}”: ${conf.editionsHeld ?? 0} edition(s) · ${formatMoney(conf.lifetimeRevenue ?? 0)} lifetime yield`
+    );
+  }
+
+  const propProgram = getPropertyProgram(state);
+  const propSum = propertyHoldingsSummary(state);
+  if (propProgram && propSum.totalUnits > 0) {
+    lines.push(
+      `Category property (${propProgram.tabTitle}): ${propSum.totalUnits} units · ${formatMoney(propSum.lifetimeCapex)} capex · +${(propSum.revenueMultBonus * 100).toFixed(1)}% desk rev× · ${formatMoney(propSum.mrrGrantMonthly)}/mo contracted`
     );
   }
 

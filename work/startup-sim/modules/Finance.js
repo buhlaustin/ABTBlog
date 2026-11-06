@@ -24,6 +24,7 @@ import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 import { accrueFiscalExpense, accrueFiscalRevenue, fiscalYearDisplay } from './CorporateTax.js';
 import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
 import { conferenceMonthActive, conferenceTaskRevenueMultiplier } from './StartupConference.js';
+import { propertyRevenueMultBonus } from './FinanceProperty.js';
 
 function startupConferenceDeskRevenueMult(state, taskDef) {
   if (!taskDef?.startupConference || !conferenceMonthActive(state)) return 1;
@@ -111,7 +112,8 @@ export function getCoreTaskRevenueMult(state) {
     acceleratorRevenueMult(state) *
     productBuzzRevenueMult(state) *
     staffRevenueMultiplier(state) *
-    scenarioRevenueMult(state);
+    scenarioRevenueMult(state) *
+    (1 + propertyRevenueMultBonus(state));
   return Math.round(m * 100) / 100;
 }
 

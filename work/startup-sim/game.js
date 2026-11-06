@@ -108,6 +108,7 @@ import {
 } from './modules/TreasurySponsorships.js';
 import { runPublicMarketEvent, runPreIpoIrPrep, setPublicSection } from './modules/PublicMarkets.js';
 import { saveStartupConferenceConfig } from './modules/StartupConference.js';
+import { acquireFinanceProperty, preloadFinancePropertyPrograms } from './modules/FinanceProperty.js';
 import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback, setCeoSection } from './modules/Ceo.js';
 import {
   purchaseCeoHomeCash,
@@ -1246,6 +1247,19 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    if (e.target.id === 'btn-acquire-property' && sessionState) {
+      const result = acquireFinanceProperty(sessionState, {
+        tierId: document.getElementById('property-tier-select')?.value,
+        quantityRaw: document.getElementById('property-qty-input')?.value
+      });
+      if (!result.ok) showFinanceFeedback(result.reason || 'Could not acquire property.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     const publicEventBtn = e.target.closest('[data-public-event]');
     if (publicEventBtn && sessionState) {
       const result = runPublicMarketEvent(sessionState, publicEventBtn.getAttribute('data-public-event'));
@@ -2275,6 +2289,7 @@ async function init() {
         preloadCeoAlmaMaterCatalog(),
         preloadCeoLifestyleCatalog(),
         preloadCeoWlbCatalog(),
+        preloadFinancePropertyPrograms(),
         preloadNewsTimeline()
       ]);
       populateCategorySelect(categorySelect, getCategoriesSync());

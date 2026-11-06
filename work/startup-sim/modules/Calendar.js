@@ -58,6 +58,7 @@ import {
   tickStartupConferenceAtMonthStart,
   settleStartupConferenceAtMonthEnd
 } from './StartupConference.js';
+import { tickFinancePropertyAtMonthStart } from './FinanceProperty.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -134,6 +135,9 @@ export function startMonth(state) {
       recordCashOutflow(state, confStart.budgetCharge, 'startup_conference');
     }
     for (const line of confStart.lines) appendLog(state, line);
+  }
+  for (const line of tickFinancePropertyAtMonthStart(state)) {
+    appendLog(state, line);
   }
   dealMonthlyTasks(state);
   dealCeoWlbOffers(state);

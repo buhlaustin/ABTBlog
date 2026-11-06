@@ -16,6 +16,7 @@ import {
   sponsoredMrrMonthly,
   renderTreasurySponsorshipPanel
 } from './TreasurySponsorships.js';
+import { propertyOpexMonthly } from './FinanceProperty.js';
 
 /** Annual lease review applied each January (HQ, hub, satellites). */
 export const ANNUAL_RENT_ESCALATION_RATE = 0.045;
@@ -84,7 +85,8 @@ export function treasuryObligationsSummary(state) {
     rbfOwed > 0 ? Math.min(rbfOwed, Math.round((state.finance?.mrr ?? 0) * rbfShare)) : 0;
   const sponsorPay = sponsorshipPaymentMonthly(state);
   const sponsorMrr = sponsoredMrrMonthly(state);
-  const fixedMo = rent.totalMonthly + loanPay + rbfEstMo;
+  const propertyOpex = propertyOpexMonthly(state);
+  const fixedMo = rent.totalMonthly + loanPay + rbfEstMo + propertyOpex;
   return {
     rent,
     loanPay,
@@ -93,6 +95,7 @@ export function treasuryObligationsSummary(state) {
     rbfEstMo,
     sponsorPay,
     sponsorMrr,
+    propertyOpex,
     fixedMo,
     creditLimit: computeCreditLimit(state),
     headroom: loanHeadroom(state)

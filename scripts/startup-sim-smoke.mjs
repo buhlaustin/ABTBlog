@@ -3108,4 +3108,47 @@ if (!signConf.ok) {
   }
 }
 
+{
+  const { preloadFinancePropertyPrograms, acquireFinanceProperty, propertyHoldingsSummary, propertyRevenueMultBonus } =
+    await import(`file://${join(sim, 'modules/FinanceProperty.js')}`);
+  await preloadFinancePropertyPrograms();
+  const aiState = createInitialState({
+    companyName: 'GPU Co',
+    categoryId: 'ai-tools',
+    mode: 'sandbox'
+  });
+  aiState.flags.seedRoundClosed = true;
+  aiState.finance.cash = 50_000_000;
+  aiState.finance.mrr = 50_000;
+  aiState.finance.arr = 600_000;
+  const bought = acquireFinanceProperty(aiState, { tierId: 'ai-tools-edge-pod', quantityRaw: 2 });
+  if (!bought.ok) {
+    console.error(`FAIL: finance property acquire (ai): ${bought.reason}`);
+    failed = true;
+  } else if (propertyHoldingsSummary(aiState).totalUnits !== 2) {
+    console.error('FAIL: finance property holdings count');
+    failed = true;
+  } else if (propertyRevenueMultBonus(aiState) <= 0) {
+    console.error('FAIL: finance property revenue mult bonus');
+    failed = true;
+  } else {
+    const edState = createInitialState({
+      companyName: 'Learn Co',
+      categoryId: 'edtech',
+      mode: 'sandbox'
+    });
+    edState.flags.seedRoundClosed = true;
+    edState.finance.cash = 5_000_000;
+    edState.finance.mrr = 30_000;
+    edState.finance.arr = 360_000;
+    const emo = acquireFinanceProperty(edState, { tierId: 'edtech-virtual-charter', quantityRaw: 1 });
+    if (!emo.ok) {
+      console.error(`FAIL: finance property acquire (edtech): ${emo.reason}`);
+      failed = true;
+    } else {
+      console.log('OK: finance property (category tiers, capex, rev× / EMO MRR)');
+    }
+  }
+}
+
 process.exit(failed ? 1 : 0);
