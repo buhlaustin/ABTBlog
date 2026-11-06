@@ -8,6 +8,7 @@ import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
 import bundledLaunchCrowd from '../data/launch-crowdfunding-tasks.json' with { type: 'json' };
 import bundledSpaceExploration from '../data/space-exploration-tasks.json' with { type: 'json' };
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
+import bundledAiToolsDeskExtra from '../data/ai-tools-desk-tasks-extra.json' with { type: 'json' };
 import bundledCatalogExpansion from '../data/tasks-catalog-expansion.json' with { type: 'json' };
 import bundledPublicLate from '../data/tasks-public-late-game.json' with { type: 'json' };
 import bundledPublicLateExtra from '../data/tasks-public-late-game-extra.json' with { type: 'json' };
@@ -99,6 +100,10 @@ function mergeSpaceExplorationTasks(base) {
   return out;
 }
 
+function mergeAiToolsDeskTasks(base) {
+  return mergeTaskPack(base, bundledAiToolsDeskExtra?.tasks ?? []);
+}
+
 function mergeCatalogExpansion(base) {
   return mergeTaskPack(base, bundledCatalogExpansion?.tasks ?? []);
 }
@@ -115,8 +120,10 @@ function mergeCatalog(base) {
     mergeXcDemoDayTasks(
       mergePostXcPreSeedTasks(
         mergeLaunchTasks(
-          mergeSpaceExplorationTasks(
-            mergePublicLateGameTasks(mergeCatalogExpansion(mergeSignatureTasks(base)))
+          mergeAiToolsDeskTasks(
+            mergeSpaceExplorationTasks(
+              mergePublicLateGameTasks(mergeCatalogExpansion(mergeSignatureTasks(base)))
+            )
           )
         )
       )
