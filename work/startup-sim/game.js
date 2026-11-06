@@ -499,7 +499,7 @@ async function handleEndMonth() {
       await rollDeskDecision(sessionState);
     }
 
-    applyOfflineMonthlyNews(sessionState);
+    applyOfflineMonthlyNews(sessionState, result.monthSummary);
     const newArticles = unreadNewsCount(sessionState);
     if (newArticles > 0) {
       appendLog(
