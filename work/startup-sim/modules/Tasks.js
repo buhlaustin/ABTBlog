@@ -41,7 +41,9 @@ import {
   launchPhaseAllowed,
   launchLifecycleActive,
   canSchedulePublicLaunch,
-  CHATXGPT_LAUNCH_CATEGORY
+  CHATXGPT_LAUNCH_CATEGORY,
+  getMonthlyTaskSlotsForState,
+  getMonthlyTaskOfferCountForState
 } from './LaunchLifecycle.js';
 
 /** Shipped catalog — always available with the game bundle. */
@@ -394,8 +396,8 @@ function buildTaskPool(state) {
 export function dealMonthlyTasks(state) {
   const taskStage = getTaskStage(state);
   const categoryId = state.company?.categoryId;
-  const slots = getMonthlyTaskSlots(taskStage);
-  const offerCount = getMonthlyTaskOfferCount(taskStage);
+  const slots = getMonthlyTaskSlotsForState(state);
+  const offerCount = getMonthlyTaskOfferCountForState(state);
   const pool = buildTaskPool(state);
   if (!pool.length) {
     state.calendar.taskCatalogError = true;
@@ -500,7 +502,7 @@ export function selectedOfferCount(state) {
 }
 
 export function toggleTaskOffer(state, offerId) {
-  const slots = state.calendar.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+  const slots = state.calendar.monthTaskSlotTarget ?? getMonthlyTaskSlotsForState(state);
   if (state.calendar.taskLineupConfirmed) {
     return { ok: false, reason: 'Lineup locked — complete tasks or finish the month.' };
   }
@@ -518,7 +520,7 @@ export function toggleTaskOffer(state, offerId) {
 }
 
 export function confirmTaskLineup(state) {
-  const slots = state.calendar.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+  const slots = state.calendar.monthTaskSlotTarget ?? getMonthlyTaskSlotsForState(state);
   const selected = (state.calendar.monthTaskOffers ?? []).filter((o) => o.selected);
   if (selected.length !== slots) {
     return { ok: false, reason: `Select exactly ${slots} tasks for this month.` };

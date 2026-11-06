@@ -331,8 +331,39 @@ if (aiPreLaunch.length < 9) {
 const {
   usesChatXgptLaunchPlaybook,
   CHATXGPT_PRODUCT_NAME,
-  launchPhaseLabel
+  launchPhaseLabel,
+  LAUNCH_MONTH_GARAGE_TASK_SLOTS,
+  getMonthlyTaskSlotsForState,
+  getMonthlyTaskOfferCountForState,
+  isLaunchMonthGarage
 } = await import(`file://${join(sim, 'modules/LaunchLifecycle.js')}`);
+const launchWeekGarageState = createInitialState({
+  companyName: 'LaunchWeekCo',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+launchWeekGarageState.launch.phase = 'launch_month';
+if (!isLaunchMonthGarage(launchWeekGarageState)) {
+  console.error('FAIL: launch_month garage detection');
+  failed = true;
+} else if (getMonthlyTaskSlotsForState(launchWeekGarageState) !== LAUNCH_MONTH_GARAGE_TASK_SLOTS) {
+  console.error(
+    `FAIL: launch month garage slots expected ${LAUNCH_MONTH_GARAGE_TASK_SLOTS}, got ${getMonthlyTaskSlotsForState(launchWeekGarageState)}`
+  );
+  failed = true;
+} else {
+  dealMonthlyTasks(launchWeekGarageState);
+  if (launchWeekGarageState.calendar.monthTaskSlotTarget !== LAUNCH_MONTH_GARAGE_TASK_SLOTS) {
+    console.error('FAIL: launch month deal should set 6 slot target');
+    failed = true;
+  } else if ((launchWeekGarageState.calendar.monthTaskOffers?.length ?? 0) < LAUNCH_MONTH_GARAGE_TASK_SLOTS) {
+    console.error('FAIL: launch month offer board smaller than slot target');
+    failed = true;
+  } else {
+    console.log(`OK: launch month garage desk (${LAUNCH_MONTH_GARAGE_TASK_SLOTS} slots, ${getMonthlyTaskOfferCountForState(launchWeekGarageState)} offers)`);
+  }
+}
+
 const aiLaunchMonthState = createInitialState({
   companyName: 'ModelCo',
   categoryId: 'ai-tools',

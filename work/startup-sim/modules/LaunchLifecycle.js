@@ -1,4 +1,4 @@
-import { STAGES, formatMoney } from './constants.js';
+import { STAGES, formatMoney, getMonthlyTaskSlots } from './constants.js';
 import { getTaskStage } from './Workspace.js';
 import { addCalendarMonths, formatCalendarMonth } from './GameCalendar.js';
 
@@ -15,6 +15,27 @@ export function usesChatXgptLaunchPlaybook(state) {
 export function launchPublicProductName(state) {
   return usesChatXgptLaunchPlaybook(state) ? CHATXGPT_PRODUCT_NAME : state.company?.name ?? 'the product';
 }
+
+/** Garage launch month gets extra desk slots (launch week intensity). */
+export const LAUNCH_MONTH_GARAGE_TASK_SLOTS = 6;
+
+export function isLaunchMonthGarage(state) {
+  return (
+    getTaskStage(state) === STAGES.GARAGE &&
+    launchLifecycleActive(state) &&
+    state.launch?.phase === 'launch_month'
+  );
+}
+
+export function getMonthlyTaskSlotsForState(state) {
+  if (isLaunchMonthGarage(state)) return LAUNCH_MONTH_GARAGE_TASK_SLOTS;
+  return getMonthlyTaskSlots(getTaskStage(state));
+}
+
+export function getMonthlyTaskOfferCountForState(state) {
+  return getMonthlyTaskSlotsForState(state) + 2;
+}
+
 /** Minimum product level from engineering pre-launch work. */
 export const PRE_LAUNCH_PRODUCT_REQUIRED = 4;
 
@@ -182,11 +203,14 @@ export function launchDeskPhaseBanner(state) {
       return `Train the model, stack buzz, and schedule ${CHATXGPT_PRODUCT_NAME} when you hit ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz and product ${PRE_LAUNCH_PRODUCT_REQUIRED}+. Launch-month desk work is the ${CHATXGPT_PRODUCT_NAME} ship checklist — not a generic Product Hunt playbook.`;
     }
     if (p === 'launch_month') {
-      return `${CHATXGPT_PRODUCT_NAME} is live this month — flip GA, throttle free tier, and survive the inference bill.`;
+      return `${CHATXGPT_PRODUCT_NAME} is live this month — ${LAUNCH_MONTH_GARAGE_TASK_SLOTS} desk slots to stack launch plays; flip GA, throttle free tier, and survive the inference bill.`;
     }
     if (p === 'post_launch') {
       return `${CHATXGPT_PRODUCT_NAME} post-launch — hotfixes, Plus upsell, and enterprise waitlist before the garage desk unlocks fully.`;
     }
+  }
+  if (p === 'launch_month') {
+    return `Launch week — ${LAUNCH_MONTH_GARAGE_TASK_SLOTS} desk slots this month (normally 4). Stack every launch play you can before the month closes.`;
   }
   return `Engineering raises product level; marketing raises buzz. Schedule launch at ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz and product ${PRE_LAUNCH_PRODUCT_REQUIRED}+. Pre-sell revenue is normal desk cash. Graduate after post-launch or leaving the garage.`;
 }

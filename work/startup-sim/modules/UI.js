@@ -1,4 +1,4 @@
-import { formatMoney, stageLabel, getMonthlyTaskSlots } from './constants.js';
+import { formatMoney, stageLabel } from './constants.js';
 import {
   formatStateMonth,
   formatCalendarStamp,
@@ -77,7 +77,8 @@ import {
   PRE_LAUNCH_BUZZ_REQUIRED,
   PRE_LAUNCH_PRODUCT_REQUIRED,
   canSchedulePublicLaunch,
-  renderPreLaunchProgressBlock
+  renderPreLaunchProgressBlock,
+  getMonthlyTaskSlotsForState
 } from './LaunchLifecycle.js';
 import {
   deskMonthCloseChecklist,
@@ -273,7 +274,7 @@ export function renderDeskPanel(state) {
   if (!desk) return;
 
   const taskStage = getTaskStage(state);
-  const slotTarget = state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlots(taskStage);
+  const slotTarget = state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlotsForState(state);
   const pending = pendingTasks(state);
   const done = state.calendar.tasksCompleted ?? 0;
   const milestone = nextRevenueMilestone(state);

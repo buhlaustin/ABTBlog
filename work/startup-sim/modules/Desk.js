@@ -1,4 +1,4 @@
-import { getMonthlyTaskSlots } from './constants.js';
+import { getMonthlyTaskSlotsForState } from './LaunchLifecycle.js';
 import { getTaskStage } from './Workspace.js';
 import { getArr } from './Workspace.js';
 import {
@@ -35,7 +35,7 @@ export function deskMonthCloseChecklist(state) {
   }
 
   const lineupOpen = needsTaskLineup(state);
-  const slotTarget = state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+  const slotTarget = state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlotsForState(state);
   const selected = selectedOfferCount(state);
   items.push({
     id: 'lineup',
@@ -91,7 +91,7 @@ export function autoSelectRecommendedLineup(state) {
     return { ok: false, reason: 'No task offers this month.' };
   }
   const slots =
-    state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlots(getTaskStage(state));
+    state.calendar?.monthTaskSlotTarget ?? getMonthlyTaskSlotsForState(state);
   const mandatoryIds = [];
   if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
     mandatoryIds.push(XC_DEMO_DAY_TASK_ID);
