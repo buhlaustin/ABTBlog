@@ -27,6 +27,7 @@ import {
   preparePersonalExpensesForMonth
 } from './CeoEconomics.js';
 import { createInitialCooState, hireCoo, isCooHired } from './Coo.js';
+import { clampCeoBirthMonth, clampCeoBirthYear } from './CeoProfile.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -86,6 +87,8 @@ export function createInitialState(options) {
       name: String(options.companyName || 'Untitled Co.').trim(),
       ceoFirstName: String(options.ceoFirstName || 'Founder').trim(),
       ceoLastName: String(options.ceoLastName || '').trim(),
+      ceoBirthMonth: clampCeoBirthMonth(options.ceoBirthMonth),
+      ceoBirthYear: clampCeoBirthYear(options.ceoBirthYear),
       categoryId: category.id,
       categoryLabel: category.label,
       economics
@@ -321,6 +324,10 @@ export function normalizeSave(raw) {
     }
     if (!state.company.ceoFirstName) state.company.ceoFirstName = 'Founder';
     if (state.company.ceoLastName === undefined) state.company.ceoLastName = '';
+    if (state.company.ceoBirthMonth == null) state.company.ceoBirthMonth = 6;
+    if (state.company.ceoBirthYear == null) state.company.ceoBirthYear = 1990;
+    state.company.ceoBirthMonth = clampCeoBirthMonth(state.company.ceoBirthMonth);
+    state.company.ceoBirthYear = clampCeoBirthYear(state.company.ceoBirthYear);
     {
       const cat = getCategoryById(state.company?.categoryId);
       if (!cat) return null;

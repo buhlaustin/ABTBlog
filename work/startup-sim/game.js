@@ -1987,6 +1987,8 @@ async function init() {
     const companyName = String(fd.get('companyName') || '').trim();
     const ceoFirstName = String(fd.get('ceoFirstName') || '').trim();
     const ceoLastName = String(fd.get('ceoLastName') || '').trim();
+    const ceoBirthMonth = fd.get('ceoBirthMonth');
+    const ceoBirthYear = fd.get('ceoBirthYear');
     const categoryId = String(fd.get('category') || '');
     const mode = String(fd.get('mode') || 'career');
     const sandboxCash = fd.get('sandboxCash');
@@ -2015,6 +2017,8 @@ async function init() {
         companyName,
         ceoFirstName,
         ceoLastName,
+        ceoBirthMonth,
+        ceoBirthYear,
         categoryId,
         mode,
         sandboxCash,
