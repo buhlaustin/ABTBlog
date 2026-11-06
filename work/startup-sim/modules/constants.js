@@ -65,7 +65,10 @@ export function createInitialPublicMarket() {
     lastMonthDeltaPct: null,
     lastTickDrivers: [],
     ipoPrimaryProceeds: 0,
-    ipoPrimaryShares: 0
+    ipoPrimaryShares: 0,
+    earningsPrepLevel: 0,
+    eventsUsedThisMonth: [],
+    lastIndexOutreachTurn: null
   };
 }
 

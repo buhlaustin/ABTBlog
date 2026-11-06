@@ -16,6 +16,7 @@ import {
 } from './CeoEconomics.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
 import { tickPublicMarket, tickIpoLockup, tickPublicMarketAtMonthStart, isPublicCompany } from './IPO.js';
+import { resetPublicMarketEventsAtMonthStart } from './PublicMarkets.js';
 import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
 import { syncDraftFromFinalized } from './Staff.js';
 import { tickXcResidency } from './XC.js';
@@ -100,6 +101,7 @@ export function startMonth(state) {
   for (const line of tickAcquisitionsAtMonthStart(state)) {
     appendLog(state, line);
   }
+  resetPublicMarketEventsAtMonthStart(state);
   for (const line of tickPublicMarketAtMonthStart(state)) {
     appendLog(state, line);
   }

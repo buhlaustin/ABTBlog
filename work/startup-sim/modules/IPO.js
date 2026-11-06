@@ -565,9 +565,12 @@ export function tickPublicMarket(state) {
     const whisper = pm.whisperRevenueTarget ?? whisperRevenueTarget(state);
     const surprise = whisper > 0 ? (monthRev - whisper) / whisper : 0;
     const earningsShock = Math.max(-0.09, Math.min(0.11, surprise * 0.35));
-    deltaPct += earningsShock;
+    const prepBoost = Math.min(0.04, (pm.earningsPrepLevel ?? 0) * 0.013);
+    deltaPct += earningsShock + prepBoost;
     drivers.push({ label: 'Earnings vs whisper', pct: earningsShock });
+    if (prepBoost > 0) drivers.push({ label: 'IR / earnings prep', pct: prepBoost });
     deltaPct *= 1.35;
+    pm.earningsPrepLevel = 0;
     pm.lastEarningsMonth = `${state.calendar.year}-${state.calendar.monthIndex}`;
     if ((pm.guidanceBeatStreak ?? 0) >= 2) {
       pm.earningsSurpriseStreak = (pm.earningsSurpriseStreak ?? 0) + 1;
@@ -824,18 +827,25 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;');
 }
 
-export function renderIpoPanel(container, state) {
-  const mount = container?.querySelector('#ipo-panel-mount') ?? document.getElementById('ipo-panel-mount');
-  if (!mount) return;
-
-  let block = '';
+export function renderPreIpoPublicBlock(state) {
   if (canFileIpo(state)) {
-    block = `<div class="finance-action ipo-action">
+    return `<div class="finance-action ipo-action">
       <p><strong>IPO window open</strong> — You crossed ${formatMoney(getEffectiveIpoGate(state))} ARR. File to list on the fictional exchange.</p>
-      <p class="fine-print">Typical listing: ~8% primary (new shares, cash to the company) and ~26% public float — insiders dilute accordingly. Sentiment nudges the opening pop; the stock marks monthly after that.</p>
+      <p class="fine-print">Typical listing: ~8% primary (new shares, cash to the company) and ~26% public float — insiders dilute accordingly. After listing, use this <strong>Public</strong> tab for the stock, earnings, and IR events.</p>
       <button type="button" class="btn btn-primary btn-small" id="btn-file-ipo">File IPO</button>
     </div>`;
-  } else if (isPublicCompany(state) && !state.flags?.cashedOut) {
+  }
+  if (state.flags?.seedRoundClosed && !state.flags?.ipoUnlocked) {
+    return `<p class="fine-print">Reach ${formatMoney(getEffectiveIpoGate(state))} ARR to unlock the IPO window and this tab.</p>`;
+  }
+  return `<p class="fine-print">Close seed and grow ARR to unlock the public listing path.</p>`;
+}
+
+/** Listed-company stock controls (Finance → Public sub-tab). */
+export function renderPublicStockPanel(mount, state) {
+  if (!mount) return;
+  let block = '';
+  if (isPublicCompany(state) && !state.flags?.cashedOut) {
     if (!state.publicMarket?.analystRating) refreshAnalystCoverage(state);
     const pm = state.publicMarket ?? {};
     if (pm.fundamentalPrice == null) computeFundamentalSharePrice(state);
@@ -930,9 +940,18 @@ export function renderIpoPanel(container, state) {
     </div>`;
   } else if (state.flags?.cashedOut) {
     block = `<p class="fine-print">You already cashed out — start a new company from the main menu.</p>`;
-  } else if (state.flags?.seedRoundClosed && !state.flags?.ipoUnlocked) {
-    block = `<p class="fine-print">Reach ${formatMoney(getEffectiveIpoGate(state))} ARR to unlock the IPO window.</p>`;
   }
 
   mount.innerHTML = block;
+}
+
+/** Pre-IPO snippet on Finance overview only (listed companies use Public sub-tab). */
+export function renderIpoPanel(container, state) {
+  const mount = container?.querySelector('#ipo-panel-mount') ?? document.getElementById('ipo-panel-mount');
+  if (!mount) return;
+  if (isPublicCompany(state)) {
+    mount.innerHTML = `<p class="fine-print">Stock, guidance, and IR events → <strong>Public</strong> sub-tab above.</p>`;
+    return;
+  }
+  mount.innerHTML = renderPreIpoPublicBlock(state);
 }

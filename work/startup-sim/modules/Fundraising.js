@@ -76,6 +76,14 @@ import { renderOfficesPanel } from './Offices.js';
 import { xcBatchStartLabelText } from './XC.js';
 import { renderIpoPanel } from './IPO.js';
 import {
+  activeFinanceSection,
+  publicFinanceTabVisible,
+  renderFinancePublicSection,
+  setFinanceSection
+} from './PublicMarkets.js';
+
+export { setFinanceSection };
+import {
   escapeHtml,
   panelStatCard,
   panelMetricGroup,
@@ -404,13 +412,21 @@ export function renderFinancePanel(container, state) {
     .filter(Boolean)
     .join('');
 
-  container.innerHTML = `
-    <div class="finance-panel">
-      <header class="finance-hero">
-        <p class="panel-lede">Desk revenue hits cash immediately; payroll and rent close with the month.</p>
-        <p class="finance-mult-chip" title="Revenue multiplier on desk and Growth">${escapeHtml(multExpl)}</p>
-      </header>
+  const financeSection = activeFinanceSection(state);
+  const showPublicTab = publicFinanceTabVisible(state);
+  const financeTabBtn = (id, label) =>
+    `<button type="button" class="${financeSection === id ? 'active' : ''}" data-finance-tab="${id}">${label}</button>`;
+  const subtabs = showPublicTab
+    ? `<nav class="finance-subtabs people-subtabs" aria-label="Finance sections">
+        ${financeTabBtn('overview', 'Overview')}
+        ${financeTabBtn('public', 'Public')}
+      </nav>`
+    : '';
 
+  const overviewBody =
+    financeSection === 'public'
+      ? ''
+      : `
       ${panelSnapshotSection(
         panelMetricStack(
           panelMetricGroup(
@@ -490,13 +506,30 @@ export function renderFinancePanel(container, state) {
         }
       </section>
 
-      <p class="fine-print finance-ceo-pointer">Founder equity, salary, draws, and net worth → <strong>CEO</strong> tab.</p>
+      <p class="fine-print finance-ceo-pointer">Founder equity, salary, draws, and net worth → <strong>CEO</strong> tab.</p>`;
+
+  const publicBody =
+    financeSection === 'public' ? `<div id="finance-public-section-mount"></div>` : '';
+
+  container.innerHTML = `
+    <div class="finance-panel">
+      <header class="finance-hero">
+        <p class="panel-lede">Desk revenue hits cash immediately; payroll and rent close with the month.</p>
+        <p class="finance-mult-chip" title="Revenue multiplier on desk and Growth">${escapeHtml(multExpl)}</p>
+      </header>
+      ${subtabs}
+      ${overviewBody}
+      ${publicBody}
       <p id="finance-feedback" class="desk-feedback" hidden></p>
     </div>
   `;
 
-  renderIpoPanel(container, state);
-  renderOfficesPanel(document.getElementById('offices-panel-mount'), state);
+  if (financeSection !== 'public') {
+    renderIpoPanel(container, state);
+    renderOfficesPanel(document.getElementById('offices-panel-mount'), state);
+  } else {
+    renderFinancePublicSection(document.getElementById('finance-public-section-mount'), state);
+  }
 }
 
 export function showFinanceFeedback(message, isError = false) {

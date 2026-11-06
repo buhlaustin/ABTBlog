@@ -95,8 +95,10 @@ import {
   prepayLoan,
   refinanceLoanAfterSeed,
   drawRevenueAdvance,
-  showFinanceFeedback
+  showFinanceFeedback,
+  setFinanceSection
 } from './modules/Fundraising.js';
+import { runPublicMarketEvent } from './modules/PublicMarkets.js';
 import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback, setCeoSection } from './modules/Ceo.js';
 import {
   purchaseCeoHomeCash,
@@ -597,10 +599,11 @@ async function handleFileIpo() {
       `IPO primary raised ${formatMoney(result.primaryProceeds)} — cash now on the balance sheet.`
     );
   }
+  setFinanceSection(sessionState, 'public');
   showFinanceFeedback(
     result.primaryProceeds > 0
-      ? `${result.ticker} is live — ${formatMoney(result.primaryProceeds)} primary added to company cash.`
-      : `${result.ticker} is live.`
+      ? `${result.ticker} is live — ${formatMoney(result.primaryProceeds)} primary added to company cash. Open the Public sub-tab for IR events.`
+      : `${result.ticker} is live. Open the Public sub-tab for IR events.`
   );
   refresh();
 }
@@ -1172,6 +1175,23 @@ function bindGameInteractions() {
     const ceoTab = e.target.closest('[data-ceo-tab]');
     if (ceoTab && sessionState) {
       setCeoSection(sessionState, ceoTab.getAttribute('data-ceo-tab'));
+      refresh();
+      return;
+    }
+    const financeTab = e.target.closest('[data-finance-tab]');
+    if (financeTab && sessionState) {
+      setFinanceSection(sessionState, financeTab.getAttribute('data-finance-tab'));
+      refresh();
+      return;
+    }
+    const publicEventBtn = e.target.closest('[data-public-event]');
+    if (publicEventBtn && sessionState) {
+      const result = runPublicMarketEvent(sessionState, publicEventBtn.getAttribute('data-public-event'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Event blocked.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
       refresh();
       return;
     }

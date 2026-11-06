@@ -111,7 +111,8 @@ export function createInitialState(options) {
       fixedCostsMonthly: fixedCostsForStage(STAGES.GARAGE),
       instruments: [],
       lastRound: null,
-      fiscal: createInitialFiscal()
+      fiscal: createInitialFiscal(),
+      section: 'overview'
     },
     ceo: {
       salaryAnnual: 0,
@@ -318,7 +319,11 @@ export function normalizeSave(raw) {
       if (!pm.lastTickDrivers) pm.lastTickDrivers = [];
       if (pm.ipoPrimaryProceeds === undefined) pm.ipoPrimaryProceeds = 0;
       if (pm.ipoPrimaryShares === undefined) pm.ipoPrimaryShares = 0;
+      if (pm.earningsPrepLevel === undefined) pm.earningsPrepLevel = 0;
+      if (!pm.eventsUsedThisMonth) pm.eventsUsedThisMonth = [];
+      if (pm.lastIndexOutreachTurn === undefined) pm.lastIndexOutreachTurn = null;
     }
+    if (state.finance.section === undefined) state.finance.section = 'overview';
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);
     }
