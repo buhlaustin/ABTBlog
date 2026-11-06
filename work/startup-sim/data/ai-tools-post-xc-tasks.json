@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "cat-ai-tools-post-batch-api-release",
+      "title": "Release the ChatXGPT API",
+      "description": "First month after the batch — ship docs, API keys, and rate limits while Demo Day buzz still converts.",
+      "types": ["product", "marketing"],
+      "stages": ["post_xc"],
+      "categories": ["ai-tools"],
+      "aiPostBatchApiRelease": true,
+      "tierMin": 1,
+      "tierMax": 3,
+      "cost": 4200,
+      "revenue": [8500, 44000],
+      "product": 2,
+      "buzz": 3,
+      "mrrGain": [1400, 5200],
+      "authored": true
+    }
+  ]
+}

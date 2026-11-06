@@ -162,6 +162,8 @@ import {
   calendarTurn,
   XC_DEMO_DAY_TASK_ID,
   XC_DEMO_DAY_DECISION_ID,
+  AI_POST_BATCH_API_RELEASE_TASK_ID,
+  onPostBatchApiReleaseTaskCompleted,
   onDemoDayTaskCompleted,
   applyDemoDayPitchChoice
 } from './modules/XC.js';
@@ -406,6 +408,13 @@ function handleCompleteTask(instanceId) {
     onDemoDayTaskCompleted(sessionState);
     appendLog(sessionState, 'Demo Day stage time — pick your pitch on the desk before closing the month.');
     showDeskFeedback('Demo Day complete — choose focused vs. risk-taking pitch below.');
+    refresh();
+    return;
+  }
+  if (inst.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID) {
+    const apiRelease = onPostBatchApiReleaseTaskCompleted(sessionState);
+    appendLog(sessionState, apiRelease.summary);
+    showDeskFeedback(apiRelease.summary);
     refresh();
     return;
   }

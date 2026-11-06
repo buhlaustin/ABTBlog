@@ -12,6 +12,7 @@ import {
   turnToCalendar,
   formatCalendarMonth
 } from './GameCalendar.js';
+import { CHATXGPT_LAUNCH_CATEGORY } from './LaunchLifecycle.js';
 
 /** Four batches per year: W Jan–Mar, Y Apr–Jun, S Jul–Sep, F Oct–Dec. */
 export const XC_SEASON_STARTS = [
@@ -48,6 +49,7 @@ export { calendarTurn };
 
 export const XC_DEMO_DAY_TASK_ID = 'xc-demo-day';
 export const XC_DEMO_DAY_DECISION_ID = 'xc-demo-day-pitch';
+export const AI_POST_BATCH_API_RELEASE_TASK_ID = 'cat-ai-tools-post-batch-api-release';
 
 export const DEFAULT_SEED_ROUND_TERMS = {
   raised: 3_000_000,
@@ -58,6 +60,26 @@ export const DEFAULT_SEED_ROUND_TERMS = {
 /** Last month of the 3-month XC residency (Demo Day month). */
 export function isXcDemoDayMonth(state) {
   return Boolean(isInResidency(state) && (state.xc?.residencyMonthsRemaining ?? 0) === 1);
+}
+
+/** AI apps: mandatory desk task the first month after XC batch ends (API GA). */
+export function isAiPostBatchApiReleaseMonth(state) {
+  if (state.company?.categoryId !== CHATXGPT_LAUNCH_CATEGORY) return false;
+  if (!state.flags?.xcResidencyComplete) return false;
+  if (!state.xc?.demoDayTaskDone) return false;
+  if (state.xc?.postBatchApiReleaseDone) return false;
+  return Boolean(state.xc?.postBatchApiReleasePending);
+}
+
+export function onPostBatchApiReleaseTaskCompleted(state) {
+  state.xc = state.xc ?? createInitialXcState();
+  state.xc.postBatchApiReleaseDone = true;
+  state.xc.postBatchApiReleasePending = false;
+  state.product.buzz = (state.product.buzz ?? 0) + 2;
+  return {
+    ok: true,
+    summary: 'ChatXGPT API is live — developers have keys, docs, and the first rate-limit blog post.'
+  };
 }
 
 export function getSeedRoundTerms(state) {
@@ -115,7 +137,9 @@ export function createInitialXcState() {
     demoDayPitch: null,
     demoDayBoldHit: null,
     seedRoundTerms: null,
-    graduateBoostMonths: 0
+    graduateBoostMonths: 0,
+    postBatchApiReleasePending: false,
+    postBatchApiReleaseDone: false
   };
 }
 
@@ -294,6 +318,9 @@ export function tickXcResidency(state) {
   if (state.xc.residencyMonthsRemaining <= 0) {
     state.flags.xcResidencyComplete = true;
     state.flags.xcBatchActive = false;
+    if (state.company?.categoryId === CHATXGPT_LAUNCH_CATEGORY) {
+      state.xc.postBatchApiReleasePending = true;
+    }
     state.xc.graduateBoostMonths = 8;
     state.product.buzz = (state.product.buzz ?? 0) + 3;
     state.product.level = (state.product.level ?? 0) + 2;

@@ -9,6 +9,7 @@ import bundledLaunchCrowd from '../data/launch-crowdfunding-tasks.json' with { t
 import bundledLaunchPostHandcrafted from '../data/launch-post-handcrafted-pack.json' with { type: 'json' };
 import bundledAiToolsPrelaunch from '../data/ai-tools-prelaunch-tasks.json' with { type: 'json' };
 import bundledAiToolsChatXgptLaunch from '../data/ai-tools-chatxgpt-launch-tasks.json' with { type: 'json' };
+import bundledAiToolsPostXc from '../data/ai-tools-post-xc-tasks.json' with { type: 'json' };
 import { CHATXGPT_LAUNCH_CATEGORY } from './LaunchLifecycle.js';
 import bundledSpaceExploration from '../data/space-exploration-tasks.json' with { type: 'json' };
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
@@ -24,7 +25,12 @@ import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { ty
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import bundledTaxFiling from '../data/tax-filing-task.json' with { type: 'json' };
 import bundledCeoPersonalTaxFiling from '../data/ceo-personal-tax-task.json' with { type: 'json' };
-import { isXcDemoDayMonth, XC_DEMO_DAY_TASK_ID } from './XC.js';
+import {
+  isXcDemoDayMonth,
+  isAiPostBatchApiReleaseMonth,
+  XC_DEMO_DAY_TASK_ID,
+  AI_POST_BATCH_API_RELEASE_TASK_ID
+} from './XC.js';
 import { isTaxFilingRequired, TAX_FILING_TASK_ID } from './CorporateTax.js';
 import {
   isCeoPersonalTaxFilingRequired,
@@ -114,6 +120,7 @@ function mergeSpaceExplorationTasks(base) {
 function mergeAiToolsDeskTasks(base) {
   let out = mergeTaskPack(base, bundledAiToolsDeskExtra?.tasks ?? []);
   out = mergeTaskPack(out, bundledAiToolsModelLab?.tasks ?? []);
+  out = mergeTaskPack(out, bundledAiToolsPostXc?.tasks ?? []);
   return out;
 }
 
@@ -368,6 +375,7 @@ function buildTaskPool(state) {
   return getTaskDefinitions().filter(
     (t) => {
       if (t.xcDemoDay && !demoMonth) return false;
+      if (t.aiPostBatchApiRelease && !isAiPostBatchApiReleaseMonth(state)) return false;
       if (t.taxFiling && !isTaxFilingRequired(state)) return false;
       if (t.ceoPersonalTaxFiling && !isCeoPersonalTaxFilingRequired(state)) return false;
       return (
@@ -414,6 +422,10 @@ export function dealMonthlyTasks(state) {
   if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
     const demo = pool.find((t) => t.id === XC_DEMO_DAY_TASK_ID);
     if (demo) offered = mergeUniqueTaskOffers(offered, demo, offerCount);
+  }
+  if (isAiPostBatchApiReleaseMonth(state)) {
+    const apiRelease = pool.find((t) => t.id === AI_POST_BATCH_API_RELEASE_TASK_ID);
+    if (apiRelease) offered = mergeUniqueTaskOffers(offered, apiRelease, offerCount);
   }
   if (isTaxFilingRequired(state)) {
     const taxTask = pool.find((t) => t.id === TAX_FILING_TASK_ID);
@@ -497,6 +509,14 @@ export function confirmTaskLineup(state) {
   if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
     if (!selected.some((o) => o.taskId === XC_DEMO_DAY_TASK_ID)) {
       return { ok: false, reason: 'Demo Day is mandatory in your final batch month — include it in your lineup.' };
+    }
+  }
+  if (isAiPostBatchApiReleaseMonth(state)) {
+    if (!selected.some((o) => o.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID)) {
+      return {
+        ok: false,
+        reason: 'Post-batch month — release the ChatXGPT API is mandatory in your lineup.'
+      };
     }
   }
   if (isTaxFilingRequired(state)) {

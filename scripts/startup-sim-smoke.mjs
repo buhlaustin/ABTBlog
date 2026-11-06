@@ -78,6 +78,9 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
 } else if (!getTaskDefinitions().some((t) => t.id === 'launch-chatxgpt-ga-flip')) {
   console.error('FAIL: ChatXGPT launch pack not merged');
   failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'cat-ai-tools-post-batch-api-release')) {
+  console.error('FAIL: AI post-batch API release task not merged');
+  failed = true;
 } else if (!failed) {
   console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
 }
@@ -372,6 +375,72 @@ if (!usesChatXgptLaunchPlaybook(aiLaunchMonthState)) {
       failed = true;
     } else {
       console.log(`OK: ChatXGPT launch playbook (${aiLaunchDesk.length} launch-month tasks)`);
+    }
+  }
+}
+
+const {
+  isAiPostBatchApiReleaseMonth,
+  AI_POST_BATCH_API_RELEASE_TASK_ID,
+  onPostBatchApiReleaseTaskCompleted
+} = await import(`file://${join(sim, 'modules/XC.js')}`);
+const aiPostBatchState = createInitialState({
+  companyName: 'BatchAPI',
+  categoryId: 'ai-tools',
+  mode: 'career'
+});
+aiPostBatchState.flags.xcResidencyComplete = true;
+aiPostBatchState.flags.xcBatchActive = false;
+aiPostBatchState.xc.demoDayTaskDone = true;
+aiPostBatchState.xc.postBatchApiReleasePending = true;
+if (!isAiPostBatchApiReleaseMonth(aiPostBatchState)) {
+  console.error('FAIL: AI post-batch API release month gate');
+  failed = true;
+} else {
+  dealMonthlyTasks(aiPostBatchState);
+  const offers = aiPostBatchState.calendar.monthTaskOffers ?? [];
+  if (!offers.some((o) => o.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID)) {
+    console.error('FAIL: post-batch API release task not on desk offers');
+    failed = true;
+  } else {
+    const slots = aiPostBatchState.calendar.monthTaskSlotTarget ?? 4;
+    for (const offer of offers.slice(0, slots)) {
+      offer.selected = offer.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID;
+    }
+    let picked = offers.filter((o) => o.selected).length;
+    for (const offer of offers) {
+      if (picked >= slots) break;
+      if (!offer.selected) {
+        offer.selected = true;
+        picked += 1;
+      }
+    }
+    const withoutApi = offers.map((o) => ({
+      ...o,
+      selected: o.selected && o.taskId !== AI_POST_BATCH_API_RELEASE_TASK_ID
+    }));
+    aiPostBatchState.calendar.monthTaskOffers = withoutApi;
+    const blocked = confirmTaskLineup(aiPostBatchState);
+    if (blocked.ok) {
+      console.error('FAIL: lineup should require post-batch API release task');
+      failed = true;
+    } else {
+      aiPostBatchState.calendar.monthTaskOffers = offers;
+      for (const offer of offers) {
+        offer.selected = offers.indexOf(offer) < slots;
+      }
+      if (!offers.some((o) => o.selected && o.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID)) {
+        offers[0].selected = true;
+        offers.find((o) => o.taskId === AI_POST_BATCH_API_RELEASE_TASK_ID).selected = true;
+      }
+      confirmTaskLineup(aiPostBatchState);
+      onPostBatchApiReleaseTaskCompleted(aiPostBatchState);
+      if (aiPostBatchState.xc.postBatchApiReleaseDone !== true || isAiPostBatchApiReleaseMonth(aiPostBatchState)) {
+        console.error('FAIL: post-batch API release completion flags');
+        failed = true;
+      } else {
+        console.log('OK: AI post-batch ChatXGPT API release desk task');
+      }
     }
   }
 }

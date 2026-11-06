@@ -543,6 +543,12 @@ export function normalizeSave(raw) {
     if (state.xc && state.xc.demoDayTaskDone === undefined) state.xc.demoDayTaskDone = false;
     if (state.xc && state.xc.demoDayPitch === undefined) state.xc.demoDayPitch = null;
     if (state.xc && state.xc.demoDayBoldHit === undefined) state.xc.demoDayBoldHit = null;
+    if (state.xc && state.xc.postBatchApiReleasePending === undefined) {
+      state.xc.postBatchApiReleasePending = false;
+    }
+    if (state.xc && state.xc.postBatchApiReleaseDone === undefined) {
+      state.xc.postBatchApiReleaseDone = false;
+    }
     if (state.xc && state.xc.seedRoundTerms === undefined) state.xc.seedRoundTerms = null;
     if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
     if (!state.acquisitions.owned) state.acquisitions.owned = [];
