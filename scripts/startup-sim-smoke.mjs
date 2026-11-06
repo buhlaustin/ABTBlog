@@ -71,6 +71,9 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
 } else if (!getTaskDefinitions().some((t) => t.id === 'launch-post-handcrafted-churn-interviews')) {
   console.error('FAIL: post-launch handcrafted pack not merged');
   failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'launch-pre-cat-ai-tools-pretrain-shard-mix')) {
+  console.error('FAIL: ai-tools pre-launch pack not merged');
+  failed = true;
 } else if (!failed) {
   console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
 }
@@ -292,6 +295,26 @@ if (crowdDef) {
     failed = true;
   } else {
     console.log(`OK: pre-launch crowdfunding desk tasks (${crowdPreLaunch.length} in bank)`);
+  }
+}
+
+const aiPreLaunch = getTaskDefinitions().filter(
+  (t) => t.launchPhase === 'pre_launch' && t.categories?.includes('ai-tools')
+);
+if (aiPreLaunch.length < 9) {
+  console.error(`FAIL: ai-tools pre-launch bank ${aiPreLaunch.length} < 9`);
+  failed = true;
+} else {
+  const aiLaunchState = createInitialState({
+    companyName: 'ModelCo',
+    categoryId: 'ai-tools',
+    mode: 'career'
+  });
+  if (getTaskPoolSize(aiLaunchState) < getMonthlyTaskOfferCount(STAGES.GARAGE)) {
+    console.error(`FAIL: ai-tools garage pre-launch pool ${getTaskPoolSize(aiLaunchState)} too small`);
+    failed = true;
+  } else {
+    console.log(`OK: ai-tools pre-launch tasks (${aiPreLaunch.length} in bank)`);
   }
 }
 
