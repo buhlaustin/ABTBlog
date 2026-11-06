@@ -16,8 +16,7 @@ import {
   previewOptionPoolExpansion,
   totalOutstandingShares
 } from './CapTable.js';
-import { calendarTurn } from './GameCalendar.js';
-import { formatCalendarStamp } from './GameCalendar.js';
+import { calendarTurn, formatCalendarStamp, twelveMonthCooldownStatus } from './GameCalendar.js';
 import { accrueCeoTaxableIncome } from './CeoPersonalTax.js';
 import {
   panelStatCard,
@@ -240,6 +239,16 @@ function ensurePeoplePrograms(state) {
   if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
   if (state.staff.peopleSection == null) state.staff.peopleSection = 'staffing';
   if (state.staff.companyBonusAnnualMode == null) state.staff.companyBonusAnnualMode = false;
+  if (state.staff.lastAnnualCompanyBonusAt === undefined) state.staff.lastAnnualCompanyBonusAt = null;
+  if (!canPayAnnualCompanyBonus(state)) state.staff.companyBonusAnnualMode = false;
+}
+
+export function canPayAnnualCompanyBonus(state) {
+  return twelveMonthCooldownStatus(state.staff?.lastAnnualCompanyBonusAt, state).eligible;
+}
+
+export function monthsUntilAnnualCompanyBonus(state) {
+  return twelveMonthCooldownStatus(state.staff?.lastAnnualCompanyBonusAt, state).monthsUntil;
 }
 
 export function resetEmployeeBenefitsMonth(state) {
@@ -316,6 +325,10 @@ export function estimateCompanyBonusPool(state, pct, annualMode = false) {
 
 export function setCompanyBonusAnnualMode(state, enabled) {
   ensurePeoplePrograms(state);
+  if (enabled && !canPayAnnualCompanyBonus(state)) {
+    state.staff.companyBonusAnnualMode = false;
+    return;
+  }
   state.staff.companyBonusAnnualMode = Boolean(enabled);
 }
 
@@ -329,6 +342,13 @@ export function payCompanyWideBonus(state, pctRaw, opts = {}) {
     return { ok: false, reason: 'Already paid a company bonus this month.' };
   }
   const annualMode = opts.annual ?? state.staff.companyBonusAnnualMode ?? false;
+  if (annualMode && !canPayAnnualCompanyBonus(state)) {
+    const wait = monthsUntilAnnualCompanyBonus(state);
+    return {
+      ok: false,
+      reason: `Annual company bonus available again in ${wait} month(s) (once every 12 months).`
+    };
+  }
   const mass = companyBonusSalaryBase(state, annualMode);
   if (mass.total < 1) {
     return { ok: false, reason: 'No salary mass to bonus — hire staff or set CEO pay first.' };
@@ -342,6 +362,13 @@ export function payCompanyWideBonus(state, pctRaw, opts = {}) {
 
   state.staff.benefitsThisMonth.companyBonusPct = pct;
   state.staff.benefitsThisMonth.companyBonusAnnual = annualMode;
+  if (annualMode) {
+    state.staff.lastAnnualCompanyBonusAt = {
+      year: state.calendar?.year,
+      monthIndex: state.calendar?.monthIndex
+    };
+    state.staff.companyBonusAnnualMode = false;
+  }
   state.product.buzz = (state.product?.buzz ?? 0) + Math.min(6, Math.ceil(pct / 4));
   adjustSentiment(
     state,
@@ -501,7 +528,9 @@ export function renderEmployeeBenefitsPanel(container, state) {
   const sentiment = state.sentiment?.score ?? 68;
   const cash = state.finance?.cash ?? 0;
 
-  const annualMode = Boolean(state.staff.companyBonusAnnualMode);
+  const annualEligible = canPayAnnualCompanyBonus(state);
+  const annualCooldown = monthsUntilAnnualCompanyBonus(state);
+  const annualMode = annualEligible && Boolean(state.staff.companyBonusAnnualMode);
   const bonusBase = mass.total * (annualMode ? 12 : 1);
   const bonusButtons = COMPANY_BONUS_PCTS.map((pct) => {
     const est = Math.round(bonusBase * (pct / 100));
@@ -557,9 +586,14 @@ export function renderEmployeeBenefitsPanel(container, state) {
       </div>
       <p class="fine-print">Payroll ${formatMoney(mass.payroll)}/mo · CEO+COO ${formatMoney(mass.ceo + mass.coo)}/mo · ${mass.headcount} employees · bonus base ${formatMoney(bonusBase)}${annualMode ? ' (annual)' : ''}.</p>
       <label class="people-bonus-annual-toggle fine-print">
-        <input type="checkbox" id="company-bonus-annual" data-company-bonus-annual ${annualMode ? 'checked' : ''} ${bonusDone != null ? 'disabled' : ''} />
-        Annual bonus — apply % to monthly salary mass × 12 (not just one month)
+        <input type="checkbox" id="company-bonus-annual" data-company-bonus-annual ${annualMode ? 'checked' : ''} ${bonusDone != null || !annualEligible ? 'disabled' : ''} />
+        Annual bonus — apply % to monthly salary mass × 12 (once every 12 months; monthly % bonuses still available)
       </label>
+      ${
+        !annualEligible && annualCooldown > 0
+          ? `<p class="fine-print people-bonus-cooldown">Annual bonus on cooldown — ${annualCooldown} month(s) until you can run another.</p>`
+          : ''
+      }
       <div class="benefits-preset-row">${bonusButtons}</div>
       <div class="finance-section-head">
         <h3 class="finance-section-title">Offsites</h3>

@@ -118,7 +118,8 @@ import {
   depositPersonalInvestment,
   withdrawPersonalInvestment,
   personalInvestmentBalance,
-  payCeoPersonalTaxFromBank
+  payCeoPersonalTaxFromBank,
+  payCeoArrBonus
 } from './modules/CeoEconomics.js';
 import {
   hireCoo,
@@ -1417,6 +1418,17 @@ function bindGameInteractions() {
         appendLog(sessionState, result.summary);
         showCeoFeedback(result.summary);
         preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    const arrBonusBtn = e.target.closest('[data-ceo-arr-bonus]');
+    if (arrBonusBtn && sessionState) {
+      const result = payCeoArrBonus(sessionState, arrBonusBtn.getAttribute('data-ceo-arr-bonus'));
+      if (!result.ok) showCeoFeedback(result.reason, true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
       }
       refresh();
       return;

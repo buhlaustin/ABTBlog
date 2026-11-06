@@ -191,6 +191,8 @@ export function createInitialStaff() {
     payrollMonthly: 0,
     peopleSection: 'staffing',
     benefitsThisMonth: { companyBonusPct: null, offsiteId: null, perks: [] },
+    companyBonusAnnualMode: false,
+    lastAnnualCompanyBonusAt: null,
     optionPoolLog: [],
     optionPoolExpandedThisMonth: false,
     marketSalaryMult: 1,

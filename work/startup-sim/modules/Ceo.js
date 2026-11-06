@@ -14,6 +14,9 @@ import {
   buildCompLedger,
   cashOutPreview,
   maxOwnerDrawAmount,
+  CEO_ARR_BONUS_PCTS,
+  estimateCeoArrBonus,
+  ceoArrBonusUiState,
   ceoPersonalBankBalance,
   personalExpenseBand,
   scheduledPersonalExpense,
@@ -486,6 +489,22 @@ function renderCeoWealthSection(ctx) {
 
 function renderCeoCompSection(ctx) {
   const { band, boardNote, annual, disabled, maxDraw, ledger, state } = ctx;
+  const arrBonus = ceoArrBonusUiState(state);
+  const arrBonusBtns = CEO_ARR_BONUS_PCTS.map((pct) => {
+    const est = estimateCeoArrBonus(state, pct);
+    const gateCash = (state.finance?.cash ?? 0) >= est && est >= 500;
+    const btnDisabled =
+      disabled || !arrBonus.cooldown.eligible || arrBonus.priorYearArr < 1 || !gateCash
+        ? ' disabled'
+        : '';
+    return `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-arr-bonus="${pct}"${btnDisabled}>${pct}% · ${formatMoney(est)}</button>`;
+  }).join('');
+  const arrBonusNote =
+    arrBonus.priorYearArr < 1
+      ? 'Available after your first full fiscal year closes (December year-end).'
+      : arrBonus.cooldown.eligible
+        ? `Prior-year revenue base ${formatMoney(arrBonus.priorYearArr)} — once every 12 months.`
+        : `On cooldown — ${arrBonus.cooldown.monthsUntil} month(s) until the next ARR bonus${arrBonus.lastPaidLabel ? ` (last paid ${arrBonus.lastPaidLabel})` : ''}.`;
   const presetBtns = band.presets
     .map(
       (p) =>
@@ -543,6 +562,11 @@ function renderCeoCompSection(ctx) {
           <input id="ceo-draw-input" type="number" min="500" step="500" placeholder="Custom amount" ${disabled}>
           <button type="button" class="btn btn-ghost btn-small" id="btn-ceo-draw-custom" ${disabled}>Draw</button>
         </div>
+      </div>
+      <div class="finance-action finance-card">
+        <p><strong>CEO ARR bonus</strong> — % of prior fiscal-year revenue (company cash → personal bank)</p>
+        <p class="fine-print">${escapeHtml(arrBonusNote)}</p>
+        <div class="finance-charity-chips">${arrBonusBtns}</div>
       </div>
     </section>
     <section class="finance-section finance-section--cap">

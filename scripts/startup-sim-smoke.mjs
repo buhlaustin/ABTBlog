@@ -1925,9 +1925,27 @@ if (!canBuyAllRemainingSideTasks(sideBulk, ['product', 'growth', 'brand', 'both'
 const {
   payCompanyWideBonus,
   totalEmployeeSalaryMassMonthly,
+  canPayAnnualCompanyBonus,
+  monthsUntilAnnualCompanyBonus,
   EXTRA_PERKS,
   runExtraEmployeePerk
 } = await import(`file://${join(sim, 'modules/EmployeeBenefits.js')}`);
+const { payCeoArrBonus, canPayCeoArrBonus, priorYearArrRevenue } = await import(
+  `file://${join(sim, 'modules/CeoEconomics.js')}`
+);
+
+function bumpCalendarMonths(state, delta) {
+  let y = state.calendar?.year ?? 2026;
+  let m = state.calendar?.monthIndex ?? 1;
+  for (let i = 0; i < delta; i += 1) {
+    m += 1;
+    if (m > 12) {
+      m = 1;
+      y += 1;
+    }
+  }
+  state.calendar = { ...state.calendar, year: y, monthIndex: m };
+}
 const { expandEmployeeOptionPool, applySeedCapTableSnapshot } = await import(
   `file://${join(sim, 'modules/CapTable.js')}`
 );
@@ -1973,6 +1991,27 @@ if (!bonusAnnual.ok || bonusAnnual.pool !== expectedAnnualPool || !bonusAnnual.a
   failed = true;
 } else {
   console.log(`OK: annual company bonus (${bonusAnnual.pct}%, pool ${formatMoney(bonusAnnual.pool)})`);
+}
+if (annualBonusState.staff.companyBonusAnnualMode) {
+  console.error('FAIL: annual bonus should clear annual mode after payout');
+  failed = true;
+} else if (canPayAnnualCompanyBonus(annualBonusState)) {
+  console.error('FAIL: annual bonus should start 12-month cooldown');
+  failed = true;
+} else if (monthsUntilAnnualCompanyBonus(annualBonusState) !== 12) {
+  console.error(
+    `FAIL: annual bonus cooldown expected 12 months, got ${monthsUntilAnnualCompanyBonus(annualBonusState)}`
+  );
+  failed = true;
+} else {
+  annualBonusState.staff.benefitsThisMonth.companyBonusPct = null;
+  const monthlyAfterAnnual = payCompanyWideBonus(annualBonusState, 2);
+  if (!monthlyAfterAnnual.ok || monthlyAfterAnnual.annualMode) {
+    console.error(`FAIL: monthly bonus after annual: ${monthlyAfterAnnual.reason ?? 'unexpected annual mode'}`);
+    failed = true;
+  } else {
+    console.log('OK: annual bonus 12-month cooldown + monthly bonus still available');
+  }
 }
 if (EXTRA_PERKS.length < 15) {
   console.error(`FAIL: expected 15+ employee perks, got ${EXTRA_PERKS.length}`);
@@ -2055,6 +2094,48 @@ const {
   ensureFiscal,
   taxBaseRevenue
 } = await import(`file://${join(sim, 'modules/CorporateTax.js')}`);
+
+const arrBonusState = createInitialState({
+  companyName: 'ArrBonusCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 5_000_000
+});
+arrBonusState.meta.calendarStartYear = 2024;
+arrBonusState.calendar = { year: 2026, monthIndex: 3, monthSpend: 0, monthTasks: [] };
+ensureFiscal(arrBonusState);
+arrBonusState.finance.fiscal.prior = { year: 2025, revenue: 2_000_000, expenses: 800_000, profit: 1_200_000 };
+if (priorYearArrRevenue(arrBonusState) !== 2_000_000) {
+  console.error('FAIL: prior year ARR base for CEO bonus');
+  failed = true;
+} else {
+  const arrPay = payCeoArrBonus(arrBonusState, 10);
+  if (!arrPay.ok || arrPay.amount !== 200_000 || (arrBonusState.ceo.careerCeoArrBonuses ?? 0) !== 200_000) {
+    console.error(`FAIL: CEO ARR bonus: ${arrPay.reason ?? arrPay.amount}`);
+    failed = true;
+  } else {
+    const repeat = payCeoArrBonus(arrBonusState, 10);
+    if (repeat.ok) {
+      console.error('FAIL: CEO ARR bonus should block repeat within 12 months');
+      failed = true;
+    } else {
+      bumpCalendarMonths(arrBonusState, 12);
+      if (!canPayCeoArrBonus(arrBonusState).ok) {
+        console.error('FAIL: CEO ARR bonus should unlock after 12 months');
+        failed = true;
+      } else {
+        arrBonusState.finance.cash = 5_000_000;
+        const arrPay2 = payCeoArrBonus(arrBonusState, 5);
+        if (!arrPay2.ok || arrPay2.amount !== 100_000) {
+          console.error(`FAIL: CEO ARR bonus second payout: ${arrPay2.reason ?? arrPay2.amount}`);
+          failed = true;
+        } else {
+          console.log('OK: CEO ARR bonus (prior-year revenue, 12-month cooldown)');
+        }
+      }
+    }
+  }
+}
 
 const fyRoll = createInitialState({ companyName: 'FY Co', categoryId: 'b2b-saas', mode: 'career' });
 ensureFiscal(fyRoll);

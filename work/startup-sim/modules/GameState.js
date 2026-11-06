@@ -227,6 +227,7 @@ export function normalizeSave(raw) {
       ensureCeoPersonalTax(state);
     }
     if (state.staff.companyBonusAnnualMode === undefined) state.staff.companyBonusAnnualMode = false;
+    if (state.staff.lastAnnualCompanyBonusAt === undefined) state.staff.lastAnnualCompanyBonusAt = null;
     if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
     if (state.staff.optionPoolExpandedThisMonth === undefined) {
       state.staff.optionPoolExpandedThisMonth = false;
@@ -402,6 +403,8 @@ export function normalizeSave(raw) {
       if (state.ceo.careerSalaryPaid === undefined) state.ceo.careerSalaryPaid = 0;
       if (state.ceo.careerOwnerDraws === undefined) state.ceo.careerOwnerDraws = 0;
       if (state.ceo.careerEmployeeBonuses === undefined) state.ceo.careerEmployeeBonuses = 0;
+      if (state.ceo.careerCeoArrBonuses === undefined) state.ceo.careerCeoArrBonuses = 0;
+      if (state.ceo.lastCeoArrBonusAt === undefined) state.ceo.lastCeoArrBonusAt = null;
       if (state.ceo.careerStockSales === undefined) state.ceo.careerStockSales = 0;
       if (!state.ceo.drawLog) state.ceo.drawLog = [];
       if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];

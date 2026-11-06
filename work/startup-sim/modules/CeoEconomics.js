@@ -15,6 +15,10 @@ import {
   serviceCeoMortgageAtMonthEnd
 } from './CeoLifestyle.js';
 import { accrueCeoTaxableIncome, createInitialCeoPersonalTax } from './CeoPersonalTax.js';
+import { ensureFiscal } from './CorporateTax.js';
+import { formatCalendarStamp, twelveMonthCooldownStatus } from './GameCalendar.js';
+
+export const CEO_ARR_BONUS_PCTS = [2, 5, 10, 20];
 
 const EXPENSE_DEBIT_CATEGORIES = [
   'Housing',
@@ -34,7 +38,9 @@ export function createInitialCeoState() {
     careerSalaryPaid: 0,
     careerOwnerDraws: 0,
     careerEmployeeBonuses: 0,
+    careerCeoArrBonuses: 0,
     careerStockSales: 0,
+    lastCeoArrBonusAt: null,
     bankBalance: null,
     personalExpenseScheduled: null,
     lastPersonalExpense: null,
@@ -562,6 +568,92 @@ export function canTakeOwnerDraw(state, amount) {
   return { ok: true };
 }
 
+/** Closed prior fiscal year revenue (ARR base for CEO bonus). Zero before first FY closes. */
+export function priorYearArrRevenue(state) {
+  const f = ensureFiscal(state);
+  const startY = state.meta?.calendarStartYear ?? f.current.year;
+  const calY = state.calendar?.year ?? startY;
+  if (f.prior?.year != null && calY > startY) {
+    return Math.max(0, f.prior.revenue ?? 0);
+  }
+  return 0;
+}
+
+export function estimateCeoArrBonus(state, pctRaw) {
+  const pct = Number(pctRaw);
+  const base = priorYearArrRevenue(state);
+  if (base < 1 || !CEO_ARR_BONUS_PCTS.includes(pct)) return 0;
+  return Math.round(base * (pct / 100));
+}
+
+export function canPayCeoArrBonus(state) {
+  if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
+  const base = priorYearArrRevenue(state);
+  if (base < 1) {
+    return { ok: false, reason: 'Need a closed prior fiscal year with revenue (Dec year-end).' };
+  }
+  const cd = twelveMonthCooldownStatus(state.ceo?.lastCeoArrBonusAt, state);
+  if (!cd.eligible) {
+    return {
+      ok: false,
+      reason: `CEO ARR bonus available again in ${cd.monthsUntil} month(s) (once every 12 months).`
+    };
+  }
+  return { ok: true, priorYearArr: base };
+}
+
+export function payCeoArrBonus(state, pctRaw) {
+  const pct = Number(pctRaw);
+  if (!CEO_ARR_BONUS_PCTS.includes(pct)) {
+    return { ok: false, reason: 'Choose 2%, 5%, 10%, or 20% of prior-year ARR.' };
+  }
+  const gate = canPayCeoArrBonus(state);
+  if (!gate.ok) return gate;
+  const pay = estimateCeoArrBonus(state, pct);
+  if (pay < 500) {
+    return { ok: false, reason: 'Bonus would be under $500 — pick a higher % or grow prior-year revenue.' };
+  }
+  const cash = state.finance?.cash ?? 0;
+  if (cash < pay) {
+    return { ok: false, reason: `Need ${formatMoney(pay)} company cash (have ${formatMoney(cash)}).` };
+  }
+  state.finance.cash -= pay;
+  recordCashOutflow(state, pay, 'ceo_arr_bonus');
+  state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + pay;
+  const ceo = ceoState(state);
+  ceo.careerCeoArrBonuses = (ceo.careerCeoArrBonuses ?? 0) + pay;
+  ceo.lastCeoArrBonusAt = {
+    year: state.calendar?.year,
+    monthIndex: state.calendar?.monthIndex
+  };
+  creditPersonalBank(
+    state,
+    pay,
+    `CEO ARR bonus (${pct}% of prior-year revenue)`,
+    'ceo_arr_bonus'
+  );
+  accrueCeoTaxableIncome(state, pay);
+  return {
+    ok: true,
+    pct,
+    amount: pay,
+    priorYearArr: gate.priorYearArr,
+    summary: `CEO ARR bonus ${formatMoney(pay)} (${pct}% of prior-year revenue ${formatMoney(gate.priorYearArr)}) — personal bank ${formatMoney(ceo.bankBalance)}.`
+  };
+}
+
+export function ceoArrBonusUiState(state) {
+  const base = priorYearArrRevenue(state);
+  const cd = twelveMonthCooldownStatus(state.ceo?.lastCeoArrBonusAt, state);
+  const last = state.ceo?.lastCeoArrBonusAt;
+  return {
+    priorYearArr: base,
+    cooldown: cd,
+    lastPaidLabel:
+      last?.year != null ? formatCalendarStamp(last.year, last.monthIndex) : null
+  };
+}
+
 export function takeOwnerDraw(state, amount) {
   const gate = canTakeOwnerDraw(state, amount);
   if (!gate.ok) return gate;
@@ -659,6 +751,7 @@ export function ceoPersonalCashComp(state) {
     (ceo.careerSalaryPaid ?? 0) +
     (ceo.careerOwnerDraws ?? 0) +
     (ceo.careerEmployeeBonuses ?? 0) +
+    (ceo.careerCeoArrBonuses ?? 0) +
     (ceo.careerStockSales ?? 0)
   );
 }
@@ -869,7 +962,8 @@ export function renderCeoCompBreakdown(state) {
   const equity = founderEquityValue(state);
   const salary = state.ceo?.careerSalaryPaid ?? 0;
   const draws = state.ceo?.careerOwnerDraws ?? 0;
-  const bonuses = state.ceo?.careerEmployeeBonuses ?? 0;
+  const bonuses =
+    (state.ceo?.careerEmployeeBonuses ?? 0) + (state.ceo?.careerCeoArrBonuses ?? 0);
   const stockSales = state.ceo?.careerStockSales ?? 0;
   const bank = ceoPersonalBankBalance(state);
   const net = bank + equity;
