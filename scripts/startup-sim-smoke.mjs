@@ -2186,8 +2186,15 @@ const {
   migrateStaffHeadcount,
   totalHeadcount
 } = await import(`file://${join(sim, 'modules/Staff.js')}`);
-const { sellCeoHome, purchaseCeoHomeCash, purchaseCeoHomeMortgage, prepayCeoMortgage } =
-  await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
+const {
+  sellCeoHome,
+  purchaseCeoHomeCash,
+  purchaseCeoHomeMortgage,
+  prepayCeoMortgage,
+  purchaseCeoLifestyle,
+  getCeoHomeTier,
+  ceoLifestyleMonthlyDebit
+} = await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
 const {
   donateFromPersonalBank,
   recordCeoNetWorthSnapshot,
@@ -2199,6 +2206,10 @@ const homeState = createInitialState({
   mode: 'sandbox',
   sandboxCash: 500_000
 });
+if (!getCeoHomeTier('tech-loft')?.cashPrice) {
+  console.error('FAIL: CEO tech-loft home tier missing');
+  failed = true;
+}
 homeState.ceo.bankBalance = 2_000_000;
 const bought = purchaseCeoHomeCash(homeState, 'starter-condo');
 if (!bought.ok) {
@@ -2245,9 +2256,21 @@ if (!bought.ok) {
           console.error('FAIL: CEO portfolio deposit or mortgage prepay');
           failed = true;
         } else {
-          console.log(
-            `OK: CEO tab (sell home ${formatMoney(sold.proceeds)}, portfolio ${formatMoney(investState.ceo.investmentBalance)}, mortgage prepay)`
-          );
+          const lifestyleState = createInitialState({
+            companyName: 'LifestyleCo',
+            categoryId: 'b2b-saas',
+            mode: 'sandbox'
+          });
+          lifestyleState.ceo.bankBalance = 50_000;
+          const gym = purchaseCeoLifestyle(lifestyleState, 'premium-gym');
+          if (!gym.ok || ceoLifestyleMonthlyDebit(lifestyleState) !== 380) {
+            console.error(`FAIL: CEO lifestyle purchase: ${gym.reason ?? 'debit bump'}`);
+            failed = true;
+          } else {
+            console.log(
+              `OK: CEO tab (sell home ${formatMoney(sold.proceeds)}, portfolio ${formatMoney(investState.ceo.investmentBalance)}, mortgage prepay, lifestyle debits ${formatMoney(ceoLifestyleMonthlyDebit(lifestyleState))}/mo)`
+            );
+          }
         }
       }
     }

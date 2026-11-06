@@ -28,7 +28,10 @@ import {
 import {
   CEO_HOME_TIERS,
   CEO_LIFESTYLE_PURCHASES,
+  CEO_LIFESTYLE_CATEGORIES,
   ceoHousingSummary,
+  ceoLifestyleMonthlyDebit,
+  ceoLifestyleOwnedDetails,
   standardMortgagePayment,
   HOUSING_MODE
 } from './CeoLifestyle.js';
@@ -576,17 +579,45 @@ function renderCeoLifestyleSection(ctx) {
     </div>`;
   }).join('');
 
-  const lifestyleCards = CEO_LIFESTYLE_PURCHASES.map((item) => {
+  const renderLifestyleCard = (item) => {
     const owned = lifestyleOwned.has(item.id);
-    const gated = item.minNetWorth && netWorth < item.minNetWorth;
+    const gatedNw = item.minNetWorth && netWorth < item.minNetWorth;
+    const gatedPublic = item.requiresPublic && !isPublicCompany(state);
+    const gated = gatedNw || gatedPublic;
+    const gateNote = gatedPublic
+      ? 'Public company only'
+      : gatedNw
+        ? `Requires ≈ ${formatMoney(item.minNetWorth)} net worth`
+        : '';
     return `<div class="finance-action people-perk-card">
       <p><strong>${escapeHtml(item.label)}</strong> — ${formatMoney(item.cost)}${owned ? ' <span class="task-tag">Owned</span>' : ''}</p>
       <p class="fine-print">${escapeHtml(item.blurb)}</p>
-      ${gated ? `<p class="fine-print people-perk-effects">Requires ≈ ${formatMoney(item.minNetWorth)} net worth</p>` : ''}
+      ${gateNote ? `<p class="fine-print people-perk-effects">${escapeHtml(gateNote)}</p>` : ''}
       ${item.monthlyDebitBump ? `<p class="fine-print people-perk-effects">+${formatMoney(item.monthlyDebitBump)}/mo discretionary debits</p>` : ''}
       <button type="button" class="btn btn-primary btn-small" data-ceo-lifestyle="${escapeHtml(item.id)}" ${owned || disabled || gated ? 'disabled' : ''}>Buy</button>
     </div>`;
+  };
+
+  const lifestyleByCategory = CEO_LIFESTYLE_CATEGORIES.map((cat) => {
+    const items = CEO_LIFESTYLE_PURCHASES.filter((p) => (p.category ?? 'other') === cat.id);
+    if (!items.length) return '';
+    return `<div class="ceo-lifestyle-category">
+      <h5 class="finance-section-title">${escapeHtml(cat.label)}</h5>
+      <div class="people-perk-grid">${items.map(renderLifestyleCard).join('')}</div>
+    </div>`;
   }).join('');
+
+  const ownedDetails = ceoLifestyleOwnedDetails(state);
+  const lifestyleMo = ceoLifestyleMonthlyDebit(state);
+  const ownedList =
+    ownedDetails.length > 0
+      ? `<ul class="instrument-list fine-print">${ownedDetails
+          .map(
+            (p) =>
+              `<li><strong>${escapeHtml(p.label)}</strong>${p.monthlyDebitBump ? ` · +${formatMoney(p.monthlyDebitBump)}/mo` : ''}</li>`
+          )
+          .join('')}</ul>`
+      : '<p class="fine-print">No splurges yet — early picks like the e-bike pack or premium gym are affordable on a modest personal bank.</p>';
 
   const housingStatusLine =
     housing.mode === HOUSING_MODE.RENT
@@ -634,17 +665,21 @@ function renderCeoLifestyleSection(ctx) {
       ${mortgageBlock}
       ${panelMetricGroup(
         'Lifestyle snapshot',
-        panelMetricGrid('3', [
+        panelMetricGrid('4', [
           panelStatCard('Home equity', formatMoney(housing.equity), { hero: housing.equity > 0 }),
           panelStatCard('Est. net worth', formatMoney(netWorth)),
-          panelStatCard('Splurges owned', String(lifestyleOwned.size))
+          panelStatCard('Splurges owned', String(lifestyleOwned.size)),
+          panelStatCard('Lifestyle debits', lifestyleMo > 0 ? `${formatMoney(lifestyleMo)}/mo` : '—', {
+            hero: lifestyleMo > 0
+          })
         ])
       )}
+      <div class="ceo-lifestyle-owned">${ownedList}</div>
       <h4 class="finance-section-title">Homes</h4>
       <div class="people-perk-grid ceo-home-grid">${homeCards}</div>
-      <h4 class="finance-section-title">One-time splurges</h4>
-      <p class="fine-print">${CEO_LIFESTYLE_PURCHASES.length} purchases — some add recurring discretionary debits.</p>
-      <div class="people-perk-grid">${lifestyleCards}</div>
+      <h4 class="finance-section-title">Splurge catalog</h4>
+      <p class="fine-print">${CEO_LIFESTYLE_PURCHASES.length} purchases across ${CEO_LIFESTYLE_CATEGORIES.length} categories — some add recurring discretionary debits on top of your salary band.</p>
+      ${lifestyleByCategory}
     </section>
   `;
 }
