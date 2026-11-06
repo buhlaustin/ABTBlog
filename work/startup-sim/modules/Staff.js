@@ -9,7 +9,7 @@ import {
 import { setGameFeedback } from './GameFeedback.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { renderLeadershipOrgChart, cooSalaryMonthly } from './Coo.js';
-import { panelStatCard } from './PanelChrome.js';
+import { panelStatCard, panelMetricGroup, panelMetricGrid, panelMetricStack, panelSnapshotSection } from './PanelChrome.js';
 
 const STAGE_ORDER = [STAGES.GARAGE, STAGES.OFFICE, STAGES.XC, STAGES.POST_XC, STAGES.PUBLIC];
 
@@ -462,13 +462,26 @@ export function renderPeopleStaffingPanel(container, state) {
       ${orgMount}
       <div id="org-chart-mount"></div>
       <p class="fine-print">Hire a named <strong>COO</strong> in the org chart (garage onward). Department headcount unlocks after a small office ($10k ARR).${state.mode === 'sandbox' ? ' Sandbox cap <strong>10,000</strong> headcount.' : ''}${capHint ? ` ${capHint}` : ''}</p>
-      <div class="finance-kpi-row people-kpi-row">
-        ${panelStatCard('Draft / cap', `${totalDraft} / ${maxHc}`, { hero: true })}
-        ${panelStatCard('Active HC', String(totalFinal))}
-        ${panelStatCard('Payroll (draft)', formatMoney(econ.payroll))}
-        ${panelStatCard('Proj. burn', formatMoney(econ.burn))}
-        ${panelStatCard('vs last rev.', formatMoney(econ.surplus), { tone: econ.surplus >= 0 ? 'pos' : 'neg' })}
-      </div>
+      ${panelSnapshotSection(
+        panelMetricStack(
+          panelMetricGroup(
+            'Headcount',
+            panelMetricGrid('3', [
+              panelStatCard('Draft / cap', `${totalDraft} / ${maxHc}`, { hero: true }),
+              panelStatCard('Active HC', String(totalFinal)),
+              panelStatCard('Payroll (draft)', formatMoney(econ.payroll))
+            ])
+          ),
+          panelMetricGroup(
+            'Burn vs revenue',
+            panelMetricGrid('2', [
+              panelStatCard('Proj. burn', formatMoney(econ.burn)),
+              panelStatCard('vs last rev.', formatMoney(econ.surplus), { tone: econ.surplus >= 0 ? 'pos' : 'neg' })
+            ])
+          )
+        ),
+        { ariaLabel: 'Staffing snapshot' }
+      )}
       <details class="finance-details">
         <summary>COO comp &amp; finalize history</summary>
         <p class="fine-print">COO comp ${formatMoney(econ.execPay)}/mo · Last finalized ${escapeHtml(finalizedLabel)}</p>

@@ -473,9 +473,25 @@ h1 {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.75rem 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
   margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .summary-grid.summary-grid--3,
+  .growth-context-grid,
+  .board-context-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .stock-stats-primary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stock-stats:not(.stock-stats-primary) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .summary-grid > div {
@@ -1186,8 +1202,19 @@ h1 {
   margin-bottom: 0.75rem;
 }
 
-.growth-panel .growth-kpi-row {
-  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+.panel-snapshot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.panel-snapshot-lede,
+.panel-metric-group-lede {
+  margin: -0.2rem 0 0;
+}
+
+.panel-metric-stack {
+  margin: 0;
 }
 
 .growth-channel-compare {
@@ -1349,11 +1376,8 @@ h1 {
   gap: 0.5rem;
 }
 
-.desk-kpi-row,
-.people-kpi-row,
-.board-kpi-row,
-.news-kpi-row {
-  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+.companies-holding-stats {
+  margin-top: 0.35rem;
 }
 
 .desk-close-bar {
@@ -1990,8 +2014,14 @@ h1 {
 
 .finance-kpi-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
+}
+
+@media (min-width: 640px) {
+  .finance-kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .finance-stat-card {
@@ -2141,6 +2171,15 @@ h1 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.finance-metric-grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.finance-metric-grid--3 {
+  grid-template-columns: 1fr;
+}
+
+.finance-metric-grid--4,
 .finance-metric-grid--lifetime {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -2155,9 +2194,30 @@ h1 {
 }
 
 @media (min-width: 520px) {
+  .finance-metric-grid--3,
   .finance-metric-grid--fy {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+.stock-metric-stack {
+  margin: 0.75rem 0;
+}
+
+.dialog-metric-panel {
+  margin-bottom: 1rem;
+}
+
+.dialog-metric-panel .finance-history-groups {
+  gap: 0.65rem;
+}
+
+.dialog-metric-panel .finance-metric-group {
+  padding: 0.65rem 0.75rem;
+}
+
+#screen-gameover .finance-history-groups {
+  margin-top: 0.75rem;
 }
 
 .finance-card {

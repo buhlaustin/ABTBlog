@@ -1,6 +1,7 @@
 import { formatMoney } from './constants.js';
 import { loanOutstanding, loanPaymentMonthly, computeCreditLimit } from './BankLoan.js';
 import { getArr } from './Workspace.js';
+import { escapeHtml, panelStatCard, panelMetricGrid, panelMetricGroup } from './PanelChrome.js';
 
 export function activeSafeInstruments(state) {
   return (state.finance?.instruments ?? []).filter((i) => i.type === 'safe' && !i.converted);
@@ -33,13 +34,6 @@ export function convertOutstandingSafesAtSeed(state, postMoney) {
   return lines;
 }
 
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
 export function renderCapitalStackSummary(state) {
   const safeTotal = totalSafePrincipal(state);
   const safeCount = activeSafeInstruments(state).length;
@@ -53,16 +47,18 @@ export function renderCapitalStackSummary(state) {
   if (safeCount === 0 && debt <= 0) return '';
 
   return `<div class="capital-stack" role="region" aria-label="Capital stack">
-    <p class="prelaunch-progress-title"><strong>Capital stack</strong></p>
-    <div class="summary-grid">
-      <div><span class="stat-label">Cash</span><span class="stat-value">${formatMoney(cash)}</span></div>
-      <div><span class="stat-label">SAFE outstanding</span><span class="stat-value">${formatMoney(safeTotal)} (${safeCount})</span></div>
-      <div><span class="stat-label">Est. SAFE dilution @ seed</span><span class="stat-value">~${dilution}%</span></div>
-      <div><span class="stat-label">Bank debt</span><span class="stat-value">${formatMoney(debt)}</span></div>
-      <div><span class="stat-label">Debt service</span><span class="stat-value">${formatMoney(debtSvc)}/mo</span></div>
-      <div><span class="stat-label">Credit headroom</span><span class="stat-value">${formatMoney(Math.max(0, limit - debt))}</span></div>
-    </div>
-    <p class="fine-print">ARR ${formatMoney(arr)} · Line limit ${formatMoney(limit)}. SAFEs convert on priced seed; loan balance is paid down via monthly overhead.</p>
+    ${panelMetricGroup(
+      'Capital stack',
+      panelMetricGrid('3', [
+        panelStatCard('Cash', formatMoney(cash), { hero: true }),
+        panelStatCard('SAFE outstanding', `${formatMoney(safeTotal)} (${safeCount})`),
+        panelStatCard('Est. SAFE dilution @ seed', `~${dilution}%`),
+        panelStatCard('Bank debt', formatMoney(debt)),
+        panelStatCard('Debt service', `${formatMoney(debtSvc)}/mo`),
+        panelStatCard('Credit headroom', formatMoney(Math.max(0, limit - debt)))
+      ]),
+      { lede: `ARR ${formatMoney(arr)} · Line limit ${formatMoney(limit)}. SAFEs convert on priced seed; loan balance is paid down via monthly overhead.` }
+    )}
   </div>`;
 }
 

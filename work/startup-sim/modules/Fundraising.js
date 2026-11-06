@@ -75,6 +75,14 @@ export { closeAngelSafe, requestLoanDraw, prepayLoan, refinanceLoanAfterSeed, dr
 import { renderOfficesPanel } from './Offices.js';
 import { xcBatchStartLabelText } from './XC.js';
 import { renderIpoPanel } from './IPO.js';
+import {
+  escapeHtml,
+  panelStatCard,
+  panelMetricGroup,
+  panelMetricGrid,
+  panelMetricStack,
+  panelSnapshotSection
+} from './PanelChrome.js';
 
 export function canCloseSeed(state) {
   return Boolean(
@@ -120,21 +128,6 @@ function renderPricedRoundBlock(state, preview, flagName, buttonId, label) {
     <p class="fine-print">Founder ~${preview.founderPctNow}% → ~${preview.founderPctAfterApprox}%.</p>
     <button type="button" class="btn btn-primary btn-small" id="${buttonId}">Close ${label}</button>
   </div>`;
-}
-
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-function financeStatCard(label, value, { hero = false, tone = null } = {}) {
-  const classes = ['finance-stat-card'];
-  if (hero) classes.push('finance-stat-card--hero');
-  if (tone === 'pos') classes.push('finance-stat-card--pos');
-  if (tone === 'neg') classes.push('finance-stat-card--neg');
-  return `<div class="${classes.join(' ')}"><span class="finance-stat-label">${escapeHtml(label)}</span><span class="finance-stat-value">${value}</span></div>`;
 }
 
 function profitTone(n) {
@@ -344,9 +337,9 @@ export function renderFinancePanel(container, state) {
     ? `<div class="finance-metric-group finance-metric-group--prior">
         <h4 class="finance-metric-group-title">Prior fiscal year ${sum.fiscalPriorYear ?? '—'}</h4>
         <div class="finance-metric-grid finance-metric-grid--fy">
-          ${financeStatCard('Revenue', sum.fiscalPriorRevenueLabel)}
-          ${financeStatCard('Expenses', sum.fiscalPriorExpensesLabel)}
-          ${financeStatCard('Profit', sum.fiscalPriorProfitLabel, { tone: profitTone(sum.fiscalPriorProfit) })}
+          ${panelStatCard('Revenue', sum.fiscalPriorRevenueLabel)}
+          ${panelStatCard('Expenses', sum.fiscalPriorExpensesLabel)}
+          ${panelStatCard('Profit', sum.fiscalPriorProfitLabel, { tone: profitTone(sum.fiscalPriorProfit) })}
         </div>
       </div>`
     : '';
@@ -376,7 +369,7 @@ export function renderFinancePanel(container, state) {
   const charityBlock = `<section class="finance-section finance-card finance-charity">
     <h3 class="finance-section-title">Charitable giving</h3>
     <div class="finance-metric-grid finance-metric-grid--single">
-      ${financeStatCard('Lifetime donated', sum.charityLifetimeLabel)}
+      ${panelStatCard('Lifetime donated', sum.charityLifetimeLabel)}
     </div>
     <p class="fine-print">Company cash only · min ${formatMoney(1_000)} · counts as expense</p>
     <div class="finance-charity-chips">
@@ -418,24 +411,31 @@ export function renderFinancePanel(container, state) {
         <p class="finance-mult-chip" title="Revenue multiplier on desk and Growth">${escapeHtml(multExpl)}</p>
       </header>
 
-      <section class="finance-kpi-row" aria-label="Cash and runway">
-        ${financeStatCard('Company cash', sum.cashLabel, { hero: true })}
-        ${financeStatCard('Runway', sum.runway)}
-        ${financeStatCard('Overhead / mo', sum.burnLabel)}
-      </section>
+      ${panelSnapshotSection(
+        panelMetricStack(
+          panelMetricGroup(
+            'Cash & runway',
+            panelMetricGrid('3', [
+              panelStatCard('Company cash', sum.cashLabel, { hero: true }),
+              panelStatCard('Runway', sum.runway),
+              panelStatCard('Overhead / mo', sum.burnLabel)
+            ])
+          ),
+          panelMetricGroup(
+            'Operating snapshot',
+            panelMetricGrid('4', [
+              panelStatCard('Last month rev.', sum.mrrLabel),
+              panelStatCard('Portfolio MRR', `${portfolioMrr}/mo`),
+              panelStatCard('Valuation', valuationLabel),
+              panelStatCard('HQ / office', escapeHtml(state.company.location || '—'))
+            ])
+          )
+        ),
+        { ariaLabel: 'Cash, runway, and operating snapshot' }
+      )}
       <p class="fine-print finance-runway-detail">${sum.runwayDetail}</p>
 
       ${taxAprilNote}
-
-      <section class="finance-section" aria-label="Operating snapshot">
-        <h3 class="finance-section-title">Operating</h3>
-        <div class="finance-operating-grid">
-          ${financeStatCard('Last month rev.', sum.mrrLabel)}
-          ${financeStatCard('Portfolio MRR', `${portfolioMrr}/mo`)}
-          ${financeStatCard('Valuation', valuationLabel)}
-          ${financeStatCard('HQ / office', escapeHtml(state.company.location || '—'))}
-        </div>
-      </section>
 
       <section class="finance-section finance-history" aria-label="Lifetime and fiscal year">
         <h3 class="finance-section-title">History & fiscal year</h3>
@@ -444,18 +444,18 @@ export function renderFinancePanel(container, state) {
           <div class="finance-metric-group">
             <h4 class="finance-metric-group-title">Lifetime (all-time)</h4>
             <div class="finance-metric-grid finance-metric-grid--lifetime">
-              ${financeStatCard('Revenue', sum.lifetimeRevenueLabel)}
-              ${financeStatCard('Expenses', sum.lifetimeExpensesLabel)}
-              ${financeStatCard('Profit', sum.lifetimeProfitLabel, { tone: profitTone(sum.lifetimeProfit) })}
-              ${financeStatCard('Starting cash', sum.initialInvestmentLabel)}
+              ${panelStatCard('Revenue', sum.lifetimeRevenueLabel)}
+              ${panelStatCard('Expenses', sum.lifetimeExpensesLabel)}
+              ${panelStatCard('Profit', sum.lifetimeProfitLabel, { tone: profitTone(sum.lifetimeProfit) })}
+              ${panelStatCard('Starting cash', sum.initialInvestmentLabel)}
             </div>
           </div>
           <div class="finance-metric-group">
             <h4 class="finance-metric-group-title">Current fiscal year ${sum.fiscalCurrentYear ?? '—'}</h4>
             <div class="finance-metric-grid finance-metric-grid--fy">
-              ${financeStatCard('Revenue', sum.fiscalCurrentRevenueLabel)}
-              ${financeStatCard('Expenses', sum.fiscalCurrentExpensesLabel)}
-              ${financeStatCard('Profit', sum.fiscalCurrentProfitLabel, { tone: profitTone(sum.fiscalCurrentProfit) })}
+              ${panelStatCard('Revenue', sum.fiscalCurrentRevenueLabel)}
+              ${panelStatCard('Expenses', sum.fiscalCurrentExpensesLabel)}
+              ${panelStatCard('Profit', sum.fiscalCurrentProfitLabel, { tone: profitTone(sum.fiscalCurrentProfit) })}
             </div>
           </div>
           ${priorFyGroup}

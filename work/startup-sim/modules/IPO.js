@@ -24,6 +24,7 @@ import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 import { recordCashOutflow } from './Finance.js';
 import { totalSubsidiaryMrr } from './Acquisitions.js';
+import { panelStatCard, panelMetricGroup, panelMetricGrid, panelMetricStack } from './PanelChrome.js';
 
 function deriveTicker(companyName) {
   const letters = String(companyName || 'CO')
@@ -863,21 +864,33 @@ export function renderIpoPanel(container, state) {
         <p class="fine-print">Mkt cap ${formatMoney(cap)} · ${totalOutstandingShares(state).toLocaleString()} shares outstanding</p>
       </div>
       ${renderStockSparkline(pm.priceHistory)}
-      <div class="summary-grid stock-stats stock-stats-primary">
-        <div><span class="stat-label">Model fair value</span><span class="stat-value">${formatMoney(metrics.fundamental ?? pm.fundamentalPrice ?? 0)}/sh</span></div>
-        <div><span class="stat-label">Premium to model</span><span class="stat-value ${premiumClass}">${premium >= 0 ? '+' : ''}${premium.toFixed(1)}%</span></div>
-        <div><span class="stat-label">Trading P/S (ARR)</span><span class="stat-value">${metrics.tradingPs != null ? `${metrics.tradingPs.toFixed(1)}×` : '—'}</span></div>
-        <div><span class="stat-label">Model P/S</span><span class="stat-value">${pm.priceSalesMultiple != null ? `${pm.priceSalesMultiple}×` : '—'}</span></div>
-        <div><span class="stat-label">Last month move</span><span class="stat-value">${pm.lastMonthDeltaPct != null ? formatDriverPct(pm.lastMonthDeltaPct) : '—'}</span></div>
-        <div><span class="stat-label">IPO open</span><span class="stat-value">${formatMoney(pm.ipoPrice ?? 0)}</span></div>
-      </div>
-      <div class="summary-grid stock-stats">
-        <div><span class="stat-label">Analyst</span><span class="stat-value">${escapeHtml(pm.analystRating ?? '—')} · ${formatMoney(pm.analystTarget ?? 0)} PT</span></div>
-        <div><span class="stat-label">Whisper rev.</span><span class="stat-value">${formatMoney(pm.whisperRevenueTarget ?? 0)}/mo</span></div>
-        <div><span class="stat-label">Beat streak</span><span class="stat-value">${pm.guidanceBeatStreak ?? 0}</span></div>
-        <div><span class="stat-label">Short interest</span><span class="stat-value">${pm.shortInterestPct ?? 0}%</span></div>
-        <div><span class="stat-label">Institutional</span><span class="stat-value">${Math.round(pm.institutionalHoldPct ?? 42)}%</span></div>
-        <div><span class="stat-label">52-week</span><span class="stat-value">${formatMoney(pm.low52 ?? pm.sharePrice ?? 0)} – ${formatMoney(pm.high52 ?? pm.sharePrice ?? 0)}</span></div>
+      <div class="stock-metric-stack">
+        ${panelMetricStack(
+          panelMetricGroup(
+            'Valuation vs model',
+            panelMetricGrid('3', [
+              panelStatCard('Model fair value', `${formatMoney(metrics.fundamental ?? pm.fundamentalPrice ?? 0)}/sh`),
+              panelStatCard('Premium to model', `${premium >= 0 ? '+' : ''}${premium.toFixed(1)}%`, {
+                tone: premium >= 0 ? 'pos' : 'neg'
+              }),
+              panelStatCard('Trading P/S (ARR)', metrics.tradingPs != null ? `${metrics.tradingPs.toFixed(1)}×` : '—'),
+              panelStatCard('Model P/S', pm.priceSalesMultiple != null ? `${pm.priceSalesMultiple}×` : '—'),
+              panelStatCard('Last month move', pm.lastMonthDeltaPct != null ? formatDriverPct(pm.lastMonthDeltaPct) : '—'),
+              panelStatCard('IPO open', formatMoney(pm.ipoPrice ?? 0))
+            ])
+          ),
+          panelMetricGroup(
+            'Street & flow',
+            panelMetricGrid('3', [
+              panelStatCard('Analyst', `${escapeHtml(pm.analystRating ?? '—')} · ${formatMoney(pm.analystTarget ?? 0)} PT`),
+              panelStatCard('Whisper rev.', `${formatMoney(pm.whisperRevenueTarget ?? 0)}/mo`),
+              panelStatCard('Beat streak', String(pm.guidanceBeatStreak ?? 0)),
+              panelStatCard('Short interest', `${pm.shortInterestPct ?? 0}%`),
+              panelStatCard('Institutional', `${Math.round(pm.institutionalHoldPct ?? 42)}%`),
+              panelStatCard('52-week range', `${formatMoney(pm.low52 ?? pm.sharePrice ?? 0)} – ${formatMoney(pm.high52 ?? pm.sharePrice ?? 0)}`)
+            ])
+          )
+        )}
       </div>
       <details class="stock-drivers-details"><summary>Last month price drivers</summary>${driverList}</details>
       <p class="fine-print">${monthsPub} month(s) public${pm.ipoPrimaryProceeds ? ` · IPO primary ${formatMoney(pm.ipoPrimaryProceeds)} (${(pm.ipoPrimaryShares ?? 0).toLocaleString('en-US')} sh)` : ''}${earningsThisMonth ? ' · <strong>earnings month</strong>' : earningsSoon ? ' · earnings next month' : ''}${pm.indexMember ? ` · ${escapeHtml(pm.indexName ?? 'Index')}` : ''} · buyback auth ${formatMoney(pm.buybackAuthorized ?? 0)}${pm.dividendPerShareLast ? ` · last div $${Number(pm.dividendPerShareLast).toFixed(2)}/sh` : ''}. Monthly mark re-rates toward ARR×P/S with growth, guidance, and cash runway.</p>

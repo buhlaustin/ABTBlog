@@ -6,7 +6,7 @@ import { getArr } from './Workspace.js';
 import bundledTimeline from '../data/news-timeline-seed.json' with { type: 'json' };
 import { calendarTurn, formatStateMonth, formatCalendarStamp } from './GameCalendar.js';
 import { formatMoney } from './constants.js';
-import { panelStatCard } from './PanelChrome.js';
+import { panelStatCard, panelMetricGroup, panelMetricGrid, panelSnapshotSection } from './PanelChrome.js';
 
 let timelineSeed = bundledTimeline;
 let timelineHydrated = false;
@@ -620,11 +620,17 @@ export function renderNewsPanel(container, state) {
       <div class="finance-hero">
         <p class="panel-lede">Parody press coverage — fresh headlines when you close each month.</p>
       </div>
-      <div class="finance-kpi-row news-kpi-row">
-        ${panelStatCard('This month', String(articleCount), { hero: true })}
-        ${panelStatCard('Unread', String(unread), { tone: unread > 0 ? 'pos' : null })}
-        ${panelStatCard('Archive', String(archiveCount))}
-      </div>
+      ${panelSnapshotSection(
+        panelMetricGroup(
+          'Feed snapshot',
+          panelMetricGrid('3', [
+            panelStatCard('This month', String(articleCount), { hero: true }),
+            panelStatCard('Unread', String(unread), { tone: unread > 0 ? 'pos' : null }),
+            panelStatCard('Archive', String(archiveCount))
+          ])
+        ),
+        { ariaLabel: 'News feed snapshot' }
+      )}
       ${alertLine}
       <div class="news-toolbar">
         <button type="button" class="btn btn-primary btn-small" id="btn-toggle-news-archive">${showArchive ? 'Hide archive' : 'Show archive'}</button>
