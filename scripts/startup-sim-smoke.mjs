@@ -1160,7 +1160,9 @@ if (!buy.ok) {
 }
 
 const { STAGES: ST } = await import(`file://${join(sim, 'modules/constants.js')}`);
-const { PUBLIC_FLOAT_ROW_ID, getFounderRow } = await import(`file://${join(sim, 'modules/CapTable.js')}`);
+const { PUBLIC_FLOAT_ROW_ID, getFounderRow, totalOutstandingShares } = await import(
+  `file://${join(sim, 'modules/CapTable.js')}`
+);
 const {
   fileIpo,
   tickPublicMarket,
@@ -1169,7 +1171,11 @@ const {
   executeStockSplit,
   whisperRevenueTarget,
   sellFounderSharesPartial,
-  ytdSmoothedMonthlyRevenue
+  ytdSmoothedMonthlyRevenue,
+  computeFundamentalSharePrice,
+  marketCap,
+  treasuryNetCash,
+  estimateEquityValue
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
 const { calendarTurn } = await import(`file://${join(sim, 'modules/XC.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
@@ -1214,6 +1220,18 @@ if (!ipo.ok) {
     console.log(
       `OK: IPO primary + float (${formatMoney(ipo.primaryProceeds)} primary, float ${floatPct}%, founder ${founder?.pct}%, ${formatMoney(listPrice)}/share)`
     );
+    pub.finance.cash = 1_000_000_000_000;
+    pub.finance.mrr = 250_000;
+    const fundPx = computeFundamentalSharePrice(pub);
+    const shares = totalOutstandingShares(pub);
+    const modelCap = Math.round(fundPx * shares);
+    const net = treasuryNetCash(pub);
+    if (modelCap < net * 0.9) {
+      console.error(`FAIL: model cap ${modelCap} should reflect net cash ${net}`);
+      failed = true;
+    } else {
+      console.log(`OK: valuation model includes balance sheet cash (model cap ${formatMoney(modelCap)})`);
+    }
   }
   const { hasInstitutionalBoard, meetsHubInvestorGate } = await import(
     `file://${join(sim, 'modules/Sentiment.js')}`

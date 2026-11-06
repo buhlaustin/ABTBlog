@@ -16,7 +16,13 @@ import {
 } from './CeoEconomics.js';
 import { prepareCompanyOverheadForMonth } from './CompanyOverhead.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
-import { tickPublicMarket, tickIpoLockup, tickPublicMarketAtMonthStart, isPublicCompany } from './IPO.js';
+import {
+  tickPublicMarket,
+  tickIpoLockup,
+  tickPublicMarketAtMonthStart,
+  isPublicCompany,
+  refreshMarketValuationFromFundamentals
+} from './IPO.js';
 import { resetPublicMarketEventsAtMonthStart } from './PublicMarkets.js';
 import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
 import { syncDraftFromFinalized, tickMarketSalaryDemand } from './Staff.js';
@@ -203,6 +209,7 @@ export function endMonth(state) {
       appendLog(state, line);
     }
   }
+  refreshMarketValuationFromFundamentals(state);
 
   for (const line of tickXcResidency(state)) {
     appendLog(state, line);
