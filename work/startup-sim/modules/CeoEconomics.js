@@ -329,6 +329,18 @@ export function suggestedCeoSalaryBand(state) {
       note: 'Angels expect frugal pay until priced seed.'
     };
   }
+  if (isPublicCompany(state) || state.flags?.ipoFiled) {
+    return {
+      label: 'Public company',
+      typical: 450_000,
+      presets: [
+        { annual: 350_000, label: '$350k' },
+        { annual: 450_000, label: '$450k' },
+        { annual: 750_000, label: '$750k' }
+      ],
+      note: 'Salary is in the proxy; most wealth is still equity.'
+    };
+  }
   if (!state.flags?.seriesAClosed) {
     return {
       label: 'Post-seed',
@@ -384,7 +396,13 @@ export function ceoSalaryBoardNote(state) {
   if (state.flags?.seriesAClosed && arr > 0 && annual > arr * 0.14) {
     return `CEO salary is ${Math.round((annual / arr) * 100)}% of ARR — expect board questions.`;
   }
-  if (state.flags?.seedRoundClosed && !state.flags?.seriesAClosed && annual > 280_000) {
+  if (
+    state.flags?.seedRoundClosed &&
+    !state.flags?.seriesAClosed &&
+    !state.flags?.ipoFiled &&
+    !isPublicCompany(state) &&
+    annual > 280_000
+  ) {
     return 'Salary is high for pre–Series A — investors may ask you to reset comp.';
   }
   return null;

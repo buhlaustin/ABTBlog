@@ -1142,7 +1142,8 @@ const {
   recordCeoSalaryForMonth,
   wealthMix,
   buildCompLedger,
-  suggestedCeoSalaryBand
+  suggestedCeoSalaryBand,
+  ceoSalaryBoardNote
 } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
 const { projectMonthlyBurn, estimateEraRevenuePotential, allTierRevenuePotentialRows } =
   await import(`file://${join(sim, 'modules/Finance.js')}`);
@@ -1187,6 +1188,27 @@ if (!failed) {
     console.error('FAIL: wealth mix');
     failed = true;
   }
+}
+const ipoSalaryState = createInitialState({
+  companyName: 'IPO Salary Co',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+ipoSalaryState.flags.seedRoundClosed = true;
+ipoSalaryState.flags.ipoFiled = true;
+ipoSalaryState.flags.seriesAClosed = false;
+ipoSalaryState.stage = STAGES.PUBLIC;
+ipoSalaryState.ceo.salaryAnnual = 450_000;
+const ipoBand = suggestedCeoSalaryBand(ipoSalaryState);
+const ipoBoardNote = ceoSalaryBoardNote(ipoSalaryState);
+if (ipoBand.label !== 'Public company') {
+  console.error(`FAIL: IPO-without-A salary band should be public (got ${ipoBand.label})`);
+  failed = true;
+} else if (ipoBoardNote?.includes('pre–Series A')) {
+  console.error(`FAIL: IPO path should not show pre-Series A salary warning (${ipoBoardNote})`);
+  failed = true;
+} else if (!failed) {
+  console.log('OK: public CEO comp band + no pre-Series A warning without Series A');
 }
 if (!failed) {
   if (TIER_REVENUE_PROFILE.length !== 8) {
