@@ -1147,8 +1147,8 @@ const { portfolioPulseSummary } = await import(`file://${join(sim, 'modules/Comp
 await preloadAcquisitionCatalog();
 const acqCatalog = getAcquisitionCatalog();
 const acqCatalogSize = acqCatalog.length;
-if (acqCatalogSize !== 175) {
-  console.error(`FAIL: expected 175 acquisition targets, got ${acqCatalogSize}`);
+if (acqCatalogSize !== 185) {
+  console.error(`FAIL: expected 185 acquisition targets, got ${acqCatalogSize}`);
   failed = true;
 } else {
   console.log(`OK: acquisition catalog has ${acqCatalogSize} handcrafted companies`);
@@ -1170,8 +1170,8 @@ if (maxEntAcqMrr < 5_000_000) {
   console.log(`OK: enterprise acquisition MRR scales to ${formatMoney(maxEntAcqMrr)}/mo`);
 }
 const giants = acqCatalog.filter((c) => c.segment === 'giant');
-if (giants.length < 10) {
-  console.error(`FAIL: expected 10+ giant (mega-cap) acquisition targets, got ${giants.length}`);
+if (giants.length < 18) {
+  console.error(`FAIL: expected 18+ giant (mega-cap) acquisition targets, got ${giants.length}`);
   failed = true;
 } else {
   const minGiantAsk = Math.min(...giants.map((c) => c.basePrice));

@@ -10,7 +10,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'work/startup-sim/data/acquisition-targets.json');
 
 /** Target count (11 rivals + handcrafted targets + mega-cap giants). */
-export const ACQUISITION_CATALOG_SIZE = 175;
+export const ACQUISITION_CATALOG_SIZE = 185;
 
 const SMALL_MRR = [4_200, 6_800, 9_500, 12_800, 16_500, 22_000, 27_500];
 const MID_MRR = [58_000, 92_000, 138_000, 205_000, 310_000, 465_000, 620_000];
