@@ -238,6 +238,23 @@
       "whale": true,
       "apiCreditsWhale": true,
       "authored": true
+    },
+    {
+      "id": "whale-ai-tools-next-api-model-ga",
+      "title": "Next API model GA whale",
+      "description": "Ship a new ChatXGPT model on the API — three anchor tenants prepay migration credits and launch-week burst before you flip the default endpoint.",
+      "types": ["product", "sales"],
+      "stages": ["post_xc"],
+      "categories": ["ai-tools"],
+      "tierMin": 4,
+      "tierMax": 6,
+      "cost": 38000,
+      "revenue": [320000, 1320000],
+      "product": 3,
+      "buzz": 4,
+      "whale": true,
+      "apiCreditsWhale": true,
+      "authored": true
     }
   ]
 }
