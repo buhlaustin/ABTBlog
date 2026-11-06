@@ -10,7 +10,14 @@ import {
   confirmTaskLineup
 } from './modules/Tasks.js';
 import { autoSelectRecommendedLineup } from './modules/Desk.js';
-import { completeBoardTask, ensureBoardRoster, dealBoardTasks } from './modules/Board.js';
+import {
+  addBoardSeat,
+  completeBoardTask,
+  ensureBoardRoster,
+  dealBoardTasks,
+  getBoardSeatCandidates,
+  boardSeatSearchFee
+} from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
 import {
@@ -1003,6 +1010,19 @@ function handleAddSatellite() {
 function bindGameInteractions() {
   const app = document.getElementById('app');
   app?.addEventListener('click', (e) => {
+    if (e.target.id === 'btn-add-board-seat' && sessionState) {
+      const select = document.getElementById('board-seat-candidate');
+      const result = addBoardSeat(sessionState, select?.value);
+      if (!result.ok) {
+        setGameFeedback(result.reason || 'Could not add board seat.', true);
+      } else {
+        appendLog(sessionState, `Board: ${result.summary}`);
+        setGameFeedback(result.summary, false);
+      }
+      refresh();
+      return;
+    }
+
     const boardBtn = e.target.closest('[data-complete-board-task]');
     if (boardBtn && sessionState) {
       void (async () => {
@@ -2022,6 +2042,11 @@ function bindGameInteractions() {
   app?.addEventListener('change', (e) => {
     if (e.target.id === 'satellite-template' || e.target.id === 'satellite-size') {
       paintSatelliteOpenPreview();
+    }
+    if (e.target.id === 'board-seat-candidate') {
+      const candidate = getBoardSeatCandidates().find((c) => c.id === e.target.value);
+      const blurb = document.getElementById('board-seat-candidate-blurb');
+      if (blurb && candidate?.blurb) blurb.textContent = candidate.blurb;
     }
   });
 

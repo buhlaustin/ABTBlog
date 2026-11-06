@@ -1,0 +1,112 @@
+{
+  "candidates": [
+    {
+      "id": "board-seat-former-public-cfo",
+      "name": "Elena Vasquez",
+      "seat": "Independent · Former public CFO",
+      "committee": "audit",
+      "searchFee": 95000,
+      "approvalBoost": 2,
+      "blurb": "Audit committee depth — she has signed more 10-Ks than you have pitch decks."
+    },
+    {
+      "id": "board-seat-enterprise-ceo",
+      "name": "David Okonkwo",
+      "seat": "Independent · Enterprise CEO",
+      "committee": "governance",
+      "searchFee": 110000,
+      "approvalBoost": 2,
+      "blurb": "Operator who scaled a Fortune 500 vendor — useful when your buyers want adult supervision."
+    },
+    {
+      "id": "board-seat-cyber-resilience",
+      "name": "Dr. Mei Lin",
+      "seat": "Independent · Cyber resilience",
+      "committee": "audit",
+      "searchFee": 85000,
+      "approvalBoost": 1,
+      "blurb": "Former CISO — turns breach tabletop exercises into board-friendly one-pagers."
+    },
+    {
+      "id": "board-seat-global-sales",
+      "name": "James Whitmore",
+      "seat": "Independent · Global sales",
+      "committee": "comp",
+      "searchFee": 78000,
+      "approvalBoost": 1,
+      "blurb": "Comp committee ally who knows enterprise quota math and when to stop discounting."
+    },
+    {
+      "id": "board-seat-product-vision",
+      "name": "Priya Shah",
+      "seat": "Independent · Product strategy",
+      "committee": "governance",
+      "searchFee": 72000,
+      "approvalBoost": 2,
+      "blurb": "Shipped three category-defining products — asks the roadmap questions investors repeat."
+    },
+    {
+      "id": "board-seat-regulatory-affairs",
+      "name": "Robert Kline",
+      "seat": "Independent · Regulatory affairs",
+      "committee": "governance",
+      "searchFee": 88000,
+      "approvalBoost": 1,
+      "blurb": "Former agency chief of staff — helpful when policy shifts faster than your compliance wiki."
+    },
+    {
+      "id": "board-seat-talent-culture",
+      "name": "Amira Hassan",
+      "seat": "Independent · People & culture",
+      "committee": "comp",
+      "searchFee": 68000,
+      "approvalBoost": 2,
+      "blurb": "Comp committee voice on exec pay — calibrates your CEO salary story vs. public comps."
+    },
+    {
+      "id": "board-seat-ai-ethics",
+      "name": "Prof. Alan Bergstrom",
+      "seat": "Independent · AI ethics",
+      "committee": "governance",
+      "searchFee": 62000,
+      "approvalBoost": 1,
+      "blurb": "Academic lens for model risk — turns ethics slides into something auditors can cite."
+    },
+    {
+      "id": "board-seat-customer-ceo",
+      "name": "Sandra Delgado",
+      "seat": "Independent · Customer CEO",
+      "committee": "full",
+      "searchFee": 92000,
+      "approvalBoost": 2,
+      "blurb": "Runs a top logo account — credible when prospects ask who actually uses you at scale."
+    },
+    {
+      "id": "board-seat-infrastructure",
+      "name": "Victor Petrov",
+      "seat": "Independent · Infrastructure",
+      "committee": "audit",
+      "searchFee": 80000,
+      "approvalBoost": 1,
+      "blurb": "Hyperscaler alum — stress-tests capacity plans before the board deck claims five nines."
+    },
+    {
+      "id": "board-seat-capital-markets",
+      "name": "Catherine Moore",
+      "seat": "Independent · Capital markets",
+      "committee": "audit",
+      "searchFee": 105000,
+      "approvalBoost": 2,
+      "blurb": "Former sell-side analyst — speaks fluent guidance, whisper numbers, and quiet period."
+    },
+    {
+      "id": "board-seat-emerging-markets",
+      "name": "Raj Malhotra",
+      "seat": "Independent · Emerging markets",
+      "committee": "governance",
+      "searchFee": 74000,
+      "approvalBoost": 1,
+      "blurb": "APAC operator — useful when international expansion is a slide, not yet a P&L line."
+    }
+  ]
+}

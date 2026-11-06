@@ -322,6 +322,8 @@ export function normalizeSave(raw) {
     if (!state.board.sentimentHistory) state.board.sentimentHistory = [];
     if (state.board.mandateBonusClaimed === undefined) state.board.mandateBonusClaimed = false;
     if (state.board.meetingsHeld === undefined) state.board.meetingsHeld = 0;
+    if (state.board.seatsAddedByPlayer === undefined) state.board.seatsAddedByPlayer = 0;
+    if (state.board.seatSearchSpendLifetime === undefined) state.board.seatSearchSpendLifetime = 0;
     if (state.publicMarket && state.publicMarket.guidanceBeatStreak === undefined) {
       state.publicMarket.guidanceBeatStreak = 0;
     }

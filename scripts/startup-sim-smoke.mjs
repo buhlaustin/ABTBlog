@@ -913,9 +913,15 @@ if (garageTierBase !== REV_MULT_CAP_SANDBOX || garageCap !== Math.round(REV_MULT
   console.log(`OK: garage rev× cap unchanged (${garageCap}× at empty HC, tier base ${garageTierBase}×)`);
 }
 
-const { completeBoardTask, dealBoardTasks, getBoardTaskDefs, ensureBoardRoster } = await import(
-  `file://${join(sim, 'modules/Board.js')}`
-);
+const {
+  completeBoardTask,
+  dealBoardTasks,
+  getBoardTaskDefs,
+  ensureBoardRoster,
+  addBoardSeat,
+  availableBoardSeatCandidates,
+  boardSeatCapacity
+} = await import(`file://${join(sim, 'modules/Board.js')}`);
 if (getBoardTaskDefs().length < 18) {
   console.error(`FAIL: board task catalog too small (${getBoardTaskDefs().length})`);
   failed = true;
@@ -948,6 +954,28 @@ if (!inst) {
     failed = true;
   } else {
     console.log('OK: board task outcome fields');
+  }
+}
+boardState.finance.cash = 2_000_000;
+const boardSeatPool = availableBoardSeatCandidates(boardState);
+const cap = boardSeatCapacity(boardState);
+if (boardSeatPool.length < 8) {
+  console.error(`FAIL: expected 8+ board seat candidates (got ${boardSeatPool.length})`);
+  failed = true;
+} else {
+  const beforeCount = boardState.board.members.length;
+  const seatAdd = addBoardSeat(boardState, boardSeatPool[0].id);
+  if (!seatAdd.ok || boardState.board.members.length !== beforeCount + 1) {
+    console.error(`FAIL: add board seat: ${seatAdd.reason ?? 'unknown'}`);
+    failed = true;
+  } else if (boardState.board.seatsAddedByPlayer !== 1) {
+    console.error('FAIL: board should track player-added seats');
+    failed = true;
+  } else if (beforeCount + 1 > cap) {
+    console.error('FAIL: board seat add exceeded capacity');
+    failed = true;
+  } else {
+    console.log(`OK: add board seat (${boardState.board.members.length}/${cap} directors)`);
   }
 }
 

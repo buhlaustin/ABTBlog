@@ -1,4 +1,5 @@
 import bundledBoard from '../data/board-tasks.json' with { type: 'json' };
+import bundledSeatCandidates from '../data/board-seat-candidates.json' with { type: 'json' };
 import { formatMoney } from './constants.js';
 import { recordCashOutflow, companyRunwayDisplay } from './Finance.js';
 import { getArr } from './Workspace.js';
@@ -86,7 +87,92 @@ export function createInitialBoard() {
     sentimentHistory: [],
     monthlyMandate: null,
     mandateBonusClaimed: false,
-    meetingsHeld: 0
+    meetingsHeld: 0,
+    seatsAddedByPlayer: 0,
+    seatSearchSpendLifetime: 0
+  };
+}
+
+const BOARD_SEAT_CANDIDATES = bundledSeatCandidates?.candidates ?? [];
+
+export function getBoardSeatCandidates() {
+  return BOARD_SEAT_CANDIDATES;
+}
+
+/** Max directors on the board at the current company stage. */
+export function boardSeatCapacity(state) {
+  const tier = progressionTier(state);
+  if (tier >= 7) return 11;
+  if (tier >= 5) return 9;
+  if (tier >= 4) return 8;
+  return 7;
+}
+
+export function boardSeatSearchFee(state, candidate) {
+  const base = candidate?.searchFee ?? 75_000;
+  const tier = progressionTier(state);
+  const mult = tier >= 7 ? 2.15 : tier >= 5 ? 1.45 : tier >= 4 ? 1.15 : 1;
+  return Math.round(base * mult);
+}
+
+export function availableBoardSeatCandidates(state) {
+  if (!hasInstitutionalBoard(state)) return [];
+  ensureBoardRoster(state);
+  const seated = new Set((state.board?.members ?? []).map((m) => m.id));
+  return BOARD_SEAT_CANDIDATES.filter((c) => !seated.has(c.id));
+}
+
+/** Add an independent director from the search pool (company cash, one-time fee). */
+export function addBoardSeat(state, candidateId) {
+  if (!hasInstitutionalBoard(state)) {
+    return { ok: false, reason: 'Seat a board first — close Series A or go public.' };
+  }
+  ensureBoardRoster(state);
+  const cap = boardSeatCapacity(state);
+  const members = state.board.members ?? [];
+  if (members.length >= cap) {
+    return {
+      ok: false,
+      reason: `Board is at ${cap} seats for your stage — expand again after the next funding tier or IPO scale.`
+    };
+  }
+  const candidate = BOARD_SEAT_CANDIDATES.find((c) => c.id === candidateId);
+  if (!candidate) return { ok: false, reason: 'Pick a director from the search list.' };
+  if (members.some((m) => m.id === candidate.id)) {
+    return { ok: false, reason: `${candidate.name} is already on the board.` };
+  }
+  const fee = boardSeatSearchFee(state, candidate);
+  if ((state.finance?.cash ?? 0) < fee) {
+    return { ok: false, reason: `Need ${formatMoney(fee)} company cash for search & onboarding.` };
+  }
+
+  state.finance.cash -= fee;
+  recordCashOutflow(state, fee, 'board');
+  state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + fee;
+
+  const boost = candidate.approvalBoost ?? 1;
+  if (boost) onBoardSentiment(state, boost);
+
+  const entry = {
+    id: candidate.id,
+    name: candidate.name,
+    role: 'Independent',
+    seat: candidate.seat,
+    since: `Added ${state.calendar?.monthIndex ?? 1}/${state.calendar?.year ?? 2026}`,
+    votes: 'Independent',
+    committee: candidate.committee ?? 'governance',
+    playerAdded: true
+  };
+  members.push(entry);
+  state.board.seatsAddedByPlayer = (state.board.seatsAddedByPlayer ?? 0) + 1;
+  state.board.seatSearchSpendLifetime = (state.board.seatSearchSpendLifetime ?? 0) + fee;
+
+  return {
+    ok: true,
+    member: entry,
+    fee,
+    approvalBoost: boost,
+    summary: `Seated ${candidate.name} (${formatMoney(fee)} search fee, approval +${boost}).`
   };
 }
 
@@ -388,10 +474,38 @@ export function renderBoardPanel(container, state) {
     })
   );
 
+  const seatCap = boardSeatCapacity(state);
+  const seatCandidates = availableBoardSeatCandidates(state);
+  const defaultCandidate = seatCandidates[0];
+  const candidateOptions = seatCandidates
+    .map((c) => {
+      const fee = boardSeatSearchFee(state, c);
+      return `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)} — ${escapeHtml(c.seat)} (${formatMoney(fee)}, +${c.approvalBoost ?? 1} approval)</option>`;
+    })
+    .join('');
+  const expandBlock =
+    seatCandidates.length && members.length < seatCap
+      ? `<section class="finance-section finance-card board-expand-section">
+      <h3 class="finance-section-title">Add a board seat</h3>
+      <p class="fine-print">${members.length}/${seatCap} seats filled. Run a director search (company cash) to add an independent — investors like a real committee bench.</p>
+      <div class="board-seat-add satellite-add">
+        <select id="board-seat-candidate" aria-label="Director candidate">${candidateOptions}</select>
+        <button type="button" class="btn btn-primary btn-small" id="btn-add-board-seat">Add director</button>
+      </div>
+      ${
+        defaultCandidate
+          ? `<p class="fine-print" id="board-seat-candidate-blurb">${escapeHtml(defaultCandidate.blurb)}</p>`
+          : ''
+      }
+    </section>`
+      : members.length >= seatCap
+        ? `<p class="fine-print">Board at ${seatCap}-seat cap for this stage. More seats unlock with hub HQ / public scale.</p>`
+        : '';
+
   const rosterRows = members
     .map(
       (m) =>
-        `<tr><td>${escapeHtml(m.name)}</td><td>${escapeHtml(m.seat)}</td><td class="fine-print">${escapeHtml(m.since ?? '—')}</td></tr>`
+        `<tr><td>${escapeHtml(m.name)}${m.playerAdded ? ' <span class="board-committee-tag">Added</span>' : ''}</td><td>${escapeHtml(m.seat)}</td><td class="fine-print">${escapeHtml(m.since ?? '—')}</td></tr>`
     )
     .join('');
 
@@ -491,6 +605,7 @@ export function renderBoardPanel(container, state) {
         </div>
         <p class="fine-print">Committees: Audit, Comp, Governance — tags on tasks show who cares.</p>
       </section>
+      ${expandBlock}
       <section class="finance-section">
         <h3 class="finance-section-title">This month’s board prep</h3>
         <div class="task-list">${cards || '<div class="tab-placeholder">New board tasks appear each month.</div>'}</div>
