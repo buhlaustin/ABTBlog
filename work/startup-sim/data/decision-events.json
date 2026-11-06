@@ -418,6 +418,209 @@
           }
         }
       ]
+    },
+    {
+      "id": "office-site-shutdown",
+      "title": "Regional office site shutdown",
+      "description": "The landlord pulled forward exit — the doors lock Friday. People ops needs a staffing call: who works where while you find space?",
+      "weight": 2,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Close site — furlough affected roles",
+          "effects": {
+            "headcountDelta": -5,
+            "cash": 85000,
+            "sentiment": -8,
+            "buzz": -2,
+            "modifier": {
+              "id": "furlough-fallout",
+              "label": "Site closure & furlough",
+              "revenueMult": 0.94,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Keep everyone remote through the gap",
+          "effects": {
+            "cash": -42000,
+            "sentiment": 4,
+            "buzz": 1,
+            "modifier": {
+              "id": "remote-bridge",
+              "label": "Remote bridge stipends",
+              "costMult": 1.05,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Offer relocation to HQ + retention bonus",
+          "effects": {
+            "cash": -95000,
+            "headcountDelta": -2,
+            "sentiment": 2,
+            "modifier": {
+              "id": "relo-package",
+              "label": "Relocation spend & retention",
+              "costMult": 1.06,
+              "months": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "office-reno-displacement",
+      "title": "HQ renovation displacement",
+      "description": "Facilities says four months of asbestos abatement — no badge access. Staff wants clarity on where they sit.",
+      "weight": 2,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Company-wide remote until ribbon-cutting",
+          "effects": {
+            "cash": -28000,
+            "sentiment": 3,
+            "modifier": {
+              "id": "reno-remote",
+              "label": "HQ out of service",
+              "costMult": 1.04,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Sublease swing space + daily lunch stipend",
+          "effects": {
+            "cash": -88000,
+            "sentiment": 5,
+            "modifier": {
+              "id": "swing-lease",
+              "label": "Swing office burn",
+              "costMult": 1.12,
+              "months": 3
+            }
+          }
+        },
+        {
+          "label": "Thin the bench — voluntary separation then remote",
+          "effects": {
+            "headcountDelta": -4,
+            "cash": -120000,
+            "sentiment": -4,
+            "modifier": {
+              "id": "reno-rif",
+              "label": "Restructuring optics",
+              "revenueMult": 0.96,
+              "months": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "satellite-hub-sunset",
+      "title": "Satellite hub sunset",
+      "description": "Finance wants the secondary hub off the books by quarter-end. Managers are split on freezing hiring vs. hard cuts.",
+      "weight": 2,
+      "minTier": 3,
+      "choices": [
+        {
+          "label": "Wind down — last-in-first-out",
+          "effects": {
+            "headcountDelta": -7,
+            "cash": 140000,
+            "sentiment": -7,
+            "modifier": {
+              "id": "hub-rif",
+              "label": "Hub closure turbulence",
+              "revenueMult": 0.93,
+              "months": 3
+            }
+          }
+        },
+        {
+          "label": "Remote-only pod — no new local hires",
+          "effects": {
+            "cash": -22000,
+            "sentiment": 2,
+            "modifier": {
+              "id": "hub-remote-pod",
+              "label": "Distributed hub runway",
+              "costMult": 1.03,
+              "months": 4
+            }
+          }
+        },
+        {
+          "label": "Merge teams into HQ with relocation offers",
+          "effects": {
+            "cash": -155000,
+            "headcountDelta": -3,
+            "sentiment": 3,
+            "product": 1,
+            "modifier": {
+              "id": "hub-consolidation",
+              "label": "One-roof integration drag",
+              "costMult": 1.08,
+              "months": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "lease-dispute-work-stoppage",
+      "title": "Lease dispute work stoppage",
+      "description": "The subletter changed the locks citing unpaid CAM. Legal says it could be weeks. Workers cannot enter.",
+      "weight": 1,
+      "minTier": 2,
+      "choices": [
+        {
+          "label": "Paid furlough — pause payroll at site",
+          "effects": {
+            "headcountDelta": -6,
+            "cash": 110000,
+            "sentiment": -10,
+            "modifier": {
+              "id": "paid-furlough-fallout",
+              "label": "Work stoppage headlines",
+              "revenueMult": 0.9,
+              "months": 2,
+              "fundraisingBlocked": true
+            }
+          }
+        },
+        {
+          "label": "Emergency WFH — hourly standups, IT stipend",
+          "effects": {
+            "cash": -52000,
+            "sentiment": 3,
+            "buzz": 1,
+            "modifier": {
+              "id": "ewfh-bridge",
+              "label": "Emergency remote ops",
+              "costMult": 1.07,
+              "months": 2
+            }
+          }
+        },
+        {
+          "label": "Pay legal retainer + temporary suites",
+          "effects": {
+            "cash": -78000,
+            "sentiment": 4,
+            "modifier": {
+              "id": "legal-interim-space",
+              "label": "Interim space & counsel",
+              "costMult": 1.1,
+              "months": 2
+            }
+          }
+        }
+      ]
     }
   ]
 }
