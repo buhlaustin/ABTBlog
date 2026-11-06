@@ -98,7 +98,7 @@ import {
   showFinanceFeedback,
   setFinanceSection
 } from './modules/Fundraising.js';
-import { runPublicMarketEvent } from './modules/PublicMarkets.js';
+import { runPublicMarketEvent, runPreIpoIrPrep, setPublicSection } from './modules/PublicMarkets.js';
 import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback, setCeoSection } from './modules/Ceo.js';
 import {
   purchaseCeoHomeCash,
@@ -1188,6 +1188,23 @@ function bindGameInteractions() {
     if (publicEventBtn && sessionState) {
       const result = runPublicMarketEvent(sessionState, publicEventBtn.getAttribute('data-public-event'));
       if (!result.ok) showFinanceFeedback(result.reason || 'Event blocked.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const publicSubtab = e.target.closest('[data-public-subtab]');
+    if (publicSubtab && sessionState) {
+      setPublicSection(sessionState, publicSubtab.getAttribute('data-public-subtab'));
+      refresh();
+      return;
+    }
+    const preIpoIrBtn = e.target.closest('[data-pre-ipo-ir]');
+    if (preIpoIrBtn && sessionState) {
+      const result = runPreIpoIrPrep(sessionState, preIpoIrBtn.getAttribute('data-pre-ipo-ir'));
+      if (!result.ok) showFinanceFeedback(result.reason || 'Prep blocked.', true);
       else {
         appendLog(sessionState, result.summary);
         showFinanceFeedback(result.summary);

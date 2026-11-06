@@ -322,6 +322,18 @@ export function normalizeSave(raw) {
       if (pm.earningsPrepLevel === undefined) pm.earningsPrepLevel = 0;
       if (!pm.eventsUsedThisMonth) pm.eventsUsedThisMonth = [];
       if (pm.lastIndexOutreachTurn === undefined) pm.lastIndexOutreachTurn = null;
+      if (pm.lastCrisisPressTurn === undefined) pm.lastCrisisPressTurn = null;
+      if (pm.lastInvestorDayTurn === undefined) pm.lastInvestorDayTurn = null;
+      if (pm.lastConferenceTurn === undefined) pm.lastConferenceTurn = null;
+      if (pm.streetCredibility === undefined) pm.streetCredibility = 52;
+      if (!pm.irEventLog) pm.irEventLog = [];
+      if (!pm.publicSection) pm.publicSection = 'market';
+      if (!pm.irReadiness) pm.irReadiness = { counsel: false, audit: false, roadshowDeck: false };
+      else {
+        if (pm.irReadiness.counsel === undefined) pm.irReadiness.counsel = false;
+        if (pm.irReadiness.audit === undefined) pm.irReadiness.audit = false;
+        if (pm.irReadiness.roadshowDeck === undefined) pm.irReadiness.roadshowDeck = false;
+      }
     }
     if (state.finance.section === undefined) state.finance.section = 'overview';
     if (state.finance.arr === undefined) {

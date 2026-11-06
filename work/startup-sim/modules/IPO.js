@@ -77,7 +77,9 @@ export function fileIpo(state) {
 
   const valuation = computeIpoValuation(state);
   const ipoPrice = targetIpoSharePrice(state, valuation);
-  const pop = 1.08 + Math.random() * 0.12;
+  const ir = state.publicMarket?.irReadiness ?? {};
+  const irReady = [ir.counsel, ir.audit, ir.roadshowDeck].filter(Boolean).length;
+  const pop = 1.08 + Math.random() * 0.12 + irReady * 0.012;
   const openPrice = Math.round(ipoPrice * pop * 100) / 100;
   const openValuation = Math.round(valuation * pop);
   const listing = applyPublicListingCapTable(state, openValuation, openPrice, {
@@ -239,7 +241,7 @@ function hashPublic(state, salt) {
   return (h >>> 0) / 0xffffffff;
 }
 
-function pushMarketTape(state, text) {
+export function pushMarketTape(state, text) {
   if (!state.publicMarket) return;
   const pm = state.publicMarket;
   if (!pm.marketTape) pm.marketTape = [];
@@ -536,6 +538,8 @@ export function tickPublicMarket(state) {
   const rivalHeat = Math.min(0.035, (state.world?.competitor?.pressure ?? 0) * 0.0045);
   const conglomerate = portfolioConglomerateBonus(state);
   const shortDrag = ((pm.shortInterestPct ?? 0) / 100) * 0.018;
+  const cred = pm.streetCredibility ?? 50;
+  const credNudge = Math.max(-0.012, Math.min(0.022, (cred - 50) * 0.00045));
   const growthTerm = growth * 0.42;
 
   let deltaPct =
@@ -546,7 +550,8 @@ export function tickPublicMarket(state) {
     noise +
     sentiment +
     guidanceBeat +
-    conglomerate -
+    conglomerate +
+    credNudge -
     rivalHeat -
     shortDrag;
 
@@ -556,7 +561,8 @@ export function tickPublicMarket(state) {
     { label: 'Guidance streak', pct: guidanceBeat },
     { label: 'Runway / cash', pct: runwayStress },
     { label: 'Buzz & news', pct: buzz + sentiment },
-    { label: 'Rival & shorts', pct: -(rivalHeat + shortDrag) }
+    { label: 'Rival & shorts', pct: -(rivalHeat + shortDrag) },
+    { label: 'Street credibility', pct: credNudge }
   ];
 
   const lines = [];
