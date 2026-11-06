@@ -119,7 +119,6 @@ export function satelliteRent(state) {
 /** Effective hiring cap — hub HQ base plus satellite seat bonuses (career). */
 export function totalHeadcountCap(state) {
   const base = headcountCap(state);
-  if (state?.mode === 'sandbox') return base;
   if (state.offices?.hubId) return base + satelliteSeats(state);
   return base;
 }

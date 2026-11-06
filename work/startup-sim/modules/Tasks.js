@@ -6,6 +6,7 @@ import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
 import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
 import bundledLaunchCrowd from '../data/launch-crowdfunding-tasks.json' with { type: 'json' };
+import bundledLaunchPostHandcrafted from '../data/launch-post-handcrafted-pack.json' with { type: 'json' };
 import bundledSpaceExploration from '../data/space-exploration-tasks.json' with { type: 'json' };
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
 import bundledAiToolsDeskExtra from '../data/ai-tools-desk-tasks-extra.json' with { type: 'json' };
@@ -13,6 +14,9 @@ import bundledAiToolsModelLab from '../data/ai-tools-model-lab-desk-tasks.json' 
 import bundledCatalogExpansion from '../data/tasks-catalog-expansion.json' with { type: 'json' };
 import bundledPublicLate from '../data/tasks-public-late-game.json' with { type: 'json' };
 import bundledPublicLateExtra from '../data/tasks-public-late-game-extra.json' with { type: 'json' };
+import bundledPublicWhaleHandcrafted from '../data/tasks-public-whale-handcrafted.json' with { type: 'json' };
+import bundledPublicLateHandcrafted from '../data/tasks-public-late-handcrafted-pack.json' with { type: 'json' };
+import bundledMidGameHandcrafted from '../data/tasks-mid-game-handcrafted-pack.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import bundledTaxFiling from '../data/tax-filing-task.json' with { type: 'json' };
@@ -45,7 +49,8 @@ function mergeSignatureTasks(base) {
 function mergeLaunchTasks(base) {
   const launch = [
     ...(bundledLaunch?.tasks ?? []),
-    ...(bundledLaunchCrowd?.tasks ?? [])
+    ...(bundledLaunchCrowd?.tasks ?? []),
+    ...(bundledLaunchPostHandcrafted?.tasks ?? [])
   ];
   if (!launch.length) return base;
   const ids = new Set((base.tasks ?? []).map((t) => t.id));
@@ -111,10 +116,20 @@ function mergeCatalogExpansion(base) {
   return mergeTaskPack(base, bundledCatalogExpansion?.tasks ?? []);
 }
 
+function mergeMidGameHandcrafted(base) {
+  return mergeTaskPack(base, bundledMidGameHandcrafted?.tasks ?? []);
+}
+
 function mergePublicLateGameTasks(base) {
   return mergeTaskPack(
-    mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
-    bundledPublicLateExtra?.tasks ?? []
+    mergeTaskPack(
+      mergeTaskPack(
+        mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
+        bundledPublicLateExtra?.tasks ?? []
+      ),
+      bundledPublicWhaleHandcrafted?.tasks ?? []
+    ),
+    bundledPublicLateHandcrafted?.tasks ?? []
   );
 }
 
@@ -125,7 +140,9 @@ function mergeCatalog(base) {
         mergeLaunchTasks(
           mergeAiToolsDeskTasks(
             mergeSpaceExplorationTasks(
-              mergePublicLateGameTasks(mergeCatalogExpansion(mergeSignatureTasks(base)))
+              mergePublicLateGameTasks(
+                mergeMidGameHandcrafted(mergeCatalogExpansion(mergeSignatureTasks(base)))
+              )
             )
           )
         )

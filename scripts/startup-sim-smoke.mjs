@@ -55,6 +55,25 @@ if (taskCatalogSize() < 1200) {
 } else {
   console.log(`OK: task catalog size ${taskCatalogSize()} (cooldown ${RECENT_TASK_COOLDOWN_MONTHS} months)`);
 }
+const publicWhales = getTaskDefinitions().filter((t) => t.whale === true && t.stages?.includes('public'));
+if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal')) {
+  console.error('FAIL: handcrafted public whale pack not merged into catalog');
+  failed = true;
+} else if (publicWhales.length < 23) {
+  console.error(`FAIL: expected 23+ public whale desk tasks, got ${publicWhales.length}`);
+  failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'public-esg-metrics-audit-defense')) {
+  console.error('FAIL: public late handcrafted pack not merged');
+  failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'mid-soc2-type2-evidence-sprint')) {
+  console.error('FAIL: mid-game handcrafted pack not merged');
+  failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'launch-post-handcrafted-churn-interviews')) {
+  console.error('FAIL: post-launch handcrafted pack not merged');
+  failed = true;
+} else if (!failed) {
+  console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
+}
 
 const genericPool = getTaskDefinitions().filter((t) => !t.categories?.length && !t.launchPhase);
 for (let i = 0; i < 80; i += 1) {
@@ -277,11 +296,48 @@ if (crowdDef) {
 }
 
 const { totalHeadcountCap } = await import(`file://${join(sim, 'modules/Offices.js')}`);
+const { HEADCOUNT_CAP_BY_WORKSPACE_TIER, WORKSPACE_TIER: CAP_WS_TIER } = await import(
+  `file://${join(sim, 'modules/Workspace.js')}`
+);
 if (totalHeadcountCap(state) !== 0) {
   console.error('FAIL: garage headcount cap expected 0 got', totalHeadcountCap(state));
   failed = true;
 } else {
   console.log('OK: Offices STAGES import / headcount cap');
+}
+const sandGarageCap = createInitialState({
+  companyName: 'Sand Garage',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+if (totalHeadcountCap(sandGarageCap) === 10_000) {
+  console.error('FAIL: sandbox garage should not use flat 10k headcount cap');
+  failed = true;
+}
+const sandOfficeCap = createInitialState({
+  companyName: 'Sand Cap',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxTuning: { startingStage: 'garage', revenueMult: 1, ipoGateArr: 50_000_000 }
+});
+sandOfficeCap.workspace.tier = CAP_WS_TIER.SMALL;
+sandOfficeCap.workspace.smallOfficeOwned = true;
+if (totalHeadcountCap(sandOfficeCap) !== HEADCOUNT_CAP_BY_WORKSPACE_TIER[CAP_WS_TIER.SMALL]) {
+  console.error(
+    `FAIL: sandbox office start cap should match small office (${HEADCOUNT_CAP_BY_WORKSPACE_TIER[CAP_WS_TIER.SMALL]}), got ${totalHeadcountCap(sandOfficeCap)}`
+  );
+  failed = true;
+} else {
+  sandOfficeCap.workspace.tier = CAP_WS_TIER.CAMPUS;
+  sandOfficeCap.workspace.campusOwned = true;
+  if (totalHeadcountCap(sandOfficeCap) !== HEADCOUNT_CAP_BY_WORKSPACE_TIER[CAP_WS_TIER.CAMPUS]) {
+    console.error(
+      `FAIL: sandbox campus cap expected ${HEADCOUNT_CAP_BY_WORKSPACE_TIER[CAP_WS_TIER.CAMPUS]}, got ${totalHeadcountCap(sandOfficeCap)}`
+    );
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: sandbox headcount cap follows office tier (not flat 10k)');
+  }
 }
 
 if (normalizeSave(null) !== null) failed = true;
@@ -293,7 +349,9 @@ const {
   getRawTaskRevenueMultiplier,
   REV_MULT_CAP_CAREER,
   REV_MULT_CAP_SANDBOX,
-  getTaskRevenueCap
+  REV_MULT_CAP_SANDBOX_HUB,
+  getTaskRevenueCap,
+  sandboxRevMultTierBase
 } = await import(`file://${join(sim, 'modules/Finance.js')}`);
 const careerMult = getTaskRevenueMultiplierPreview(state);
 if (careerMult < 0.9 || careerMult > 2.5) {
@@ -382,7 +440,8 @@ const coreCareer = getCoreTaskRevenueMult({
 const coreSand = getCoreTaskRevenueMult(overlayState);
 const totalSand = getTaskRevenueMultiplierPreview(overlayState);
 const expectedUncapped = Math.round(coreSand * 2 * 100) / 100;
-const expected = Math.min(expectedUncapped, REV_MULT_CAP_SANDBOX);
+const overlayCapBase = sandboxRevMultTierBase(overlayState);
+const expected = Math.min(expectedUncapped, Math.round(overlayCapBase * 0.3 * 100) / 100);
 if (Math.abs(totalSand - expected) > 0.05) {
   console.error(
     `FAIL: sandbox overlay expected ~${expected} (core ${coreSand} × 2 capped), got ${totalSand}`
@@ -596,11 +655,24 @@ const cappedSand = getTaskRevenueMultiplierPreview(maxedSand);
 if (cappedSand > sandCap + 0.01) {
   console.error(`FAIL: sandbox cap exceeded: ${cappedSand} > ${sandCap}`);
   failed = true;
-} else if (sandCap < REV_MULT_CAP_SANDBOX - 1) {
-  console.error(`FAIL: expected full sandbox workforce cap ${REV_MULT_CAP_SANDBOX}× got ${sandCap}×`);
+} else if (sandCap < REV_MULT_CAP_SANDBOX_HUB - 1) {
+  console.error(`FAIL: expected hub sandbox workforce cap ~${REV_MULT_CAP_SANDBOX_HUB}× got ${sandCap}×`);
   failed = true;
 } else {
-  console.log(`OK: sandbox rev mult cap ${cappedSand}× (workforce ceiling ${sandCap}×)`);
+  console.log(`OK: sandbox rev mult cap ${cappedSand}× (hub workforce ceiling ${sandCap}×)`);
+}
+const garageCapState = createInitialState({
+  companyName: 'GarageCap',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+const garageCap = getTaskRevenueCap(garageCapState);
+const garageTierBase = sandboxRevMultTierBase(garageCapState);
+if (garageTierBase !== REV_MULT_CAP_SANDBOX || garageCap !== Math.round(REV_MULT_CAP_SANDBOX * 0.3 * 100) / 100) {
+  console.error(`FAIL: garage rev× cap expected tier ${REV_MULT_CAP_SANDBOX}× / effective ${REV_MULT_CAP_SANDBOX * 0.3}× got ${garageTierBase}× / ${garageCap}×`);
+  failed = true;
+} else if (!failed) {
+  console.log(`OK: garage rev× cap unchanged (${garageCap}× at empty HC, tier base ${garageTierBase}×)`);
 }
 
 const { completeBoardTask, dealBoardTasks, getBoardTaskDefs, ensureBoardRoster } = await import(
@@ -870,7 +942,8 @@ const {
   executeStockBuyback,
   executeStockSplit,
   whisperRevenueTarget,
-  sellFounderSharesPartial
+  sellFounderSharesPartial,
+  ytdSmoothedMonthlyRevenue
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
 const { calendarTurn } = await import(`file://${join(sim, 'modules/XC.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
@@ -972,6 +1045,35 @@ if (!ipo.ok) {
   if (!pub.publicMarket.sharePrice || tick.deltaPct == null) {
     console.error('FAIL: tickPublicMarket');
     failed = true;
+  }
+  pub.finance.fiscal = {
+    current: { year: pub.calendar.year, revenue: 9_500_000, expenses: 0 },
+    prior: { year: pub.calendar.year - 1, revenue: 0, expenses: 0, profit: 0 },
+    taxPaidYear: null,
+    charityDonatedLifetime: 0
+  };
+  pub.calendar.monthIndex = 10;
+  pub.calendar.monthRevenue = 500_000;
+  pub.finance.mrr = 500_000;
+  pub.finance.monthlyRevenue = 500_000;
+  pub.publicMarket.priorYtdRunRateMrr = 850_000;
+  const smoothMrr = ytdSmoothedMonthlyRevenue(pub);
+  const spotMrr = pub.finance.mrr;
+  const priorRun = pub.publicMarket.priorYtdRunRateMrr;
+  const blendMrr = spotMrr * 0.32 + smoothMrr * 0.68;
+  const clampGrowth = (g) => Math.max(-0.12, Math.min(0.22, g));
+  const spotGrowth = clampGrowth((spotMrr - priorRun) / priorRun);
+  const blendGrowth = clampGrowth((blendMrr - priorRun) / priorRun);
+  if (smoothMrr < 940_000 || smoothMrr > 960_000) {
+    console.error(`FAIL: YTD smoothed MRR expected ~950k, got ${smoothMrr}`);
+    failed = true;
+  } else if (blendGrowth <= spotGrowth) {
+    console.error(
+      `FAIL: blended YTD pace should beat spot-only growth (${blendGrowth} vs ${spotGrowth})`
+    );
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: stock model blends spot MRR with YTD revenue pace');
   }
   const bb = executeStockBuyback(pub, 250_000);
   if (!bb.ok) {
@@ -1195,6 +1297,11 @@ const { purchaseWorkspaceTier, WORKSPACE_TIER: PAY_WS_TIER } = await import(
 );
 const { projectMonthlyBurn, estimateEraRevenuePotential, allTierRevenuePotentialRows } =
   await import(`file://${join(sim, 'modules/Finance.js')}`);
+const {
+  computeCompanyOverheadBreakdown,
+  scheduledCompanyOverhead,
+  COMPANY_VARIABLE_OPEX_CATEGORIES
+} = await import(`file://${join(sim, 'modules/CompanyOverhead.js')}`);
 const { TIER_REVENUE_PROFILE, eraBaseRevenueScaleForTask } = await import(
   `file://${join(sim, 'modules/ProgressionEconomy.js')}`
 );
@@ -1209,6 +1316,30 @@ if (!sal.ok) {
 } else if (projectMonthlyBurn(ceoState) < 10_000) {
   console.error('FAIL: CEO salary in burn');
   failed = true;
+} else {
+  const { prepareCompanyOverheadForMonth } = await import(
+    `file://${join(sim, 'modules/CompanyOverhead.js')}`
+  );
+  prepareCompanyOverheadForMonth(ceoState);
+  const oh = computeCompanyOverheadBreakdown(ceoState);
+  const ohSum = oh.breakdown.reduce((s, l) => s + l.amount, 0);
+  if (ohSum !== oh.total || oh.total !== projectMonthlyBurn(ceoState)) {
+    console.error(`FAIL: company overhead breakdown mismatch (${ohSum} vs ${oh.total})`);
+    failed = true;
+  } else if (!oh.breakdown.some((l) => l.label === 'CEO compensation')) {
+    console.error('FAIL: company overhead missing CEO compensation line');
+    failed = true;
+  } else if (
+    !oh.breakdown.some((l) => COMPANY_VARIABLE_OPEX_CATEGORIES.includes(l.label) || l.label.includes('Cloud'))
+  ) {
+    console.error('FAIL: company overhead missing variable OPEX categories');
+    failed = true;
+  } else if (scheduledCompanyOverhead(ceoState).total !== oh.total) {
+    console.error('FAIL: scheduled company overhead out of sync');
+    failed = true;
+  } else if (!failed) {
+    console.log(`OK: company overhead breakdown (${oh.breakdown.length} lines, ${formatMoney(oh.total)}/mo)`);
+  }
 }
 if (!failed) {
   ceoState.finance.cash = 50_000;
@@ -1589,11 +1720,31 @@ if (!failed) {
   } else if (getWorkspaceTier(sandPostXc) !== WS_TIER.HUB) {
     console.error(`FAIL: sandbox post_xc start should set hub workspace tier (got ${getWorkspaceTier(sandPostXc)})`);
     failed = true;
-  } else if (!hiringAllowed(sandPostXc) || totalHeadcountCap(sandPostXc) !== 10_000) {
-    console.error('FAIL: sandbox post_xc start hiring cap / allow hire');
+  } else if (!hiringAllowed(sandPostXc) || totalHeadcountCap(sandPostXc) !== HUB_HEADCOUNT_CAP) {
+    console.error(
+      `FAIL: sandbox post_xc hub cap should be hub HQ (${HUB_HEADCOUNT_CAP}), got ${totalHeadcountCap(sandPostXc)}`
+    );
     failed = true;
-  } else if (!failed) {
-    console.log('OK: sandbox post_xc hub start (hire allowed, 10k cap, hub tier)');
+  } else {
+    sandPostXc.offices.satellites = [
+      {
+        id: 'sat-denver',
+        templateId: 'sat-denver',
+        label: 'Denver',
+        seats: denverMed.seats,
+        rentMonthly: denverMed.rentMonthly
+      }
+    ];
+    const sandHubTotal = totalHeadcountCap(sandPostXc);
+    const expectedSandHub = HUB_HEADCOUNT_CAP + denverMed.seats;
+    if (sandHubTotal !== expectedSandHub || sandHubTotal === 10_000) {
+      console.error(
+        `FAIL: sandbox hub cap should be HQ+seats (${expectedSandHub}), not flat 10k (got ${sandHubTotal})`
+      );
+      failed = true;
+    } else if (!failed) {
+      console.log(`OK: sandbox hub cap ${HUB_HEADCOUNT_CAP} + satellites (${sandHubTotal}, not flat 10k)`);
+    }
   }
 }
 if (!failed) {
@@ -1774,9 +1925,27 @@ if (!canBuyAllRemainingSideTasks(sideBulk, ['product', 'growth', 'brand', 'both'
 const {
   payCompanyWideBonus,
   totalEmployeeSalaryMassMonthly,
+  canPayAnnualCompanyBonus,
+  monthsUntilAnnualCompanyBonus,
   EXTRA_PERKS,
   runExtraEmployeePerk
 } = await import(`file://${join(sim, 'modules/EmployeeBenefits.js')}`);
+const { payCeoArrBonus, canPayCeoArrBonus, priorYearArrRevenue } = await import(
+  `file://${join(sim, 'modules/CeoEconomics.js')}`
+);
+
+function bumpCalendarMonths(state, delta) {
+  let y = state.calendar?.year ?? 2026;
+  let m = state.calendar?.monthIndex ?? 1;
+  for (let i = 0; i < delta; i += 1) {
+    m += 1;
+    if (m > 12) {
+      m = 1;
+      y += 1;
+    }
+  }
+  state.calendar = { ...state.calendar, year: y, monthIndex: m };
+}
 const { expandEmployeeOptionPool, applySeedCapTableSnapshot } = await import(
   `file://${join(sim, 'modules/CapTable.js')}`
 );
@@ -1822,6 +1991,27 @@ if (!bonusAnnual.ok || bonusAnnual.pool !== expectedAnnualPool || !bonusAnnual.a
   failed = true;
 } else {
   console.log(`OK: annual company bonus (${bonusAnnual.pct}%, pool ${formatMoney(bonusAnnual.pool)})`);
+}
+if (annualBonusState.staff.companyBonusAnnualMode) {
+  console.error('FAIL: annual bonus should clear annual mode after payout');
+  failed = true;
+} else if (canPayAnnualCompanyBonus(annualBonusState)) {
+  console.error('FAIL: annual bonus should start 12-month cooldown');
+  failed = true;
+} else if (monthsUntilAnnualCompanyBonus(annualBonusState) !== 12) {
+  console.error(
+    `FAIL: annual bonus cooldown expected 12 months, got ${monthsUntilAnnualCompanyBonus(annualBonusState)}`
+  );
+  failed = true;
+} else {
+  annualBonusState.staff.benefitsThisMonth.companyBonusPct = null;
+  const monthlyAfterAnnual = payCompanyWideBonus(annualBonusState, 2);
+  if (!monthlyAfterAnnual.ok || monthlyAfterAnnual.annualMode) {
+    console.error(`FAIL: monthly bonus after annual: ${monthlyAfterAnnual.reason ?? 'unexpected annual mode'}`);
+    failed = true;
+  } else {
+    console.log('OK: annual bonus 12-month cooldown + monthly bonus still available');
+  }
 }
 if (EXTRA_PERKS.length < 15) {
   console.error(`FAIL: expected 15+ employee perks, got ${EXTRA_PERKS.length}`);
@@ -1904,6 +2094,48 @@ const {
   ensureFiscal,
   taxBaseRevenue
 } = await import(`file://${join(sim, 'modules/CorporateTax.js')}`);
+
+const arrBonusState = createInitialState({
+  companyName: 'ArrBonusCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox',
+  sandboxCash: 5_000_000
+});
+arrBonusState.meta.calendarStartYear = 2024;
+arrBonusState.calendar = { year: 2026, monthIndex: 3, monthSpend: 0, monthTasks: [] };
+ensureFiscal(arrBonusState);
+arrBonusState.finance.fiscal.prior = { year: 2025, revenue: 2_000_000, expenses: 800_000, profit: 1_200_000 };
+if (priorYearArrRevenue(arrBonusState) !== 2_000_000) {
+  console.error('FAIL: prior year ARR base for CEO bonus');
+  failed = true;
+} else {
+  const arrPay = payCeoArrBonus(arrBonusState, 10);
+  if (!arrPay.ok || arrPay.amount !== 200_000 || (arrBonusState.ceo.careerCeoArrBonuses ?? 0) !== 200_000) {
+    console.error(`FAIL: CEO ARR bonus: ${arrPay.reason ?? arrPay.amount}`);
+    failed = true;
+  } else {
+    const repeat = payCeoArrBonus(arrBonusState, 10);
+    if (repeat.ok) {
+      console.error('FAIL: CEO ARR bonus should block repeat within 12 months');
+      failed = true;
+    } else {
+      bumpCalendarMonths(arrBonusState, 12);
+      if (!canPayCeoArrBonus(arrBonusState).ok) {
+        console.error('FAIL: CEO ARR bonus should unlock after 12 months');
+        failed = true;
+      } else {
+        arrBonusState.finance.cash = 5_000_000;
+        const arrPay2 = payCeoArrBonus(arrBonusState, 5);
+        if (!arrPay2.ok || arrPay2.amount !== 100_000) {
+          console.error(`FAIL: CEO ARR bonus second payout: ${arrPay2.reason ?? arrPay2.amount}`);
+          failed = true;
+        } else {
+          console.log('OK: CEO ARR bonus (prior-year revenue, 12-month cooldown)');
+        }
+      }
+    }
+  }
+}
 
 const fyRoll = createInitialState({ companyName: 'FY Co', categoryId: 'b2b-saas', mode: 'career' });
 ensureFiscal(fyRoll);
@@ -2080,8 +2312,15 @@ const {
   migrateStaffHeadcount,
   totalHeadcount
 } = await import(`file://${join(sim, 'modules/Staff.js')}`);
-const { sellCeoHome, purchaseCeoHomeCash, purchaseCeoHomeMortgage, prepayCeoMortgage } =
-  await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
+const {
+  sellCeoHome,
+  purchaseCeoHomeCash,
+  purchaseCeoHomeMortgage,
+  prepayCeoMortgage,
+  purchaseCeoLifestyle,
+  getCeoHomeTier,
+  ceoLifestyleMonthlyDebit
+} = await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
 const {
   donateFromPersonalBank,
   recordCeoNetWorthSnapshot,
@@ -2093,6 +2332,10 @@ const homeState = createInitialState({
   mode: 'sandbox',
   sandboxCash: 500_000
 });
+if (!getCeoHomeTier('tech-loft')?.cashPrice) {
+  console.error('FAIL: CEO tech-loft home tier missing');
+  failed = true;
+}
 homeState.ceo.bankBalance = 2_000_000;
 const bought = purchaseCeoHomeCash(homeState, 'starter-condo');
 if (!bought.ok) {
@@ -2139,9 +2382,21 @@ if (!bought.ok) {
           console.error('FAIL: CEO portfolio deposit or mortgage prepay');
           failed = true;
         } else {
-          console.log(
-            `OK: CEO tab (sell home ${formatMoney(sold.proceeds)}, portfolio ${formatMoney(investState.ceo.investmentBalance)}, mortgage prepay)`
-          );
+          const lifestyleState = createInitialState({
+            companyName: 'LifestyleCo',
+            categoryId: 'b2b-saas',
+            mode: 'sandbox'
+          });
+          lifestyleState.ceo.bankBalance = 50_000;
+          const gym = purchaseCeoLifestyle(lifestyleState, 'premium-gym');
+          if (!gym.ok || ceoLifestyleMonthlyDebit(lifestyleState) !== 380) {
+            console.error(`FAIL: CEO lifestyle purchase: ${gym.reason ?? 'debit bump'}`);
+            failed = true;
+          } else {
+            console.log(
+              `OK: CEO tab (sell home ${formatMoney(sold.proceeds)}, portfolio ${formatMoney(investState.ceo.investmentBalance)}, mortgage prepay, lifestyle debits ${formatMoney(ceoLifestyleMonthlyDebit(lifestyleState))}/mo)`
+            );
+          }
         }
       }
     }
@@ -2152,14 +2407,15 @@ const { heuristicStaffingPlan, applyStaffingDraftPlan } = await import(
   `file://${join(sim, 'modules/StaffingPlanner.js')}`
 );
 const staffPlanState = createInitialState({ companyName: 'StaffPlan Co', categoryId: 'b2b-saas', mode: 'sandbox' });
-staffPlanState.workspace.tier = WORKSPACE_TIER.SMALL;
+staffPlanState.workspace.tier = WORKSPACE_TIER.MEDIUM;
+staffPlanState.workspace.mediumOfficeOwned = true;
 staffPlanState.stage = STAGES.OFFICE;
 staffPlanState.finance.cash = 500_000;
 staffPlanState.calendar.monthRevenue = 80_000;
 staffPlanState.staff.draftHeadcountByDept = { ...emptyHeadcount(), engineering: 2, sales: 1, product: 1 };
 staffPlanState.staff.headcountByDept = { ...staffPlanState.staff.draftHeadcountByDept };
 const growPlan = heuristicStaffingPlan(staffPlanState, 'increase');
-if (!growPlan.ok || totalHeadcount(growPlan.headcountByDept) <= 4) {
+if (!growPlan.ok || totalHeadcount(growPlan.headcountByDept) <= totalHeadcount(staffPlanState.staff.draftHeadcountByDept)) {
   console.error(`FAIL: staffing increase heuristic: ${growPlan.reason ?? 'no growth'}`);
   failed = true;
 } else {

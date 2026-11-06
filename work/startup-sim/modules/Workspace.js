@@ -103,20 +103,24 @@ export function salaryTierMult(state) {
 /** Max employees at the worldwide hub HQ before satellite seat bonuses (career). */
 export const HUB_HEADCOUNT_CAP = 5000;
 
+/** Hiring cap by purchased workspace tier (sandbox and career). */
+export const HEADCOUNT_CAP_BY_WORKSPACE_TIER = {
+  [WORKSPACE_TIER.GARAGE]: 0,
+  [WORKSPACE_TIER.SMALL]: 4,
+  [WORKSPACE_TIER.MEDIUM]: 12,
+  [WORKSPACE_TIER.LARGE]: 24,
+  [WORKSPACE_TIER.CAMPUS]: 100,
+  [WORKSPACE_TIER.HUB]: HUB_HEADCOUNT_CAP
+};
+
 function atActiveHubCity(state) {
   return Boolean(state.offices?.hubId) || getWorkspaceTier(state) === WORKSPACE_TIER.HUB;
 }
 
 export function headcountCap(state) {
-  if (state?.mode === 'sandbox') return 10_000;
   if (atActiveHubCity(state)) return HUB_HEADCOUNT_CAP;
   const tier = getWorkspaceTier(state);
-  if (tier === WORKSPACE_TIER.GARAGE) return 0;
-  if (tier === WORKSPACE_TIER.SMALL) return 4;
-  if (tier === WORKSPACE_TIER.MEDIUM) return 12;
-  if (tier === WORKSPACE_TIER.LARGE) return 24;
-  if (tier === WORKSPACE_TIER.CAMPUS) return 100;
-  return 0;
+  return HEADCOUNT_CAP_BY_WORKSPACE_TIER[tier] ?? 0;
 }
 
 export function canPurchaseTier(state, tier) {

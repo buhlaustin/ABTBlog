@@ -1,16 +1,15 @@
 import { formatMoney, MODE_CONFIG } from './constants.js';
 import {
-  computePayroll,
   staffRevenueMultiplier,
   headcountExecutionScale,
   departmentTaskMultiplier,
   staffCostMultiplier,
   staffRetentionBonus
 } from './Staff.js';
-import { satelliteRent } from './Offices.js';
-import { workspaceRentMonthly, getArr } from './Workspace.js';
+import { getArr, getWorkspaceTier, WORKSPACE_TIER } from './Workspace.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
+import { calendarTurn } from './XC.js';
 import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
 import {
@@ -22,17 +21,47 @@ import {
 } from './ProgressionEconomy.js';
 import { applyTaskRivalEffects } from './WorldDynamics.js';
 import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
-import { loanOverheadMonthly } from './BankLoan.js';
 import { accrueFiscalExpense, accrueFiscalRevenue, fiscalYearDisplay } from './CorporateTax.js';
 import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
-import { ceoSalaryMonthly } from './CeoEconomics.js';
-import { cooSalaryMonthly } from './Coo.js';
 import { totalHeadcount } from './Staff.js';
+import { totalHeadcountCap } from './Offices.js';
+import {
+  computeCompanyOverheadBreakdown,
+  scheduledCompanyOverhead
+} from './CompanyOverhead.js';
 
 /** Hard caps on desk + growth payout multiplier (after sandbox tuning overlay). */
 export const REV_MULT_CAP_CAREER = 60;
+/** Sandbox rev× ceiling at garage tier (full workforce) — unchanged from legacy flat cap. */
 export const REV_MULT_CAP_SANDBOX = 800;
+/** Sandbox rev× ceiling at hub tier (full workforce). */
+export const REV_MULT_CAP_SANDBOX_HUB = 871;
+/** @deprecated Sandbox workforce scaling uses office headcount cap, not a flat 10k. */
 export const SANDBOX_WORKFORCE_HEADCOUNT_FULL = 10_000;
+
+const WORKSPACE_TIER_RANK = {
+  [WORKSPACE_TIER.GARAGE]: 0,
+  [WORKSPACE_TIER.SMALL]: 1,
+  [WORKSPACE_TIER.MEDIUM]: 2,
+  [WORKSPACE_TIER.LARGE]: 3,
+  [WORKSPACE_TIER.CAMPUS]: 4,
+  [WORKSPACE_TIER.HUB]: 5
+};
+
+function isAtHubWorkspace(state) {
+  return Boolean(state.offices?.hubId) || getWorkspaceTier(state) === WORKSPACE_TIER.HUB;
+}
+
+/** Max rev× before workforce headcount scaling — ramps garage → hub with office tier. */
+export function sandboxRevMultTierBase(state) {
+  const garageBase = REV_MULT_CAP_SANDBOX;
+  const hubBase = REV_MULT_CAP_SANDBOX_HUB;
+  let rank = WORKSPACE_TIER_RANK[getWorkspaceTier(state)] ?? 0;
+  if (isAtHubWorkspace(state)) rank = 5;
+  if (rank <= 0) return garageBase;
+  if (rank >= 5) return hubBase;
+  return Math.round((garageBase + ((hubBase - garageBase) * rank) / 5) * 100) / 100;
+}
 
 /** Legacy alias — progression stack replaces seed-only scaling. */
 export function scalingRevenueMult(state) {
@@ -91,13 +120,19 @@ export function getSandboxTuningMult(state) {
   return state.mode === 'sandbox' ? getSandboxExtraRevenueMult(state) : 1;
 }
 
+function sandboxWorkforceHeadcountFull(state) {
+  return Math.max(1, totalHeadcountCap(state));
+}
+
 export function getTaskRevenueCap(state) {
   if (state.mode !== 'sandbox') return REV_MULT_CAP_CAREER;
+  const tierBase = sandboxRevMultTierBase(state);
   const hc = totalHeadcount(state.staff?.headcountByDept);
-  const scale = Math.min(1, hc / SANDBOX_WORKFORCE_HEADCOUNT_FULL);
-  /** 30% of cap at zero headcount → 100% at 10k employees (sandbox only). */
+  const workforceFull = sandboxWorkforceHeadcountFull(state);
+  const scale = Math.min(1, hc / workforceFull);
+  /** 30% of cap at zero headcount → 100% at office hiring cap (sandbox only). */
   const workforceScale = 0.3 + scale * 0.7;
-  return Math.round(REV_MULT_CAP_SANDBOX * workforceScale * 100) / 100;
+  return Math.round(tierBase * workforceScale * 100) / 100;
 }
 
 /** Core × sandbox tuning, before global cap. */
@@ -126,7 +161,7 @@ export function taskRevenueMultHud(state) {
   const cap = getTaskRevenueCap(state);
   const workforceNote =
     state.mode === 'sandbox'
-      ? ` Sandbox workforce cap ${cap}× (scales to ${REV_MULT_CAP_SANDBOX}× at ${SANDBOX_WORKFORCE_HEADCOUNT_FULL.toLocaleString()} staff).`
+      ? ` Sandbox cap ${cap}× (office tier → ${sandboxRevMultTierBase(state)}× max at ${sandboxWorkforceHeadcountFull(state).toLocaleString()} staff; hub ${REV_MULT_CAP_SANDBOX_HUB}×).`
       : '';
   if (isTaskRevenueMultCapped(state)) {
     return {
@@ -170,18 +205,7 @@ export function estimateTaskMrrBand(taskDef) {
 }
 
 export function projectMonthlyBurn(state) {
-  const headcount = state.staff?.headcountByDept ?? {};
-  const payroll = computePayroll(headcount, state.stage, state);
-  let fixed = workspaceRentMonthly(state);
-  fixed = Math.round(fixed * hubCostMult(state));
-  return (
-    payroll +
-    fixed +
-    satelliteRent(state) +
-    loanOverheadMonthly(state) +
-    ceoSalaryMonthly(state) +
-    cooSalaryMonthly(state)
-  );
+  return computeCompanyOverheadBreakdown(state).total;
 }
 
 function sandboxMult(state) {
@@ -343,10 +367,15 @@ export function initialInvestmentCash(state) {
 
 /** Month-end: payroll + fixed burn, update MRR snapshot. */
 export function resolveMonthEndBurn(state) {
-  const burn = projectMonthlyBurn(state);
+  const scheduled = scheduledCompanyOverhead(state);
+  const burn = scheduled.total;
   state.finance.cash -= burn;
   recordCashOutflow(state, burn, 'overhead');
   state.finance.monthlyBurn = burn;
+  state.finance.lastCompanyOverhead = {
+    ...scheduled,
+    closedTurn: calendarTurn(state)
+  };
   state.finance.monthlyRevenue = state.calendar.monthRevenue ?? 0;
   state.finance.mrr = Math.round(state.finance.monthlyRevenue);
   state.finance.arr = Math.round(state.finance.mrr * 12);

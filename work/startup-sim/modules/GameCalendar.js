@@ -91,6 +91,25 @@ export function calendarTurn(state) {
   return (y - startY) * 12 + (m - startM) + 1;
 }
 
+/** Whole months from stamp (inclusive start) to the in-game calendar month. */
+export function calendarMonthsSinceStamp(stamp, state) {
+  if (!stamp || stamp.year == null || stamp.monthIndex == null) return Infinity;
+  const cal = state.calendar ?? {};
+  const y = cal.year ?? stamp.year;
+  const m = cal.monthIndex ?? 1;
+  return (y - stamp.year) * 12 + (m - stamp.monthIndex);
+}
+
+/** Once every 12 calendar months — eligible when ≥12 months have passed since last use. */
+export function twelveMonthCooldownStatus(lastAt, state) {
+  if (!lastAt || lastAt.year == null || lastAt.monthIndex == null) {
+    return { eligible: true, monthsUntil: 0, monthsElapsed: Infinity };
+  }
+  const elapsed = calendarMonthsSinceStamp(lastAt, state);
+  if (elapsed >= 12) return { eligible: true, monthsUntil: 0, monthsElapsed: elapsed };
+  return { eligible: false, monthsUntil: 12 - elapsed, monthsElapsed: elapsed };
+}
+
 /** Turn index when the in-game calendar shows the given month. */
 export function calendarTurnAt(state, year, monthIndex) {
   const { year: startY, monthIndex: startM } = calendarAnchor(state);

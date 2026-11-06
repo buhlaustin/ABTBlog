@@ -1,5 +1,14 @@
 import { formatMoney } from './constants.js';
 import { calendarTurn } from './XC.js';
+import { isPublicCompany } from './IPO.js';
+
+export const CEO_LIFESTYLE_CATEGORIES = [
+  { id: 'mobility', label: 'Wheels & toys' },
+  { id: 'wellness', label: 'Wellness & clubs' },
+  { id: 'travel', label: 'Travel & experiences' },
+  { id: 'collectibles', label: 'Collectibles & taste' },
+  { id: 'staff', label: 'Personal staff & security' }
+];
 
 export const HOUSING_MODE = {
   RENT: 'rent',
@@ -9,6 +18,15 @@ export const HOUSING_MODE = {
 
 /** Purchasable homes — cashPrice is list; mortgage uses downPct of price. */
 export const CEO_HOME_TIERS = [
+  {
+    id: 'tech-loft',
+    label: 'Tech loft',
+    cashPrice: 335_000,
+    downPct: 0.15,
+    mortgageApr: 0.069,
+    maintenanceMo: 580,
+    blurb: 'Open plan, one parking spot, building gym you never use.'
+  },
   {
     id: 'starter-condo',
     label: 'Starter condo',
@@ -60,26 +78,102 @@ export const CEO_HOME_TIERS = [
 
 export const CEO_LIFESTYLE_PURCHASES = [
   {
+    id: 'ebike-pack',
+    category: 'mobility',
+    label: 'E-bike & gear pack',
+    cost: 12_500,
+    blurb: 'Commute without parking — still expense it as “wellness”.'
+  },
+  {
     id: 'sports-car',
+    category: 'mobility',
     label: 'Sports car',
     cost: 185_000,
     blurb: 'Garage trophy — depreciation is a lifestyle choice.'
   },
   {
+    id: 'supercar',
+    category: 'mobility',
+    label: 'Supercar allocation',
+    cost: 325_000,
+    monthlyDebitBump: 1_850,
+    blurb: 'Track days, storage, and insurance that dwarfs the car note.',
+    minNetWorth: 2_000_000
+  },
+  {
     id: 'classic-car',
+    category: 'collectibles',
     label: 'Classic collector car',
     cost: 420_000,
     blurb: 'Auction win — insured like a small company.'
   },
   {
+    id: 'premium-gym',
+    category: 'wellness',
+    label: 'Premium gym membership',
+    cost: 4_200,
+    monthlyDebitBump: 380,
+    blurb: 'Annual prepay — smoothies and recovery room access included.'
+  },
+  {
     id: 'country-club',
+    category: 'wellness',
     label: 'Country club initiation',
     cost: 75_000,
     monthlyDebitBump: 2_200,
     blurb: 'Initiation fee — monthly dues stack on discretionary debits.'
   },
   {
+    id: 'ski-club',
+    category: 'wellness',
+    label: 'Ski club deposit',
+    cost: 65_000,
+    monthlyDebitBump: 1_100,
+    blurb: 'Season locker, guest passes, and après you cannot expense.',
+    minNetWorth: 500_000
+  },
+  {
+    id: 'designer-watch',
+    category: 'collectibles',
+    label: 'Designer watch',
+    cost: 38_000,
+    blurb: 'Handshake accessory — resell value is someone else’s problem.'
+  },
+  {
+    id: 'wine-cellar',
+    category: 'collectibles',
+    label: 'Wine cellar build-out',
+    cost: 220_000,
+    monthlyDebitBump: 900,
+    blurb: 'Climate-controlled — entertainment budget finds a home.'
+  },
+  {
+    id: 'art-collection',
+    category: 'collectibles',
+    label: 'Contemporary art fund',
+    cost: 650_000,
+    blurb: 'Blue-chip pieces — appraisal fictionally tracks your net worth.'
+  },
+  {
+    id: 'jet-card',
+    category: 'travel',
+    label: 'Private jet card (25 hr)',
+    cost: 385_000,
+    monthlyDebitBump: 4_800,
+    blurb: 'Charter hours — every board meeting is “client visit”.'
+  },
+  {
+    id: 'fractional-vacation',
+    category: 'travel',
+    label: 'Fractional vacation home',
+    cost: 890_000,
+    monthlyDebitBump: 2_400,
+    blurb: 'Two weeks a year in Aspen — maintenance fee forever.',
+    minNetWorth: 1_500_000
+  },
+  {
     id: 'yacht-slip',
+    category: 'travel',
     label: 'Yacht (48 ft)',
     cost: 2_800_000,
     monthlyDebitBump: 18_000,
@@ -87,26 +181,46 @@ export const CEO_LIFESTYLE_PURCHASES = [
     minNetWorth: 3_000_000
   },
   {
-    id: 'art-collection',
-    label: 'Contemporary art fund',
-    cost: 650_000,
-    blurb: 'Blue-chip pieces — appraisal fictionally tracks your net worth.'
+    id: 'philanthropy-gala',
+    category: 'travel',
+    label: 'Charity gala table',
+    cost: 125_000,
+    blurb: 'Ten seats, open bar, photo op — donation receipt maybe.',
+    minNetWorth: 1_000_000
   },
   {
-    id: 'jet-card',
-    label: 'Private jet card (25 hr)',
-    cost: 385_000,
-    monthlyDebitBump: 4_800,
-    blurb: 'Charter hours — every board meeting is “client visit”.'
+    id: 'personal-chef',
+    category: 'staff',
+    label: 'Personal chef retainer',
+    cost: 95_000,
+    monthlyDebitBump: 6_500,
+    blurb: 'Meal prep and dinner parties — payroll not included.',
+    minNetWorth: 2_500_000
   },
   {
-    id: 'wine-cellar',
-    label: 'Wine cellar build-out',
-    cost: 220_000,
-    monthlyDebitBump: 900,
-    blurb: 'Climate-controlled — entertainment budget finds a home.'
+    id: 'executive-security',
+    category: 'staff',
+    label: 'Executive security detail',
+    cost: 180_000,
+    monthlyDebitBump: 3_200,
+    blurb: 'Discreet driver and close protection — board asked nicely.',
+    minNetWorth: 5_000_000,
+    requiresPublic: true
   }
 ];
+
+export function getCeoLifestylePurchase(purchaseId) {
+  return CEO_LIFESTYLE_PURCHASES.find((p) => p.id === purchaseId) ?? null;
+}
+
+export function ceoLifestyleMonthlyDebit(state) {
+  return Math.max(0, state.ceo?.lifestyleDebitBump ?? 0);
+}
+
+export function ceoLifestyleOwnedDetails(state) {
+  const owned = new Set(state.ceo?.lifestyleOwned ?? []);
+  return CEO_LIFESTYLE_PURCHASES.filter((p) => owned.has(p.id));
+}
 
 const MORTGAGE_TERM_MONTHS = 360;
 
@@ -398,10 +512,13 @@ export function payOffCeoMortgage(state) {
 }
 
 export function purchaseCeoLifestyle(state, purchaseId, netWorthGate = null) {
-  const def = CEO_LIFESTYLE_PURCHASES.find((p) => p.id === purchaseId);
+  const def = getCeoLifestylePurchase(purchaseId);
   if (!def) return { ok: false, reason: 'Unknown purchase.' };
   if ((state.ceo?.lifestyleOwned ?? []).includes(def.id)) {
     return { ok: false, reason: 'Already purchased this run.' };
+  }
+  if (def.requiresPublic && !isPublicCompany(state)) {
+    return { ok: false, reason: 'Unlocks after your company is public.' };
   }
   if (def.minNetWorth && netWorthGate && !netWorthGate.ok) {
     return { ok: false, reason: netWorthGate.reason ?? 'Net worth gate.' };

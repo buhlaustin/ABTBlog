@@ -14,6 +14,9 @@ import {
   buildCompLedger,
   cashOutPreview,
   maxOwnerDrawAmount,
+  CEO_ARR_BONUS_PCTS,
+  estimateCeoArrBonus,
+  ceoArrBonusUiState,
   ceoPersonalBankBalance,
   personalExpenseBand,
   scheduledPersonalExpense,
@@ -28,7 +31,10 @@ import {
 import {
   CEO_HOME_TIERS,
   CEO_LIFESTYLE_PURCHASES,
+  CEO_LIFESTYLE_CATEGORIES,
   ceoHousingSummary,
+  ceoLifestyleMonthlyDebit,
+  ceoLifestyleOwnedDetails,
   standardMortgagePayment,
   HOUSING_MODE
 } from './CeoLifestyle.js';
@@ -483,6 +489,22 @@ function renderCeoWealthSection(ctx) {
 
 function renderCeoCompSection(ctx) {
   const { band, boardNote, annual, disabled, maxDraw, ledger, state } = ctx;
+  const arrBonus = ceoArrBonusUiState(state);
+  const arrBonusBtns = CEO_ARR_BONUS_PCTS.map((pct) => {
+    const est = estimateCeoArrBonus(state, pct);
+    const gateCash = (state.finance?.cash ?? 0) >= est && est >= 500;
+    const btnDisabled =
+      disabled || !arrBonus.cooldown.eligible || arrBonus.priorYearArr < 1 || !gateCash
+        ? ' disabled'
+        : '';
+    return `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-arr-bonus="${pct}"${btnDisabled}>${pct}% · ${formatMoney(est)}</button>`;
+  }).join('');
+  const arrBonusNote =
+    arrBonus.priorYearArr < 1
+      ? 'Available after your first full fiscal year closes (December year-end).'
+      : arrBonus.cooldown.eligible
+        ? `Prior-year revenue base ${formatMoney(arrBonus.priorYearArr)} — once every 12 months.`
+        : `On cooldown — ${arrBonus.cooldown.monthsUntil} month(s) until the next ARR bonus${arrBonus.lastPaidLabel ? ` (last paid ${arrBonus.lastPaidLabel})` : ''}.`;
   const presetBtns = band.presets
     .map(
       (p) =>
@@ -541,6 +563,11 @@ function renderCeoCompSection(ctx) {
           <button type="button" class="btn btn-ghost btn-small" id="btn-ceo-draw-custom" ${disabled}>Draw</button>
         </div>
       </div>
+      <div class="finance-action finance-card">
+        <p><strong>CEO ARR bonus</strong> — % of prior fiscal-year revenue (company cash → personal bank)</p>
+        <p class="fine-print">${escapeHtml(arrBonusNote)}</p>
+        <div class="finance-charity-chips">${arrBonusBtns}</div>
+      </div>
     </section>
     <section class="finance-section finance-section--cap">
       <h3 class="finance-section-title">Personal bank ledger</h3>
@@ -576,17 +603,45 @@ function renderCeoLifestyleSection(ctx) {
     </div>`;
   }).join('');
 
-  const lifestyleCards = CEO_LIFESTYLE_PURCHASES.map((item) => {
+  const renderLifestyleCard = (item) => {
     const owned = lifestyleOwned.has(item.id);
-    const gated = item.minNetWorth && netWorth < item.minNetWorth;
+    const gatedNw = item.minNetWorth && netWorth < item.minNetWorth;
+    const gatedPublic = item.requiresPublic && !isPublicCompany(state);
+    const gated = gatedNw || gatedPublic;
+    const gateNote = gatedPublic
+      ? 'Public company only'
+      : gatedNw
+        ? `Requires ≈ ${formatMoney(item.minNetWorth)} net worth`
+        : '';
     return `<div class="finance-action people-perk-card">
       <p><strong>${escapeHtml(item.label)}</strong> — ${formatMoney(item.cost)}${owned ? ' <span class="task-tag">Owned</span>' : ''}</p>
       <p class="fine-print">${escapeHtml(item.blurb)}</p>
-      ${gated ? `<p class="fine-print people-perk-effects">Requires ≈ ${formatMoney(item.minNetWorth)} net worth</p>` : ''}
+      ${gateNote ? `<p class="fine-print people-perk-effects">${escapeHtml(gateNote)}</p>` : ''}
       ${item.monthlyDebitBump ? `<p class="fine-print people-perk-effects">+${formatMoney(item.monthlyDebitBump)}/mo discretionary debits</p>` : ''}
       <button type="button" class="btn btn-primary btn-small" data-ceo-lifestyle="${escapeHtml(item.id)}" ${owned || disabled || gated ? 'disabled' : ''}>Buy</button>
     </div>`;
+  };
+
+  const lifestyleByCategory = CEO_LIFESTYLE_CATEGORIES.map((cat) => {
+    const items = CEO_LIFESTYLE_PURCHASES.filter((p) => (p.category ?? 'other') === cat.id);
+    if (!items.length) return '';
+    return `<div class="ceo-lifestyle-category">
+      <h5 class="finance-section-title">${escapeHtml(cat.label)}</h5>
+      <div class="people-perk-grid">${items.map(renderLifestyleCard).join('')}</div>
+    </div>`;
   }).join('');
+
+  const ownedDetails = ceoLifestyleOwnedDetails(state);
+  const lifestyleMo = ceoLifestyleMonthlyDebit(state);
+  const ownedList =
+    ownedDetails.length > 0
+      ? `<ul class="instrument-list fine-print">${ownedDetails
+          .map(
+            (p) =>
+              `<li><strong>${escapeHtml(p.label)}</strong>${p.monthlyDebitBump ? ` · +${formatMoney(p.monthlyDebitBump)}/mo` : ''}</li>`
+          )
+          .join('')}</ul>`
+      : '<p class="fine-print">No splurges yet — early picks like the e-bike pack or premium gym are affordable on a modest personal bank.</p>';
 
   const housingStatusLine =
     housing.mode === HOUSING_MODE.RENT
@@ -634,17 +689,21 @@ function renderCeoLifestyleSection(ctx) {
       ${mortgageBlock}
       ${panelMetricGroup(
         'Lifestyle snapshot',
-        panelMetricGrid('3', [
+        panelMetricGrid('4', [
           panelStatCard('Home equity', formatMoney(housing.equity), { hero: housing.equity > 0 }),
           panelStatCard('Est. net worth', formatMoney(netWorth)),
-          panelStatCard('Splurges owned', String(lifestyleOwned.size))
+          panelStatCard('Splurges owned', String(lifestyleOwned.size)),
+          panelStatCard('Lifestyle debits', lifestyleMo > 0 ? `${formatMoney(lifestyleMo)}/mo` : '—', {
+            hero: lifestyleMo > 0
+          })
         ])
       )}
+      <div class="ceo-lifestyle-owned">${ownedList}</div>
       <h4 class="finance-section-title">Homes</h4>
       <div class="people-perk-grid ceo-home-grid">${homeCards}</div>
-      <h4 class="finance-section-title">One-time splurges</h4>
-      <p class="fine-print">${CEO_LIFESTYLE_PURCHASES.length} purchases — some add recurring discretionary debits.</p>
-      <div class="people-perk-grid">${lifestyleCards}</div>
+      <h4 class="finance-section-title">Splurge catalog</h4>
+      <p class="fine-print">${CEO_LIFESTYLE_PURCHASES.length} purchases across ${CEO_LIFESTYLE_CATEGORIES.length} categories — some add recurring discretionary debits on top of your salary band.</p>
+      ${lifestyleByCategory}
     </section>
   `;
 }

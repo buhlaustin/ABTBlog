@@ -31,6 +31,7 @@ import {
   ensureCeoPersonalBank,
   preparePersonalExpensesForMonth
 } from './CeoEconomics.js';
+import { prepareCompanyOverheadForMonth } from './CompanyOverhead.js';
 import { createInitialCooState, hireCoo, isCooHired } from './Coo.js';
 import { clampCeoBirthMonth, clampCeoBirthYear } from './CeoProfile.js';
 import {
@@ -226,6 +227,7 @@ export function normalizeSave(raw) {
       ensureCeoPersonalTax(state);
     }
     if (state.staff.companyBonusAnnualMode === undefined) state.staff.companyBonusAnnualMode = false;
+    if (state.staff.lastAnnualCompanyBonusAt === undefined) state.staff.lastAnnualCompanyBonusAt = null;
     if (!state.staff.optionPoolLog) state.staff.optionPoolLog = [];
     if (state.staff.optionPoolExpandedThisMonth === undefined) {
       state.staff.optionPoolExpandedThisMonth = false;
@@ -325,6 +327,9 @@ export function normalizeSave(raw) {
       if (pm.lastSplitTurn === undefined) pm.lastSplitTurn = null;
       if (pm.lastDividendTurn === undefined) pm.lastDividendTurn = null;
       if (pm.lastAnalystActionTurn === undefined) pm.lastAnalystActionTurn = null;
+      if (pm.priorYtdRunRateMrr === undefined) {
+        pm.priorYtdRunRateMrr = pm.priorMonthMrr ?? state.finance?.mrr ?? null;
+      }
       if (pm.fundamentalPrice === undefined) pm.fundamentalPrice = null;
       if (pm.priceSalesMultiple === undefined) pm.priceSalesMultiple = null;
       if (pm.lastMonthDeltaPct === undefined) pm.lastMonthDeltaPct = null;
@@ -348,6 +353,8 @@ export function normalizeSave(raw) {
       }
     }
     if (state.finance.section === undefined) state.finance.section = 'overview';
+    if (state.finance.overheadScheduled === undefined) state.finance.overheadScheduled = null;
+    if (state.finance.lastCompanyOverhead === undefined) state.finance.lastCompanyOverhead = null;
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);
     }
@@ -396,6 +403,8 @@ export function normalizeSave(raw) {
       if (state.ceo.careerSalaryPaid === undefined) state.ceo.careerSalaryPaid = 0;
       if (state.ceo.careerOwnerDraws === undefined) state.ceo.careerOwnerDraws = 0;
       if (state.ceo.careerEmployeeBonuses === undefined) state.ceo.careerEmployeeBonuses = 0;
+      if (state.ceo.careerCeoArrBonuses === undefined) state.ceo.careerCeoArrBonuses = 0;
+      if (state.ceo.lastCeoArrBonusAt === undefined) state.ceo.lastCeoArrBonusAt = null;
       if (state.ceo.careerStockSales === undefined) state.ceo.careerStockSales = 0;
       if (!state.ceo.drawLog) state.ceo.drawLog = [];
       if (!state.ceo.salaryPayLog) state.ceo.salaryPayLog = [];
@@ -424,6 +433,7 @@ export function normalizeSave(raw) {
     }
     ensureCeoPersonalBank(state);
     preparePersonalExpensesForMonth(state);
+    prepareCompanyOverheadForMonth(state);
     if (state.finance.lastRound === undefined) state.finance.lastRound = null;
     if (!state.flags) state.flags = {};
     if (state.flags.gameOver === undefined) state.flags.gameOver = false;

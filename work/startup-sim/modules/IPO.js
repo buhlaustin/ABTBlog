@@ -23,8 +23,35 @@ import { formatCalendarStamp } from './GameCalendar.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 import { recordCashOutflow } from './Finance.js';
+import { ensureFiscal } from './CorporateTax.js';
 import { totalSubsidiaryMrr } from './Acquisitions.js';
 import { panelStatCard, panelMetricGroup, panelMetricGrid, panelMetricStack } from './PanelChrome.js';
+
+/** Calendar-year revenue booked in fiscal.current (YTD through the closing month). */
+function calendarYtdRevenue(state) {
+  const f = ensureFiscal(state);
+  const calYear = state.calendar?.year ?? null;
+  if (calYear != null && f.current.year !== calYear) {
+    f.current = { year: calYear, revenue: 0, expenses: f.current.expenses ?? 0 };
+  }
+  return Math.max(0, f.current.revenue ?? 0);
+}
+
+function monthsElapsedInCalendarYear(state) {
+  return Math.max(1, state.calendar?.monthIndex ?? 1);
+}
+
+/** YTD revenue ÷ months elapsed — dampens single-month MRR noise in the stock model. */
+export function ytdSmoothedMonthlyRevenue(state) {
+  return calendarYtdRevenue(state) / monthsElapsedInCalendarYear(state);
+}
+
+/** Blend spot MRR with YTD run-rate for fundamentals and monthly ticks. */
+function blendedRunRateMrr(state) {
+  const spot = state.finance?.mrr ?? 0;
+  const ytd = ytdSmoothedMonthlyRevenue(state);
+  return spot * 0.32 + ytd * 0.68;
+}
 
 function deriveTicker(companyName) {
   const letters = String(companyName || 'CO')
@@ -98,6 +125,7 @@ export function fileIpo(state) {
   state.publicMarket.ipoMonthIndex = state.calendar.monthIndex;
   state.publicMarket.ipoYear = state.calendar.year;
   state.publicMarket.priorMonthMrr = state.finance.mrr ?? 0;
+  state.publicMarket.priorYtdRunRateMrr = blendedRunRateMrr(state);
   state.publicMarket.priceHistory = [{ month: state.calendar.monthIndex, year: state.calendar.year, price: openPrice }];
   state.publicMarket.monthsPublic = 0;
   state.publicMarket.lockupMonthsRemaining = 1;
@@ -181,15 +209,14 @@ export function computeFundamentalSharePrice(state) {
   if (shares <= 0) return null;
 
   const pm = state.publicMarket ?? {};
-  const mrr = state.finance?.mrr ?? 0;
-  const priorMrr = pm.priorMonthMrr ?? mrr;
-  const coreArr = mrr * 12;
+  const runRateMrr = blendedRunRateMrr(state);
+  const priorRun = pm.priorYtdRunRateMrr ?? pm.priorMonthMrr ?? runRateMrr;
   const portArr = totalSubsidiaryMrr(state) * 12;
-  const arr = Math.max(coreArr + portArr, 1);
+  const arr = Math.max(runRateMrr * 12 + portArr, 1);
 
   let growth = 0;
-  if (priorMrr > 0) growth = (mrr - priorMrr) / priorMrr;
-  growth = Math.max(-0.2, Math.min(0.35, growth));
+  if (priorRun > 0) growth = (runRateMrr - priorRun) / priorRun;
+  growth = Math.max(-0.12, Math.min(0.22, growth));
 
   let ps = 6 + growth * 22;
   ps += (pm.guidanceBeatStreak ?? 0) * 0.35;
@@ -519,15 +546,18 @@ export function tickPublicMarket(state) {
   const price = pm.sharePrice ?? pm.ipoPrice ?? 1;
   pm.priorSharePrice = price;
   const mrr = state.finance?.mrr ?? 0;
-  const prior = pm.priorMonthMrr ?? mrr;
   pm.priorMonthMrr = mrr;
+  const runRateMrr = blendedRunRateMrr(state);
+  const priorRun = pm.priorYtdRunRateMrr ?? pm.priorMonthMrr ?? runRateMrr;
 
   let growth = 0;
-  if (prior > 0) {
-    growth = (mrr - prior) / prior;
-  } else if (mrr > 0) {
-    growth = 0.05;
+  if (priorRun > 0) {
+    growth = (runRateMrr - priorRun) / priorRun;
+  } else if (runRateMrr > 0) {
+    growth = 0.03;
   }
+  growth = Math.max(-0.12, Math.min(0.22, growth));
+  pm.priorYtdRunRateMrr = runRateMrr;
 
   const fundamental = computeFundamentalSharePrice(state) ?? price;
   const richPct = fundamental > 0 ? (price - fundamental) / fundamental : 0;
@@ -545,7 +575,7 @@ export function tickPublicMarket(state) {
   const shortDrag = ((pm.shortInterestPct ?? 0) / 100) * 0.018;
   const cred = pm.streetCredibility ?? 50;
   const credNudge = Math.max(-0.012, Math.min(0.022, (cred - 50) * 0.00045));
-  const growthTerm = growth * 0.42;
+  const growthTerm = growth * 0.3;
 
   let deltaPct =
     growthTerm +
@@ -561,7 +591,7 @@ export function tickPublicMarket(state) {
     shortDrag;
 
   const drivers = [
-    { label: 'MRR growth', pct: growthTerm },
+    { label: 'YTD revenue pace', pct: growthTerm },
     { label: 'Valuation vs model', pct: meanRevert },
     { label: 'Guidance streak', pct: guidanceBeat },
     { label: 'Runway / cash', pct: runwayStress },

@@ -14,6 +14,7 @@ import {
   settlePersonalInvestmentsAtMonthEnd,
   preparePersonalExpensesForMonth
 } from './CeoEconomics.js';
+import { prepareCompanyOverheadForMonth } from './CompanyOverhead.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progression.js';
 import { tickPublicMarket, tickIpoLockup, tickPublicMarketAtMonthStart, isPublicCompany } from './IPO.js';
 import { resetPublicMarketEventsAtMonthStart } from './PublicMarkets.js';
@@ -108,6 +109,7 @@ export function startMonth(state) {
   dealMonthlyTasks(state);
   dealBoardTasks(state);
   preparePersonalExpensesForMonth(state);
+  prepareCompanyOverheadForMonth(state);
   return state;
 }
 
