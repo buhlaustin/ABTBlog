@@ -2,7 +2,7 @@ import { STAGES, formatMoney } from './constants.js';
 import { advanceRealCalendarMonth, realClockNow } from './GameCalendar.js';
 import { dealMonthlyTasks, allTasksComplete } from './Tasks.js';
 import { dealBoardTasks } from './Board.js';
-import { resolveMonthEndBurn } from './Finance.js';
+import { resolveMonthEndBurn, recordCashOutflow } from './Finance.js';
 import { closeFiscalYearOnDecember } from './CorporateTax.js';
 import { closeCeoPersonalTaxYearOnDecember } from './CeoPersonalTax.js';
 import { serviceLoanAtMonthEnd } from './BankLoan.js';
@@ -54,6 +54,10 @@ import {
 import { tickScenarioModifiers } from './ScenarioEffects.js';
 import { applySubsidiaryMrrPayout, tickAcquisitionsAtMonthStart } from './Acquisitions.js';
 import { dealCeoWlbOffers, tickPersonalHappinessAtMonthEnd } from './CeoHappiness.js';
+import {
+  tickStartupConferenceAtMonthStart,
+  settleStartupConferenceAtMonthEnd
+} from './StartupConference.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -123,6 +127,13 @@ export function startMonth(state) {
   resetPublicMarketEventsAtMonthStart(state);
   for (const line of tickPublicMarketAtMonthStart(state)) {
     appendLog(state, line);
+  }
+  {
+    const confStart = tickStartupConferenceAtMonthStart(state);
+    if (confStart.budgetCharge > 0) {
+      recordCashOutflow(state, confStart.budgetCharge, 'startup_conference');
+    }
+    for (const line of confStart.lines) appendLog(state, line);
   }
   dealMonthlyTasks(state);
   dealCeoWlbOffers(state);
@@ -274,6 +285,9 @@ export function endMonth(state) {
       state,
       `Personal tax year ${closedYear} closed — taxable income ${formatMoney(closedPersonalTax.income)} (April filing).`
     );
+  }
+  for (const line of settleStartupConferenceAtMonthEnd(state, closedMonthIndex, closedYear)) {
+    appendLog(state, line);
   }
   archiveCurrentNews(state);
   advanceCalendarMonth(state);

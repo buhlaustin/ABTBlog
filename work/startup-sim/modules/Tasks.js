@@ -26,6 +26,8 @@ import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { ty
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
 import bundledTaxFiling from '../data/tax-filing-task.json' with { type: 'json' };
 import bundledCeoPersonalTaxFiling from '../data/ceo-personal-tax-task.json' with { type: 'json' };
+import bundledStartupConference from '../data/startup-conference-tasks.json' with { type: 'json' };
+import { conferenceMonthActive } from './StartupConference.js';
 import {
   isXcDemoDayMonth,
   isAiPostBatchApiReleaseMonth,
@@ -153,15 +155,21 @@ function mergePublicLateGameTasks(base) {
   );
 }
 
+function mergeStartupConferenceTasks(base) {
+  return mergeTaskPack(base, bundledStartupConference?.tasks ?? []);
+}
+
 function mergeCatalog(base) {
-  return mergeTaxFilingTasks(
-    mergeXcDemoDayTasks(
-      mergePostXcPreSeedTasks(
-        mergeLaunchTasks(
-          mergeAiToolsDeskTasks(
-            mergeSpaceExplorationTasks(
-              mergePublicLateGameTasks(
-                mergeMidGameHandcrafted(mergeCatalogExpansion(mergeSignatureTasks(base)))
+  return mergeStartupConferenceTasks(
+    mergeTaxFilingTasks(
+      mergeXcDemoDayTasks(
+        mergePostXcPreSeedTasks(
+          mergeLaunchTasks(
+            mergeAiToolsDeskTasks(
+              mergeSpaceExplorationTasks(
+                mergePublicLateGameTasks(
+                  mergeMidGameHandcrafted(mergeCatalogExpansion(mergeSignatureTasks(base)))
+                )
               )
             )
           )
@@ -376,23 +384,76 @@ function taskTierAllowed(task, state) {
   return tier >= min && tier <= max;
 }
 
+function mandatoryDeskTasks(state) {
+  const defs = getTaskDefinitions();
+  const pick = (id) => defs.find((t) => t.id === id);
+  const out = [];
+  if (isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone) {
+    const t = pick(XC_DEMO_DAY_TASK_ID);
+    if (t) out.push(t);
+  }
+  if (isAiPostBatchApiReleaseMonth(state)) {
+    const t = pick(AI_POST_BATCH_API_RELEASE_TASK_ID);
+    if (t) out.push(t);
+  }
+  if (isTaxFilingRequired(state)) {
+    const t = pick(TAX_FILING_TASK_ID);
+    if (t) out.push(t);
+  }
+  if (isCeoPersonalTaxFilingRequired(state)) {
+    const t = pick(CEO_PERSONAL_TAX_FILING_TASK_ID);
+    if (t) out.push(t);
+  }
+  return out;
+}
+
+function dedupeTasksById(tasks) {
+  const seen = new Set();
+  const out = [];
+  for (const t of tasks) {
+    if (!t?.id || seen.has(t.id)) continue;
+    seen.add(t.id);
+    out.push(t);
+  }
+  return out;
+}
+
+function taskEligibleForState(t, state, taskStage, categoryId) {
+  const demoMonth = isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone;
+  if (t.xcDemoDay && !demoMonth) return false;
+  if (t.aiPostBatchApiRelease && !isAiPostBatchApiReleaseMonth(state)) return false;
+  if (t.taxFiling && !isTaxFilingRequired(state)) return false;
+  if (t.ceoPersonalTaxFiling && !isCeoPersonalTaxFilingRequired(state)) return false;
+  const launchOk = t.startupConference ? true : launchPhaseAllowed(t, state);
+  const tierOk = t.startupConference ? true : taskTierAllowed(t, state);
+  return (
+    stageAllowed(t, taskStage) &&
+    categoryAllowed(t, categoryId) &&
+    tierOk &&
+    launchOk
+  );
+}
+
 function buildTaskPool(state) {
   const taskStage = getTaskStage(state);
   const categoryId = state.company?.categoryId;
-  const demoMonth = isXcDemoDayMonth(state) && !state.xc?.demoDayTaskDone;
+  const mandatory = mandatoryDeskTasks(state);
+  const mandatoryIds = new Set(mandatory.map((t) => t.id));
+
+  if (conferenceMonthActive(state)) {
+    const conference = getTaskDefinitions().filter(
+      (t) =>
+        t.startupConference &&
+        !mandatoryIds.has(t.id) &&
+        taskEligibleForState(t, state, taskStage, categoryId)
+    );
+    return dedupeTasksById([...mandatory, ...conference]);
+  }
+
   return getTaskDefinitions().filter(
-    (t) => {
-      if (t.xcDemoDay && !demoMonth) return false;
-      if (t.aiPostBatchApiRelease && !isAiPostBatchApiReleaseMonth(state)) return false;
-      if (t.taxFiling && !isTaxFilingRequired(state)) return false;
-      if (t.ceoPersonalTaxFiling && !isCeoPersonalTaxFilingRequired(state)) return false;
-      return (
-        stageAllowed(t, taskStage) &&
-        categoryAllowed(t, categoryId) &&
-        taskTierAllowed(t, state) &&
-        launchPhaseAllowed(t, state)
-      );
-    }
+    (t) =>
+      !t.startupConference &&
+      taskEligibleForState(t, state, taskStage, categoryId)
   );
 }
 

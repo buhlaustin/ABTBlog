@@ -107,6 +107,7 @@ import {
   terminateTreasurySponsorship
 } from './modules/TreasurySponsorships.js';
 import { runPublicMarketEvent, runPreIpoIrPrep, setPublicSection } from './modules/PublicMarkets.js';
+import { saveStartupConferenceConfig } from './modules/StartupConference.js';
 import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback, setCeoSection } from './modules/Ceo.js';
 import {
   purchaseCeoHomeCash,
@@ -1220,6 +1221,26 @@ function bindGameInteractions() {
     const financeTab = e.target.closest('[data-finance-tab]');
     if (financeTab && sessionState) {
       setFinanceSection(sessionState, financeTab.getAttribute('data-finance-tab'));
+      refresh();
+      return;
+    }
+    const confBudgetPreset = e.target.closest('[data-conference-budget-preset]');
+    if (confBudgetPreset && sessionState) {
+      const input = document.getElementById('conference-budget-input');
+      if (input) input.value = confBudgetPreset.getAttribute('data-conference-budget-preset');
+      return;
+    }
+    if (e.target.id === 'btn-save-conference-config' && sessionState) {
+      const result = saveStartupConferenceConfig(sessionState, {
+        name: document.getElementById('conference-name-input')?.value,
+        budgetRaw: document.getElementById('conference-budget-input')?.value,
+        monthIndexRaw: document.getElementById('conference-month-select')?.value
+      });
+      if (!result.ok) showFinanceFeedback(result.reason || 'Could not save conference.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
       refresh();
       return;
     }

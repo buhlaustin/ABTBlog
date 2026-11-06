@@ -8,6 +8,7 @@ import {
 import { calendarTurn } from './XC.js';
 import { nextRevenueMilestone } from './Progression.js';
 import { renderFinancePanel } from './Fundraising.js';
+import { renderStartupConferenceDeskBanner } from './StartupConference.js';
 import { renderCompaniesPanel } from './Companies.js';
 import { renderPeoplePanel } from './EmployeeBenefits.js';
 import { renderCeoPanel } from './Ceo.js';
@@ -296,6 +297,7 @@ export function renderDeskPanel(state) {
           const whale = def.whale === true
               ? ' <span class="task-tag">Whale</span>'
               : '';
+          const confTag = def.startupConference ? ' <span class="task-tag">Conference</span>' : '';
           const launchTag = def.scheduleLaunch
             ? ` <span class="task-tag">${canSchedulePublicLaunch(state) ? 'Launch gate' : `${PRE_LAUNCH_BUZZ_REQUIRED} buzz · ${PRE_LAUNCH_PRODUCT_REQUIRED} prod`}</span>`
             : def.xcDemoDay
@@ -306,7 +308,7 @@ export function renderDeskPanel(state) {
           const types = taskTypeChipsHtml(def);
           const band = estimateTaskPayoutBand(def, state);
           return `<article class="${sel}">
-            <h3>${escapeHtml(def.title)}${sig}${whale}${launchTag}</h3>
+            <h3>${escapeHtml(def.title)}${sig}${whale}${confTag}${launchTag}</h3>
             ${types ? `<p class="desk-type-row">${types}</p>` : ''}
             <p>${escapeHtml(def.description)}</p>
             <p class="fine-print task-meta">Typical ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×</p>
@@ -332,6 +334,7 @@ export function renderDeskPanel(state) {
           ? ' <span class="task-tag">Whale</span>'
           : '';
       const crowd = def.crowdfunding ? ' <span class="task-tag">Crowdfunding</span>' : '';
+      const confTag = def.startupConference ? ' <span class="task-tag">Conference</span>' : '';
       const rival =
         def.rivalPressure && def.rivalPressure < 0
           ? ` · rival heat ${def.rivalPressure}`
@@ -343,7 +346,7 @@ export function renderDeskPanel(state) {
         : '';
       const types = taskTypeChipsHtml(def);
       return `<article class="${doneClass}">
-        <h3>${escapeHtml(def.title)}${sig}${whale}${crowd}</h3>
+        <h3>${escapeHtml(def.title)}${sig}${whale}${crowd}${confTag}</h3>
         ${types ? `<p class="desk-type-row">${types}</p>` : ''}
         <p>${escapeHtml(def.description)}</p>
         <p class="task-meta">Cost ~${formatMoney(def.cost)} · Typical payout ${formatMoney(band.min)}–${formatMoney(band.max)} at ${getTaskRevenueMultiplierPreview(state).toFixed(2)}×${mrrHint}${rival}${preHint}${def.stockPct && isPublicCompany(state) ? ` · stock ${def.stockPct > 0 ? '+' : ''}${Math.round(Number(def.stockPct) * 100)}%` : ''}</p>
@@ -361,6 +364,7 @@ export function renderDeskPanel(state) {
   const launchBanner = launchLifecycleActive(state)
     ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — ${escapeHtml(launchDeskPhaseBanner(state))}</p>`
     : '';
+  const conferenceBanner = renderStartupConferenceDeskBanner(state);
   const preLaunchProgress = renderPreLaunchProgressBlock(state);
 
   const revHud = taskRevenueMultHud(state);
@@ -387,6 +391,7 @@ export function renderDeskPanel(state) {
     <div class="desk-panel finance-panel">
       ${tutorial}
       ${launchBanner}
+      ${conferenceBanner}
       ${preLaunchProgress}
       ${
         catalogError

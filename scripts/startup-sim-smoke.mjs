@@ -3033,4 +3033,49 @@ if (!signConf.ok) {
   }
 }
 
+{
+  const { saveStartupConferenceConfig, tickStartupConferenceAtMonthStart } = await import(
+    `file://${join(sim, 'modules/StartupConference.js')}`
+  );
+  const { dealMonthlyTasks, getEligibleDeskTasks } = await import(
+    `file://${join(sim, 'modules/Tasks.js')}`
+  );
+  const confState = createInitialState({
+    companyName: 'Conf Co',
+    categoryId: 'b2b-saas',
+    mode: 'sandbox'
+  });
+  confState.flags.seedRoundClosed = true;
+  confState.flags.xcResidencyComplete = true;
+  confState.stage = 'post_xc';
+  confState.finance.cash = 2_000_000;
+  confState.finance.arr = 2_000_000;
+  confState.finance.mrr = Math.round(2_000_000 / 12);
+  const saved = saveStartupConferenceConfig(confState, {
+    name: 'Nexus Summit',
+    budgetRaw: 350_000,
+    monthIndexRaw: 6
+  });
+  if (!saved.ok) {
+    console.error(`FAIL: save startup conference: ${saved.reason}`);
+    failed = true;
+  } else {
+    confState.calendar.monthIndex = 6;
+    const start = tickStartupConferenceAtMonthStart(confState);
+    if (start.budgetCharge !== 350_000 || confState.startupConference.budgetPaidYear !== confState.calendar.year) {
+      console.error('FAIL: startup conference budget charge at month start');
+      failed = true;
+    } else {
+      dealMonthlyTasks(confState);
+      const pool = getEligibleDeskTasks(confState);
+      if (!pool.length || pool.some((t) => !t.startupConference && !t.taxFiling && !t.ceoPersonalTaxFiling)) {
+        console.error('FAIL: conference month desk pool should be conference tasks only');
+        failed = true;
+      } else {
+        console.log('OK: startup conference (schedule, budget, conference-only desk)');
+      }
+    }
+  }
+}
+
 process.exit(failed ? 1 : 0);

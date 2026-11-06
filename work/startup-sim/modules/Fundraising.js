@@ -84,9 +84,11 @@ import { renderIpoPanel } from './IPO.js';
 import {
   activeFinanceSection,
   publicFinanceTabVisible,
+  conferenceFinanceTabVisible,
   renderFinancePublicSection,
   setFinanceSection
 } from './PublicMarkets.js';
+import { renderStartupConferencePanel } from './StartupConference.js';
 import { renderFinanceTreasuryPanel } from './FacilitiesEconomics.js';
 
 export { setFinanceSection };
@@ -447,11 +449,13 @@ export function renderFinancePanel(container, state) {
 
   const financeSection = activeFinanceSection(state);
   const showPublicTab = publicFinanceTabVisible(state);
+  const showConferenceTab = conferenceFinanceTabVisible(state);
   const financeTabBtn = (id, label) =>
     `<button type="button" class="${financeSection === id ? 'active' : ''}" data-finance-tab="${id}">${label}</button>`;
   const subtabs = `<nav class="finance-subtabs people-subtabs" aria-label="Finance sections">
         ${financeTabBtn('overview', 'Overview')}
         ${financeTabBtn('treasury', 'Treasury')}
+        ${showConferenceTab ? financeTabBtn('conference', 'Startup Conference') : ''}
         ${showPublicTab ? financeTabBtn('public', 'Public') : ''}
       </nav>`;
 
@@ -554,6 +558,9 @@ export function renderFinancePanel(container, state) {
   const publicBody =
     financeSection === 'public' ? `<div id="finance-public-section-mount"></div>` : '';
 
+  const conferenceBody =
+    financeSection === 'conference' ? renderStartupConferencePanel(state) : '';
+
   container.innerHTML = `
     <div class="finance-panel">
       <header class="finance-hero">
@@ -563,6 +570,7 @@ export function renderFinancePanel(container, state) {
       ${subtabs}
       ${overviewBody}
       ${treasuryBody}
+      ${conferenceBody}
       ${publicBody}
       <p id="finance-feedback" class="desk-feedback" hidden></p>
     </div>

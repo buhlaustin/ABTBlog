@@ -21,7 +21,7 @@ import {
   panelMetricStack
 } from './PanelChrome.js';
 
-const FINANCE_SECTIONS = new Set(['overview', 'treasury', 'public']);
+const FINANCE_SECTIONS = new Set(['overview', 'treasury', 'conference', 'public']);
 const PUBLIC_SECTIONS = new Set(['market', 'events', 'calendar']);
 
 const PRE_IPO_IR_STEPS = [
@@ -52,6 +52,10 @@ export function publicFinanceTabVisible(state) {
   return Boolean(state.flags?.ipoUnlocked || state.flags?.ipoFiled || isPublicCompany(state));
 }
 
+export function conferenceFinanceTabVisible(state) {
+  return Boolean(state.flags?.seedRoundClosed);
+}
+
 export function setFinanceSection(state, section) {
   if (!state.finance) return;
   state.finance.section = FINANCE_SECTIONS.has(section) ? section : 'overview';
@@ -65,6 +69,7 @@ export function setPublicSection(state, section) {
 export function activeFinanceSection(state) {
   const s = state.finance?.section ?? 'overview';
   if (s === 'public' && !publicFinanceTabVisible(state)) return 'overview';
+  if (s === 'conference' && !conferenceFinanceTabVisible(state)) return 'overview';
   return FINANCE_SECTIONS.has(s) ? s : 'overview';
 }
 

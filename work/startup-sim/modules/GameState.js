@@ -20,6 +20,7 @@ import {
   createInitialTreasurySponsorshipsState,
   migrateLegacySponsorshipContract
 } from './TreasurySponsorships.js';
+import { createInitialStartupConferenceState } from './StartupConference.js';
 import { createInitialCrisisState } from './Crisis.js';
 import { createInitialDecisionState } from './DecisionEvents.js';
 import { createInitialModifiers } from './ScenarioEffects.js';
@@ -147,6 +148,7 @@ export function createInitialState(options) {
     world: { competitor: createCompetitorForCategory(category.id), competitorAcquired: false },
     acquisitions: createInitialAcquisitionsState(),
     treasurySponsorships: createInitialTreasurySponsorshipsState(),
+    startupConference: createInitialStartupConferenceState(),
     crisis: createInitialCrisisState(),
     decision: createInitialDecisionState(),
     modifiers: createInitialModifiers(),
@@ -580,6 +582,18 @@ export function normalizeSave(raw) {
       state.xc.postBatchApiReleaseDone = false;
     }
     if (state.xc && state.xc.seedRoundTerms === undefined) state.xc.seedRoundTerms = null;
+    if (!state.startupConference) {
+      state.startupConference = createInitialStartupConferenceState();
+    } else {
+      const sc = state.startupConference;
+      if (sc.budget == null) sc.budget = 150_000;
+      if (sc.monthIndex == null) sc.monthIndex = 10;
+      if (sc.configured == null) sc.configured = false;
+      if (sc.budgetPaidYear === undefined) sc.budgetPaidYear = null;
+      if (sc.lifetimeAttendees == null) sc.lifetimeAttendees = 0;
+      if (sc.lifetimeRevenue == null) sc.lifetimeRevenue = 0;
+      if (sc.lifetimeBudgetSpend == null) sc.lifetimeBudgetSpend = 0;
+    }
     if (!state.treasurySponsorships) {
       state.treasurySponsorships = createInitialTreasurySponsorshipsState();
     } else {
