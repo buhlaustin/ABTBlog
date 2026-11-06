@@ -325,6 +325,9 @@ export function normalizeSave(raw) {
       if (pm.lastSplitTurn === undefined) pm.lastSplitTurn = null;
       if (pm.lastDividendTurn === undefined) pm.lastDividendTurn = null;
       if (pm.lastAnalystActionTurn === undefined) pm.lastAnalystActionTurn = null;
+      if (pm.priorYtdRunRateMrr === undefined) {
+        pm.priorYtdRunRateMrr = pm.priorMonthMrr ?? state.finance?.mrr ?? null;
+      }
       if (pm.fundamentalPrice === undefined) pm.fundamentalPrice = null;
       if (pm.priceSalesMultiple === undefined) pm.priceSalesMultiple = null;
       if (pm.lastMonthDeltaPct === undefined) pm.lastMonthDeltaPct = null;

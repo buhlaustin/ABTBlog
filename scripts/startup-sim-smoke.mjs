@@ -883,7 +883,8 @@ const {
   executeStockBuyback,
   executeStockSplit,
   whisperRevenueTarget,
-  sellFounderSharesPartial
+  sellFounderSharesPartial,
+  ytdSmoothedMonthlyRevenue
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
 const { calendarTurn } = await import(`file://${join(sim, 'modules/XC.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
@@ -985,6 +986,35 @@ if (!ipo.ok) {
   if (!pub.publicMarket.sharePrice || tick.deltaPct == null) {
     console.error('FAIL: tickPublicMarket');
     failed = true;
+  }
+  pub.finance.fiscal = {
+    current: { year: pub.calendar.year, revenue: 9_500_000, expenses: 0 },
+    prior: { year: pub.calendar.year - 1, revenue: 0, expenses: 0, profit: 0 },
+    taxPaidYear: null,
+    charityDonatedLifetime: 0
+  };
+  pub.calendar.monthIndex = 10;
+  pub.calendar.monthRevenue = 500_000;
+  pub.finance.mrr = 500_000;
+  pub.finance.monthlyRevenue = 500_000;
+  pub.publicMarket.priorYtdRunRateMrr = 850_000;
+  const smoothMrr = ytdSmoothedMonthlyRevenue(pub);
+  const spotMrr = pub.finance.mrr;
+  const priorRun = pub.publicMarket.priorYtdRunRateMrr;
+  const blendMrr = spotMrr * 0.32 + smoothMrr * 0.68;
+  const clampGrowth = (g) => Math.max(-0.12, Math.min(0.22, g));
+  const spotGrowth = clampGrowth((spotMrr - priorRun) / priorRun);
+  const blendGrowth = clampGrowth((blendMrr - priorRun) / priorRun);
+  if (smoothMrr < 940_000 || smoothMrr > 960_000) {
+    console.error(`FAIL: YTD smoothed MRR expected ~950k, got ${smoothMrr}`);
+    failed = true;
+  } else if (blendGrowth <= spotGrowth) {
+    console.error(
+      `FAIL: blended YTD pace should beat spot-only growth (${blendGrowth} vs ${spotGrowth})`
+    );
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: stock model blends spot MRR with YTD revenue pace');
   }
   const bb = executeStockBuyback(pub, 250_000);
   if (!bb.ok) {
