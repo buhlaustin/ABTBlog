@@ -33,7 +33,13 @@ import { getCategoriesSync } from './Categories.js';
 import { canPivot } from './Pivot.js';
 import { formatHallHighlights } from './HallOfFame.js';
 import { setGameFeedback, paintGameFeedback } from './GameFeedback.js';
-import { panelStatCard } from './PanelChrome.js';
+import {
+  panelStatCard,
+  panelMetricGroup,
+  panelMetricGrid,
+  panelMetricStack,
+  panelSnapshotSection
+} from './PanelChrome.js';
 import {
   renderProductActionsPanel,
   sideTaskBankSize,
@@ -399,21 +405,33 @@ export function renderDeskPanel(state) {
         <p class="panel-lede">Pick ${slotTarget} tasks from this month’s offers, complete them, then close the month. <span class="fine-print">Shortcuts: 1–9 switch tabs, M close month.</span></p>
         <p class="finance-mult-chip">${escapeHtml(eraChip)}</p>
       </div>
-      <div class="finance-kpi-row desk-kpi-row" aria-label="Desk progress">
-        ${panelStatCard('Tasks done', `${done} / ${slotTarget}`, { hero: true })}
-        ${panelStatCard('Pending', String(pending.length))}
-        ${panelStatCard('Month revenue', `+${formatMoney(monthRev)}`, { tone: 'pos' })}
-        ${panelStatCard('Month spend', `−${formatMoney(monthSpend)}`, { tone: monthSpend > 0 ? 'neg' : null })}
-        ${panelStatCard(revHud.label, `${revHud.effective.toFixed(2)}×`)}
-      </div>
-      <div class="finance-kpi-row desk-pulse-row" aria-label="Company pulse">
-        ${panelStatCard('ARR', formatMoney(pulse.arr))}
-        ${panelStatCard('Cash', formatMoney(pulse.cash))}
-        ${panelStatCard('Runway', escapeHtml(pulse.runway))}
-        ${panelStatCard('Product', String(pulse.product))}
-        ${panelStatCard('Buzz', String(pulse.buzz))}
-        ${panelStatCard('Career tasks', String(pulse.lifetimeTasks))}
-      </div>
+      ${panelSnapshotSection(
+        panelMetricStack(
+          panelMetricGroup(
+            'This month on the desk',
+            panelMetricGrid('4', [
+              panelStatCard('Tasks done', `${done} / ${slotTarget}`, { hero: true }),
+              panelStatCard('Pending', String(pending.length)),
+              panelStatCard('Month revenue', `+${formatMoney(monthRev)}`, { tone: 'pos' }),
+              panelStatCard('Month spend', `−${formatMoney(monthSpend)}`, { tone: monthSpend > 0 ? 'neg' : null }),
+              panelStatCard(revHud.label, `${revHud.effective.toFixed(2)}×`)
+            ])
+          ),
+          panelMetricGroup(
+            'Company pulse',
+            `${panelMetricGrid('3', [
+              panelStatCard('ARR', formatMoney(pulse.arr)),
+              panelStatCard('Cash', formatMoney(pulse.cash)),
+              panelStatCard('Runway', escapeHtml(pulse.runway))
+            ])}${panelMetricGrid('3', [
+              panelStatCard('Product', String(pulse.product)),
+              panelStatCard('Buzz', String(pulse.buzz)),
+              panelStatCard('Career tasks', String(pulse.lifetimeTasks))
+            ])}`
+          )
+        ),
+        { ariaLabel: 'Desk progress and company pulse' }
+      )}
       ${modChips}
       <section class="finance-section finance-card desk-checklist-section${closeReady ? ' desk-checklist-section--ready' : ''}" aria-label="Month close checklist">
         <div class="finance-section-head">
@@ -638,13 +656,6 @@ export function renderAllPanels(state) {
   paintGameFeedback();
 }
 
-function growthStatCard(label, value, { hero = false, id = null } = {}) {
-  const classes = ['finance-stat-card'];
-  if (hero) classes.push('finance-stat-card--hero');
-  const idAttr = id ? ` id="${escapeHtml(id)}"` : '';
-  return `<div class="${classes.join(' ')}"><span class="finance-stat-label">${escapeHtml(label)}</span><span class="finance-stat-value"${idAttr}>${value}</span></div>`;
-}
-
 function growthSlotLabel(remaining, limit) {
   if (remaining === Infinity || !Number.isFinite(limit)) return 'Unlimited';
   return `${remaining}/${formatMonthlySideTaskLimit(limit)}`;
@@ -717,17 +728,25 @@ export function renderGrowthPanel(container, state) {
 
   const contextDetails = `<details class="finance-details growth-context-details">
     <summary>Market context &amp; desk</summary>
-    <div class="summary-grid growth-context-grid">
-      <div><span class="stat-label">Rival</span><span class="stat-value">${escapeHtml(rival?.name ?? '—')}</span></div>
-      <div><span class="stat-label">Heat</span><span class="stat-value">${pressure}/5</span></div>
-      <div><span class="stat-label">Rev. modifier</span><span class="stat-value">${(revMult * 100).toFixed(0)}%</span></div>
-      ${
-        hasInstitutionalBoard(state)
-          ? `<div><span class="stat-label">Board approval</span><span class="stat-value">${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}</span></div>`
-          : `<div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(runwayLabel(state))}</span></div>`
-      }
-      <div><span class="stat-label">Desk tasks left</span><span class="stat-value">${pendingDesk}</span></div>
-      <div><span class="stat-label">Industry</span><span class="stat-value">${escapeHtml(state.company.categoryLabel)}</span></div>
+    <div class="finance-history-groups panel-metric-stack">
+      ${panelMetricGroup(
+        'Market context',
+        panelMetricGrid('3', [
+          panelStatCard('Rival', escapeHtml(rival?.name ?? '—')),
+          panelStatCard('Heat', `${pressure}/5`),
+          panelStatCard('Rev. modifier', `${(revMult * 100).toFixed(0)}%`)
+        ])
+      )}
+      ${panelMetricGroup(
+        'Company context',
+        panelMetricGrid('3', [
+          hasInstitutionalBoard(state)
+            ? panelStatCard('Board approval', `${sentiment} — ${escapeHtml(sentimentLabel(sentiment))}`)
+            : panelStatCard('Runway', escapeHtml(runwayLabel(state))),
+          panelStatCard('Desk tasks left', String(pendingDesk)),
+          panelStatCard('Industry', escapeHtml(state.company.categoryLabel))
+        ])
+      )}
     </div>
     ${
       !hasInstitutionalBoard(state)
@@ -752,13 +771,26 @@ export function renderGrowthPanel(container, state) {
         <p class="panel-lede">Growth for ${escapeHtml(state.company.categoryLabel)} — two cash channels outside desk tasks, both scaled by the same Rev× multiplier.</p>
         <p class="finance-mult-chip">${multChip}</p>
       </div>
-      <div class="finance-kpi-row growth-kpi-row" aria-label="Traction and monthly limits">
-        ${growthStatCard('Product level', String(productLevel), { hero: true, id: 'growth-stat-product-level' })}
-        ${growthStatCard('Buzz', String(buzz), { id: 'growth-stat-buzz' })}
-        ${growthStatCard('Side plays left', sideSlotDisplay, { id: 'growth-stat-side-slots' })}
-        ${growthStatCard('Campaigns left', campaignSlotDisplay)}
-        ${growthStatCard('Rev× on payouts', `${totalMult.toFixed(2)}×`)}
-      </div>
+      ${panelSnapshotSection(
+        panelMetricStack(
+          panelMetricGroup(
+            'Traction',
+            panelMetricGrid('2', [
+              panelStatCard('Product level', String(productLevel), { hero: true, id: 'growth-stat-product-level' }),
+              panelStatCard('Buzz', String(buzz), { id: 'growth-stat-buzz' })
+            ])
+          ),
+          panelMetricGroup(
+            'Monthly meters',
+            panelMetricGrid('3', [
+              panelStatCard('Side plays left', sideSlotDisplay, { id: 'growth-stat-side-slots' }),
+              panelStatCard('Campaigns left', campaignSlotDisplay),
+              panelStatCard('Rev× on payouts', `${totalMult.toFixed(2)}×`)
+            ])
+          )
+        ),
+        { ariaLabel: 'Traction and monthly limits' }
+      )}
       <p class="fine-print growth-context-visible">
         <strong>Rival</strong> ${escapeHtml(rival?.name ?? '—')} · heat ${pressure}/5 ·
         ${
@@ -830,18 +862,28 @@ export function renderGameOver(state) {
             ? `<p class="hof-highlight">${escapeHtml(formatHallHighlights(state.meta.hofHighlights))}</p>`
             : ''
         }
-        <div class="summary-grid gameover-stats">
-          <div><span class="stat-label">Stock cash-out</span><span class="stat-value">${formatMoney(e.payout)}</span></div>
-          <div><span class="stat-label">CEO salary (career)</span><span class="stat-value">${formatMoney(e.ceoSalaryCareer ?? 0)}</span></div>
-          <div><span class="stat-label">Owner draws</span><span class="stat-value">${formatMoney(e.ceoOwnerDraws ?? 0)}</span></div>
-          <div><span class="stat-label">Personal bank</span><span class="stat-value">${formatMoney(e.ceoBankBalance ?? 0)}</span></div>
-          <div><span class="stat-label">Total personal cash</span><span class="stat-value">${formatMoney(e.totalCareerCashComp ?? e.payout)}</span></div>
-          <div><span class="stat-label">Share price</span><span class="stat-value">${formatMoney(e.sharePrice)}</span></div>
-          <div><span class="stat-label">Founder stake</span><span class="stat-value">${e.founderPct}%</span></div>
-          <div><span class="stat-label">Months public</span><span class="stat-value">${e.monthsPublic}</span></div>
-          <div><span class="stat-label">Lifetime revenue</span><span class="stat-value">${formatMoney(e.lifetimeRevenue)}</span></div>
-          <div><span class="stat-label">Months played</span><span class="stat-value">${months}</span></div>
-        </div>
+        ${panelMetricStack(
+          panelMetricGroup(
+            'Personal wealth',
+            panelMetricGrid('3', [
+              panelStatCard('Stock cash-out', formatMoney(e.payout), { hero: true }),
+              panelStatCard('CEO salary (career)', formatMoney(e.ceoSalaryCareer ?? 0)),
+              panelStatCard('Owner draws', formatMoney(e.ceoOwnerDraws ?? 0)),
+              panelStatCard('Personal bank', formatMoney(e.ceoBankBalance ?? 0)),
+              panelStatCard('Total personal cash', formatMoney(e.totalCareerCashComp ?? e.payout))
+            ])
+          ),
+          panelMetricGroup(
+            'Company & run',
+            panelMetricGrid('3', [
+              panelStatCard('Share price', formatMoney(e.sharePrice)),
+              panelStatCard('Founder stake', `${e.founderPct}%`),
+              panelStatCard('Months public', String(e.monthsPublic)),
+              panelStatCard('Lifetime revenue', formatMoney(e.lifetimeRevenue)),
+              panelStatCard('Months played', String(months))
+            ])
+          )
+        )}
       `;
     } else {
       body.innerHTML = `

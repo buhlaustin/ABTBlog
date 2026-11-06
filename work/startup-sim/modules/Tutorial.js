@@ -31,7 +31,7 @@ const STEPS = [
     id: 'ipo',
     stages: [STAGES.PUBLIC],
     title: 'Public markets',
-    body: 'On Finance: set guidance tone, run buybacks, or a follow-on. Earnings every 3 months swing the quote harder. Beat the whisper each month to extend your streak, then cash out when lockup ends.'
+    body: 'Finance → Public sub-tab: market desk for guidance and buybacks; IR events for earnings calls and roadshows; calendar for whisper targets and activity log. Street credibility nudges monthly marks. Earnings every 3 months hit harder — prep with rehearsal events. Cash out on CEO when lockup ends.'
   }
 ];
 

@@ -399,6 +399,7 @@ export function renderFinanceSummary(state) {
     fiscalPriorYear: fy.prior?.year,
     fiscalPriorRevenueLabel: formatMoney(fy.prior?.revenue ?? 0),
     fiscalPriorExpensesLabel: formatMoney(fy.prior?.expenses ?? 0),
+    fiscalPriorProfit: fy.prior?.profit ?? 0,
     fiscalPriorProfitLabel: formatMoney(fy.prior?.profit ?? 0),
     fiscalTaxLiability: fy.taxLiability,
     fiscalTaxLiabilityLabel: formatMoney(fy.taxLiability),

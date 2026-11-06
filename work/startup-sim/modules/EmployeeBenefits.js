@@ -19,7 +19,13 @@ import {
 import { calendarTurn } from './GameCalendar.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { accrueCeoTaxableIncome } from './CeoPersonalTax.js';
-import { panelStatCard, escapeHtml as panelEscapeHtml } from './PanelChrome.js';
+import {
+  panelStatCard,
+  escapeHtml as panelEscapeHtml,
+  panelMetricGroup,
+  panelMetricGrid,
+  panelSnapshotSection
+} from './PanelChrome.js';
 import { meetsProgressionTierMin } from './ProgressionEconomy.js';
 
 export const COMPANY_BONUS_PCTS = [2, 5, 10, 20];
@@ -523,12 +529,18 @@ export function renderEmployeeBenefitsPanel(container, state) {
   container.innerHTML = `
     <section class="finance-section people-benefits-section">
       <p class="fine-print people-benefits-lede">Cash morale programs — not health insurance. Bonuses scale with payroll; perks and offsites stack buzz and board approval. Each perk is <strong>once per month</strong>; CEO bonus share lands on the CEO tab.</p>
-      <div class="finance-kpi-row people-kpi-row">
-        ${panelStatCard('Salary mass / mo', formatMoney(mass.total), { hero: true })}
-        ${panelStatCard('Perks used', `${perksUsedCount}/${EXTRA_PERKS.length}`)}
-        ${panelStatCard('Board approval', `${sentiment}/100`)}
-        ${panelStatCard('Company cash', formatMoney(cash))}
-      </div>
+      ${panelSnapshotSection(
+        panelMetricGroup(
+          'Programs snapshot',
+          panelMetricGrid('4', [
+            panelStatCard('Salary mass / mo', formatMoney(mass.total), { hero: true }),
+            panelStatCard('Perks used', `${perksUsedCount}/${EXTRA_PERKS.length}`),
+            panelStatCard('Board approval', `${sentiment}/100`),
+            panelStatCard('Company cash', formatMoney(cash))
+          ])
+        ),
+        { ariaLabel: 'Employee perks snapshot' }
+      )}
       <div class="growth-channel-compare people-benefits-compare" role="note">
         <div class="growth-channel-card growth-channel-card--side">
           <p class="growth-channel-title"><span class="growth-channel-badge">Bonus</span></p>
@@ -623,12 +635,18 @@ export function renderOptionPoolPanel(container, state) {
   container.innerHTML = `
     <section class="finance-section people-equity-section">
       <p class="fine-print people-benefits-lede">Board-approved ESOP top-ups without a priced round. Each choice adds that percent of <strong>current pool shares</strong> (not a full cap-table recap), so post-IPO numbers stay readable. <strong>One refresh per month</strong> — nicks board approval slightly.</p>
-      <div class="finance-kpi-row people-kpi-row">
-        ${panelStatCard('Pool (FD)', poolRow ? `${poolRow.pct}%` : '—', { hero: true })}
-        ${panelStatCard('Pool shares', poolRow ? (poolRow.shares ?? 0).toLocaleString() : '—')}
-        ${panelStatCard('Outstanding', totalOut.toLocaleString())}
-        ${panelStatCard('Board approval', `${sentiment}/100`)}
-      </div>
+      ${panelSnapshotSection(
+        panelMetricGroup(
+          'Option pool snapshot',
+          panelMetricGrid('4', [
+            panelStatCard('Pool (FD)', poolRow ? `${poolRow.pct}%` : '—', { hero: true }),
+            panelStatCard('Pool shares', poolRow ? (poolRow.shares ?? 0).toLocaleString() : '—'),
+            panelStatCard('Outstanding', totalOut.toLocaleString()),
+            panelStatCard('Board approval', `${sentiment}/100`)
+          ])
+        ),
+        { ariaLabel: 'Option pool snapshot' }
+      )}
       <div class="growth-channel-compare people-benefits-compare" role="note">
         <div class="growth-channel-card growth-channel-card--side">
           <p class="growth-channel-title"><span class="growth-channel-badge">Top-up</span></p>

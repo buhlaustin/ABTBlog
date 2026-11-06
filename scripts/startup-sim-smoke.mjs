@@ -937,6 +937,22 @@ if (!ipo.ok) {
   } else if (!failed) {
     console.log('OK: late-game public market (IPO, guidance, tick, buyback, tape)');
   }
+  const { runPublicMarketEvent } = await import(`file://${join(sim, 'modules/PublicMarkets.js')}`);
+  pub.flags.seriesAClosed = true;
+  const credBefore = pub.publicMarket.streetCredibility ?? 0;
+  const irEv = runPublicMarketEvent(pub, 'public-analyst-briefing');
+  if (!irEv.ok) {
+    console.error(`FAIL: public IR event: ${irEv.reason}`);
+    failed = true;
+  } else if (!pub.publicMarket.irEventLog?.length) {
+    console.error('FAIL: IR event log should record activity');
+    failed = true;
+  } else if ((pub.publicMarket.streetCredibility ?? 0) <= credBefore) {
+    console.error('FAIL: IR event should raise street credibility');
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: public IR event (analyst briefing, credibility, activity log)');
+  }
   pub.publicMarket.lockupMonthsRemaining = 0;
   const founderBefore = getFounderRow(pub)?.shares ?? 0;
   const partial = sellFounderSharesPartial(pub, 10);

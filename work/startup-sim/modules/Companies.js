@@ -1,6 +1,12 @@
 import { formatMoney } from './constants.js';
 import { formatCalendarStamp } from './GameCalendar.js';
-import { panelStatCard, escapeHtml } from './PanelChrome.js';
+import {
+  panelStatCard,
+  escapeHtml,
+  panelMetricGroup,
+  panelMetricGrid,
+  panelMetricStack
+} from './PanelChrome.js';
 import {
   acquisitionsUnlocked,
   portfolioPulseSummary,
@@ -110,12 +116,12 @@ function renderHoldingCard(state, h) {
       ${markDriftChip(h)}
     </header>
     ${integrationBar(h)}
-    <div class="finance-operating-grid companies-holding-stats">
-      ${panelStatCard('MRR', `${formatMoney(mrr)}/mo`)}
-      ${panelStatCard('Basis', formatMoney(costBasis))}
-      ${panelStatCard('Est. exit', formatMoney(exit))}
-      ${panelStatCard('ROI', `${roi >= 0 ? '+' : ''}${roi.toFixed(0)}%`, { tone: roiTone })}
-    </div>
+    ${panelMetricGrid('4', [
+      panelStatCard('MRR', `${formatMoney(mrr)}/mo`),
+      panelStatCard('Basis', formatMoney(costBasis)),
+      panelStatCard('Est. exit', formatMoney(exit)),
+      panelStatCard('ROI', `${roi >= 0 ? '+' : ''}${roi.toFixed(0)}%`, { tone: roiTone })
+    ])}
     <div class="companies-holding-actions">
       <button type="button" class="btn btn-small btn-danger" data-acquisition-sell="${escapeHtml(co.id)}">Sell</button>
       <details class="reinvest-panel companies-reinvest-optional">
@@ -149,24 +155,30 @@ function renderPulseSection(state, pulse, mix, marketAll) {
       : '';
 
   return `
-    <section class="finance-kpi-row companies-kpi-row" aria-label="Portfolio pulse">
-      ${panelStatCard('Portfolio MRR', `${formatMoney(pulse.portfolioMrr)}/mo`, { hero: true })}
-      ${panelStatCard('Est. exit', formatMoney(pulse.exitVal))}
-      ${panelStatCard('Unrealized', formatMoney(pulse.unrealized), { tone: unrealTone })}
-      ${panelStatCard('Synergy', synergyPct)}
+    <section class="finance-section panel-snapshot" aria-label="Portfolio pulse">
+      ${panelMetricStack(
+        panelMetricGroup(
+          'Portfolio performance',
+          panelMetricGrid('4', [
+            panelStatCard('Portfolio MRR', `${formatMoney(pulse.portfolioMrr)}/mo`, { hero: true }),
+            panelStatCard('Est. exit', formatMoney(pulse.exitVal)),
+            panelStatCard('Unrealized', formatMoney(pulse.unrealized), { tone: unrealTone }),
+            panelStatCard('Synergy stack', synergyPct)
+          ])
+        ),
+        panelMetricGroup(
+          'Treasury & market',
+          `${panelMetricGrid('4', [
+            panelStatCard('Dry powder', formatMoney(pulse.cash)),
+            panelStatCard('Cost basis', formatMoney(pulse.invested)),
+            panelStatCard('Lifetime MRR paid', formatMoney(pulse.lifetime)),
+            panelStatCard('Listed targets', String(marketAll.length))
+          ])}<p class="fine-print finance-details-note">Due diligence ${formatMoney(ACQUISITION_DILIGENCE_COST)} · marks ~±3.5%/mo · optional reinvest for health</p>`
+        )
+      )}
     </section>
     ${pulse.owned ? renderPortfolioMixBar(mix) : ''}
-    ${fireNote}
-    <section class="finance-section finance-card">
-      <h3 class="finance-section-title">Treasury</h3>
-      <div class="finance-operating-grid">
-        ${panelStatCard('Dry powder', formatMoney(pulse.cash))}
-        ${panelStatCard('Cost basis', formatMoney(pulse.invested))}
-        ${panelStatCard('Lifetime MRR paid', formatMoney(pulse.lifetime))}
-        ${panelStatCard('Listed targets', String(marketAll.length))}
-      </div>
-      <p class="fine-print finance-details-note">Due diligence ${formatMoney(ACQUISITION_DILIGENCE_COST)} · marks ~±3.5%/mo · optional reinvest for health</p>
-    </section>`;
+    ${fireNote}`;
 }
 
 function renderHoldingsSection(state) {

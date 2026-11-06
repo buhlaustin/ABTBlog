@@ -1,9 +1,4 @@
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
+import { escapeHtml, panelStatCard, panelMetricGrid } from './PanelChrome.js';
 
 /** Brief popup after completing an optional board task. */
 export function openBoardTaskOutcomeDialog({
@@ -20,7 +15,7 @@ export function openBoardTaskOutcomeDialog({
 
   const delta = Number(sentimentDelta) || 0;
   const deltaLabel = delta === 0 ? 'No change' : delta > 0 ? `+${delta}` : String(delta);
-  const deltaClass = delta > 0 ? 'positive' : delta < 0 ? 'negative' : '';
+  const deltaTone = delta > 0 ? 'pos' : delta < 0 ? 'neg' : null;
   const buzzLine =
     buzzDelta > 0
       ? `<p class="fine-print">Product buzz +${buzzDelta} from the board’s network.</p>`
@@ -37,10 +32,10 @@ export function openBoardTaskOutcomeDialog({
   body.innerHTML = `
     <p class="eyebrow">Board task complete</p>
     <h2 id="board-outcome-title" class="month-summary-title">${escapeHtml(title)}</h2>
-    <div class="summary-grid">
-      <div><span class="stat-label">Board approval</span><span class="stat-value ${deltaClass}">${deltaLabel}${delta !== 0 ? ' pts' : ''}</span></div>
-      <div><span class="stat-label">New score</span><span class="stat-value">${sentimentAfter}/100</span></div>
-    </div>
+    <div class="dialog-metric-panel">${panelMetricGrid('2', [
+      panelStatCard('Board approval', `${deltaLabel}${delta !== 0 ? ' pts' : ''}`, { tone: deltaTone }),
+      panelStatCard('New score', `${sentimentAfter}/100`)
+    ])}</div>
     ${buzzLine}
     ${mandateLine}
     ${stockLine}

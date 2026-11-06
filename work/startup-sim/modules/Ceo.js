@@ -36,21 +36,14 @@ import { isPublicCompany, canSellFounderStock } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
 import { ceoAgeDisplayLine } from './CeoProfile.js';
-
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-function ceoStatCard(label, value, { hero = false, tone = null } = {}) {
-  const classes = ['finance-stat-card'];
-  if (hero) classes.push('finance-stat-card--hero');
-  if (tone === 'pos') classes.push('finance-stat-card--pos');
-  if (tone === 'neg') classes.push('finance-stat-card--neg');
-  return `<div class="${classes.join(' ')}"><span class="finance-stat-label">${escapeHtml(label)}</span><span class="finance-stat-value">${value}</span></div>`;
-}
+import {
+  escapeHtml,
+  panelStatCard,
+  panelMetricGroup,
+  panelMetricGrid,
+  panelMetricStack,
+  panelSnapshotSection
+} from './PanelChrome.js';
 
 export { setCeoSalaryAnnual, takeOwnerDraw };
 
@@ -266,12 +259,20 @@ function renderCeoOverviewSection(ctx) {
     ? `<details class="ceo-debit-history"><summary>Last month debited ${formatMoney(lastExpense.total)}</summary>${renderDebitBreakdown(lastExpense.breakdown)}</details>`
     : '';
   return `
-    <section class="finance-kpi-row" aria-label="Personal snapshot">
-      ${ceoStatCard('Personal bank', formatMoney(bank), { hero: true })}
-      ${ceoStatCard('Est. net worth', formatMoney(ceoNetWorth(state)))}
-      ${ceoStatCard('Personal runway', escapeHtml(personalRunway.label))}
-      ${ceoStatCard('Liquidity', escapeHtml(health.label), { tone: health.tone === 'pos' ? 'pos' : health.tone === 'neg' ? 'neg' : null })}
-    </section>
+    ${panelSnapshotSection(
+      panelMetricGroup(
+        'Personal snapshot',
+        panelMetricGrid('4', [
+          panelStatCard('Personal bank', formatMoney(bank), { hero: true }),
+          panelStatCard('Est. net worth', formatMoney(ceoNetWorth(state))),
+          panelStatCard('Personal runway', escapeHtml(personalRunway.label)),
+          panelStatCard('Liquidity', escapeHtml(health.label), {
+            tone: health.tone === 'pos' ? 'pos' : health.tone === 'neg' ? 'neg' : null
+          })
+        ])
+      ),
+      { ariaLabel: 'Personal snapshot' }
+    )}
     <p class="fine-print">${escapeHtml(health.detail)}${portfolio > 0 ? ` · Portfolio ${formatMoney(portfolio)}.` : ''}</p>
     <p class="fine-print finance-runway-detail">${openingLine}</p>
     ${bankAlert}
@@ -286,35 +287,49 @@ function renderCeoOverviewSection(ctx) {
         <span class="fine-print">Auto · not editable</span>
       </div>
       <p class="fine-print">${escapeHtml(expenseBand.label)} · ${formatMoney(annual)}/yr salary → ${formatMoney(expenseBand.min)}–${formatMoney(expenseBand.max)}/mo band</p>
-      <div class="finance-operating-grid">
-        ${ceoStatCard('This month', formatMoney(scheduled.total))}
-        ${ceoStatCard('Typical / mo', formatMoney(typicalBurn))}
-        ${ceoStatCard('Career paid', formatMoney(careerDebits))}
-        ${ceoStatCard('Company stage', escapeHtml(stageLabel(state.stage)))}
-      </div>
+      ${panelMetricGrid('4', [
+        panelStatCard('This month', formatMoney(scheduled.total)),
+        panelStatCard('Typical / mo', formatMoney(typicalBurn)),
+        panelStatCard('Career paid', formatMoney(careerDebits)),
+        panelStatCard('Company stage', escapeHtml(stageLabel(state.stage)))
+      ])}
       <details class="ceo-debit-details">
         <summary>This month’s breakdown</summary>
         ${renderDebitBreakdown(scheduled.breakdown)}
       </details>
       ${lastDebitBlock}
     </section>
-    <details class="finance-details">
-      <summary>Career totals &amp; company link</summary>
-      <div class="finance-operating-grid finance-details-grid">
-        ${ceoStatCard(ctx.equityLabel, formatMoney(comp.equity))}
-        ${ceoStatCard('Career salary', formatMoney(comp.salary))}
-        ${ceoStatCard('Owner draws', formatMoney(comp.draws))}
-        ${ceoStatCard('Bonuses', formatMoney(comp.bonuses))}
-        ${ceoStatCard('Stock sales', formatMoney(comp.stockSales))}
-        ${ceoStatCard('Ownership', `${comp.pct}%`)}
-        ${ceoStatCard('Pay plan', `${formatMoney(ctx.monthly)}/mo`)}
-        ${ceoStatCard('Co. runway', escapeHtml(runway.runwayLabel))}
-        ${ceoStatCard('Share price', shares.markPx > 0 ? formatMoney(shares.markPx) : '—')}
-        ${ceoStatCard('Cash comp', formatMoney(ceoPersonalCashComp(state)))}
-      </div>
-      <p class="fine-print finance-details-note">${escapeHtml(runway.runwayDetail)}</p>
-      ${runwaySalaryNoteInner}
-    </details>
+    <section class="finance-section panel-snapshot" aria-label="Career totals and company link">
+      <h3 class="finance-section-title">Career totals &amp; company link</h3>
+      ${panelMetricStack(
+        panelMetricGroup(
+          'Cash compensation (career)',
+          panelMetricGrid('4', [
+            panelStatCard('Career salary', formatMoney(comp.salary)),
+            panelStatCard('Owner draws', formatMoney(comp.draws)),
+            panelStatCard('Bonuses', formatMoney(comp.bonuses)),
+            panelStatCard('Stock sales', formatMoney(comp.stockSales)),
+            panelStatCard('Cash comp', formatMoney(ceoPersonalCashComp(state)))
+          ])
+        ),
+        panelMetricGroup(
+          'Equity & ownership',
+          panelMetricGrid('4', [
+            panelStatCard(ctx.equityLabel, formatMoney(comp.equity)),
+            panelStatCard('Ownership', `${comp.pct}%`),
+            panelStatCard('Share price', shares.markPx > 0 ? formatMoney(shares.markPx) : '—'),
+            panelStatCard('Pay plan', `${formatMoney(ctx.monthly)}/mo`)
+          ])
+        ),
+        panelMetricGroup(
+          'Company runway',
+          `${panelMetricGrid('2', [
+            panelStatCard('Co. runway', escapeHtml(runway.runwayLabel)),
+            panelStatCard('Runway detail', escapeHtml(runway.runwayDetail))
+          ])}${runwaySalaryNoteInner}`
+        )
+      )}
+    </section>
     <p class="fine-print finance-ceo-pointer">Company cash, loans, and charity → <strong>Finance</strong>. Liquid exit and secondary sales → <strong>Wealth &amp; exit</strong>.</p>
   `;
 }
@@ -341,11 +356,13 @@ function renderCeoWealthSection(ctx) {
         <span class="fine-print">${investRateLabel}</span>
       </div>
       <p class="fine-print">Park cash outside your checking balance — monthly returns track public markets when listed, otherwise a money-market-style rate.</p>
-      <div class="finance-operating-grid">
-        ${ceoStatCard('Portfolio', formatMoney(portfolio), { hero: portfolio > 0 })}
-        ${ceoStatCard('Career returns', formatMoney(state.ceo?.careerInvestmentReturns ?? 0))}
-        ${ceoStatCard('Last month', formatMoney(state.ceo?.lastInvestmentReturn ?? 0), { tone: (state.ceo?.lastInvestmentReturn ?? 0) >= 0 ? 'pos' : 'neg' })}
-      </div>
+      ${panelMetricGrid('3', [
+        panelStatCard('Portfolio', formatMoney(portfolio), { hero: portfolio > 0 }),
+        panelStatCard('Career returns', formatMoney(state.ceo?.careerInvestmentReturns ?? 0)),
+        panelStatCard('Last month', formatMoney(state.ceo?.lastInvestmentReturn ?? 0), {
+          tone: (state.ceo?.lastInvestmentReturn ?? 0) >= 0 ? 'pos' : 'neg'
+        })
+      ])}
       <p class="fine-print"><strong>To portfolio</strong> (from personal bank)</p>
       <div class="finance-charity-chips">
         <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-invest-deposit="5000" ${disabled}>${formatMoney(5_000)}</button>
@@ -372,13 +389,15 @@ function renderCeoWealthSection(ctx) {
         <span class="ceo-ticker-pill">${escapeHtml(shares.ticker ?? '—')} ${formatMoney(shares.markPx)}/sh</span>
       </div>
       <p class="ceo-stake-headline">Your block <strong>${formatMoney(shares.stakeValue)}</strong></p>
-      <div class="finance-operating-grid">
-        ${ceoStatCard('Your shares', shares.shares.toLocaleString('en-US'))}
-        ${ceoStatCard('Ownership', `${comp.pct}%`)}
-        ${ceoStatCard('vs IPO', shares.gainSinceIpo != null ? formatMoney(shares.gainSinceIpo) : '—', { tone: shares.gainSinceIpo > 0 ? 'pos' : shares.gainSinceIpo < 0 ? 'neg' : null })}
-        ${ceoStatCard('PT upside', shares.upsideAtPt != null ? formatMoney(shares.upsideAtPt) : '—')}
-        ${shares.lastDividend > 0 ? ceoStatCard('Last dividend', formatMoney(shares.lastDividend)) : ''}
-      </div>
+      ${panelMetricGrid('3', [
+        panelStatCard('Your shares', shares.shares.toLocaleString('en-US')),
+        panelStatCard('Ownership', `${comp.pct}%`),
+        panelStatCard('vs IPO', shares.gainSinceIpo != null ? formatMoney(shares.gainSinceIpo) : '—', {
+          tone: shares.gainSinceIpo > 0 ? 'pos' : shares.gainSinceIpo < 0 ? 'neg' : null
+        }),
+        panelStatCard('PT upside', shares.upsideAtPt != null ? formatMoney(shares.upsideAtPt) : '—'),
+        shares.lastDividend > 0 ? panelStatCard('Last dividend', formatMoney(shares.lastDividend)) : ''
+      ])}
       ${
         exitPrev
           ? `<p class="fine-print">Step-down today ≈ ${formatMoney(exitPrev.combined)} (${formatMoney(exitPrev.payout)} stock + ${formatMoney(exitPrev.liquid)} bank).</p>`
@@ -389,11 +408,11 @@ function renderCeoWealthSection(ctx) {
     </section>`
       : !publicCo
         ? `<section class="finance-section finance-card"><p class="fine-print">Pre-IPO wealth is mostly <strong>paper equity</strong> at the last valuation mark. IPO unlocks secondary sales and step-down exit.</p>
-        <div class="finance-operating-grid">
-          ${ceoStatCard('Founder stake', formatMoney(comp.equity), { hero: true })}
-          ${ceoStatCard('Ownership', `${comp.pct}%`)}
-          ${ceoStatCard('Implied $/sh', shares.markPx > 0 ? formatMoney(shares.markPx) : '—')}
-        </div></section>`
+        ${panelMetricGrid('3', [
+          panelStatCard('Founder stake', formatMoney(comp.equity), { hero: true }),
+          panelStatCard('Ownership', `${comp.pct}%`),
+          panelStatCard('Implied $/sh', shares.markPx > 0 ? formatMoney(shares.markPx) : '—')
+        ])}</section>`
         : '';
 
   const sellStockBlock =
@@ -443,10 +462,8 @@ function renderCeoWealthSection(ctx) {
       ${renderNetWorthHistory(netWorthHist)}
     </section>
     <section class="finance-section finance-card finance-charity">
-      <div class="finance-section-head">
-        <h3 class="finance-section-title">Personal philanthropy</h3>
-        <span class="fine-print">Lifetime ${formatMoney(givingLifetime)}</span>
-      </div>
+      <h3 class="finance-section-title">Personal philanthropy</h3>
+      ${panelMetricGrid('single', [panelStatCard('Lifetime donated', formatMoney(givingLifetime))])}
       <p class="fine-print">Give from your <strong>personal bank</strong> — separate from company charity on Finance (gifts are not modeled as deductions).</p>
       <div class="finance-charity-chips">
         <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-personal-give="2500" ${disabled}>${formatMoney(2_500)}</button>
@@ -615,11 +632,14 @@ function renderCeoLifestyleSection(ctx) {
       <p class="fine-print">${housingStatusLine}</p>
       ${sellHomeBlock}
       ${mortgageBlock}
-      <div class="finance-kpi-row people-kpi-row">
-        ${ceoStatCard('Home equity', formatMoney(housing.equity), { hero: housing.equity > 0 })}
-        ${ceoStatCard('Est. net worth', formatMoney(ceoNetWorth(state)))}
-        ${ceoStatCard('Splurges owned', String(lifestyleOwned.size))}
-      </div>
+      ${panelMetricGroup(
+        'Lifestyle snapshot',
+        panelMetricGrid('3', [
+          panelStatCard('Home equity', formatMoney(housing.equity), { hero: housing.equity > 0 }),
+          panelStatCard('Est. net worth', formatMoney(netWorth)),
+          panelStatCard('Splurges owned', String(lifestyleOwned.size))
+        ])
+      )}
       <h4 class="finance-section-title">Homes</h4>
       <div class="people-perk-grid ceo-home-grid">${homeCards}</div>
       <h4 class="finance-section-title">One-time splurges</h4>

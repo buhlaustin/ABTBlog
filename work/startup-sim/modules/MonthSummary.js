@@ -2,13 +2,7 @@ import { formatMoney } from './constants.js';
 import { formatCalendarMonth, formatStateMonth } from './GameCalendar.js';
 import { companyRunwayDisplay } from './Finance.js';
 import { isPublicCompany, marketCap } from './IPO.js';
-
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
+import { escapeHtml, panelStatCard, panelMetricGrid, panelMetricGroup, panelMetricStack } from './PanelChrome.js';
 
 export function runwayLabel(state) {
   return companyRunwayDisplay(state).monthsLabel;
@@ -21,31 +15,46 @@ export function runwayDetail(state) {
 /** Render month-close summary into dialog body. */
 export function renderMonthSummaryContent(container, state, summary, headlineTeaser) {
   if (!container) return;
-  const stockBlock =
+  const stockMovePct =
     summary.stockDeltaPct != null
-      ? `<div><span class="stat-label">Stock move</span><span class="stat-value">${summary.stockDeltaPct >= 0 ? '+' : ''}${(summary.stockDeltaPct * 100).toFixed(1)}%</span></div>
-      ${
-        isPublicCompany(state)
-          ? `<div><span class="stat-label">${state.publicMarket?.ticker ?? 'Stock'}</span><span class="stat-value">${formatMoney(state.publicMarket?.sharePrice ?? 0)} · cap ${formatMoney(marketCap(state))}</span></div>`
-          : ''
-      }`
-      : '';
+      ? `${summary.stockDeltaPct >= 0 ? '+' : ''}${(summary.stockDeltaPct * 100).toFixed(1)}%`
+      : null;
+  const stockTone = summary.stockDeltaPct != null && summary.stockDeltaPct >= 0 ? 'pos' : 'neg';
+
+  const operatingCards = [
+    panelStatCard('Cash', formatMoney(summary.cashAfter), { hero: true }),
+    panelStatCard('Month revenue', formatMoney(summary.monthRevenue), { tone: 'pos' }),
+    panelStatCard('ARR (after close)', formatMoney(summary.arrAfter ?? 0)),
+    panelStatCard('Overhead', formatMoney(summary.burn)),
+    summary.growthCampaignsClosed
+      ? panelStatCard('Growth campaigns', String(summary.growthCampaignsClosed))
+      : null,
+    panelStatCard('Runway', escapeHtml(runwayLabel(state)))
+  ].filter(Boolean);
+
+  const publicCards =
+    stockMovePct != null
+      ? [
+          panelStatCard('Stock move', stockMovePct, { tone: stockTone }),
+          isPublicCompany(state)
+            ? panelStatCard(
+                state.publicMarket?.ticker ?? 'Stock',
+                `${formatMoney(state.publicMarket?.sharePrice ?? 0)} · cap ${formatMoney(marketCap(state))}`
+              )
+            : null
+        ].filter(Boolean)
+      : [];
 
   container.innerHTML = `
     <p class="eyebrow">${escapeHtml(formatCalendarMonth(summary.closedYear, summary.closedMonthIndex))} closed</p>
     <h2 id="month-summary-title" class="month-summary-title">Month-end summary</h2>
-    <div class="summary-grid">
-      <div><span class="stat-label">Cash</span><span class="stat-value">${formatMoney(summary.cashAfter)}</span></div>
-      <div><span class="stat-label">Month revenue</span><span class="stat-value">${formatMoney(summary.monthRevenue)}</span></div>
-      <div><span class="stat-label">ARR (after close)</span><span class="stat-value">${formatMoney(summary.arrAfter ?? 0)}</span></div>
-      <div><span class="stat-label">Overhead</span><span class="stat-value">${formatMoney(summary.burn)}</span></div>
-      ${
-        summary.growthCampaignsClosed
-          ? `<div><span class="stat-label">Growth campaigns</span><span class="stat-value">${summary.growthCampaignsClosed}</span></div>`
-          : ''
-      }
-      <div><span class="stat-label">Runway</span><span class="stat-value">${escapeHtml(runwayLabel(state))}</span></div>
-      ${stockBlock}
+    <div class="dialog-metric-panel">
+      ${panelMetricStack(
+        panelMetricGroup('Operating snapshot', panelMetricGrid('3', operatingCards)),
+        publicCards.length
+          ? panelMetricGroup('Public market', panelMetricGrid('2', publicCards))
+          : null
+      )}
     </div>
     <p class="fine-print">${escapeHtml(runwayDetail(state))}</p>
     ${

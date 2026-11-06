@@ -13,7 +13,14 @@ import {
 import { progressionTier } from './ProgressionEconomy.js';
 import { isPublicCompany, applyStockPctMove } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
-import { panelStatCard, escapeHtml as panelEscapeHtml } from './PanelChrome.js';
+import {
+  panelStatCard,
+  escapeHtml as panelEscapeHtml,
+  panelMetricGroup,
+  panelMetricGrid,
+  panelMetricStack,
+  panelSnapshotSection
+} from './PanelChrome.js';
 
 let boardCatalog = bundledBoard;
 
@@ -340,12 +347,11 @@ export function renderBoardPanel(container, state) {
   const members = state.board?.members ?? [];
   const history = (state.board?.sentimentHistory ?? []).slice(0, 6);
 
-  const gateRows = snap.gates
-    .map(
-      (g) =>
-        `<div><span class="stat-label">${escapeHtml(g.label)} gate</span><span class="stat-value ${g.ok ? 'positive' : 'negative'}">${g.current}/100 · need ${g.required}+</span></div>`
-    )
-    .join('');
+  const gateCards = snap.gates.map((g) =>
+    panelStatCard(`${g.label} gate`, `${g.current}/100 · need ${g.required}+`, {
+      tone: g.ok ? 'pos' : 'neg'
+    })
+  );
 
   const rosterRows = members
     .map(
@@ -413,20 +419,30 @@ export function renderBoardPanel(container, state) {
         </div>
         <p class="fine-print">${snap.lastReason ? `Latest: ${escapeHtml(snap.lastReason)}` : 'Complete prep tasks to build trust before priced rounds.'}</p>
       </div>
-      <div class="finance-kpi-row board-kpi-row">
-        ${panelStatCard('Approval', `${snap.approval}/100`, { hero: true, tone: snap.approval >= 75 ? 'pos' : snap.approval < 35 ? 'neg' : null })}
-        ${panelStatCard('Prep done', `${snap.tasksDone}/${snap.tasksTotal}`)}
-        ${panelStatCard('Streak', `${snap.streak} mo`)}
-        ${panelStatCard('ARR', formatMoney(snap.arr))}
-        ${panelStatCard('Runway', escapeHtml(snap.runwayLabel))}
-      </div>
+      ${panelSnapshotSection(
+        panelMetricStack(
+          panelMetricGroup(
+            'This month’s prep',
+            panelMetricGrid('3', [
+              panelStatCard('Prep done', `${snap.tasksDone}/${snap.tasksTotal}`, { hero: true }),
+              panelStatCard('Streak', `${snap.streak} mo`),
+              panelStatCard('Meetings (career)', String(state.board?.meetingsHeld ?? 0))
+            ])
+          ),
+          panelMetricGroup(
+            'Company health',
+            panelMetricGrid('3', [
+              panelStatCard('ARR', formatMoney(snap.arr)),
+              panelStatCard('Runway', panelEscapeHtml(snap.runwayLabel)),
+              panelStatCard('Rival heat', `${snap.rivalHeat}/5`)
+            ])
+          )
+        ),
+        { ariaLabel: 'Board prep and company snapshot' }
+      )}
       <details class="finance-details board-gates-details">
-        <summary>Rival heat, gates &amp; meetings</summary>
-        <div class="summary-grid board-context-grid">
-          <div><span class="stat-label">Rival heat</span><span class="stat-value">${snap.rivalHeat}/5</span></div>
-          <div><span class="stat-label">Meetings (career)</span><span class="stat-value">${state.board?.meetingsHeld ?? 0}</span></div>
-          ${gateRows}
-        </div>
+        <summary>Round gates &amp; sentiment targets</summary>
+        ${panelMetricGrid('3', gateCards)}
         <p class="fine-print">${escapeHtml(snap.runwayDetail)} · Skip <em>all</em> prep in a month → −4 approval and rival heat.</p>
       </details>
       ${mandateBlock}
