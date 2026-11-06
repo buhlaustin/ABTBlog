@@ -344,6 +344,188 @@
       "minTier": 3,
       "committee": "governance",
       "wlbCost": 5
+    },
+    {
+      "id": "meet-series-extension-vote",
+      "title": "Inside round extension vote",
+      "description": "Pro-rata, valuation flat vs up, and who leads — board resolution before wires move.",
+      "cost": 4100,
+      "sentiment": 5,
+      "buzz": 2,
+      "minTier": 4,
+      "committee": "governance",
+      "wlbCost": 7
+    },
+    {
+      "id": "meet-bridge-note-session",
+      "title": "Bridge note emergency session",
+      "description": "Runway math, note terms, and conversion caps — called on 48 hours notice.",
+      "cost": 3200,
+      "sentiment": 4,
+      "buzz": 0,
+      "minTier": 3,
+      "committee": "full",
+      "wlbCost": 8
+    },
+    {
+      "id": "meet-coo-succession",
+      "title": "COO succession review",
+      "description": "Bench plan if your operator leaves — comp committee joins for retention numbers.",
+      "cost": 2700,
+      "sentiment": 4,
+      "buzz": 0,
+      "minTier": 4,
+      "committee": "comp",
+      "wlbCost": 5
+    },
+    {
+      "id": "meet-headcount-governance",
+      "title": "Headcount plan governance session",
+      "description": "Hiring freeze exceptions, contractor mix, and whether eng ratios still make sense.",
+      "cost": 2400,
+      "sentiment": 3,
+      "buzz": 0,
+      "minTier": 3,
+      "committee": "comp",
+      "wlbCost": 4
+    },
+    {
+      "id": "meet-growth-spend-oversight",
+      "title": "Growth spend oversight meeting",
+      "description": "Paid campaign roster, CAC bands, and whale-tier bets — board wants a kill switch.",
+      "cost": 3500,
+      "sentiment": 4,
+      "buzz": 1,
+      "minTier": 4,
+      "committee": "governance",
+      "wlbCost": 5
+    },
+    {
+      "id": "meet-whale-desk-review",
+      "title": "Whale desk task review",
+      "description": "Directors skim tier-7 desk plays — approve the multi-million burn with eyes open.",
+      "cost": 4600,
+      "sentiment": 4,
+      "buzz": 2,
+      "minTier": 6,
+      "committee": "full",
+      "wlbCost": 6
+    },
+    {
+      "id": "meet-property-program-vote",
+      "title": "Property program board vote",
+      "description": "HQ purchase vs lease, cap rate, and personal vs company exposure — full board vote.",
+      "cost": 5200,
+      "sentiment": 4,
+      "buzz": 1,
+      "minTier": 5,
+      "committee": "full",
+      "wlbCost": 6
+    },
+    {
+      "id": "meet-ceo-disclosure-session",
+      "title": "CEO personal disclosure session",
+      "description": "Housing, loans, and side investments — governance wants it on the record before gossip spreads.",
+      "cost": 1900,
+      "sentiment": 3,
+      "buzz": 0,
+      "minTier": 3,
+      "committee": "governance",
+      "wlbCost": 4
+    },
+    {
+      "id": "meet-secondary-tender",
+      "title": "Secondary tender offer review",
+      "description": "Employee liquidity, price, and who sells — lead investor watches dilution like a hawk.",
+      "cost": 6400,
+      "sentiment": 5,
+      "buzz": 1,
+      "minTier": 5,
+      "committee": "comp",
+      "wlbCost": 7
+    },
+    {
+      "id": "meet-proxy-season-kickoff",
+      "title": "Proxy season kickoff",
+      "description": "Say-on-pay, board slate, and shareholder proposals — comp and governance align on messaging.",
+      "cost": 7100,
+      "sentiment": 5,
+      "buzz": 0,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "governance",
+      "wlbCost": 6
+    },
+    {
+      "id": "meet-guidance-reset",
+      "title": "Guidance reset board session",
+      "description": "Missed whisper twice — board decides whether to cut the range live or buy time.",
+      "cost": 8200,
+      "sentiment": 6,
+      "buzz": 0,
+      "stockPct": -0.01,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "full",
+      "wlbCost": 9
+    },
+    {
+      "id": "meet-analyst-day-qna",
+      "title": "Analyst day Q&A dry run",
+      "description": "Independents play hostile analysts — you answer without hiding behind IR slides.",
+      "cost": 4900,
+      "sentiment": 4,
+      "buzz": 2,
+      "stockPct": 0.011,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "full",
+      "wlbCost": 7
+    },
+    {
+      "id": "meet-cyber-insurance-renewal",
+      "title": "Cyber insurance renewal session",
+      "description": "Premium spike, coverage gaps, and whether your controls actually match the application.",
+      "cost": 3100,
+      "sentiment": 3,
+      "buzz": 0,
+      "minTier": 3,
+      "committee": "audit",
+      "wlbCost": 4
+    },
+    {
+      "id": "meet-vendor-concentration",
+      "title": "Vendor concentration review",
+      "description": "Single-cloud, single-model, single-payment processor — audit chair wants Plan B on slide one.",
+      "cost": 2600,
+      "sentiment": 3,
+      "buzz": 0,
+      "minTier": 3,
+      "committee": "audit",
+      "wlbCost": 4
+    },
+    {
+      "id": "meet-open-source-compliance",
+      "title": "Open-source compliance hearing",
+      "description": "License stack, copyleft exposure, and what legal needs before the next enterprise RFP.",
+      "cost": 2200,
+      "sentiment": 3,
+      "buzz": 1,
+      "minTier": 2,
+      "committee": "audit",
+      "wlbCost": 3
+    },
+    {
+      "id": "meet-megawhale-growth-audit",
+      "title": "Megawhale growth audit",
+      "description": "Multi-billion campaign line items — board asks if ARR justifies the burn in plain English.",
+      "cost": 9200,
+      "sentiment": 5,
+      "buzz": 2,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "full",
+      "wlbCost": 8
     }
   ]
 }

@@ -350,6 +350,143 @@
       "sentiment": 2,
       "minTier": 3,
       "committee": "governance"
+    },
+    {
+      "id": "board-whale-desk-summary",
+      "title": "Whale desk monthly summary",
+      "description": "One-pager on tier-6/7 desk spend, expected ARR lift, and what you will not repeat.",
+      "cost": 880,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 2,
+      "minTier": 5,
+      "committee": "governance"
+    },
+    {
+      "id": "board-growth-roster-review",
+      "title": "Growth roster board review",
+      "description": "Campaign mix, cooldown hygiene, and whale pins — show the board you are not spray-and-pray.",
+      "cost": 1320,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 2,
+      "minTier": 4,
+      "committee": "governance"
+    },
+    {
+      "id": "board-property-lease-summary",
+      "title": "Property & lease summary",
+      "description": "HQ, satellites, and cap-ex pipeline — finance packet for directors who hate surprises.",
+      "cost": 1050,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 2,
+      "minTier": 4,
+      "committee": "audit"
+    },
+    {
+      "id": "board-conference-sponsorship",
+      "title": "Conference sponsorship packet",
+      "description": "Booth tier, keynote slot, and lead targets — justify the spend before marketing commits.",
+      "cost": 1450,
+      "revenue": [0, 0],
+      "buzz": 2,
+      "sentiment": 2,
+      "minTier": 3,
+      "committee": "governance"
+    },
+    {
+      "id": "board-coo-equity-refresh",
+      "title": "COO equity refresh memo",
+      "description": "Retention grant sizing vs dilution — comp committee pre-read before the live vote.",
+      "cost": 1180,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "minTier": 4,
+      "committee": "comp"
+    },
+    {
+      "id": "board-runway-stress-test",
+      "title": "Runway stress-test appendix",
+      "description": "Downside MRR, hiring freeze, and bridge scenarios — lead wants three cases, not one hockey stick.",
+      "cost": 920,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "minTier": 2,
+      "committee": "audit"
+    },
+    {
+      "id": "board-cap-table-scenarios",
+      "title": "Cap table scenario pack",
+      "description": "Series B/C dilution waterfalls and pro-rata — stop answering this in hallway conversations.",
+      "cost": 1280,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "minTier": 3,
+      "committee": "governance"
+    },
+    {
+      "id": "board-ir-social-prep",
+      "title": "IR social media prep",
+      "description": "CEO tweet guardrails, quiet period reminders, and who approves threads.",
+      "cost": 680,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 2,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "governance"
+    },
+    {
+      "id": "board-proxy-statement-draft",
+      "title": "Proxy statement draft review",
+      "description": "Comp disclosure, related-party footnotes, and board bios — counsel redlines, you sign.",
+      "cost": 4600,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 4,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "comp"
+    },
+    {
+      "id": "board-guidance-bridge-memo",
+      "title": "Guidance bridge memo",
+      "description": "Explain the quarter-to-quarter walk for analysts — prep before the board asks on the call.",
+      "cost": 2700,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "stockPct": 0.007,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "audit"
+    },
+    {
+      "id": "board-media-training-packet",
+      "title": "Executive media training packet",
+      "description": "Bridging phrases, no-comment zones, and podcast rules — board wants fewer unforced errors.",
+      "cost": 1540,
+      "revenue": [0, 0],
+      "buzz": 2,
+      "sentiment": 2,
+      "minTier": 4,
+      "committee": "governance"
+    },
+    {
+      "id": "board-megawhale-growth-summary",
+      "title": "Megawhale growth summary",
+      "description": "Multi-billion campaign roster with payback bands — public-company packet for skeptical independents.",
+      "cost": 3800,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 3,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "full"
     }
   ]
 }

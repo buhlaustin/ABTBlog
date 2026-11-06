@@ -79,6 +79,27 @@ const MONTHLY_MANDATES = [
     detail: 'Complete “Pre-earnings board preview” for an extra +3 approval.',
     taskId: 'board-earnings-preview',
     bonusSentiment: 3
+  },
+  {
+    id: 'mandate-ai-safety',
+    title: 'Governance wants AI safety packet',
+    detail: 'Complete “AI product safety review packet” for an extra +2 approval.',
+    taskId: 'board-ai-product-review',
+    bonusSentiment: 2
+  },
+  {
+    id: 'mandate-churn',
+    title: 'Lead asked for churn saves',
+    detail: 'Complete “Enterprise churn intervention plan” for an extra +2 approval.',
+    taskId: 'board-churn-intervention',
+    bonusSentiment: 2
+  },
+  {
+    id: 'mandate-option-pool',
+    title: 'Comp wants option pool math',
+    detail: 'Complete “Option pool refresh memo” for an extra +2 approval.',
+    taskId: 'board-option-pool-refresh',
+    bonusSentiment: 2
   }
 ];
 
@@ -216,8 +237,8 @@ function shuffle(arr) {
   return a;
 }
 
-const BOARD_TASK_COOLDOWN = 4;
-const BOARD_MEETING_COOLDOWN = 3;
+const BOARD_TASK_COOLDOWN = 5;
+const BOARD_MEETING_COOLDOWN = 5;
 
 function boardTaskAllowed(def, state) {
   const tier = progressionTier(state);
@@ -303,7 +324,8 @@ export function dealBoardMeetingTasks(state) {
   const recent = new Set((state.board.recentMeetingTaskIds ?? []).slice(-BOARD_MEETING_COOLDOWN * 3));
   const fresh = pool.filter((t) => !recent.has(t.id));
   const source = fresh.length >= 2 ? fresh : pool;
-  const slotCount = progressionTier(state) >= 7 ? 3 : 2;
+  const tier = progressionTier(state);
+  const slotCount = tier >= 7 ? 4 : tier >= 5 ? 3 : 2;
   const picked = [];
   const formal = source.find((t) => t.id === 'meet-monthly-formal');
   if (formal) picked.push(formal);
@@ -340,7 +362,8 @@ export function dealBoardTasks(state) {
   const recent = new Set((state.board.recentTaskIds ?? []).slice(-BOARD_TASK_COOLDOWN * 3));
   const fresh = pool.filter((t) => !recent.has(t.id));
   const source = fresh.length >= 3 ? fresh : pool;
-  const slotCount = progressionTier(state) >= 5 ? 4 : 3;
+  const tier = progressionTier(state);
+  const slotCount = tier >= 7 ? 5 : tier >= 5 ? 4 : 3;
   const picked = shuffle(source).slice(0, slotCount);
   state.board.recentTaskIds = [...(state.board.recentTaskIds ?? []), ...picked.map((p) => p.id)].slice(
     -BOARD_TASK_COOLDOWN * 3

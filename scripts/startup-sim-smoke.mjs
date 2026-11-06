@@ -925,11 +925,11 @@ const {
   completeBoardMeetingTask,
   getBoardMeetingTaskDefs
 } = await import(`file://${join(sim, 'modules/Board.js')}`);
-if (getBoardTaskDefs().length < 28) {
+if (getBoardTaskDefs().length < 40) {
   console.error(`FAIL: board task catalog too small (${getBoardTaskDefs().length})`);
   failed = true;
 }
-if (getBoardMeetingTaskDefs().length < 28) {
+if (getBoardMeetingTaskDefs().length < 44) {
   console.error(`FAIL: board meeting catalog too small (${getBoardMeetingTaskDefs().length})`);
   failed = true;
 }
