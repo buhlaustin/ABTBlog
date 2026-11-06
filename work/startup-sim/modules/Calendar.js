@@ -35,6 +35,7 @@ import { resetGrowthCampaignsMonth, growthRosterRefreshLine } from './GrowthCamp
 import { resetProductActionsMonth } from './ProductActions.js';
 import { resetEmployeeBenefitsMonth } from './EmployeeBenefits.js';
 import { tickAnnualFacilitiesAtMonthStart } from './FacilitiesEconomics.js';
+import { settleTreasurySponsorshipsAtMonthEnd } from './TreasurySponsorships.js';
 import {
   tickLaunchAtMonthStart,
   tickPreLaunchAtMonthStart,
@@ -158,6 +159,9 @@ export function endMonth(state) {
     appendLog(state, line);
   }
   for (const line of serviceLoanAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
+  for (const line of settleTreasurySponsorshipsAtMonthEnd(state)) {
     appendLog(state, line);
   }
   const portfolio = applySubsidiaryMrrPayout(state);

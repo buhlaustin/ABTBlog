@@ -16,6 +16,7 @@ import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
 import { createInitialAcquisitionsState } from './Acquisitions.js';
+import { createInitialTreasurySponsorshipsState } from './TreasurySponsorships.js';
 import { createInitialCrisisState } from './Crisis.js';
 import { createInitialDecisionState } from './DecisionEvents.js';
 import { createInitialModifiers } from './ScenarioEffects.js';
@@ -137,6 +138,7 @@ export function createInitialState(options) {
     sentiment: createInitialSentiment(),
     world: { competitor: createCompetitorForCategory(category.id), competitorAcquired: false },
     acquisitions: createInitialAcquisitionsState(),
+    treasurySponsorships: createInitialTreasurySponsorshipsState(),
     crisis: createInitialCrisisState(),
     decision: createInitialDecisionState(),
     modifiers: createInitialModifiers(),
@@ -550,6 +552,18 @@ export function normalizeSave(raw) {
       state.xc.postBatchApiReleaseDone = false;
     }
     if (state.xc && state.xc.seedRoundTerms === undefined) state.xc.seedRoundTerms = null;
+    if (!state.treasurySponsorships) {
+      state.treasurySponsorships = createInitialTreasurySponsorshipsState();
+    } else {
+      if (!state.treasurySponsorships.active) state.treasurySponsorships.active = [];
+      if (!state.treasurySponsorships.signedDealIds) state.treasurySponsorships.signedDealIds = [];
+      if (state.treasurySponsorships.lifetimeFeesPaid === undefined) {
+        state.treasurySponsorships.lifetimeFeesPaid = 0;
+      }
+      if (state.treasurySponsorships.lifetimeMrrGranted === undefined) {
+        state.treasurySponsorships.lifetimeMrrGranted = 0;
+      }
+    }
     if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
     if (!state.acquisitions.owned) state.acquisitions.owned = [];
     if (!state.acquisitions.dealLog) state.acquisitions.dealLog = [];

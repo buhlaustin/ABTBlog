@@ -11,6 +11,11 @@ import { rbfOutstanding } from './RevenueAdvance.js';
 import { renderCapitalStackSummary, totalSafePrincipal, activeSafeInstruments } from './FinanceCapital.js';
 import { acquisitionsUnlocked, portfolioPulseSummary } from './Acquisitions.js';
 import { scheduledCompanyOverhead } from './CompanyOverhead.js';
+import {
+  sponsorshipPaymentMonthly,
+  sponsoredMrrMonthly,
+  renderTreasurySponsorshipPanel
+} from './TreasurySponsorships.js';
 
 /** Annual lease review applied each January (HQ, hub, satellites). */
 export const ANNUAL_RENT_ESCALATION_RATE = 0.045;
@@ -77,13 +82,17 @@ export function treasuryObligationsSummary(state) {
   const rbfShare = state.finance?.rbf?.sharePct ?? 0.12;
   const rbfEstMo =
     rbfOwed > 0 ? Math.min(rbfOwed, Math.round((state.finance?.mrr ?? 0) * rbfShare)) : 0;
-  const fixedMo = rent.totalMonthly + loanPay + rbfEstMo;
+  const sponsorPay = sponsorshipPaymentMonthly(state);
+  const sponsorMrr = sponsoredMrrMonthly(state);
+  const fixedMo = rent.totalMonthly + loanPay + rbfEstMo + sponsorPay;
   return {
     rent,
     loanPay,
     loanBal,
     rbfOwed,
     rbfEstMo,
+    sponsorPay,
+    sponsorMrr,
     fixedMo,
     creditLimit: computeCreditLimit(state),
     headroom: loanHeadroom(state)
@@ -124,6 +133,13 @@ function renderObligationsTable(state) {
           label: 'Revenue advance (est.)',
           amount: ob.rbfEstMo,
           note: `${formatMoney(ob.rbfOwed)} left · ~${Math.round((state.finance?.rbf?.sharePct ?? 0.12) * 100)}% of desk revenue`
+        }
+      : null,
+    ob.sponsorPay > 0
+      ? {
+          label: 'Sponsorship / naming fees',
+          amount: ob.sponsorPay,
+          note: `+${formatMoney(ob.sponsorMrr)}/mo guaranteed MRR when paid`
         }
       : null
   ].filter(Boolean);
@@ -338,6 +354,8 @@ export function renderFinanceTreasuryPanel(state, opts) {
     ${capitalStack}
 
     ${renderSubsidiaryTreasuryBlock(state)}
+
+    ${renderTreasurySponsorshipPanel(state)}
 
     ${charityLine}
 

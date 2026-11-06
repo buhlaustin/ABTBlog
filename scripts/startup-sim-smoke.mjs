@@ -2835,4 +2835,39 @@ if (activeFinanceSection({ finance: { section: 'treasury' } }) !== 'treasury') {
   }
 }
 
+const {
+  preloadTreasurySponsorshipDeals,
+  signTreasurySponsorship,
+  settleTreasurySponsorshipsAtMonthEnd,
+  sponsoredMrrMonthly
+} = await import(`file://${join(sim, 'modules/TreasurySponsorships.js')}`);
+await preloadTreasurySponsorshipDeals();
+const sponsorState = createInitialState({
+  companyName: 'Sponsor Co',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+sponsorState.flags.seedRoundClosed = true;
+sponsorState.finance.cash = 500_000_000;
+sponsorState.finance.mrr = 5_000_000;
+sponsorState.finance.arr = 60_000_000;
+const signConf = signTreasurySponsorship(sponsorState, 'nra-stadium-flagship');
+if (!signConf.ok) {
+  console.error(`FAIL: sign sponsorship: ${signConf.reason}`);
+  failed = true;
+} else if (sponsoredMrrMonthly(sponsorState) !== 4_000_000) {
+  console.error(`FAIL: sponsorship MRR grant expected 4000000/mo`);
+  failed = true;
+} else {
+  sponsorState.calendar.monthRevenue = 100_000;
+  const revBefore = sponsorState.calendar.monthRevenue;
+  const lines = settleTreasurySponsorshipsAtMonthEnd(sponsorState);
+  if (lines.length === 0 || sponsorState.calendar.monthRevenue !== revBefore + 4_000_000) {
+    console.error('FAIL: sponsorship month-end settle');
+    failed = true;
+  } else {
+    console.log('OK: treasury sponsorship contracts (fee → guaranteed MRR)');
+  }
+}
+
 process.exit(failed ? 1 : 0);

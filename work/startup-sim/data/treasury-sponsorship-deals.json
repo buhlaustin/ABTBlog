@@ -1,0 +1,91 @@
+[
+  {
+    "id": "nra-regional-arena",
+    "label": "Regional arena naming rights",
+    "category": "naming_rights",
+    "exclusiveGroup": "major-arena",
+    "annualPayment": 12000000,
+    "termYears": 3,
+    "minArr": 5000000,
+    "requiresSeed": true,
+    "blurb": "Your logo on the roof. Local sports radio says your name wrong every night."
+  },
+  {
+    "id": "nra-stadium-flagship",
+    "label": "Stadium naming rights (flagship)",
+    "category": "naming_rights",
+    "exclusiveGroup": "major-arena",
+    "annualPayment": 48000000,
+    "termYears": 5,
+    "minArr": 50000000,
+    "requiresSeed": true,
+    "blurb": "$48M/yr — $4M/mo fee for guaranteed $4M/mo contracted MRR for the term."
+  },
+  {
+    "id": "transit-hub-title",
+    "label": "Transit hub title sponsorship",
+    "category": "transit",
+    "exclusiveGroup": "transit",
+    "annualPayment": 8000000,
+    "termYears": 4,
+    "minArr": 8000000,
+    "requiresSeed": true,
+    "blurb": "Every commuter sees the brand. Fee and booked MRR match monthly."
+  },
+  {
+    "id": "esports-league-title",
+    "label": "Esports league title partner",
+    "category": "sports_media",
+    "exclusiveGroup": "esports-title",
+    "annualPayment": 15000000,
+    "termYears": 3,
+    "minArr": 15000000,
+    "requiresSeed": true,
+    "blurb": "Broadcast overlays and jersey patches — recurring fee, recurring MRR credit."
+  },
+  {
+    "id": "airport-lounge-nra",
+    "label": "International airport lounge naming",
+    "category": "naming_rights",
+    "exclusiveGroup": "airport",
+    "annualPayment": 20000000,
+    "termYears": 7,
+    "minArr": 100000000,
+    "requiresSeed": true,
+    "blurb": "Premium travelers and guaranteed ARR optics for the finance slide."
+  },
+  {
+    "id": "conference-title-global",
+    "label": "Global developer conference title",
+    "category": "events",
+    "exclusiveGroup": "flagship-conference",
+    "annualPayment": 6000000,
+    "termYears": 2,
+    "minArr": 3000000,
+    "requiresSeed": false,
+    "blurb": "Keynote backdrop rights — shorter term, faster MRR bump."
+  },
+  {
+    "id": "public-jersey-patch",
+    "label": "Pro jersey chest patch (public co.)",
+    "category": "sports_media",
+    "exclusiveGroup": "jersey-patch",
+    "annualPayment": 25000000,
+    "termYears": 5,
+    "minArr": 200000000,
+    "requiresSeed": true,
+    "requiresPublic": true,
+    "blurb": "Listed companies only — prime broadcast real estate."
+  },
+  {
+    "id": "podcast-network-exclusive",
+    "label": "Podcast network exclusive partner",
+    "category": "media",
+    "exclusiveGroup": "podcast-net",
+    "annualPayment": 4500000,
+    "termYears": 4,
+    "minArr": 2000000,
+    "requiresSeed": true,
+    "blurb": "Host-read ads plus contracted MRR while the deal runs."
+  }
+]

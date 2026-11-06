@@ -100,6 +100,10 @@ import {
   showFinanceFeedback,
   setFinanceSection
 } from './modules/Fundraising.js';
+import {
+  preloadTreasurySponsorshipDeals,
+  signTreasurySponsorship
+} from './modules/TreasurySponsorships.js';
 import { runPublicMarketEvent, runPreIpoIrPrep, setPublicSection } from './modules/PublicMarkets.js';
 import { setCeoSalaryAnnual, takeOwnerDraw, showCeoFeedback, setCeoSection } from './modules/Ceo.js';
 import {
@@ -1582,6 +1586,20 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const sponsorBtn = e.target.closest('[data-sign-sponsorship]');
+    if (sponsorBtn && sessionState) {
+      const result = signTreasurySponsorship(
+        sessionState,
+        sponsorBtn.getAttribute('data-sign-sponsorship')
+      );
+      if (!result.ok) showFinanceFeedback(result.reason || 'Could not sign.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showFinanceFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     const charityBtn = e.target.closest('[data-charity-donate]');
     if (charityBtn && sessionState) {
       const result = donateToCharity(sessionState, charityBtn.getAttribute('data-charity-donate'));
@@ -2116,6 +2134,7 @@ async function init() {
         preloadCrisisCatalog(),
         preloadDecisionEvents(),
         preloadAcquisitionCatalog(),
+        preloadTreasurySponsorshipDeals(),
         preloadNewsTimeline()
       ]);
       populateCategorySelect(categorySelect, getCategoriesSync());
