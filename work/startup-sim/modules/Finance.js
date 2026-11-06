@@ -1,16 +1,15 @@
 import { formatMoney, MODE_CONFIG } from './constants.js';
 import {
-  computePayroll,
   staffRevenueMultiplier,
   headcountExecutionScale,
   departmentTaskMultiplier,
   staffCostMultiplier,
   staffRetentionBonus
 } from './Staff.js';
-import { satelliteRent } from './Offices.js';
-import { workspaceRentMonthly, getArr, getWorkspaceTier, WORKSPACE_TIER } from './Workspace.js';
+import { getArr, getWorkspaceTier, WORKSPACE_TIER } from './Workspace.js';
 import { competitorRevenueMult } from './Competitor.js';
 import { getSandboxExtraRevenueMult } from './SandboxTuning.js';
+import { calendarTurn } from './XC.js';
 import { xcProgramRevenueMult, xcProgramProductBonus } from './XC.js';
 import { acceleratorRevenueMult } from './Accelerators.js';
 import {
@@ -22,13 +21,14 @@ import {
 } from './ProgressionEconomy.js';
 import { applyTaskRivalEffects } from './WorldDynamics.js';
 import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
-import { loanOverheadMonthly } from './BankLoan.js';
 import { accrueFiscalExpense, accrueFiscalRevenue, fiscalYearDisplay } from './CorporateTax.js';
 import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
-import { ceoSalaryMonthly } from './CeoEconomics.js';
-import { cooSalaryMonthly } from './Coo.js';
 import { totalHeadcount } from './Staff.js';
 import { totalHeadcountCap } from './Offices.js';
+import {
+  computeCompanyOverheadBreakdown,
+  scheduledCompanyOverhead
+} from './CompanyOverhead.js';
 
 /** Hard caps on desk + growth payout multiplier (after sandbox tuning overlay). */
 export const REV_MULT_CAP_CAREER = 60;
@@ -205,18 +205,7 @@ export function estimateTaskMrrBand(taskDef) {
 }
 
 export function projectMonthlyBurn(state) {
-  const headcount = state.staff?.headcountByDept ?? {};
-  const payroll = computePayroll(headcount, state.stage, state);
-  let fixed = workspaceRentMonthly(state);
-  fixed = Math.round(fixed * hubCostMult(state));
-  return (
-    payroll +
-    fixed +
-    satelliteRent(state) +
-    loanOverheadMonthly(state) +
-    ceoSalaryMonthly(state) +
-    cooSalaryMonthly(state)
-  );
+  return computeCompanyOverheadBreakdown(state).total;
 }
 
 function sandboxMult(state) {
@@ -378,10 +367,15 @@ export function initialInvestmentCash(state) {
 
 /** Month-end: payroll + fixed burn, update MRR snapshot. */
 export function resolveMonthEndBurn(state) {
-  const burn = projectMonthlyBurn(state);
+  const scheduled = scheduledCompanyOverhead(state);
+  const burn = scheduled.total;
   state.finance.cash -= burn;
   recordCashOutflow(state, burn, 'overhead');
   state.finance.monthlyBurn = burn;
+  state.finance.lastCompanyOverhead = {
+    ...scheduled,
+    closedTurn: calendarTurn(state)
+  };
   state.finance.monthlyRevenue = state.calendar.monthRevenue ?? 0;
   state.finance.mrr = Math.round(state.finance.monthlyRevenue);
   state.finance.arr = Math.round(state.finance.mrr * 12);

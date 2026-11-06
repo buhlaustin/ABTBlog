@@ -22,6 +22,12 @@ import {
   getCoreTaskRevenueMult,
   getSandboxTuningMult
 } from './Finance.js';
+import {
+  scheduledCompanyOverhead,
+  typicalCompanyOverheadMonthly,
+  renderCompanyOverheadBreakdownHtml,
+  companyVariableOverheadBand
+} from './CompanyOverhead.js';
 import { progressionTierLabel } from './ProgressionEconomy.js';
 import { formatMoney } from './constants.js';
 import {
@@ -374,6 +380,32 @@ export function renderFinancePanel(container, state) {
   const valuationLabel = state.finance.valuation ? formatMoney(state.finance.valuation) : '—';
   const portfolioMrr = formatMoney(totalSubsidiaryMrr(state));
 
+  const overheadScheduled = scheduledCompanyOverhead(state);
+  const overheadBand = companyVariableOverheadBand(state);
+  const typicalOverhead = typicalCompanyOverheadMonthly(state);
+  const lastOverhead = state.finance?.lastCompanyOverhead;
+  const lastOverheadBlock =
+    lastOverhead?.total != null
+      ? `<details class="ceo-debit-history"><summary>Last month closed ${formatMoney(lastOverhead.total)} overhead</summary>${renderCompanyOverheadBreakdownHtml(lastOverhead.breakdown)}</details>`
+      : '';
+  const companyOverheadBlock = `<section class="finance-section finance-card ceo-debit-panel" aria-label="Company overhead">
+      <div class="finance-section-head">
+        <h3 class="finance-section-title">Company overhead</h3>
+        <span class="fine-print">Auto · closes with the month</span>
+      </div>
+      <p class="fine-print">${escapeHtml(overheadBand.label)} · vendor OPEX band ${formatMoney(overheadBand.min)}–${formatMoney(overheadBand.max)}/mo (excludes payroll & rent)</p>
+      ${panelMetricGrid('3', [
+        panelStatCard('This month', formatMoney(overheadScheduled.total), { hero: true }),
+        panelStatCard('Typical / mo', formatMoney(typicalOverhead)),
+        panelStatCard('Runway burn', sum.burnLabel)
+      ])}
+      <details class="ceo-debit-details">
+        <summary>This month’s overhead breakdown</summary>
+        ${renderCompanyOverheadBreakdownHtml(overheadScheduled.breakdown)}
+      </details>
+      ${lastOverheadBlock}
+    </section>`;
+
   const charityBlock = `<section class="finance-section finance-card finance-charity">
     <h3 class="finance-section-title">Charitable giving</h3>
     <div class="finance-metric-grid finance-metric-grid--single">
@@ -450,6 +482,8 @@ export function renderFinancePanel(container, state) {
         { ariaLabel: 'Cash, runway, and operating snapshot' }
       )}
       <p class="fine-print finance-runway-detail">${sum.runwayDetail}</p>
+
+      ${companyOverheadBlock}
 
       ${taxAprilNote}
 

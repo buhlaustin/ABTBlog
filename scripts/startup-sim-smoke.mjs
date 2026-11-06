@@ -1297,6 +1297,11 @@ const { purchaseWorkspaceTier, WORKSPACE_TIER: PAY_WS_TIER } = await import(
 );
 const { projectMonthlyBurn, estimateEraRevenuePotential, allTierRevenuePotentialRows } =
   await import(`file://${join(sim, 'modules/Finance.js')}`);
+const {
+  computeCompanyOverheadBreakdown,
+  scheduledCompanyOverhead,
+  COMPANY_VARIABLE_OPEX_CATEGORIES
+} = await import(`file://${join(sim, 'modules/CompanyOverhead.js')}`);
 const { TIER_REVENUE_PROFILE, eraBaseRevenueScaleForTask } = await import(
   `file://${join(sim, 'modules/ProgressionEconomy.js')}`
 );
@@ -1311,6 +1316,30 @@ if (!sal.ok) {
 } else if (projectMonthlyBurn(ceoState) < 10_000) {
   console.error('FAIL: CEO salary in burn');
   failed = true;
+} else {
+  const { prepareCompanyOverheadForMonth } = await import(
+    `file://${join(sim, 'modules/CompanyOverhead.js')}`
+  );
+  prepareCompanyOverheadForMonth(ceoState);
+  const oh = computeCompanyOverheadBreakdown(ceoState);
+  const ohSum = oh.breakdown.reduce((s, l) => s + l.amount, 0);
+  if (ohSum !== oh.total || oh.total !== projectMonthlyBurn(ceoState)) {
+    console.error(`FAIL: company overhead breakdown mismatch (${ohSum} vs ${oh.total})`);
+    failed = true;
+  } else if (!oh.breakdown.some((l) => l.label === 'CEO compensation')) {
+    console.error('FAIL: company overhead missing CEO compensation line');
+    failed = true;
+  } else if (
+    !oh.breakdown.some((l) => COMPANY_VARIABLE_OPEX_CATEGORIES.includes(l.label) || l.label.includes('Cloud'))
+  ) {
+    console.error('FAIL: company overhead missing variable OPEX categories');
+    failed = true;
+  } else if (scheduledCompanyOverhead(ceoState).total !== oh.total) {
+    console.error('FAIL: scheduled company overhead out of sync');
+    failed = true;
+  } else if (!failed) {
+    console.log(`OK: company overhead breakdown (${oh.breakdown.length} lines, ${formatMoney(oh.total)}/mo)`);
+  }
 }
 if (!failed) {
   ceoState.finance.cash = 50_000;

@@ -31,6 +31,7 @@ import {
   ensureCeoPersonalBank,
   preparePersonalExpensesForMonth
 } from './CeoEconomics.js';
+import { prepareCompanyOverheadForMonth } from './CompanyOverhead.js';
 import { createInitialCooState, hireCoo, isCooHired } from './Coo.js';
 import { clampCeoBirthMonth, clampCeoBirthYear } from './CeoProfile.js';
 import {
@@ -351,6 +352,8 @@ export function normalizeSave(raw) {
       }
     }
     if (state.finance.section === undefined) state.finance.section = 'overview';
+    if (state.finance.overheadScheduled === undefined) state.finance.overheadScheduled = null;
+    if (state.finance.lastCompanyOverhead === undefined) state.finance.lastCompanyOverhead = null;
     if (state.finance.arr === undefined) {
       state.finance.arr = Math.round((state.finance.mrr ?? state.finance.monthlyRevenue ?? 0) * 12);
     }
@@ -427,6 +430,7 @@ export function normalizeSave(raw) {
     }
     ensureCeoPersonalBank(state);
     preparePersonalExpensesForMonth(state);
+    prepareCompanyOverheadForMonth(state);
     if (state.finance.lastRound === undefined) state.finance.lastRound = null;
     if (!state.flags) state.flags = {};
     if (state.flags.gameOver === undefined) state.flags.gameOver = false;
