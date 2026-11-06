@@ -2117,6 +2117,22 @@ h1 {
   min-width: 10rem;
 }
 
+.ceo-lifestyle-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.ceo-lifestyle-tags {
+  opacity: 0.88;
+}
+
+.ceo-lifestyle-owned .btn-small {
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+
 .finance-panel {
   display: flex;
   flex-direction: column;

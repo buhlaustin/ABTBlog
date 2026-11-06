@@ -1,0 +1,271 @@
+{
+  "categories": [
+    { "id": "mobility", "label": "Wheels & toys" },
+    { "id": "tech", "label": "Home office & tech" },
+    { "id": "wellness", "label": "Wellness & clubs" },
+    { "id": "travel", "label": "Travel & experiences" },
+    { "id": "collectibles", "label": "Collectibles & taste" },
+    { "id": "staff", "label": "Personal staff & security" }
+  ],
+  "purchases": [
+    {
+      "id": "ebike-pack",
+      "category": "mobility",
+      "label": "E-bike & gear pack",
+      "cost": 12500,
+      "blurb": "Commute without parking — still expense it as “wellness”."
+    },
+    {
+      "id": "electric-sedan",
+      "category": "mobility",
+      "label": "Executive EV sedan",
+      "cost": 78000,
+      "monthlyDebitBump": 420,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Quiet commute, home charger, and a tax story for your accountant.",
+      "resalePct": 0.62
+    },
+    {
+      "id": "sports-car",
+      "category": "mobility",
+      "label": "Sports car",
+      "cost": 185000,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Garage trophy — depreciation is a lifestyle choice.",
+      "resalePct": 0.55
+    },
+    {
+      "id": "luxury-suv",
+      "category": "mobility",
+      "label": "Luxury SUV",
+      "cost": 95000,
+      "monthlyDebitBump": 650,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Car seats, ski rack, and a parking spot labeled “Reserved”.",
+      "resalePct": 0.58
+    },
+    {
+      "id": "supercar",
+      "category": "mobility",
+      "label": "Supercar allocation",
+      "cost": 325000,
+      "monthlyDebitBump": 1850,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Track days, storage, and insurance that dwarfs the car note.",
+      "minNetWorth": 2000000,
+      "resalePct": 0.48,
+      "sentimentOnPurchase": 1
+    },
+    {
+      "id": "classic-car",
+      "category": "collectibles",
+      "label": "Classic collector car",
+      "cost": 420000,
+      "blurb": "Auction win — insured like a small company.",
+      "resalePct": 0.65,
+      "minNetWorth": 1500000
+    },
+    {
+      "id": "standing-desk-suite",
+      "category": "tech",
+      "label": "Standing desk & monitor wall",
+      "cost": 8500,
+      "blurb": "Ultrawides, cable management, and a chair that costs more than your first hire."
+    },
+    {
+      "id": "podcast-studio",
+      "category": "tech",
+      "label": "Home podcast studio",
+      "cost": 52000,
+      "monthlyDebitBump": 280,
+      "blurb": "Acoustic panels — every founder suddenly has a newsletter voice.",
+      "buzzOnPurchase": 1
+    },
+    {
+      "id": "home-theater",
+      "category": "tech",
+      "label": "Home theater build-out",
+      "cost": 145000,
+      "monthlyDebitBump": 1200,
+      "blurb": "4K projector, stadium seating, and a streaming backlog you will never finish.",
+      "minNetWorth": 750000
+    },
+    {
+      "id": "premium-gym",
+      "category": "wellness",
+      "label": "Premium gym membership",
+      "cost": 4200,
+      "monthlyDebitBump": 380,
+      "blurb": "Annual prepay — smoothies and recovery room access included."
+    },
+    {
+      "id": "home-gym-buildout",
+      "category": "wellness",
+      "label": "Home gym build-out",
+      "cost": 85000,
+      "monthlyDebitBump": 450,
+      "blurb": "Rogue rack, cold plunge, and a mirror for post-workout selfies."
+    },
+    {
+      "id": "country-club",
+      "category": "wellness",
+      "label": "Country club initiation",
+      "cost": 75000,
+      "monthlyDebitBump": 2200,
+      "exclusiveGroup": "private-club",
+      "blurb": "Initiation fee — monthly dues stack on discretionary debits."
+    },
+    {
+      "id": "ski-club",
+      "category": "wellness",
+      "label": "Ski club deposit",
+      "cost": 65000,
+      "monthlyDebitBump": 1100,
+      "exclusiveGroup": "private-club",
+      "blurb": "Season locker, guest passes, and après you cannot expense.",
+      "minNetWorth": 500000
+    },
+    {
+      "id": "race-club-membership",
+      "category": "wellness",
+      "label": "Private race club membership",
+      "cost": 120000,
+      "monthlyDebitBump": 1500,
+      "exclusiveGroup": "private-club",
+      "blurb": "Track days in a controlled environment — your board slides call it “team building”.",
+      "minNetWorth": 1500000,
+      "requiresOwned": ["sports-car", "supercar", "luxury-suv", "electric-sedan"]
+    },
+    {
+      "id": "designer-watch",
+      "category": "collectibles",
+      "label": "Designer watch",
+      "cost": 38000,
+      "blurb": "Handshake accessory — resell value is someone else’s problem.",
+      "resalePct": 0.7
+    },
+    {
+      "id": "first-edition-library",
+      "category": "collectibles",
+      "label": "First-edition book collection",
+      "cost": 95000,
+      "blurb": "Signed tech canon — shelf candy for Zoom backgrounds.",
+      "resalePct": 0.6
+    },
+    {
+      "id": "wine-cellar",
+      "category": "collectibles",
+      "label": "Wine cellar build-out",
+      "cost": 220000,
+      "monthlyDebitBump": 900,
+      "blurb": "Climate-controlled — entertainment budget finds a home."
+    },
+    {
+      "id": "vineyard-stake",
+      "category": "collectibles",
+      "label": "Vineyard stake (limited partner)",
+      "cost": 450000,
+      "monthlyDebitBump": 1100,
+      "blurb": "Harvest weekends — the label has your last name in small caps.",
+      "minNetWorth": 2000000,
+      "sentimentOnPurchase": 1
+    },
+    {
+      "id": "art-collection",
+      "category": "collectibles",
+      "label": "Contemporary art fund",
+      "cost": 650000,
+      "blurb": "Blue-chip pieces — appraisal fictionally tracks your net worth.",
+      "minNetWorth": 2500000,
+      "resalePct": 0.55,
+      "sentimentOnPurchase": 2
+    },
+    {
+      "id": "jet-card",
+      "category": "travel",
+      "label": "Private jet card (25 hr)",
+      "cost": 385000,
+      "monthlyDebitBump": 4800,
+      "blurb": "Charter hours — every board meeting is “client visit”."
+    },
+    {
+      "id": "fractional-vacation",
+      "category": "travel",
+      "label": "Fractional vacation home",
+      "cost": 890000,
+      "monthlyDebitBump": 2400,
+      "blurb": "Two weeks a year in Aspen — maintenance fee forever.",
+      "minNetWorth": 1500000
+    },
+    {
+      "id": "yacht-slip",
+      "category": "travel",
+      "label": "Yacht (48 ft)",
+      "cost": 2800000,
+      "monthlyDebitBump": 18000,
+      "blurb": "Dock fees, crew, and fuel — discretionary line never recovers.",
+      "minNetWorth": 3000000,
+      "requiresOwned": ["jet-card"],
+      "sentimentOnPurchase": 2
+    },
+    {
+      "id": "helicopter-share",
+      "category": "travel",
+      "label": "Helicopter fractional share",
+      "cost": 1200000,
+      "monthlyDebitBump": 8500,
+      "blurb": "Skip traffic to the airport you already fly private from.",
+      "minNetWorth": 4000000,
+      "requiresPublic": true,
+      "requiresOwned": ["jet-card"]
+    },
+    {
+      "id": "philanthropy-gala",
+      "category": "travel",
+      "label": "Charity gala table",
+      "cost": 125000,
+      "blurb": "Ten seats, open bar, photo op — donation receipt maybe.",
+      "minNetWorth": 1000000,
+      "sentimentOnPurchase": 1
+    },
+    {
+      "id": "personal-chef",
+      "category": "staff",
+      "label": "Personal chef retainer",
+      "cost": 95000,
+      "monthlyDebitBump": 6500,
+      "blurb": "Meal prep and dinner parties — payroll not included.",
+      "minNetWorth": 2500000
+    },
+    {
+      "id": "household-staff",
+      "category": "staff",
+      "label": "Household manager & nanny team",
+      "cost": 240000,
+      "monthlyDebitBump": 9200,
+      "blurb": "School runs, travel packing, and a calendar you still ignore.",
+      "minNetWorth": 3000000,
+      "minHomeEquity": 500000
+    },
+    {
+      "id": "estate-manager",
+      "category": "staff",
+      "label": "Estate manager retainer",
+      "cost": 180000,
+      "monthlyDebitBump": 5500,
+      "blurb": "Vendor calls, renovation quotes, and gate codes for guests.",
+      "minNetWorth": 5000000,
+      "minHomeEquity": 1500000
+    },
+    {
+      "id": "executive-security",
+      "category": "staff",
+      "label": "Executive security detail",
+      "cost": 180000,
+      "monthlyDebitBump": 3200,
+      "blurb": "Discreet driver and close protection — board asked nicely.",
+      "minNetWorth": 5000000,
+      "requiresPublic": true
+    }
+  ]
+}

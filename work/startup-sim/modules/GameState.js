@@ -442,6 +442,7 @@ export function normalizeSave(raw) {
       }
       if (!state.ceo.lifestyleOwned) state.ceo.lifestyleOwned = [];
       if (state.ceo.lifestyleDebitBump == null) state.ceo.lifestyleDebitBump = 0;
+      if (state.ceo.lifestyleLifetimeSpend == null) state.ceo.lifestyleLifetimeSpend = 0;
       if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
       if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
     }

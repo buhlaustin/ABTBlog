@@ -81,6 +81,7 @@ export function createInitialCeoState() {
     },
     lifestyleOwned: [],
     lifestyleDebitBump: 0,
+    lifestyleLifetimeSpend: 0,
     section: 'overview',
     personalGivingLifetime: 0,
     alumniGivingLifetime: 0,

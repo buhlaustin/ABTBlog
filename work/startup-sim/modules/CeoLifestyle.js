@@ -1,14 +1,62 @@
 import { formatMoney } from './constants.js';
+import { fetchGameJson } from './utils.js';
 import { calendarTurn } from './XC.js';
 import { isPublicCompany } from './IPO.js';
+import bundledCatalog from '../data/ceo-lifestyle-catalog.json' with { type: 'json' };
 
-export const CEO_LIFESTYLE_CATEGORIES = [
-  { id: 'mobility', label: 'Wheels & toys' },
-  { id: 'wellness', label: 'Wellness & clubs' },
-  { id: 'travel', label: 'Travel & experiences' },
-  { id: 'collectibles', label: 'Collectibles & taste' },
-  { id: 'staff', label: 'Personal staff & security' }
-];
+const BUILTIN_PURCHASES = Array.isArray(bundledCatalog?.purchases) ? bundledCatalog.purchases : [];
+const BUILTIN_CATEGORIES = Array.isArray(bundledCatalog?.categories)
+  ? bundledCatalog.categories
+  : [
+      { id: 'mobility', label: 'Wheels & toys' },
+      { id: 'wellness', label: 'Wellness & clubs' },
+      { id: 'travel', label: 'Travel & experiences' },
+      { id: 'collectibles', label: 'Collectibles & taste' },
+      { id: 'staff', label: 'Personal staff & security' }
+    ];
+
+let lifestyleCatalogCache = null;
+
+export async function preloadCeoLifestyleCatalog() {
+  if (lifestyleCatalogCache) return lifestyleCatalogCache;
+  lifestyleCatalogCache = { categories: BUILTIN_CATEGORIES, purchases: BUILTIN_PURCHASES };
+  if (typeof window !== 'undefined') {
+    try {
+      const data = await fetchGameJson('data/ceo-lifestyle-catalog.json');
+      if (data?.purchases?.length) {
+        lifestyleCatalogCache = {
+          categories:
+            Array.isArray(data.categories) && data.categories.length ? data.categories : BUILTIN_CATEGORIES,
+          purchases: data.purchases
+        };
+      }
+    } catch {
+      /* keep bundled catalog */
+    }
+  }
+  syncCeoLifestyleCatalogExports();
+  return lifestyleCatalogCache;
+}
+
+export function getCeoLifestyleCategoriesSync() {
+  return lifestyleCatalogCache?.categories ?? BUILTIN_CATEGORIES;
+}
+
+export function getCeoLifestylePurchasesSync() {
+  if (lifestyleCatalogCache?.purchases?.length) return lifestyleCatalogCache.purchases;
+  return BUILTIN_PURCHASES;
+}
+
+/** Live binding for legacy imports — populated after preload. */
+export let CEO_LIFESTYLE_CATEGORIES = BUILTIN_CATEGORIES;
+export let CEO_LIFESTYLE_PURCHASES = BUILTIN_PURCHASES;
+
+export function syncCeoLifestyleCatalogExports() {
+  CEO_LIFESTYLE_CATEGORIES = getCeoLifestyleCategoriesSync();
+  CEO_LIFESTYLE_PURCHASES = getCeoLifestylePurchasesSync();
+}
+
+syncCeoLifestyleCatalogExports();
 
 export const HOUSING_MODE = {
   RENT: 'rent',
@@ -37,6 +85,15 @@ export const CEO_HOME_TIERS = [
     blurb: 'One-bed downtown — elevator, HOA, no yard.'
   },
   {
+    id: 'city-townhouse',
+    label: 'City townhouse',
+    cashPrice: 820_000,
+    downPct: 0.2,
+    mortgageApr: 0.0665,
+    maintenanceMo: 980,
+    blurb: 'Three floors, small patio, walkable to a overpriced coffee shop.'
+  },
+  {
     id: 'suburban-home',
     label: 'Suburban home',
     cashPrice: 1_350_000,
@@ -53,6 +110,16 @@ export const CEO_HOME_TIERS = [
     mortgageApr: 0.0625,
     maintenanceMo: 3_800,
     blurb: 'Pool, wine room, guest house — property tax hurts.'
+  },
+  {
+    id: 'mountain-retreat',
+    label: 'Mountain retreat',
+    cashPrice: 2_100_000,
+    downPct: 0.22,
+    mortgageApr: 0.064,
+    maintenanceMo: 2_100,
+    blurb: 'A-frame adjacent to a ski lift — short-term rental fantasy included.',
+    minNetWorth: 1_200_000
   },
   {
     id: 'mansion',
@@ -76,141 +143,74 @@ export const CEO_HOME_TIERS = [
   }
 ];
 
-export const CEO_LIFESTYLE_PURCHASES = [
-  {
-    id: 'ebike-pack',
-    category: 'mobility',
-    label: 'E-bike & gear pack',
-    cost: 12_500,
-    blurb: 'Commute without parking — still expense it as “wellness”.'
-  },
-  {
-    id: 'sports-car',
-    category: 'mobility',
-    label: 'Sports car',
-    cost: 185_000,
-    blurb: 'Garage trophy — depreciation is a lifestyle choice.'
-  },
-  {
-    id: 'supercar',
-    category: 'mobility',
-    label: 'Supercar allocation',
-    cost: 325_000,
-    monthlyDebitBump: 1_850,
-    blurb: 'Track days, storage, and insurance that dwarfs the car note.',
-    minNetWorth: 2_000_000
-  },
-  {
-    id: 'classic-car',
-    category: 'collectibles',
-    label: 'Classic collector car',
-    cost: 420_000,
-    blurb: 'Auction win — insured like a small company.'
-  },
-  {
-    id: 'premium-gym',
-    category: 'wellness',
-    label: 'Premium gym membership',
-    cost: 4_200,
-    monthlyDebitBump: 380,
-    blurb: 'Annual prepay — smoothies and recovery room access included.'
-  },
-  {
-    id: 'country-club',
-    category: 'wellness',
-    label: 'Country club initiation',
-    cost: 75_000,
-    monthlyDebitBump: 2_200,
-    blurb: 'Initiation fee — monthly dues stack on discretionary debits.'
-  },
-  {
-    id: 'ski-club',
-    category: 'wellness',
-    label: 'Ski club deposit',
-    cost: 65_000,
-    monthlyDebitBump: 1_100,
-    blurb: 'Season locker, guest passes, and après you cannot expense.',
-    minNetWorth: 500_000
-  },
-  {
-    id: 'designer-watch',
-    category: 'collectibles',
-    label: 'Designer watch',
-    cost: 38_000,
-    blurb: 'Handshake accessory — resell value is someone else’s problem.'
-  },
-  {
-    id: 'wine-cellar',
-    category: 'collectibles',
-    label: 'Wine cellar build-out',
-    cost: 220_000,
-    monthlyDebitBump: 900,
-    blurb: 'Climate-controlled — entertainment budget finds a home.'
-  },
-  {
-    id: 'art-collection',
-    category: 'collectibles',
-    label: 'Contemporary art fund',
-    cost: 650_000,
-    blurb: 'Blue-chip pieces — appraisal fictionally tracks your net worth.'
-  },
-  {
-    id: 'jet-card',
-    category: 'travel',
-    label: 'Private jet card (25 hr)',
-    cost: 385_000,
-    monthlyDebitBump: 4_800,
-    blurb: 'Charter hours — every board meeting is “client visit”.'
-  },
-  {
-    id: 'fractional-vacation',
-    category: 'travel',
-    label: 'Fractional vacation home',
-    cost: 890_000,
-    monthlyDebitBump: 2_400,
-    blurb: 'Two weeks a year in Aspen — maintenance fee forever.',
-    minNetWorth: 1_500_000
-  },
-  {
-    id: 'yacht-slip',
-    category: 'travel',
-    label: 'Yacht (48 ft)',
-    cost: 2_800_000,
-    monthlyDebitBump: 18_000,
-    blurb: 'Dock fees, crew, and fuel — discretionary line never recovers.',
-    minNetWorth: 3_000_000
-  },
-  {
-    id: 'philanthropy-gala',
-    category: 'travel',
-    label: 'Charity gala table',
-    cost: 125_000,
-    blurb: 'Ten seats, open bar, photo op — donation receipt maybe.',
-    minNetWorth: 1_000_000
-  },
-  {
-    id: 'personal-chef',
-    category: 'staff',
-    label: 'Personal chef retainer',
-    cost: 95_000,
-    monthlyDebitBump: 6_500,
-    blurb: 'Meal prep and dinner parties — payroll not included.',
-    minNetWorth: 2_500_000
-  },
-  {
-    id: 'executive-security',
-    category: 'staff',
-    label: 'Executive security detail',
-    cost: 180_000,
-    monthlyDebitBump: 3_200,
-    blurb: 'Discreet driver and close protection — board asked nicely.',
-    minNetWorth: 5_000_000,
-    requiresPublic: true
-  }
-];
-
 export function getCeoLifestylePurchase(purchaseId) {
-  return CEO_LIFESTYLE_PURCHASES.find((p) => p.id === purchaseId) ?? null;
+  return getCeoLifestylePurchasesSync().find((p) => p.id === purchaseId) ?? null;
+}
+
+function ownedLifestyleIds(state) {
+  return new Set(state.ceo?.lifestyleOwned ?? []);
+}
+
+function ownedInExclusiveGroup(state, group) {
+  if (!group) return null;
+  const owned = ownedLifestyleIds(state);
+  return getCeoLifestylePurchasesSync().find((p) => owned.has(p.id) && p.exclusiveGroup === group) ?? null;
+}
+
+function applyLifestylePurchaseEffects(state, def) {
+  const lines = [];
+  if (def.sentimentOnPurchase) {
+    state.sentiment = state.sentiment ?? { score: 68 };
+    state.sentiment.score = Math.min(100, (state.sentiment.score ?? 68) + def.sentimentOnPurchase);
+    lines.push(`Press photos — sentiment +${def.sentimentOnPurchase}.`);
+  }
+  if (def.buzzOnPurchase && state.product) {
+    state.product.buzz = (state.product.buzz ?? 0) + def.buzzOnPurchase;
+    lines.push(`Product buzz +${def.buzzOnPurchase}.`);
+  }
+  return lines;
+}
+
+export function lifestylePurchaseGate(state, def, netWorthGate = null) {
+  if (!def) return { ok: false, reason: 'Unknown purchase.' };
+  if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
+  if (ownedLifestyleIds(state).has(def.id)) {
+    return { ok: false, reason: 'Already purchased this run.' };
+  }
+  if (def.requiresPublic && !isPublicCompany(state)) {
+    return { ok: false, reason: 'Unlocks after your company is public.' };
+  }
+  const clash = ownedInExclusiveGroup(state, def.exclusiveGroup);
+  if (clash) {
+    return { ok: false, reason: `Already own ${clash.label} (one per ${def.exclusiveGroup.replace(/-/g, ' ')}).` };
+  }
+  if (def.requiresOwned?.length) {
+    const owned = ownedLifestyleIds(state);
+    const hasAny = def.requiresOwned.some((id) => owned.has(id));
+    if (!hasAny) {
+      return { ok: false, reason: 'Requires another lifestyle purchase first (see catalog note).' };
+    }
+  }
+  if (def.minHomeEquity) {
+    const eq = ceoHomeEquity(state);
+    if (eq < def.minHomeEquity) {
+      return {
+        ok: false,
+        reason: `Need about ${formatMoney(def.minHomeEquity)} home equity (yours ≈ ${formatMoney(eq)}).`
+      };
+    }
+  }
+  if (def.minNetWorth && netWorthGate && !netWorthGate.ok) {
+    return { ok: false, reason: netWorthGate.reason ?? 'Net worth gate.' };
+  }
+  const bal = state.ceo?.bankBalance ?? 0;
+  if (bal < def.cost) {
+    return {
+      ok: false,
+      reason: `Need ${formatMoney(def.cost)} in personal bank (have ${formatMoney(bal)}).`
+    };
+  }
+  return { ok: true };
 }
 
 export function ceoLifestyleMonthlyDebit(state) {
@@ -218,8 +218,12 @@ export function ceoLifestyleMonthlyDebit(state) {
 }
 
 export function ceoLifestyleOwnedDetails(state) {
-  const owned = new Set(state.ceo?.lifestyleOwned ?? []);
-  return CEO_LIFESTYLE_PURCHASES.filter((p) => owned.has(p.id));
+  const owned = ownedLifestyleIds(state);
+  return getCeoLifestylePurchasesSync().filter((p) => owned.has(p.id));
+}
+
+export function ceoLifestyleLifetimeSpend(state) {
+  return Math.max(0, state.ceo?.lifestyleLifetimeSpend ?? 0);
 }
 
 const MORTGAGE_TERM_MONTHS = 360;
@@ -515,16 +519,9 @@ export function payOffCeoMortgage(state) {
 
 export function purchaseCeoLifestyle(state, purchaseId, netWorthGate = null) {
   const def = getCeoLifestylePurchase(purchaseId);
-  if (!def) return { ok: false, reason: 'Unknown purchase.' };
-  if ((state.ceo?.lifestyleOwned ?? []).includes(def.id)) {
-    return { ok: false, reason: 'Already purchased this run.' };
-  }
-  if (def.requiresPublic && !isPublicCompany(state)) {
-    return { ok: false, reason: 'Unlocks after your company is public.' };
-  }
-  if (def.minNetWorth && netWorthGate && !netWorthGate.ok) {
-    return { ok: false, reason: netWorthGate.reason ?? 'Net worth gate.' };
-  }
+  const gate = lifestylePurchaseGate(state, def, netWorthGate);
+  if (!gate.ok) return gate;
+
   const paid = payFromPersonalBank(state, def.cost, def.label, 'lifestyle');
   if (!paid.ok) return paid;
 
@@ -532,13 +529,54 @@ export function purchaseCeoLifestyle(state, purchaseId, netWorthGate = null) {
   if (def.monthlyDebitBump) {
     state.ceo.lifestyleDebitBump = (state.ceo.lifestyleDebitBump ?? 0) + def.monthlyDebitBump;
   }
+  state.ceo.lifestyleLifetimeSpend = (state.ceo.lifestyleLifetimeSpend ?? 0) + paid.paid;
+  const effectLines = applyLifestylePurchaseEffects(state, def);
 
   const bumpNote = def.monthlyDebitBump
     ? ` Discretionary debits +${formatMoney(def.monthlyDebitBump)}/mo.`
     : '';
+  const fx = effectLines.length ? ` ${effectLines.join(' ')}` : '';
   return {
     ok: true,
-    summary: `Paid ${formatMoney(def.cost)} — ${def.label}.${bumpNote}`
+    summary: `Paid ${formatMoney(def.cost)} — ${def.label}.${bumpNote}${fx}`
+  };
+}
+
+export function sellCeoLifestyle(state, purchaseId) {
+  if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
+  const def = getCeoLifestylePurchase(purchaseId);
+  if (!def) return { ok: false, reason: 'Unknown purchase.' };
+  const owned = state.ceo?.lifestyleOwned ?? [];
+  if (!owned.includes(def.id)) return { ok: false, reason: 'You do not own this item.' };
+  const pct = def.resalePct;
+  if (!pct || pct <= 0) return { ok: false, reason: 'This splurge cannot be resold in-game.' };
+
+  const proceeds = Math.max(500, Math.round(def.cost * pct));
+  state.ceo.lifestyleOwned = owned.filter((id) => id !== def.id);
+  if (def.monthlyDebitBump) {
+    state.ceo.lifestyleDebitBump = Math.max(
+      0,
+      (state.ceo.lifestyleDebitBump ?? 0) - def.monthlyDebitBump
+    );
+  }
+  state.ceo.bankBalance = (state.ceo.bankBalance ?? 0) + proceeds;
+  if (!state.ceo.bankLog) state.ceo.bankLog = [];
+  state.ceo.bankLog.unshift({
+    kind: 'lifestyle_resale',
+    amount: proceeds,
+    delta: proceeds,
+    balanceAfter: state.ceo.bankBalance,
+    label: `Sold ${def.label}`,
+    turn: calendarTurn(state),
+    month: state.calendar?.monthIndex,
+    year: state.calendar?.year
+  });
+  if (state.ceo.bankLog.length > 12) state.ceo.bankLog.length = 12;
+
+  return {
+    ok: true,
+    proceeds,
+    summary: `Sold ${def.label} — ${formatMoney(proceeds)} to personal bank (~${Math.round(pct * 100)}% of purchase). Monthly debits adjusted.`
   };
 }
 

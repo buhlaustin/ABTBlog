@@ -3,6 +3,7 @@ import { formatStateMonth } from './GameCalendar.js';
 import { calendarTurn } from './XC.js';
 import { sponsoredMrrMonthly, sponsorshipBookSummary } from './TreasurySponsorships.js';
 import { resolveCompanyAlmaMater, alumniRecognitionLabel } from './CeoAlumniGiving.js';
+import { ceoLifestyleLifetimeSpend, ceoLifestyleOwnedDetails } from './CeoLifestyle.js';
 
 export function buildRunExportText(state) {
   const lines = [];
@@ -16,6 +17,13 @@ export function buildRunExportText(state) {
   lines.push(`Months played: ${months}`);
   lines.push(`Lifetime revenue: ${formatMoney(state.finance?.lifetimeRevenue ?? 0)}`);
   lines.push(`Cash: ${formatMoney(state.finance?.cash ?? 0)}`);
+
+  const lifestyleOwned = ceoLifestyleOwnedDetails(state);
+  if (lifestyleOwned.length > 0) {
+    lines.push(
+      `CEO splurges: ${lifestyleOwned.length} owned · ${formatMoney(ceoLifestyleLifetimeSpend(state))} lifetime spend`
+    );
+  }
 
   const school = resolveCompanyAlmaMater(state);
   const alumniLifetime = state.ceo?.alumniGivingLifetime ?? 0;

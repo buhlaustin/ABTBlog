@@ -30,11 +30,13 @@ import {
 } from './CeoEconomics.js';
 import {
   CEO_HOME_TIERS,
-  CEO_LIFESTYLE_PURCHASES,
-  CEO_LIFESTYLE_CATEGORIES,
+  getCeoLifestylePurchasesSync,
+  getCeoLifestyleCategoriesSync,
   ceoHousingSummary,
   ceoLifestyleMonthlyDebit,
   ceoLifestyleOwnedDetails,
+  ceoLifestyleLifetimeSpend,
+  lifestylePurchaseGate,
   standardMortgagePayment,
   HOUSING_MODE
 } from './CeoLifestyle.js';
@@ -611,25 +613,38 @@ function renderCeoLifestyleSection(ctx) {
 
   const renderLifestyleCard = (item) => {
     const owned = lifestyleOwned.has(item.id);
-    const gatedNw = item.minNetWorth && netWorth < item.minNetWorth;
-    const gatedPublic = item.requiresPublic && !isPublicCompany(state);
-    const gated = gatedNw || gatedPublic;
-    const gateNote = gatedPublic
-      ? 'Public company only'
-      : gatedNw
-        ? `Requires ≈ ${formatMoney(item.minNetWorth)} net worth`
+    const gate = lifestylePurchaseGate(state, item, { ok: !item.minNetWorth || netWorth >= item.minNetWorth });
+    const canBuy = gate.ok && !disabled;
+    const tags = [
+      item.exclusiveGroup ? 'One per category' : null,
+      item.requiresPublic ? 'Public co.' : null,
+      item.resalePct ? `Resell ~${Math.round(item.resalePct * 100)}%` : null,
+      item.buzzOnPurchase ? `+${item.buzzOnPurchase} buzz` : null,
+      item.sentimentOnPurchase ? `+${item.sentimentOnPurchase} sentiment` : null,
+      item.requiresOwned?.length ? 'Requires prior purchase' : null,
+      item.minHomeEquity ? `≥${formatMoney(item.minHomeEquity)} home equity` : null
+    ]
+      .filter(Boolean)
+      .join(' · ');
+    const sellBtn =
+      owned && item.resalePct
+        ? `<button type="button" class="btn btn-ghost btn-small" data-ceo-lifestyle-sell="${escapeHtml(item.id)}" ${disabled}>Sell</button>`
         : '';
-    return `<div class="finance-action people-perk-card">
+    return `<div class="finance-action people-perk-card ceo-lifestyle-card">
       <p><strong>${escapeHtml(item.label)}</strong> — ${formatMoney(item.cost)}${owned ? ' <span class="task-tag">Owned</span>' : ''}</p>
       <p class="fine-print">${escapeHtml(item.blurb)}</p>
-      ${gateNote ? `<p class="fine-print people-perk-effects">${escapeHtml(gateNote)}</p>` : ''}
+      ${tags ? `<p class="fine-print ceo-lifestyle-tags">${escapeHtml(tags)}</p>` : ''}
+      ${item.minNetWorth ? `<p class="fine-print people-perk-effects">≈ ${formatMoney(item.minNetWorth)} net worth</p>` : ''}
       ${item.monthlyDebitBump ? `<p class="fine-print people-perk-effects">+${formatMoney(item.monthlyDebitBump)}/mo discretionary debits</p>` : ''}
-      <button type="button" class="btn btn-primary btn-small" data-ceo-lifestyle="${escapeHtml(item.id)}" ${owned || disabled || gated ? 'disabled' : ''}>Buy</button>
+      <div class="ceo-lifestyle-card-actions">
+        <button type="button" class="btn btn-primary btn-small" data-ceo-lifestyle="${escapeHtml(item.id)}" ${owned || !canBuy ? 'disabled' : ''}${!canBuy && !owned ? ` title="${escapeHtml(gate.reason ?? '')}"` : ''}>Buy</button>
+        ${sellBtn}
+      </div>
     </div>`;
   };
 
-  const lifestyleByCategory = CEO_LIFESTYLE_CATEGORIES.map((cat) => {
-    const items = CEO_LIFESTYLE_PURCHASES.filter((p) => (p.category ?? 'other') === cat.id);
+  const lifestyleByCategory = getCeoLifestyleCategoriesSync().map((cat) => {
+    const items = getCeoLifestylePurchasesSync().filter((p) => (p.category ?? 'other') === cat.id);
     if (!items.length) return '';
     return `<div class="ceo-lifestyle-category">
       <h5 class="finance-section-title">${escapeHtml(cat.label)}</h5>
@@ -639,15 +654,19 @@ function renderCeoLifestyleSection(ctx) {
 
   const ownedDetails = ceoLifestyleOwnedDetails(state);
   const lifestyleMo = ceoLifestyleMonthlyDebit(state);
+  const lifestyleSpend = ceoLifestyleLifetimeSpend(state);
   const ownedList =
     ownedDetails.length > 0
       ? `<ul class="instrument-list fine-print">${ownedDetails
-          .map(
-            (p) =>
-              `<li><strong>${escapeHtml(p.label)}</strong>${p.monthlyDebitBump ? ` · +${formatMoney(p.monthlyDebitBump)}/mo` : ''}</li>`
-          )
+          .map((p) => {
+            const sell =
+              p.resalePct && !disabled
+                ? ` <button type="button" class="btn btn-ghost btn-small" data-ceo-lifestyle-sell="${escapeHtml(p.id)}">Sell</button>`
+                : '';
+            return `<li><strong>${escapeHtml(p.label)}</strong>${p.monthlyDebitBump ? ` · +${formatMoney(p.monthlyDebitBump)}/mo` : ''}${sell}</li>`;
+          })
           .join('')}</ul>`
-      : '<p class="fine-print">No splurges yet — early picks like the e-bike pack or premium gym are affordable on a modest personal bank.</p>';
+      : '<p class="fine-print">No splurges yet — e-bike, standing desk, or premium gym are affordable early; cars and clubs are exclusive picks.</p>';
 
   const housingStatusLine =
     housing.mode === HOUSING_MODE.RENT
@@ -695,10 +714,11 @@ function renderCeoLifestyleSection(ctx) {
       ${mortgageBlock}
       ${panelMetricGroup(
         'Lifestyle snapshot',
-        panelMetricGrid('4', [
+        panelMetricGrid('5', [
           panelStatCard('Home equity', formatMoney(housing.equity), { hero: housing.equity > 0 }),
           panelStatCard('Est. net worth', formatMoney(netWorth)),
           panelStatCard('Splurges owned', String(lifestyleOwned.size)),
+          panelStatCard('Lifetime splurge spend', lifestyleSpend > 0 ? formatMoney(lifestyleSpend) : '—'),
           panelStatCard('Lifestyle debits', lifestyleMo > 0 ? `${formatMoney(lifestyleMo)}/mo` : '—', {
             hero: lifestyleMo > 0
           })
@@ -708,7 +728,7 @@ function renderCeoLifestyleSection(ctx) {
       <h4 class="finance-section-title">Homes</h4>
       <div class="people-perk-grid ceo-home-grid">${homeCards}</div>
       <h4 class="finance-section-title">Splurge catalog</h4>
-      <p class="fine-print">${CEO_LIFESTYLE_PURCHASES.length} purchases across ${CEO_LIFESTYLE_CATEGORIES.length} categories — some add recurring discretionary debits on top of your salary band.</p>
+      <p class="fine-print">${getCeoLifestylePurchasesSync().length} purchases across ${getCeoLifestyleCategoriesSync().length} categories — exclusive groups (one car, one club), prerequisites, resell on select items, optional buzz/sentiment on flagship buys.</p>
       ${lifestyleByCategory}
     </section>
   `;

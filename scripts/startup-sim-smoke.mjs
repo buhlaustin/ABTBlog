@@ -2583,9 +2583,13 @@ const {
   purchaseCeoHomeMortgage,
   prepayCeoMortgage,
   purchaseCeoLifestyle,
+  sellCeoLifestyle,
+  preloadCeoLifestyleCatalog,
   getCeoHomeTier,
-  ceoLifestyleMonthlyDebit
+  ceoLifestyleMonthlyDebit,
+  ceoLifestyleLifetimeSpend
 } = await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
+await preloadCeoLifestyleCatalog();
 const {
   donateFromPersonalBank,
   recordCeoNetWorthSnapshot,
@@ -2652,10 +2656,22 @@ if (!bought.ok) {
             categoryId: 'b2b-saas',
             mode: 'sandbox'
           });
-          lifestyleState.ceo.bankBalance = 50_000;
+          lifestyleState.ceo.bankBalance = 300_000;
           const gym = purchaseCeoLifestyle(lifestyleState, 'premium-gym');
+          const car = purchaseCeoLifestyle(lifestyleState, 'electric-sedan');
+          const carClash = purchaseCeoLifestyle(lifestyleState, 'sports-car');
+          const resale = sellCeoLifestyle(lifestyleState, 'electric-sedan');
           if (!gym.ok || ceoLifestyleMonthlyDebit(lifestyleState) !== 380) {
             console.error(`FAIL: CEO lifestyle purchase: ${gym.reason ?? 'debit bump'}`);
+            failed = true;
+          } else if (!car.ok || carClash.ok) {
+            console.error('FAIL: CEO lifestyle exclusive vehicle group');
+            failed = true;
+          } else if (!resale.ok || resale.proceeds <= 0) {
+            console.error(`FAIL: CEO lifestyle resale: ${resale.reason ?? 'proceeds'}`);
+            failed = true;
+          } else if (ceoLifestyleLifetimeSpend(lifestyleState) !== 4200 + 78000) {
+            console.error('FAIL: CEO lifestyle lifetime spend');
             failed = true;
           } else {
             console.log(

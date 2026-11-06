@@ -112,11 +112,13 @@ import {
   purchaseCeoHomeCash,
   purchaseCeoHomeMortgage,
   purchaseCeoLifestyle,
+  sellCeoLifestyle,
   sellCeoHome,
   prepayCeoMortgage,
   payOffCeoMortgage,
   getCeoHomeTier,
-  CEO_LIFESTYLE_PURCHASES
+  getCeoLifestylePurchase,
+  preloadCeoLifestyleCatalog
 } from './modules/CeoLifestyle.js';
 import {
   preloadCeoAlmaMaterCatalog,
@@ -1436,10 +1438,23 @@ function bindGameInteractions() {
     const lifestyleBtn = e.target.closest('[data-ceo-lifestyle]');
     if (lifestyleBtn && sessionState) {
       const purchaseId = lifestyleBtn.getAttribute('data-ceo-lifestyle');
-      const def = CEO_LIFESTYLE_PURCHASES.find((p) => p.id === purchaseId);
+      const def = getCeoLifestylePurchase(purchaseId);
       const gate = assertCeoNetWorthGate(sessionState, def?.minNetWorth);
       const result = purchaseCeoLifestyle(sessionState, purchaseId, gate);
       if (!result.ok) showCeoFeedback(result.reason || 'Purchase failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+        preparePersonalExpensesForMonth(sessionState);
+      }
+      refresh();
+      return;
+    }
+    const lifestyleSellBtn = e.target.closest('[data-ceo-lifestyle-sell]');
+    if (lifestyleSellBtn && sessionState) {
+      const purchaseId = lifestyleSellBtn.getAttribute('data-ceo-lifestyle-sell');
+      const result = sellCeoLifestyle(sessionState, purchaseId);
+      if (!result.ok) showCeoFeedback(result.reason || 'Sale failed.', true);
       else {
         appendLog(sessionState, result.summary);
         showCeoFeedback(result.summary);
@@ -2202,6 +2217,7 @@ async function init() {
         preloadAcquisitionCatalog(),
         preloadTreasurySponsorshipDeals(),
         preloadCeoAlmaMaterCatalog(),
+        preloadCeoLifestyleCatalog(),
         preloadNewsTimeline()
       ]);
       populateCategorySelect(categorySelect, getCategoriesSync());
