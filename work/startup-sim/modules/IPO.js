@@ -386,10 +386,15 @@ export function executeStockSplit(state) {
     return { ok: false, reason: 'Board waits until the share price is at least $180.' };
   }
   const turn = calendarTurn(state);
-  if (pm.lastSplitTurn != null && turn - pm.lastSplitTurn < 6) {
+  const sandbox = state.mode === 'sandbox';
+  if (
+    !sandbox &&
+    pm.lastSplitTurn != null &&
+    turn - pm.lastSplitTurn < 6
+  ) {
     return { ok: false, reason: 'One split every 6 months max.' };
   }
-  pm.lastSplitTurn = turn;
+  if (!sandbox) pm.lastSplitTurn = turn;
   for (const row of state.capTable ?? []) {
     if (row.shares) row.shares *= 2;
   }

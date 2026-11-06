@@ -868,9 +868,11 @@ const {
   tickPublicMarket,
   setPublicGuidanceTone,
   executeStockBuyback,
+  executeStockSplit,
   whisperRevenueTarget,
   sellFounderSharesPartial
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+const { calendarTurn } = await import(`file://${join(sim, 'modules/XC.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 pub.stage = ST.PUBLIC;
 pub.flags.seedRoundClosed = true;
@@ -975,6 +977,44 @@ if (!ipo.ok) {
   if (!bb.ok) {
     console.error(`FAIL: buyback smoke: ${bb.reason}`);
     failed = true;
+  }
+  pub.publicMarket.sharePrice = 400;
+  pub.publicMarket.lastSplitTurn = calendarTurn(pub);
+  const sandboxSplitA = executeStockSplit(pub);
+  const sandboxSplitB = executeStockSplit(pub);
+  if (!sandboxSplitA.ok) {
+    console.error(`FAIL: sandbox stock split: ${sandboxSplitA.reason}`);
+    failed = true;
+  } else if (!sandboxSplitB.ok) {
+    console.error(`FAIL: sandbox should allow back-to-back splits: ${sandboxSplitB.reason}`);
+    failed = true;
+  } else {
+    const careerSplitState = createInitialState({
+      companyName: 'Split Gate Co',
+      categoryId: 'b2b-saas',
+      mode: 'career'
+    });
+    careerSplitState.flags.seedRoundClosed = true;
+    careerSplitState.flags.ipoFiled = true;
+    careerSplitState.stage = ST.PUBLIC;
+    careerSplitState.publicMarket = {
+      ...pub.publicMarket,
+      sharePrice: 400,
+      ipoPrice: 400,
+      lastSplitTurn: null
+    };
+    careerSplitState.capTable = JSON.parse(JSON.stringify(pub.capTable));
+    const careerSplitOnce = executeStockSplit(careerSplitState);
+    const careerSplitTwice = executeStockSplit(careerSplitState);
+    if (!careerSplitOnce.ok) {
+      console.error(`FAIL: career stock split: ${careerSplitOnce.reason}`);
+      failed = true;
+    } else if (careerSplitTwice.ok) {
+      console.error('FAIL: career should enforce 6-month split cooldown');
+      failed = true;
+    } else if (!failed) {
+      console.log('OK: sandbox unlimited stock splits; career keeps 6-month gate');
+    }
   }
   const { tickPublicMarketAtMonthStart } = await import(`file://${join(sim, 'modules/IPO.js')}`);
   tickPublicMarketAtMonthStart(pub);
