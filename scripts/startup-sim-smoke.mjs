@@ -65,6 +65,9 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
 } else if (!getTaskDefinitions().some((t) => t.id === 'public-esg-metrics-audit-defense')) {
   console.error('FAIL: public late handcrafted pack not merged');
   failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'mid-soc2-type2-evidence-sprint')) {
+  console.error('FAIL: mid-game handcrafted pack not merged');
+  failed = true;
 } else if (!failed) {
   console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
 }
