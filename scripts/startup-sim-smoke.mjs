@@ -868,9 +868,11 @@ const {
   tickPublicMarket,
   setPublicGuidanceTone,
   executeStockBuyback,
+  executeStockSplit,
   whisperRevenueTarget,
   sellFounderSharesPartial
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+const { calendarTurn } = await import(`file://${join(sim, 'modules/XC.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 pub.stage = ST.PUBLIC;
 pub.flags.seedRoundClosed = true;
@@ -975,6 +977,44 @@ if (!ipo.ok) {
   if (!bb.ok) {
     console.error(`FAIL: buyback smoke: ${bb.reason}`);
     failed = true;
+  }
+  pub.publicMarket.sharePrice = 400;
+  pub.publicMarket.lastSplitTurn = calendarTurn(pub);
+  const sandboxSplitA = executeStockSplit(pub);
+  const sandboxSplitB = executeStockSplit(pub);
+  if (!sandboxSplitA.ok) {
+    console.error(`FAIL: sandbox stock split: ${sandboxSplitA.reason}`);
+    failed = true;
+  } else if (!sandboxSplitB.ok) {
+    console.error(`FAIL: sandbox should allow back-to-back splits: ${sandboxSplitB.reason}`);
+    failed = true;
+  } else {
+    const careerSplitState = createInitialState({
+      companyName: 'Split Gate Co',
+      categoryId: 'b2b-saas',
+      mode: 'career'
+    });
+    careerSplitState.flags.seedRoundClosed = true;
+    careerSplitState.flags.ipoFiled = true;
+    careerSplitState.stage = ST.PUBLIC;
+    careerSplitState.publicMarket = {
+      ...pub.publicMarket,
+      sharePrice: 400,
+      ipoPrice: 400,
+      lastSplitTurn: null
+    };
+    careerSplitState.capTable = JSON.parse(JSON.stringify(pub.capTable));
+    const careerSplitOnce = executeStockSplit(careerSplitState);
+    const careerSplitTwice = executeStockSplit(careerSplitState);
+    if (!careerSplitOnce.ok) {
+      console.error(`FAIL: career stock split: ${careerSplitOnce.reason}`);
+      failed = true;
+    } else if (careerSplitTwice.ok) {
+      console.error('FAIL: career should enforce 6-month split cooldown');
+      failed = true;
+    } else if (!failed) {
+      console.log('OK: sandbox unlimited stock splits; career keeps 6-month gate');
+    }
   }
   const { tickPublicMarketAtMonthStart } = await import(`file://${join(sim, 'modules/IPO.js')}`);
   tickPublicMarketAtMonthStart(pub);
@@ -1145,6 +1185,14 @@ const {
   suggestedCeoSalaryBand,
   ceoSalaryBoardNote
 } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
+const {
+  salaryForDept,
+  tickMarketSalaryDemand,
+  MARKET_SALARY_ANNUAL_BUMP_PCT
+} = await import(`file://${join(sim, 'modules/Staff.js')}`);
+const { purchaseWorkspaceTier, WORKSPACE_TIER: PAY_WS_TIER } = await import(
+  `file://${join(sim, 'modules/Workspace.js')}`
+);
 const { projectMonthlyBurn, estimateEraRevenuePotential, allTierRevenuePotentialRows } =
   await import(`file://${join(sim, 'modules/Finance.js')}`);
 const { TIER_REVENUE_PROFILE, eraBaseRevenueScaleForTask } = await import(
@@ -1209,6 +1257,33 @@ if (ipoBand.label !== 'Public company') {
   failed = true;
 } else if (!failed) {
   console.log('OK: public CEO comp band + no pre-Series A warning without Series A');
+}
+const marketPayState = createInitialState({
+  companyName: 'Market Pay Co',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+marketPayState.finance.mrr = 15_000;
+marketPayState.flags.seedRoundClosed = true;
+const officeOk = purchaseWorkspaceTier(marketPayState, PAY_WS_TIER.SMALL);
+const engBefore = salaryForDept('engineering', null, marketPayState);
+marketPayState.staff.marketSalaryLastBumpYear = marketPayState.calendar.year;
+marketPayState.staff.marketSalaryLastBumpMonth = marketPayState.calendar.monthIndex;
+marketPayState.calendar.year += 1;
+const marketLines = tickMarketSalaryDemand(marketPayState);
+const engAfter = salaryForDept('engineering', null, marketPayState);
+const expectedEng = Math.round(engBefore * (1 + MARKET_SALARY_ANNUAL_BUMP_PCT));
+if (!officeOk.ok) {
+  console.error(`FAIL: market pay office: ${officeOk.reason}`);
+  failed = true;
+} else if (!marketLines.length) {
+  console.error('FAIL: expected annual market salary bump log line');
+  failed = true;
+} else if (Math.abs(engAfter - expectedEng) > 2) {
+  console.error(`FAIL: market salary bump ${engBefore} → ${engAfter} (expected ~${expectedEng})`);
+  failed = true;
+} else if (!failed) {
+  console.log(`OK: annual market salary bump (+${MARKET_SALARY_ANNUAL_BUMP_PCT * 100}% every 12 months)`);
 }
 if (!failed) {
   if (TIER_REVENUE_PROFILE.length !== 8) {
@@ -1465,6 +1540,60 @@ if (!failed) {
     failed = true;
   } else {
     console.log(`OK: hub HQ cap ${HUB_HEADCOUNT_CAP} + satellite seats (${totalHeadcountCap(hubCapState)} hiring cap)`);
+  }
+  const { headcountCap, getWorkspaceTier } = await import(`file://${join(sim, 'modules/Workspace.js')}`);
+  const { hiringAllowed } = await import(`file://${join(sim, 'modules/Staff.js')}`);
+  const driftHubState = createInitialState({
+    companyName: 'Drift Hub',
+    categoryId: 'b2b-saas',
+    mode: 'career'
+  });
+  driftHubState.workspace = {
+    ...(driftHubState.workspace ?? {}),
+    tier: WS_TIER.CAMPUS,
+    campusOwned: true
+  };
+  driftHubState.offices = {
+    hubId: 'atlanta',
+    hubLabel: 'Atlanta',
+    satellites: [{ id: 'sat-denver', templateId: 'sat-denver', label: 'Denver', seats: denverMed.seats }],
+    usedSatelliteTemplateIds: ['sat-denver']
+  };
+  const driftTotal = totalHeadcountCap(driftHubState);
+  if (headcountCap(driftHubState) !== HUB_HEADCOUNT_CAP || driftTotal !== HUB_HEADCOUNT_CAP + denverMed.seats) {
+    console.error(
+      `FAIL: hub city should set hub cap even when workspace tier drifted (got ${headcountCap(driftHubState)}/${driftTotal})`
+    );
+    failed = true;
+  } else if (!hiringAllowed(driftHubState)) {
+    console.error('FAIL: hub city should allow hiring when workspace tier drifted');
+    failed = true;
+  } else {
+    const migratedDrift = normalizeSave(JSON.parse(JSON.stringify(driftHubState)));
+    if (getWorkspaceTier(migratedDrift) !== WS_TIER.HUB) {
+      console.error('FAIL: normalizeSave should restore hub workspace tier when hubId is set');
+      failed = true;
+    } else {
+      console.log('OK: hub headcount cap follows hub city + save migrate fixes tier drift');
+    }
+  }
+  const sandPostXc = createInitialState({
+    companyName: 'Sandbox Hub Start',
+    categoryId: 'b2b-saas',
+    mode: 'sandbox',
+    sandboxTuning: { startingStage: 'post_xc', revenueMult: 1, ipoGateArr: 50_000_000 }
+  });
+  if (!sandPostXc.offices?.hubId) {
+    console.error('FAIL: sandbox post_xc start should open a hub city');
+    failed = true;
+  } else if (getWorkspaceTier(sandPostXc) !== WS_TIER.HUB) {
+    console.error(`FAIL: sandbox post_xc start should set hub workspace tier (got ${getWorkspaceTier(sandPostXc)})`);
+    failed = true;
+  } else if (!hiringAllowed(sandPostXc) || totalHeadcountCap(sandPostXc) !== 10_000) {
+    console.error('FAIL: sandbox post_xc start hiring cap / allow hire');
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: sandbox post_xc hub start (hire allowed, 10k cap, hub tier)');
   }
 }
 if (!failed) {

@@ -5,7 +5,12 @@ import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
 import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices, satelliteTemplateIdFromEntry } from './Offices.js';
-import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
+import {
+  createInitialWorkspace,
+  applyWorkspaceBurn,
+  getWorkspaceTier,
+  WORKSPACE_TIER
+} from './Workspace.js';
 import { createInitialBoard, migrateBoardForPublicSave } from './Board.js';
 import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart } from './XC.js';
 import { createInitialSentiment } from './Sentiment.js';
@@ -226,6 +231,13 @@ export function normalizeSave(raw) {
       state.staff.optionPoolExpandedThisMonth = false;
     }
     if (!state.staff.peopleSection) state.staff.peopleSection = 'staffing';
+    if (state.staff.marketSalaryMult == null) state.staff.marketSalaryMult = 1;
+    if (state.staff.marketSalaryLastBumpYear === undefined) {
+      state.staff.marketSalaryLastBumpYear = null;
+    }
+    if (state.staff.marketSalaryLastBumpMonth === undefined) {
+      state.staff.marketSalaryLastBumpMonth = null;
+    }
     delete state.social;
     if (!state.news) state.news = createInitialNews();
     if (!state.product) state.product = { level: 0, buzz: 0 };
@@ -417,6 +429,12 @@ export function normalizeSave(raw) {
     if (state.flags.gameOver === undefined) state.flags.gameOver = false;
     if (state.flags.seedRoundClosed === undefined) state.flags.seedRoundClosed = false;
     if (!state.offices) state.offices = createInitialOffices();
+    if (state.offices?.hubId && getWorkspaceTier(state) !== WORKSPACE_TIER.HUB) {
+      if (!state.workspace) state.workspace = createInitialWorkspace();
+      state.workspace.tier = WORKSPACE_TIER.HUB;
+      state.workspace.hubOwned = true;
+      applyWorkspaceBurn(state);
+    }
     if (state.offices && !state.offices.usedSatelliteTemplateIds) {
       state.offices.usedSatelliteTemplateIds = [];
       for (const s of state.offices.satellites ?? []) {

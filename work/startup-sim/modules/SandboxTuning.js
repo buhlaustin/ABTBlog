@@ -82,6 +82,14 @@ export function applySandboxStartingStage(state) {
     };
     state.finance.fixedCostsMonthly = hub.fixedBase;
     state.company.location = hub.label;
+    if (!state.workspace) state.workspace = { tier: WORKSPACE_TIER.GARAGE };
+    state.workspace.tier = WORKSPACE_TIER.HUB;
+    state.workspace.hubOwned = true;
+    state.workspace.smallOfficeOwned = true;
+    state.workspace.mediumOfficeOwned = true;
+    state.workspace.largeOfficeOwned = true;
+    state.workspace.campusOwned = true;
+    state.finance.hubRentMonthly = hub.fixedBase;
     applySeedCapTableSnapshot(state);
   }
 }

@@ -18,7 +18,7 @@ import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './Progressi
 import { tickPublicMarket, tickIpoLockup, tickPublicMarketAtMonthStart, isPublicCompany } from './IPO.js';
 import { resetPublicMarketEventsAtMonthStart } from './PublicMarkets.js';
 import { onMonthEndSentiment, onStockSentiment } from './Sentiment.js';
-import { syncDraftFromFinalized } from './Staff.js';
+import { syncDraftFromFinalized, tickMarketSalaryDemand } from './Staff.js';
 import { tickXcResidency } from './XC.js';
 import { archiveCurrentNews } from './News.js';
 import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
@@ -130,6 +130,9 @@ export function endMonth(state) {
     appendLog(state, line);
   }
   for (const line of tickCooCompensationReview(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickMarketSalaryDemand(state)) {
     appendLog(state, line);
   }
   for (const line of settlePersonalExpensesAtMonthEnd(state)) {

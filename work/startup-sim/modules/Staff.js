@@ -13,6 +13,10 @@ import { panelStatCard, panelMetricGroup, panelMetricGrid, panelMetricStack, pan
 
 const STAGE_ORDER = [STAGES.GARAGE, STAGES.OFFICE, STAGES.XC, STAGES.POST_XC, STAGES.PUBLIC];
 
+/** Rolling 12-month market reset for department base pay (see tickMarketSalaryDemand). */
+export const MARKET_SALARY_REVIEW_MONTHS = 12;
+export const MARKET_SALARY_ANNUAL_BUMP_PCT = 0.035;
+
 function stageRank(stage) {
   const i = STAGE_ORDER.indexOf(stage);
   return i >= 0 ? i : 0;
@@ -188,8 +192,55 @@ export function createInitialStaff() {
     peopleSection: 'staffing',
     benefitsThisMonth: { companyBonusPct: null, offsiteId: null, perks: [] },
     optionPoolLog: [],
-    optionPoolExpandedThisMonth: false
+    optionPoolExpandedThisMonth: false,
+    marketSalaryMult: 1,
+    marketSalaryLastBumpYear: null,
+    marketSalaryLastBumpMonth: null
   };
+}
+
+/** Every 12 in-game months, lift department base salaries for market demand. */
+export function tickMarketSalaryDemand(state) {
+  if (!state.staff) return [];
+  if (!hiringAllowed(state)) return [];
+
+  const year = state.calendar?.year ?? 0;
+  const month = state.calendar?.monthIndex ?? 0;
+  if (state.staff.marketSalaryMult == null) state.staff.marketSalaryMult = 1;
+
+  if (state.staff.marketSalaryLastBumpYear == null) {
+    state.staff.marketSalaryLastBumpYear = year;
+    state.staff.marketSalaryLastBumpMonth = month;
+    return [];
+  }
+
+  const elapsed =
+    (year - state.staff.marketSalaryLastBumpYear) * 12 +
+    (month - (state.staff.marketSalaryLastBumpMonth ?? month));
+  if (elapsed < MARKET_SALARY_REVIEW_MONTHS) return [];
+
+  const priorMult = state.staff.marketSalaryMult ?? 1;
+  state.staff.marketSalaryMult =
+    Math.round(priorMult * (1 + MARKET_SALARY_ANNUAL_BUMP_PCT) * 1000) / 1000;
+  state.staff.marketSalaryLastBumpYear = year;
+  state.staff.marketSalaryLastBumpMonth = month;
+
+  if (totalHeadcount(state.staff.headcountByDept) > 0) {
+    state.staff.payrollMonthly = computePayroll(
+      state.staff.headcountByDept,
+      state.stage,
+      state
+    );
+  }
+
+  const pctLabel = Math.round(MARKET_SALARY_ANNUAL_BUMP_PCT * 1000) / 10;
+  return [
+    `Market salary adjustment (+${pctLabel}%): department pay bands reset for recruiting and retention.`
+  ];
+}
+
+export function marketSalaryMult(state) {
+  return state.staff?.marketSalaryMult ?? 1;
 }
 
 export function syncDraftFromFinalized(state) {
@@ -207,7 +258,7 @@ export function salaryForDept(deptId, _stage, state = null) {
   if (!state) return base;
   const tier = getWorkspaceTier(state);
   if (tier === WORKSPACE_TIER.GARAGE) return 0;
-  return Math.round(base * salaryTierMult(state));
+  return Math.round(base * salaryTierMult(state) * marketSalaryMult(state));
 }
 
 export function computePayroll(headcount, stage, state = null) {
@@ -234,6 +285,7 @@ export function lockedDepartments(state) {
 }
 
 export function hiringAllowed(state) {
+  if (state.offices?.hubId) return true;
   return getWorkspaceTier(state) !== WORKSPACE_TIER.GARAGE;
 }
 
@@ -461,7 +513,11 @@ export function renderPeopleStaffingPanel(container, state) {
     <section class="finance-section people-staffing-section">
       ${orgMount}
       <div id="org-chart-mount"></div>
-      <p class="fine-print">Hire a named <strong>COO</strong> in the org chart (garage onward). Department headcount unlocks after a small office ($10k ARR).${state.mode === 'sandbox' ? ' Sandbox cap <strong>10,000</strong> headcount.' : ''}${capHint ? ` ${capHint}` : ''}</p>
+      <p class="fine-print">Hire a named <strong>COO</strong> in the org chart (garage onward). Department headcount unlocks after a small office ($10k ARR).${state.mode === 'sandbox' ? ' Sandbox cap <strong>10,000</strong> headcount.' : ''}${capHint ? ` ${capHint}` : ''}${
+        marketSalaryMult(state) > 1.001
+          ? ` Market comp index <strong>×${marketSalaryMult(state).toFixed(3)}</strong> (annual reset).`
+          : ' Base pay resets every 12 months for market demand.'
+      }</p>
       ${panelSnapshotSection(
         panelMetricStack(
           panelMetricGroup(

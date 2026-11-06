@@ -120,17 +120,16 @@ export function satelliteRent(state) {
 export function totalHeadcountCap(state) {
   const base = headcountCap(state);
   if (state?.mode === 'sandbox') return base;
-  if (getWorkspaceTier(state) === WORKSPACE_TIER.HUB && state.offices?.hubId) {
-    return base + satelliteSeats(state);
-  }
+  if (state.offices?.hubId) return base + satelliteSeats(state);
   return base;
 }
 
 export function headcountCapBreakdown(state) {
   const base = headcountCap(state);
-  const seats = satelliteSeats(state);
+  const seats = state.offices?.hubId ? satelliteSeats(state) : 0;
   const total = totalHeadcountCap(state);
-  const atHub = getWorkspaceTier(state) === WORKSPACE_TIER.HUB && Boolean(state.offices?.hubId);
+  const atHub =
+    Boolean(state.offices?.hubId) || getWorkspaceTier(state) === WORKSPACE_TIER.HUB;
   return { base, seats, total, atHub };
 }
 
@@ -212,12 +211,8 @@ export function removeSatellite(state, satelliteId) {
   if (!target) {
     return { ok: false, reason: 'Satellite not found.' };
   }
-  const nextSeats = satelliteSeats(state) - (target.seats ?? 0);
-  const base = headcountCap(state);
-  const nextCap =
-    state?.mode === 'sandbox' || !state.offices?.hubId
-      ? base
-      : base + nextSeats;
+  const priorTotal = totalHeadcountCap(state);
+  const nextCap = priorTotal - (target.seats ?? 0);
   const hc = state.staff?.headcountByDept ?? {};
   const active = Object.values(hc).reduce((a, b) => a + (Number(b) || 0), 0);
   if (active > nextCap) {
