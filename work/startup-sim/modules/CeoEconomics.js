@@ -12,6 +12,8 @@ import { calendarTurn } from './XC.js';
 import {
   applyHousingToPersonalExpenses,
   ceoHomeEquity,
+  ceoHousingSummary,
+  HOUSING_MODE,
   serviceCeoMortgageAtMonthEnd
 } from './CeoLifestyle.js';
 import { accrueCeoTaxableIncome, createInitialCeoPersonalTax } from './CeoPersonalTax.js';
@@ -252,7 +254,10 @@ export function rollPersonalExpenseTotal(state) {
 export function preparePersonalExpensesForMonth(state) {
   const ceo = ceoState(state);
   const turn = calendarTurn(state);
-  if (isGaragePhasePersonalExpenses(state)) {
+  const housingMode = ceoHousingSummary(state).mode;
+  const garageLeanBurn =
+    isGaragePhasePersonalExpenses(state) && housingMode === HOUSING_MODE.RENT;
+  if (garageLeanBurn) {
     ceo.personalExpenseScheduled = {
       turn,
       total: GARAGE_PHASE_PERSONAL_EXPENSE_MO,

@@ -320,12 +320,27 @@ export function ceoHomeEquity(state) {
 /** Replace rolled Housing line with mortgage / owned carrying costs; apply lifestyle bumps. */
 export function applyHousingToPersonalExpenses(state, breakdown, total) {
   const parts = breakdown.map((p) => ({ ...p }));
-  const housingIdx = parts.findIndex((p) => p.label === 'Housing');
-  if (housingIdx < 0) return { breakdown: parts, total };
-
   const summary = ceoHousingSummary(state);
   const bump = state.ceo?.lifestyleDebitBump ?? 0;
   let newTotal = total;
+  let housingIdx = parts.findIndex((p) => p.label === 'Housing');
+
+  if (housingIdx < 0 && summary.mode !== HOUSING_MODE.RENT && (summary.monthlyHousingDebit ?? 0) > 0) {
+    const label =
+      summary.mode === HOUSING_MODE.MORTGAGE ? 'Mortgage & housing' : 'Home (taxes & upkeep)';
+    parts.push({ label, amount: summary.monthlyHousingDebit });
+    newTotal = total + summary.monthlyHousingDebit;
+    if (bump > 0) {
+      const discIdx = parts.findIndex((p) => p.label === 'Discretionary');
+      if (discIdx >= 0) {
+        parts[discIdx].amount += bump;
+        newTotal += bump;
+      }
+    }
+    return { breakdown: parts, total: newTotal };
+  }
+
+  if (housingIdx < 0) return { breakdown: parts, total };
 
   if (summary.mode === HOUSING_MODE.RENT) {
     if (bump > 0) {

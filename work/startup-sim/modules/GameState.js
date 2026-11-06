@@ -135,14 +135,7 @@ export function createInitialState(options) {
       fiscal: createInitialFiscal(),
       section: 'overview'
     },
-    ceo: {
-      salaryAnnual: 0,
-      careerSalaryPaid: 0,
-      careerOwnerDraws: 0,
-      drawLog: [],
-      salaryPayLog: [],
-      salaryChangeLog: []
-    },
+    ceo: createInitialCeoState(),
     staff: createInitialStaff(),
     product: { level: 0, buzz: 0, actionsThisMonth: 0 },
     news: createInitialNews(),
@@ -249,9 +242,6 @@ export function normalizeSave(raw) {
       if (state.ceo.investmentBalance == null) state.ceo.investmentBalance = 0;
       if (state.ceo.careerInvestmentReturns == null) state.ceo.careerInvestmentReturns = 0;
       if (state.ceo.lastInvestmentReturn == null) state.ceo.lastInvestmentReturn = 0;
-      if (state.ceo.housing?.mortgageOriginalPrincipal == null) {
-        state.ceo.housing.mortgageOriginalPrincipal = 0;
-      }
       ensureCeoPersonalTax(state);
     }
     if (state.staff.companyBonusAnnualMode === undefined) state.staff.companyBonusAnnualMode = false;
@@ -449,15 +439,10 @@ export function normalizeSave(raw) {
       delete state.ceo.personalBurnMonthly;
       delete state.ceo.personalBurnCustom;
       if (!state.ceo.housing) {
-        state.ceo.housing = {
-          mode: 'rent',
-          tierId: 'rent',
-          purchasePrice: 0,
-          mortgageBalance: 0,
-          mortgagePaymentMonthly: 0,
-          maintenanceMonthly: 0,
-          purchasedTurn: null
-        };
+        state.ceo.housing = { ...createInitialCeoState().housing };
+      }
+      if (state.ceo.housing.mortgageOriginalPrincipal == null) {
+        state.ceo.housing.mortgageOriginalPrincipal = 0;
       }
       if (!state.ceo.lifestyleOwned) state.ceo.lifestyleOwned = [];
       if (state.ceo.lifestyleDebitBump == null) state.ceo.lifestyleDebitBump = 0;

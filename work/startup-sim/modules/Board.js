@@ -217,7 +217,14 @@ export function getBoardTaskDef(taskId) {
 export function migrateBoardForPublicSave(state) {
   if (!hasInstitutionalBoard(state)) return;
   if (!state.board) state.board = createInitialBoard();
-  if (state.flags?.ipoFiled && !state.flags?.seriesAClosed && state.sentiment?.lastReason == null) {
+  const members = state.board.members ?? [];
+  const hasLead = members.some((m) => m.id === 'lead-series-a' || m.id === 'lead-public-chair');
+  if (
+    state.flags?.ipoFiled &&
+    !state.flags?.seriesAClosed &&
+    !hasLead &&
+    state.sentiment?.lastReason == null
+  ) {
     seatInstitutionalBoard(
       state,
       'Public listing seated an independent board and approval tracking.'
