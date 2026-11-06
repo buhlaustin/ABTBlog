@@ -14,6 +14,7 @@ import {
   headcountCap
 } from './Workspace.js';
 import bundledHubs from '../data/hubs.json' with { type: 'json' };
+import { meetsHubInvestorGate } from './Sentiment.js';
 import {
   SATELLITE_SIZE_IDS,
   SATELLITE_SIZES,
@@ -143,8 +144,11 @@ export function selectHub(state, hubId) {
   if (arr < ARR_GATES.HUB_HQ) {
     return { ok: false, reason: `Reach ${formatMoney(ARR_GATES.HUB_HQ)} ARR before a worldwide hub city.` };
   }
-  if (!state.flags?.seriesAClosed && !state.flags?.seriesBClosed) {
-    return { ok: false, reason: 'Close Series A or B before opening a hub city.' };
+  if (!meetsHubInvestorGate(state)) {
+    return {
+      ok: false,
+      reason: 'Close Series A or B, or file an IPO, before opening a hub city.'
+    };
   }
   if (getWorkspaceTier(state) !== WORKSPACE_TIER.HUB && !state.workspace?.hubOwned) {
     const buy = purchaseWorkspaceTier(state, WORKSPACE_TIER.HUB);
@@ -286,7 +290,7 @@ export function renderOfficesPanel(container, state) {
   let hubSection = '';
   const hubUnlocked =
     state.flags?.xcResidencyComplete &&
-    (state.flags?.seriesAClosed || state.flags?.seriesBClosed) &&
+    meetsHubInvestorGate(state) &&
     getArr(state) >= ARR_GATES.HUB_HQ;
   if (hubUnlocked && !state.offices?.hubId) {
     const options = getHubs()
@@ -297,7 +301,7 @@ export function renderOfficesPanel(container, state) {
       .join('');
     hubSection = `
       <div class="finance-action">
-        <p><strong>Worldwide hub city</strong> — Series A/B + ${formatMoney(ARR_GATES.HUB_HQ)} ARR. Massive task revenue; sprint to IPO.</p>
+        <p><strong>Worldwide hub city</strong> — Series A/B or IPO + ${formatMoney(ARR_GATES.HUB_HQ)} ARR. Massive task revenue; sprint to IPO.</p>
         <select id="hub-select" class="hub-select">
           <option value="">Select hub…</option>
           ${options}

@@ -1,7 +1,14 @@
-/** Board / investor sentiment (0–100). Only active after Series A seats a lead investor. */
+/** Board / investor sentiment (0–100). Active after Series A or a public listing seats governance. */
 
 export function hasInstitutionalBoard(state) {
-  return Boolean(state.flags?.seriesAClosed);
+  return Boolean(state.flags?.seriesAClosed || state.flags?.ipoFiled);
+}
+
+/** Priced round or public listing — prerequisite for worldwide hub cities. */
+export function meetsHubInvestorGate(state) {
+  return Boolean(
+    state.flags?.seriesAClosed || state.flags?.seriesBClosed || state.flags?.ipoFiled
+  );
 }
 
 /** Called when Series A closes — board approval tracking begins. */

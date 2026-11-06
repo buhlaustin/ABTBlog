@@ -6,7 +6,7 @@ import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } f
 import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './CapTable.js';
 import { createInitialOffices, satelliteTemplateIdFromEntry } from './Offices.js';
 import { createInitialWorkspace, applyWorkspaceBurn, getWorkspaceTier } from './Workspace.js';
-import { createInitialBoard } from './Board.js';
+import { createInitialBoard, migrateBoardForPublicSave } from './Board.js';
 import { createInitialXcState, calendarTurn, formatXcBatchCode, nextXcBatchStart } from './XC.js';
 import { createInitialSentiment } from './Sentiment.js';
 import { createCompetitorForCategory } from './Competitor.js';
@@ -576,6 +576,7 @@ export function normalizeSave(raw) {
     syncStageFromProgress(state);
     applyWorkspaceBurn(state);
     syncLifetimeProfit(state);
+    migrateBoardForPublicSave(state);
 
     state.version = SAVE_VERSION;
     return state;

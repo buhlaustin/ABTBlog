@@ -1,4 +1,4 @@
-import { adjustSentiment } from './Sentiment.js';
+import { adjustSentiment, hasInstitutionalBoard } from './Sentiment.js';
 import { bumpCompetitorPressure, easeCompetitorPressure } from './Competitor.js';
 import { isPublicCompany, whisperRevenueTarget } from './IPO.js';
 import { launchLifecycleActive } from './LaunchLifecycle.js';
@@ -48,9 +48,9 @@ export function settleRivalHeatAtMonthEnd(state, monthRevenue, burn) {
   return lines;
 }
 
-/** After Series A, skipping all board prep has a cost. */
+/** After a board is seated, skipping all board prep has a cost. */
 export function settleBoardGovernance(state) {
-  if (!state.flags?.seriesAClosed || state.flags?.gameOver) return [];
+  if (!hasInstitutionalBoard(state) || state.flags?.gameOver) return [];
   const offered = (state.board?.monthTasks ?? []).filter((t) => t.status === 'pending' || t.status === 'done').length;
   const done = state.board?.completedThisMonth ?? 0;
   if (offered < 1) return [];
