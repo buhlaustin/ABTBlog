@@ -914,6 +914,53 @@ if (!ipo.ok) {
       `OK: IPO primary + float (${formatMoney(ipo.primaryProceeds)} primary, float ${floatPct}%, founder ${founder?.pct}%, ${formatMoney(listPrice)}/share)`
     );
   }
+  const { hasInstitutionalBoard, meetsHubInvestorGate } = await import(
+    `file://${join(sim, 'modules/Sentiment.js')}`
+  );
+  const { canPurchaseTier, WORKSPACE_TIER } = await import(`file://${join(sim, 'modules/Workspace.js')}`);
+  if (!pub.flags.seriesAClosed && !hasInstitutionalBoard(pub)) {
+    console.error('FAIL: IPO without Series A should activate institutional board');
+    failed = true;
+  } else if (!meetsHubInvestorGate(pub)) {
+    console.error('FAIL: IPO should satisfy hub investor gate');
+    failed = true;
+  } else {
+    console.log('OK: public listing unlocks board + hub investor gate (no Series A)');
+  }
+  const legacyPublic = createInitialState({
+    companyName: 'Legacy Pub',
+    categoryId: 'b2b-saas',
+    mode: 'sandbox'
+  });
+  legacyPublic.flags.seedRoundClosed = true;
+  legacyPublic.flags.ipoFiled = true;
+  legacyPublic.flags.seriesAClosed = false;
+  legacyPublic.stage = ST.PUBLIC;
+  legacyPublic.finance.mrr = 50_000_000;
+  legacyPublic.flags.xcResidencyComplete = true;
+  legacyPublic.workspace.campusOwned = true;
+  legacyPublic.workspace.tier = 'campus';
+  legacyPublic.board = { members: [] };
+  legacyPublic.sentiment = { score: 68, lastDelta: 0, lastReason: null };
+  const migrated = normalizeSave(JSON.parse(JSON.stringify(legacyPublic)));
+  if (!migrated || !hasInstitutionalBoard(migrated)) {
+    console.error('FAIL: normalizeSave should repair public-only board access');
+    failed = true;
+  } else if (!migrated.board?.members?.some((m) => m.id === 'lead-public-chair')) {
+    console.error('FAIL: migrated public save should seat IPO board chair');
+    failed = true;
+  } else {
+    const hubGate = canPurchaseTier(migrated, WORKSPACE_TIER.HUB);
+    if (!hubGate.ok && hubGate.reason?.includes('Series A or B')) {
+      console.error(`FAIL: hub gate should accept IPO listing: ${hubGate.reason}`);
+      failed = true;
+    } else if (!hubGate.ok && !hubGate.reason?.includes('ARR')) {
+      console.error(`FAIL: unexpected hub gate after IPO migrate: ${hubGate.reason}`);
+      failed = true;
+    } else {
+      console.log('OK: save migrate seats public board + hub gate (IPO path)');
+    }
+  }
   const tone = setPublicGuidanceTone(pub, 'aggressive');
   if (!tone.ok || whisperRevenueTarget(pub) <= 0) {
     console.error('FAIL: public guidance / whisper target');

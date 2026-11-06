@@ -10,7 +10,7 @@ import {
   confirmTaskLineup
 } from './modules/Tasks.js';
 import { autoSelectRecommendedLineup } from './modules/Desk.js';
-import { completeBoardTask } from './modules/Board.js';
+import { completeBoardTask, ensureBoardRoster, dealBoardTasks } from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
 import {
@@ -127,7 +127,7 @@ import {
   previewCooSalaryMonthly
 } from './modules/Coo.js';
 import { loadAccelerators } from './modules/Accelerators.js';
-import { onLayoffSentiment } from './modules/Sentiment.js';
+import { onLayoffSentiment, seatInstitutionalBoard } from './modules/Sentiment.js';
 import {
   rollMonthStartCrisis,
   hasActiveCrisis,
@@ -588,6 +588,14 @@ async function handleFileIpo() {
     return;
   }
   await fetchIpoPress(sessionState);
+  if (!sessionState.flags?.seriesAClosed) {
+    seatInstitutionalBoard(
+      sessionState,
+      'Public listing seated an independent board and approval tracking.'
+    );
+  }
+  ensureBoardRoster(sessionState);
+  dealBoardTasks(sessionState);
   dealMonthlyTasks(sessionState);
   appendLog(
     sessionState,

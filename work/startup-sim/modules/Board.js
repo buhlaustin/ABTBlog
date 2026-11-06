@@ -6,6 +6,7 @@ import { setGameFeedback } from './GameFeedback.js';
 import {
   onBoardSentiment,
   hasInstitutionalBoard,
+  seatInstitutionalBoard,
   sentimentLabel,
   seriesBGateSentiment,
   seriesAGateSentiment
@@ -123,15 +124,29 @@ export function ensureBoardRoster(state) {
   if (!state.board.members) state.board.members = [];
 
   const members = state.board.members;
-  if (!members.some((m) => m.id === 'lead-series-a')) {
-    members.push({
-      id: 'lead-series-a',
-      name: pickLeadInvestorName(state),
-      role: 'Lead investor',
-      seat: 'Board · Lead director',
-      since: 'Series A',
-      votes: 'Control block'
-    });
+  const hasLead = members.some((m) => m.id === 'lead-series-a' || m.id === 'lead-public-chair');
+  if (!hasLead) {
+    if (state.flags?.seriesAClosed) {
+      members.push({
+        id: 'lead-series-a',
+        name: pickLeadInvestorName(state),
+        role: 'Lead investor',
+        seat: 'Board · Lead director',
+        since: 'Series A',
+        votes: 'Control block'
+      });
+    } else if (state.flags?.ipoFiled || isPublicCompany(state)) {
+      members.push({
+        id: 'lead-public-chair',
+        name: pickLeadInvestorName(state),
+        role: 'Independent chair',
+        seat: 'Board · Non-executive chair',
+        since: 'IPO',
+        votes: 'Independents'
+      });
+    }
+  }
+  if (!members.some((m) => m.id === 'founder-seat')) {
     members.push({
       id: 'founder-seat',
       name: 'You (Founder CEO)',
@@ -198,6 +213,19 @@ export function getBoardTaskDef(taskId) {
   return getBoardTaskDefs().find((t) => t.id === taskId);
 }
 
+/** Repair older saves that went public without Series A (board tab + roster). */
+export function migrateBoardForPublicSave(state) {
+  if (!hasInstitutionalBoard(state)) return;
+  if (!state.board) state.board = createInitialBoard();
+  if (state.flags?.ipoFiled && !state.flags?.seriesAClosed && state.sentiment?.lastReason == null) {
+    seatInstitutionalBoard(
+      state,
+      'Public listing seated an independent board and approval tracking.'
+    );
+  }
+  ensureBoardRoster(state);
+}
+
 export function boardFundraisingGates(state) {
   const approval = state.sentiment?.score ?? 68;
   const gates = [];
@@ -209,7 +237,7 @@ export function boardFundraisingGates(state) {
       ok: seriesBGateSentiment(state) >= 25
     });
   }
-  if (!state.flags?.seriesAClosed && state.flags?.seedRoundClosed) {
+  if (!state.flags?.seriesAClosed && state.flags?.seedRoundClosed && !state.flags?.ipoFiled) {
     gates.push({
       label: 'Series A',
       required: 32,
@@ -335,7 +363,7 @@ export function renderBoardPanel(container, state) {
         <div class="finance-hero">
           <p class="panel-lede">No board yet — you're still running solo.</p>
         </div>
-        <div class="finance-alert">Close <strong>Series A</strong> on Finance to seat a lead investor and unlock board prep here.</div>
+        <div class="finance-alert">Close <strong>Series A</strong> on Finance, or <strong>file an IPO</strong>, to seat a board and unlock prep here.</div>
       </div>
     `;
     return;

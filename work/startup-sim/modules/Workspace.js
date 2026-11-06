@@ -1,4 +1,5 @@
 import { STAGES, formatMoney } from './constants.js';
+import { meetsHubInvestorGate } from './Sentiment.js';
 
 /** Physical workspace tier (purchased — not auto-upgraded from revenue). */
 export const WORKSPACE_TIER = {
@@ -161,10 +162,11 @@ export function canPurchaseTier(state, tier) {
     if (arr < ARR_GATES.HUB_HQ) {
       return { ok: false, reason: `Reach ${formatMoney(ARR_GATES.HUB_HQ)} ARR to open a worldwide hub city.` };
     }
-    if (!state.flags?.seriesAClosed && !state.flags?.seriesBClosed) {
+    if (!meetsHubInvestorGate(state)) {
       return {
         ok: false,
-        reason: 'Close Series A or B first — investors expect a priced round before a global hub.'
+        reason:
+          'Close Series A or B, or file an IPO, before a global hub — investors expect a priced round or listing.'
       };
     }
     if (!state.flags?.xcResidencyComplete) {
