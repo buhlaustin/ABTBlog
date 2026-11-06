@@ -1185,6 +1185,14 @@ const {
   suggestedCeoSalaryBand,
   ceoSalaryBoardNote
 } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
+const {
+  salaryForDept,
+  tickMarketSalaryDemand,
+  MARKET_SALARY_ANNUAL_BUMP_PCT
+} = await import(`file://${join(sim, 'modules/Staff.js')}`);
+const { purchaseWorkspaceTier, WORKSPACE_TIER: PAY_WS_TIER } = await import(
+  `file://${join(sim, 'modules/Workspace.js')}`
+);
 const { projectMonthlyBurn, estimateEraRevenuePotential, allTierRevenuePotentialRows } =
   await import(`file://${join(sim, 'modules/Finance.js')}`);
 const { TIER_REVENUE_PROFILE, eraBaseRevenueScaleForTask } = await import(
@@ -1249,6 +1257,33 @@ if (ipoBand.label !== 'Public company') {
   failed = true;
 } else if (!failed) {
   console.log('OK: public CEO comp band + no pre-Series A warning without Series A');
+}
+const marketPayState = createInitialState({
+  companyName: 'Market Pay Co',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+marketPayState.finance.mrr = 15_000;
+marketPayState.flags.seedRoundClosed = true;
+const officeOk = purchaseWorkspaceTier(marketPayState, PAY_WS_TIER.SMALL);
+const engBefore = salaryForDept('engineering', null, marketPayState);
+marketPayState.staff.marketSalaryLastBumpYear = marketPayState.calendar.year;
+marketPayState.staff.marketSalaryLastBumpMonth = marketPayState.calendar.monthIndex;
+marketPayState.calendar.year += 1;
+const marketLines = tickMarketSalaryDemand(marketPayState);
+const engAfter = salaryForDept('engineering', null, marketPayState);
+const expectedEng = Math.round(engBefore * (1 + MARKET_SALARY_ANNUAL_BUMP_PCT));
+if (!officeOk.ok) {
+  console.error(`FAIL: market pay office: ${officeOk.reason}`);
+  failed = true;
+} else if (!marketLines.length) {
+  console.error('FAIL: expected annual market salary bump log line');
+  failed = true;
+} else if (Math.abs(engAfter - expectedEng) > 2) {
+  console.error(`FAIL: market salary bump ${engBefore} → ${engAfter} (expected ~${expectedEng})`);
+  failed = true;
+} else if (!failed) {
+  console.log(`OK: annual market salary bump (+${MARKET_SALARY_ANNUAL_BUMP_PCT * 100}% every 12 months)`);
 }
 if (!failed) {
   if (TIER_REVENUE_PROFILE.length !== 8) {

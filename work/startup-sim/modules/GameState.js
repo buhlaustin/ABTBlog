@@ -231,6 +231,13 @@ export function normalizeSave(raw) {
       state.staff.optionPoolExpandedThisMonth = false;
     }
     if (!state.staff.peopleSection) state.staff.peopleSection = 'staffing';
+    if (state.staff.marketSalaryMult == null) state.staff.marketSalaryMult = 1;
+    if (state.staff.marketSalaryLastBumpYear === undefined) {
+      state.staff.marketSalaryLastBumpYear = null;
+    }
+    if (state.staff.marketSalaryLastBumpMonth === undefined) {
+      state.staff.marketSalaryLastBumpMonth = null;
+    }
     delete state.social;
     if (!state.news) state.news = createInitialNews();
     if (!state.product) state.product = { level: 0, buzz: 0 };
