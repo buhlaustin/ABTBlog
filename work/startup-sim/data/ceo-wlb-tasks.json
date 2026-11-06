@@ -3,11 +3,12 @@
     {
       "id": "wlb-garage-sleep-reset",
       "title": "Three nights of real sleep",
-      "description": "Phone in the kitchen drawer. Alarm off on Sunday. No deploys after 9pm.",
+      "description": "Phone in the kitchen drawer. Alarm off on Sunday. No deploys after 9pm — if prod pages you, someone else is on call.",
       "stages": ["garage", "office"],
       "happiness": [6, 10],
       "personalCost": 0,
-      "tag": "Rest"
+      "tag": "Rest",
+      "intensity": "standard"
     },
     {
       "id": "wlb-garage-walk-lunch",
@@ -30,11 +31,12 @@
     {
       "id": "wlb-garage-therapy-hour",
       "title": "Founder therapy session",
-      "description": "Talk to someone who isn't your co-founder or investor.",
+      "description": "Talk to someone who isn't your co-founder or investor. Bring the thing you almost said on the all-hands.",
       "stages": ["garage", "office", "xc", "post_xc", "public"],
       "happiness": [7, 12],
       "personalCost": 200,
-      "tag": "Health"
+      "tag": "Health",
+      "intensity": "deep"
     },
     {
       "id": "wlb-office-no-meeting-friday",
@@ -506,6 +508,283 @@
       "tag": "Health",
       "intensity": "deep",
       "recovery": true
+    },
+    {
+      "id": "wlb-co-founder-coffee-no-agenda",
+      "title": "Co-founder coffee — no roadmap",
+      "description": "Remember why you started. No cap table, no hiring plan, no passive-aggressive Slack subtext.",
+      "stages": ["garage", "office", "xc", "post_xc"],
+      "happiness": [5, 9],
+      "personalCost": 25,
+      "tag": "Community",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-friend-before-startup-dinner",
+      "title": "Dinner with a pre-startup friend",
+      "description": "They knew you before the title. Let them roast your old haircut.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [5, 9],
+      "personalCost": 120,
+      "tag": "Community",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-kid-bedtime-week",
+      "title": "Bedtime routine all week",
+      "description": "Stories, teeth, lights out — you present for all of it, laptop closed.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [6, 10],
+      "personalCost": 0,
+      "tag": "Family",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-sunday-no-work-calls",
+      "title": "Sundays without work calls",
+      "description": "Calendar block reads 'Unavailable'. Investors can wait until Monday 9am.",
+      "stages": ["office", "xc", "post_xc", "public"],
+      "happiness": [4, 8],
+      "personalCost": 0,
+      "tag": "Boundaries",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-hike-no-podcast",
+      "title": "Trail day — no podcasts",
+      "description": "Birds, not founder interviews. Phone stays in the car.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [5, 9],
+      "personalCost": 35,
+      "tag": "Recharge",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-decline-keynote-season",
+      "title": "Decline a keynote season",
+      "description": "Say no to three conference stages this quarter. Your product doesn't need another selfie.",
+      "stages": ["post_xc", "public"],
+      "happiness": [5, 8],
+      "personalCost": 0,
+      "tag": "Boundaries",
+      "intensity": "standard",
+      "tradeoff": { "buzz": -2 }
+    },
+    {
+      "id": "wlb-delegate-investor-update-draft",
+      "title": "Delegate the investor update draft",
+      "description": "CFO or chief of staff writes v1. You only edit tone, not every metric.",
+      "stages": ["post_xc", "public"],
+      "happiness": [4, 7],
+      "personalCost": 0,
+      "tag": "Boundaries",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-xc-skip-demo-day-afterparty",
+      "title": "Skip the demo-day afterparty",
+      "description": "You pitched. Go home. The afterparty will happen again next batch.",
+      "stages": ["xc"],
+      "happiness": [4, 7],
+      "personalCost": 0,
+      "tag": "Rest",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-garage-celebrate-shipped-milestone",
+      "title": "Celebrate a shipped milestone IRL",
+      "description": "Not a Slack emoji — cake, beers, or a walk with whoever helped you ship.",
+      "stages": ["garage", "office"],
+      "happiness": [4, 8],
+      "personalCost": 90,
+      "tag": "Community",
+      "intensity": "light",
+      "tradeoff": { "sentiment": 1 }
+    },
+    {
+      "id": "wlb-sauna-cold-plunge-series",
+      "title": "Sauna + cold plunge series",
+      "description": "Four sessions. Sweat out the quarter, not your equity grant.",
+      "stages": ["post_xc", "public"],
+      "happiness": [5, 9],
+      "personalCost": 240,
+      "tag": "Health",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-massage-recovery-block",
+      "title": "Three massage appointments",
+      "description": "Shoulders that live at keyboard height deserve maintenance.",
+      "stages": ["office", "xc", "post_xc", "public"],
+      "happiness": [5, 8],
+      "personalCost": 360,
+      "tag": "Health",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-creative-writing-evenings",
+      "title": "Creative writing four evenings",
+      "description": "Fiction, poetry, or a journal — nothing that becomes a blog post.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [4, 8],
+      "personalCost": 0,
+      "tag": "Mindfulness",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-photography-afternoon",
+      "title": "Photography afternoon",
+      "description": "Borrow a real camera. Shoot trees, not your dashboard.",
+      "stages": ["office", "xc", "post_xc", "public"],
+      "happiness": [4, 7],
+      "personalCost": 60,
+      "tag": "Recharge",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-elder-parent-day-trip",
+      "title": "Day trip with an aging parent",
+      "description": "Drive, lunch, listen to the story you've heard — again — on purpose.",
+      "stages": ["post_xc", "public"],
+      "happiness": [6, 10],
+      "personalCost": 150,
+      "tag": "Family",
+      "intensity": "deep"
+    },
+    {
+      "id": "wlb-bike-commute-month",
+      "title": "Bike commute twice a week",
+      "description": "Helmet, route, no calls while pedaling. Legs instead of Lyft guilt.",
+      "stages": ["office", "xc", "post_xc", "public"],
+      "happiness": [4, 7],
+      "personalCost": 0,
+      "tag": "Health",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-gratitude-notes-team",
+      "title": "Handwritten thank-yous to five people",
+      "description": "Specific, not generic. Drop them on desks — no all-hands announcement.",
+      "stages": ["office", "xc", "post_xc", "public"],
+      "happiness": [4, 7],
+      "personalCost": 15,
+      "tag": "Community",
+      "intensity": "light",
+      "tradeoff": { "sentiment": 1 }
+    },
+    {
+      "id": "wlb-decline-overpacked-week",
+      "title": "Cancel one overpacked week",
+      "description": "Move three external meetings. Protect sleep before you protect optics.",
+      "stages": ["xc", "post_xc", "public"],
+      "happiness": [6, 10],
+      "personalCost": 0,
+      "tag": "Boundaries",
+      "intensity": "deep",
+      "recovery": true,
+      "tradeoff": { "buzz": -1 }
+    },
+    {
+      "id": "wlb-spouse-career-win-dinner",
+      "title": "Celebrate your partner's career win",
+      "description": "Their promotion, publication, or project ships — you host, you don't multitask.",
+      "stages": ["post_xc", "public"],
+      "happiness": [6, 10],
+      "personalCost": 220,
+      "tag": "Family",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-garden-weekend",
+      "title": "Garden or yard weekend",
+      "description": "Dirt under nails beats another dashboard refresh.",
+      "stages": ["garage", "office", "post_xc", "public"],
+      "happiness": [4, 8],
+      "personalCost": 85,
+      "tag": "Rest",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-two-week-real-vacation",
+      "title": "Two-week vacation (delegated)",
+      "description": "Real OOO: exec team owns decisions. You return with stories, not inbox PTSD.",
+      "stages": ["post_xc", "public"],
+      "happiness": [10, 16],
+      "personalCost": 4500,
+      "tag": "Recharge",
+      "intensity": "deep",
+      "tradeoff": { "sentiment": -1 }
+    },
+    {
+      "id": "wlb-public-earnings-weekend-away",
+      "title": "Post-earnings weekend away",
+      "description": "After the call, leave town before you refresh Bloomberg every six minutes.",
+      "stages": ["public"],
+      "happiness": [7, 12],
+      "personalCost": 900,
+      "tag": "Recharge",
+      "intensity": "deep"
+    },
+    {
+      "id": "wlb-public-volunteer-not-gala",
+      "title": "Volunteer shift (no gala speech)",
+      "description": "Serve meals or tutor — skip the photo line and the branded step-and-repeat.",
+      "stages": ["public"],
+      "happiness": [5, 9],
+      "personalCost": 0,
+      "tag": "Community",
+      "intensity": "standard",
+      "tradeoff": { "sentiment": 1 }
+    },
+    {
+      "id": "wlb-office-sunlight-lunch",
+      "title": "Eat lunch outside daily",
+      "description": "Ten minutes of sun before the afternoon meeting avalanche.",
+      "stages": ["office", "xc", "post_xc", "public"],
+      "happiness": [3, 6],
+      "personalCost": 0,
+      "tag": "Health",
+      "intensity": "light"
+    },
+    {
+      "id": "wlb-meditation-retreat-weekend",
+      "title": "Silent meditation retreat weekend",
+      "description": "No talking, no email, no 'quick thought' Slack messages.",
+      "stages": ["post_xc", "public"],
+      "happiness": [8, 13],
+      "personalCost": 550,
+      "tag": "Mindfulness",
+      "intensity": "deep"
+    },
+    {
+      "id": "wlb-kids-school-play",
+      "title": "Attend the school play or game",
+      "description": "Front row, phone off. They'll remember; the investor won't.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [7, 11],
+      "personalCost": 0,
+      "tag": "Family",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-mentor-office-hours-self",
+      "title": "Book mentor time for yourself",
+      "description": "You're not the mentor this hour — someone senior helps you untangle the job.",
+      "stages": ["xc", "post_xc", "public"],
+      "happiness": [5, 9],
+      "personalCost": 400,
+      "tag": "Mindfulness",
+      "intensity": "standard"
+    },
+    {
+      "id": "wlb-limited-screen-bedroom",
+      "title": "No screens in the bedroom month",
+      "description": "Charge the phone in the hall. Read something that isn't a term sheet.",
+      "stages": ["garage", "office", "xc", "post_xc", "public"],
+      "happiness": [5, 9],
+      "personalCost": 0,
+      "tag": "Rest",
+      "intensity": "standard"
     }
   ]
 }

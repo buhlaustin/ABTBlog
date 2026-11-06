@@ -3006,8 +3006,8 @@ if (!signConf.ok) {
     getCeoWlbTaskById
   } = await import(`file://${join(sim, 'modules/CeoHappiness.js')}`);
   await preloadCeoWlbCatalog();
-  if (getCeoWlbCatalogCount() < 48) {
-    console.error('FAIL: CEO WLB task catalog (expected 48+ handcrafted tasks)');
+  if (getCeoWlbCatalogCount() < 75) {
+    console.error('FAIL: CEO WLB task catalog (expected 75+ handcrafted tasks)');
     failed = true;
   } else {
     const wlbState = createInitialState({

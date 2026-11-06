@@ -58,6 +58,11 @@ export function getCeoWlbTaskById(id) {
   return getCeoWlbCatalogSync().find((t) => t.id === id) ?? null;
 }
 
+export function countEligibleCeoWlbTasks(state) {
+  const taskStage = getTaskStage(state);
+  return getCeoWlbCatalogSync().filter((t) => stageAllowed(t, taskStage)).length;
+}
+
 function ensureCeoHappiness(state) {
   if (!state.ceo) return null;
   if (state.ceo.personalHappiness == null) state.ceo.personalHappiness = DEFAULT_HAPPINESS;
@@ -306,6 +311,8 @@ export function renderCeoBalanceSection(state, { disabled = '' } = {}) {
   const slotsLeft = Math.max(0, WLB_MAX_COMPLETE_PER_MONTH - completedMo);
   const streak = ceo?.wlbStreakMonths ?? 0;
   const lifetime = ceo?.wlbLifetimeCompleted ?? 0;
+  const catalogSize = getCeoWlbCatalogSync().length;
+  const eligiblePool = countEligibleCeoWlbTasks(state);
 
   const offerCards = offers.length
     ? offers
@@ -341,15 +348,15 @@ export function renderCeoBalanceSection(state, { disabled = '' } = {}) {
         .join('')
     : '<p class="fine-print">Balance tasks refresh when the calendar advances.</p>';
 
-  const history = (ceo?.wlbLog ?? []).slice(0, 5);
+  const history = (ceo?.wlbLog ?? []).slice(0, 8);
   const histRows = history.length
     ? history
         .map(
           (h) =>
-            `<tr><td>${escapeHtml(h.title ?? '—')}</td><td class="num">+${h.happinessGain ?? 0}</td><td class="fine-print">${escapeHtml(h.year ? `Y${h.year} M${h.month}` : '—')}</td></tr>`
+            `<tr><td>${escapeHtml(h.title ?? '—')}</td><td class="fine-print">${escapeHtml(h.tag ?? '—')}</td><td class="num">+${h.happinessGain ?? 0}</td><td class="fine-print">${escapeHtml(h.year ? `Y${h.year} M${h.month}` : '—')}</td></tr>`
         )
         .join('')
-    : '<tr><td colspan="3">No balance tasks yet.</td></tr>';
+    : '<tr><td colspan="4">No balance tasks yet.</td></tr>';
 
   return `
     <section class="finance-section finance-card" aria-label="Personal happiness">
@@ -373,14 +380,14 @@ export function renderCeoBalanceSection(state, { disabled = '' } = {}) {
     </section>
     <section class="finance-section" aria-label="Work-life balance tasks">
       <h3 class="finance-section-title">Work-life balance</h3>
-      <p class="fine-print">${offers.length} options this month · skipping balance work costs ~${MONTHLY_DRIFT_NO_WLB} happiness at month close.</p>
+      <p class="fine-print">${offers.length} options this month · <strong>${eligiblePool}</strong> tasks fit your stage (${catalogSize} total in catalog) · skipping balance work costs ~${MONTHLY_DRIFT_NO_WLB} happiness at month close.</p>
       <div class="ceo-wlb-grid">${offerCards}</div>
     </section>
     <section class="finance-section finance-section--cap">
       <h3 class="finance-section-title">Recent balance wins</h3>
       <div class="table-scroll finance-cap-scroll">
         <table class="data-table">
-          <thead><tr><th>Task</th><th>Δ</th><th>When</th></tr></thead>
+          <thead><tr><th>Task</th><th>Tag</th><th>Δ</th><th>When</th></tr></thead>
           <tbody>${histRows}</tbody>
         </table>
       </div>
