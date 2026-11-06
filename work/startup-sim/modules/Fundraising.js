@@ -340,8 +340,15 @@ export function renderFinancePanel(container, state) {
       ? `${progressionTierLabel(state)}: ${coreMult.toFixed(2)}× progression × ${tuneMult.toFixed(2)}× sandbox = ${revMult.toFixed(2)}× on desk & Growth payouts.`
       : `${progressionTierLabel(state)}: ${revMult.toFixed(2)}× on desk & Growth payouts (rounds + HQ + staff).`;
 
-  const priorFyLine = sum.fiscalShowPrior
-    ? `<p class="fine-print finance-details-note">Prior FY ${sum.fiscalPriorYear ?? '—'}: ${sum.fiscalPriorRevenueLabel} rev · ${sum.fiscalPriorExpensesLabel} exp · ${sum.fiscalPriorProfitLabel} profit</p>`
+  const priorFyGroup = sum.fiscalShowPrior
+    ? `<div class="finance-metric-group finance-metric-group--prior">
+        <h4 class="finance-metric-group-title">Prior fiscal year ${sum.fiscalPriorYear ?? '—'}</h4>
+        <div class="finance-metric-grid finance-metric-grid--fy">
+          ${financeStatCard('Revenue', sum.fiscalPriorRevenueLabel)}
+          ${financeStatCard('Expenses', sum.fiscalPriorExpensesLabel)}
+          ${financeStatCard('Profit', sum.fiscalPriorProfitLabel, { tone: profitTone(sum.fiscalPriorProfit) })}
+        </div>
+      </div>`
     : '';
 
   const corpTaxDue = sum.fiscalTaxLiability > 0 && !sum.fiscalTaxPaid;
@@ -367,9 +374,9 @@ export function renderFinancePanel(container, state) {
   const portfolioMrr = formatMoney(totalSubsidiaryMrr(state));
 
   const charityBlock = `<section class="finance-section finance-card finance-charity">
-    <div class="finance-section-head">
-      <h3 class="finance-section-title">Charitable giving</h3>
-      <span class="fine-print">Lifetime ${sum.charityLifetimeLabel}</span>
+    <h3 class="finance-section-title">Charitable giving</h3>
+    <div class="finance-metric-grid finance-metric-grid--single">
+      ${financeStatCard('Lifetime donated', sum.charityLifetimeLabel)}
     </div>
     <p class="fine-print">Company cash only · min ${formatMoney(1_000)} · counts as expense</p>
     <div class="finance-charity-chips">
@@ -430,19 +437,30 @@ export function renderFinancePanel(container, state) {
         </div>
       </section>
 
-      <details class="finance-details">
-        <summary>Lifetime & fiscal year (Jan–Dec)</summary>
-        <div class="finance-operating-grid finance-details-grid">
-          ${financeStatCard('Lifetime revenue', sum.lifetimeRevenueLabel)}
-          ${financeStatCard('Lifetime expenses', sum.lifetimeExpensesLabel)}
-          ${financeStatCard('Lifetime profit', sum.lifetimeProfitLabel, { tone: profitTone(sum.lifetimeProfit) })}
-          ${financeStatCard('Starting investment', sum.initialInvestmentLabel)}
-          ${financeStatCard(`FY ${sum.fiscalCurrentYear ?? '—'} revenue`, sum.fiscalCurrentRevenueLabel)}
-          ${financeStatCard('FY expenses', sum.fiscalCurrentExpensesLabel)}
-          ${financeStatCard('FY profit', sum.fiscalCurrentProfitLabel, { tone: profitTone(sum.fiscalCurrentProfit) })}
+      <section class="finance-section finance-history" aria-label="Lifetime and fiscal year">
+        <h3 class="finance-section-title">History & fiscal year</h3>
+        <p class="fine-print finance-history-lede">Calendar fiscal years (Jan–Dec). Lifetime totals include every month since founding.</p>
+        <div class="finance-history-groups">
+          <div class="finance-metric-group">
+            <h4 class="finance-metric-group-title">Lifetime (all-time)</h4>
+            <div class="finance-metric-grid finance-metric-grid--lifetime">
+              ${financeStatCard('Revenue', sum.lifetimeRevenueLabel)}
+              ${financeStatCard('Expenses', sum.lifetimeExpensesLabel)}
+              ${financeStatCard('Profit', sum.lifetimeProfitLabel, { tone: profitTone(sum.lifetimeProfit) })}
+              ${financeStatCard('Starting cash', sum.initialInvestmentLabel)}
+            </div>
+          </div>
+          <div class="finance-metric-group">
+            <h4 class="finance-metric-group-title">Current fiscal year ${sum.fiscalCurrentYear ?? '—'}</h4>
+            <div class="finance-metric-grid finance-metric-grid--fy">
+              ${financeStatCard('Revenue', sum.fiscalCurrentRevenueLabel)}
+              ${financeStatCard('Expenses', sum.fiscalCurrentExpensesLabel)}
+              ${financeStatCard('Profit', sum.fiscalCurrentProfitLabel, { tone: profitTone(sum.fiscalCurrentProfit) })}
+            </div>
+          </div>
+          ${priorFyGroup}
         </div>
-        ${priorFyLine}
-      </details>
+      </section>
 
       ${charityBlock}
 

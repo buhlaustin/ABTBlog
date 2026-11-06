@@ -2092,30 +2092,72 @@ h1 {
 
 .finance-operating-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.6rem;
 }
 
-.finance-details {
+@media (min-width: 720px) {
+  .finance-operating-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.finance-history-lede {
+  margin: -0.25rem 0 0;
+}
+
+.finance-history-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.finance-metric-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.75rem 0.85rem;
   border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  padding: 0.65rem 0.85rem;
+  border-radius: 0.65rem;
   background: rgba(255, 255, 255, 0.02);
 }
 
-.finance-details summary {
-  cursor: pointer;
+.finance-metric-group--prior {
+  border-style: dashed;
+  opacity: 0.95;
+}
+
+.finance-metric-group-title {
+  margin: 0;
+  font-size: 0.82rem;
   font-weight: 600;
-  font-size: 0.9rem;
-  list-style-position: outside;
+  color: var(--text);
+  letter-spacing: 0.01em;
 }
 
-.finance-details-grid {
-  margin-top: 0.75rem;
+.finance-metric-grid {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.finance-details-note {
-  margin: 0.65rem 0 0;
+.finance-metric-grid--lifetime {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.finance-metric-grid--fy {
+  grid-template-columns: 1fr;
+}
+
+.finance-metric-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 16rem;
+}
+
+@media (min-width: 520px) {
+  .finance-metric-grid--fy {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .finance-card {
