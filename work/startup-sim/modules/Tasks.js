@@ -6,6 +6,7 @@ import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
 import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
 import bundledLaunchCrowd from '../data/launch-crowdfunding-tasks.json' with { type: 'json' };
+import bundledLaunchPostHandcrafted from '../data/launch-post-handcrafted-pack.json' with { type: 'json' };
 import bundledSpaceExploration from '../data/space-exploration-tasks.json' with { type: 'json' };
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
 import bundledAiToolsDeskExtra from '../data/ai-tools-desk-tasks-extra.json' with { type: 'json' };
@@ -48,7 +49,8 @@ function mergeSignatureTasks(base) {
 function mergeLaunchTasks(base) {
   const launch = [
     ...(bundledLaunch?.tasks ?? []),
-    ...(bundledLaunchCrowd?.tasks ?? [])
+    ...(bundledLaunchCrowd?.tasks ?? []),
+    ...(bundledLaunchPostHandcrafted?.tasks ?? [])
   ];
   if (!launch.length) return base;
   const ids = new Set((base.tasks ?? []).map((t) => t.id));
