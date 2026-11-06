@@ -593,6 +593,15 @@ export function normalizeSave(raw) {
       if (sc.lifetimeAttendees == null) sc.lifetimeAttendees = 0;
       if (sc.lifetimeRevenue == null) sc.lifetimeRevenue = 0;
       if (sc.lifetimeBudgetSpend == null) sc.lifetimeBudgetSpend = 0;
+      if (sc.sponsorTier == null) sc.sponsorTier = 'regional';
+      if (sc.ticketTier == null) sc.ticketTier = 'paid';
+      if (sc.editionsHeld == null) sc.editionsHeld = 0;
+      if (!sc.history) sc.history = [];
+      if (sc.lifetimeTicketRevenue == null) sc.lifetimeTicketRevenue = 0;
+      if (sc.lifetimeSponsorRevenue == null) sc.lifetimeSponsorRevenue = 0;
+      if (sc.lastTicketRevenue == null) sc.lastTicketRevenue = 0;
+      if (sc.lastSponsorRevenue == null) sc.lastSponsorRevenue = 0;
+      if (sc.lastDeskRevenue == null) sc.lastDeskRevenue = 0;
     }
     if (!state.treasurySponsorships) {
       state.treasurySponsorships = createInitialTreasurySponsorshipsState();

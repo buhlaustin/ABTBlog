@@ -8,6 +8,7 @@ import {
   athleticsBoosterLabel
 } from './CeoAlumniGiving.js';
 import { personalHappinessScore, personalHappinessLabel } from './CeoHappiness.js';
+import { isConferenceConfigured, ensureStartupConference } from './StartupConference.js';
 import { ceoLifestyleLifetimeSpend, ceoLifestyleOwnedDetails } from './CeoLifestyle.js';
 
 export function buildRunExportText(state) {
@@ -25,6 +26,13 @@ export function buildRunExportText(state) {
 
   const happiness = personalHappinessScore(state);
   lines.push(`Personal happiness: ${happiness}/100 — ${personalHappinessLabel(happiness)}`);
+
+  if (isConferenceConfigured(state)) {
+    const conf = ensureStartupConference(state);
+    lines.push(
+      `Startup conference “${conf.name}”: ${conf.editionsHeld ?? 0} edition(s) · ${formatMoney(conf.lifetimeRevenue ?? 0)} lifetime yield`
+    );
+  }
 
   const lifestyleOwned = ceoLifestyleOwnedDetails(state);
   if (lifestyleOwned.length > 0) {

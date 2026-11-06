@@ -263,6 +263,102 @@
       "revenue": [95000, 275000],
       "product": 1,
       "buzz": 5
+    },
+    {
+      "id": "conf-badge-scan-analytics",
+      "title": "Badge scan & lead analytics",
+      "description": "RFID lanes, real-time funnel dashboards, and sales ops drowning in qualified scans.",
+      "types": ["sales"],
+      "stages": ["post_xc", "public"],
+      "startupConference": true,
+      "cost": 14000,
+      "revenue": [88000, 220000],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "conf-speaker-green-room",
+      "title": "Speaker green room & prep",
+      "description": "Celebrity MC, teleprompter coaches, and snacks that don’t violate rider contracts.",
+      "types": ["marketing"],
+      "stages": ["post_xc", "public"],
+      "startupConference": true,
+      "cost": 11000,
+      "revenue": [52000, 140000],
+      "product": 1,
+      "buzz": 3
+    },
+    {
+      "id": "conf-security-credentialing",
+      "title": "Security & credentialing",
+      "description": "Bag check, session-hopping detection, and a SOC that actually answers Slack.",
+      "types": ["support"],
+      "stages": ["post_xc", "public"],
+      "startupConference": true,
+      "cost": 19000,
+      "revenue": [42000, 110000],
+      "product": 0,
+      "buzz": 1
+    },
+    {
+      "id": "conf-after-hours-hack-night",
+      "title": "After-hours hack night",
+      "description": "Midnight pizza, API keys that expire at dawn, and a judging panel of tired staff engineers.",
+      "types": ["product"],
+      "stages": ["post_xc", "public"],
+      "startupConference": true,
+      "cost": 8000,
+      "revenue": [65000, 175000],
+      "product": 2,
+      "buzz": 4
+    },
+    {
+      "id": "conf-investor-office-hours",
+      "title": "Investor office hours",
+      "description": "Timed partner rotations — founders get 12 minutes and one follow-up email max.",
+      "types": ["sales"],
+      "stages": ["post_xc", "public"],
+      "startupConference": true,
+      "cost": 7000,
+      "revenue": [72000, 195000],
+      "product": 0,
+      "buzz": 3
+    },
+    {
+      "id": "conf-local-transit-shuttles",
+      "title": "Airport & hotel shuttles",
+      "description": "Coach buses, rideshare stipends, and signage that doesn’t send people to the wrong city.",
+      "types": ["support"],
+      "stages": ["post_xc", "public"],
+      "startupConference": true,
+      "cost": 24000,
+      "revenue": [38000, 98000],
+      "product": 0,
+      "buzz": 2
+    },
+    {
+      "id": "conf-product-roadmap-reveal",
+      "title": "On-stage roadmap reveal",
+      "description": "Live feature flags, gasps in the audience, and docs published before the applause ends.",
+      "types": ["product"],
+      "stages": ["post_xc", "public"],
+      "startupConference": true,
+      "cost": 16000,
+      "revenue": [105000, 290000],
+      "product": 3,
+      "buzz": 5
+    },
+    {
+      "id": "conf-sustainability-credits",
+      "title": "Carbon-neutral conference ops",
+      "description": "Comp offsets, reusable badge lanyards, and a press release that lands on Hacker News.",
+      "types": ["marketing"],
+      "stages": ["post_xc", "public"],
+      "startupConference": true,
+      "cost": 13000,
+      "revenue": [48000, 125000],
+      "product": 0,
+      "buzz": 3
     }
   ]
 }

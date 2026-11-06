@@ -3054,7 +3054,9 @@ if (!signConf.ok) {
   const saved = saveStartupConferenceConfig(confState, {
     name: 'Nexus Summit',
     budgetRaw: 350_000,
-    monthIndexRaw: 6
+    monthIndexRaw: 6,
+    sponsorTier: 'flagship',
+    ticketTier: 'paid'
   });
   if (!saved.ok) {
     console.error(`FAIL: save startup conference: ${saved.reason}`);
@@ -3062,8 +3064,9 @@ if (!signConf.ok) {
   } else {
     confState.calendar.monthIndex = 6;
     const start = tickStartupConferenceAtMonthStart(confState);
-    if (start.budgetCharge !== 350_000 || confState.startupConference.budgetPaidYear !== confState.calendar.year) {
-      console.error('FAIL: startup conference budget charge at month start');
+    const expectedCharge = Math.round(350_000 * 1.38);
+    if (start.budgetCharge !== expectedCharge || confState.startupConference.budgetPaidYear !== confState.calendar.year) {
+      console.error(`FAIL: startup conference budget charge at month start (got ${start.budgetCharge}, want ${expectedCharge})`);
       failed = true;
     } else {
       dealMonthlyTasks(confState);

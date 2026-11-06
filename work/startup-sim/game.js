@@ -1234,7 +1234,9 @@ function bindGameInteractions() {
       const result = saveStartupConferenceConfig(sessionState, {
         name: document.getElementById('conference-name-input')?.value,
         budgetRaw: document.getElementById('conference-budget-input')?.value,
-        monthIndexRaw: document.getElementById('conference-month-select')?.value
+        monthIndexRaw: document.getElementById('conference-month-select')?.value,
+        sponsorTier: document.getElementById('conference-sponsor-select')?.value,
+        ticketTier: document.getElementById('conference-ticket-select')?.value
       });
       if (!result.ok) showFinanceFeedback(result.reason || 'Could not save conference.', true);
       else {

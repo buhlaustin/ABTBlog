@@ -23,19 +23,11 @@ import { applyTaskRivalEffects } from './WorldDynamics.js';
 import { scenarioCostMult, scenarioRevenueMult } from './ScenarioEffects.js';
 import { accrueFiscalExpense, accrueFiscalRevenue, fiscalYearDisplay } from './CorporateTax.js';
 import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
-import {
-  CONFERENCE_MIN_BUDGET,
-  conferenceMonthActive,
-  ensureStartupConference
-} from './StartupConference.js';
+import { conferenceMonthActive, conferenceTaskRevenueMultiplier } from './StartupConference.js';
 
 function startupConferenceDeskRevenueMult(state, taskDef) {
   if (!taskDef?.startupConference || !conferenceMonthActive(state)) return 1;
-  const budget = Math.max(
-    CONFERENCE_MIN_BUDGET,
-    ensureStartupConference(state).budget ?? CONFERENCE_MIN_BUDGET
-  );
-  return Math.min(3.6, 0.72 + Math.sqrt(budget / 38_000));
+  return conferenceTaskRevenueMultiplier(state, taskDef);
 }
 import { totalHeadcount } from './Staff.js';
 import { totalHeadcountCap } from './Offices.js';
