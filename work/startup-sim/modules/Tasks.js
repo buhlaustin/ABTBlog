@@ -26,6 +26,7 @@ import bundledPublicLate from '../data/tasks-public-late-game.json' with { type:
 import bundledPublicLateExtra from '../data/tasks-public-late-game-extra.json' with { type: 'json' };
 import bundledPublicWhaleHandcrafted from '../data/tasks-public-whale-handcrafted.json' with { type: 'json' };
 import bundledPublicMegawhaleHandcrafted from '../data/tasks-public-megawhale-handcrafted.json' with { type: 'json' };
+import bundledPublicAiMegawhaleGovHandcrafted from '../data/tasks-public-ai-megawhale-gov-handcrafted.json' with { type: 'json' };
 import bundledPublicLateHandcrafted from '../data/tasks-public-late-handcrafted-pack.json' with { type: 'json' };
 import bundledPublicPostIpoHandcrafted from '../data/tasks-public-post-ipo-handcrafted-pack.json' with { type: 'json' };
 import bundledMidGameHandcrafted from '../data/tasks-mid-game-handcrafted-pack.json' with { type: 'json' };
@@ -158,12 +159,15 @@ function mergePublicLateGameTasks(base) {
       mergeTaskPack(
         mergeTaskPack(
           mergeTaskPack(
-            mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
-            bundledPublicLateExtra?.tasks ?? []
+            mergeTaskPack(
+              mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
+              bundledPublicLateExtra?.tasks ?? []
+            ),
+            bundledPublicWhaleHandcrafted?.tasks ?? []
           ),
-          bundledPublicWhaleHandcrafted?.tasks ?? []
+          bundledPublicMegawhaleHandcrafted?.tasks ?? []
         ),
-        bundledPublicMegawhaleHandcrafted?.tasks ?? []
+        bundledPublicAiMegawhaleGovHandcrafted?.tasks ?? []
       ),
       bundledPublicLateHandcrafted?.tasks ?? []
     ),

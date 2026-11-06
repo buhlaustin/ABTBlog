@@ -108,11 +108,15 @@ const publicMegawhales = getTaskDefinitions().filter(
 if (!getTaskDefinitions().some((t) => t.id === 'megawhale-federal-cloud-continuity-mandate')) {
   console.error('FAIL: handcrafted public megawhale desk pack not merged');
   failed = true;
-} else if (publicMegawhales.length < 18) {
-  console.error(`FAIL: expected 18+ public megawhale desk tasks, got ${publicMegawhales.length}`);
+} else if (publicMegawhales.length < 26) {
+  console.error(`FAIL: expected 26+ public megawhale desk tasks, got ${publicMegawhales.length}`);
+  failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'megawhale-ai-doe-exascale-ops')) {
+  console.error('FAIL: AI public megawhale gov pack not merged');
   failed = true;
 } else if (!failed) {
-  console.log(`OK: public megawhale desk tasks (${publicMegawhales.length} multi-billion)`);
+  const aiGovMegas = publicMegawhales.filter((t) => t.id.startsWith('megawhale-ai-'));
+  console.log(`OK: public megawhale desk tasks (${publicMegawhales.length} multi-billion, ${aiGovMegas.length} AI gov)`);
 }
 
 const genericPool = getTaskDefinitions().filter((t) => !t.categories?.length && !t.launchPhase);
