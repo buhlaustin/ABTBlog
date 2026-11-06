@@ -141,7 +141,8 @@ test.describe('Startup Simulator', () => {
     await page.locator('#btn-confirm-task-lineup').click();
 
     await page.locator('#tab-finance').click();
-    await expect(page.locator('#panel-finance .data-table').first()).toBeVisible();
+    // Cap table (not the first .data-table — overhead breakdown sits in a closed <details>).
+    await expect(page.locator('#panel-finance .finance-cap-scroll .data-table')).toBeVisible();
     await expect(page.locator('#tab-desk')).toHaveCSS('min-height', '44px');
 
     const tabIds = [
