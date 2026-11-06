@@ -81,6 +81,9 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
 } else if (!getTaskDefinitions().some((t) => t.id === 'cat-ai-tools-post-batch-api-release')) {
   console.error('FAIL: AI post-batch API release task not merged');
   failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'whale-ai-tools-hyperscaler-marketplace-credits')) {
+  console.error('FAIL: AI post-XC API credit whale pack not merged');
+  failed = true;
 } else if (!failed) {
   console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
 }
@@ -442,6 +445,45 @@ if (!isAiPostBatchApiReleaseMonth(aiPostBatchState)) {
         console.log('OK: AI post-batch ChatXGPT API release desk task');
       }
     }
+  }
+}
+
+const aiCreditWhales = getTaskDefinitions().filter(
+  (t) => t.whale && t.apiCreditsWhale && t.categories?.includes('ai-tools')
+);
+if (aiCreditWhales.length < 10) {
+  console.error(`FAIL: expected 10+ AI API credit whales, got ${aiCreditWhales.length}`);
+  failed = true;
+} else {
+  const aiWhaleFreqState = createInitialState({
+    companyName: 'CreditWhaleCo',
+    categoryId: 'ai-tools',
+    mode: 'career'
+  });
+  aiWhaleFreqState.flags.xcResidencyComplete = true;
+  aiWhaleFreqState.flags.seedRoundClosed = true;
+  aiWhaleFreqState.flags.seriesAClosed = true;
+  aiWhaleFreqState.xc.postBatchApiReleaseDone = true;
+  aiWhaleFreqState.launch.phase = 'graduated';
+  aiWhaleFreqState.stage = STAGES.OFFICE;
+  aiWhaleFreqState.finance.mrr = 85000;
+  const whaleIds = new Set(aiCreditWhales.map((t) => t.id));
+  let monthsWithWhale = 0;
+  for (let i = 0; i < 18; i += 1) {
+    dealMonthlyTasks(aiWhaleFreqState);
+    const offerIds = (aiWhaleFreqState.calendar.monthTaskOffers ?? []).map((o) => o.taskId);
+    if (offerIds.some((id) => whaleIds.has(id))) monthsWithWhale += 1;
+    aiWhaleFreqState.calendar.monthIndex = (aiWhaleFreqState.calendar.monthIndex ?? 1) + 1;
+    if (aiWhaleFreqState.calendar.monthIndex > 12) {
+      aiWhaleFreqState.calendar.monthIndex = 1;
+      aiWhaleFreqState.calendar.year = (aiWhaleFreqState.calendar.year ?? 2026) + 1;
+    }
+  }
+  if (monthsWithWhale < 12) {
+    console.error(`FAIL: AI API credit whales should appear often (${monthsWithWhale}/18 months)`);
+    failed = true;
+  } else {
+    console.log(`OK: AI post-XC API credit whales (${aiCreditWhales.length}, ${monthsWithWhale}/18 offer boards)`);
   }
 }
 

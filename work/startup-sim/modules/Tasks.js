@@ -10,7 +10,7 @@ import bundledLaunchPostHandcrafted from '../data/launch-post-handcrafted-pack.j
 import bundledAiToolsPrelaunch from '../data/ai-tools-prelaunch-tasks.json' with { type: 'json' };
 import bundledAiToolsChatXgptLaunch from '../data/ai-tools-chatxgpt-launch-tasks.json' with { type: 'json' };
 import bundledAiToolsPostXc from '../data/ai-tools-post-xc-tasks.json' with { type: 'json' };
-import { CHATXGPT_LAUNCH_CATEGORY } from './LaunchLifecycle.js';
+import bundledAiToolsPostXcWhales from '../data/ai-tools-post-xc-whale-tasks.json' with { type: 'json' };
 import bundledSpaceExploration from '../data/space-exploration-tasks.json' with { type: 'json' };
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
 import bundledAiToolsDeskExtra from '../data/ai-tools-desk-tasks-extra.json' with { type: 'json' };
@@ -40,7 +40,8 @@ import {
   currentLaunchTaskPhase,
   launchPhaseAllowed,
   launchLifecycleActive,
-  canSchedulePublicLaunch
+  canSchedulePublicLaunch,
+  CHATXGPT_LAUNCH_CATEGORY
 } from './LaunchLifecycle.js';
 
 /** Shipped catalog — always available with the game bundle. */
@@ -121,6 +122,7 @@ function mergeAiToolsDeskTasks(base) {
   let out = mergeTaskPack(base, bundledAiToolsDeskExtra?.tasks ?? []);
   out = mergeTaskPack(out, bundledAiToolsModelLab?.tasks ?? []);
   out = mergeTaskPack(out, bundledAiToolsPostXc?.tasks ?? []);
+  out = mergeTaskPack(out, bundledAiToolsPostXcWhales?.tasks ?? []);
   return out;
 }
 
@@ -391,6 +393,7 @@ function buildTaskPool(state) {
 /** Offer extra tasks; player confirms lineup before work counts. */
 export function dealMonthlyTasks(state) {
   const taskStage = getTaskStage(state);
+  const categoryId = state.company?.categoryId;
   const slots = getMonthlyTaskSlots(taskStage);
   const offerCount = getMonthlyTaskOfferCount(taskStage);
   const pool = buildTaskPool(state);
@@ -426,6 +429,20 @@ export function dealMonthlyTasks(state) {
   if (isAiPostBatchApiReleaseMonth(state)) {
     const apiRelease = pool.find((t) => t.id === AI_POST_BATCH_API_RELEASE_TASK_ID);
     if (apiRelease) offered = mergeUniqueTaskOffers(offered, apiRelease, offerCount);
+  }
+  if (
+    taskStage === STAGES.POST_XC &&
+    categoryId === CHATXGPT_LAUNCH_CATEGORY &&
+    !launchLifecycleActive(state) &&
+    !offered.some((t) => t.apiCreditsWhale)
+  ) {
+    const creditWhales = pool.filter((t) => t.apiCreditsWhale && t.whale);
+    if (creditWhales.length) {
+      const recentIds = new Set(state.calendar.recentTaskIds ?? []);
+      const freshWhales = creditWhales.filter((t) => !recentIds.has(t.id));
+      const pickFrom = freshWhales.length ? freshWhales : creditWhales;
+      offered = mergeUniqueTaskOffers(offered, shuffle(pickFrom)[0], offerCount);
+    }
   }
   if (isTaxFilingRequired(state)) {
     const taxTask = pool.find((t) => t.id === TAX_FILING_TASK_ID);
