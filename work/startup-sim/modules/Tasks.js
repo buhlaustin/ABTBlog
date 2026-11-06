@@ -2,6 +2,12 @@ import { fetchGameJson } from './utils.js';
 import { STAGES, getMonthlyTaskSlots, getMonthlyTaskOfferCount } from './constants.js';
 import { getTaskStage } from './Workspace.js';
 import { progressionTierForUnlocks } from './ProgressionEconomy.js';
+
+const MID_GAME_TASK_ID_PREFIX = 'mid-';
+
+function isMidGameHandcraftedTask(task) {
+  return typeof task?.id === 'string' && task.id.startsWith(MID_GAME_TASK_ID_PREFIX);
+}
 import bundledCatalog from '../data/tasks.json' with { type: 'json' };
 import bundledSignature from '../data/signature-tasks.json' with { type: 'json' };
 import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
@@ -536,6 +542,35 @@ export function dealMonthlyTasks(state) {
   if (isConferenceKeynoteMandatory(state)) {
     const keynote = pool.find((t) => t.id === CONFERENCE_KEYNOTE_TASK_ID);
     if (keynote) offered = mergeUniqueTaskOffers(offered, keynote, offerCount);
+  }
+  const midTier = progressionTierForUnlocks(state);
+  if (
+    taskStage === STAGES.POST_XC &&
+    midTier >= 2 &&
+    midTier <= 5 &&
+    !offered.some(isMidGameHandcraftedTask)
+  ) {
+    const midPool = pool.filter(isMidGameHandcraftedTask);
+    if (midPool.length) {
+      const recentIds = new Set(state.calendar.recentTaskIds ?? []);
+      const fresh = midPool.filter((t) => !recentIds.has(t.id));
+      const pickFrom = fresh.length ? fresh : midPool;
+      offered = mergeUniqueTaskOffers(offered, shuffle(pickFrom)[0], offerCount);
+    }
+  }
+  if (
+    taskStage === STAGES.POST_XC &&
+    midTier >= 4 &&
+    midTier <= 5 &&
+    !offered.some((t) => isMidGameHandcraftedTask(t) && t.whale)
+  ) {
+    const midWhales = pool.filter((t) => isMidGameHandcraftedTask(t) && t.whale);
+    if (midWhales.length) {
+      const recentIds = new Set(state.calendar.recentTaskIds ?? []);
+      const fresh = midWhales.filter((t) => !recentIds.has(t.id));
+      const pickFrom = fresh.length ? fresh : midWhales;
+      offered = mergeUniqueTaskOffers(offered, shuffle(pickFrom)[0], offerCount);
+    }
   }
   if ((isPublicCompany(state) || taskStage === STAGES.PUBLIC) && !offered.some(isMegawhalePlay)) {
     const megaPool = pool.filter(isMegawhalePlay);

@@ -72,6 +72,14 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
 } else if (!getTaskDefinitions().some((t) => t.id === 'mid-soc2-type2-evidence-sprint')) {
   console.error('FAIL: mid-game handcrafted pack not merged');
   failed = true;
+} else if (getTaskDefinitions().filter((t) => t.id.startsWith('mid-')).length < 42) {
+  const midCount = getTaskDefinitions().filter((t) => t.id.startsWith('mid-')).length;
+  console.error(`FAIL: expected 42+ mid-game desk tasks, got ${midCount}`);
+  failed = true;
+} else if (getTaskDefinitions().filter((t) => t.id.startsWith('mid-') && t.whale).length < 4) {
+  const midWhaleCount = getTaskDefinitions().filter((t) => t.id.startsWith('mid-') && t.whale).length;
+  console.error(`FAIL: expected 4+ mid-game whale desk tasks, got ${midWhaleCount}`);
+  failed = true;
 } else if (!getTaskDefinitions().some((t) => t.id === 'launch-post-handcrafted-churn-interviews')) {
   console.error('FAIL: post-launch handcrafted pack not merged');
   failed = true;
@@ -88,7 +96,11 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
   console.error('FAIL: AI post-XC API credit whale pack not merged');
   failed = true;
 } else if (!failed) {
-  console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
+  const midDeskTasks = getTaskDefinitions().filter((t) => t.id.startsWith('mid-'));
+  const midWhales = midDeskTasks.filter((t) => t.whale);
+  console.log(
+    `OK: mid-game desk pack (${midDeskTasks.length} tasks, ${midWhales.length} whales); public whale desk tasks (${publicWhales.length} flagged whale)`
+  );
 }
 const publicMegawhales = getTaskDefinitions().filter(
   (t) => t.megawhale === true && t.stages?.includes('public')
@@ -2673,6 +2685,23 @@ if (!needsTaskLineup(deskState) || !(deskState.calendar.monthTaskOffers?.length 
       console.log(`OK: desk tab (auto-lineup ${auto.picked}/${slots}, checklist ${checklist.length} items)`);
     }
   }
+}
+
+const midPinState = createInitialState({
+  companyName: 'MidPinCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+midPinState.flags.xcResidencyComplete = true;
+midPinState.flags.seedRoundClosed = true;
+midPinState.flags.seriesAClosed = true;
+dealMonthlyTasks(midPinState);
+const midOffers = (midPinState.calendar.monthTaskOffers ?? []).map((o) => o.taskId);
+if (!midOffers.some((id) => id.startsWith('mid-'))) {
+  console.error('FAIL: mid-game tier should pin a mid- desk offer each month');
+  failed = true;
+} else {
+  console.log('OK: mid-game desk offer pinning (Series A band)');
 }
 
 if (getTaskDefinitions().some((t) => t.id === TAX_FILING_TASK_ID)) {
