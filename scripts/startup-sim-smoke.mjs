@@ -1915,10 +1915,23 @@ if (!failed) {
   } else if (knoxMed.rentMonthly >= laMed.rentMonthly) {
     console.error('FAIL: Knoxville should rent cheaper than Los Angeles at the same footprint size');
     failed = true;
-  } else if (!failed) {
-    console.log(
-      `OK: satellite sizing (Knoxville medium ${knoxMed.seats}/${knoxMed.rentMonthly}, LA medium ${laMed.seats}/${laMed.rentMonthly})`
-    );
+  } else {
+    const laLarge = computeSatelliteOffice(laTpl, 'large');
+    const laXl = computeSatelliteOffice(laTpl, 'xlarge');
+    if (laMed.seats < 16 || laMed.seats > 24) {
+      console.error(`FAIL: LA medium satellite should land ~19 seats (got ${laMed.seats})`);
+      failed = true;
+    } else if (laLarge.seats <= laMed.seats + 10) {
+      console.error(`FAIL: LA large satellite should exceed medium by a wide margin (${laLarge.seats} vs ${laMed.seats})`);
+      failed = true;
+    } else if (laXl.seats <= laLarge.seats) {
+      console.error('FAIL: extra-large satellite should beat large on seats');
+      failed = true;
+    } else if (!failed) {
+      console.log(
+        `OK: satellite sizing (Knoxville medium ${knoxMed.seats}/${knoxMed.rentMonthly}, LA medium/large/xl ${laMed.seats}/${laLarge.seats}/${laXl.seats} seats)`
+      );
+    }
   }
 
   const { totalHeadcountCap, headcountCapBreakdown } = await import(

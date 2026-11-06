@@ -204,6 +204,24 @@ export function addSatellite(state, templateId, sizeId = 'medium') {
   return { ok: true, entry };
 }
 
+/** Recompute seats/rent from city + size (keeps saves aligned when footprint tables change). */
+export function refreshSatelliteFootprints(state) {
+  const templates = getSatelliteTemplates();
+  for (const s of state.offices?.satellites ?? []) {
+    const tid = satelliteTemplateIdFromEntry(s);
+    const tpl = templates.find((t) => t.id === tid);
+    if (!tpl) continue;
+    const sizeId = s.size && SATELLITE_SIZES[s.size] ? s.size : 'medium';
+    const stats = computeSatelliteOffice(tpl, sizeId);
+    s.seats = stats.seats;
+    s.rentMonthly = stats.rentMonthly;
+    s.size = stats.size;
+    s.sizeLabel = stats.sizeLabel;
+    s.costTier = stats.costTier;
+    s.capacityTier = stats.capacityTier;
+  }
+}
+
 export function removeSatellite(state, satelliteId) {
   const list = state.offices?.satellites ?? [];
   const target = list.find((s) => s.id === satelliteId);
@@ -339,7 +357,7 @@ export function renderOfficesPanel(container, state) {
     state.offices?.hubId
       ? `
     <h3 class="log-head">Satellite offices</h3>
-    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Pick a <strong>city</strong> and <strong>size</strong> — alpha markets cost more and add more seats (<strong>once per city per run</strong>).</p>
+    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Pick a <strong>city</strong> and footprint (<strong>Small → Extra-large</strong>) — alpha markets cost more and add more seats (<strong>once per city per run</strong>).</p>
     <div class="table-scroll">
       <table class="data-table">
         <thead><tr><th>City</th><th>Size</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>

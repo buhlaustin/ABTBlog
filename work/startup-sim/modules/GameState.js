@@ -4,7 +4,11 @@ import { createInitialNews } from './News.js';
 import { createInitialCalendar, startMonth } from './Calendar.js';
 import { realClockNow, migrateLegacyCalendar, calendarTurnAt, turnToCalendar } from './GameCalendar.js';
 import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './CapTable.js';
-import { createInitialOffices, satelliteTemplateIdFromEntry } from './Offices.js';
+import {
+  createInitialOffices,
+  satelliteTemplateIdFromEntry,
+  refreshSatelliteFootprints
+} from './Offices.js';
 import {
   createInitialWorkspace,
   applyWorkspaceBurn,
@@ -491,6 +495,9 @@ export function normalizeSave(raw) {
           state.offices.usedSatelliteTemplateIds.push(tid);
         }
       }
+    }
+    if ((state.offices?.satellites?.length ?? 0) > 0) {
+      refreshSatelliteFootprints(state);
     }
     if (!state.xc) state.xc = createInitialXcState();
     if (state.xc.retryAvailableTurn === undefined) state.xc.retryAvailableTurn = null;
