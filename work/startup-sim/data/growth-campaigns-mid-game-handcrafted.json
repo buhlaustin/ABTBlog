@@ -1,0 +1,370 @@
+{
+  "version": 1,
+  "campaigns": [
+    {
+      "id": "growth-mid-abm-enterprise-list",
+      "title": "ABM enterprise list blitz",
+      "description": "Named accounts, intent data, and SDR sequences that reference the CFO by first name.",
+      "cost": 18500,
+      "revenue": [42000, 265000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-linkedin-thought-leader-ads",
+      "title": "Founder LinkedIn boost campaign",
+      "description": "Boost your founder posts — comments from VPs who never reply to cold email.",
+      "cost": 9200,
+      "revenue": [28000, 165000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-mid-google-brand-defense",
+      "title": "Google brand defense",
+      "description": "Bid on your own name before competitors buy the typo domains.",
+      "cost": 6800,
+      "revenue": [22000, 128000],
+      "buzz": 1,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-podcast-sponsor-run",
+      "title": "B2B podcast sponsor run",
+      "description": "Host-read ads on three shows your buyers pretend they do not listen to.",
+      "cost": 24000,
+      "revenue": [55000, 310000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-customer-case-film",
+      "title": "Enterprise customer film shoot",
+      "description": "Crew on site, logo on the timeline, and a quote legal actually approves.",
+      "cost": 32000,
+      "revenue": [48000, 285000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-analyst-briefing-tour",
+      "title": "Analyst briefing tour",
+      "description": "Gartner, Forrester, and the boutique firm your lead investor name-drops.",
+      "cost": 45000,
+      "revenue": [65000, 380000],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-aws-marketplace-spend",
+      "title": "AWS Marketplace co-spend",
+      "description": "Private offer credits — finance loves drawing down committed cloud spend.",
+      "cost": 28000,
+      "revenue": [72000, 420000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-salesforce-appexchange-boost",
+      "title": "AppExchange featured boost",
+      "description": "Pay for placement — reviews, screenshots, and a demo org that works live.",
+      "cost": 21000,
+      "revenue": [58000, 340000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-field-marketing-regional",
+      "title": "Regional field marketing tour",
+      "description": "Executive dinners in Dallas, Denver, and Atlanta — pipeline on napkins.",
+      "cost": 38000,
+      "revenue": [85000, 490000],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-retargeting-enterprise",
+      "title": "Enterprise retargeting stack",
+      "description": "Sixsense, LinkedIn, and display — chase the same logo until they book.",
+      "cost": 16500,
+      "revenue": [38000, 225000],
+      "buzz": 1,
+      "tierMin": 2,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-mid-webinar-series-quarter",
+      "title": "Quarterly webinar series",
+      "description": "Four sessions, guest customers, and registrants who become MQLs or ghosts.",
+      "cost": 12000,
+      "revenue": [32000, 185000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-mid-partner-co-marketing-fund",
+      "title": "Partner co-marketing fund",
+      "description": "Split spend with an ISV — joint landing pages and arguing over lead routing.",
+      "cost": 22000,
+      "revenue": [62000, 360000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-customer-referral-spiff",
+      "title": "Customer referral SPIFF",
+      "description": "Champions get gift cards — procurement still asks if it is a bribe.",
+      "cost": 8500,
+      "revenue": [45000, 275000],
+      "buzz": 1,
+      "tierMin": 2,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-mid-seo-content-engine",
+      "title": "SEO content engine",
+      "description": "Comparison pages, glossary, and writers who finally understand your ICP.",
+      "cost": 14000,
+      "revenue": [35000, 210000],
+      "buzz": 1,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-review-site-acceleration",
+      "title": "G2 & review site acceleration",
+      "description": "Incentivized reviews, badge graphics, and sales quoting your star average.",
+      "cost": 11000,
+      "revenue": [42000, 245000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-virtual-user-conference",
+      "title": "Virtual user conference",
+      "description": "Hopin, swag boxes, and breakout tracks that do not buffer.",
+      "cost": 52000,
+      "revenue": [95000, 520000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-direct-mail-enterprise",
+      "title": "Enterprise direct mail drop",
+      "description": "Dimensional mail to 200 accounts — kitschy but the AE gets the meeting.",
+      "cost": 35000,
+      "revenue": [78000, 450000],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-community-led-growth",
+      "title": "Community-led growth sprint",
+      "description": "Slack, Circle, and power users who answer tickets before support wakes up.",
+      "cost": 7500,
+      "revenue": [28000, 158000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 4
+    },
+    {
+      "id": "growth-mid-plg-paid-acquisition",
+      "title": "PLG paid acquisition test",
+      "description": "Free tier ads on Reddit and Twitter — pray signup-to-paid holds.",
+      "cost": 9800,
+      "revenue": [24000, 142000],
+      "buzz": 2,
+      "tierMin": 2,
+      "tierMax": 3
+    },
+    {
+      "id": "growth-mid-sdr-outbound-agency",
+      "title": "SDR outbound agency",
+      "description": "Booked meetings SLA — you still join the first calls to save deals.",
+      "cost": 28000,
+      "revenue": [65000, 385000],
+      "buzz": 1,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-industry-analyst-report",
+      "title": "Sponsored analyst report",
+      "description": "Pay for the quadrant slide — product marketing frames it carefully.",
+      "cost": 85000,
+      "revenue": [120000, 680000],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-trade-show-island-booth",
+      "title": "Trade show island booth",
+      "description": "20×20 footprint, espresso machine, and scanners that sync to Salesforce.",
+      "cost": 95000,
+      "revenue": [145000, 820000],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-executive-dinner-series",
+      "title": "Executive dinner series",
+      "description": "Six cities, private dining, and NDAs on the place cards.",
+      "cost": 42000,
+      "revenue": [88000, 510000],
+      "buzz": 2,
+      "tierMin": 4,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-tv-streaming-test",
+      "title": "Streaming TV test flight",
+      "description": "Hulu and YouTube CTV — brand lift study your board will ask about twice.",
+      "cost": 65000,
+      "revenue": [110000, 640000],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-global-2000-whale",
+      "title": "Global 2000 ABM whale",
+      "description": "Full-funnel surround on 40 logos — six figures of spend before the first RFP.",
+      "cost": 185000,
+      "revenue": [520000, 2850000],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 5,
+      "whale": true
+    },
+    {
+      "id": "growth-mid-fortune500-pilot-whale",
+      "title": "Fortune 500 pilot marketing whale",
+      "description": "Custom microsite, exec gifts, and air cover while sales navigates procurement.",
+      "cost": 142000,
+      "revenue": [380000, 2100000],
+      "buzz": 4,
+      "tierMin": 4,
+      "tierMax": 5,
+      "whale": true
+    },
+    {
+      "id": "growth-mid-category-creation-whale",
+      "title": "Category creation PR whale",
+      "description": "Launch report, paid media, and a coined acronym analysts repeat nervously.",
+      "cost": 220000,
+      "revenue": [450000, 3200000],
+      "buzz": 5,
+      "tierMin": 5,
+      "tierMax": 5,
+      "whale": true
+    },
+    {
+      "id": "growth-mid-national-radio-test-whale",
+      "title": "National radio test whale",
+      "description": "Drive-time spots in ten markets — brand team calls it “top of funnel experiments”.",
+      "cost": 168000,
+      "revenue": [410000, 2450000],
+      "buzz": 4,
+      "tierMin": 5,
+      "tierMax": 5,
+      "whale": true
+    },
+    {
+      "id": "growth-mid-competitive-takeout-campaign",
+      "title": "Competitive takeout campaign",
+      "description": "Switch offers, migration credits, and ads on your rival’s brand terms.",
+      "cost": 32000,
+      "revenue": [95000, 560000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 5,
+      "rivalEase": 1
+    },
+    {
+      "id": "growth-mid-customer-expansion-mail",
+      "title": "Customer expansion mailer",
+      "description": "Upsell sequences to the installed base — CS approves the discount ladder.",
+      "cost": 8800,
+      "revenue": [55000, 320000],
+      "buzz": 1,
+      "tierMin": 2,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-developer-hackathon-sponsor",
+      "title": "Developer hackathon sponsor",
+      "description": "API prizes, Discord stage, and repos that fork your SDK overnight.",
+      "cost": 45000,
+      "revenue": [72000, 410000],
+      "buzz": 3,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-finops-sponsored-research",
+      "title": "FinOps sponsored research",
+      "description": "Commission a benchmark report — every chart cites your product footnotes.",
+      "cost": 38000,
+      "revenue": [68000, 395000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-vertical-media-bundle",
+      "title": "Vertical media bundle",
+      "description": "Industry newsletters, podcasts, and one print ad nobody admits they saw.",
+      "cost": 26000,
+      "revenue": [58000, 335000],
+      "buzz": 2,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-series-b-roadshow-pr",
+      "title": "Series B roadshow PR",
+      "description": "Embargoed TechCrunch, founder photos, and quotes your comms lead wrote for you.",
+      "cost": 18000,
+      "revenue": [35000, 195000],
+      "buzz": 3,
+      "tierMin": 4,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-ai-feature-launch-spend",
+      "title": "AI feature launch spend",
+      "description": "Launch video, paid social, and influencers who say “game-changer” on cue.",
+      "cost": 42000,
+      "revenue": [88000, 510000],
+      "buzz": 4,
+      "tierMin": 3,
+      "tierMax": 5
+    },
+    {
+      "id": "growth-mid-churn-winback-offers",
+      "title": "Churn win-back offers",
+      "description": "Paid ads to cancelled accounts — apology copy approved by legal.",
+      "cost": 14000,
+      "revenue": [48000, 275000],
+      "buzz": 1,
+      "tierMin": 2,
+      "tierMax": 4
+    }
+  ]
+}

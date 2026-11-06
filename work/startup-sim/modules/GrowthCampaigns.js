@@ -7,6 +7,13 @@ import bundledSpaceGrowthExtra from '../data/space-exploration-growth-extra.json
 import bundledPublicLate from '../data/growth-campaigns-public-late.json' with { type: 'json' };
 import bundledPublicWhale from '../data/growth-campaigns-public-whale.json' with { type: 'json' };
 import bundledPublicMegawhale from '../data/growth-campaigns-public-megawhale.json' with { type: 'json' };
+import bundledMidGameHandcrafted from '../data/growth-campaigns-mid-game-handcrafted.json' with { type: 'json' };
+
+const MID_GROWTH_CAMPAIGN_ID_PREFIX = 'growth-mid-';
+
+function isMidGameHandcraftedCampaign(def) {
+  return typeof def?.id === 'string' && def.id.startsWith(MID_GROWTH_CAMPAIGN_ID_PREFIX);
+}
 import { isMegawhalePlay } from './WhaleScale.js';
 import { fetchGameJson } from './utils.js';
 import { progressionTier, progressionTierForUnlocks } from './ProgressionEconomy.js';
@@ -41,7 +48,8 @@ const bundledExtras = [
   bundledSpaceGrowthExtra,
   bundledPublicLate,
   bundledPublicWhale,
-  bundledPublicMegawhale
+  bundledPublicMegawhale,
+  bundledMidGameHandcrafted
 ];
 
 /** Months before the same paid growth play can appear in the monthly roster again. */
@@ -119,6 +127,31 @@ export function refreshGrowthCampaignOffers(state) {
   const recent = state.growth.recentCampaignIds ?? [];
   const offerCount = growthMonthlyOfferCount(state);
   let offers = pickMonthlyCampaignDefs(pool, offerCount, recent);
+
+  const midTier = progressionTierForUnlocks(state);
+  const midPool = pool.filter(isMidGameHandcraftedCampaign);
+  if (!isPublicCompany(state) && midTier >= 2 && midTier <= 5) {
+    if (midPool.length && !offers.some(isMidGameHandcraftedCampaign)) {
+      const cooldownLen = offerCount * GROWTH_CAMPAIGN_COOLDOWN_MONTHS;
+      const recentSet = new Set((recent ?? []).slice(-cooldownLen));
+      const fresh = midPool.filter((c) => !recentSet.has(c.id));
+      const pickFrom = fresh.length ? fresh : midPool;
+      offers = mergeUniqueCampaignOffers(offers, shuffle(pickFrom)[0], offerCount);
+    }
+    if (
+      midTier >= 4 &&
+      !offers.some((c) => isMidGameHandcraftedCampaign(c) && c.whale)
+    ) {
+      const midWhales = midPool.filter((c) => c.whale === true);
+      if (midWhales.length) {
+        const cooldownLen = offerCount * GROWTH_CAMPAIGN_COOLDOWN_MONTHS;
+        const recentSet = new Set((recent ?? []).slice(-cooldownLen));
+        const fresh = midWhales.filter((c) => !recentSet.has(c.id));
+        const pickFrom = fresh.length ? fresh : midWhales;
+        offers = mergeUniqueCampaignOffers(offers, shuffle(pickFrom)[0], offerCount);
+      }
+    }
+  }
 
   if (isPublicCompany(state)) {
     const whalePool = pool.filter((c) => c.whale === true);

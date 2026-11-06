@@ -2269,6 +2269,24 @@ if (roster.length < 1 || roster.length > expectedOffers) {
   }
 }
 
+const midGrowthRosterState = createInitialState({
+  companyName: 'MidGrowthCo',
+  categoryId: 'b2b-saas',
+  mode: 'sandbox'
+});
+midGrowthRosterState.flags.xcResidencyComplete = true;
+midGrowthRosterState.flags.seedRoundClosed = true;
+midGrowthRosterState.flags.seriesAClosed = true;
+midGrowthRosterState.finance.cash = 5_000_000;
+resetGrowthCampaignsMonth(midGrowthRosterState);
+const midGrowthRoster = midGrowthRosterState.growth.monthCampaignOffers ?? [];
+if (!midGrowthRoster.some((id) => id.startsWith('growth-mid-'))) {
+  console.error('FAIL: mid-game growth roster should pin a growth-mid- campaign');
+  failed = true;
+} else {
+  console.log('OK: mid-game growth roster pinning (Series A band)');
+}
+
 const productSideBank = sideTaskBankSize(['product', 'both']);
 const publicGrowthWhales = getGrowthCampaigns().filter((c) => c.whale === true && (c.tierMin ?? 0) >= 7);
 const publicGrowthMegawhales = getGrowthCampaigns().filter(
@@ -2280,18 +2298,30 @@ if (publicGrowthWhales.length < 20) {
 } else if (publicGrowthMegawhales.length < 15) {
   console.error(`FAIL: expected 15+ post-IPO megawhale growth campaigns (got ${publicGrowthMegawhales.length})`);
   failed = true;
-} else if (growthCampaignCatalogSize() < 315) {
-  console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()}, want ≥315)`);
+} else if (growthCampaignCatalogSize() < 350) {
+  console.error(`FAIL: growth campaign bank too small (${growthCampaignCatalogSize()}, want ≥350)`);
   failed = true;
-} else if (getProductActions().length < 75) {
+} else {
+  const midGrowth = getGrowthCampaigns().filter((c) => c.id.startsWith('growth-mid-'));
+  const midGrowthWhales = midGrowth.filter((c) => c.whale);
+  if (midGrowth.length < 34) {
+    console.error(`FAIL: expected 34+ mid-game growth campaigns (got ${midGrowth.length})`);
+    failed = true;
+  } else if (midGrowthWhales.length < 4) {
+    console.error(`FAIL: expected 4+ mid-game growth whales (got ${midGrowthWhales.length})`);
+    failed = true;
+  }
+}
+if (!failed && getProductActions().length < 75) {
   console.error(`FAIL: side-task lever bank too small (${getProductActions().length})`);
   failed = true;
 } else if (productSideBank < 32) {
   console.error(`FAIL: product side-task bank too small (${productSideBank})`);
   failed = true;
-} else {
+} else if (!failed) {
+  const midGrowthCount = getGrowthCampaigns().filter((c) => c.id.startsWith('growth-mid-')).length;
   console.log(
-    `OK: side-task banks (${growthCampaignCatalogSize()} paid campaigns, ${getProductActions().length} levers, ${productSideBank} product-focused)`
+    `OK: side-task banks (${growthCampaignCatalogSize()} paid campaigns incl. ${midGrowthCount} mid-game, ${getProductActions().length} levers, ${productSideBank} product-focused)`
   );
 }
 
