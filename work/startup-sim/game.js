@@ -126,6 +126,7 @@ import {
   donateToAlmaMater,
   donateToAlmaMaterAthletics
 } from './modules/CeoAlumniGiving.js';
+import { preloadCeoWlbCatalog, completeCeoWlbTask } from './modules/CeoHappiness.js';
 import {
   preparePersonalExpensesForMonth,
   takeOwnerDrawFraction,
@@ -1533,6 +1534,17 @@ function bindGameInteractions() {
       refresh();
       return;
     }
+    const wlbBtn = e.target.closest('[data-ceo-wlb-complete]');
+    if (wlbBtn && sessionState) {
+      const result = completeCeoWlbTask(sessionState, wlbBtn.getAttribute('data-ceo-wlb-complete'));
+      if (!result.ok) showCeoFeedback(result.reason || 'Balance task failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
     const alumniAthleticsBtn = e.target.closest('[data-ceo-alumni-athletics-give]');
     if (alumniAthleticsBtn && sessionState) {
       const result = donateToAlmaMaterAthletics(
@@ -2239,6 +2251,7 @@ async function init() {
         preloadTreasurySponsorshipDeals(),
         preloadCeoAlmaMaterCatalog(),
         preloadCeoLifestyleCatalog(),
+        preloadCeoWlbCatalog(),
         preloadNewsTimeline()
       ]);
       populateCategorySelect(categorySelect, getCategoriesSync());

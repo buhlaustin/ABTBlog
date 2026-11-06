@@ -7,6 +7,7 @@ import {
   alumniRecognitionLabel,
   athleticsBoosterLabel
 } from './CeoAlumniGiving.js';
+import { personalHappinessScore, personalHappinessLabel } from './CeoHappiness.js';
 import { ceoLifestyleLifetimeSpend, ceoLifestyleOwnedDetails } from './CeoLifestyle.js';
 
 export function buildRunExportText(state) {
@@ -21,6 +22,9 @@ export function buildRunExportText(state) {
   lines.push(`Months played: ${months}`);
   lines.push(`Lifetime revenue: ${formatMoney(state.finance?.lifetimeRevenue ?? 0)}`);
   lines.push(`Cash: ${formatMoney(state.finance?.cash ?? 0)}`);
+
+  const happiness = personalHappinessScore(state);
+  lines.push(`Personal happiness: ${happiness}/100 — ${personalHappinessLabel(happiness)}`);
 
   const lifestyleOwned = ceoLifestyleOwnedDetails(state);
   if (lifestyleOwned.length > 0) {

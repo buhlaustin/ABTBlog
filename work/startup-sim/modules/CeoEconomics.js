@@ -91,7 +91,12 @@ export function createInitialCeoState() {
     investmentBalance: 0,
     careerInvestmentReturns: 0,
     lastInvestmentReturn: 0,
-    personalTax: createInitialCeoPersonalTax()
+    personalTax: createInitialCeoPersonalTax(),
+    personalHappiness: 62,
+    wlbOffers: [],
+    wlbRecentIds: [],
+    wlbLog: [],
+    wlbCompletedThisMonth: 0
   };
 }
 

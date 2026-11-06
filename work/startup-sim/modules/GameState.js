@@ -230,6 +230,11 @@ export function normalizeSave(raw) {
       if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
       if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
       if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
+      if (state.ceo.personalHappiness == null) state.ceo.personalHappiness = 62;
+      if (!state.ceo.wlbOffers) state.ceo.wlbOffers = [];
+      if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];
+      if (!state.ceo.wlbLog) state.ceo.wlbLog = [];
+      if (state.ceo.wlbCompletedThisMonth == null) state.ceo.wlbCompletedThisMonth = 0;
       if (!state.ceo.netWorthHistory) state.ceo.netWorthHistory = [];
       if (state.ceo.investmentBalance == null) state.ceo.investmentBalance = 0;
       if (state.ceo.careerInvestmentReturns == null) state.ceo.careerInvestmentReturns = 0;
@@ -450,6 +455,11 @@ export function normalizeSave(raw) {
       if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
       if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
       if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
+      if (state.ceo.personalHappiness == null) state.ceo.personalHappiness = 62;
+      if (!state.ceo.wlbOffers) state.ceo.wlbOffers = [];
+      if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];
+      if (!state.ceo.wlbLog) state.ceo.wlbLog = [];
+      if (state.ceo.wlbCompletedThisMonth == null) state.ceo.wlbCompletedThisMonth = 0;
     }
     ensureCeoPersonalBank(state);
     preparePersonalExpensesForMonth(state);

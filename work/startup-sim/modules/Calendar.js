@@ -53,6 +53,7 @@ import {
 } from './WorldDynamics.js';
 import { tickScenarioModifiers } from './ScenarioEffects.js';
 import { applySubsidiaryMrrPayout, tickAcquisitionsAtMonthStart } from './Acquisitions.js';
+import { dealCeoWlbOffers, tickPersonalHappinessAtMonthEnd } from './CeoHappiness.js';
 
 export { getMonthlyTaskSlots } from './constants.js';
 
@@ -124,6 +125,7 @@ export function startMonth(state) {
     appendLog(state, line);
   }
   dealMonthlyTasks(state);
+  dealCeoWlbOffers(state);
   dealBoardTasks(state);
   preparePersonalExpensesForMonth(state);
   prepareCompanyOverheadForMonth(state);
@@ -155,6 +157,9 @@ export function endMonth(state) {
     appendLog(state, line);
   }
   for (const line of settlePersonalExpensesAtMonthEnd(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickPersonalHappinessAtMonthEnd(state)) {
     appendLog(state, line);
   }
   for (const line of settlePersonalInvestmentsAtMonthEnd(state)) {

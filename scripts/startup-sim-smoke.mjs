@@ -2996,4 +2996,41 @@ if (!signConf.ok) {
   }
 }
 
+{
+  const {
+    preloadCeoWlbCatalog,
+    dealCeoWlbOffers,
+    completeCeoWlbTask,
+    personalHappinessScore,
+    getCeoWlbCatalogCount
+  } = await import(`file://${join(sim, 'modules/CeoHappiness.js')}`);
+  await preloadCeoWlbCatalog();
+  if (getCeoWlbCatalogCount() < 28) {
+    console.error('FAIL: CEO WLB task catalog (expected 28+ handcrafted tasks)');
+    failed = true;
+  } else {
+    const wlbState = createInitialState({
+      companyName: 'Balance Co',
+      categoryId: 'b2b-saas',
+      mode: 'sandbox'
+    });
+    wlbState.ceo.bankBalance = 50_000;
+    const before = personalHappinessScore(wlbState);
+    dealCeoWlbOffers(wlbState);
+    const offerId = wlbState.ceo.wlbOffers?.[0]?.taskId;
+    if (!offerId) {
+      console.error('FAIL: CEO WLB monthly offers');
+      failed = true;
+    } else {
+      const done = completeCeoWlbTask(wlbState, offerId);
+      if (!done.ok || personalHappinessScore(wlbState) <= before) {
+        console.error(`FAIL: CEO WLB task completion: ${done.reason ?? 'happiness'}`);
+        failed = true;
+      } else {
+        console.log('OK: CEO personal happiness & work-life balance tasks');
+      }
+    }
+  }
+}
+
 process.exit(failed ? 1 : 0);

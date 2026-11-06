@@ -47,6 +47,12 @@ import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
 import { ceoAgeDisplayLine } from './CeoProfile.js';
 import { renderCeoAlumniSection, resolveCompanyAlmaMater } from './CeoAlumniGiving.js';
 import {
+  renderCeoBalanceSection,
+  personalHappinessScore,
+  personalHappinessLabel,
+  personalHappinessTone
+} from './CeoHappiness.js';
+import {
   escapeHtml,
   panelStatCard,
   panelMetricGroup,
@@ -57,7 +63,7 @@ import {
 
 export { setCeoSalaryAnnual, takeOwnerDraw };
 
-const CEO_SECTIONS = new Set(['overview', 'wealth', 'comp', 'lifestyle', 'alumni']);
+const CEO_SECTIONS = new Set(['overview', 'wealth', 'comp', 'balance', 'lifestyle', 'alumni']);
 
 export function setCeoSection(state, section) {
   if (!state.ceo) return;
@@ -225,6 +231,7 @@ function renderCeoSectionHtml(ctx) {
   if (section === 'wealth') return renderCeoWealthSection(ctx);
   if (section === 'comp') return renderCeoCompSection(ctx);
   if (section === 'lifestyle') return renderCeoLifestyleSection(ctx);
+  if (section === 'balance') return renderCeoBalanceSection(state, { disabled: ctx.disabled });
   if (section === 'alumni') return renderCeoAlumniSection(state, { disabled: ctx.disabled });
   return renderCeoOverviewSection(ctx);
 }
@@ -249,6 +256,9 @@ function renderCeoOverviewSection(ctx) {
     portfolio,
     state
   } = ctx;
+  const happiness = personalHappinessScore(state);
+  const happinessLabel = personalHappinessLabel(happiness);
+  const happinessTone = personalHappinessTone(happiness);
   const runwaySalaryNoteInner =
     runway.ceoMo > 0 && runway.deltaMo
       ? `<p class="fine-print finance-details-note">CEO salary adds ~${formatMoney(runway.ceoMo)}/mo company overhead (≈${runway.deltaMo} mo less runway vs $0).</p>`
@@ -275,14 +285,17 @@ function renderCeoOverviewSection(ctx) {
     ${panelSnapshotSection(
       panelMetricGroup(
         'Personal snapshot',
-        panelMetricGrid('4', [
+        `${panelMetricGrid('4', [
           panelStatCard('Personal bank', formatMoney(bank), { hero: true }),
           panelStatCard('Est. net worth', formatMoney(ceoNetWorth(state))),
+          panelStatCard('Personal happiness', `${happiness}/100`, { tone: happinessTone }),
+          panelStatCard('Balance', happinessLabel, { tone: happinessTone })
+        ])}${panelMetricGrid('2', [
           panelStatCard('Personal runway', escapeHtml(personalRunway.label)),
           panelStatCard('Liquidity', escapeHtml(health.label), {
             tone: health.tone === 'pos' ? 'pos' : health.tone === 'neg' ? 'neg' : null
           })
-        ])
+        ])}`
       ),
       { ariaLabel: 'Personal snapshot' }
     )}
@@ -349,7 +362,7 @@ function renderCeoOverviewSection(ctx) {
         )
       )}
     </section>
-    <p class="fine-print finance-ceo-pointer">Company cash, loans, and charity → <strong>Finance</strong>. Liquid exit and secondary sales → <strong>Wealth &amp; exit</strong>.</p>
+    <p class="fine-print finance-ceo-pointer">Work-life balance tasks → <strong>Balance</strong>. Company cash, loans, and charity → <strong>Finance</strong>. Liquid exit and secondary sales → <strong>Wealth &amp; exit</strong>.</p>
   `;
 }
 
@@ -773,6 +786,7 @@ export function renderCeoPanel(container, state) {
         ${tab('overview', 'Overview')}
         ${tab('wealth', 'Wealth & exit')}
         ${tab('comp', compTabLabel)}
+        ${tab('balance', 'Balance')}
         ${tab('lifestyle', 'Homes & splurges')}
         ${tab('alumni', 'Alma mater')}
       </nav>
