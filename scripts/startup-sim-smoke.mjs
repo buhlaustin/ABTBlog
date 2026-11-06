@@ -25,6 +25,7 @@ const {
   selectedOfferCount,
   needsTaskLineup,
   getTaskPoolSize,
+  getEligibleDeskTasks,
   getTaskDefinitions,
   taskCatalogSize,
   RECENT_TASK_COOLDOWN_MONTHS
@@ -73,6 +74,9 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
   failed = true;
 } else if (!getTaskDefinitions().some((t) => t.id === 'launch-pre-cat-ai-tools-pretrain-shard-mix')) {
   console.error('FAIL: ai-tools pre-launch pack not merged');
+  failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'launch-chatxgpt-ga-flip')) {
+  console.error('FAIL: ChatXGPT launch pack not merged');
   failed = true;
 } else if (!failed) {
   console.log(`OK: public whale desk tasks (${publicWhales.length} flagged whale)`);
@@ -315,6 +319,60 @@ if (aiPreLaunch.length < 9) {
     failed = true;
   } else {
     console.log(`OK: ai-tools pre-launch tasks (${aiPreLaunch.length} in bank)`);
+  }
+}
+
+const {
+  usesChatXgptLaunchPlaybook,
+  CHATXGPT_PRODUCT_NAME,
+  launchPhaseLabel
+} = await import(`file://${join(sim, 'modules/LaunchLifecycle.js')}`);
+const aiLaunchMonthState = createInitialState({
+  companyName: 'ModelCo',
+  categoryId: 'ai-tools',
+  mode: 'career'
+});
+aiLaunchMonthState.launch.phase = 'launch_month';
+if (!usesChatXgptLaunchPlaybook(aiLaunchMonthState)) {
+  console.error('FAIL: ai-tools should use ChatXGPT launch playbook');
+  failed = true;
+} else if (!launchPhaseLabel(aiLaunchMonthState)?.includes(CHATXGPT_PRODUCT_NAME)) {
+  console.error('FAIL: ChatXGPT launch phase label');
+  failed = true;
+} else if (getTaskPoolSize(aiLaunchMonthState) < getMonthlyTaskOfferCount(STAGES.GARAGE)) {
+  console.error(`FAIL: ChatXGPT launch-month pool ${getTaskPoolSize(aiLaunchMonthState)} too small`);
+  failed = true;
+} else {
+  const aiLaunchDeskIds = getEligibleDeskTasks(aiLaunchMonthState).map((t) => t.id);
+  const aiLaunchDesk = getTaskDefinitions().filter(
+    (t) => t.launchPhase === 'launch' && t.categories?.includes('ai-tools')
+  );
+  if (aiLaunchDesk.length < 6) {
+    console.error(`FAIL: ChatXGPT launch-month bank ${aiLaunchDesk.length} < 6`);
+    failed = true;
+  } else if (aiLaunchDeskIds.includes('launch-day-product-hunt')) {
+    console.error('FAIL: ai-tools launch month should not offer generic Product Hunt task');
+    failed = true;
+  } else if (!aiLaunchDeskIds.includes('launch-chatxgpt-ga-flip')) {
+    console.error('FAIL: ChatXGPT GA task missing from ai-tools launch-month pool');
+    failed = true;
+  } else {
+    const b2bLaunchState = createInitialState({
+      companyName: 'SaaSCo',
+      categoryId: 'b2b-saas',
+      mode: 'career'
+    });
+    b2bLaunchState.launch.phase = 'launch_month';
+    const b2bIds = getEligibleDeskTasks(b2bLaunchState).map((t) => t.id);
+    if (!b2bIds.includes('launch-day-product-hunt')) {
+      console.error('FAIL: b2b-saas should still get generic launch-month tasks');
+      failed = true;
+    } else if (b2bIds.includes('launch-chatxgpt-ga-flip')) {
+      console.error('FAIL: ChatXGPT tasks should not appear for b2b-saas launch month');
+      failed = true;
+    } else {
+      console.log(`OK: ChatXGPT launch playbook (${aiLaunchDesk.length} launch-month tasks)`);
+    }
   }
 }
 

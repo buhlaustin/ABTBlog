@@ -73,6 +73,7 @@ import { progressionTierLabel } from './ProgressionEconomy.js';
 import {
   launchLifecycleActive,
   launchPhaseLabel,
+  launchDeskPhaseBanner,
   PRE_LAUNCH_BUZZ_REQUIRED,
   PRE_LAUNCH_PRODUCT_REQUIRED,
   canSchedulePublicLaunch,
@@ -356,7 +357,7 @@ export function renderDeskPanel(state) {
 
   const tutorial = renderTutorialBanner(activeTutorialStep(state));
   const launchBanner = launchLifecycleActive(state)
-    ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — engineering raises product level; marketing raises buzz. Schedule launch at <strong>${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz</strong> and <strong>product ${PRE_LAUNCH_PRODUCT_REQUIRED}+</strong>. Pre-sell revenue is normal desk cash. Graduate after post-launch or leaving the garage.</p>`
+    ? `<p class="fine-print launch-phase-banner"><strong>${escapeHtml(launchPhaseLabel(state) ?? 'Pre-launch')}</strong> — ${escapeHtml(launchDeskPhaseBanner(state))}</p>`
     : '';
   const preLaunchProgress = renderPreLaunchProgressBlock(state);
 

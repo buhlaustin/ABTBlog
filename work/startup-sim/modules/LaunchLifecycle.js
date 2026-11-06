@@ -4,6 +4,17 @@ import { addCalendarMonths, formatCalendarMonth } from './GameCalendar.js';
 
 /** Minimum product buzz before "Schedule public launch" unlocks. */
 export const PRE_LAUNCH_BUZZ_REQUIRED = 10;
+/** AI apps ship the consumer chat product at launch instead of a generic SaaS drop. */
+export const CHATXGPT_LAUNCH_CATEGORY = 'ai-tools';
+export const CHATXGPT_PRODUCT_NAME = 'ChatXGPT';
+
+export function usesChatXgptLaunchPlaybook(state) {
+  return state.company?.categoryId === CHATXGPT_LAUNCH_CATEGORY;
+}
+
+export function launchPublicProductName(state) {
+  return usesChatXgptLaunchPlaybook(state) ? CHATXGPT_PRODUCT_NAME : state.company?.name ?? 'the product';
+}
 /** Minimum product level from engineering pre-launch work. */
 export const PRE_LAUNCH_PRODUCT_REQUIRED = 4;
 
@@ -136,18 +147,48 @@ export function launchLifecycleActive(state) {
 export function launchPhaseLabel(state) {
   if (!launchLifecycleActive(state)) return null;
   const p = state.launch?.phase;
-  if (p === 'pre_launch') return 'Pre-launch';
+  const product = launchPublicProductName(state);
+  if (p === 'pre_launch') {
+    return usesChatXgptLaunchPlaybook(state) ? `Pre-launch · ${CHATXGPT_PRODUCT_NAME}` : 'Pre-launch';
+  }
   if (p === 'scheduled') {
     const y = state.launch.launchYear;
     const m = state.launch.launchMonthIndex;
-    return `Pre-launch · launch scheduled ${formatCalendarMonth(y, m)}`;
+    const when = formatCalendarMonth(y, m);
+    return usesChatXgptLaunchPlaybook(state)
+      ? `${CHATXGPT_PRODUCT_NAME} ships ${when}`
+      : `Pre-launch · launch scheduled ${when}`;
   }
-  if (p === 'launch_month') return 'Launch month';
+  if (p === 'launch_month') {
+    return usesChatXgptLaunchPlaybook(state)
+      ? `${CHATXGPT_PRODUCT_NAME} launch month`
+      : 'Launch month';
+  }
   if (p === 'post_launch') {
     const left = state.launch.postLaunchMonthsLeft ?? 0;
-    return `Post-launch · ${left} month(s) left in playbook`;
+    return usesChatXgptLaunchPlaybook(state)
+      ? `${CHATXGPT_PRODUCT_NAME} post-launch · ${left} month(s) left`
+      : `Post-launch · ${left} month(s) left in playbook`;
   }
   return null;
+}
+
+/** Desk banner copy under the launch phase label. */
+export function launchDeskPhaseBanner(state) {
+  if (!launchLifecycleActive(state)) return '';
+  const p = state.launch?.phase ?? 'pre_launch';
+  if (usesChatXgptLaunchPlaybook(state)) {
+    if (p === 'pre_launch' || p === 'scheduled') {
+      return `Train the model, stack buzz, and schedule ${CHATXGPT_PRODUCT_NAME} when you hit ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz and product ${PRE_LAUNCH_PRODUCT_REQUIRED}+. Launch-month desk work is the ${CHATXGPT_PRODUCT_NAME} ship checklist — not a generic Product Hunt playbook.`;
+    }
+    if (p === 'launch_month') {
+      return `${CHATXGPT_PRODUCT_NAME} is live this month — flip GA, throttle free tier, and survive the inference bill.`;
+    }
+    if (p === 'post_launch') {
+      return `${CHATXGPT_PRODUCT_NAME} post-launch — hotfixes, Plus upsell, and enterprise waitlist before the garage desk unlocks fully.`;
+    }
+  }
+  return `Engineering raises product level; marketing raises buzz. Schedule launch at ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz and product ${PRE_LAUNCH_PRODUCT_REQUIRED}+. Pre-sell revenue is normal desk cash. Graduate after post-launch or leaving the garage.`;
 }
 
 /** Which `launchPhase` on tasks.json rows to deal this month. */
@@ -184,7 +225,11 @@ export function tickLaunchAtMonthStart(state) {
     launch.launchMonthIndex === monthIndex
   ) {
     launch.phase = 'launch_month';
-    lines.push('Launch month — Product Hunt, press, and the servers you forgot to scale.');
+    lines.push(
+      usesChatXgptLaunchPlaybook(state)
+        ? `${CHATXGPT_PRODUCT_NAME} launch month — flip GA, pray the GPUs hold, and read the timeline in real time.`
+        : 'Launch month — Product Hunt, press, and the servers you forgot to scale.'
+    );
   }
   return lines;
 }
@@ -205,12 +250,13 @@ export function onScheduleLaunchTaskCompleted(state) {
   state.launch.phase = 'scheduled';
   state.launch.launchYear = next.year;
   state.launch.launchMonthIndex = next.monthIndex;
-  return {
-    ok: true,
-    lines: [
-      `Public launch scheduled for ${formatCalendarMonth(next.year, next.monthIndex)}. Finish pre-launch work until then.`
-    ]
-  };
+  const when = formatCalendarMonth(next.year, next.monthIndex);
+  const lines = usesChatXgptLaunchPlaybook(state)
+    ? [
+        `${CHATXGPT_PRODUCT_NAME} scheduled for ${when}. Finish pre-launch training and waitlist work until then.`
+      ]
+    : [`Public launch scheduled for ${when}. Finish pre-launch work until then.`];
+  return { ok: true, lines };
 }
 
 export function settleLaunchAtMonthEnd(state) {
@@ -220,7 +266,11 @@ export function settleLaunchAtMonthEnd(state) {
   if (state.launch.phase === 'launch_month') {
     state.launch.phase = 'post_launch';
     state.launch.postLaunchMonthsLeft = 3;
-    lines.push('Launch month closed — post-launch playbook runs for 3 months.');
+    lines.push(
+      usesChatXgptLaunchPlaybook(state)
+        ? `${CHATXGPT_PRODUCT_NAME} launch month closed — post-launch playbook runs for 3 months.`
+        : 'Launch month closed — post-launch playbook runs for 3 months.'
+    );
   } else if (state.launch.phase === 'post_launch') {
     state.launch.postLaunchMonthsLeft = Math.max(0, (state.launch.postLaunchMonthsLeft ?? 0) - 1);
     if (state.launch.postLaunchMonthsLeft <= 0) {

@@ -50,7 +50,9 @@ import {
   canSchedulePublicLaunch,
   PRE_LAUNCH_BUZZ_REQUIRED,
   PRE_LAUNCH_PRODUCT_REQUIRED,
-  recordPreLaunchTaskOutcome
+  recordPreLaunchTaskOutcome,
+  usesChatXgptLaunchPlaybook,
+  CHATXGPT_PRODUCT_NAME
 } from './modules/LaunchLifecycle.js';
 import { formatMoney } from './modules/GameState.js';
 import { syncStageFromProgress, onStageChange, onIpoUnlocked } from './modules/Progression.js';
@@ -418,7 +420,11 @@ function handleCompleteTask(instanceId) {
       for (const line of sched.lines ?? []) {
         appendLog(sessionState, line);
       }
-      showDeskFeedback('Public launch scheduled for next month.');
+      showDeskFeedback(
+        usesChatXgptLaunchPlaybook(sessionState)
+          ? `${CHATXGPT_PRODUCT_NAME} ships next month.`
+          : 'Public launch scheduled for next month.'
+      );
     }
   }
 

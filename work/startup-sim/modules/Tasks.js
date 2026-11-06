@@ -8,6 +8,8 @@ import bundledLaunch from '../data/launch-tasks.json' with { type: 'json' };
 import bundledLaunchCrowd from '../data/launch-crowdfunding-tasks.json' with { type: 'json' };
 import bundledLaunchPostHandcrafted from '../data/launch-post-handcrafted-pack.json' with { type: 'json' };
 import bundledAiToolsPrelaunch from '../data/ai-tools-prelaunch-tasks.json' with { type: 'json' };
+import bundledAiToolsChatXgptLaunch from '../data/ai-tools-chatxgpt-launch-tasks.json' with { type: 'json' };
+import { CHATXGPT_LAUNCH_CATEGORY } from './LaunchLifecycle.js';
 import bundledSpaceExploration from '../data/space-exploration-tasks.json' with { type: 'json' };
 import bundledSpaceExpansion from '../data/space-exploration-expansion.json' with { type: 'json' };
 import bundledAiToolsDeskExtra from '../data/ai-tools-desk-tasks-extra.json' with { type: 'json' };
@@ -52,7 +54,8 @@ function mergeLaunchTasks(base) {
     ...(bundledLaunch?.tasks ?? []),
     ...(bundledLaunchCrowd?.tasks ?? []),
     ...(bundledLaunchPostHandcrafted?.tasks ?? []),
-    ...(bundledAiToolsPrelaunch?.tasks ?? [])
+    ...(bundledAiToolsPrelaunch?.tasks ?? []),
+    ...(bundledAiToolsChatXgptLaunch?.tasks ?? [])
   ];
   if (!launch.length) return base;
   const ids = new Set((base.tasks ?? []).map((t) => t.id));
@@ -184,6 +187,11 @@ export function getTaskPoolSize(state) {
   return buildTaskPool(state).length;
 }
 
+/** Eligible desk tasks for tests and diagnostics. */
+export function getEligibleDeskTasks(state) {
+  return buildTaskPool(state);
+}
+
 export function isTaskCatalogReady() {
   return getTaskDefinitions().length > 0;
 }
@@ -284,6 +292,15 @@ export function monthDealHasDuplicateTaskIds(picked) {
 }
 
 function categoryAllowed(task, categoryId) {
+  const phase = task.launchPhase;
+  if (phase === 'launch' || phase === 'post_launch') {
+    if (categoryId === CHATXGPT_LAUNCH_CATEGORY) {
+      return task.categories?.includes(CHATXGPT_LAUNCH_CATEGORY) === true;
+    }
+    if (task.categories?.includes(CHATXGPT_LAUNCH_CATEGORY)) return false;
+    if (task.categories?.length) return task.categories.includes(categoryId);
+    return true;
+  }
   const cats = task.categories;
   if (!cats?.length) return true;
   return cats.includes(categoryId);
