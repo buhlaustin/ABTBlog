@@ -2707,9 +2707,22 @@ const {
   preloadCeoLifestyleCatalog,
   getCeoHomeTier,
   ceoLifestyleMonthlyDebit,
-  ceoLifestyleLifetimeSpend
+  ceoLifestyleLifetimeSpend,
+  getCeoLifestylePurchasesSync,
+  getCeoLifestyleCategoriesSync
 } = await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
 await preloadCeoLifestyleCatalog();
+const lifestyleCatalogCount = getCeoLifestylePurchasesSync().length;
+const lifestyleCategoryCount = getCeoLifestyleCategoriesSync().length;
+if (lifestyleCatalogCount < 68) {
+  console.error(`FAIL: CEO lifestyle catalog too small (${lifestyleCatalogCount})`);
+  failed = true;
+} else if (lifestyleCategoryCount < 9) {
+  console.error(`FAIL: CEO lifestyle categories too few (${lifestyleCategoryCount})`);
+  failed = true;
+} else {
+  console.log(`OK: CEO lifestyle catalog (${lifestyleCatalogCount} purchases, ${lifestyleCategoryCount} categories)`);
+}
 const {
   donateFromPersonalBank,
   recordCeoNetWorthSnapshot,
