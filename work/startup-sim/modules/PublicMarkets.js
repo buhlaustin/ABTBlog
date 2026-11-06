@@ -21,7 +21,7 @@ import {
   panelMetricStack
 } from './PanelChrome.js';
 
-const FINANCE_SECTIONS = new Set(['overview', 'public']);
+const FINANCE_SECTIONS = new Set(['overview', 'treasury', 'public']);
 const PUBLIC_SECTIONS = new Set(['market', 'events', 'calendar']);
 
 const PRE_IPO_IR_STEPS = [

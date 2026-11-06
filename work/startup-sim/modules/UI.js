@@ -12,6 +12,7 @@ import { renderCompaniesPanel } from './Companies.js';
 import { renderPeoplePanel } from './EmployeeBenefits.js';
 import { renderCeoPanel } from './Ceo.js';
 import { ceoPersonalCashComp } from './CeoEconomics.js';
+import { ceoPersonalWealthEndgame } from './FacilitiesEconomics.js';
 import { renderNewsPanel, markNewsAsRead, syncNewsTabAlert } from './News.js';
 import {
   getTaskDef,
@@ -872,6 +873,16 @@ export function renderGameOver(state) {
               panelStatCard('CEO salary (career)', formatMoney(e.ceoSalaryCareer ?? 0)),
               panelStatCard('Owner draws', formatMoney(e.ceoOwnerDraws ?? 0)),
               panelStatCard('Personal bank', formatMoney(e.ceoBankBalance ?? 0)),
+              panelStatCard('Personal portfolio', formatMoney(e.ceoPortfolioBalance ?? 0)),
+              ...(e.ceoHomeMarketValue > 0
+                ? [
+                    panelStatCard(
+                      e.ceoHomeLabel ? `${e.ceoHomeLabel} (value)` : 'Home (market value)',
+                      formatMoney(e.ceoHomeMarketValue)
+                    ),
+                    panelStatCard('Home equity', formatMoney(e.ceoHomeEquity ?? 0))
+                  ]
+                : []),
               panelStatCard('Total personal cash', formatMoney(e.totalCareerCashComp ?? e.payout))
             ])
           ),
@@ -897,6 +908,15 @@ export function renderGameOver(state) {
         <p>${escapeHtml(state.flags.gameOverReason || 'Your run ended.')}</p>
         <p>Lifetime revenue: <strong>${formatMoney(state.finance.lifetimeRevenue)}</strong></p>
         <p>CEO cash comp this run: <strong>${formatMoney(ceoPersonalCashComp(state))}</strong> (salary + owner draws)</p>
+        ${(() => {
+          const w = ceoPersonalWealthEndgame(state);
+          const bits = [];
+          if (w.portfolio > 0) bits.push(`portfolio ${formatMoney(w.portfolio)}`);
+          if (w.homeMarketValue > 0) {
+            bits.push(`${w.homeLabel ?? 'Home'} ${formatMoney(w.homeMarketValue)} (equity ${formatMoney(w.homeEquity)})`);
+          }
+          return bits.length ? `<p>Personal holdings: <strong>${bits.join(' · ')}</strong></p>` : '';
+        })()}
         <p>Months played: <strong>${months}</strong></p>
         ${
           isPublicCompany(state)

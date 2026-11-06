@@ -87,6 +87,7 @@ import {
   renderFinancePublicSection,
   setFinanceSection
 } from './PublicMarkets.js';
+import { renderFinanceTreasuryIntro, facilitiesRentBreakdown } from './FacilitiesEconomics.js';
 
 export { setFinanceSection };
 import {
@@ -423,6 +424,8 @@ export function renderFinancePanel(container, state) {
     </div>
   </section>`;
 
+  const creditBlocks = [rbfBlock, loanBlock].filter(Boolean).join('');
+
   const fundraisingBlocks = [
     blockNote,
     capitalStack,
@@ -430,8 +433,6 @@ export function renderFinancePanel(container, state) {
     sentimentBlock,
     xcBlock,
     angelBlock,
-    rbfBlock,
-    loanBlock,
     seedBlock,
     seriesABlock,
     seriesBBlock,
@@ -448,17 +449,37 @@ export function renderFinancePanel(container, state) {
   const showPublicTab = publicFinanceTabVisible(state);
   const financeTabBtn = (id, label) =>
     `<button type="button" class="${financeSection === id ? 'active' : ''}" data-finance-tab="${id}">${label}</button>`;
-  const subtabs = showPublicTab
-    ? `<nav class="finance-subtabs people-subtabs" aria-label="Finance sections">
+  const subtabs = `<nav class="finance-subtabs people-subtabs" aria-label="Finance sections">
         ${financeTabBtn('overview', 'Overview')}
-        ${financeTabBtn('public', 'Public')}
-      </nav>`
-    : '';
+        ${financeTabBtn('treasury', 'Treasury')}
+        ${showPublicTab ? financeTabBtn('public', 'Public') : ''}
+      </nav>`;
+
+  const rentSnap = facilitiesRentBreakdown(state);
+  const treasuryBody =
+    financeSection === 'treasury'
+      ? `${renderFinanceTreasuryIntro(state)}
+      <section class="finance-section finance-card" aria-label="Lease costs">
+        <h3 class="finance-section-title">Monthly lease stack</h3>
+        <p class="fine-print">${rentSnap.hubLine ? `Hub: ${escapeHtml(rentSnap.hubLine)} · ` : ''}${rentSnap.satelliteCount} satellite office(s).</p>
+        ${panelMetricGrid('3', [
+          panelStatCard('HQ rent', `${formatMoney(rentSnap.hqMonthly)}/mo`, { hero: true }),
+          panelStatCard('Satellites', `${formatMoney(rentSnap.satelliteMonthly)}/mo`),
+          panelStatCard('Combined', `${formatMoney(rentSnap.totalMonthly)}/mo`)
+        ])}
+      </section>
+      <section class="finance-section finance-fundraising-stack">
+        <h3 class="finance-section-title">Credit & non-dilutive capital</h3>
+        ${creditBlocks || '<p class="fine-print">No active credit lines yet — bank LOC unlocks as the company scales.</p>'}
+      </section>
+      <section class="finance-section finance-section--cap">
+        <div id="offices-panel-mount"></div>
+      </section>`
+      : '';
 
   const overviewBody =
-    financeSection === 'public'
-      ? ''
-      : `
+    financeSection === 'overview'
+      ? `
       ${panelSnapshotSection(
         panelMetricStack(
           panelMetricGroup(
@@ -540,7 +561,8 @@ export function renderFinancePanel(container, state) {
         }
       </section>
 
-      <p class="fine-print finance-ceo-pointer">Founder equity, salary, draws, and net worth → <strong>CEO</strong> tab.</p>`;
+      <p class="fine-print finance-ceo-pointer">Credit, leases, and revenue advances → <strong>Treasury</strong> subtab. Founder equity and personal bank → <strong>CEO</strong> tab.</p>`
+      : '';
 
   const publicBody =
     financeSection === 'public' ? `<div id="finance-public-section-mount"></div>` : '';
@@ -553,15 +575,18 @@ export function renderFinancePanel(container, state) {
       </header>
       ${subtabs}
       ${overviewBody}
+      ${treasuryBody}
       ${publicBody}
       <p id="finance-feedback" class="desk-feedback" hidden></p>
     </div>
   `;
 
-  if (financeSection !== 'public') {
+  if (financeSection === 'overview') {
     renderIpoPanel(container, state);
     renderOfficesPanel(document.getElementById('offices-panel-mount'), state);
-  } else {
+  } else if (financeSection === 'treasury') {
+    renderOfficesPanel(document.getElementById('offices-panel-mount'), state);
+  } else if (financeSection === 'public') {
     renderFinancePublicSection(document.getElementById('finance-public-section-mount'), state);
   }
 }

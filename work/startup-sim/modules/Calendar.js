@@ -28,6 +28,7 @@ import { tickCooCompensationReview } from './Coo.js';
 import { resetGrowthCampaignsMonth, growthRosterRefreshLine } from './GrowthCampaigns.js';
 import { resetProductActionsMonth } from './ProductActions.js';
 import { resetEmployeeBenefitsMonth } from './EmployeeBenefits.js';
+import { tickAnnualFacilitiesAtMonthStart } from './FacilitiesEconomics.js';
 import {
   tickLaunchAtMonthStart,
   tickPreLaunchAtMonthStart,
@@ -97,6 +98,9 @@ export function startMonth(state) {
     appendLog(state, line);
   }
   for (const line of tickPreLaunchAtMonthStart(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickAnnualFacilitiesAtMonthStart(state)) {
     appendLog(state, line);
   }
   for (const line of tickAcquisitionsAtMonthStart(state)) {

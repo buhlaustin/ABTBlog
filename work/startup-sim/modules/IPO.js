@@ -19,6 +19,7 @@ import {
   depositStockCashOutToPersonalBank,
   creditCeoStockSale
 } from './CeoEconomics.js';
+import { ceoPersonalWealthEndgame } from './FacilitiesEconomics.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
@@ -800,6 +801,8 @@ export function cashOut(state) {
   const payout = founderStakeValue(state);
   const founder = getFounderRow(state);
   const comp = ceoEndgameCompSnapshot(state);
+  const personalWealth = ceoPersonalWealthEndgame(state);
+  const bankAfter = depositStockCashOutToPersonalBank(state, payout);
   state.ending = {
     type: 'cash_out',
     payout,
@@ -812,7 +815,11 @@ export function cashOut(state) {
     pressDek: state.publicMarket?.pressDek ?? null,
     ceoSalaryCareer: comp.salary,
     ceoOwnerDraws: comp.draws,
-    ceoBankBalance: depositStockCashOutToPersonalBank(state, payout),
+    ceoBankBalance: bankAfter,
+    ceoPortfolioBalance: personalWealth.portfolio,
+    ceoHomeMarketValue: personalWealth.homeMarketValue,
+    ceoHomeEquity: personalWealth.homeEquity,
+    ceoHomeLabel: personalWealth.homeLabel,
     totalCareerCashComp: comp.salary + comp.draws + payout
   };
 

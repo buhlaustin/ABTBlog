@@ -84,9 +84,10 @@ export function workspaceRentMonthly(state) {
   let rent = RENT_BY_TIER[tier] ?? RENT_BY_TIER[WORKSPACE_TIER.GARAGE];
   if (tier === WORKSPACE_TIER.HUB && state.offices?.hubId) {
     const hubRent = state.finance?.hubRentMonthly;
-    if (typeof hubRent === 'number') rent = hubRent;
+    if (typeof hubRent === 'number') return hubRent;
   }
-  return rent;
+  const indexMult = state.finance?.rentIndexMult ?? 1;
+  return Math.round(rent * indexMult);
 }
 
 export function applyWorkspaceBurn(state) {

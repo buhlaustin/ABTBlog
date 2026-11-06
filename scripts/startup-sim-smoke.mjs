@@ -2701,4 +2701,76 @@ if (DEPARTMENTS.length < 15) {
   }
 }
 
+const { workspaceRentMonthly } = await import(`file://${join(sim, 'modules/Workspace.js')}`);
+const { tickAnnualFacilitiesAtMonthStart } = await import(
+  `file://${join(sim, 'modules/FacilitiesEconomics.js')}`
+);
+const { HOUSING_MODE } = await import(`file://${join(sim, 'modules/CeoLifestyle.js')}`);
+const { setFinanceSection, activeFinanceSection } = await import(
+  `file://${join(sim, 'modules/PublicMarkets.js')}`
+);
+
+const rentEscState = createInitialState({ companyName: 'Rent Esc', categoryId: 'b2b-saas', mode: 'sandbox' });
+rentEscState.workspace.tier = WORKSPACE_TIER.SMALL;
+rentEscState.workspace.smallOfficeOwned = true;
+rentEscState.meta.calendarStartYear = 1;
+rentEscState.meta.calendarStartMonth = 1;
+rentEscState.calendar.year = 2;
+rentEscState.calendar.monthIndex = 1;
+if (calendarTurn(rentEscState) <= 1) {
+  console.error('FAIL: rent escalation fixture should be past founding month');
+  failed = true;
+} else {
+  const rentBefore = workspaceRentMonthly(rentEscState);
+  const escLines = tickAnnualFacilitiesAtMonthStart(rentEscState);
+  const rentAfter = workspaceRentMonthly(rentEscState);
+  if (escLines.length === 0 || rentAfter <= rentBefore) {
+    console.error(`FAIL: annual rent escalation (${rentBefore} → ${rentAfter})`);
+    failed = true;
+  } else {
+    rentEscState.finance.hubRentMonthly = 100_000;
+    rentEscState.offices.hubId = 'sf';
+    rentEscState.workspace.tier = WORKSPACE_TIER.HUB;
+    const hubBefore = workspaceRentMonthly(rentEscState);
+    rentEscState.calendar.year = 3;
+    rentEscState.finance.lastRentEscalationYear = 2;
+    tickAnnualFacilitiesAtMonthStart(rentEscState);
+    const hubAfter = workspaceRentMonthly(rentEscState);
+    if (hubAfter <= hubBefore) {
+      console.error(`FAIL: hub rent escalation (${hubBefore} → ${hubAfter})`);
+      failed = true;
+    } else {
+      console.log('OK: annual rent escalation (HQ + hub)');
+    }
+  }
+}
+
+const homeEscState = createInitialState({ companyName: 'Home Esc', categoryId: 'b2b-saas', mode: 'sandbox' });
+homeEscState.meta.calendarStartYear = 1;
+homeEscState.meta.calendarStartMonth = 1;
+homeEscState.calendar.year = 2;
+homeEscState.calendar.monthIndex = 1;
+homeEscState.ceo.housing = {
+  mode: HOUSING_MODE.OWNED,
+  tierId: 'penthouse',
+  purchasePrice: 1_000_000,
+  costBasis: 1_000_000,
+  mortgageBalance: 0
+};
+tickAnnualFacilitiesAtMonthStart(homeEscState);
+if ((homeEscState.ceo.housing.purchasePrice ?? 0) <= 1_000_000) {
+  console.error('FAIL: CEO home annual appreciation');
+  failed = true;
+} else {
+  console.log('OK: CEO home annual appreciation');
+}
+
+setFinanceSection({ finance: {} }, 'treasury');
+if (activeFinanceSection({ finance: { section: 'treasury' } }) !== 'treasury') {
+  console.error('FAIL: finance treasury section');
+  failed = true;
+} else {
+  console.log('OK: finance treasury section');
+}
+
 process.exit(failed ? 1 : 0);
