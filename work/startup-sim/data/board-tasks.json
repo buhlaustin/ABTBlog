@@ -225,6 +225,131 @@
       "minTier": 7,
       "requiresPublic": true,
       "committee": "full"
+    },
+    {
+      "id": "board-option-pool-refresh",
+      "title": "Option pool refresh memo",
+      "description": "Model dilution for the next refresh — comp committee wants ranges before the board vote.",
+      "cost": 1400,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "minTier": 3,
+      "committee": "comp"
+    },
+    {
+      "id": "board-churn-intervention",
+      "title": "Enterprise churn intervention plan",
+      "description": "Logo saves, exec sponsors, and discount guardrails — show the board you are not praying.",
+      "cost": 1100,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 2,
+      "minTier": 3,
+      "committee": "governance"
+    },
+    {
+      "id": "board-security-questionnaire",
+      "title": "Security questionnaire blitz",
+      "description": "Pre-fill SIG and CAIQ for top prospects — audit chair wants zero surprise gaps.",
+      "cost": 980,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 2,
+      "minTier": 2,
+      "committee": "audit"
+    },
+    {
+      "id": "board-ai-product-review",
+      "title": "AI product safety review packet",
+      "description": "Eval harness, abuse cases, and customer opt-outs — governance wants it before the launch PR.",
+      "cost": 2100,
+      "revenue": [0, 0],
+      "buzz": 2,
+      "sentiment": 3,
+      "minTier": 4,
+      "committee": "governance"
+    },
+    {
+      "id": "board-partner-council-summary",
+      "title": "Partner council summary",
+      "description": "Top integrators’ feedback distilled for directors who do not read Slack.",
+      "cost": 750,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 2,
+      "minTier": 2,
+      "committee": "governance"
+    },
+    {
+      "id": "board-hub-expansion-case",
+      "title": "HQ hub expansion business case",
+      "description": "Seat growth, lease options, and rival talent maps for the next office tier-up.",
+      "cost": 1650,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 2,
+      "minTier": 4,
+      "committee": "full"
+    },
+    {
+      "id": "board-activist-letter-prep",
+      "title": "Activist letter response prep",
+      "description": "Draft the board packet before the 13D hits — talking points, not panic.",
+      "cost": 5400,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 4,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "governance"
+    },
+    {
+      "id": "board-insider-window-memo",
+      "title": "Insider trading window memo",
+      "description": "Blackout dates, 10b5-1 plans, and who may trade after earnings — counsel signs off.",
+      "cost": 1900,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "audit"
+    },
+    {
+      "id": "board-segment-kpi-pack",
+      "title": "Segment KPI board pack",
+      "description": "Product-line ARR, margin, and headcount — prep for public segment disclosure debates.",
+      "cost": 3200,
+      "revenue": [0, 0],
+      "buzz": 0,
+      "sentiment": 3,
+      "stockPct": 0.006,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "audit"
+    },
+    {
+      "id": "board-treasury-sponsor-review",
+      "title": "Treasury sponsorship review",
+      "description": "Naming deals, stadium checks, and brand ROI — audit wants payback, marketing wants buzz.",
+      "cost": 2400,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 2,
+      "minTier": 5,
+      "committee": "audit"
+    },
+    {
+      "id": "board-alumni-giving-brief",
+      "title": "CEO alumni giving brief",
+      "description": "Personal philanthropy that still affects company reputation — disclosure for the governance packet.",
+      "cost": 620,
+      "revenue": [0, 0],
+      "buzz": 1,
+      "sentiment": 2,
+      "minTier": 3,
+      "committee": "governance"
     }
   ]
 }
