@@ -920,10 +920,17 @@ const {
   ensureBoardRoster,
   addBoardSeat,
   availableBoardSeatCandidates,
-  boardSeatCapacity
+  boardSeatCapacity,
+  dealBoardMeetingTasks,
+  completeBoardMeetingTask,
+  getBoardMeetingTaskDefs
 } = await import(`file://${join(sim, 'modules/Board.js')}`);
 if (getBoardTaskDefs().length < 18) {
   console.error(`FAIL: board task catalog too small (${getBoardTaskDefs().length})`);
+  failed = true;
+}
+if (getBoardMeetingTaskDefs().length < 12) {
+  console.error(`FAIL: board meeting catalog too small (${getBoardMeetingTaskDefs().length})`);
   failed = true;
 }
 const boardState = createInitialState({
@@ -934,6 +941,7 @@ const boardState = createInitialState({
 boardState.flags.seriesAClosed = true;
 boardState.finance.cash = 500_000;
 dealBoardTasks(boardState);
+dealBoardMeetingTasks(boardState);
 ensureBoardRoster(boardState);
 if ((boardState.board?.members?.length ?? 0) < 2) {
   console.error('FAIL: board roster should include lead + founder after Series A');
@@ -954,6 +962,20 @@ if (!inst) {
     failed = true;
   } else {
     console.log('OK: board task outcome fields');
+  }
+}
+const meetInst = boardState.board?.meetingTasks?.[0];
+if (!meetInst) {
+  console.error('FAIL: board meeting tasks not dealt');
+  failed = true;
+} else {
+  boardState.finance.cash = Math.max(boardState.finance.cash ?? 0, 500_000);
+  const meetResult = completeBoardMeetingTask(boardState, meetInst.instanceId);
+  if (!meetResult.ok || meetResult.isMeeting !== true) {
+    console.error(`FAIL: board meeting task: ${meetResult.reason ?? 'unknown'}`);
+    failed = true;
+  } else {
+    console.log('OK: board meeting task outcome');
   }
 }
 boardState.finance.cash = 2_000_000;

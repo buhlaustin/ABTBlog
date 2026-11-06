@@ -13,10 +13,12 @@ import { autoSelectRecommendedLineup } from './modules/Desk.js';
 import {
   addBoardSeat,
   completeBoardTask,
+  completeBoardMeetingTask,
   ensureBoardRoster,
   dealBoardTasks,
   getBoardSeatCandidates,
-  boardSeatSearchFee
+  boardSeatSearchFee,
+  setBoardSection
 } from './modules/Board.js';
 import { openBoardTaskOutcomeDialog } from './modules/BoardOutcome.js';
 import { purchaseWorkspaceTier } from './modules/Workspace.js';
@@ -1020,6 +1022,47 @@ function bindGameInteractions() {
         setGameFeedback(result.summary, false);
       }
       refresh();
+      return;
+    }
+
+    const boardSubtab = e.target.closest('[data-board-subtab]');
+    if (boardSubtab && sessionState) {
+      setBoardSection(sessionState, boardSubtab.getAttribute('data-board-subtab'));
+      refresh();
+      return;
+    }
+
+    const boardMeetBtn = e.target.closest('[data-complete-board-meeting]');
+    if (boardMeetBtn && sessionState) {
+      void (async () => {
+        const result = completeBoardMeetingTask(
+          sessionState,
+          boardMeetBtn.getAttribute('data-complete-board-meeting')
+        );
+        if (!result.ok) {
+          setGameFeedback(result.reason || 'Could not hold board meeting.', true);
+          refresh();
+          return;
+        }
+        appendLog(sessionState, `Board meeting: “${result.def.title}”.`);
+        if (result.stockPct) {
+          appendLog(
+            sessionState,
+            `Board read-through: stock ${result.stockPct > 0 ? '+' : ''}${Math.round(Number(result.stockPct) * 100)}%.`
+          );
+        }
+        refresh();
+        await openBoardTaskOutcomeDialog({
+          title: result.def.title,
+          sentimentDelta: result.sentimentDelta ?? 0,
+          sentimentAfter: result.sentimentAfter ?? 0,
+          buzzDelta: result.buzzDelta ?? 0,
+          mandateBonus: 0,
+          stockPct: result.stockPct,
+          happinessDelta: result.happinessDelta ?? 0,
+          isMeeting: true
+        });
+      })();
       return;
     }
 

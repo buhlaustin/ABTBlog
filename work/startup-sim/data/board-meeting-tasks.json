@@ -1,0 +1,174 @@
+{
+  "tasks": [
+    {
+      "id": "meet-monthly-formal",
+      "title": "Formal monthly board meeting",
+      "description": "Three-hour quorum: consent agenda, CEO report, exec session tail. You run the room.",
+      "cost": 2200,
+      "sentiment": 4,
+      "buzz": 1,
+      "minTier": 2,
+      "committee": "full",
+      "wlbCost": 6
+    },
+    {
+      "id": "meet-audit-committee-live",
+      "title": "Live audit committee session",
+      "description": "Walk the control matrix with the audit chair — no async deck substitutes.",
+      "cost": 3800,
+      "sentiment": 5,
+      "buzz": 0,
+      "minTier": 3,
+      "committee": "audit",
+      "wlbCost": 5
+    },
+    {
+      "id": "meet-comp-committee-live",
+      "title": "Comp committee live review",
+      "description": "Approve option refreshes and exec pay bands in a recorded session.",
+      "cost": 2900,
+      "sentiment": 4,
+      "buzz": 0,
+      "minTier": 3,
+      "committee": "comp",
+      "wlbCost": 4
+    },
+    {
+      "id": "meet-strategy-deep-dive",
+      "title": "Strategy deep-dive (full board)",
+      "description": "Whiteboard TAM, pricing power, and the one bet you are doubling down on.",
+      "cost": 4500,
+      "sentiment": 5,
+      "buzz": 2,
+      "minTier": 4,
+      "committee": "full",
+      "wlbCost": 8
+    },
+    {
+      "id": "meet-crisis-war-room",
+      "title": "Crisis war room with board",
+      "description": "Outage, PR flare, or churn spike — directors on Zoom until there is a plan.",
+      "cost": 5200,
+      "sentiment": 6,
+      "buzz": 1,
+      "minTier": 3,
+      "committee": "full",
+      "wlbCost": 10
+    },
+    {
+      "id": "meet-fundraise-pricing",
+      "title": "Fundraise pricing committee",
+      "description": "Term sheet math live — lead wants your ask, dilution, and use of proceeds on one slide.",
+      "cost": 3400,
+      "sentiment": 5,
+      "buzz": 2,
+      "minTier": 4,
+      "committee": "governance",
+      "wlbCost": 7
+    },
+    {
+      "id": "meet-ceo-performance",
+      "title": "CEO performance review",
+      "description": "Lead director runs the session; you present goals, misses, and the recovery plan.",
+      "cost": 1800,
+      "sentiment": 4,
+      "buzz": 0,
+      "minTier": 2,
+      "committee": "governance",
+      "wlbCost": 6
+    },
+    {
+      "id": "meet-independent-executive",
+      "title": "Independent executive session",
+      "description": "Directors meet without management — you wait in the hall with coffee.",
+      "cost": 1200,
+      "sentiment": 5,
+      "buzz": 0,
+      "minTier": 4,
+      "committee": "governance",
+      "wlbCost": 3
+    },
+    {
+      "id": "meet-customer-proof",
+      "title": "Customer proof session",
+      "description": "Two reference CEOs join for thirty minutes; board asks the hard renewal questions.",
+      "cost": 4100,
+      "sentiment": 4,
+      "buzz": 3,
+      "minTier": 3,
+      "committee": "governance",
+      "wlbCost": 5
+    },
+    {
+      "id": "meet-ipo-readiness-live",
+      "title": "IPO readiness board readout",
+      "description": "S-1 timeline, dual-class debate, and banker roster — everyone leaves with owners.",
+      "cost": 6800,
+      "sentiment": 6,
+      "buzz": 2,
+      "minTier": 6,
+      "committee": "full",
+      "wlbCost": 9
+    },
+    {
+      "id": "meet-earnings-call-prep",
+      "title": "Board earnings call prep",
+      "description": "Script the quarter narrative with directors before the public call.",
+      "cost": 7200,
+      "sentiment": 6,
+      "buzz": 1,
+      "stockPct": 0.02,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "full",
+      "wlbCost": 7
+    },
+    {
+      "id": "meet-buyback-vote",
+      "title": "Buyback authorization vote",
+      "description": "Model repurchase bands; board votes yes/no on the authorization size.",
+      "cost": 5500,
+      "sentiment": 5,
+      "buzz": 0,
+      "stockPct": 0.012,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "full",
+      "wlbCost": 5
+    },
+    {
+      "id": "meet-ma-live-diligence",
+      "title": "M&A live diligence review",
+      "description": "Target deck, synergy ranges, and integration risks — partners want numbers, not vibes.",
+      "cost": 8900,
+      "sentiment": 5,
+      "buzz": 2,
+      "minTier": 5,
+      "committee": "full",
+      "wlbCost": 10
+    },
+    {
+      "id": "meet-succession-tabletop",
+      "title": "Succession tabletop",
+      "description": "If you get hit by a bus — who runs product, who talks to investors?",
+      "cost": 2600,
+      "sentiment": 4,
+      "buzz": 0,
+      "minTier": 4,
+      "committee": "comp",
+      "wlbCost": 4
+    },
+    {
+      "id": "meet-esg-investor-day",
+      "title": "ESG & investor day dry run",
+      "description": "Full board attends the dress rehearsal for your investor day keynote.",
+      "cost": 6100,
+      "sentiment": 5,
+      "buzz": 3,
+      "minTier": 7,
+      "requiresPublic": true,
+      "committee": "full",
+      "wlbCost": 8
+    }
+  ]
+}

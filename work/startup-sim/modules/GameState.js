@@ -324,6 +324,12 @@ export function normalizeSave(raw) {
     if (state.board.meetingsHeld === undefined) state.board.meetingsHeld = 0;
     if (state.board.seatsAddedByPlayer === undefined) state.board.seatsAddedByPlayer = 0;
     if (state.board.seatSearchSpendLifetime === undefined) state.board.seatSearchSpendLifetime = 0;
+    if (!state.board.meetingTasks) state.board.meetingTasks = [];
+    if (state.board.meetingsCompletedThisMonth === undefined) state.board.meetingsCompletedThisMonth = 0;
+    if (!state.board.recentMeetingTaskIds) state.board.recentMeetingTaskIds = [];
+    if (!state.board.boardSection || !['governance', 'meeting'].includes(state.board.boardSection)) {
+      state.board.boardSection = 'governance';
+    }
     if (state.publicMarket && state.publicMarket.guidanceBeatStreak === undefined) {
       state.publicMarket.guidanceBeatStreak = 0;
     }

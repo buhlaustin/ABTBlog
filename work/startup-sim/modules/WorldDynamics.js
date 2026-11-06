@@ -55,16 +55,31 @@ export function settleBoardGovernance(state) {
   const done = state.board?.completedThisMonth ?? 0;
   if (offered < 1) return [];
 
+  const meetingsOffered = (state.board?.meetingTasks ?? []).filter(
+    (t) => t.status === 'pending' || t.status === 'done'
+  ).length;
+  const meetingsDone = state.board?.meetingsCompletedThisMonth ?? 0;
+  const meetingLines = [];
+  if (meetingsOffered >= 1) {
+    if (meetingsDone >= 1) {
+      adjustSentiment(state, 1, 'Productive board meeting');
+      meetingLines.push('Live board meeting held — directors feel heard.');
+    } else {
+      adjustSentiment(state, -2, 'Board meeting skipped');
+      meetingLines.push('No live board meeting this month — approval slipped.');
+    }
+  }
+
   if (done >= 1) {
     state.board.governanceStreak = (state.board.governanceStreak ?? 0) + 1;
     if (done >= 2) adjustSentiment(state, 1, 'Strong board month');
-    return ['Board prep filed — investors stay off the warpath.'];
+    return ['Board prep filed — investors stay off the warpath.', ...meetingLines];
   }
 
   state.board.governanceStreak = 0;
   adjustSentiment(state, -4, 'Board prep skipped');
   bumpCompetitorPressure(state, 1);
-  return ['You skipped board prep — sentiment dipped and rivals smelled blood.'];
+  return ['You skipped board prep — sentiment dipped and rivals smelled blood.', ...meetingLines];
 }
 
 /** Public: did this month beat implied burn guidance? Feeds stock tick. */
