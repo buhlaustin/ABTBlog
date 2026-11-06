@@ -25,6 +25,14 @@ export function buildRunExportText(state) {
     lines.push(`CEO salary (career): ${formatMoney(e.ceoSalaryCareer ?? 0)}`);
     lines.push(`Owner draws: ${formatMoney(e.ceoOwnerDraws ?? 0)}`);
     lines.push(`Personal bank at exit: ${formatMoney(e.ceoBankBalance ?? 0)}`);
+    if (e.ceoPortfolioBalance > 0) {
+      lines.push(`Personal portfolio: ${formatMoney(e.ceoPortfolioBalance)}`);
+    }
+    if (e.ceoHomeMarketValue > 0) {
+      lines.push(
+        `${e.ceoHomeLabel ?? 'Home'} (market): ${formatMoney(e.ceoHomeMarketValue)} · equity ${formatMoney(e.ceoHomeEquity ?? 0)}`
+      );
+    }
     lines.push(`Total personal cash comp: ${formatMoney(e.totalCareerCashComp ?? e.payout)}`);
     if (e.pressHeadline) lines.push(`Press: ${e.pressHeadline}`);
   } else if (state.flags?.gameOver) {
