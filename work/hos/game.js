@@ -38,6 +38,10 @@ import {
   getLocalWeekRecapVoiceover,
   getWeekRecapBanner
 } from './modules/weekEndRecap.js';
+import {
+  buildScheduleRepairFeedEntries,
+  getScheduleRepairBanner
+} from './modules/scheduleRepair.js';
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
 import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
@@ -258,13 +262,9 @@ class Game {
       return;
     }
 
-    if (this.state._scheduleRepaired) {
-      this.logAndRender([
-        {
-          type: 'warning',
-          text: 'Your save was stuck on eviction night without nominees. The calendar was adjusted so you can keep playing.'
-        }
-      ]);
+    const loadRepair = this.state.lastScheduleRepair;
+    if (loadRepair?.source === 'load') {
+      this.logAndRender(buildScheduleRepairFeedEntries(loadRepair));
     }
 
     this.runPhase();
@@ -344,6 +344,8 @@ class Game {
     if (confessionalBanner) twistParts.push(confessionalBanner);
     const weekRecapBanner = getWeekRecapBanner(state);
     if (weekRecapBanner) twistParts.push(weekRecapBanner);
+    const scheduleRepairBanner = getScheduleRepairBanner(state);
+    if (scheduleRepairBanner) twistParts.push(scheduleRepairBanner);
     const vetoBlockBanner = buildVetoBlockBanner(state);
     if (vetoBlockBanner) twistParts.push(vetoBlockBanner);
     const threatAlert = getThreatNominationAlert(state, previewLeans);
@@ -1538,20 +1540,10 @@ class Game {
   _recoverFromInvalidEviction() {
     if (this.state.getActiveNominees().length >= 2) return false;
 
-    const hadHoh =
-      this.state.currentHOH ||
-      this.state.getActiveContestants().some((c) => c.isHOH);
+    const repair = this.state.repairInvalidEvictionSchedule('recover');
+    if (!repair) return false;
 
-    this.logAndRender([
-      {
-        type: 'warning',
-        text: hadHoh
-          ? 'Eviction night arrived without two nominees on the block. The schedule jumps to Saturday’s nomination ceremony.'
-          : 'Eviction night arrived before a Head of Household was crowned. The week rewinds to Friday’s HOH competition.'
-      }
-    ]);
-
-    this.state.repairInvalidEvictionSchedule();
+    this.logAndRender(buildScheduleRepairFeedEntries(repair));
     this.render();
     if (this.state.phase === PHASES.NOMINATION) {
       void this.runNominationPhase();

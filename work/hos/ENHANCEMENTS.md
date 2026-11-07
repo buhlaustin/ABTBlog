@@ -209,9 +209,10 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
+| **Status** | **Shipped (v1):** `scheduleRepair.js` captures **before/after** weekday, phase, block, HOH; **View what happened** `<details>` in feed; **Deals** repair log; header banner; `scheduleRepairLog` on save; load + live **recover** sources; `scripts/hos-schedule-repair-smoke.mjs`. |
 | **Goal** | When save repair rewinds calendar, explain why. |
 | **Player experience** | Already a story warning; add “View what happened” with before/after weekday. |
-| **Implementation** | Log repair metadata in `repairInvalidEvictionSchedule()` for dev; player-safe message in prod. |
+| **Implementation** | `runScheduleRepair` via `GameState.repairInvalidEvictionSchedule(source)`. |
 | **Priority** | Low. |
 
 ---

@@ -17,6 +17,7 @@ import {
 } from './utils.js';
 import { ensureEasyCastFloaters } from './floaterShields.js';
 import { evaluateTwistsForNewWeek, initTwistSchedule, trackFirstEvicted } from './SeasonTwists.js';
+import { runScheduleRepair } from './scheduleRepair.js';
 
 /** Calendar: Friday → Thursday (Big Brother–style week). */
 export const WEEKDAYS = [
@@ -148,6 +149,10 @@ export class GameState {
     this.weekRecapLog = [];
     /** Transient payload for narrate week_recap (not saved). */
     this.weekRecapPayload = null;
+
+    /** Last calendar rewind/jump (load or live recovery). */
+    this.lastScheduleRepair = null;
+    this.scheduleRepairLog = [];
 
     this.lastPawnShieldWeek = null;
     this.lastPawnShieldNomineeNames = [];
@@ -326,31 +331,11 @@ export class GameState {
   /**
    * Heal saves that reached eviction night without HOH and/or two nominees
    * (e.g. Week 1 starting mid-week before this fix).
+   * @param {'load' | 'recover' | 'runtime'} [source]
+   * @returns {object | null} repair record when adjusted
    */
-  repairInvalidEvictionSchedule() {
-    if (this.gameOver) return false;
-    if (this.phase !== PHASES.EVICTION) return false;
-    if (this.getActiveNominees().length >= 2) return false;
-
-    this._scheduleRepaired = true;
-
-    const hoh =
-      this.currentHOH ||
-      this.getActiveContestants().find((c) => c.isHOH) ||
-      null;
-
-    if (!hoh) {
-      this.nominees = [];
-      this.weekdayIndex = 0;
-      this.houseEventComplete = false;
-      this.syncPhaseForWeekday();
-    } else {
-      this.weekdayIndex = 1;
-      this.houseEventComplete = false;
-      this.phase = PHASES.NOMINATION;
-      this.day = 2;
-    }
-    return true;
+  repairInvalidEvictionSchedule(source = 'runtime') {
+    return runScheduleRepair(this, source);
   }
 
   isScheduledHouseEventDay() {
@@ -671,6 +656,8 @@ export class GameState {
       confessionalDedupeKeys: this.confessionalDedupeKeys,
       lastWeekRecap: this.lastWeekRecap,
       weekRecapLog: this.weekRecapLog,
+      lastScheduleRepair: this.lastScheduleRepair,
+      scheduleRepairLog: this.scheduleRepairLog,
       lastPawnShieldWeek: this.lastPawnShieldWeek,
       lastPawnShieldNomineeNames: this.lastPawnShieldNomineeNames,
       lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
@@ -763,6 +750,8 @@ export class GameState {
     state.confessionalDedupeKeys = data.confessionalDedupeKeys ?? [];
     state.lastWeekRecap = data.lastWeekRecap ?? null;
     state.weekRecapLog = data.weekRecapLog ?? [];
+    state.lastScheduleRepair = data.lastScheduleRepair ?? null;
+    state.scheduleRepairLog = data.scheduleRepairLog ?? [];
     state.weekRecapPayload = null;
     state.lastPawnShieldWeek = data.lastPawnShieldWeek ?? null;
     state.lastPawnShieldNomineeNames = data.lastPawnShieldNomineeNames ?? [];
@@ -807,7 +796,7 @@ export class GameState {
     state.finaleQAIndex = data.finaleQAIndex ?? 0;
     state.finaleQAQuestionOrder = data.finaleQAQuestionOrder ?? [];
     state.juryQAAdjustments = data.juryQAAdjustments ?? {};
-    state.repairInvalidEvictionSchedule();
+    state.repairInvalidEvictionSchedule('load');
     return state;
   }
 }

@@ -8,6 +8,7 @@ import { buildHostBeatIntelSection } from './hostPhaseBeats.js';
 import { buildConfessionalIntelSection } from './confessionals.js';
 import { buildWeekRecapIntelSection } from './weekEndRecap.js';
 import { buildWeekCalendarIntelSection } from './weekCalendarStrip.js';
+import { buildScheduleRepairIntelSection } from './scheduleRepair.js';
 
 const PROMISE_LABELS = {
   vote: 'Vote deal',
@@ -109,6 +110,11 @@ export function buildDealIntel(state) {
   const calendarSection = buildWeekCalendarIntelSection(state);
   if (calendarSection) {
     sections.push(calendarSection);
+  }
+
+  const scheduleRepairSection = buildScheduleRepairIntelSection(state);
+  if (scheduleRepairSection) {
+    sections.push(scheduleRepairSection);
   }
 
   const hostSection = buildHostBeatIntelSection(state);
