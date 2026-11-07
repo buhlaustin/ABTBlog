@@ -152,6 +152,10 @@ export class GameState {
     this.mvpTwistScheduledWeek = null;
     this.mvpHolderId = null;
     this.mvpPowerAvailable = false;
+    this.mvpRaceOpen = false;
+    /** @type {Record<string, number>} */
+    this.mvpCampaignPoints = {};
+    this.mvpCampaignedToday = false;
 
     this.inFinale = false;
     this.finalePhase = null;
@@ -563,6 +567,9 @@ export class GameState {
       mvpTwistScheduledWeek: this.mvpTwistScheduledWeek,
       mvpHolderId: this.mvpHolderId,
       mvpPowerAvailable: this.mvpPowerAvailable,
+      mvpRaceOpen: this.mvpRaceOpen,
+      mvpCampaignPoints: this.mvpCampaignPoints,
+      mvpCampaignedToday: this.mvpCampaignedToday,
       week: this.week,
       weekdayIndex: this.weekdayIndex,
       day: this.day,
@@ -625,6 +632,9 @@ export class GameState {
     state.mvpTwistScheduledWeek = data.mvpTwistScheduledWeek ?? null;
     state.mvpHolderId = data.mvpHolderId ?? null;
     state.mvpPowerAvailable = data.mvpPowerAvailable ?? false;
+    state.mvpRaceOpen = data.mvpRaceOpen ?? false;
+    state.mvpCampaignPoints = data.mvpCampaignPoints ?? {};
+    state.mvpCampaignedToday = data.mvpCampaignedToday ?? false;
     state.week = data.week;
     state.weekdayIndex =
       data.weekdayIndex ??

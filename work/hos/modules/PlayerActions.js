@@ -5,6 +5,7 @@ import {
   getContestantAlliances,
   sharesAllianceWith
 } from './allianceUtils.js';
+import { addMvpCampaignPoints, getMvpRaceLeader } from './SeasonTwists.js';
 
 /**
  * Player-initiated actions during the social phase.
@@ -74,6 +75,19 @@ export class PlayerActions {
       });
     }
 
+    if (
+      this.state.mvpTwistWeekActive
+      && this.state.mvpRaceOpen
+      && !this.state.mvpCampaignedToday
+      && !player.evicted
+    ) {
+      actions.unshift({
+        id: 'campaign_mvp',
+        label: 'Campaign for MVP',
+        description: 'Rally the house for MVP votes — once per day during MVP week.'
+      });
+    }
+
     if (nominees.length > 0 && (phase === PHASES.VETO_COMP || phase === PHASES.EVICTION)) {
       actions.unshift({
         id: 'comfort_nominee',
@@ -132,6 +146,8 @@ export class PlayerActions {
         return this._pregameComp(player, target);
       case 'comfort_nominee':
         return this._comfortNominee(player, target);
+      case 'campaign_mvp':
+        return this._campaignMvp(player);
       case 'end_day':
         return { success: true, text: 'You chose to end the day.', type: 'system', endDay: true };
       default:
@@ -509,6 +525,28 @@ export class PlayerActions {
         ? `You sat with ${target.name} on the block — real comfort in a cruel week.`
         : `You performed sympathy for ${target.name}. The cameras might buy it; they might not.`,
       type: genuine ? 'success' : 'narrative'
+    };
+  }
+
+  _campaignMvp(player) {
+    if (!this.state.mvpTwistWeekActive || !this.state.mvpRaceOpen) {
+      return { success: false, text: 'There is no MVP race right now.', type: 'system' };
+    }
+    if (this.state.mvpCampaignedToday) {
+      return { success: false, text: 'You already campaigned for MVP today.', type: 'system' };
+    }
+    const pts = randomInt(14, 24) + Math.floor(player.social / 4) + Math.floor(player.reputation / 15);
+    addMvpCampaignPoints(this.state, player.id, pts);
+    this.state.mvpCampaignedToday = true;
+    this._consumeAction();
+    const lead = getMvpRaceLeader(this.state);
+    const leadText = lead
+      ? ` ${lead.contestant.isPlayer ? 'You lead' : `${lead.contestant.name} leads`} with ${lead.points} support.`
+      : '';
+    return {
+      success: true,
+      text: `You work the house on MVP talk (+${pts} support).${leadText}`,
+      type: 'success'
     };
   }
 

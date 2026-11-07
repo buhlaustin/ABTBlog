@@ -206,7 +206,7 @@ export class UIManager {
     this.elements.allianceOverview.innerHTML = html;
   }
 
-  renderJuryPanel(outlook, player) {
+  renderJuryPanel(outlook, player, twistNote = '') {
     const panel = this.elements.juryPanel;
     if (!panel || !outlook?.total) {
       if (panel) panel.classList.add('hidden');
@@ -225,7 +225,13 @@ export class UIManager {
       if (favor) parts.push(`${favor} leaning your way`);
       if (against) parts.push(`${against} likely bitter`);
       if (neutral) parts.push(`${neutral} undecided`);
-      this.elements.jurySummary.textContent = parts.join(' · ');
+      let summary = parts.join(' · ');
+      if (twistNote) {
+        summary = `${twistNote} ${summary}`;
+      }
+      this.elements.jurySummary.textContent = summary;
+    } else if (twistNote) {
+      this.elements.jurySummary.textContent = twistNote;
     }
 
     this.elements.juryList.innerHTML = outlook.rows

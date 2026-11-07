@@ -464,6 +464,31 @@ body {
   display: none;
 }
 
+.twist-rules-cheat {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.twist-rules-cheat summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-primary, #eee);
+}
+
+.twist-rules-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.twist-rules-list li {
+  margin: 0.35rem 0;
+}
+
+.twist-rules-list li[aria-disabled="true"] {
+  opacity: 0.45;
+}
+
 .mvp-vote-hint {
   margin: 0 0 0.75rem;
   font-size: 0.9rem;

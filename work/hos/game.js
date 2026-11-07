@@ -6,7 +6,7 @@
 import { FinaleManager } from './modules/Finale.js';
 import { FINALE_PHASES, GameState, PHASES, PHASE_LABELS } from './modules/GameState.js';
 import { AIController } from './modules/AI.js';
-import { CompetitionManager } from './modules/Competition.js';
+import { COMPETITION_TYPES, CompetitionManager } from './modules/Competition.js';
 import { NarrativeEngine } from './modules/Events.js';
 import { EvictionSystem } from './modules/Eviction.js';
 import { PlayerActions } from './modules/PlayerActions.js';
@@ -19,11 +19,16 @@ import {
 } from './modules/NarrativeApi.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
 import {
+  computeBattleBackScores,
+  finalizeMvpRace,
   getTwistRulesBanner,
   getTwistWeekAnnouncements,
-  runBattleBack
+  prepareBattleBack,
+  resolveBattleBack,
+  runBattleBack,
+  tickMvpCampaignAI
 } from './modules/SeasonTwists.js';
-import { aiCountForCast, escapeHtml, totalCastSize } from './modules/utils.js';
+import { aiCountForCast, escapeHtml, randomInt, totalCastSize } from './modules/utils.js';
 
 class Game {
   constructor() {
@@ -39,6 +44,7 @@ class Game {
     this.pendingChallenge = null;
     this._finaleQAPending = null;
     this._narrativeWarned = false;
+    this._battleBackPrep = null;
 
     setStorageRef(StorageManager);
     this._bindSetupEvents();
@@ -71,6 +77,28 @@ class Game {
       this._resetGame();
       ui.showSetup();
     });
+
+    const refreshTwistCheat = () => {
+      const map = [
+        ['double-eviction', ui.elements.doubleEvictionToggle],
+        ['twist-battle-back', ui.elements.battleBackToggle],
+        ['twist-mvp', ui.elements.mvpTwistToggle]
+      ];
+      for (const [ruleId, input] of map) {
+        const row = document.querySelector(`[data-twist-rule="${ruleId}"]`);
+        if (row && input) {
+          row.setAttribute('aria-disabled', input.checked ? 'false' : 'true');
+        }
+      }
+    };
+    for (const input of [
+      ui.elements.doubleEvictionToggle,
+      ui.elements.battleBackToggle,
+      ui.elements.mvpTwistToggle
+    ]) {
+      input?.addEventListener('change', refreshTwistCheat);
+    }
+    refreshTwistCheat();
 
     ui.showSetup();
   }
@@ -233,7 +261,10 @@ class Game {
     ui.renderPlayer(state.getPlayer());
     ui.renderHouseguests(state.contestants, state.getPlayer());
     ui.renderAlliances(state.alliances, state.getPlayer());
-    ui.renderJuryPanel(buildJuryOutlook(state), state.getPlayer());
+    const juryTwistNote = state.doubleEvictionWeekActive
+      ? 'Double eviction this week — up to two new jurors may be seated after tonight.'
+      : '';
+    ui.renderJuryPanel(buildJuryOutlook(state), state.getPlayer(), juryTwistNote);
     state.updateThreatLevels();
   }
 
@@ -640,6 +671,14 @@ class Game {
       this.logAndRender(aiEvents);
     }
 
+    if (this.state.mvpRaceOpen) {
+      const mvpTicks = tickMvpCampaignAI(this.state);
+      if (mvpTicks.length > 0) {
+        this.logAndRender(mvpTicks);
+      }
+    }
+    this.state.mvpCampaignedToday = false;
+
     const event = this.narrative.generateDailyEvent();
     if (event) {
       this.logAndRender([event]);
@@ -980,19 +1019,112 @@ class Game {
 
   // ─── Eviction ──────────────────────────────────────────────────────
 
+  _startBattleBackComp() {
+    this.competition.currentCompetition = COMPETITION_TYPES.find((c) => c.id === 'endurance');
+    const challenge = this.competition.createChallengeData(this.competition.currentCompetition);
+    const challengeData = this.competition.getPlayerChallengeData(challenge.type, challenge.data);
+    if (!challengeData) {
+      this._finishBattleBack(10);
+      return;
+    }
+
+    let html = `<p><strong>Battle Back — Endurance segment.</strong> ${escapeHtml(challengeData.prompt)}</p><div class="competition-choices">`;
+    for (const choice of challengeData.choices) {
+      const value = typeof choice.value === 'string' ? choice.value : String(choice.value);
+      html += `<button class="btn btn-action competition-choice" data-value="${escapeHtml(value)}">${escapeHtml(choice.label)}</button>`;
+    }
+    html += '</div>';
+
+    this.ui.showActionDetail(html);
+    this.ui.setActionPrompt('Battle Back competition — make your move.');
+    this.ui.renderActions([], () => {});
+
+    this.ui.elements.actionDetail.querySelectorAll('.competition-choice').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const heldStrong = btn.dataset.value === 'true';
+        this._finishBattleBack(heldStrong);
+      });
+    });
+  }
+
+  _finishBattleBack(heldStrong) {
+    const prep = this._battleBackPrep;
+    if (!prep) return;
+
+    const player = this.state.getPlayer();
+    let bonus = heldStrong ? 22 + randomInt(0, 8) : 6 + randomInt(0, 6);
+    bonus += Math.floor(player.competition * 1.8);
+
+    const scores = computeBattleBackScores(this.state, prep.competitors, bonus);
+    const resolved = resolveBattleBack(this.state, prep.competitors, scores, true);
+    this.state.battleBackResolvedTonight = true;
+    this.ui.hideActionDetail();
+    this.logAndRender([
+      {
+        type: 'competition',
+        text: heldStrong
+          ? 'You grit through every round — the house feels your comeback energy.'
+          : 'You slip once, but you still post a respectable Battle Back score.'
+      },
+      ...resolved.results
+    ]);
+    this._battleBackPrep = null;
+    this._afterBattleBack(resolved.reentered);
+  }
+
+  _afterBattleBack(reentered) {
+    this.render();
+    if (this.state.getActiveContestants().length <= 2) {
+      this._onHouseEventComplete();
+      return;
+    }
+    if (reentered?.isPlayer) {
+      this.logAndRender([
+        {
+          type: 'success',
+          text: 'You are back in the house. Eviction night continues — you can vote if you are not on the block.'
+        }
+      ]);
+      this.render();
+    }
+    this.runEvictionPhase();
+  }
+
   runEvictionPhase() {
     if (this._maybeTriggerFinale()) return;
 
     if (this._recoverFromInvalidEviction()) return;
 
     if (this.state.battleBackWeekActive && !this.state.battleBackResolvedTonight) {
-      const { results } = runBattleBack(this.state);
-      this.state.battleBackResolvedTonight = true;
-      this.logAndRender(results);
-      this.render();
-      if (this.state.getActiveContestants().length <= 2) {
-        this._onHouseEventComplete();
-        return;
+      if (!this._battleBackPrep) {
+        const prep = prepareBattleBack(this.state);
+        this.logAndRender(prep.results);
+        if (prep.skip) {
+          this.state.battleBackResolvedTonight = true;
+          this.state.battleBackSeasonUsed = true;
+          this.state.battleBackWeekActive = false;
+          this.render();
+        } else if (prep.playerCompeting) {
+          this._battleBackPrep = prep;
+          this._startBattleBackComp();
+          return;
+        } else {
+          const scores = computeBattleBackScores(this.state, prep.competitors);
+          const resolved = resolveBattleBack(this.state, prep.competitors, scores, true);
+          this.state.battleBackResolvedTonight = true;
+          this.logAndRender(resolved.results);
+          this._afterBattleBack(resolved.reentered);
+          return;
+        }
+      }
+      return;
+    }
+
+    if (this.state.mvpTwistWeekActive && this.state.mvpRaceOpen) {
+      const mvpResults = finalizeMvpRace(this.state);
+      if (mvpResults.length > 0) {
+        this.logAndRender(mvpResults);
+        this.render();
       }
     }
 
