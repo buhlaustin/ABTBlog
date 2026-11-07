@@ -6,6 +6,7 @@ import { buildAllianceIntelSection } from './allianceMap.js';
 import { buildLayLowIntelSection } from './layLowFeedback.js';
 import { buildHostBeatIntelSection } from './hostPhaseBeats.js';
 import { buildConfessionalIntelSection } from './confessionals.js';
+import { buildWeekRecapIntelSection } from './weekEndRecap.js';
 
 const PROMISE_LABELS = {
   vote: 'Vote deal',
@@ -107,6 +108,11 @@ export function buildDealIntel(state) {
   const hostSection = buildHostBeatIntelSection(state);
   if (hostSection) {
     sections.push(hostSection);
+  }
+
+  const recapSection = buildWeekRecapIntelSection(state);
+  if (recapSection) {
+    sections.push(recapSection);
   }
 
   const confessionalSection = buildConfessionalIntelSection(state);

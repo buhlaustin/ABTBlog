@@ -127,6 +127,7 @@ export function buildNarrativeContext(state) {
     inFinale: Boolean(state.inFinale),
     lastHostBeatKind: state.lastHostBeatKind || null,
     confessional: state.confessionalPayload || null,
+    weekRecap: state.weekRecapPayload || null,
     playerIsNominated: Boolean(player?.isNominated),
     playerIsHOH: Boolean(player?.isHOH),
     playerAllianceCount: playerAlliances.length,

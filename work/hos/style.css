@@ -363,6 +363,18 @@ body {
   border-left-color: var(--gold);
 }
 
+.story-entry.week-recap {
+  background: rgba(91, 141, 184, 0.14);
+  border-left: 3px solid #5b8db8;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.story-entry.week-recap .week-recap-label {
+  font-weight: 600;
+  color: var(--text);
+}
+
 .story-entry.veto-summary {
   background: rgba(212, 175, 55, 0.12);
   border-left: 3px solid var(--gold, #d4af37);

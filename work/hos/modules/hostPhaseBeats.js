@@ -1,6 +1,7 @@
 import { PHASES, PHASE_LABELS, WEEKDAYS } from './GameState.js';
 import { getLocalNominationHostBeat } from './hohNomPersonas.js';
 import { getOriginalBlockLabel } from './vetoCeremonySummary.js';
+import { getLocalWeekRecapVoiceover } from './weekEndRecap.js';
 import { pickRandom } from './utils.js';
 
 /** Prompt kinds sent to NarrativeApi / Lambda. */
@@ -367,6 +368,18 @@ export function getLocalHostPhaseBeat(kind, state, extra = {}) {
         'Welcome to finale night — jurors, prepare your questions.',
         kind
       );
+    case 'week_recap': {
+      if (state.weekRecapPayload) {
+        return getLocalWeekRecapVoiceover(state.weekRecapPayload);
+      }
+      if (state.lastWeekRecap) {
+        return getLocalWeekRecapVoiceover(state.lastWeekRecap);
+      }
+      return formatHostFeedEntry(
+        `Week ${state.week} is in the books — power shifts and evictions set the tone for what's next.`,
+        kind
+      );
+    }
     case 'host_line':
       return formatHostFeedEntry(
         `${PHASE_LABELS[state.phase] || 'The house'} — let's get to it.`,

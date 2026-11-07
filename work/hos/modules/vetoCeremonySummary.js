@@ -207,6 +207,16 @@ export function appendVetoCeremonySummary(results, state, opts) {
   results.push(entry);
   state.lastVetoRecapText = stripTags(entry.text);
   state.lastVetoRecapWeek = state.week;
+  const holder = opts.vetoWinner
+    ?? (state.vetoHolderId ? state.getContestant(state.vetoHolderId) : null);
+  state.addHistory({
+    type: 'veto_ceremony',
+    holderId: holder?.id ?? null,
+    vetoUsed: Boolean(opts.vetoUsed),
+    savedId: opts.savedNominee?.id ?? null,
+    replacementId: opts.replacement?.id ?? null,
+    powerRound: state.doubleEvictionRound > 1 ? 2 : 1
+  });
   state.vetoSavedNomineeId = null;
 }
 

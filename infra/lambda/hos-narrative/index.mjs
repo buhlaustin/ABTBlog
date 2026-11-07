@@ -206,7 +206,11 @@ Context: ${ctx}`;
     return `${base}\nKind: Dramatic eviction line for evictedTonightName.\nContext: ${ctx}`;
   }
   if (kind === 'week_recap') {
-    return `${base}\nKind: End-of-week recap voiceover.\nContext: ${ctx}`;
+    return `${base}
+Kind: End-of-week recap voiceover after the structured recap card.
+Use weekRecap in context: hohWins, nominationSets, vetoMoves, evicted, remaining, danger.topThreats, twists.
+Name evicted houseguests. Mention who is in danger next week. Under 320 characters. No markdown.
+Context: ${ctx}`;
   }
   return `${base}\nKind: Daily house drama or strategy beat during social time.\nContext: ${ctx}`;
 }

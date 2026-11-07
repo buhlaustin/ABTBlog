@@ -120,7 +120,8 @@ export class EvictionSystem {
       hoh: hoh.id,
       nominees: this.state.nominees,
       hohStrategy: hoh.personality?.strategy ?? null,
-      hohArchetype: hoh.personality?.name ?? null
+      hohArchetype: hoh.personality?.name ?? null,
+      powerRound: this.state.doubleEvictionRound > 1 ? 2 : 1
     });
     return { results, nominees };
   }
@@ -188,6 +189,11 @@ export class EvictionSystem {
 
     vetoWinner.hasVeto = true;
     this.state.vetoHolderId = vetoWinner.id;
+    this.state.addHistory({
+      type: 'veto_win',
+      holderId: vetoWinner.id,
+      powerRound: this.state.doubleEvictionRound > 1 ? 2 : 1
+    });
     results.push({
       type: 'success',
       text: `<strong>${vetoWinner.name}</strong> wins the Power of Veto!`

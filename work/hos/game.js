@@ -32,6 +32,12 @@ import {
   shouldSkipConfessional,
   buildReplacementConfessionalExtras
 } from './modules/confessionals.js';
+import {
+  buildWeekRecapFeedEntries,
+  compileWeekRecap,
+  getLocalWeekRecapVoiceover,
+  getWeekRecapBanner
+} from './modules/weekEndRecap.js';
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
 import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
@@ -335,6 +341,8 @@ class Game {
     if (hostScheduleBanner) twistParts.push(hostScheduleBanner);
     const confessionalBanner = getConfessionalFeedBanner(state);
     if (confessionalBanner) twistParts.push(confessionalBanner);
+    const weekRecapBanner = getWeekRecapBanner(state);
+    if (weekRecapBanner) twistParts.push(weekRecapBanner);
     const vetoBlockBanner = buildVetoBlockBanner(state);
     if (vetoBlockBanner) twistParts.push(vetoBlockBanner);
     const threatAlert = getThreatNominationAlert(state, previewLeans);
@@ -1663,17 +1671,43 @@ class Game {
 
   // ─── Week end ──────────────────────────────────────────────────────
 
-  async runWeekEnd() {
-    const active = this.state.getActiveContestants().length;
-
-    this.logAndRender([{
-      type: 'system',
-      text: `Week ${this.state.week} is over. ${active} houseguests remain.`
-    }]);
-
+  async _appendWeekRecapVoiceover(recap) {
+    this.state.weekRecapPayload = recap;
+    let line = null;
     if (isNarrativeApiEnabled()) {
-      await this._appendAiNarrative('week_recap');
+      const beat = await fetchNarrativeBeat('week_recap', this.state);
+      if (beat?.text) line = beat.text;
     }
+    this.state.weekRecapPayload = null;
+
+    if (line) {
+      recordHostBeat(this.state, 'week_recap', 'api');
+      this.logAndRender([{
+        type: 'ai-host',
+        text: `<strong>Recap:</strong> ${line}`,
+        hostBeatKind: 'week_recap'
+      }]);
+      return;
+    }
+
+    const local = getLocalWeekRecapVoiceover(recap);
+    if (local) {
+      recordHostBeat(this.state, 'week_recap', 'local');
+      this.logAndRender([local]);
+    }
+  }
+
+  async runWeekEnd() {
+    const recap = compileWeekRecap(this.state);
+    this.state.lastWeekRecap = recap;
+    if (!this.state.weekRecapLog) this.state.weekRecapLog = [];
+    this.state.weekRecapLog.push(recap);
+    if (this.state.weekRecapLog.length > 6) {
+      this.state.weekRecapLog = this.state.weekRecapLog.slice(-6);
+    }
+
+    this.logAndRender(buildWeekRecapFeedEntries(recap));
+    await this._appendWeekRecapVoiceover(recap);
 
     if (this.state.checkWinCondition()) {
       this.endGame();

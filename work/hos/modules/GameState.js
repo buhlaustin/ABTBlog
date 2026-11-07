@@ -143,6 +143,12 @@ export class GameState {
     /** Dedupe keys week:day:speaker:event. */
     this.confessionalDedupeKeys = [];
 
+    /** Last completed week structured recap (Deals drawer + banner). */
+    this.lastWeekRecap = null;
+    this.weekRecapLog = [];
+    /** Transient payload for narrate week_recap (not saved). */
+    this.weekRecapPayload = null;
+
     this.lastPawnShieldWeek = null;
     this.lastPawnShieldNomineeNames = [];
     this.lastPawnShieldNomineeIds = [];
@@ -525,7 +531,11 @@ export class GameState {
     evicted.isHOH = false;
     evicted.hasVeto = false;
     this.evictedThisWeek = evicted.id;
-    this.addHistory({ type: 'eviction', evictedId: evicted.id });
+    this.addHistory({
+      type: 'eviction',
+      evictedId: evicted.id,
+      powerRound: this.doubleEvictionRound > 1 ? 2 : 1
+    });
     trackFirstEvicted(this, evicted);
 
     const remaining = this.getActiveContestants().length;
@@ -659,6 +669,8 @@ export class GameState {
       lastHostBeatSource: this.lastHostBeatSource,
       confessionalLog: this.confessionalLog,
       confessionalDedupeKeys: this.confessionalDedupeKeys,
+      lastWeekRecap: this.lastWeekRecap,
+      weekRecapLog: this.weekRecapLog,
       lastPawnShieldWeek: this.lastPawnShieldWeek,
       lastPawnShieldNomineeNames: this.lastPawnShieldNomineeNames,
       lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
@@ -749,6 +761,9 @@ export class GameState {
     state.lastHostBeatSource = data.lastHostBeatSource ?? null;
     state.confessionalLog = data.confessionalLog ?? [];
     state.confessionalDedupeKeys = data.confessionalDedupeKeys ?? [];
+    state.lastWeekRecap = data.lastWeekRecap ?? null;
+    state.weekRecapLog = data.weekRecapLog ?? [];
+    state.weekRecapPayload = null;
     state.lastPawnShieldWeek = data.lastPawnShieldWeek ?? null;
     state.lastPawnShieldNomineeNames = data.lastPawnShieldNomineeNames ?? [];
     state.lastPawnShieldNomineeIds = data.lastPawnShieldNomineeIds ?? [];

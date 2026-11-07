@@ -1,3 +1,4 @@
+import { PHASES } from './GameState.js';
 import { statCheck, randomInt, pickRandom, clamp } from './utils.js';
 import {
   THROW_COMP_SCORE_PENALTY,
@@ -196,6 +197,14 @@ export class CompetitionManager {
     winner.isHOH = true;
     this.state.currentHOH = winner;
     this.challengeData = null;
+
+    if (!this.state.inFinale && this.state.phase === PHASES.COMPETITION) {
+      this.state.addHistory({
+        type: 'hoh',
+        hohId: winner.id,
+        powerRound: this.state.doubleEvictionRound > 1 ? 2 : 1
+      });
+    }
 
     results.push({
       type: 'success',

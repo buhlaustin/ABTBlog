@@ -176,9 +176,10 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
+| **Status** | **Shipped (v1):** `history` hooks (HOH, noms, POV, veto, eviction); `compileWeekRecap` + **week-recap** feed card; local/API voiceover; **Deals** drawer + header banner; save `lastWeekRecap` / `weekRecapLog`. |
 | **Goal** | Replace single system line with structured recap. |
 | **Player experience** | HOH, nominees, veto, evicted, who’s in danger next week. |
-| **Implementation** | `runWeekEnd()` in `game.js` reads `history` for the week. |
+| **Implementation** | `weekEndRecap.js`; `runWeekEnd()` in `game.js`. |
 | **Priority** | Medium. |
 
 ---
