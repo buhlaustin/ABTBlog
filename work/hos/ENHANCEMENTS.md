@@ -2,6 +2,12 @@
 
 Living design notes for features **not yet built**. Items marked **shipped** are in the active PR / current branch.
 
+### Design constraints (Big Brother–realistic)
+
+- A **week** is one full power cycle: **HOH → nominations → POV comp → veto ceremony → eviction vote**, with social days in between.
+- **Week 1 premiere** still runs that full cycle. Move-in day adds mingle before the first HOH; it does **not** skip eviction or run noms/POV without a vote later in the same week.
+- Twists (double eviction, battle back, audience-style perks) change **how** someone leaves or **what power** they get — they do not leave two nominees on the block with no vote or push eviction to “next week” after a completed veto.
+
 ---
 
 ## Shipped direction (keep building on this)
@@ -14,21 +20,11 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 **Implementation (current):** `GameState` starts `weekdayIndex = 0` with `COMPETITION`; `runEventDaySocialPhase()` uses move-in copy on week 1 Friday; broken saves that hit eviction without noms are repaired on load.
 
-**Follow-ups (optional polish):** One-time “move-in” narrative beat; restrict AI alliance formation until after first HOH; soft “no eviction in week 1” flag if we ever add a true double-length premiere.
+**Follow-ups (optional polish):** One-time move-in host beat; slightly lower AI alliance-formation odds until after the first HOH comp (feels like day-one chaos, still allows deals).
 
 ---
 
 ## Calendar, twists, and endgame
-
-### Premiere week without eviction (extension)
-
-| Field | Detail |
-|--------|--------|
-| **Goal** | First eviction no earlier than end of Week 2, so Week 1 is relationships-only after first HOH. |
-| **Player experience** | Week 1 still crowns HOH and may do noms/POV for drama, but **no live eviction**; or skip noms until Week 2. |
-| **Implementation** | `GameState.week` + flag `premiereEvictionDeferred`; gate `runEvictionPhase` when `week === 1`; week-end copy explains “no eviction — unpack week.” |
-| **Depends on** | Move-in Friday start (shipped). |
-| **Priority** | Medium — clarity for new players. |
 
 ### Double eviction — rules in UI
 
@@ -57,13 +53,14 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 | **Implementation** | Extend `Finale.js` state machine; reuse `Competition.js` with finalist-only pool. |
 | **Priority** | Low–medium. |
 
-### “America’s Vote” / house save twist
+### Twist nights (optional new-game toggles)
 
 | Field | Detail |
 |--------|--------|
-| **Goal** | Tie-break or one-time save driven by **reputation** / social standing, not real audience votes. |
-| **Player experience** | One season twist: highest reputation among nominees is safe; or player spends an action to “campaign for save.” |
-| **Implementation** | One-off event in `Events.js` or eviction branch; configurable in new-game options. |
+| **Goal** | Season-flavored beats that exist on real shows, still ending in someone leaving when eviction night fires. |
+| **Examples** | **Double eviction** (two votes one night, already partly in state); **Battle Back** (first evictee of the season re-enters via comp, rare); **MVP-style bonus** (one social/comp action grants a one-time vote sway or POV-style safety, not a free skip of eviction). |
+| **Player experience** | Host announces twist at week start; rules appear in UI before live events. |
+| **Implementation** | Flags on `GameState`; hooks in `Eviction.js` / `Events.js`; no “deferred eviction” after noms/veto. |
 | **Priority** | Low. |
 
 ---
@@ -115,7 +112,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 | Field | Detail |
 |--------|--------|
 | **Goal** | More BB verbs without full multiplayer. |
-| **Options** | **Throw comp** (lower score if not nominated); **pity vote** (one eviction/nominee bias); **backdoor** (HOH only: nominate then veto pawn) — each gated by phase and threat. |
+| **Options** | **Throw comp** (intentionally weaken comp score when not on the block — classic floater move); **backdoor path** (HOH: nominate pawns Sat, win/use veto Mon, replace with true target — same week, still leads to Thu vote). |
 | **Implementation** | New `PlayerActions` entries; hooks in `Competition.js` / `Eviction.js`. |
 | **Priority** | Medium. |
 
@@ -262,7 +259,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 2. **Promise/grudge surfacing** + **threat bands** (gameplay feel).
 3. **Playwright Week 1** (lock in premiere + eviction fixes).
 4. **HOH personas** + **week-end recap** (depth).
-5. Longer arcs: **premiere no eviction**, **finale parts**, **double eviction UX**.
+5. Longer arcs: **double eviction UX**, **finale parts**, optional **twist nights**.
 
 ---
 
