@@ -172,6 +172,33 @@ Kind: Julie Chen-style host reaction immediately AFTER the HOH names two nominee
 Use hohName, hohArchetype, hohNomStyle, nominees, and nominationLeanNames from context if present — reflect the HOH's persona (e.g. backdoor/strategist, loyalist, chaos) without inventing extra nominees.
 Name both nominees. Under 320 characters. Context: ${ctx}`;
   }
+  if (kind === 'hoh_competition') {
+    return `${base}\nKind: Lead-in before the Head of Household competition (live event starting).\nContext: ${ctx}`;
+  }
+  if (kind === 'hoh_competition_result') {
+    return `${base}\nKind: Announce the HOH winner using competitionWinnerName and hohName if present.\nContext: ${ctx}`;
+  }
+  if (kind === 'nomination_pre_ceremony') {
+    return `${base}\nKind: Open the nomination ceremony before nominees are named.\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_competition') {
+    return `${base}\nKind: Lead-in before the Power of Veto competition.\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_competition_result') {
+    return `${base}\nKind: Announce who won the veto (vetoHolderName).\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_ceremony_pre') {
+    return `${base}\nKind: Open the veto meeting / ceremony; nominees are on the block.\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_ceremony') {
+    return `${base}\nKind: React after veto decision — vetoUsed, vetoSavedName, nominees.\nContext: ${ctx}`;
+  }
+  if (kind === 'eviction_pre') {
+    return `${base}\nKind: Lead-in to the live eviction vote; name nominees if present; mention doubleEvictionNight if true.\nContext: ${ctx}`;
+  }
+  if (kind === 'eviction_ceremony') {
+    return `${base}\nKind: Dramatic eviction line for evictedTonightName.\nContext: ${ctx}`;
+  }
   if (kind === 'week_recap') {
     return `${base}\nKind: End-of-week recap voiceover.\nContext: ${ctx}`;
   }

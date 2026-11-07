@@ -17,6 +17,10 @@ import {
   initNarrativeApiUrl,
   isNarrativeApiEnabled
 } from './modules/NarrativeApi.js';
+import {
+  getHostBeatKindForPhase,
+  getLocalHostPhaseBeat
+} from './modules/hostPhaseBeats.js';
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
 import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
@@ -49,7 +53,6 @@ import {
   buildPlayerHohLens,
   formatHohNomIntelLine,
   getHohWatchBanner,
-  getLocalNominationHostBeat,
   getNomTargetLensLabel,
   getPlayerHohPickerIntro
 } from './modules/hohNomPersonas.js';
@@ -322,14 +325,29 @@ class Game {
   }
 
   async _appendAiNarrative(kind) {
-    const beat = await fetchNarrativeBeat(kind, this.state);
-    if (beat) {
+    await this._appendHostBeat(kind);
+  }
+
+  /**
+   * Phase host beat — narrate API when enabled, else local fallback.
+   * @param {string} kind
+   * @param {{ hoh?: object, nominees?: object[], winner?: object, evicted?: object | null }} [extra]
+   */
+  async _appendHostBeat(kind, extra = {}) {
+    const beat = isNarrativeApiEnabled()
+      ? await fetchNarrativeBeat(kind, this.state)
+      : null;
+    if (beat?.text) {
       this.logAndRender([{
-        ...beat,
         type: 'ai-host',
         text: `<strong>Host:</strong> ${beat.text}`
       }]);
-      return;
+      return true;
+    }
+    const local = getLocalHostPhaseBeat(kind, this.state, extra);
+    if (local) {
+      this.logAndRender([local]);
+      return true;
     }
     if (isNarrativeApiEnabled() && !this._narrativeWarned) {
       this._narrativeWarned = true;
@@ -338,12 +356,12 @@ class Game {
         text: 'Host narration could not load (network or blocker). Local story continues.'
       }]);
     }
+    return false;
   }
 
   async _beginScheduledHouseDay() {
-    if (isNarrativeApiEnabled()) {
-      await this._appendAiNarrative('host_line');
-    }
+    const kind = getHostBeatKindForPhase(this.state.phase);
+    await this._appendHostBeat(kind);
     this._runScheduledHouseEvent();
   }
 
@@ -948,7 +966,8 @@ class Game {
     this._afterCompetition(winner);
   }
 
-  _afterCompetition(winner) {
+  async _afterCompetition(winner) {
+    await this._appendHostBeat('hoh_competition_result', { winner });
     if (this._maybeTriggerFinale()) return;
     this._onHouseEventComplete();
   }
@@ -975,18 +994,8 @@ class Game {
   async _appendNominationHostBeat(hoh, nominees) {
     if (!hoh || !nominees?.length) return;
     this.state.nominationLeanNames = nominees.map((n) => n.name);
-    const beat = await fetchNarrativeBeat('nomination_ceremony', this.state);
+    await this._appendHostBeat('nomination_ceremony', { hoh, nominees });
     this.state.nominationLeanNames = [];
-    if (beat) {
-      this.logAndRender([{
-        ...beat,
-        type: 'ai-host',
-        text: `<strong>Host:</strong> ${beat.text}`
-      }]);
-      return;
-    }
-    const local = getLocalNominationHostBeat(hoh, nominees);
-    if (local) this.logAndRender([local]);
   }
 
   _runReadHohAction() {
@@ -1128,9 +1137,10 @@ class Game {
     });
   }
 
-  _finishVetoComp(playerWonVeto) {
+  async _finishVetoComp(playerWonVeto) {
     const result = this.eviction.runVetoCompetition(playerWonVeto);
     this.logAndRender(result.results);
+    await this._appendHostBeat('veto_competition_result');
     this._onHouseEventComplete();
   }
 
@@ -1152,6 +1162,11 @@ class Game {
       return;
     }
 
+    void this._completeVetoCeremonyHostBeat();
+  }
+
+  async _completeVetoCeremonyHostBeat() {
+    await this._appendHostBeat('veto_ceremony');
     this._onHouseEventComplete();
   }
 
@@ -1174,7 +1189,7 @@ class Game {
         if (vetoResult.needsReplacementPick) {
           this._showReplacementPicker();
         } else {
-          this._onHouseEventComplete();
+          void this._completeVetoCeremonyHostBeat();
         }
       });
     });
@@ -1185,7 +1200,7 @@ class Game {
         const vetoResult = this.eviction.playerUseVeto(vetoWinner, null, false);
         this.ui.hideActionDetail();
         this.logAndRender(vetoResult.results);
-        this._onHouseEventComplete();
+        void this._completeVetoCeremonyHostBeat();
       });
     }
   }
@@ -1218,7 +1233,7 @@ class Game {
         const results = this.eviction.playerPickReplacement(btn.dataset.replacement);
         this.ui.hideActionDetail();
         this.logAndRender(results);
-        this._onHouseEventComplete();
+        void this._completeVetoCeremonyHostBeat();
       });
     });
   }
@@ -1417,12 +1432,14 @@ class Game {
     });
   }
 
-  _afterEviction(evicted) {
+  async _afterEviction(evicted) {
     if (!evicted) {
       if (this._recoverFromInvalidEviction()) return;
       this._onHouseEventComplete();
       return;
     }
+
+    await this._appendHostBeat('eviction_ceremony', { evicted });
 
     if (this.state.getPlayer().evicted) {
       const remaining = this.state.getActiveContestants().length;
