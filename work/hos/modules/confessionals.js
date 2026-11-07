@@ -1,7 +1,7 @@
 import { escapeHtml, pickRandom } from './utils.js';
 
 /**
- * @typedef {'hoh_win' | 'hoh_nominated' | 'on_block' | 'veto_saved' | 'veto_unused' | 'veto_won' | 'evicted' | 'survived_vote' | 'betrayal' | 'betrayed_by' | 'alliance_formed' | 'new_promise' | 'campaign' | 'backdoor' | 'premiere'} ConfessionalEvent
+ * @typedef {'hoh_win' | 'hoh_nominated' | 'on_block' | 'veto_saved' | 'veto_unused' | 'veto_won' | 'veto_spared' | 'evicted' | 'survived_vote' | 'double_eviction' | 'jury_seat' | 'betrayal' | 'betrayed_by' | 'alliance_formed' | 'alliance_exposed' | 'new_promise' | 'campaign' | 'backdoor' | 'lay_low' | 'replacement_nom' | 'replacement_pick' | 'premiere'} ConfessionalEvent
  */
 
 export const CONFESSIONAL_EVENT_LABELS = {
@@ -11,14 +11,21 @@ export const CONFESSIONAL_EVENT_LABELS = {
   veto_saved: 'Veto used',
   veto_unused: 'Veto held',
   veto_won: 'Won POV',
+  veto_spared: 'Saved by veto',
   evicted: 'Evicted',
+  double_eviction: 'Double eviction',
+  jury_seat: 'Jury seat',
   survived_vote: 'Survived vote',
   betrayal: 'Broke a deal',
   betrayed_by: 'Betrayed',
   alliance_formed: 'New alliance',
+  alliance_exposed: 'Alliance busted',
   new_promise: 'Promise',
   campaign: 'Campaign',
   backdoor: 'Backdoor plan',
+  lay_low: 'Lay low',
+  replacement_nom: 'Replacement nom',
+  replacement_pick: 'Replacement pick',
   premiere: 'Move-in'
 };
 
@@ -51,7 +58,142 @@ const GENERIC_LINES = {
   premiere: [
     () => 'First day energy — smile now, strategize in the shower.',
     () => 'Nobody knows my game yet. That’s the advantage.'
+  ],
+  lay_low: [
+    () => 'I stayed invisible today — the radar can’t find what it doesn’t see.',
+    () => 'Let them scream; I’m taking the quiet lane.'
+  ],
+  replacement_nom: [
+    (ctx) => `${ctx.hoh || 'The HOH'} just put me on the block as the replacement — blindsided.`,
+    () => 'Veto save flipped the week and I drew the short stick.'
+  ],
+  replacement_pick: [
+    (ctx) => `Naming ${ctx.target} as the replacement protects my real target.`,
+    (ctx) => `${ctx.saved || 'They'} got saved — ${ctx.target} pays the price.`
+  ],
+  veto_spared: [
+    (ctx) => `${ctx.saver || 'They'} pulled me off the block — I owe them everything.`,
+    () => 'Veto save. I’m breathing again, barely.'
+  ],
+  alliance_exposed: [
+    (ctx) => `The house caught me with ${ctx.partner} — cover blown.`,
+    () => 'Exposed alliance. Time to rebrand or go down swinging.'
+  ],
+  jury_seat: [
+    () => 'Evicted, but the game isn’t over — jury remembers grudges.',
+    () => 'I’ll be watching from the jury. Every lie gets a receipt.'
+  ],
+  double_eviction: [
+    (ctx) => `${ctx.other || 'Someone'} is out and we’re doing this again tonight.`,
+    () => 'Double eviction chaos — survive round one, pray for round two.'
   ]
+};
+
+/** Archetype-specific lines for social / floater events (merged when core bucket missing). */
+/** @type {Record<string, Partial<Record<ConfessionalEvent, ((ctx: Record<string, string>, speaker: import('./Contestant.js').Contestant) => string)[]>>>} */
+const ARCHETYPE_SOCIAL = {
+  manipulate: {
+    lay_low: [
+      () => 'Laying low lets me listen — information beats visibility.',
+      () => 'Invisible today, dangerous tomorrow.'
+    ],
+    alliance_formed: [
+      (ctx) => `New lever with ${ctx.partner} — the house won’t see the strings.`,
+      (ctx) => `${ctx.partner} thinks it’s friendship. It’s math.`
+    ],
+    betrayed_by: [
+      (ctx) => `${ctx.betrayer} flipped — I already have the counter-move.`,
+      (ctx) => `Not shocked ${ctx.betrayer} lied. Disappointed I trusted the sell.`
+    ],
+    replacement_nom: [
+      () => 'Replacement nom? Fine — pity wins votes if I sell it right.',
+      (ctx) => `${ctx.hoh} put me up as the sacrificial pawn. Joke’s on them.`
+    ]
+  },
+  ally: {
+    lay_low: [
+      () => 'My alliance needs me quiet today — not flashy.',
+      () => 'I’ll let the house fight while I tend my people.'
+    ],
+    alliance_formed: [
+      (ctx) => `${ctx.partner} and I are locked — ride or die.`,
+      () => 'Another soldier in the army. Grateful.'
+    ],
+    betrayed_by: [
+      (ctx) => `${ctx.betrayer} broke our word. The alliance felt that.`,
+      () => 'Betrayal hurts more when you meant the promise.'
+    ]
+  },
+  survive: {
+    lay_low: [
+      () => 'Floater mode: smile, hide, survive.',
+      () => 'Nobody talking about me is the win.'
+    ],
+    alliance_formed: [
+      (ctx) => `Soft alliance with ${ctx.partner} — might keep me off the block.`,
+      () => 'I need numbers without becoming a target.'
+    ],
+    replacement_nom: [
+      () => 'Replacement nom on a floater? Classic house mistake.',
+      () => 'They think I’m easy to evict. We’ll see.'
+    ]
+  },
+  attack: {
+    lay_low: [
+      () => 'Rare quiet day — saving ammunition.',
+      () => 'Even villains need a nap.'
+    ],
+    campaign: [
+      (ctx) => `Blood in the water around ${ctx.target} — I started the feeding frenzy.`,
+      () => 'The house is hunting and I picked the prey.'
+    ],
+    betrayed_by: [
+      (ctx) => `${ctx.betrayer} crossed me — they’re on the hit list now.`,
+      () => 'Betrayal just made my week personal.'
+    ]
+  },
+  befriend: {
+    lay_low: [
+      () => 'Being likable means letting others be the drama today.',
+      () => 'I’ll bake cookies while they scream.'
+    ],
+    alliance_formed: [
+      (ctx) => `${ctx.partner} feels like family already.`,
+      () => 'Another friend in the house — I hope that’s enough.'
+    ],
+    veto_spared: [
+      (ctx) => `${ctx.saver} saved me — I’ll never stop thanking them.`,
+      () => 'Veto save. My social game might actually work.'
+    ]
+  },
+  chaos: {
+    lay_low: [
+      () => 'Even chaos agents need a day off from the blast radius.',
+      () => 'Quiet today so tomorrow’s mess hits harder.'
+    ],
+    alliance_exposed: [
+      () => 'Busted alliance? Now the fun starts.',
+      (ctx) => `Caught with ${ctx.partner} — time to spin a new story.`
+    ],
+    double_eviction: [
+      () => 'Two boots tonight? Music to my ears.',
+      () => 'Double eviction is my favorite holiday.'
+    ]
+  },
+  win: {
+    lay_low: [
+      () => 'Rest day — comps are where I print power.',
+      () => 'Threat drops when I’m not flexing in the yard.'
+    ],
+    veto_won: [
+      () => 'Veto win. Physical dominance plus power — ideal.',
+      () => 'Golden veto. The block fears me for a reason.'
+    ],
+    jury_seat: [
+      () => 'Evicted as a comp beast — jury better respect the wins.',
+      () => 'I’ll vote for whoever played hardest, not nicest.'
+    ]
+  }
 };
 
 /** Player diary lines override archetype templates when `speaker.isPlayer`. */
@@ -104,6 +246,46 @@ const PLAYER_LINES = {
   backdoor: [
     (ctx) => `Backdoor lane open on ${ctx.target} — don’t blow this.`,
     () => 'Pawns, veto, replacement — I’ve got the route mapped.'
+  ],
+  premiere: [
+    () => 'First confessional of the season — my real game starts now.',
+    () => 'Smile for the cameras; the plans stay in my head.'
+  ],
+  veto_won: [
+    () => 'POV around my neck — I decide who sweats this week.',
+    () => 'Veto win. The block is mine to reshape.'
+  ],
+  veto_spared: [
+    (ctx) => `${ctx.saver || 'They'} yanked me off the block — I’m not wasting that.`,
+    () => 'Saved by veto. Time to work the guilt.'
+  ],
+  betrayed_by: [
+    (ctx) => `${ctx.betrayer} stabbed me — I’ll remember every vote.`,
+    () => 'Trust broke. My game just got personal.'
+  ],
+  lay_low: [
+    () => 'I took the Rest action — let the loud ones burn threat.',
+    () => 'Floating today. Threat down, patience up.'
+  ],
+  replacement_nom: [
+    (ctx) => `Replacement nom courtesy of ${ctx.hoh} — didn’t see it coming.`,
+    () => 'Veto chaos landed me on the block. Not ideal.'
+  ],
+  replacement_pick: [
+    (ctx) => `Replacement ${ctx.target} — the path I mapped finally paid off.`,
+    (ctx) => `Saved ${ctx.saved}, sacrificed ${ctx.target}. Cold, correct.`
+  ],
+  jury_seat: [
+    () => 'Evicted but not done — jury votes are my last move.',
+    () => 'I’ll sit in that jury house and judge who lied.'
+  ],
+  double_eviction: [
+    () => 'Double eviction night — one down, maybe two to go.',
+    (ctx) => `${ctx.other || 'They'}’re out; I need to survive the encore.`
+  ],
+  alliance_exposed: [
+    (ctx) => `House caught my deal with ${ctx.partner} — damage control mode.`,
+    () => 'Exposed alliance. Spin or sink.'
   ]
 };
 
@@ -365,7 +547,9 @@ export function pickConfessionalLine(speaker, eventKey, ctx = {}) {
   const strat = speaker.personality?.strategy || 'survive';
   let bucket =
     CONFESSIONAL_LINES[strat]?.[eventKey] ||
-    CONFESSIONAL_LINES.survive[eventKey];
+    ARCHETYPE_SOCIAL[strat]?.[eventKey] ||
+    CONFESSIONAL_LINES.survive[eventKey] ||
+    ARCHETYPE_SOCIAL.survive?.[eventKey];
   if (!bucket?.length) {
     bucket = GENERIC_LINES[eventKey];
   }
@@ -377,13 +561,50 @@ export function pickConfessionalLine(speaker, eventKey, ctx = {}) {
 /**
  * @param {import('./GameState.js').GameState} state
  */
+export function countConfessionalsThisWeek(state) {
+  return (state.confessionalLog || []).filter((r) => r.week === state.week).length;
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ * @param {import('./Contestant.js').Contestant} replacement
+ */
+export function buildReplacementConfessionalExtras(state, replacement) {
+  const hoh = state.getActiveContestants().find((c) => c.isHOH);
+  const saved = state.vetoSavedNomineeId
+    ? state.getContestant(state.vetoSavedNomineeId)
+    : null;
+  /** @type {{ speaker: import('./Contestant.js').Contestant, eventKey: string, ctx?: Record<string, string> }[]} */
+  const extras = [{
+    speaker: replacement,
+    eventKey: 'replacement_nom',
+    ctx: { hoh: hoh?.name || 'the HOH' }
+  }];
+  if (hoh) {
+    extras.push({
+      speaker: hoh,
+      eventKey: 'replacement_pick',
+      ctx: {
+        target: replacement.name,
+        saved: saved?.name || 'a nominee'
+      }
+    });
+  }
+  return extras;
+}
+
 export function getConfessionalFeedBanner(state) {
   const last = state.confessionalLog?.[state.confessionalLog.length - 1];
   if (!last) return '';
   const label = CONFESSIONAL_EVENT_LABELS[last.eventKey] || 'Diary';
   const snippet =
     last.line.length > 42 ? `${last.line.slice(0, 40)}…` : last.line;
-  return `Confessional · ${last.speakerName} (${label}): “${snippet}”`;
+  const weekCount = countConfessionalsThisWeek(state);
+  const prefix =
+    weekCount > 1
+      ? `Confessionals · ${weekCount} this week · `
+      : 'Confessional · ';
+  return `${prefix}${last.speakerName} (${label}): “${snippet}”`;
 }
 
 /**
@@ -441,29 +662,41 @@ export function buildConfessionalIntelSection(state) {
   const log = state.confessionalLog || [];
   if (!log.length) return null;
 
-  const thisWeek = log.filter((r) => r.week === state.week).length;
+  const thisWeek = log.filter((r) => r.week === state.week);
+  const weekCount = thisWeek.length;
+  const speakerCount = new Set(thisWeek.map((r) => r.speakerId)).size;
+  const playerLines = player
+    ? thisWeek.filter((r) => r.speakerId === player.id).length
+    : 0;
 
   return {
     id: 'confessionals',
     title: 'Confessionals',
     tone: 'neutral',
     items: [
-      ...(thisWeek
+      ...(weekCount
         ? [{
           key: 'conf-week-count',
           name: 'This week',
-          detail: `${thisWeek} diary line${thisWeek === 1 ? '' : 's'} in the feed.`
+          detail: `${weekCount} line${weekCount === 1 ? '' : 's'} · ${speakerCount} HG${speakerCount === 1 ? '' : 's'} spoke${playerLines ? ` · you: ${playerLines}` : ''}.`
         }]
         : []),
       ...log
-        .slice(-5)
+        .slice(-6)
         .reverse()
-        .map((row) => ({
-          key: `conf-${row.week}-${row.day}-${row.speakerId}-${row.eventKey || 'x'}`,
-          name: row.speakerName,
-          detail: `${CONFESSIONAL_EVENT_LABELS[row.eventKey] || row.eventKey || 'Diary'} · “${row.line}”`
-        }))
-    ].slice(0, 7)
+        .map((row) => {
+          const tag = CONFESSIONAL_EVENT_LABELS[row.eventKey] || row.eventKey || 'Diary';
+          const src = row.source === 'api' ? ' · narrated' : '';
+          const arch = row.archetype && row.archetype !== 'Player'
+            ? ` (${row.archetype})`
+            : '';
+          return {
+            key: `conf-${row.week}-${row.day}-${row.speakerId}-${row.eventKey || 'x'}`,
+            name: `${row.speakerName}${arch}`,
+            detail: `${tag}${src} · “${row.line}”`
+          };
+        })
+    ].slice(0, 8)
   };
 }
 
@@ -484,7 +717,7 @@ export function recordConfessional(state, speaker, line, eventKey = null, source
     archetype: speaker.personality?.name || null,
     line
   });
-  if (state.confessionalLog.length > 12) {
-    state.confessionalLog = state.confessionalLog.slice(-12);
+  if (state.confessionalLog.length > 20) {
+    state.confessionalLog = state.confessionalLog.slice(-20);
   }
 }

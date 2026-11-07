@@ -29,7 +29,8 @@ import {
   markConfessionalPlayed,
   pickConfessionalLine,
   recordConfessional,
-  shouldSkipConfessional
+  shouldSkipConfessional,
+  buildReplacementConfessionalExtras
 } from './modules/confessionals.js';
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
@@ -66,7 +67,14 @@ import {
   getNomTargetLensLabel,
   getPlayerHohPickerIntro
 } from './modules/hohNomPersonas.js';
-import { aiCountForCast, escapeHtml, pickRandom, randomInt, totalCastSize } from './modules/utils.js';
+import {
+  aiCountForCast,
+  escapeHtml,
+  JURY_START_HOUSE_COUNT,
+  pickRandom,
+  randomInt,
+  totalCastSize
+} from './modules/utils.js';
 
 class Game {
   constructor() {
@@ -210,6 +218,10 @@ class Game {
       });
     }
     void this._appendHostBeat('premiere_move_in');
+    const player = this.state.getPlayer();
+    if (player && !player.evicted) {
+      void this._appendConfessional(player, 'premiere');
+    }
     const cast = this.state.getActiveContestants().filter((c) => !c.isPlayer);
     if (cast.length) {
       void this._appendConfessional(pickRandom(cast), 'premiere');
@@ -1291,6 +1303,11 @@ class Game {
         await this._appendConfessional(holder, 'veto_saved', {
           saved: saved?.name || 'a nominee'
         });
+        if (saved && saved.id !== holder.id) {
+          await this._appendConfessional(saved, 'veto_spared', {
+            saver: holder.name
+          });
+        }
       } else {
         await this._appendConfessional(holder, 'veto_unused');
       }
@@ -1359,7 +1376,15 @@ class Game {
 
     this.ui.elements.actionDetail.querySelectorAll('[data-replacement]').forEach((btn) => {
       btn.addEventListener('click', () => {
+        const replacement = this.state.getContestant(btn.dataset.replacement);
         const results = this.eviction.playerPickReplacement(btn.dataset.replacement);
+        if (replacement && results.length) {
+          const tail = results[results.length - 1];
+          tail.confessionalExtras = [
+            ...(tail.confessionalExtras || []),
+            ...buildReplacementConfessionalExtras(this.state, replacement)
+          ];
+        }
         this.ui.hideActionDetail();
         this.logAndRender(results);
         void this._completeVetoCeremonyHostBeat();
@@ -1569,12 +1594,23 @@ class Game {
     }
 
     await this._appendHostBeat('eviction_ceremony', { evicted });
-    await this._appendConfessional(evicted, 'evicted');
+    const deNight = this.state.doubleEvictionWeekActive;
+    const evictedKey =
+      deNight && this.state.doubleEvictionRound !== 2 ? 'double_eviction' : 'evicted';
+    await this._appendConfessional(evicted, evictedKey);
+
+    const remainingAfter = this.state.getActiveContestants().length;
+    if (remainingAfter < JURY_START_HOUSE_COUNT) {
+      await this._appendConfessional(evicted, 'jury_seat');
+    }
 
     const survivors = this.state.getActiveNominees().filter((n) => n.id !== evicted.id);
     const survivor = survivors[0];
     if (survivor) {
-      await this._appendConfessional(survivor, 'survived_vote', {
+      const survKey = deNight && this.state.doubleEvictionRound !== 2
+        ? 'double_eviction'
+        : 'survived_vote';
+      await this._appendConfessional(survivor, survKey, {
         other: evicted.name
       });
     }

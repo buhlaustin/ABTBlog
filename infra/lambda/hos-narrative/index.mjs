@@ -167,8 +167,9 @@ Name both nominees. Under 320 characters. Context: ${ctx}`;
   }
   if (kind === 'confessional') {
     return `${base}
-Kind: Diary confessional — first-person one sentence. Use confessional object in context (speaker, event).
-Return plain text only in JSON text field. Under 200 characters.
+Kind: Diary confessional — first-person one sentence. Use confessional object in context (speakerName, speakerArchetype, speakerStrategy, event, and any partner/target/saver names).
+Events include hoh_win, on_block, veto_spared, lay_low, replacement_nom, jury_seat, double_eviction, alliance_exposed, betrayal, etc.
+Return plain text only in JSON text field. Under 200 characters. In-character for the archetype.
 Context: ${ctx}`;
   }
   if (kind === 'premiere_move_in') {

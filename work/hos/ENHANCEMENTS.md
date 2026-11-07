@@ -166,7 +166,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Status** | **Shipped (v2):** v1 plus **player** diary overrides; **alliance / promise / campaign / backdoor / POV win / premiere / AI betrayal** hooks; **both nominees** on the block; dedupe; **feed banner**; intel labels + week count; archetype tags. |
+| **Status** | **Shipped (v3):** v2 plus **lay low / veto spare / replacement noms / jury seat / double eviction / exposed alliance**; **ARCHETYPE_SOCIAL** lines; player premiere + expand-alliance + break-promise victim DR; AI campaign/lay-low/alliance DR; banner **week count**; richer **Deals** log (speakers, narrated tag); `scripts/hos-confessionals-smoke.mjs`. |
 | **Goal** | Short flavor after big moves. |
 | **Player experience** | “Confessional — Riley: ‘I had to put them up; they’re coming for me next.’” |
 | **Implementation** | Template + personality from `Contestant`; optional LLM beat. |

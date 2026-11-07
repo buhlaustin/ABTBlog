@@ -385,10 +385,23 @@ export class PlayerActions {
     player.modifyRelationship(target.id, 10);
     target.modifyRelationship(player.id, 8);
     this._consumeAction();
+    const extras = target.isPlayer
+      ? []
+      : [{
+        speaker: target,
+        eventKey: 'alliance_formed',
+        ctx: { partner: player.name }
+      }];
     return {
       success: true,
       text: `${target.name} joined your alliance "${alliance.name}".`,
-      type: 'success'
+      type: 'success',
+      confessional: {
+        speaker: player,
+        eventKey: 'alliance_formed',
+        ctx: { partner: target.name }
+      },
+      confessionalExtras: extras
     };
   }
 
@@ -500,6 +513,13 @@ export class PlayerActions {
     player.trust = clamp(player.trust - 10, 0, 100);
 
     this._consumeAction();
+    const extras = target.isPlayer
+      ? []
+      : [{
+        speaker: target,
+        eventKey: 'betrayed_by',
+        ctx: { betrayer: player.name }
+      }];
     return {
       success: true,
       text: `<strong>${target.name}</strong> will remember you broke your ${activePromise.type} deal from <strong>Week ${activePromise.week}</strong>.`,
@@ -508,7 +528,8 @@ export class PlayerActions {
         speaker: player,
         eventKey: 'betrayal',
         ctx: { target: target.name }
-      }
+      },
+      confessionalExtras: extras
     };
   }
 
@@ -614,7 +635,7 @@ export class PlayerActions {
       player.threatOffset <= -25 && applied < delta
         ? ' Cushion hit the −25 cap.'
         : '';
-    return {
+    const restResult = {
       success: true,
       text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first. ${formatThreatChange(before, after)}${capNote}`,
       type: 'success',
@@ -626,6 +647,14 @@ export class PlayerActions {
         bandCrossed: getThreatBand(before).id !== getThreatBand(after).id
       }
     };
+    if (applied > 0 || after < before) {
+      restResult.confessional = {
+        speaker: player,
+        eventKey: 'lay_low',
+        ctx: { delta: String(Math.max(0, before - after)) }
+      };
+    }
+    return restResult;
   }
 
   _schemeNominees(player, target) {

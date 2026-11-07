@@ -151,7 +151,10 @@ export class AIController {
         target.reputation = clamp(target.reputation - 5, 0, 100);
         return {
           type: 'drama',
-          text: `${ai.name} has been quietly campaigning against ${target.name} in the house.`
+          text: `${ai.name} has been quietly campaigning against ${target.name} in the house.`,
+          confessional: Math.random() < 0.35
+            ? { speaker: ai, eventKey: 'campaign', ctx: { target: target.name } }
+            : undefined
         };
       }
       case 'gather_intel': {
@@ -201,7 +204,10 @@ export class AIController {
         ai.threat = clamp(ai.threat - 3, 0, 100);
         return {
           type: 'system',
-          text: `${ai.name} kept a low profile today.`
+          text: `${ai.name} kept a low profile today.`,
+          confessional: Math.random() < 0.45
+            ? { speaker: ai, eventKey: 'lay_low' }
+            : undefined
         };
       }
       case 'train': {
@@ -258,13 +264,23 @@ export class AIController {
       alliance.exposed = true;
       return {
         type: 'drama',
-        text: `The house caught ${leader.name} and ${member.name} plotting — their alliance is exposed!`
+        text: `The house caught ${leader.name} and ${member.name} plotting — their alliance is exposed!`,
+        confessionalExtras: [
+          { speaker: leader, eventKey: 'alliance_exposed', ctx: { partner: member.name } },
+          { speaker: member, eventKey: 'alliance_exposed', ctx: { partner: leader.name } }
+        ]
       };
     }
 
     return {
       type: 'drama',
-      text: `${leader.name} and ${member.name} seem to be forming a secret alliance.`
+      text: `${leader.name} and ${member.name} seem to be forming a secret alliance.`,
+      confessionalExtras: Math.random() < 0.4
+        ? [
+          { speaker: leader, eventKey: 'alliance_formed', ctx: { partner: member.name } },
+          { speaker: member, eventKey: 'alliance_formed', ctx: { partner: leader.name } }
+        ]
+        : undefined
     };
   }
 

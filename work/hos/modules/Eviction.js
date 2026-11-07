@@ -14,6 +14,7 @@ import {
 import { getFloaterShieldCeremonyNote } from './floaterShields.js';
 import { buildBackdoorCompletionLine, clearThrowCompetitionIntent } from './strategicVerbs.js';
 import { appendVetoCeremonySummary, snapshotVetoWeekBlock } from './vetoCeremonySummary.js';
+import { buildReplacementConfessionalExtras } from './confessionals.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -324,10 +325,12 @@ export class EvictionSystem {
       replacement.isNominated = true;
       this.state.nominees.push(replacement.id);
       const reason = describeNominationReason(hoh, replacement);
-      results.push({
+      const drama = {
         type: 'drama',
-        text: `${hoh.name} nominates <strong>${replacement.name}</strong> as the replacement — ${reason}.`
-      });
+        text: `${hoh.name} nominates <strong>${replacement.name}</strong> as the replacement — ${reason}.`,
+        confessionalExtras: buildReplacementConfessionalExtras(this.state, replacement)
+      };
+      results.push(drama);
     }
 
     appendVetoCeremonySummary(results, this.state, {
@@ -394,6 +397,13 @@ export class EvictionSystem {
         replacement,
         vetoUsed: true
       });
+      if (results.length) {
+        const tail = results[results.length - 1];
+        tail.confessionalExtras = [
+          ...(tail.confessionalExtras || []),
+          ...buildReplacementConfessionalExtras(this.state, replacement)
+        ];
+      }
     }
     return results;
   }
