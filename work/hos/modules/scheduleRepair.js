@@ -1,6 +1,12 @@
 import { PHASE_LABELS, PHASES, WEEKDAYS } from './GameState.js';
 import { escapeHtml } from './utils.js';
 
+const SOURCE_LABELS = {
+  load: 'Save load',
+  recover: 'Live eviction guard',
+  runtime: 'Auto fix'
+};
+
 /**
  * @param {import('./GameState.js').GameState} state
  */
@@ -10,6 +16,10 @@ export function snapshotSchedule(state) {
     state.getActiveContestants().find((c) => c.isHOH) ||
     null;
   const idx = state.weekdayIndex ?? 0;
+  const vetoHolder = state.vetoHolderId
+    ? state.getContestant(state.vetoHolderId)
+    : null;
+
   return {
     week: state.week,
     weekdayIndex: idx,
@@ -19,8 +29,41 @@ export function snapshotSchedule(state) {
     nomineeCount: state.getActiveNominees().length,
     nomineeNames: state.getActiveNominees().map((n) => n.name),
     hohName: hoh?.name ?? null,
-    houseEventComplete: Boolean(state.houseEventComplete)
+    vetoHolderName: vetoHolder?.name ?? null,
+    houseEventComplete: Boolean(state.houseEventComplete),
+    doubleEviction: Boolean(
+      state.doubleEvictionWeekActive
+      || state.doubleEvictionAwaitingRound2
+      || state.doubleEvictionRound2Cycle
+    )
   };
+}
+
+/**
+ * @param {ReturnType<typeof snapshotSchedule>} before
+ * @param {ReturnType<typeof snapshotSchedule>} after
+ */
+export function formatCalendarJump(before, after) {
+  return `${before.weekday} (${before.phaseLabel}) → ${after.weekday} (${after.phaseLabel})`;
+}
+
+/**
+ * @param {NonNullable<ReturnType<typeof runScheduleRepair>>} repair
+ */
+export function describeRepairNextStep(repair) {
+  if (repair.reason === 'missing_hoh') {
+    return 'Run the Friday HOH competition when you are ready, then continue the week in order.';
+  }
+  return 'Proceed with the nomination ceremony — two houseguests must be on the block before eviction night returns.';
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ */
+export function getActiveScheduleRepair(state) {
+  const r = state.lastScheduleRepair;
+  if (!r || r.week !== state.week) return null;
+  return r;
 }
 
 /**
@@ -52,7 +95,9 @@ function formatSnapLine(snap) {
     ? `${snap.nomineeCount} on block (${snap.nomineeNames.join(', ')})`
     : '0 on block';
   const hoh = snap.hohName ? `HOH: ${snap.hohName}` : 'No HOH';
-  return `${snap.weekday} · ${snap.phaseLabel} · ${noms} · ${hoh}`;
+  const veto = snap.vetoHolderName ? ` · Veto: ${snap.vetoHolderName}` : '';
+  const de = snap.doubleEviction ? ' · DE week' : '';
+  return `Week ${snap.week} · ${snap.weekday} · ${snap.phaseLabel} · ${noms} · ${hoh}${veto}${de}`;
 }
 
 /**
@@ -115,12 +160,15 @@ export function buildScheduleRepairFeedEntries(repair) {
   const action = describeScheduleRepairAction(repair.reason);
   const beforeLine = escapeHtml(formatSnapLine(repair.before));
   const afterLine = escapeHtml(formatSnapLine(repair.after));
+  const jump = escapeHtml(formatCalendarJump(repair.before, repair.after));
+  const srcLabel = SOURCE_LABELS[repair.source] || 'Auto fix';
   const src =
     repair.source === 'load'
-      ? 'Detected while loading your save.'
+      ? 'Detected while loading your save (older broken state).'
       : repair.source === 'recover'
-        ? 'Detected during live eviction.'
+        ? 'Detected during live eviction — you would have been soft-locked.'
         : 'Detected automatically.';
+  const next = escapeHtml(describeRepairNextStep(repair));
 
   return [
     {
@@ -129,13 +177,15 @@ export function buildScheduleRepairFeedEntries(repair) {
     },
     {
       type: 'schedule-repair',
-      text: `<details class="schedule-repair-detail">
+      text: `<details class="schedule-repair-detail" open>
 <summary>View what happened</summary>
-<p class="schedule-repair-meta">${escapeHtml(src)}</p>
+<p class="schedule-repair-meta">${escapeHtml(srcLabel)} · ${escapeHtml(src)}</p>
+<p class="schedule-repair-jump"><strong>Calendar jump:</strong> ${jump}</p>
 <ul class="schedule-repair-diff">
 <li><strong>Before:</strong> ${beforeLine}</li>
 <li><strong>After:</strong> ${afterLine}</li>
 </ul>
+<p class="schedule-repair-next"><strong>Next:</strong> ${next}</p>
 </details>`
     }
   ];
@@ -145,10 +195,9 @@ export function buildScheduleRepairFeedEntries(repair) {
  * @param {import('./GameState.js').GameState} state
  */
 export function getScheduleRepairBanner(state) {
-  const r = state.lastScheduleRepair;
-  if (!r || r.week !== state.week) return '';
-  const day = r.after?.weekday || '—';
-  return `Schedule repair · now ${day} (${r.after?.phaseLabel || '—'})`;
+  const r = getActiveScheduleRepair(state);
+  if (!r) return '';
+  return `Schedule repair · ${formatCalendarJump(r.before, r.after)}`;
 }
 
 /**
@@ -161,19 +210,44 @@ export function buildScheduleRepairIntelSection(state) {
   const log = state.scheduleRepairLog || [];
   if (!log.length && !state.lastScheduleRepair) return null;
 
-  const items = (log.length ? log : [state.lastScheduleRepair])
-    .slice(-3)
-    .reverse()
-    .map((r, idx) => ({
-      key: `sched-repair-${r.week}-${r.at}-${idx}`,
-      name: `Week ${r.week} fix`,
-      detail: `${describeScheduleRepairReason(r.reason).replace(/\.$/, '')} → ${r.after.weekday} (${r.after.phaseLabel})`
-    }));
+  const items = [];
+
+  const active = getActiveScheduleRepair(state);
+  if (active) {
+    items.push({
+      key: 'sched-repair-active',
+      name: 'This week',
+      detail: `${formatCalendarJump(active.before, active.after)} · ${SOURCE_LABELS[active.source] || 'Fix'}`
+    });
+    items.push({
+      key: 'sched-repair-next',
+      name: 'What’s next',
+      detail: describeRepairNextStep(active)
+    });
+  }
+
+  for (const r of (log.length ? log : []).slice(-3).reverse()) {
+    if (active && r.at === active.at) continue;
+    items.push({
+      key: `sched-repair-${r.week}-${r.at}`,
+      name: `Week ${r.week} (${SOURCE_LABELS[r.source] || 'Fix'})`,
+      detail: `${formatCalendarJump(r.before, r.after)}`
+    });
+  }
+
+  if (!items.length && state.lastScheduleRepair) {
+    const r = state.lastScheduleRepair;
+    items.push({
+      key: 'sched-repair-last',
+      name: `Week ${r.week}`,
+      detail: formatCalendarJump(r.before, r.after)
+    });
+  }
 
   return {
     id: 'schedule-repair',
-    title: 'Schedule repairs',
+    title: `Schedule repairs${log.length ? ` (${log.length})` : ''}`,
     tone: 'caution',
-    items
+    items: items.slice(0, 6)
   };
 }

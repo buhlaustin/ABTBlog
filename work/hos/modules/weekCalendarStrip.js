@@ -1,5 +1,6 @@
 import { PHASES, PHASE_LABELS, WEEKDAYS } from './GameState.js';
 import { getNextHostEventPreview } from './hostPhaseBeats.js';
+import { getActiveScheduleRepair } from './scheduleRepair.js';
 import { escapeHtml } from './utils.js';
 
 export const WEEKDAY_SHORT = ['Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu'];
@@ -147,6 +148,13 @@ export function buildWeekCalendarCells(state) {
       subtitle: ''
     };
     cell.subtitle = resolveSubtitle(state, cell);
+
+    const repair = getActiveScheduleRepair(state);
+    if (repair && cell.status === 'today') {
+      cell.repaired = true;
+      cell.subtitle = `↩ fixed · ${cell.subtitle}`;
+    }
+
     return cell;
   });
 }
@@ -231,6 +239,7 @@ function renderCellHtml(c) {
     c.live ? 'cal-live' : 'cal-social',
     c.doubleEviction ? 'cal-double' : '',
     c.premiere ? 'cal-premiere' : '',
+    c.repaired ? 'cal-repaired' : '',
     c.eventState === 'now' ? 'cal-now' : '',
     c.eventState === 'done' ? 'cal-event-done' : ''
   ].filter(Boolean).join(' ');

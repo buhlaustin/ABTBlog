@@ -265,10 +265,13 @@ class Game {
     const loadRepair = this.state.lastScheduleRepair;
     if (loadRepair?.source === 'load') {
       this.logAndRender(buildScheduleRepairFeedEntries(loadRepair));
+      this.ui.showToast('Save repaired — calendar adjusted. Expand “View what happened” in the feed.');
     }
 
     this.runPhase();
-    this.ui.showToast('Game loaded!');
+    if (loadRepair?.source !== 'load') {
+      this.ui.showToast('Game loaded!');
+    }
   }
 
   saveGame() {

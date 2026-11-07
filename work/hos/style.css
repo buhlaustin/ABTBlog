@@ -558,6 +558,18 @@ body {
   color: var(--text-muted);
 }
 
+.schedule-repair-jump,
+.schedule-repair-next {
+  margin: 0.35rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.week-calendar .cal-cell.cal-repaired {
+  outline: 1px dashed var(--warning);
+  outline-offset: 2px;
+}
+
 .story-entry.veto-summary {
   background: rgba(212, 175, 55, 0.12);
   border-left: 3px solid var(--gold, #d4af37);

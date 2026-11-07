@@ -4,9 +4,13 @@
  */
 import {
   buildScheduleRepairFeedEntries,
+  describeRepairNextStep,
+  formatCalendarJump,
+  getScheduleRepairBanner,
   runScheduleRepair,
   snapshotSchedule
 } from '../work/hos/modules/scheduleRepair.js';
+import { buildWeekCalendarCells } from '../work/hos/modules/weekCalendarStrip.js';
 import { PHASES } from '../work/hos/modules/GameState.js';
 
 function fail(msg) {
@@ -64,6 +68,20 @@ if (entries.length !== 2 || !entries[1].text.includes('View what happened')) {
 if (!entries[1].text.includes('Before:') || !entries[1].text.includes('After:')) {
   fail('diff missing');
 }
+if (!entries[1].text.includes('Calendar jump') || !entries[1].text.includes('Next:')) {
+  fail('v2 detail missing');
+}
+
+const jump = formatCalendarJump(record.before, record.after);
+if (!jump.includes('Thursday') || !jump.includes('Saturday')) fail(`jump ${jump}`);
+if (!describeRepairNextStep(record).includes('nomination')) fail('next step');
+
+state.lastScheduleRepair = record;
+const banner = getScheduleRepairBanner(state);
+if (!banner.includes('→')) fail(`banner ${banner}`);
+
+const cal = buildWeekCalendarCells(state).find((c) => c.status === 'today');
+if (!cal?.repaired || !cal.subtitle?.includes('fixed')) fail(`cal ${cal?.subtitle}`);
 
 const noHoh = makeState({ currentHOH: null });
 contestants[0].isHOH = false;
