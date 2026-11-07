@@ -12,6 +12,31 @@ import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 import { renderWeekCalendarHtml } from './weekCalendarStrip.js';
 import { formatHouseguestDisplayName, getHouseguestCastMarks } from './castPresets.js';
 
+const ACTION_TONES = {
+  talk: 'social',
+  befriend: 'social',
+  alliance: 'social',
+  spy: 'intel',
+  promise: 'deal',
+  campaign: 'aggressive',
+  reputation: 'social',
+  'lay-low': 'shield',
+  rest: 'shield',
+  end_day: 'continue',
+  finale_continue: 'continue',
+  vote: 'live',
+  nominate: 'live',
+  veto: 'live',
+  comp: 'live'
+};
+
+function guestInitials(contestant) {
+  const raw = (contestant?.name || '?').trim();
+  const parts = raw.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  return raw.slice(0, 2).toUpperCase();
+}
+
 const STORY_TYPE_LABELS = {
   narrative: 'Story',
   drama: 'Drama',
@@ -97,6 +122,11 @@ export class UIManager {
   showEnd(won) {
     this.showScreen(this.elements.endScreen);
     this.elements.endTitle.textContent = won ? 'You Won!' : 'Game Over';
+    const eyebrow = document.getElementById('end-eyebrow');
+    if (eyebrow) {
+      eyebrow.textContent = won ? 'Winner · jury vote' : 'Season over';
+    }
+    this.elements.endScreen?.classList.toggle('end-screen-won', Boolean(won));
   }
 
   updateWeekDay(week, weekdayIndex, phase, phaseLabel = null) {
@@ -105,7 +135,8 @@ export class UIManager {
     const label = phaseLabel ?? PHASE_LABELS[phase] ?? phase;
     this.elements.phaseLabel.textContent = label;
     const deActive = typeof phaseLabel === 'string' && phaseLabel.startsWith('Double Eviction');
-    this.elements.phaseLabel.classList.toggle('double-eviction', deActive);
+    const phaseKey = phase ? String(phase).replace(/_/g, '-') : '';
+    this.elements.phaseLabel.className = `phase-badge${deActive ? ' double-eviction' : ''}${phaseKey ? ` phase-${phaseKey}` : ''}`;
   }
 
   /**
@@ -147,6 +178,8 @@ export class UIManager {
       const label = STORY_TYPE_LABELS[type] || 'Feed';
       div.innerHTML = `<span class="story-entry-meta">${escapeHtml(label)}</span><div class="story-entry-body">${entry.text}</div>`;
       this.elements.storyLog.appendChild(div);
+      div.classList.add('story-entry-enter');
+      window.setTimeout(() => div.classList.remove('story-entry-enter'), 420);
     }
     if (scroll) {
       this.elements.storyLog.scrollTop = this.elements.storyLog.scrollHeight;
@@ -179,11 +212,11 @@ export class UIManager {
     this.elements.playerStats.innerHTML = stats.map((s) => {
       if (s.cls) {
         return `<div class="stat-bar-wrap">
-          <div class="stat-row"><span class="stat-label">${s.label}</span><span>${s.value}</span></div>
+          <div class="stat-row"><span class="stat-label">${s.label}</span><span class="stat-value">${s.value}</span></div>
           <div class="stat-bar"><div class="stat-bar-fill ${s.cls}" style="width:${s.value * 10}%"></div></div>
         </div>`;
       }
-      return `<div class="stat-row"><span class="stat-label">${s.label}</span><span>${s.value}</span></div>`;
+      return `<div class="stat-row stat-row-plain"><span class="stat-label">${s.label}</span><span class="stat-value">${s.value}</span></div>`;
     }).join('');
 
     const tags = [];
@@ -345,11 +378,11 @@ export class UIManager {
     this.elements.houseguestList.innerHTML = contestants.map((c) => {
       const rel = player ? player.getRelationship(c.id) : 0;
       const relDisplay = c.isPlayer ? '' : `<span class="rel-score ${relationshipClass(rel)}">${rel > 0 ? '+' : ''}${rel}</span>`;
-      const icons = [];
-      if (c.isHOH) icons.push('👑');
-      if (c.isNominated) icons.push('⚠️');
-      if (c.evicted && c.isJuror) icons.push('⚖️');
-      else if (c.evicted) icons.push('❌');
+      const statusBadges = [];
+      if (c.isHOH) statusBadges.push('<span class="hg-status hg-status-hoh">HOH</span>');
+      if (c.isNominated) statusBadges.push('<span class="hg-status hg-status-nom">Nom</span>');
+      if (c.evicted && c.isJuror) statusBadges.push('<span class="hg-status hg-status-jury">Jury</span>');
+      else if (c.evicted) statusBadges.push('<span class="hg-status hg-status-out">Out</span>');
 
       const personaTitle = c.isHOH ? getHohNomPersonaTooltip(c) : '';
       const personaAttrs = personaTitle
@@ -367,10 +400,18 @@ export class UIManager {
         ).join('')}</div>`
         : '';
 
+      const statusHtml = statusBadges.length
+        ? `<div class="hg-status-row">${statusBadges.join('')}</div>`
+        : '';
+
       return `<li class="houseguest-item ${c.isPlayer ? 'is-player' : ''} ${c.evicted ? 'evicted' : ''}">
-        <div>
-          <span class="name">${icons.join(' ')} ${escapeHtml(formatHouseguestDisplayName(c))}</span>
-          <div${personaAttrs}>${escapeHtml(c.personality.name)}${c.isHOH ? ' · HOH' : ''}</div>
+        <span class="hg-avatar" aria-hidden="true">${escapeHtml(guestInitials(c))}</span>
+        <div class="hg-main">
+          <div class="hg-name-row">
+            <span class="name">${escapeHtml(formatHouseguestDisplayName(c))}</span>
+            ${statusHtml}
+          </div>
+          <div${personaAttrs}>${escapeHtml(c.personality.name)}</div>
           ${marksHtml}
         </div>
         ${relDisplay}
@@ -481,9 +522,14 @@ export class UIManager {
     this.elements.actionButtons.innerHTML = '';
     for (const action of actions) {
       const btn = document.createElement('button');
-      btn.className = 'btn btn-action';
-      btn.textContent = action.label;
+      const tone = ACTION_TONES[action.id] || 'default';
+      btn.className = `btn btn-action btn-action-tone-${tone}`;
       btn.title = action.description || '';
+      if (action.description) {
+        btn.innerHTML = `<span class="btn-action-label">${escapeHtml(action.label)}</span><span class="btn-action-desc">${escapeHtml(action.description)}</span>`;
+      } else {
+        btn.textContent = action.label;
+      }
       btn.addEventListener('click', () => onAction(action));
       this.elements.actionButtons.appendChild(btn);
     }
@@ -517,15 +563,27 @@ export class UIManager {
     return { html, targets };
   }
 
-  showToast(message) {
+  showToast(message, variant = null) {
     const existing = document.querySelector('.toast');
     if (existing) existing.remove();
 
+    const inferred = variant
+      ?? (/saved|loaded|repaired/i.test(message)
+        ? 'success'
+        : /fail|no save|before ending|no actions/i.test(message)
+          ? 'warn'
+          : 'info');
+
     const toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = `toast toast--${inferred}`;
+    toast.setAttribute('role', 'status');
     toast.textContent = message;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2500);
+    requestAnimationFrame(() => toast.classList.add('toast-visible'));
+    setTimeout(() => {
+      toast.classList.remove('toast-visible');
+      setTimeout(() => toast.remove(), 200);
+    }, 2600);
   }
 
   setActionPrompt(text) {
