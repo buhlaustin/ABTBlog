@@ -57,10 +57,13 @@ export class UIManager {
     this.elements.endTitle.textContent = won ? 'You Won!' : 'Game Over';
   }
 
-  updateWeekDay(week, weekdayIndex, phase) {
+  updateWeekDay(week, weekdayIndex, phase, phaseLabel = null) {
     const weekday = WEEKDAYS[weekdayIndex] ?? `Day ${weekdayIndex + 1}`;
     this.elements.weekDay.textContent = `Week ${week} — ${weekday}`;
-    this.elements.phaseLabel.textContent = PHASE_LABELS[phase] || phase;
+    const label = phaseLabel ?? PHASE_LABELS[phase] ?? phase;
+    this.elements.phaseLabel.textContent = label;
+    const deActive = typeof phaseLabel === 'string' && phaseLabel.startsWith('Double Eviction');
+    this.elements.phaseLabel.classList.toggle('double-eviction', deActive);
   }
 
   /** Append entries to story log. */

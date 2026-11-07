@@ -26,14 +26,14 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 ## Calendar, twists, and endgame
 
-### Double eviction — rules in UI
+### Double eviction — rules in UI (shipped core loop)
 
 | Field | Detail |
 |--------|--------|
-| **Goal** | `doubleEvictionEnabled` is in state; players should see **when** it triggers and **how** votes work. |
-| **Player experience** | Banner when ≤8 remain: “Double eviction this week.” Two nominee pairs or back-to-back eviction phases with one vote each. |
-| **Implementation** | `GameState` already has flag; wire `runEvictionPhase` for second block; story + UI checklist; save format version bump if needed. |
-| **Priority** | Medium. |
+| **Goal** | When ≤8 remain (once per season), Thursday runs **Vote 1 → paused Round 2 cycle (HOH, noms, POV, veto) → Vote 2** with explicit **Continue** between each live event. |
+| **Player experience** | Week-start warning; phase badge `Double Eviction · Round N · …`; no auto-blur of Round 2. |
+| **Follow-ups** | On-screen rules cheat sheet; jury banner when Round 2 would seat jurors; dev shortcut to force DE week for testing. |
+| **Priority** | Polish only — core pacing landed in PR #42. |
 
 ### Jury visibility
 

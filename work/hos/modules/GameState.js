@@ -7,6 +7,7 @@ import {
 } from './allianceUtils.js';
 import {
   DIFFICULTY_CONFIG,
+  JURY_START_HOUSE_COUNT,
   generateAINames,
   pickRandom,
   shuffle,
@@ -48,6 +49,15 @@ export const PHASE_LABELS = {
   [PHASES.EVICTION]: 'Live eviction',
   [PHASES.WEEK_END]: 'Week summary'
 };
+
+/** Second power cycle on Double Eviction Thursday (stays on calendar Thursday). */
+export const DOUBLE_EVICTION_ROUND2_PHASES = [
+  PHASES.COMPETITION,
+  PHASES.NOMINATION,
+  PHASES.VETO_COMP,
+  PHASES.VETO_CEREMONY,
+  PHASES.EVICTION
+];
 
 export { sharesAllianceWith, getAllianceIds, getContestantAlliances } from './allianceUtils.js';
 
@@ -94,6 +104,14 @@ export class GameState {
     this.winner = null;
     /** True after HOH / noms / veto / eviction finishes for the current calendar day. */
     this.houseEventComplete = false;
+
+    this.doubleEvictionSeasonUsed = false;
+    this.doubleEvictionWeekActive = false;
+    /** 1 = first eviction vote tonight; 2 = second cycle. */
+    this.doubleEvictionRound = 1;
+    this.doubleEvictionAwaitingRound2 = false;
+    this.doubleEvictionRound2Cycle = false;
+    this.doubleEvictionPendingNextPhase = null;
 
     this._initContestants(playerName, aiCount);
     this.syncPhaseForWeekday();
@@ -317,6 +335,112 @@ export class GameState {
     this.currentHOH = null;
   }
 
+  /** Clear HOH/nom/veto for Double Eviction round 2 on the same Thursday. */
+  resetPowerCycleForDoubleEvictionRound2() {
+    for (const c of this.getActiveContestants()) {
+      c.isHOH = false;
+      c.isNominated = false;
+      c.hasVeto = false;
+      c.votesReceived = 0;
+    }
+    this.nominees = [];
+    this.vetoUsed = false;
+    this.vetoReplacements = [];
+    this.vetoHolderId = null;
+    this.competitionWinner = null;
+    this.currentHOH = null;
+    this.currentCompetition = null;
+    this.challengeData = null;
+  }
+
+  evaluateDoubleEvictionWeek() {
+    this.doubleEvictionWeekActive = false;
+    this.doubleEvictionRound = 1;
+    this.doubleEvictionAwaitingRound2 = false;
+    this.doubleEvictionRound2Cycle = false;
+    this.doubleEvictionPendingNextPhase = null;
+    if (!this.doubleEvictionEnabled || this.doubleEvictionSeasonUsed) return;
+    const remaining = this.getActiveContestants().length;
+    if (remaining <= 8 && remaining > 3) {
+      this.doubleEvictionWeekActive = true;
+    }
+  }
+
+  getDoubleEvictionRound2NextPhase() {
+    if (!this.doubleEvictionRound2Cycle) return null;
+    const idx = DOUBLE_EVICTION_ROUND2_PHASES.indexOf(this.phase);
+    if (idx < 0 || idx >= DOUBLE_EVICTION_ROUND2_PHASES.length - 1) return null;
+    return DOUBLE_EVICTION_ROUND2_PHASES[idx + 1];
+  }
+
+  startDoubleEvictionRound2() {
+    this.doubleEvictionRound = 2;
+    this.doubleEvictionAwaitingRound2 = false;
+    this.doubleEvictionRound2Cycle = true;
+    this.doubleEvictionPendingNextPhase = null;
+    this.doubleEvictionSeasonUsed = true;
+    this.resetPowerCycleForDoubleEvictionRound2();
+    this.weekdayIndex = 6;
+    this.day = 7;
+    this.phase = PHASES.COMPETITION;
+    this.houseEventComplete = false;
+  }
+
+  finalizeDoubleEvictionWeek() {
+    this.doubleEvictionWeekActive = false;
+    this.doubleEvictionRound2Cycle = false;
+    this.doubleEvictionAwaitingRound2 = false;
+    this.doubleEvictionPendingNextPhase = null;
+    this.doubleEvictionRound = 1;
+  }
+
+  shouldRunDoubleEvictionRound2() {
+    return (
+      this.doubleEvictionWeekActive
+      && this.doubleEvictionRound === 1
+      && !this.doubleEvictionAwaitingRound2
+      && !this.doubleEvictionRound2Cycle
+      && this.getActiveContestants().length > 2
+    );
+  }
+
+  processEviction(evicted) {
+    if (!evicted || evicted.evicted) return;
+    evicted.evicted = true;
+    evicted.evictedWeek = this.week;
+    evicted.isNominated = false;
+    evicted.isHOH = false;
+    evicted.hasVeto = false;
+    this.evictedThisWeek = evicted.id;
+    this.addHistory({ type: 'eviction', evictedId: evicted.id });
+
+    const remaining = this.getActiveContestants().length;
+    if (remaining <= JURY_START_HOUSE_COUNT - 1) {
+      evicted.isJuror = true;
+    }
+
+    this.nominees = this.nominees.filter((id) => id !== evicted.id);
+    for (const c of this.contestants) {
+      c.isNominated = this.nominees.includes(c.id);
+    }
+  }
+
+  getJurors() {
+    return this.contestants.filter((c) => c.evicted && c.isJuror);
+  }
+
+  getPhaseDisplayLabel() {
+    if (this.doubleEvictionWeekActive || this.doubleEvictionAwaitingRound2 || this.doubleEvictionRound2Cycle) {
+      const round = this.doubleEvictionRound;
+      const phase = PHASE_LABELS[this.phase] || this.phase;
+      if (this.doubleEvictionAwaitingRound2) {
+        return `Double Eviction · Vote 1 complete`;
+      }
+      return `Double Eviction · Round ${round} · ${phase}`;
+    }
+    return PHASE_LABELS[this.phase] || this.phase;
+  }
+
   advancePhase() {
     const order = [
       PHASES.SOCIAL,
@@ -343,6 +467,7 @@ export class GameState {
     this.actionsRemaining = this.config.actionsPerDay;
     this.resetWeeklyFlags();
     this.syncPhaseForWeekday();
+    this.evaluateDoubleEvictionWeek();
   }
 
   checkWinCondition(allowFinalTwo = true) {
@@ -391,7 +516,13 @@ export class GameState {
       playerIntel: this.playerIntel,
       gameOver: this.gameOver,
       winner: this.winner ? this.winner.id : null,
-      houseEventComplete: this.houseEventComplete
+      houseEventComplete: this.houseEventComplete,
+      doubleEvictionSeasonUsed: this.doubleEvictionSeasonUsed,
+      doubleEvictionWeekActive: this.doubleEvictionWeekActive,
+      doubleEvictionRound: this.doubleEvictionRound,
+      doubleEvictionAwaitingRound2: this.doubleEvictionAwaitingRound2,
+      doubleEvictionRound2Cycle: this.doubleEvictionRound2Cycle,
+      doubleEvictionPendingNextPhase: this.doubleEvictionPendingNextPhase
     };
   }
 
@@ -433,6 +564,12 @@ export class GameState {
     state.gameOver = data.gameOver;
     state.winner = data.winner ? state.contestants.find((c) => c.id === data.winner) : null;
     state.houseEventComplete = data.houseEventComplete ?? false;
+    state.doubleEvictionSeasonUsed = data.doubleEvictionSeasonUsed ?? false;
+    state.doubleEvictionWeekActive = data.doubleEvictionWeekActive ?? false;
+    state.doubleEvictionRound = data.doubleEvictionRound ?? 1;
+    state.doubleEvictionAwaitingRound2 = data.doubleEvictionAwaitingRound2 ?? false;
+    state.doubleEvictionRound2Cycle = data.doubleEvictionRound2Cycle ?? false;
+    state.doubleEvictionPendingNextPhase = data.doubleEvictionPendingNextPhase ?? null;
     state.repairInvalidEvictionSchedule();
     return state;
   }

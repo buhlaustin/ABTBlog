@@ -192,7 +192,7 @@ class Game {
 
   render() {
     const { state, ui } = this;
-    ui.updateWeekDay(state.week, state.weekdayIndex, state.phase);
+    ui.updateWeekDay(state.week, state.weekdayIndex, state.phase, state.getPhaseDisplayLabel());
     ui.renderStoryLog(state.storyLog);
     ui.renderPlayer(state.getPlayer());
     ui.renderHouseguests(state.contestants, state.getPlayer());
@@ -275,6 +275,20 @@ class Game {
       return;
     }
 
+    if (this.state.doubleEvictionAwaitingRound2) {
+      this._showDoubleEvictionBridgePrompt();
+      return;
+    }
+
+    if (
+      this.state.doubleEvictionRound2Cycle
+      && this.state.doubleEvictionPendingNextPhase
+      && this.state.houseEventComplete
+    ) {
+      this._showDoubleEvictionPhaseContinuePrompt(this.state.doubleEvictionPendingNextPhase);
+      return;
+    }
+
     if (this.state.isScheduledHouseEventDay() && !this.state.houseEventComplete) {
       this.runEventDaySocialPhase();
       return;
@@ -338,22 +352,56 @@ class Game {
       this.state.week === 1
       && this.state.weekdayIndex === 0
       && this.state.phase === PHASES.COMPETITION;
+    const deRound2 = this.state.doubleEvictionRound2Cycle && this.state.doubleEvictionRound === 2;
     const mingleLine = isMoveInHoh
       ? 'Move-in day — tour the house, meet the cast, and use your actions. When you\'re ready, start the first Head of Household competition.'
-      : `${dayName} — ${eventLabel}. Mingle in the house, then begin the live event when you're ready.`;
+      : deRound2
+        ? `Double Eviction Round 2 — ${eventLabel}. Read the latest in the feed, then start this live event when you're ready.`
+        : `${dayName} — ${eventLabel}. Mingle in the house, then begin the live event when you're ready.`;
     this.ui.setActionPrompt(mingleLine);
+    const liveEventLabel = isMoveInHoh
+      ? 'Begin first HOH competition'
+      : deRound2
+        ? `Begin Round 2 — ${eventLabel.replace(' — live', '')}`
+        : `Begin ${dayName} live event`;
     const actions = [
       {
         id: 'begin_house_event',
-        label: isMoveInHoh ? 'Begin first HOH competition' : `Begin ${dayName} live event`,
+        label: liveEventLabel,
         description: isMoveInHoh ? 'Head of Household — live' : eventLabel
-      },
-      ...this.playerActions.getAvailableActions()
+      }
     ];
+    if (!deRound2) {
+      actions.push(...this.playerActions.getAvailableActions());
+    }
     this.ui.renderActions(actions, (action) => this.handlePlayerAction(action));
   }
 
   handlePlayerAction(action) {
+    if (action.id === 'de_round2_continue') {
+      this.state.startDoubleEvictionRound2();
+      this.logAndRender([
+        {
+          type: 'drama',
+          text: '<strong>Double Eviction — Round 2</strong> begins. A new Head of Household will be crowned.'
+        }
+      ]);
+      this.render();
+      this.runEventDaySocialPhase();
+      return;
+    }
+
+    if (action.id === 'de_round2_next_phase') {
+      const next = this.state.doubleEvictionPendingNextPhase;
+      if (!next) return;
+      this.state.phase = next;
+      this.state.doubleEvictionPendingNextPhase = null;
+      this.state.houseEventComplete = false;
+      this.render();
+      this.runEventDaySocialPhase();
+      return;
+    }
+
     if (action.id === 'continue_day' || action.id === 'begin_house_event') {
       void this._beginScheduledHouseDay();
       return;
@@ -501,6 +549,17 @@ class Game {
   }
 
   advanceDay() {
+    if (
+      this.state.doubleEvictionAwaitingRound2
+      || this.state.doubleEvictionRound2Cycle
+    ) {
+      this.ui.showToast('Finish Double Eviction night — use Continue between each live event.');
+      if (this.state.doubleEvictionAwaitingRound2) {
+        this._showDoubleEvictionBridgePrompt();
+      }
+      return;
+    }
+
     if (this.state.isScheduledHouseEventDay() && !this.state.houseEventComplete) {
       this.ui.showToast('Begin today’s live house event before ending the day.');
       this.runEventDaySocialPhase();
@@ -536,6 +595,21 @@ class Game {
   _onHouseEventComplete() {
     this.state.houseEventComplete = true;
     this.state.actionsRemaining = this.state.config.actionsPerDay;
+
+    const deNext = this.state.getDoubleEvictionRound2NextPhase();
+    if (this.state.doubleEvictionRound2Cycle && deNext) {
+      this.state.doubleEvictionPendingNextPhase = deNext;
+      this.logAndRender([
+        {
+          type: 'system',
+          text: `Double Eviction Round 2 — <strong>${PHASE_LABELS[this.state.phase]}</strong> is over. Review the feed, then continue when ready.`
+        }
+      ]);
+      this.render();
+      this._showDoubleEvictionPhaseContinuePrompt(deNext);
+      return;
+    }
+
     this.logAndRender([
       {
         type: 'system',
@@ -544,6 +618,39 @@ class Game {
     ]);
     this.render();
     this.runSocialPhase();
+  }
+
+  _showDoubleEvictionBridgePrompt() {
+    this.ui.hideActionDetail();
+    this.ui.setActionPrompt(
+      'Double Eviction Night — Round 1 is complete. Continue when you have read the vote breakdown above.'
+    );
+    this.ui.renderActions(
+      [
+        {
+          id: 'de_round2_continue',
+          label: 'Continue — Round 2 HOH competition',
+          description: 'Round 2 runs as separate steps: HOH, nominations, POV, then a second eviction vote.'
+        }
+      ],
+      (action) => this.handlePlayerAction(action)
+    );
+  }
+
+  _showDoubleEvictionPhaseContinuePrompt(nextPhase) {
+    this.ui.hideActionDetail();
+    const label = PHASE_LABELS[nextPhase] || nextPhase;
+    this.ui.setActionPrompt(`Double Eviction Round 2 paused — next: ${label}`);
+    this.ui.renderActions(
+      [
+        {
+          id: 'de_round2_next_phase',
+          label: `Continue — ${label}`,
+          description: 'Opens the next live event; nothing runs until you confirm.'
+        }
+      ],
+      (action) => this.handlePlayerAction(action)
+    );
   }
 
   // ─── Competition ─────────────────────────────────────────────────
@@ -811,6 +918,17 @@ class Game {
 
     if (this._recoverFromInvalidEviction()) return;
 
+    if (this.state.doubleEvictionWeekActive && !this.state.houseEventComplete) {
+      this.logAndRender([
+        {
+          type: 'warning',
+          text: this.state.doubleEvictionRound === 2
+            ? '<strong>Double Eviction — Vote 2</strong> A second houseguest leaves tonight.'
+            : '<strong>Double Eviction — Vote 1</strong> The first houseguest leaves tonight; Round 2 follows after a pause.'
+        }
+      ]);
+    }
+
     const player = this.state.getPlayer();
 
     if (!player.isNominated && !player.isHOH && !player.evicted) {
@@ -896,6 +1014,28 @@ class Game {
       return;
     }
 
+    if (this.state.shouldRunDoubleEvictionRound2()) {
+      this.state.doubleEvictionAwaitingRound2 = true;
+      this.state.houseEventComplete = true;
+      this.logAndRender([
+        {
+          type: 'drama',
+          text: `<strong>${evicted.name}</strong> has left the house. Double Eviction Night continues — Round 2 (HOH, nominations, POV, eviction) is next.`
+        },
+        {
+          type: 'system',
+          text: 'Take a moment to read the vote results. Press <strong>Continue — Round 2 HOH competition</strong> when ready — each step runs separately.'
+        }
+      ]);
+      this.render();
+      this._showDoubleEvictionBridgePrompt();
+      return;
+    }
+
+    if (this.state.doubleEvictionRound2Cycle || this.state.doubleEvictionWeekActive) {
+      this.state.finalizeDoubleEvictionWeek();
+    }
+
     this.state.phase = PHASES.WEEK_END;
     this.render();
     this.runPhase();
@@ -927,8 +1067,64 @@ class Game {
       text: `<strong>Week ${this.state.week}</strong> begins. The game is heating up.`
     }]);
 
+    if (this.state.doubleEvictionWeekActive) {
+      this.logAndRender([{
+        type: 'warning',
+        text: '<strong>Double Eviction week</strong> — Thursday will feature two eviction votes with a full power cycle in between. The game pauses after each live event so you can follow along.'
+      }]);
+    }
+
     this.render();
     this.runPhase();
+  }
+
+  _pushSpectateEntries(entries, phase) {
+    this.state.storyLog.push(
+      ...entries.map((r) => ({
+        ...r,
+        week: this.state.week,
+        day: this.state.day,
+        phase
+      }))
+    );
+  }
+
+  /** Spectator: run Round 2 as labeled steps (no single blur of all phases). */
+  _spectateDoubleEvictionRound2() {
+    this.state.startDoubleEvictionRound2();
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Double Eviction Round 2: Head of Household ---' }],
+      PHASES.COMPETITION
+    );
+
+    const comp = this.competition.runCompetition();
+    this._pushSpectateEntries(comp.results, PHASES.COMPETITION);
+
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Double Eviction Round 2: Nominations ---' }],
+      PHASES.NOMINATION
+    );
+    const nomResults = this.eviction.runNominations();
+    this._pushSpectateEntries(nomResults.results, PHASES.NOMINATION);
+
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Double Eviction Round 2: Power of Veto ---' }],
+      PHASES.VETO_COMP
+    );
+    const vetoComp = this.eviction.runVetoCompetition(false);
+    this._pushSpectateEntries(vetoComp.results, PHASES.VETO_COMP);
+
+    const vetoMeet = this.eviction.runVetoCeremony(vetoComp.vetoWinner);
+    this._pushSpectateEntries(vetoMeet.results, PHASES.VETO_CEREMONY);
+
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Double Eviction Round 2: Eviction vote ---' }],
+      PHASES.EVICTION
+    );
+    const evictResults = this.eviction.runEvictionVote(null);
+    this._pushSpectateEntries(evictResults.results, PHASES.EVICTION);
+
+    this.state.finalizeDoubleEvictionWeek();
   }
 
   // ─── Spectator mode (player evicted) ───────────────────────────────
@@ -993,6 +1189,10 @@ class Game {
           phase: PHASES.EVICTION
         }))
       );
+
+      if (this.state.shouldRunDoubleEvictionRound2()) {
+        this._spectateDoubleEvictionRound2();
+      }
 
       if (this.state.getActiveContestants().length <= 2) {
         this.state.checkWinCondition(true);
