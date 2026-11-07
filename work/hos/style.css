@@ -510,6 +510,8 @@ body {
 .tag.nominated { background: var(--danger); color: white; }
 .tag.veto-holder { background: var(--success); color: white; }
 .tag.alliance { background: var(--info); color: white; }
+.tag.lay-low { background: rgba(46, 125, 98, 0.35); color: #8fd4b8; }
+.tag.campaign-heat { background: rgba(230, 57, 70, 0.25); color: #ffb3b8; }
 .tag.safe { background: rgba(42, 157, 143, 0.3); color: var(--success); }
 .tag.jury { background: rgba(244, 162, 97, 0.35); color: var(--gold); }
 .tag.evicted-player { background: rgba(231, 111, 81, 0.25); color: var(--danger); }
@@ -815,10 +817,47 @@ body {
   overflow: hidden;
 }
 
+.threat-band-meter-ghost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(143, 212, 184, 0.12),
+    rgba(143, 212, 184, 0.12) 4px,
+    rgba(143, 212, 184, 0.22) 4px,
+    rgba(143, 212, 184, 0.22) 8px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
 .threat-band-meter-fill {
+  position: relative;
+  z-index: 1;
   height: 100%;
   border-radius: 999px;
   transition: width 0.25s ease;
+}
+
+.threat-band-pulse .threat-band-score::after {
+  content: ' (' attr(data-delta) ')';
+  font-size: 0.75em;
+  color: #8fd4b8;
+  animation: threat-delta-fade 1.4s ease forwards;
+}
+
+@keyframes threat-delta-fade {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.threat-band-pulse {
+  box-shadow: 0 0 0 2px rgba(143, 212, 184, 0.35);
+  transition: box-shadow 0.2s ease;
 }
 
 .threat-band-meter-fill.threat-tone-low {

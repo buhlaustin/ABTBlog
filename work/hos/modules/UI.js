@@ -153,6 +153,9 @@ export class UIManager {
     const allianceCount = player.allianceIds?.length || (player.allianceId ? 1 : 0);
     if (allianceCount === 1) tags.push('<span class="tag alliance">In Alliance</span>');
     if (allianceCount > 1) tags.push(`<span class="tag alliance">${allianceCount} Alliances</span>`);
+    const threatOff = player.threatOffset ?? 0;
+    if (threatOff < -2) tags.push('<span class="tag lay-low">Lay low</span>');
+    if (threatOff > 2) tags.push('<span class="tag campaign-heat">Campaign heat</span>');
     if (!player.isNominated && !player.isHOH) tags.push('<span class="tag safe">Safe</span>');
 
     this.elements.playerStatus.innerHTML = tags.join('');
@@ -218,17 +221,28 @@ export class UIManager {
     if (outlook.nextBand) {
       metaParts.push(outlook.nextBand);
     }
+    if (outlook.offsetNote) {
+      metaParts.push(outlook.offsetNote);
+    }
     const meta = metaParts.length
       ? `<p class="threat-band-meta">${metaParts.map((p) => escapeHtml(p)).join(' · ')}</p>`
       : '';
 
     const radarPct = outlook.radarAt ?? 32;
     const targetPct = outlook.targetAt ?? 52;
+    const ghost =
+      typeof outlook.rawThreat === 'number' &&
+      outlook.threatOffset < 0 &&
+      outlook.rawThreat > outlook.threat
+        ? `<div class="threat-band-meter-ghost" style="width:${outlook.rawThreat}%" title="Threat without lay-low cushion"></div>`
+        : '';
+
     const meter = `
       <div class="threat-band-meter" role="img" aria-label="Threat ${outlook.threat} of 100">
         <div class="threat-band-meter-track">
           <span class="threat-band-tick threat-band-tick-radar" style="left:${radarPct}%"></span>
           <span class="threat-band-tick threat-band-tick-target" style="left:${targetPct}%"></span>
+          ${ghost}
           <div class="threat-band-meter-fill threat-tone-${outlook.tone}" style="width:${outlook.threat}%"></div>
         </div>
       </div>`;
@@ -256,6 +270,27 @@ export class UIManager {
       ${drivers}
       ${shield}
     `;
+  }
+
+  /**
+   * Brief highlight when Rest (or similar) changes threat.
+   * @param {{ delta: number }} feedback
+   */
+  pulseThreatFeedback(feedback) {
+    const el = this.elements.threatBand;
+    if (!el || !feedback) return;
+    el.classList.remove('threat-band-pulse');
+    void el.offsetWidth;
+    el.classList.add('threat-band-pulse');
+    const score = el.querySelector('.threat-band-score');
+    if (score && typeof feedback.delta === 'number' && feedback.delta !== 0) {
+      const sign = feedback.delta > 0 ? '+' : '−';
+      score.setAttribute('data-delta', `${sign}${Math.abs(feedback.delta)}`);
+    }
+    window.setTimeout(() => {
+      el.classList.remove('threat-band-pulse');
+      score?.removeAttribute('data-delta');
+    }, 1400);
   }
 
   renderHouseguests(contestants, player, state = null) {

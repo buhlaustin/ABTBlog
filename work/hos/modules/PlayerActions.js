@@ -8,6 +8,7 @@ import {
 import { addMvpCampaignPoints, getMvpRaceLeader } from './SeasonTwists.js';
 import { formatHohNomIntelLine } from './hohNomPersonas.js';
 import { formatThreatChange } from './threatBands.js';
+import { recordLayLowRest } from './layLowFeedback.js';
 import { formatPawnShieldSpyIntel } from './floaterShields.js';
 import {
   canCancelThrowCompetition,
@@ -42,7 +43,11 @@ export class PlayerActions {
       { id: 'promise', label: 'Make a Promise', description: 'Pledge your vote or loyalty.' },
       { id: 'campaign', label: 'Campaign Against Target', description: 'Turn the house against someone.' },
       { id: 'reputation', label: 'Improve Reputation', description: 'Do something to look good to the house.' },
-      { id: 'rest', label: 'Rest & Observe', description: 'Skip action, lower threat slightly.' }
+      {
+        id: 'rest',
+        label: 'Rest & Observe',
+        description: 'Lay low — 3–6 threat drop (shown in the band panel & log).'
+      }
     ];
 
     const playerAlliances = getContestantAlliances(this.state, player.id);
@@ -564,11 +569,18 @@ export class PlayerActions {
     player.threatOffset = clamp((player.threatOffset ?? 0) - delta, -25, 0);
     this.state.updateThreatLevels?.();
     const after = player.threat;
+    recordLayLowRest(this.state, before, after);
     this._consumeAction();
     return {
       success: true,
       text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first. ${formatThreatChange(before, after)}`,
-      type: 'system'
+      type: 'success',
+      threatFeedback: {
+        before,
+        after,
+        delta: after - before,
+        offsetTotal: player.threatOffset ?? 0
+      }
     };
   }
 

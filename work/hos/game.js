@@ -728,6 +728,10 @@ class Game {
       this.logAndRender([{ text: result.text, type: result.type || 'narrative' }]);
     }
 
+    if (result.threatFeedback) {
+      this.ui.pulseThreatFeedback(result.threatFeedback);
+    }
+
     this._exposeGlobals();
 
     if (this.state.actionsRemaining <= 0) {

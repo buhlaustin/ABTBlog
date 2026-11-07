@@ -124,6 +124,11 @@ export class GameState {
     this.playerThreatWeekStart = null;
     this.playerThreatWeekSnapshotWeek = null;
 
+    /** Last Rest & Observe feedback (lay-low intel). */
+    this.playerLayLowWeek = null;
+    this.playerLayLowBefore = null;
+    this.playerLayLowAfter = null;
+
     this.lastPawnShieldWeek = null;
     this.lastPawnShieldNomineeNames = [];
     this.lastPawnShieldNomineeIds = [];
@@ -628,6 +633,9 @@ export class GameState {
       storyLog: this.storyLog,
       playerThreatWeekStart: this.playerThreatWeekStart,
       playerThreatWeekSnapshotWeek: this.playerThreatWeekSnapshotWeek,
+      playerLayLowWeek: this.playerLayLowWeek,
+      playerLayLowBefore: this.playerLayLowBefore,
+      playerLayLowAfter: this.playerLayLowAfter,
       lastPawnShieldWeek: this.lastPawnShieldWeek,
       lastPawnShieldNomineeNames: this.lastPawnShieldNomineeNames,
       lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
@@ -708,6 +716,9 @@ export class GameState {
     state.storyLog = data.storyLog;
     state.playerThreatWeekStart = data.playerThreatWeekStart ?? null;
     state.playerThreatWeekSnapshotWeek = data.playerThreatWeekSnapshotWeek ?? null;
+    state.playerLayLowWeek = data.playerLayLowWeek ?? null;
+    state.playerLayLowBefore = data.playerLayLowBefore ?? null;
+    state.playerLayLowAfter = data.playerLayLowAfter ?? null;
     state.lastPawnShieldWeek = data.lastPawnShieldWeek ?? null;
     state.lastPawnShieldNomineeNames = data.lastPawnShieldNomineeNames ?? [];
     state.lastPawnShieldNomineeIds = data.lastPawnShieldNomineeIds ?? [];

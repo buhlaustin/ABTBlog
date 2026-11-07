@@ -2,6 +2,7 @@ import { clamp } from './utils.js';
 import { PHASES } from './GameState.js';
 import { describeEasyFloaterShield, describeLastPawnShield } from './floaterShields.js';
 import { describeStrategicVerbThreatNote } from './strategicVerbs.js';
+import { describeThreatOffsetNote } from './layLowFeedback.js';
 
 export const THREAT_BAND_RADAR = 32;
 export const THREAT_BAND_TARGET = 52;
@@ -240,6 +241,11 @@ export function buildThreatBandOutlook(state, previewLeans) {
 
   const nominationAlert = getThreatNominationAlert(state, previewLeans);
 
+  const threatOffset = player.threatOffset ?? 0;
+  const offsetNote = describeThreatOffsetNote(player);
+  const rawThreat =
+    threatOffset !== 0 ? clamp(player.threat - threatOffset, 0, 100) : null;
+
   return {
     visible: true,
     label: band.label,
@@ -254,6 +260,9 @@ export function buildThreatBandOutlook(state, previewLeans) {
     nextBand,
     nominationAlert,
     radarAt: THREAT_BAND_RADAR,
-    targetAt: THREAT_BAND_TARGET
+    targetAt: THREAT_BAND_TARGET,
+    threatOffset,
+    offsetNote,
+    rawThreat
   };
 }
