@@ -43,8 +43,49 @@ export class AIController {
       if (side) events.push(side);
     }
 
+    if (Math.random() < 0.22 && this.state.week > 1) {
+      const offer = this._tryOfferPromiseToPlayer();
+      if (offer) events.push(offer.event);
+    }
+
     this.state.updateThreatLevels();
     return events;
+  }
+
+  _tryOfferPromiseToPlayer() {
+    const player = this.state.getPlayer();
+    if (!player || player.evicted) return null;
+
+    const candidates = this.state
+      .getActiveContestants()
+      .filter((c) => !c.isPlayer && c.getRelationship(player.id) >= 22);
+
+    if (candidates.length === 0) return null;
+
+    const ai = pickRandom(candidates);
+    if (ai.promises.some((p) => p.targetId === player.id && p.kept === null)) {
+      return null;
+    }
+
+    const typeRoll = Math.random();
+    const type = typeRoll < 0.5 ? 'vote' : typeRoll < 0.82 ? 'safety' : 'loyalty';
+    ai.makePromise(player.id, type, this.state.week);
+
+    const labels = { vote: 'vote with them', safety: 'keep you safe this week', loyalty: 'ride with you to the end' };
+    const text = `${ai.name} seals a deal: they promise to ${labels[type] || 'work with you'} (Week ${this.state.week}).`;
+
+    this.state.playerIntel.push({
+      week: this.state.week,
+      about: ai.id,
+      text: `${ai.name} promised you ${type} support.`
+    });
+
+    return {
+      event: {
+        type: 'warning',
+        text
+      }
+    };
   }
 
   _ambientHouseMoment() {

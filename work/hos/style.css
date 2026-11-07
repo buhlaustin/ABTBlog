@@ -590,6 +590,48 @@ body {
   color: #6bc98a;
 }
 
+.intel-empty {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.deal-marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+}
+
+.deal-mark {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(240, 160, 48, 0.15);
+  color: var(--accent-warm, #f0a030);
+  cursor: help;
+}
+
+.deal-mark-grudge-against {
+  background: rgba(224, 112, 112, 0.18);
+  color: #e07070;
+}
+
+.deal-mark-deal-in {
+  background: rgba(107, 201, 138, 0.15);
+  color: #6bc98a;
+}
+
+.deal-vote-warn {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
 /* Jury sidebar */
 .jury-panel.hidden {
   display: none;

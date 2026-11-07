@@ -6,6 +6,7 @@ import {
   getHohNominationStyleLine
 } from './hohNomPersonas.js';
 import {
+  applyAiVotePromiseBreak,
   applyPlayerVotePromiseConsequences,
   getNominationConsequenceLine,
   getVoteConsequenceLine
@@ -397,6 +398,10 @@ export class EvictionSystem {
         target: decision.target.name,
         reason: decision.reason
       });
+      const aiBreak = applyAiVotePromiseBreak(voter, decision.target.id, this.state);
+      if (aiBreak) {
+        results.push(aiBreak);
+      }
     }
 
     // Player vote (HOH does not vote)

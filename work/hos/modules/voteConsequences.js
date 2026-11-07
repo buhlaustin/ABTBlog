@@ -121,3 +121,46 @@ export function getNominationConsequenceLine(hoh, target) {
 
   return null;
 }
+
+/**
+ * When an AI voter evicts someone they previously promised.
+ * @returns {object|null}
+ */
+export function applyAiVotePromiseBreak(voter, targetId, state) {
+  const active = voter.promises.find((p) => p.targetId === targetId && p.kept === null);
+  if (!active) return null;
+
+  voter.breakPromise(targetId);
+  const target = state.getContestant(targetId);
+  const type = active.type || 'deal';
+
+  if (target?.isPlayer) {
+    target.addGrudge(voter.id, 'broken promise', 20);
+    target.betrayals.push({ byId: voter.id, week: state.week });
+    return {
+      type: 'drama',
+      text: `<strong>${voter.name}</strong> broke their ${type} promise from <strong>Week ${active.week}</strong> — they voted to evict you.`
+    };
+  }
+
+  if (target) {
+    target.addGrudge(voter.id, 'broken promise', 16);
+    return {
+      type: 'narrative',
+      text: `${voter.name} went back on a Week ${active.week} ${type} deal and voted out <strong>${target.name}</strong>.`
+    };
+  }
+
+  return null;
+}
+
+/**
+ * @param {import('./Contestant.js').Contestant} player
+ * @param {import('./Contestant.js').Contestant} nominee
+ */
+export function getEvictionVoteDealWarning(player, nominee) {
+  if (!player || !nominee) return null;
+  const deal = player.promises.find((p) => p.targetId === nominee.id && p.kept === null);
+  if (!deal) return null;
+  return `Active ${deal.type} promise (Week ${deal.week}) — voting them out breaks it.`;
+}

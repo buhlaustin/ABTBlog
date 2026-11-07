@@ -375,6 +375,15 @@ export class PlayerActions {
   _makePromise(player, target, promiseType = 'vote') {
     if (!target) return { success: false, text: 'Choose who to make a promise to.', type: 'system' };
 
+    const existing = player.promises.find((p) => p.targetId === target.id && p.kept === null);
+    if (existing) {
+      return {
+        success: false,
+        text: `You already have an active ${existing.type} deal with ${target.name}. Break it first or honor it.`,
+        type: 'system'
+      };
+    }
+
     player.makePromise(target.id, promiseType, this.state.week);
     target.modifyRelationship(player.id, randomInt(8, 14));
     player.trust = clamp(player.trust + 3, 0, 100);

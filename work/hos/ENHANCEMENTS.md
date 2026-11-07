@@ -80,8 +80,8 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Status** | **Shipped:** Sidebar **Deals & grudges** (`dealIntel.js`) — active/broken/honored promises, grudges held vs against you, betrayals, gathered intel. `voteConsequences.js` logs Week N deal breaks on votes/noms; breaking a promise records betrayal + grudge; eviction votes honor/break deals with feed copy. |
-| **Follow-ups** | Promise type picker in UI; AI-initiated promises to player. |
+| **Status** | **Shipped (v2):** Intel panel (incl. empty state), houseguest **Deal/Owes you/Bitter** chips, **promise type picker**, AI offers deals to player, AI vote betrayal lines, eviction vote deal warnings. |
+| **Follow-ups** | Player accept/decline UI for AI deals; jury feed recap of broken deals. |
 | **Priority** | Polish only. |
 
 ### Threat band warnings

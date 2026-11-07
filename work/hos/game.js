@@ -18,6 +18,7 @@ import {
   isNarrativeApiEnabled
 } from './modules/NarrativeApi.js';
 import { buildDealIntel } from './modules/dealIntel.js';
+import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
 import {
   computeBattleBackScores,
@@ -520,13 +521,17 @@ class Game {
       return;
     }
 
+    if (action.id === 'promise') {
+      this._showPromiseTypePicker(action);
+      return;
+    }
+
     const needsTarget = [
       'talk',
       'befriend',
       'alliance',
       'expand_alliance',
       'spy',
-      'promise',
       'break_promise',
       'campaign',
       'influence',
@@ -618,6 +623,49 @@ class Game {
     }
 
     this.executePlayerAction(action.id);
+  }
+
+  _showPromiseTypePicker(action) {
+    const types = [
+      { id: 'vote', label: 'Vote deal', desc: 'Pledge your eviction vote with them this week.' },
+      { id: 'safety', label: 'Safety', desc: 'Promise not to nominate or vote against them while it stands.' },
+      { id: 'loyalty', label: 'Loyalty', desc: 'Long-haul loyalty — harder to break without fallout.' }
+    ];
+
+    let html = '<p>What kind of deal?</p><div class="target-grid promise-type-grid">';
+    for (const t of types) {
+      html += `<button class="btn target-btn" data-promise-type="${t.id}" title="${escapeHtml(t.desc)}">${escapeHtml(t.label)}</button>`;
+    }
+    html += '</div><button class="btn btn-ghost" data-cancel>Cancel</button>';
+
+    this.ui.showActionDetail(html);
+    this.ui.setActionPrompt('Make a Promise — choose the deal type.');
+
+    this.ui.elements.actionDetail.querySelectorAll('[data-promise-type]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const promiseType = btn.dataset.promiseType;
+        const picker = this.ui.buildTargetPicker(
+          this.state.contestants,
+          'Who are you making this promise to?'
+        );
+        this.ui.showActionDetail(
+          picker.html + '<button class="btn btn-ghost" data-cancel>Cancel</button>',
+          null
+        );
+        this.ui.elements.actionDetail.querySelectorAll('[data-target]').forEach((tbtn) => {
+          tbtn.addEventListener('click', () => {
+            this.executePlayerAction(action.id, tbtn.dataset.target, { promiseType });
+          });
+        });
+        const cancelInner = this.ui.elements.actionDetail.querySelector('[data-cancel]');
+        cancelInner?.addEventListener('click', () => this.ui.hideActionDetail());
+      });
+    });
+
+    const cancel = this.ui.elements.actionDetail.querySelector('[data-cancel]');
+    if (cancel) {
+      cancel.addEventListener('click', () => this.ui.hideActionDetail());
+    }
   }
 
   executePlayerAction(actionId, targetId = null, extra = {}) {
@@ -1274,9 +1322,13 @@ class Game {
       this.state.mvpPowerAvailable && player.id === this.state.mvpHolderId
         ? '<p class="mvp-vote-hint"><strong>MVP power</strong> is active — your vote counts twice tonight.</p>'
         : '';
-    let html = `${mvpNote}<p>Cast your vote to evict:</p><div class="target-grid">`;
+    let html = `${mvpNote}<p>Cast your vote to evict:</p><div class="target-grid nomination-target-grid">`;
     for (const n of nominees) {
-      html += `<button class="btn target-btn btn-danger" data-evict="${n.id}">Evict ${escapeHtml(n.name)}</button>`;
+      const warn = getEvictionVoteDealWarning(player, n);
+      const warnHtml = warn
+        ? `<span class="nom-lens deal-vote-warn">${escapeHtml(warn)}</span>`
+        : '';
+      html += `<button class="btn target-btn btn-danger" data-evict="${n.id}">${escapeHtml(n.name)}${warnHtml}</button>`;
     }
     html += '</div>';
     this.ui.showActionDetail(html);

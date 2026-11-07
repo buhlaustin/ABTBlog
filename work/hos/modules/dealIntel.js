@@ -128,12 +128,16 @@ export function buildDealIntel(state) {
     })) });
   }
 
-  const visible = sections.length > 0;
+  const hasContent = sections.length > 0;
+  const visible = hasContent || !player.evicted;
 
   return {
     visible,
+    empty: !hasContent,
     sections,
-    summary: summarize(promisesByYou, grudgesAgainstYou, betrayalsAgainstYou)
+    summary: hasContent
+      ? summarize(promisesByYou, grudgesAgainstYou, betrayalsAgainstYou)
+      : 'No active deals yet — make promises or spy for leverage.'
   };
 }
 
@@ -152,6 +156,13 @@ function summarize(promisesByYou, grudgesAgainstYou, betrayalsAgainstYou) {
 export function renderDealIntelHtml(outlook) {
   if (!outlook?.visible) {
     return { html: '', hidden: true };
+  }
+
+  if (outlook.empty) {
+    return {
+      html: '<p class="intel-empty">Break a deal on purpose, vote against an ally, or get caught spying — it will show up here.</p>',
+      hidden: false
+    };
   }
 
   let html = '';

@@ -1,5 +1,6 @@
 import { PHASE_LABELS, PHASES, WEEKDAYS } from './GameState.js';
 import { renderDealIntelHtml } from './dealIntel.js';
+import { getHouseguestDealMarks } from './houseguestDealMarks.js';
 import { getHohNomPersonaTooltip } from './hohNomPersonas.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 
@@ -167,10 +168,18 @@ export class UIManager {
         ? ` class="personality hoh-nom-persona" title="${escapeHtml(personaTitle)}"`
         : ' class="personality"';
 
+      const dealMarks = player ? getHouseguestDealMarks(player, c) : [];
+      const marksHtml = dealMarks.length
+        ? `<div class="deal-marks">${dealMarks.map((m) =>
+          `<span class="deal-mark deal-mark-${escapeHtml(m.key)}" title="${escapeHtml(m.title)}">${escapeHtml(m.label)}</span>`
+        ).join('')}</div>`
+        : '';
+
       return `<li class="houseguest-item ${c.isPlayer ? 'is-player' : ''} ${c.evicted ? 'evicted' : ''}">
         <div>
           <span class="name">${icons.join(' ')} ${escapeHtml(c.name)}</span>
           <div${personaAttrs}>${escapeHtml(c.personality.name)}${c.isHOH ? ' · HOH' : ''}</div>
+          ${marksHtml}
         </div>
         ${relDisplay}
       </li>`;
