@@ -51,7 +51,8 @@ node scripts/hos-run-stats-smoke.mjs
 
 ```
 index.html          # Game shell and layout
-style.css           # UI styling
+style.css           # Base UI
+ui-refresh.css      # Layout, typography, and surface refresh layer
 game.js             # Main game controller and weekly loop
 modules/
   Contestant.js     # Houseguest class and stats

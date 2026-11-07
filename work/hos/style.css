@@ -453,6 +453,10 @@ body {
   margin-bottom: 0.75rem;
 }
 
+.story-panel .panel-head {
+  margin-bottom: 0.75rem;
+}
+
 .story-log {
   flex: 1;
   overflow-y: auto;

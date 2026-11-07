@@ -12,6 +12,20 @@ import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 import { renderWeekCalendarHtml } from './weekCalendarStrip.js';
 import { formatHouseguestDisplayName, getHouseguestCastMarks } from './castPresets.js';
 
+const STORY_TYPE_LABELS = {
+  narrative: 'Story',
+  drama: 'Drama',
+  success: 'Win',
+  warning: 'Alert',
+  system: 'System',
+  competition: 'Comp',
+  social: 'Social',
+  confessional: 'DR',
+  'ai-host': 'Host',
+  'week-recap': 'Recap',
+  'week-recap-digest': 'Your week'
+};
+
 /**
  * DOM rendering and screen management.
  */
@@ -128,8 +142,10 @@ export class UIManager {
       const hostTag = entry.hostBeatKind
         ? ` story-entry-host-${entry.hostBeatKind.replace(/_/g, '-')}`
         : '';
-      div.className = `story-entry ${entry.type || 'narrative'}${hostTag}`;
-      div.innerHTML = entry.text;
+      const type = entry.type || 'narrative';
+      div.className = `story-entry ${type}${hostTag}`;
+      const label = STORY_TYPE_LABELS[type] || 'Feed';
+      div.innerHTML = `<span class="story-entry-meta">${escapeHtml(label)}</span><div class="story-entry-body">${entry.text}</div>`;
       this.elements.storyLog.appendChild(div);
     }
     if (scroll) {
