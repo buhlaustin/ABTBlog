@@ -1,4 +1,5 @@
 import { PHASE_LABELS, PHASES, WEEKDAYS } from './GameState.js';
+import { getHohNomPersonaTooltip } from './hohNomPersonas.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 
 /**
@@ -157,10 +158,15 @@ export class UIManager {
       if (c.evicted && c.isJuror) icons.push('⚖️');
       else if (c.evicted) icons.push('❌');
 
+      const personaTitle = c.isHOH ? getHohNomPersonaTooltip(c) : '';
+      const personaAttrs = personaTitle
+        ? ` class="personality hoh-nom-persona" title="${escapeHtml(personaTitle)}"`
+        : ' class="personality"';
+
       return `<li class="houseguest-item ${c.isPlayer ? 'is-player' : ''} ${c.evicted ? 'evicted' : ''}">
         <div>
           <span class="name">${icons.join(' ')} ${escapeHtml(c.name)}</span>
-          <div class="personality">${escapeHtml(c.personality.name)}</div>
+          <div${personaAttrs}>${escapeHtml(c.personality.name)}${c.isHOH ? ' · HOH' : ''}</div>
         </div>
         ${relDisplay}
       </li>`;

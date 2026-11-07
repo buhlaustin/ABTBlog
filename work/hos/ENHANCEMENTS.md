@@ -72,10 +72,9 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Goal** | Same weighted pick system, but HOH **personality** biases targets (backdoorer, loyalist, chaos). |
-| **Player experience** | “Morgan plays a physical game — tends to nominate floaters.” Visible in log or hover on HOH. |
-| **Implementation** | Extend `_nominationScore` in `AI.js` with `hoh.personality.strategy` multipliers; optional `decideVetoUse` alignment. |
-| **Priority** | Medium. |
+| **Status** | **Shipped:** `hohNomPersonas.js` biases `_nominationScore` by `personality.strategy` (backdoor/manipulate, loyalist/ally, chaos, floater/survive, comp/win, attack, social/befriend). Nomination ceremony logs persona line + per-nominee reason; HOH sidebar row shows tooltip. `decideVetoUse` aligned to persona. |
+| **Follow-ups** | Show persona hint on player HOH picker by archetype; AI host narration beat. |
+| **Priority** | Polish only. |
 
 ### Promises, grudges, and betrayal — surface in UI
 

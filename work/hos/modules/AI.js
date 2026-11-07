@@ -4,6 +4,7 @@ import {
   getContestantAlliances,
   sharesAllianceWith
 } from './allianceUtils.js';
+import { applyHohPersonaNominationBias } from './hohNomPersonas.js';
 
 /**
  * Autonomous AI decision-making for alliances, social moves, nominations, and votes.
@@ -322,6 +323,8 @@ export class AIController {
       }
     }
 
+    score = applyHohPersonaNominationBias(hoh, target, score);
+
     return Math.max(0, score);
   }
 
@@ -401,15 +404,31 @@ export class AIController {
 
   /** AI uses veto decision. */
   decideVetoUse(holder, nominees) {
+    const strat = holder.personality?.strategy || 'survive';
     const ally = nominees.find((n) => sharesAllianceWith(holder, n));
     if (ally && holder.getRelationship(ally.id) > 10) {
+      if (strat === 'manipulate' && ally.threat < 42 && Math.random() < 0.35) {
+        return { use: false, target: null };
+      }
+      if (strat === 'attack' && ally.aggression >= 7 && holder.getRelationship(ally.id) < 25) {
+        return { use: Math.random() < 0.4, target: ally };
+      }
+      if (strat === 'ally' || strat === 'befriend') {
+        return { use: true, target: ally };
+      }
+      if (strat === 'chaos') {
+        return { use: Math.random() < 0.55, target: ally };
+      }
       return { use: true, target: ally };
     }
     if (holder.isNominated && Math.random() < 0.85) {
       return { use: true, target: holder };
     }
-    if (holder.personality.strategy === 'survive' && holder.getRelationship(nominees[0].id) < -10) {
+    if (strat === 'survive' && holder.getRelationship(nominees[0].id) < -10) {
       return { use: false, target: null };
+    }
+    if (strat === 'win' && holder.competition >= 7) {
+      return { use: Math.random() < 0.35, target: nominees[0] };
     }
     return { use: Math.random() < 0.25, target: nominees[0] };
   }

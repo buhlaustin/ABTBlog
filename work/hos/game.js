@@ -860,7 +860,8 @@ class Game {
     let selected = [];
 
     const renderPicker = () => {
-      let html = `<p>Select 2 nominees (${selected.length}/2):</p><div class="target-grid">`;
+      let html = '<p class="hoh-nom-hint">As HOH, your nominations set the tone — the house will react to who you put on the block.</p>';
+      html += `<p>Select 2 nominees (${selected.length}/2):</p><div class="target-grid">`;
       for (const t of targets) {
         const isSelected = selected.includes(t.id);
         html += `<button class="btn target-btn ${isSelected ? 'selected' : ''}" data-target="${t.id}">${escapeHtml(t.name)}</button>`;

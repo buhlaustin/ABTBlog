@@ -1,4 +1,5 @@
 import { randomInt, clamp, pickRandom } from './utils.js';
+import { describeNominationReason, getHohNominationStyleLine } from './hohNomPersonas.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -34,6 +35,13 @@ export class EvictionSystem {
       text: `<strong>Nomination Ceremony</strong> — ${hoh.name} must nominate two houseguests for eviction.`
     });
 
+    if (!hoh.isPlayer) {
+      results.push({
+        type: 'narrative',
+        text: getHohNominationStyleLine(hoh)
+      });
+    }
+
     let nominees;
 
     if (hoh.isPlayer && playerPicks && playerPicks.length === 2) {
@@ -66,9 +74,12 @@ export class EvictionSystem {
 
     for (const n of nominees) {
       n.isNominated = true;
+      const reason = hoh.isPlayer
+        ? 'your strategic choice'
+        : describeNominationReason(hoh, n);
       results.push({
         type: 'drama',
-        text: `${hoh.name} nominates <strong>${n.name}</strong> for eviction.`
+        text: `${hoh.name} nominates <strong>${n.name}</strong> for eviction — ${reason}.`
       });
       n.threat = clamp(n.threat - 5, 0, 100);
     }
