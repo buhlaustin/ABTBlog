@@ -8,6 +8,7 @@ import {
 import { addMvpCampaignPoints, getMvpRaceLeader } from './SeasonTwists.js';
 import { formatHohNomIntelLine } from './hohNomPersonas.js';
 import { formatThreatChange } from './threatBands.js';
+import { formatPawnShieldSpyIntel } from './floaterShields.js';
 
 /**
  * Player-initiated actions during the social phase.
@@ -351,6 +352,8 @@ export class PlayerActions {
       intelTypes.push(
         `${subject.name}'s allies say their nominations will match a ${subject.personality?.name || 'wildcard'} playbook.`
       );
+      const pawnIntel = formatPawnShieldSpyIntel(subject, this.state);
+      if (pawnIntel) intelTypes.push(pawnIntel);
     }
 
     const intel = intelTypes[randomInt(0, intelTypes.length - 1)];

@@ -1,4 +1,5 @@
 import { getAllianceIds } from './allianceUtils.js';
+import { PHASES } from './GameState.js';
 import { PERSONALITY_TYPES, shuffle, weightedPick } from './utils.js';
 
 export const FLOATER_THREAT_MIN = 20;
@@ -48,6 +49,162 @@ export function easyFloaterNominationBonus(state, target) {
     bonus += 4;
   }
   return bonus;
+}
+
+/**
+ * @param {import('./Contestant.js').Contestant} c
+ * @param {import('./GameState.js').GameState} state
+ */
+export function pawnSuitabilityScore(c, state) {
+  let score = 0;
+  if (isShieldPawn(c)) score += 22;
+  if (isNominationFloater(c, state)) score += 14;
+  if (c.personality?.id === 'floater') score += 9;
+  score += Math.max(0, 44 - c.threat);
+  return score;
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ * @param {number} [limit]
+ */
+export function listPawnShieldTargets(state, limit = 5) {
+  return state
+    .getActiveContestants()
+    .filter((c) => !c.isPlayer)
+    .map((c) => ({ contestant: c, score: pawnSuitabilityScore(c, state) }))
+    .filter((row) => row.score >= 12)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ * @param {import('./Contestant.js').Contestant} guest
+ */
+export function getHouseguestFloaterMarks(state, guest) {
+  if (!state || !guest || guest.isPlayer || guest.evicted) return [];
+
+  /** @type {{ key: string, label: string, title: string }[]} */
+  const marks = [];
+
+  if (guest.personality?.id === 'floater') {
+    marks.push({
+      key: 'floater',
+      label: 'Floater',
+      title: `${guest.name} plays a classic floater game — common pawn nom.`
+    });
+  }
+
+  if (state.difficulty !== 'easy') return marks;
+
+  if (isShieldPawn(guest)) {
+    marks.push({
+      key: 'pawn',
+      label: 'Pawn',
+      title: `Shield pawn (threat ${guest.threat}) — AI HOHs love this profile on Easy.`
+    });
+  } else if (isNominationFloater(guest, state)) {
+    marks.push({
+      key: 'pawn-radar',
+      label: 'Pawn radar',
+      title: `Floater radar · threat ${guest.threat}, no alliance.`
+    });
+  }
+
+  return marks;
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ */
+export function buildFloaterShieldIntelSection(state) {
+  if (state.difficulty !== 'easy') return null;
+  const player = state.getPlayer();
+  if (!player || player.evicted) return null;
+
+  const targets = listPawnShieldTargets(state, 6);
+  if (!targets.length) return null;
+
+  return {
+    id: 'pawn-radar',
+    title: 'Pawn radar (Easy)',
+    tone: 'neutral',
+    items: targets.map(({ contestant: c }) => ({
+      key: `pawn-${c.id}`,
+      name: c.name,
+      detail: describePawnRadarDetail(c, state)
+    }))
+  };
+}
+
+/**
+ * @param {import('./Contestant.js').Contestant} c
+ * @param {import('./GameState.js').GameState} state
+ */
+export function describePawnRadarDetail(c, state) {
+  if (isShieldPawn(c)) return `Threat ${c.threat} · shield pawn`;
+  if (c.personality?.id === 'floater') return `Threat ${c.threat} · Floater archetype`;
+  if (isNominationFloater(c, state)) return `Threat ${c.threat} · floater radar`;
+  return `Threat ${c.threat} · low-profile nom`;
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ * @param {(hoh: import('./Contestant.js').Contestant, limit: number) => { target: import('./Contestant.js').Contestant }[]} previewLeans
+ */
+export function getPawnShieldWatchBanner(state, previewLeans) {
+  if (state.difficulty !== 'easy') return '';
+  const hoh = state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
+  if (!hoh || state.houseEventComplete || state.inFinale) return '';
+  if (state.phase !== PHASES.SOCIAL && state.phase !== PHASES.NOMINATION) return '';
+  if (typeof previewLeans !== 'function') return '';
+
+  const leans = previewLeans(hoh, 3);
+  const pawnNames = leans
+    .filter((row) => isNominationFloater(row.target, state) || isShieldPawn(row.target))
+    .map((row) => row.target.name);
+
+  if (pawnNames.length >= 2) {
+    return `Pawn watch · ${hoh.name} leans ${pawnNames.join(', ')} — shield pair possible`;
+  }
+
+  const player = state.getPlayer();
+  if (pawnNames.length === 1 && player && !player.isHOH && player.threat >= 32) {
+    return `Pawn watch · ${pawnNames[0]} may absorb a nom so ${player.name} stays safe`;
+  }
+
+  return '';
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ */
+export function describeLastPawnShield(state) {
+  if (state.difficulty !== 'easy' || !state.lastPawnShieldWeek) return null;
+  const names = state.lastPawnShieldNomineeNames;
+  if (names?.length === 2) {
+    return `Last pawn block: Week ${state.lastPawnShieldWeek} (${names.join(' & ')}).`;
+  }
+  return `Last pawn block: Week ${state.lastPawnShieldWeek}.`;
+}
+
+export function recordPawnShieldNominations(state, nominees) {
+  if (state.difficulty !== 'easy' || !nominees || nominees.length < 2) return;
+  state.lastPawnShieldWeek = state.week;
+  state.lastPawnShieldNomineeNames = nominees.map((n) => n.name);
+  state.lastPawnShieldNomineeIds = nominees.map((n) => n.id);
+}
+
+/**
+ * @param {import('./Contestant.js').Contestant} hoh
+ * @param {import('./GameState.js').GameState} state
+ */
+export function formatPawnShieldSpyIntel(hoh, state) {
+  if (state.difficulty !== 'easy' || !hoh?.isHOH) return null;
+  const targets = listPawnShieldTargets(state, 2).map((t) => t.contestant.name);
+  if (targets.length < 2) return null;
+  return `${hoh.name}'s allies floated pawn names: <strong>${targets.join('</strong> and <strong>')}</strong> — bigger threats may skate.`;
 }
 
 /**
@@ -112,9 +269,12 @@ export function getFloaterShieldCeremonyNote(state, nominees) {
   const player = state.getPlayer();
   if (!player || player.isHOH) return null;
 
+  recordPawnShieldNominations(state, nominees);
+
+  const names = nominees.map((n) => n.name).join(' and ');
   return {
     type: 'narrative',
-    text: 'The HOH put up a classic pawn pair — floaters absorbing the block while bigger threats watch.'
+    text: `The HOH put up a classic pawn pair — <strong>${names}</strong> absorb the block while bigger threats watch.`
   };
 }
 
@@ -154,5 +314,7 @@ export function tryEasyFloaterShieldNominations(state, hoh, others, nominationPi
   const rest = pool.filter((c) => c.id !== first.id);
   if (rest.length === 0) return null;
   const second = weightedPick(rest, pawnWeight);
-  return second ? [first, second] : null;
+  if (!second) return null;
+  recordPawnShieldNominations(state, [first, second]);
+  return [first, second];
 }

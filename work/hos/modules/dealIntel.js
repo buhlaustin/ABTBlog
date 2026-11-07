@@ -1,4 +1,5 @@
 import { escapeHtml } from './utils.js';
+import { buildFloaterShieldIntelSection } from './floaterShields.js';
 
 const PROMISE_LABELS = {
   vote: 'Vote deal',
@@ -97,6 +98,11 @@ export function buildDealIntel(state) {
 
   const sections = [];
 
+  const pawnSection = buildFloaterShieldIntelSection(state);
+  if (pawnSection) {
+    sections.push(pawnSection);
+  }
+
   if (promisesByYou.active.length) {
     sections.push({ id: 'promises-active', title: 'Your active deals', tone: 'active', items: promisesByYou.active });
   }
@@ -131,18 +137,25 @@ export function buildDealIntel(state) {
   const hasContent = sections.length > 0;
   const visible = hasContent || !player.evicted;
 
+  const pawnOnly = sections.length === 1 && sections[0].id === 'pawn-radar';
+
   return {
     visible,
     empty: !hasContent,
     sections,
     summary: hasContent
-      ? summarize(promisesByYou, grudgesAgainstYou, betrayalsAgainstYou)
-      : 'No active deals yet — make promises or spy for leverage.'
+      ? summarize(promisesByYou, grudgesAgainstYou, betrayalsAgainstYou, pawnOnly)
+      : pawnSection
+        ? 'Pawn radar active — Easy HOHs may shield you with floater pairs.'
+        : 'No active deals yet — make promises or spy for leverage.'
   };
 }
 
-function summarize(promisesByYou, grudgesAgainstYou, betrayalsAgainstYou) {
+function summarize(promisesByYou, grudgesAgainstYou, betrayalsAgainstYou, pawnOnly = false) {
   const parts = [];
+  if (pawnOnly) {
+    parts.push('pawn radar live');
+  }
   if (promisesByYou.active.length) {
     parts.push(`${promisesByYou.active.length} active deal${promisesByYou.active.length === 1 ? '' : 's'}`);
   }

@@ -98,7 +98,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Status** | **Shipped:** `floaterShields.js` — Easy cast skew (~28% Floaters), nom score bonuses, pawn-pair branch in `chooseNominations`, ceremony note + threat-band copy. |
+| **Status** | **Shipped (v2):** v1 plus **Pawn radar** intel section, **Pawn/Floater** houseguest chips, **Pawn watch** header, spy HOH pawn lines, last pawn-block memory on threat band. |
 | **Goal** | AI sometimes nominates obvious pawns so the human isn’t the default second name. |
 | **Player experience** | Repeated “easy floaters” in cast; AI HOH occasionally nominates low-threat pairs. |
 | **Implementation** | Nomination weight bonus for mid-threat when `difficulty === 'easy'`; floater personality already exists. |

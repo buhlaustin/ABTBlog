@@ -124,6 +124,10 @@ export class GameState {
     this.playerThreatWeekStart = null;
     this.playerThreatWeekSnapshotWeek = null;
 
+    this.lastPawnShieldWeek = null;
+    this.lastPawnShieldNomineeNames = [];
+    this.lastPawnShieldNomineeIds = [];
+
     this.currentHOH = null;
     this.nominees = [];
     this.vetoUsed = false;
@@ -607,6 +611,9 @@ export class GameState {
       storyLog: this.storyLog,
       playerThreatWeekStart: this.playerThreatWeekStart,
       playerThreatWeekSnapshotWeek: this.playerThreatWeekSnapshotWeek,
+      lastPawnShieldWeek: this.lastPawnShieldWeek,
+      lastPawnShieldNomineeNames: this.lastPawnShieldNomineeNames,
+      lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
       currentHOH: this.currentHOH?.id ?? this.currentHOH,
       nominees: this.nominees,
       vetoUsed: this.vetoUsed,
@@ -677,6 +684,9 @@ export class GameState {
     state.storyLog = data.storyLog;
     state.playerThreatWeekStart = data.playerThreatWeekStart ?? null;
     state.playerThreatWeekSnapshotWeek = data.playerThreatWeekSnapshotWeek ?? null;
+    state.lastPawnShieldWeek = data.lastPawnShieldWeek ?? null;
+    state.lastPawnShieldNomineeNames = data.lastPawnShieldNomineeNames ?? [];
+    state.lastPawnShieldNomineeIds = data.lastPawnShieldNomineeIds ?? [];
     state.currentHOH = data.currentHOH
       ? state.contestants.find((c) => c.id === data.currentHOH) || data.currentHOH
       : null;

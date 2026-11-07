@@ -1,6 +1,6 @@
 import { clamp } from './utils.js';
 import { PHASES } from './GameState.js';
-import { describeEasyFloaterShield } from './floaterShields.js';
+import { describeEasyFloaterShield, describeLastPawnShield } from './floaterShields.js';
 
 export const THREAT_BAND_RADAR = 32;
 export const THREAT_BAND_TARGET = 52;
@@ -219,6 +219,10 @@ export function buildThreatBandOutlook(state, previewLeans) {
   const floaterShield = describeEasyFloaterShield(state);
   if (floaterShield) {
     shield = shield ? `${shield} ${floaterShield}` : floaterShield;
+  }
+  const lastPawn = describeLastPawnShield(state);
+  if (lastPawn) {
+    shield = shield ? `${shield} ${lastPawn}` : lastPawn;
   }
   const drivers = computeThreatDrivers(player, state);
   const { rank, total } = getThreatHouseRank(state, player);

@@ -625,6 +625,21 @@ body {
   color: #6bc98a;
 }
 
+.deal-mark-floater {
+  background: rgba(120, 160, 200, 0.15);
+  color: #8cb4d8;
+}
+
+.deal-mark-pawn {
+  background: rgba(180, 140, 220, 0.15);
+  color: #c4a0e8;
+}
+
+.deal-mark-pawn-radar {
+  background: rgba(160, 160, 160, 0.12);
+  color: var(--text-muted);
+}
+
 .deal-vote-warn {
   text-transform: none;
   letter-spacing: normal;

@@ -1,6 +1,7 @@
 import { PHASE_LABELS, PHASES, WEEKDAYS } from './GameState.js';
 import { renderDealIntelHtml } from './dealIntel.js';
 import { getHouseguestDealMarks } from './houseguestDealMarks.js';
+import { getHouseguestFloaterMarks } from './floaterShields.js';
 import { getHohNomPersonaTooltip } from './hohNomPersonas.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 
@@ -220,7 +221,7 @@ export class UIManager {
     `;
   }
 
-  renderHouseguests(contestants, player) {
+  renderHouseguests(contestants, player, state = null) {
     const active = contestants.filter((c) => !c.evicted);
     this.elements.guestCount.textContent = active.length;
 
@@ -239,8 +240,10 @@ export class UIManager {
         : ' class="personality"';
 
       const dealMarks = player ? getHouseguestDealMarks(player, c) : [];
-      const marksHtml = dealMarks.length
-        ? `<div class="deal-marks">${dealMarks.map((m) =>
+      const floaterMarks = state ? getHouseguestFloaterMarks(state, c) : [];
+      const allMarks = [...dealMarks, ...floaterMarks];
+      const marksHtml = allMarks.length
+        ? `<div class="deal-marks">${allMarks.map((m) =>
           `<span class="deal-mark deal-mark-${escapeHtml(m.key)}" title="${escapeHtml(m.title)}">${escapeHtml(m.label)}</span>`
         ).join('')}</div>`
         : '';

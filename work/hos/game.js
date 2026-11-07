@@ -20,7 +20,7 @@ import {
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
 import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
-import { countCastFloaters } from './modules/floaterShields.js';
+import { countCastFloaters, getPawnShieldWatchBanner } from './modules/floaterShields.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
 import {
   computeBattleBackScores,
@@ -281,6 +281,8 @@ class Game {
     const previewLeans = (hoh, limit) => this.ai.previewNominationLeans(hoh, limit);
     const hohWatch = getHohWatchBanner(state, previewLeans);
     if (hohWatch) twistParts.push(hohWatch);
+    const pawnWatch = getPawnShieldWatchBanner(state, previewLeans);
+    if (pawnWatch) twistParts.push(pawnWatch);
     const threatAlert = getThreatNominationAlert(state, previewLeans);
     if (threatAlert) twistParts.push(threatAlert);
     ui.updateTwistBanner(twistParts.join(' · '));
@@ -288,7 +290,7 @@ class Game {
     state.updateThreatLevels();
     ui.renderPlayer(state.getPlayer());
     ui.renderThreatBand(buildThreatBandOutlook(state, previewLeans));
-    ui.renderHouseguests(state.contestants, state.getPlayer());
+    ui.renderHouseguests(state.contestants, state.getPlayer(), state);
     ui.renderAlliances(state.alliances, state.getPlayer());
     const juryTwistNote = state.doubleEvictionWeekActive
       ? 'Double eviction this week — up to two new jurors may be seated after tonight.'
