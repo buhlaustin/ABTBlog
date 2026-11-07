@@ -1,40 +1,6 @@
-import { randomInt, pickRandom } from './utils.js';
+import { JURY_QA_TEMPLATES } from './juryQABank.js';
+import { randomInt, pickRandom, shuffle } from './utils.js';
 import { FINALE_PHASES } from './GameState.js';
-
-const JURY_QA_TEMPLATES = [
-  {
-    prompt: 'What was the move you are most proud of this season?',
-    choices: [
-      { id: 'honest', label: 'Explain it clearly and own the blood on your hands', delta: 10 },
-      { id: 'humble', label: 'Downplay it and credit the house', delta: 4 },
-      { id: 'evasive', label: 'Dodge the question', delta: -8 }
-    ]
-  },
-  {
-    prompt: 'Why should this jury vote for you over your opponent?',
-    choices: [
-      { id: 'respect', label: 'Respect the jury and make a concise case', delta: 12 },
-      { id: 'shade', label: 'Trash your opponent\'s game', delta: 5 },
-      { id: 'plead', label: 'Beg without substance', delta: -10 }
-    ]
-  },
-  {
-    prompt: 'Did you stay true to who you are in this house?',
-    choices: [
-      { id: 'authentic', label: 'Yes — admit flaws and growth', delta: 9 },
-      { id: 'game', label: 'I played a character for the game', delta: 2 },
-      { id: 'deny', label: 'Deny ever lying', delta: -6 }
-    ]
-  },
-  {
-    prompt: 'If you lose, what will you regret most?',
-    choices: [
-      { id: 'human', label: 'A specific relationship you burned', delta: 8 },
-      { id: 'comp', label: 'A competition you should have won', delta: 5 },
-      { id: 'nothing', label: 'Nothing — you played perfectly', delta: -7 }
-    ]
-  }
-];
 
 /**
  * Big Brother Final 3: R1 (3-way) → R2 (R1 losers) → R3 (R1 winner vs R2 winner) → Final HOH pick → jury vote.
@@ -266,16 +232,27 @@ export class FinaleManager {
     return best;
   }
 
-  /** How many jury Q&A rounds to run (capped by jury size). */
+  /** How many jury Q&A rounds to run (up to jury size, max seven questions). */
   getJuryQARoundCount() {
     const jury = this.state.getJurors();
-    return Math.min(JURY_QA_TEMPLATES.length, Math.max(1, jury.length));
+    const cap = Math.min(7, jury.length, JURY_QA_TEMPLATES.length);
+    return Math.max(1, cap);
+  }
+
+  _buildJuryQAQuestionOrder() {
+    const rounds = this.getJuryQARoundCount();
+    const indices = shuffle(JURY_QA_TEMPLATES.map((_, i) => i));
+    return indices.slice(0, rounds);
   }
 
   getJuryQAQuestion(index) {
     const jury = this.state.getJurors();
     if (jury.length === 0) return null;
-    const template = JURY_QA_TEMPLATES[index % JURY_QA_TEMPLATES.length];
+    const order = this.state.finaleQAQuestionOrder?.length
+      ? this.state.finaleQAQuestionOrder
+      : this._buildJuryQAQuestionOrder();
+    const templateIdx = order[index] ?? index % JURY_QA_TEMPLATES.length;
+    const template = JURY_QA_TEMPLATES[templateIdx];
     const juror = jury[index % jury.length];
     return { juror, template };
   }
@@ -283,16 +260,32 @@ export class FinaleManager {
   /** AI finalist picks an answer style. */
   aiPickQAResponse(finalist, template) {
     const strategy = finalist.personality?.strategy;
-    let choice = template.choices[0];
+    const byId = (id) => template.choices.find((c) => c.id === id);
+    const bestDelta = () =>
+      template.choices.reduce((a, b) => (b.delta > a.delta ? b : a));
+
     if (strategy === 'manipulate' || strategy === 'attack') {
-      choice = template.choices.find((c) => c.id === 'shade') || pickRandom(template.choices);
-    } else if (strategy === 'befriend' || strategy === 'ally') {
-      choice = template.choices.find((c) => c.id === 'respect' || c.id === 'honest')
-        || pickRandom(template.choices);
-    } else {
-      choice = pickRandom(template.choices);
+      return byId('shade') || byId('blame') || byId('petty') || pickRandom(template.choices);
     }
-    return choice;
+    if (strategy === 'befriend' || strategy === 'ally' || strategy === 'loyalist') {
+      return (
+        byId('respect')
+        || byId('honest')
+        || byId('gratitude')
+        || byId('loyal')
+        || bestDelta()
+      );
+    }
+    if (strategy === 'win' || strategy === 'competitor') {
+      return byId('comp') || byId('own_game') || byId('comp_brag') || bestDelta();
+    }
+    if (strategy === 'survive' || strategy === 'floater') {
+      return byId('humble') || byId('human') || byId('humble_throw') || bestDelta();
+    }
+    if (strategy === 'chaos') {
+      return pickRandom(template.choices);
+    }
+    return bestDelta();
   }
 
   applyFinalistQAAnswer(juror, finalist, choice) {
@@ -325,6 +318,7 @@ export class FinaleManager {
     }
     this.state.finalePhase = FINALE_PHASES.JURY_QA;
     this.state.finaleQAIndex = 0;
+    this.state.finaleQAQuestionOrder = this._buildJuryQAQuestionOrder();
     return { results, ok: true };
   }
 

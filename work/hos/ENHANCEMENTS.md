@@ -51,7 +51,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 |--------|--------|
 | **Goal** | Final 3 at three houseguests: **HOH Part 1 → Part 2 → Part 3 → Final HOH pick → Jury Q&A → jury vote**, with Continue between each beat. |
 | **Player experience** | Player finalist picks Q&A answers; juror player casts winner vote; Q&A answers sway jurors via `juryQAAdjustments`. |
-| **Follow-ups** | Interactive comps for finale parts; more Q&A templates; jury recap in end screen. |
+| **Follow-ups** | Interactive comps for finale parts; jury recap in end screen. Q&A bank: `juryQABank.js` (12 questions, shuffled per finale). |
 | **Priority** | Polish only. |
 
 ### Twist nights (optional new-game toggles)

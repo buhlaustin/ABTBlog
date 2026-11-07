@@ -144,6 +144,8 @@ export class GameState {
     this.finalePartLosers = [];
     this.finaleAwaitingStep = null;
     this.finaleQAIndex = 0;
+    /** Shuffled indices into JURY_QA_TEMPLATES for this finale. */
+    this.finaleQAQuestionOrder = [];
     /** @type {Record<string, Record<string, number>>} jurorId → finalistId → vote sway */
     this.juryQAAdjustments = {};
 
@@ -566,6 +568,7 @@ export class GameState {
       finalePartLosers: this.finalePartLosers,
       finaleAwaitingStep: this.finaleAwaitingStep,
       finaleQAIndex: this.finaleQAIndex,
+      finaleQAQuestionOrder: this.finaleQAQuestionOrder,
       juryQAAdjustments: this.juryQAAdjustments
     };
   }
@@ -622,6 +625,7 @@ export class GameState {
     state.finalePartLosers = data.finalePartLosers ?? [];
     state.finaleAwaitingStep = data.finaleAwaitingStep ?? null;
     state.finaleQAIndex = data.finaleQAIndex ?? 0;
+    state.finaleQAQuestionOrder = data.finaleQAQuestionOrder ?? [];
     state.juryQAAdjustments = data.juryQAAdjustments ?? {};
     state.repairInvalidEvictionSchedule();
     return state;
