@@ -13,6 +13,7 @@ import {
 } from './voteConsequences.js';
 import { getFloaterShieldCeremonyNote } from './floaterShields.js';
 import { buildBackdoorCompletionLine, clearThrowCompetitionIntent } from './strategicVerbs.js';
+import { appendVetoCeremonySummary } from './vetoCeremonySummary.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -226,6 +227,7 @@ export class EvictionSystem {
       type: 'narrative',
       text: `${vetoWinner.name} chose not to use the Power of Veto.`
     });
+    appendVetoCeremonySummary(results, this.state, { vetoWinner, vetoUsed: false });
     return { results, vetoWinner, vetoUsed: false };
   }
 
@@ -291,6 +293,7 @@ export class EvictionSystem {
       type: 'narrative',
       text: `${vetoWinner.name} chose not to use the Power of Veto.`
     });
+    appendVetoCeremonySummary(results, this.state, { vetoWinner, vetoUsed: false });
     return { results, vetoWinner, vetoUsed: false };
   }
 
@@ -299,6 +302,7 @@ export class EvictionSystem {
     savedNominee.isNominated = false;
     this.state.nominees = this.state.nominees.filter((id) => id !== savedNominee.id);
     this.state.vetoUsed = true;
+    this.state.vetoSavedNomineeId = savedNominee.id;
 
     results.push({
       type: 'success',
@@ -324,6 +328,13 @@ export class EvictionSystem {
       });
     }
 
+    appendVetoCeremonySummary(results, this.state, {
+      vetoWinner,
+      savedNominee,
+      replacement: replacement ?? null,
+      vetoUsed: true
+    });
+
     return { results, vetoWinner, vetoUsed: true };
   }
 
@@ -334,6 +345,7 @@ export class EvictionSystem {
 
     if (!useVeto) {
       results.push({ type: 'narrative', text: 'You chose not to use the Power of Veto.' });
+      appendVetoCeremonySummary(results, this.state, { vetoWinner, vetoUsed: false });
       return { results, vetoUsed: false };
     }
 
@@ -367,6 +379,19 @@ export class EvictionSystem {
         this.state.backdoorTargetId = null;
         this.state.backdoorPawnsLocked = false;
       }
+
+      const saved = this.state.vetoSavedNomineeId
+        ? this.state.getContestant(this.state.vetoSavedNomineeId)
+        : null;
+      const vetoWinner = this.state.vetoHolderId
+        ? this.state.getContestant(this.state.vetoHolderId)
+        : null;
+      appendVetoCeremonySummary(results, this.state, {
+        vetoWinner,
+        savedNominee: saved,
+        replacement,
+        vetoUsed: true
+      });
     }
     return results;
   }

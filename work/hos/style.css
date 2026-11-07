@@ -347,6 +347,21 @@ body {
 .story-entry.social { background: rgba(168, 218, 220, 0.12); border-left: 3px solid #7eb8bc; }
 .story-entry.ai-host { background: rgba(155, 89, 182, 0.15); border-left: 3px solid #9b59b6; font-style: italic; }
 
+.story-entry.veto-summary {
+  background: rgba(212, 175, 55, 0.12);
+  border-left: 3px solid var(--gold, #d4af37);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.veto-summary-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--gold, #d4af37);
+}
+
 .story-entry strong {
   color: var(--gold);
 }

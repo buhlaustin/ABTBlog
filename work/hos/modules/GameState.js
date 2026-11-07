@@ -137,6 +137,7 @@ export class GameState {
     this.currentHOH = null;
     this.nominees = [];
     this.vetoUsed = false;
+    this.vetoSavedNomineeId = null;
     this.vetoReplacements = [];
     this.evictedThisWeek = null;
     this.competitionWinner = null;
@@ -412,6 +413,7 @@ export class GameState {
     }
     this.nominees = [];
     this.vetoUsed = false;
+    this.vetoSavedNomineeId = null;
     this.vetoReplacements = [];
     this.evictedThisWeek = null;
     this.competitionWinner = null;
@@ -629,6 +631,7 @@ export class GameState {
       currentHOH: this.currentHOH?.id ?? this.currentHOH,
       nominees: this.nominees,
       vetoUsed: this.vetoUsed,
+      vetoSavedNomineeId: this.vetoSavedNomineeId,
       vetoReplacements: this.vetoReplacements,
       evictedThisWeek: this.evictedThisWeek,
       competitionWinner: this.competitionWinner?.id ?? this.competitionWinner,
@@ -707,6 +710,7 @@ export class GameState {
       : null;
     state.nominees = data.nominees;
     state.vetoUsed = data.vetoUsed;
+    state.vetoSavedNomineeId = data.vetoSavedNomineeId ?? null;
     state.vetoReplacements = data.vetoReplacements;
     state.evictedThisWeek = data.evictedThisWeek;
     state.competitionWinner = data.competitionWinner

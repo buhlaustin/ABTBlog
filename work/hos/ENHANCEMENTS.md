@@ -122,6 +122,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
+| **Status** | **Shipped:** `vetoCeremonySummary.js` — **Veto recap** feed line after AI/player veto (used or not), replacement picks, and final block. |
 | **Goal** | After veto, explain replacement pick and who remains on the block. |
 | **Player experience** | Summary card: “Used on X → Y replaced by Z → final nominees: A, B.” |
 | **Implementation** | Extra `logAndRender` in `Eviction.js` after `playerPickReplacement` / AI replacement. |
