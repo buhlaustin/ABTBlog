@@ -7,8 +7,8 @@ import {
 } from './allianceUtils.js';
 import { addMvpCampaignPoints, getMvpRaceLeader } from './SeasonTwists.js';
 import { formatHohNomIntelLine } from './hohNomPersonas.js';
-import { formatThreatChange } from './threatBands.js';
-import { recordLayLowRest } from './layLowFeedback.js';
+import { formatThreatChange, getThreatBand } from './threatBands.js';
+import { describeLayLowRestAction, recordLayLowRest } from './layLowFeedback.js';
 import { formatPawnShieldSpyIntel } from './floaterShields.js';
 import {
   canCancelThrowCompetition,
@@ -46,7 +46,7 @@ export class PlayerActions {
       {
         id: 'rest',
         label: 'Rest & Observe',
-        description: 'Lay low — 3–6 threat drop (shown in the band panel & log).'
+        description: describeLayLowRestAction(player)
       }
     ];
 
@@ -517,6 +517,12 @@ export class PlayerActions {
     return {
       success: true,
       text: `${base} ${threatLine}`,
+      threatFeedback: {
+        before: threatBefore,
+        after: player.threat,
+        delta: player.threat - threatBefore,
+        offsetTotal: player.threatOffset ?? 0
+      },
       type: 'drama'
     };
   }
@@ -565,21 +571,28 @@ export class PlayerActions {
 
   _rest(player) {
     const before = player.threat;
+    const beforeOff = player.threatOffset ?? 0;
     const delta = randomInt(3, 6);
-    player.threatOffset = clamp((player.threatOffset ?? 0) - delta, -25, 0);
+    player.threatOffset = clamp(beforeOff - delta, -25, 0);
+    const applied = beforeOff - player.threatOffset;
     this.state.updateThreatLevels?.();
     const after = player.threat;
     recordLayLowRest(this.state, before, after);
     this._consumeAction();
+    const capNote =
+      player.threatOffset <= -25 && applied < delta
+        ? ' Cushion hit the −25 cap.'
+        : '';
     return {
       success: true,
-      text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first. ${formatThreatChange(before, after)}`,
+      text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first. ${formatThreatChange(before, after)}${capNote}`,
       type: 'success',
       threatFeedback: {
         before,
         after,
         delta: after - before,
-        offsetTotal: player.threatOffset ?? 0
+        offsetTotal: player.threatOffset ?? 0,
+        bandCrossed: getThreatBand(before).id !== getThreatBand(after).id
       }
     };
   }
@@ -629,7 +642,13 @@ export class PlayerActions {
     return {
       success: true,
       text: `You commit to throwing the ${compLabel} comp — floaters notice. ${formatThreatChange(threatBefore, player.threat)}`,
-      type: 'system'
+      type: 'system',
+      threatFeedback: {
+        before: threatBefore,
+        after: player.threat,
+        delta: player.threat - threatBefore,
+        offsetTotal: player.threatOffset ?? 0
+      }
     };
   }
 

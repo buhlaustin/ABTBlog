@@ -44,13 +44,18 @@ export function getThreatBand(threat) {
  */
 export function formatThreatChange(before, after) {
   const band = getThreatBand(after);
+  const beforeBand = getThreatBand(before);
   const delta = after - before;
   if (delta === 0) {
     return `Threat unchanged at ${after} (${band.label}).`;
   }
   const mag = Math.abs(delta);
   const sign = delta > 0 ? '+' : '−';
-  return `Threat ${sign}${mag} (now ${after} — ${band.label}).`;
+  let line = `Threat ${sign}${mag} (now ${after} — ${band.label}).`;
+  if (beforeBand.id !== band.id) {
+    line += ` Moved from ${beforeBand.label}.`;
+  }
+  return line;
 }
 
 /**

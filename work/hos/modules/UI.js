@@ -221,9 +221,6 @@ export class UIManager {
     if (outlook.nextBand) {
       metaParts.push(outlook.nextBand);
     }
-    if (outlook.offsetNote) {
-      metaParts.push(outlook.offsetNote);
-    }
     const meta = metaParts.length
       ? `<p class="threat-band-meta">${metaParts.map((p) => escapeHtml(p)).join(' · ')}</p>`
       : '';
@@ -258,6 +255,10 @@ export class UIManager {
       ? `<p class="threat-band-shield">${escapeHtml(outlook.shield)}</p>`
       : '';
 
+    const offsetBlock = outlook.offsetNote
+      ? `<p class="threat-band-offset">${escapeHtml(outlook.offsetNote)}</p>`
+      : '';
+
     el.innerHTML = `
       <div class="threat-band-head threat-tone-${outlook.tone}">
         <span class="threat-band-label">${escapeHtml(outlook.label)}</span>
@@ -265,6 +266,7 @@ export class UIManager {
       </div>
       ${alert}
       ${meter}
+      ${offsetBlock}
       ${meta}
       <p class="threat-band-advice">${escapeHtml(outlook.advice)}</p>
       ${drivers}
@@ -282,13 +284,16 @@ export class UIManager {
     el.classList.remove('threat-band-pulse');
     void el.offsetWidth;
     el.classList.add('threat-band-pulse');
+    if (feedback.bandCrossed) {
+      el.classList.add('threat-band-band-cross');
+    }
     const score = el.querySelector('.threat-band-score');
     if (score && typeof feedback.delta === 'number' && feedback.delta !== 0) {
       const sign = feedback.delta > 0 ? '+' : '−';
       score.setAttribute('data-delta', `${sign}${Math.abs(feedback.delta)}`);
     }
     window.setTimeout(() => {
-      el.classList.remove('threat-band-pulse');
+      el.classList.remove('threat-band-pulse', 'threat-band-band-cross');
       score?.removeAttribute('data-delta');
     }, 1400);
   }

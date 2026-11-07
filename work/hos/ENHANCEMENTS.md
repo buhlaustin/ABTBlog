@@ -142,7 +142,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Status** | **Shipped (v2):** v1 log copy + `threatOffset` decay; **threat band** cushion note + ghost meter; **Lay low** player tag + post-Rest pulse; **Deals → Lay low** intel (cushion, Rest today, tips). |
+| **Status** | **Shipped (v3):** v2 plus **band crossover** log copy, **twist banner**, decay **forecast** + **Rests/week** intel, dynamic **Rest** action text, **−25 cap** note, **Easy** synergy line, campaign/throw **threat pulse**. |
 | **Goal** | `rest` lowers threat; player should see delta. |
 | **Player experience** | “Threat −4 (now 32 — Under the radar).” |
 | **Implementation** | Return structure from `PlayerActions`; `logAndRender` on success. |

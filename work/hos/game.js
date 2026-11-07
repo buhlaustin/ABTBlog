@@ -20,6 +20,7 @@ import {
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
 import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
+import { getLayLowBanner } from './modules/layLowFeedback.js';
 import { countCastFloaters, getPawnShieldWatchBanner } from './modules/floaterShields.js';
 import {
   getBackdoorNomLens,
@@ -299,6 +300,8 @@ class Game {
     if (backdoorBanner) twistParts.push(backdoorBanner);
     const throwBanner = getThrowCompBanner(state);
     if (throwBanner) twistParts.push(throwBanner);
+    const layLowBanner = getLayLowBanner(state);
+    if (layLowBanner) twistParts.push(layLowBanner);
     const vetoBlockBanner = buildVetoBlockBanner(state);
     if (vetoBlockBanner) twistParts.push(vetoBlockBanner);
     const threatAlert = getThreatNominationAlert(state, previewLeans);

@@ -128,6 +128,8 @@ export class GameState {
     this.playerLayLowWeek = null;
     this.playerLayLowBefore = null;
     this.playerLayLowAfter = null;
+    this.playerLayLowRestsWeek = null;
+    this.playerLayLowRestsThisWeek = 0;
 
     this.lastPawnShieldWeek = null;
     this.lastPawnShieldNomineeNames = [];
@@ -588,6 +590,8 @@ export class GameState {
     const player = this.getPlayer();
     this.playerThreatWeekStart = player?.threat ?? null;
     this.playerThreatWeekSnapshotWeek = this.week;
+    this.playerLayLowRestsWeek = this.week;
+    this.playerLayLowRestsThisWeek = 0;
   }
 
   checkWinCondition() {
@@ -636,6 +640,8 @@ export class GameState {
       playerLayLowWeek: this.playerLayLowWeek,
       playerLayLowBefore: this.playerLayLowBefore,
       playerLayLowAfter: this.playerLayLowAfter,
+      playerLayLowRestsWeek: this.playerLayLowRestsWeek,
+      playerLayLowRestsThisWeek: this.playerLayLowRestsThisWeek,
       lastPawnShieldWeek: this.lastPawnShieldWeek,
       lastPawnShieldNomineeNames: this.lastPawnShieldNomineeNames,
       lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
@@ -719,6 +725,8 @@ export class GameState {
     state.playerLayLowWeek = data.playerLayLowWeek ?? null;
     state.playerLayLowBefore = data.playerLayLowBefore ?? null;
     state.playerLayLowAfter = data.playerLayLowAfter ?? null;
+    state.playerLayLowRestsWeek = data.playerLayLowRestsWeek ?? null;
+    state.playerLayLowRestsThisWeek = data.playerLayLowRestsThisWeek ?? 0;
     state.lastPawnShieldWeek = data.lastPawnShieldWeek ?? null;
     state.lastPawnShieldNomineeNames = data.lastPawnShieldNomineeNames ?? [];
     state.lastPawnShieldNomineeIds = data.lastPawnShieldNomineeIds ?? [];
