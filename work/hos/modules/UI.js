@@ -9,6 +9,7 @@ import {
 } from './allianceMap.js';
 import { getHohNomPersonaTooltip } from './hohNomPersonas.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
+import { renderWeekCalendarHtml } from './weekCalendarStrip.js';
 
 /**
  * DOM rendering and screen management.
@@ -32,6 +33,7 @@ export class UIManager {
       btnMenu: document.getElementById('btn-menu'),
       btnPlayAgain: document.getElementById('btn-play-again'),
       weekDay: document.getElementById('week-day'),
+      weekCalendar: document.getElementById('week-calendar'),
       phaseLabel: document.getElementById('phase-label'),
       storyLog: document.getElementById('story-log'),
       playerNameDisplay: document.getElementById('player-name-display'),
@@ -85,6 +87,20 @@ export class UIManager {
     this.elements.phaseLabel.textContent = label;
     const deActive = typeof phaseLabel === 'string' && phaseLabel.startsWith('Double Eviction');
     this.elements.phaseLabel.classList.toggle('double-eviction', deActive);
+  }
+
+  /**
+   * Fri→Thu strip with live vs social markers.
+   * @param {import('./GameState.js').GameState} state
+   */
+  renderWeekCalendar(state) {
+    const host = this.elements.weekCalendar;
+    if (!host || !state) return;
+    host.innerHTML = renderWeekCalendarHtml(state);
+    const today = host.querySelector('.cal-today');
+    if (today && typeof today.scrollIntoView === 'function') {
+      today.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    }
   }
 
   updateTwistBanner(text) {

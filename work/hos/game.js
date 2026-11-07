@@ -325,6 +325,7 @@ class Game {
   render() {
     const { state, ui } = this;
     ui.updateWeekDay(state.week, state.weekdayIndex, state.phase, state.getPhaseDisplayLabel());
+    ui.renderWeekCalendar(state);
     const twistParts = [getTwistRulesBanner(state)];
     const previewLeans = (hoh, limit) => this.ai.previewNominationLeans(hoh, limit);
     const hohWatch = getHohWatchBanner(state, previewLeans);

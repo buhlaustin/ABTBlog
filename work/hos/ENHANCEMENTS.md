@@ -190,9 +190,10 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
+| **Status** | **Shipped (v1):** `weekCalendarStrip.js` + header **Fri→Thu** strip; **today** highlight; **Live** (◆) vs **Social** (·); double-eviction Thu styling; finale mode; horizontal scroll; `scripts/hos-week-calendar-smoke.mjs`. |
 | **Goal** | Prevent “what night is it?” confusion. |
 | **Player experience** | Fri→Thu strip with highlight on today and icon for live vs social. |
-| **Implementation** | `UI.js` + `WEEKDAYS` / `PHASE_LABELS`; mobile-friendly horizontal scroll. |
+| **Implementation** | `UI.renderWeekCalendar` on each `render()`. |
 | **Priority** | High. |
 
 ### Tutorial week (scripted)
