@@ -529,10 +529,15 @@ export class PlayerActions {
     if (sharesAllianceWith(player, target)) {
       target.competition = clamp(target.competition + 1, 1, 10);
     }
+    const aiHoh = this.state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
+    let text = `You hyped ${target.name} before the comp — whether they win or not, they remember.`;
+    if (aiHoh) {
+      text += ` ${formatHohNomIntelLine(aiHoh).replace(/^As HOH, /, 'Current HOH ')}`;
+    }
     this._consumeAction();
     return {
       success: true,
-      text: `You hyped ${target.name} before the comp — whether they win or not, they remember.`,
+      text,
       type: 'narrative'
     };
   }

@@ -31,6 +31,7 @@ import {
 import {
   buildPlayerHohLens,
   formatHohNomIntelLine,
+  getHohWatchBanner,
   getLocalNominationHostBeat,
   getNomTargetLensLabel,
   getPlayerHohPickerIntro
@@ -263,7 +264,10 @@ class Game {
   render() {
     const { state, ui } = this;
     ui.updateWeekDay(state.week, state.weekdayIndex, state.phase, state.getPhaseDisplayLabel());
-    ui.updateTwistBanner(getTwistRulesBanner(state));
+    const twistParts = [getTwistRulesBanner(state)];
+    const hohWatch = getHohWatchBanner(state, (hoh, limit) => this.ai.previewNominationLeans(hoh, limit));
+    if (hohWatch) twistParts.push(hohWatch);
+    ui.updateTwistBanner(twistParts.join(' · '));
     ui.renderStoryLog(state.storyLog);
     ui.renderPlayer(state.getPlayer());
     ui.renderHouseguests(state.contestants, state.getPlayer());
@@ -869,7 +873,9 @@ class Game {
 
   async _appendNominationHostBeat(hoh, nominees) {
     if (!hoh || !nominees?.length) return;
+    this.state.nominationLeanNames = nominees.map((n) => n.name);
     const beat = await fetchNarrativeBeat('nomination_ceremony', this.state);
+    this.state.nominationLeanNames = [];
     if (beat) {
       this.logAndRender([{
         ...beat,
@@ -1071,12 +1077,16 @@ class Game {
 
   _showReplacementPicker() {
     const player = this.state.getPlayer();
+    const hohLens = buildPlayerHohLens(player);
     const nominees = new Set(this.state.nominees);
     const targets = this.state.getOthers(player).filter((c) => !nominees.has(c.id));
 
-    let html = '<p>Pick a replacement nominee:</p><div class="target-grid">';
+    let html = `<p class="hoh-nom-hint">${getPlayerHohPickerIntro(player)}</p>`;
+    html += '<p>Pick a replacement nominee:</p><div class="target-grid nomination-target-grid">';
     for (const t of targets) {
-      html += `<button class="btn target-btn" data-replacement="${t.id}">${escapeHtml(t.name)}</button>`;
+      const lens = getNomTargetLensLabel(hohLens, t);
+      const lensHtml = lens ? `<span class="nom-lens">${escapeHtml(lens)}</span>` : '';
+      html += `<button class="btn target-btn" data-replacement="${t.id}">${escapeHtml(t.name)}${lensHtml}</button>`;
     }
     html += '</div>';
     this.ui.showActionDetail(html);

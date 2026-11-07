@@ -166,6 +166,12 @@ Do not invent evictions or wins that are not in context. Stay dramatic but plaus
   if (kind === 'host_line') {
     return `${base}\nKind: Julie Chen-style host line before a live event.\nContext: ${ctx}`;
   }
+  if (kind === 'nomination_ceremony') {
+    return `${base}
+Kind: Julie Chen-style host reaction immediately AFTER the HOH names two nominees on the block.
+Use hohName, hohArchetype, hohNomStyle, nominees, and nominationLeanNames from context if present — reflect the HOH's persona (e.g. backdoor/strategist, loyalist, chaos) without inventing extra nominees.
+Name both nominees. Under 320 characters. Context: ${ctx}`;
+  }
   if (kind === 'week_recap') {
     return `${base}\nKind: End-of-week recap voiceover.\nContext: ${ctx}`;
   }

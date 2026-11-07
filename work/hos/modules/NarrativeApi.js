@@ -94,6 +94,9 @@ export function buildNarrativeContext(state) {
       hoh?.personality?.strategy && typeof hoh.personality.strategy === 'string'
         ? hoh.personality.strategy
         : null,
+    nominationLeanNames: Array.isArray(state.nominationLeanNames)
+      ? state.nominationLeanNames
+      : [],
     nominees,
     playerIsNominated: Boolean(player?.isNominated),
     playerIsHOH: Boolean(player?.isHOH),

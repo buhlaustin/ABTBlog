@@ -1,4 +1,5 @@
 import { getAllianceIds, sharesAllianceWith } from './allianceUtils.js';
+import { PHASES } from './GameState.js';
 import { randomInt } from './utils.js';
 
 /** Short player-facing copy keyed by `personality.strategy`. */
@@ -220,4 +221,56 @@ export function getLocalNominationHostBeat(hoh, nominees) {
 export function formatHohNomIntelLine(hoh) {
   const hint = HOH_NOM_PERSONA_HINTS[hoh.personality?.strategy] || HOH_NOM_PERSONA_HINTS.survive;
   return `As HOH, ${hoh.name} ${hint}.`;
+}
+
+/**
+ * Hidden motivation surfaced in the feed when grudges, deals, or rivalries drove the pick.
+ * @param {import('./Contestant.js').Contestant} hoh
+ * @param {import('./Contestant.js').Contestant} target
+ */
+export function getNominationDramaNote(hoh, target) {
+  const grudge = hoh.grudges?.find((g) => g.againstId === target.id);
+  if (grudge && grudge.intensity >= 12) {
+    return `<em>Behind the scenes:</em> ${hoh.name}'s grudge against ${target.name} helped put them on the block.`;
+  }
+
+  const brokenToHoh = target.promises?.find((p) => p.targetId === hoh.id && p.kept === false);
+  if (brokenToHoh) {
+    return `<em>Behind the scenes:</em> ${target.name} broke a ${brokenToHoh.type || 'deal'} with ${hoh.name} — this nom looks like payback.`;
+  }
+
+  const hohOwed = hoh.promises?.find((p) => p.targetId === target.id && p.kept === null);
+  if (hohOwed && hoh.personality?.strategy === 'ally') {
+    return `<em>Behind the scenes:</em> ${hoh.name} had promised safety to ${target.name}, but loyalty lost to strategy.`;
+  }
+
+  if (getAllianceIds(target).length > 0 && !sharesAllianceWith(hoh, target)) {
+    const strat = hoh.personality?.strategy;
+    if (strat === 'ally' || strat === 'manipulate') {
+      return `<em>Behind the scenes:</em> ${hoh.name}'s nom chips away at a rival alliance anchored on ${target.name}.`;
+    }
+  }
+
+  if (target.isPlayer && hoh.getRelationship(target.id) < -15) {
+    return `<em>Behind the scenes:</em> ${hoh.name} has been ice-cold toward you — this was coming.`;
+  }
+
+  return null;
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ * @param {(hoh: import('./Contestant.js').Contestant, limit: number) => { target: { name: string } }[]} previewLeans
+ */
+export function getHohWatchBanner(state, previewLeans) {
+  const hoh = state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
+  if (!hoh || state.houseEventComplete || state.inFinale) return '';
+  if (state.phase !== PHASES.SOCIAL && state.phase !== PHASES.NOMINATION) return '';
+  if (typeof previewLeans !== 'function') return '';
+
+  const leans = previewLeans(hoh, 2);
+  if (!leans.length) return '';
+
+  const names = leans.map((row) => row.target.name).join(', ');
+  return `HOH watch · ${hoh.name} (${hoh.personality?.name ?? '?'}) leans ${names}`;
 }

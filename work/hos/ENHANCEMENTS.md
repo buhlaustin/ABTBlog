@@ -72,8 +72,8 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Status** | **Shipped (v2):** Persona biases + ceremony copy + veto alignment; **player HOH picker** infers archetype from stats with on-brand target tags; **Read the HOH** social intel + spy/HOH lines; local/API **host beat** after noms; veto replacement reasons; nomination history stores `hohStrategy`. |
-| **Follow-ups** | LLM prompt tuning for `nomination_ceremony` kind on narrate API. |
+| **Status** | **Shipped (v3):** v2 features plus **HOH watch** header lean banner pre-ceremony, **behind-the-scenes** grudge/deal/alliance notes on AI noms, player **veto replacement** persona tags, `nomination_ceremony` narrate API prompt, pre-comp pep reads HOH style. |
+| **Follow-ups** | Surface `playerIntel` panel for stored HOH leans. |
 | **Priority** | Polish only. |
 
 ### Promises, grudges, and betrayal — surface in UI

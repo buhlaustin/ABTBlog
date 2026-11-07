@@ -1,5 +1,10 @@
 import { randomInt, clamp, pickRandom } from './utils.js';
-import { describeNominationReason, getHohNominationStyleLine } from './hohNomPersonas.js';
+import {
+  buildPlayerHohLens,
+  describeNominationReason,
+  getNominationDramaNote,
+  getHohNominationStyleLine
+} from './hohNomPersonas.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -81,6 +86,12 @@ export class EvictionSystem {
         type: 'drama',
         text: `${hoh.name} nominates <strong>${n.name}</strong> for eviction — ${reason}.`
       });
+      if (!hoh.isPlayer) {
+        const drama = getNominationDramaNote(hoh, n);
+        if (drama) {
+          results.push({ type: 'narrative', text: drama });
+        }
+      }
       n.threat = clamp(n.threat - 5, 0, 100);
     }
     this.state.nominees = nominees.map((n) => n.id);
@@ -316,10 +327,16 @@ export class EvictionSystem {
       replacement.isNominated = true;
       this.state.nominees.push(replacement.id);
       const hoh = this._getHOH();
+      const hohLens = hoh?.isPlayer ? buildPlayerHohLens(hoh) : hoh;
+      const reason = hohLens ? describeNominationReason(hohLens, replacement) : 'strategic choice';
       results.push({
         type: 'drama',
-        text: `${hoh?.name || 'The HOH'} nominates <strong>${replacement.name}</strong> as the replacement.`
+        text: `${hoh?.name || 'The HOH'} nominates <strong>${replacement.name}</strong> as the replacement — ${reason}.`
       });
+      if (hohLens) {
+        const drama = getNominationDramaNote(hohLens, replacement);
+        if (drama) results.push({ type: 'narrative', text: drama });
+      }
     }
     return results;
   }
