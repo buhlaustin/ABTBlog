@@ -1,4 +1,4 @@
-import { escapeHtml, pickRandom } from './utils.js';
+import { escapeHtml, JURY_START_HOUSE_COUNT, pickRandom } from './utils.js';
 import { getThreatBand } from './threatBands.js';
 
 /**
@@ -19,6 +19,80 @@ function powerRound(state) {
 
 /**
  * @param {import('./GameState.js').GameState} state
+ * @param {number} week
+ * @param {object[]} events
+ */
+function summarizePlayerWeek(state, week, events) {
+  const player = state.getPlayer();
+  if (!player || player.evicted) return null;
+
+  const pid = player.id;
+  /** @type {string[]} */
+  const roles = [];
+
+  if (events.some((e) => e.type === 'hoh' && e.hohId === pid)) roles.push('HOH');
+  if (events.some((e) => e.type === 'veto_win' && e.holderId === pid)) roles.push('Won POV');
+  if (events.some((e) => e.type === 'nominations' && (e.nominees || []).includes(pid))) {
+    roles.push('On the block');
+  }
+  if (events.some((e) => e.type === 'veto_ceremony' && e.holderId === pid && e.vetoUsed)) {
+    roles.push('Used veto');
+  }
+  const wasNominated = events.some(
+    (e) => e.type === 'nominations' && (e.nominees || []).includes(pid)
+  );
+  const evictedSelf = events.some((e) => e.type === 'eviction' && e.evictedId === pid);
+  if (wasNominated && !evictedSelf) {
+    roles.push('Survived eviction');
+  }
+
+  let threatDelta = null;
+  if (typeof state.playerThreatWeekStart === 'number') {
+    threatDelta = player.threat - state.playerThreatWeekStart;
+  }
+
+  const confessionalsThisWeek = (state.confessionalLog || []).filter((r) => r.week === week).length;
+  const yourConfessionals = (state.confessionalLog || []).filter(
+    (r) => r.week === week && r.speakerId === pid
+  ).length;
+
+  let betrayalsReceived = 0;
+  for (const c of state.contestants) {
+    for (const b of c.betrayals || []) {
+      if (b.byId !== pid) continue;
+      if (b.week === week) betrayalsReceived += 1;
+    }
+  }
+
+  return {
+    roles,
+    threatDelta,
+    threatNow: player.threat,
+    threatBand: getThreatBand(player.threat).label,
+    confessionalsThisWeek,
+    yourConfessionals,
+    betrayalsReceived
+  };
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ * @param {number} week
+ */
+function summarizeJuryWeek(state, week) {
+  const seated = state.contestants
+    .filter((c) => c.isJuror && c.evictedWeek === week)
+    .map((c) => c.name);
+  const total = state.getJurors?.().length ?? state.contestants.filter((c) => c.isJuror).length;
+  return {
+    seated,
+    total,
+    juryPhase: state.getActiveContestants().length < JURY_START_HOUSE_COUNT
+  };
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
  */
 export function compileWeekRecap(state) {
   const week = state.week;
@@ -28,6 +102,7 @@ export function compileWeekRecap(state) {
     .filter((e) => e.type === 'hoh')
     .map((e) => ({
       name: nameFor(state, e.hohId),
+      archetype: e.hohArchetype || null,
       round: e.powerRound ?? 1
     }));
 
@@ -35,6 +110,7 @@ export function compileWeekRecap(state) {
     .filter((e) => e.type === 'nominations')
     .map((e) => ({
       hoh: nameFor(state, e.hoh),
+      hohArchetype: e.hohArchetype || null,
       nominees: (e.nominees || []).map((id) => nameFor(state, id)).filter(Boolean),
       round: e.powerRound ?? 1
     }));
@@ -97,6 +173,13 @@ export function compileWeekRecap(state) {
   if (state.mvpTwistWeekActive || state.mvpTwistScheduledWeek === week) twists.push('MVP twist');
   if (state.battleBackWeekActive || state.battleBackScheduledWeek === week) twists.push('Battle Back');
 
+  const playerWeek = summarizePlayerWeek(state, week, events);
+  const jury = summarizeJuryWeek(state, week);
+
+  const hohLeans = nominationSets
+    .map((n) => n.hohArchetype)
+    .filter(Boolean);
+
   return {
     week,
     remaining: active.length,
@@ -106,6 +189,9 @@ export function compileWeekRecap(state) {
     vetoMoves,
     evicted,
     twists,
+    playerWeek,
+    jury,
+    hohLeans,
     danger: {
       topThreats,
       playerThreat,
@@ -117,12 +203,37 @@ export function compileWeekRecap(state) {
 }
 
 /**
- * @param {import('./weekEndRecap.js').WeekRecap} recap
+ * @param {ReturnType<typeof compileWeekRecap>['playerWeek']} digest
  */
+export function formatPlayerWeekDigest(digest) {
+  if (!digest) return '';
+  const parts = [];
+  if (digest.roles?.length) parts.push(digest.roles.join(' · '));
+  if (digest.threatDelta != null && digest.threatDelta !== 0) {
+    const sign = digest.threatDelta > 0 ? '+' : '−';
+    parts.push(`threat ${sign}${Math.abs(digest.threatDelta)}`);
+  } else if (digest.threatNow != null) {
+    parts.push(`threat ${digest.threatNow} (${digest.threatBand})`);
+  }
+  if (digest.yourConfessionals) {
+    parts.push(`${digest.yourConfessionals} DR line${digest.yourConfessionals === 1 ? '' : 's'}`);
+  }
+  if (digest.betrayalsReceived) {
+    parts.push(`${digest.betrayalsReceived} betrayal${digest.betrayalsReceived === 1 ? '' : 's'} logged`);
+  }
+  return parts.join(' · ');
+}
+
 function formatNomLine(set) {
   const label = set.round > 1 ? ` (R${set.round})` : '';
+  const arch = set.hohArchetype ? ` (${set.hohArchetype})` : '';
   const noms = set.nominees?.length ? set.nominees.join(' & ') : '—';
-  return `<strong>${escapeHtml(set.hoh || 'HOH')}</strong>${label} → ${escapeHtml(noms)}`;
+  return `<strong>${escapeHtml(set.hoh || 'HOH')}</strong>${escapeHtml(arch)}${label} → ${escapeHtml(noms)}`;
+}
+
+function formatHohLine(h) {
+  const arch = h.archetype ? ` (${h.archetype})` : '';
+  return h.round > 1 ? `${h.name}${arch} (R${h.round})` : `${h.name}${arch}`;
 }
 
 /**
@@ -136,9 +247,7 @@ export function buildWeekRecapFeedEntries(recap) {
   );
 
   if (recap.hohWins.length) {
-    const hohText = recap.hohWins
-      .map((h) => (h.round > 1 ? `${h.name} (R${h.round})` : h.name))
-      .join(' → ');
+    const hohText = recap.hohWins.map(formatHohLine).join(' → ');
     lines.push(`HOH: ${escapeHtml(hohText)}`);
   }
 
@@ -174,27 +283,54 @@ export function buildWeekRecapFeedEntries(recap) {
     lines.push('Evicted: <em>none recorded</em>');
   }
 
+  if (recap.jury?.seated?.length) {
+    lines.push(
+      `Jury: <strong>${escapeHtml(recap.jury.seated.join(', '))}</strong> seated `
+      + `(${recap.jury.total} total)`
+    );
+  } else if (recap.jury?.juryPhase) {
+    lines.push(`Jury: ${recap.jury.total} seated — endgame jury phase`);
+  }
+
+  const digestLine = formatPlayerWeekDigest(recap.playerWeek);
+  if (digestLine) {
+    lines.push(`<span class="week-recap-you">Your week:</span> ${escapeHtml(digestLine)}`);
+  }
+
   const danger = recap.danger;
   if (danger?.topThreats?.length) {
     const names = danger.topThreats.map((t) => `${t.name} (${t.threat})`).join(', ');
     lines.push(`Next week radar: ${escapeHtml(names)}`);
   }
-  if (danger?.playerBand && danger.playerThreat != null) {
+  if (danger?.playerBand && danger.playerThreat != null && !digestLine?.includes('threat')) {
     lines.push(
       `Your threat: <strong>${danger.playerThreat}</strong> (${escapeHtml(danger.playerBand)})`
       + (danger.playerOnRadar ? ' — on the nomination radar' : '')
     );
   }
 
+  if (recap.playerWeek?.confessionalsThisWeek > 0 && !recap.playerWeek?.yourConfessionals) {
+    lines.push(`Diary room: ${recap.playerWeek.confessionalsThisWeek} confessional line(s) this week`);
+  }
+
   if (recap.twists?.length) {
     lines.push(`Twists: ${escapeHtml(recap.twists.join(' · '))}`);
   }
 
-  return [{
+  const entries = [{
     type: 'week-recap',
     text: lines.join('<br>'),
     weekRecap: recap
   }];
+
+  if (recap.playerWeek?.roles?.length) {
+    entries.push({
+      type: 'week-recap-digest',
+      text: `<span class="week-recap-label">Week ${recap.week} — your arc</span> · ${escapeHtml(recap.playerWeek.roles.join(' → '))}`
+    });
+  }
+
+  return entries;
 }
 
 /**
@@ -204,22 +340,27 @@ export function getLocalWeekRecapVoiceover(recap) {
   const evictedNames = recap.evicted.map((e) => e.name).filter(Boolean);
   const hoh = recap.hohWins[recap.hohWins.length - 1]?.name || 'a new HOH';
   const danger = recap.danger?.topThreats?.[0]?.name;
+  const you = recap.playerWeek;
+  const youNote = you?.roles?.length ? `You played: ${you.roles.join(', ')}.` : '';
+  const juryNote = recap.jury?.seated?.length
+    ? `${recap.jury.seated.join(' and ')} join the jury. `
+    : '';
 
   let line;
   if (evictedNames.length >= 2) {
     line = pickRandom([
-      `What a week — ${hoh} ran the house, and ${evictedNames.join(' and ')} both went to the jury. The target list starts with ${danger || 'everyone'}.`,
-      `Double eviction fallout: ${evictedNames.join(', ')} are out. ${recap.remaining} players left and ${danger || 'the threats'} are still hunting.`
+      `What a week — ${hoh} ran the house, and ${evictedNames.join(' and ')} both went to the jury. ${juryNote}${youNote} The target list starts with ${danger || 'everyone'}.`,
+      `Double eviction fallout: ${evictedNames.join(', ')} are out. ${recap.remaining} players left. ${youNote}`
     ]);
   } else if (evictedNames.length === 1) {
     line = pickRandom([
-      `Week ${recap.week} closes with ${evictedNames[0]} evicted. ${hoh} held the keys; ${danger || 'the big threats'} eye next week.`,
-      `${evictedNames[0]} is gone — ${recap.remaining} remain. Watch ${danger || 'whoever won POV'} and your own threat meter.`
+      `Week ${recap.week} closes with ${evictedNames[0]} evicted. ${juryNote}${hoh} held the keys. ${youNote}`,
+      `${evictedNames[0]} is gone — ${recap.remaining} remain. ${youNote} Watch ${danger || 'the threats'} next week.`
     ]);
   } else {
     line = pickRandom([
-      `Week ${recap.week} wraps with ${recap.remaining} still inside. ${hoh} was in charge — nominations and veto drama set up next week’s bloodbath.`,
-      `No eviction stuck in the ledger, but ${hoh} shaped the board. ${danger || 'Pressure'} builds before Friday.`
+      `Week ${recap.week} wraps with ${recap.remaining} still inside. ${youNote} ${hoh} shaped the board before Friday returns.`,
+      `The ledger is messy but everyone survived eviction night. ${youNote} Pressure builds.`
     ]);
   }
 
@@ -238,7 +379,9 @@ export function getWeekRecapBanner(state) {
   if (!recap || recap.week !== state.week - 1) return '';
   const evicted = recap.evicted.map((e) => e.name).filter(Boolean).join(', ') || '—';
   const hoh = recap.hohWins.map((h) => h.name).filter(Boolean).pop() || '—';
-  return `Week ${recap.week} recap · HOH ${hoh} · Out: ${evicted} · ${recap.remaining} left`;
+  const you = formatPlayerWeekDigest(recap.playerWeek);
+  const youBit = you ? ` · You: ${you.split(' · ')[0]}` : '';
+  return `Week ${recap.week} recap · HOH ${hoh} · Out: ${evicted} · ${recap.remaining} left${youBit}`;
 }
 
 /**
@@ -255,15 +398,37 @@ export function buildWeekRecapIntelSection(state) {
   const items = [{
     key: 'wr-week',
     name: `Week ${recap.week}`,
-    detail: `${recap.remaining} HG remain · ${recap.evicted.length} evicted this week`
+    detail: `${recap.remaining} HG remain · ${recap.evicted.length} evicted`
   }];
 
   if (recap.hohWins.length) {
     items.push({
       key: 'wr-hoh',
       name: 'HOH',
-      detail: recap.hohWins.map((h) => h.name).filter(Boolean).join(' → ')
+      detail: recap.hohWins.map((h) => {
+        const arch = h.archetype ? ` (${h.archetype})` : '';
+        return `${h.name}${arch}`;
+      }).filter(Boolean).join(' → ')
     });
+  }
+
+  if (recap.nominationSets.length) {
+    items.push({
+      key: 'wr-noms',
+      name: 'Blocks',
+      detail: recap.nominationSets
+        .map((n) => `${n.nominees.join(' & ')}`)
+        .join(' · ')
+    });
+  }
+
+  if (recap.vetoMoves.length) {
+    const vetoDetail = recap.vetoMoves.map((v) => {
+      if (v.summary) return v.summary.slice(0, 72);
+      if (!v.used) return 'Veto unused';
+      return `Saved ${v.saved || '—'}${v.replacement ? ` → ${v.replacement}` : ''}`;
+    }).join(' · ');
+    items.push({ key: 'wr-veto', name: 'Veto', detail: vetoDetail });
   }
 
   if (recap.evicted.length) {
@@ -274,19 +439,24 @@ export function buildWeekRecapIntelSection(state) {
     });
   }
 
+  if (recap.jury?.seated?.length) {
+    items.push({
+      key: 'wr-jury',
+      name: 'New jurors',
+      detail: `${recap.jury.seated.join(', ')} (${recap.jury.total} total)`
+    });
+  }
+
+  const digest = formatPlayerWeekDigest(recap.playerWeek);
+  if (digest) {
+    items.push({ key: 'wr-you', name: 'Your week', detail: digest });
+  }
+
   if (recap.danger?.topThreats?.length) {
     items.push({
       key: 'wr-danger',
       name: 'Next-week heat',
       detail: recap.danger.topThreats.map((t) => `${t.name} (${t.threat})`).join(' · ')
-    });
-  }
-
-  if (recap.danger?.playerThreat != null) {
-    items.push({
-      key: 'wr-you',
-      name: 'Your threat',
-      detail: `${recap.danger.playerThreat} — ${recap.danger.playerBand || '—'}`
     });
   }
 
@@ -305,6 +475,6 @@ export function buildWeekRecapIntelSection(state) {
     id: 'week-recap',
     title: 'Week recap',
     tone: 'neutral',
-    items: items.slice(0, 8)
+    items: items.slice(0, 10)
   };
 }

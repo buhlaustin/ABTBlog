@@ -208,7 +208,7 @@ Context: ${ctx}`;
   if (kind === 'week_recap') {
     return `${base}
 Kind: End-of-week recap voiceover after the structured recap card.
-Use weekRecap in context: hohWins, nominationSets, vetoMoves, evicted, remaining, danger.topThreats, twists.
+Use weekRecap in context: hohWins, nominationSets, vetoMoves, evicted, remaining, jury.seated, playerWeek.roles, danger.topThreats, twists.
 Name evicted houseguests. Mention who is in danger next week. Under 320 characters. No markdown.
 Context: ${ctx}`;
   }

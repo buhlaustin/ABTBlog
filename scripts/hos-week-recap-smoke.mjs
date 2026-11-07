@@ -5,6 +5,7 @@
 import {
   buildWeekRecapFeedEntries,
   compileWeekRecap,
+  formatPlayerWeekDigest,
   getWeekRecapBanner
 } from '../work/hos/modules/weekEndRecap.js';
 
@@ -25,8 +26,14 @@ const state = {
   doubleEvictionRound: 1,
   lastVetoRecapWeek: null,
   evictedThisWeek: 'x1',
+  playerThreatWeekStart: 35,
+  confessionalLog: [{ week: 3, speakerId: 'p1' }, { week: 3, speakerId: 'h1' }],
+  contestants: [],
+  getJurors() {
+    return [{ name: 'Alex', evictedWeek: 3, isJuror: true }];
+  },
   history: [
-    { week: 3, type: 'hoh', hohId: 'h1', powerRound: 1 },
+    { week: 3, type: 'hoh', hohId: 'h1', hohArchetype: 'Strategist', powerRound: 1 },
     { week: 3, type: 'nominations', hoh: 'h1', nominees: ['v1', 'p1'], powerRound: 1 },
     { week: 3, type: 'veto_win', holderId: 'p1', powerRound: 1 },
     {
@@ -47,10 +54,17 @@ const state = {
     return contestants.filter((c) => !c.evicted);
   },
   getContestant(id) {
-    if (id === 'x1') return { id: 'x1', name: 'Alex', evicted: true };
+    if (id === 'x1') {
+      return { id: 'x1', name: 'Alex', evicted: true, isJuror: true, evictedWeek: 3 };
+    }
     return contestants.find((c) => c.id === id) ?? null;
   }
 };
+
+state.contestants = [
+  ...contestants,
+  { id: 'x1', name: 'Alex', evicted: true, isJuror: true, evictedWeek: 3 }
+];
 
 const recap = compileWeekRecap(state);
 if (recap.hohWins.length !== 1 || recap.nominationSets.length !== 1) {
@@ -61,11 +75,20 @@ if (recap.evicted[0]?.name !== 'Alex') {
 }
 if (!recap.danger?.topThreats?.length) fail('danger threats missing');
 
+if (!recap.playerWeek?.roles?.includes('Won POV')) fail('player POV role missing');
+if (!recap.jury?.seated?.includes('Alex')) fail('jury seated missing');
+const digest = formatPlayerWeekDigest(recap.playerWeek);
+if (!digest.includes('Won POV')) fail(`digest ${digest}`);
+
 const entries = buildWeekRecapFeedEntries(recap);
 if (!entries[0]?.text?.includes('week-recap-label')) {
   fail('feed missing recap label');
 }
 if (!entries[0]?.text?.includes('Jordan')) fail('feed missing HOH name');
+if (!entries[0]?.text?.includes('Your week')) fail('feed missing player line');
+if (entries.length < 2 || entries[1].type !== 'week-recap-digest') {
+  fail('missing digest entry');
+}
 
 state.lastWeekRecap = recap;
 state.week = 4;

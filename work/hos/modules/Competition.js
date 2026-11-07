@@ -202,6 +202,8 @@ export class CompetitionManager {
       this.state.addHistory({
         type: 'hoh',
         hohId: winner.id,
+        hohArchetype: winner.personality?.name ?? null,
+        hohStrategy: winner.personality?.strategy ?? null,
         powerRound: this.state.doubleEvictionRound > 1 ? 2 : 1
       });
     }

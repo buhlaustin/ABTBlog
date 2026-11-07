@@ -370,9 +370,22 @@ body {
   line-height: 1.6;
 }
 
-.story-entry.week-recap .week-recap-label {
+.story-entry.week-recap .week-recap-label,
+.story-entry.week-recap-digest .week-recap-label {
   font-weight: 600;
   color: var(--text);
+}
+
+.story-entry.week-recap-digest {
+  background: rgba(91, 141, 184, 0.08);
+  border-left: 3px solid #7aa3c7;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.story-entry.week-recap .week-recap-you {
+  font-weight: 600;
+  color: var(--info);
 }
 
 .story-entry.veto-summary {
