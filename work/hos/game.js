@@ -21,7 +21,13 @@ import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
 import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
 import { countCastFloaters, getPawnShieldWatchBanner } from './modules/floaterShields.js';
-import { getBackdoorNomLens, getBackdoorPlanBanner } from './modules/strategicVerbs.js';
+import {
+  getBackdoorNomLens,
+  getBackdoorPlanBanner,
+  getBackdoorVetoCeremonyHint,
+  getThrowCompBanner,
+  validateBackdoorNominations
+} from './modules/strategicVerbs.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
 import {
   computeBattleBackScores,
@@ -286,6 +292,8 @@ class Game {
     if (pawnWatch) twistParts.push(pawnWatch);
     const backdoorBanner = getBackdoorPlanBanner(state);
     if (backdoorBanner) twistParts.push(backdoorBanner);
+    const throwBanner = getThrowCompBanner(state);
+    if (throwBanner) twistParts.push(throwBanner);
     const threatAlert = getThreatNominationAlert(state, previewLeans);
     if (threatAlert) twistParts.push(threatAlert);
     ui.updateTwistBanner(twistParts.join(' · '));
@@ -857,6 +865,13 @@ class Game {
       text: `<strong>${comp.name}</strong>: ${comp.description}`
     }]);
 
+    if (this.state.playerThrowCompetition) {
+      this.logAndRender([{
+        type: 'warning',
+        text: 'Throw comp armed — you are tanking this Head of Household competition.'
+      }]);
+    }
+
     const player = this.state.getPlayer();
     if (player.evicted) {
       this._resolveCompetitionAI();
@@ -1038,9 +1053,11 @@ class Game {
       if (confirm) {
         confirm.addEventListener('click', () => {
           const picks = selected.map((id) => this.state.getContestant(id));
+          const backdoorCheck = validateBackdoorNominations(this.state, picks);
           const { results, nominees } = this.eviction.runNominations(picks);
           this.ui.hideActionDetail();
-          this.logAndRender(results);
+          const feed = backdoorCheck.feedLine ? [...results, backdoorCheck.feedLine] : results;
+          this.logAndRender(feed);
           void (async () => {
             await this._appendNominationHostBeat(hohLens, nominees);
             this._onHouseEventComplete();
@@ -1075,7 +1092,10 @@ class Game {
 
   _showVetoCompetition() {
     this.ui.setActionPrompt('Power of Veto — compete to save a nominee!');
-    const html = `<p>The veto competition is intense. Can you outlast the distractions?</p>
+    const throwNote = this.state.playerThrowCompetition
+      ? '<p class="backdoor-hint">Throw comp armed — you already committed to tanking this POV comp.</p>'
+      : '';
+    const html = `${throwNote}<p>The veto competition is intense. Can you outlast the distractions?</p>
       <div class="competition-choices">
         <button class="btn btn-action competition-choice" data-value="true">Push through and win!</button>
         <button class="btn btn-action competition-choice" data-value="false">Play it safe</button>
@@ -1100,6 +1120,10 @@ class Game {
   }
 
   _finishVetoCeremony(vetoWinner) {
+    const backdoorHint = getBackdoorVetoCeremonyHint(this.state, vetoWinner);
+    if (backdoorHint) {
+      this.logAndRender([{ type: 'narrative', text: backdoorHint }]);
+    }
     const result = this.eviction.runVetoCeremony(vetoWinner);
     this.logAndRender(result.results);
 
@@ -1118,7 +1142,9 @@ class Game {
 
   _showVetoChoice(vetoWinner) {
     const nominees = this.state.nominees.map((id) => this.state.getContestant(id)).filter(Boolean);
-    let html = '<p>You won the Veto! Use it?</p><div class="target-grid">';
+    const backdoorHint = getBackdoorVetoCeremonyHint(this.state, vetoWinner);
+    let html = backdoorHint ? `<p class="backdoor-hint">${backdoorHint}</p>` : '';
+    html += '<p>You won the Veto! Use it?</p><div class="target-grid">';
     for (const n of nominees) {
       html += `<button class="btn target-btn" data-veto-target="${n.id}">Save ${escapeHtml(n.name)}</button>`;
     }

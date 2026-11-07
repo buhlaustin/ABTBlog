@@ -1,5 +1,6 @@
 import { escapeHtml } from './utils.js';
 import { buildFloaterShieldIntelSection } from './floaterShields.js';
+import { buildStrategicVerbsIntelSection } from './strategicVerbs.js';
 
 const PROMISE_LABELS = {
   vote: 'Vote deal',
@@ -101,6 +102,11 @@ export function buildDealIntel(state) {
   const pawnSection = buildFloaterShieldIntelSection(state);
   if (pawnSection) {
     sections.push(pawnSection);
+  }
+
+  const strategicSection = buildStrategicVerbsIntelSection(state);
+  if (strategicSection) {
+    sections.push(strategicSection);
   }
 
   if (promisesByYou.active.length) {

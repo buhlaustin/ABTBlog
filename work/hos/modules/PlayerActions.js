@@ -9,7 +9,12 @@ import { addMvpCampaignPoints, getMvpRaceLeader } from './SeasonTwists.js';
 import { formatHohNomIntelLine } from './hohNomPersonas.js';
 import { formatThreatChange } from './threatBands.js';
 import { formatPawnShieldSpyIntel } from './floaterShields.js';
-import { canThrowCompetition, canSetBackdoorPlan } from './strategicVerbs.js';
+import {
+  canCancelThrowCompetition,
+  canClearBackdoorPlan,
+  canSetBackdoorPlan,
+  canThrowCompetition
+} from './strategicVerbs.js';
 
 /**
  * Player-initiated actions during the social phase.
@@ -105,6 +110,22 @@ export class PlayerActions {
       });
     }
 
+    if (canClearBackdoorPlan(this.state, player)) {
+      actions.unshift({
+        id: 'clear_backdoor',
+        label: 'Clear Backdoor Plan',
+        description: 'Abandon the backdoor route this week.'
+      });
+    }
+
+    if (canCancelThrowCompetition(this.state, player)) {
+      actions.unshift({
+        id: 'cancel_throw',
+        label: 'Cancel Throw Comp',
+        description: 'Compete normally again before the live event starts.'
+      });
+    }
+
     const aiHoh = this.state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
     if (
       aiHoh
@@ -196,6 +217,10 @@ export class PlayerActions {
         return this._throwCompetition(player);
       case 'backdoor_plan':
         return this._setBackdoorPlan(player, target);
+      case 'clear_backdoor':
+        return this._clearBackdoorPlan(player);
+      case 'cancel_throw':
+        return this._cancelThrowComp(player);
       case 'end_day':
         return { success: true, text: 'You chose to end the day.', type: 'system', endDay: true };
       default:
@@ -596,6 +621,34 @@ export class PlayerActions {
     };
   }
 
+  _clearBackdoorPlan(player) {
+    if (!canClearBackdoorPlan(this.state, player)) {
+      return { success: false, text: 'No backdoor plan to clear.', type: 'system' };
+    }
+    const name = this.state.getContestant(this.state.backdoorTargetId)?.name ?? 'target';
+    this.state.backdoorTargetId = null;
+    this.state.backdoorPawnsLocked = false;
+    this._consumeAction();
+    return {
+      success: true,
+      text: `You shelved the backdoor on <strong>${name}</strong> and pivoted to a straight-forward week.`,
+      type: 'narrative'
+    };
+  }
+
+  _cancelThrowComp(player) {
+    if (!canCancelThrowCompetition(this.state, player)) {
+      return { success: false, text: 'You are not throwing a competition.', type: 'system' };
+    }
+    this.state.playerThrowCompetition = false;
+    this._consumeAction();
+    return {
+      success: true,
+      text: 'You will compete at full strength when the live comp begins.',
+      type: 'system'
+    };
+  }
+
   _setBackdoorPlan(player, target) {
     if (!canSetBackdoorPlan(this.state, player)) {
       return { success: false, text: 'You can only backdoor while reigning as HOH this week.', type: 'warning' };
@@ -608,6 +661,7 @@ export class PlayerActions {
     }
 
     this.state.backdoorTargetId = target.id;
+    this.state.backdoorPawnsLocked = false;
     this._consumeAction();
     return {
       success: true,

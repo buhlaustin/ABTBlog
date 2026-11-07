@@ -132,6 +132,7 @@ export class GameState {
     this.playerThrowCompetition = false;
     /** Player HOH backdoor replacement target id. */
     this.backdoorTargetId = null;
+    this.backdoorPawnsLocked = false;
 
     this.currentHOH = null;
     this.nominees = [];
@@ -416,6 +417,7 @@ export class GameState {
     this.competitionWinner = null;
     this.currentHOH = null;
     this.backdoorTargetId = null;
+    this.backdoorPawnsLocked = false;
     this.playerThrowCompetition = false;
   }
 
@@ -623,6 +625,7 @@ export class GameState {
       lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
       playerThrowCompetition: this.playerThrowCompetition,
       backdoorTargetId: this.backdoorTargetId,
+      backdoorPawnsLocked: this.backdoorPawnsLocked,
       currentHOH: this.currentHOH?.id ?? this.currentHOH,
       nominees: this.nominees,
       vetoUsed: this.vetoUsed,
@@ -698,6 +701,7 @@ export class GameState {
     state.lastPawnShieldNomineeIds = data.lastPawnShieldNomineeIds ?? [];
     state.playerThrowCompetition = data.playerThrowCompetition ?? false;
     state.backdoorTargetId = data.backdoorTargetId ?? null;
+    state.backdoorPawnsLocked = data.backdoorPawnsLocked ?? false;
     state.currentHOH = data.currentHOH
       ? state.contestants.find((c) => c.id === data.currentHOH) || data.currentHOH
       : null;

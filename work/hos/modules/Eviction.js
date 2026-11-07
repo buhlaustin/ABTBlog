@@ -365,6 +365,7 @@ export class EvictionSystem {
       if (backdoor) {
         results.push(backdoor);
         this.state.backdoorTargetId = null;
+        this.state.backdoorPawnsLocked = false;
       }
     }
     return results;

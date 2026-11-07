@@ -1,6 +1,7 @@
 import { clamp } from './utils.js';
 import { PHASES } from './GameState.js';
 import { describeEasyFloaterShield, describeLastPawnShield } from './floaterShields.js';
+import { describeStrategicVerbThreatNote } from './strategicVerbs.js';
 
 export const THREAT_BAND_RADAR = 32;
 export const THREAT_BAND_TARGET = 52;
@@ -223,6 +224,10 @@ export function buildThreatBandOutlook(state, previewLeans) {
   const lastPawn = describeLastPawnShield(state);
   if (lastPawn) {
     shield = shield ? `${shield} ${lastPawn}` : lastPawn;
+  }
+  const strategic = describeStrategicVerbThreatNote(state);
+  if (strategic) {
+    shield = shield ? `${shield} ${strategic}` : strategic;
   }
   const drivers = computeThreatDrivers(player, state);
   const { rank, total } = getThreatHouseRank(state, player);
