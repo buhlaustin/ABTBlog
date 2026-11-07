@@ -36,7 +36,11 @@ export const DIFFICULTY_CONFIG = {
     competitionPlayerBonus: 2,
     aiAggressionMod: -1,
     startingTrust: 15,
-    actionsPerDay: 3
+    actionsPerDay: 3,
+    /** Flat reduction to AI HOH nomination score for the human player. */
+    playerNominationProtection: 18,
+    /** Multiplier on nomination weight (0–1 = rarer picks). */
+    playerNominationWeightFactor: 0.48
   },
   normal: {
     label: 'Normal',
@@ -45,7 +49,9 @@ export const DIFFICULTY_CONFIG = {
     competitionPlayerBonus: 0,
     aiAggressionMod: 0,
     startingTrust: 5,
-    actionsPerDay: 2
+    actionsPerDay: 2,
+    playerNominationProtection: 6,
+    playerNominationWeightFactor: 0.9
   },
   hard: {
     label: 'Hard',
@@ -54,7 +60,9 @@ export const DIFFICULTY_CONFIG = {
     competitionPlayerBonus: -1,
     aiAggressionMod: 1,
     startingTrust: 0,
-    actionsPerDay: 2
+    actionsPerDay: 2,
+    playerNominationProtection: 0,
+    playerNominationWeightFactor: 1.12
   }
 };
 

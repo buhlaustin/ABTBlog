@@ -262,15 +262,23 @@ export class AIController {
     if (others.length === 0) return [];
     if (others.length === 1) return [others[0]];
 
-    const sorted = [...others].sort((a, b) => {
-      const scoreA = this._nominationScore(hoh, a);
-      const scoreB = this._nominationScore(hoh, b);
-      return scoreB - scoreA;
-    });
+    const pickWeight = (target) => this._nominationPickWeight(hoh, target);
 
-    const first = sorted[0];
-    const second = sorted.find((c) => c.id !== first.id);
+    const first = weightedPick(others, pickWeight);
+    const remaining = others.filter((c) => c.id !== first.id);
+    const second = weightedPick(remaining, pickWeight);
     return second ? [first, second] : [first];
+  }
+
+  _nominationPickWeight(hoh, target) {
+    let score = this._nominationScore(hoh, target);
+    score += randomInt(-4, 4);
+
+    if (target.isPlayer) {
+      score *= this.state.config.playerNominationWeightFactor ?? 1;
+    }
+
+    return Math.max(1, Math.round(score));
   }
 
   _nominationScore(hoh, target) {
@@ -288,7 +296,15 @@ export class AIController {
     const grudge = hoh.grudges.find((g) => g.againstId === target.id);
     if (grudge) score += grudge.intensity / 3;
 
-    return score;
+    if (target.isPlayer) {
+      const protection = this.state.config.playerNominationProtection ?? 0;
+      score -= protection;
+      if (hoh.getRelationship(target.id) > 5) {
+        score -= Math.min(20, hoh.getRelationship(target.id) / 2);
+      }
+    }
+
+    return Math.max(0, score);
   }
 
   /** AI decides eviction vote with reasoning. */
