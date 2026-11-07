@@ -22,16 +22,21 @@
       <div class="setup-layout">
       <div class="setup-panel card">
         <h2>Enter the House</h2>
+        <div class="setup-field-group">
         <label for="player-name">Your Name</label>
         <input type="text" id="player-name" maxlength="20" placeholder="Enter your name" value="You">
+        </div>
 
+        <div class="setup-field-group">
         <label for="difficulty">Difficulty</label>
         <select id="difficulty">
           <option value="easy">Easy — Softer competition, forgiving house</option>
           <option value="normal" selected>Normal — Balanced challenge</option>
           <option value="hard">Hard — Ruthless strategists, slim margins</option>
         </select>
+        </div>
 
+        <div class="setup-field-group">
         <label for="cast-size">Cast size</label>
         <select id="cast-size">
           <option value="standard" selected>Standard — 16 houseguests</option>
@@ -44,6 +49,7 @@
           <option value="jury_sprint">Jury sprint — 12 guests, jury at 8</option>
         </select>
         <p id="cast-preset-blurb" class="cast-preset-blurb" aria-live="polite"></p>
+        </div>
 
         <details class="cast-preset-cheat" id="cast-preset-cheat">
           <summary>Cast preset cheat sheet</summary>
@@ -110,6 +116,7 @@
             </div>
             <div id="week-calendar" class="week-calendar-host" aria-label="Week schedule"></div>
             <p id="twist-banner" class="twist-banner hidden" aria-live="polite"></p>
+            <div id="run-stats-chip" class="run-stats-chip hidden" aria-live="polite"></div>
           </div>
         </div>
         <div class="header-right">
@@ -121,9 +128,12 @@
       <main class="game-layout">
         <!-- Left: story log -->
         <section class="story-panel card">
-          <header class="panel-head">
-            <h2>House feed</h2>
-            <span class="panel-sub">Story · DR · host</span>
+          <header class="panel-head panel-head-feed">
+            <div class="panel-head-titles">
+              <h2>House feed</h2>
+              <span class="panel-sub">Story · DR · host</span>
+            </div>
+            <button type="button" id="btn-story-jump" class="btn btn-small btn-ghost story-jump hidden" aria-label="Jump to latest feed entries">Latest ↓</button>
           </header>
           <div id="story-log" class="story-log" aria-live="polite"></div>
         </section>

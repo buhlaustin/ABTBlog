@@ -71,6 +71,8 @@ export class UIManager {
       battleBackToggle: document.getElementById('twist-battle-back'),
       mvpTwistToggle: document.getElementById('twist-mvp'),
       twistBanner: document.getElementById('twist-banner'),
+      runStatsChip: document.getElementById('run-stats-chip'),
+      btnStoryJump: document.getElementById('btn-story-jump'),
       btnNewGame: document.getElementById('btn-new-game'),
       btnLoadGame: document.getElementById('btn-load-game'),
       btnSave: document.getElementById('btn-save'),
@@ -101,6 +103,30 @@ export class UIManager {
       endTitle: document.getElementById('end-title'),
       endSummary: document.getElementById('end-summary')
     };
+    this.initStoryFeedChrome();
+  }
+
+  initStoryFeedChrome() {
+    const log = this.elements.storyLog;
+    const jump = this.elements.btnStoryJump;
+    if (!log || !jump) return;
+    jump.addEventListener('click', () => {
+      log.scrollTop = log.scrollHeight;
+      jump.classList.add('hidden');
+    });
+    log.addEventListener('scroll', () => this._syncStoryJumpButton());
+  }
+
+  _storyNearBottom() {
+    const log = this.elements.storyLog;
+    if (!log) return true;
+    return log.scrollHeight - log.scrollTop - log.clientHeight < 100;
+  }
+
+  _syncStoryJumpButton() {
+    const jump = this.elements.btnStoryJump;
+    if (!jump) return;
+    jump.classList.toggle('hidden', this._storyNearBottom());
   }
 
   showScreen(screen) {
@@ -166,6 +192,33 @@ export class UIManager {
     el.classList.remove('hidden');
   }
 
+  updateRunStatsChip(text) {
+    const el = this.elements.runStatsChip;
+    if (!el) return;
+    const trimmed = (text || '').trim();
+    if (!trimmed) {
+      el.textContent = '';
+      el.classList.add('hidden');
+      el.innerHTML = '';
+      return;
+    }
+    const body = trimmed.replace(/^Run\s*·\s*/i, '');
+    const parts = body.split(/\s*·\s*/).filter(Boolean);
+    el.innerHTML = `<span class="run-chip-kicker">Run</span>${parts
+      .map((p) => `<span class="run-chip">${escapeHtml(p)}</span>`)
+      .join('')}`;
+    el.classList.remove('hidden');
+  }
+
+  pulseSaveButton() {
+    const btn = this.elements.btnSave;
+    if (!btn) return;
+    btn.classList.remove('btn-saved-flash');
+    void btn.offsetWidth;
+    btn.classList.add('btn-saved-flash');
+    window.setTimeout(() => btn.classList.remove('btn-saved-flash'), 900);
+  }
+
   /** Append entries to story log. */
   addStoryEntries(entries, scroll = true) {
     for (const entry of entries) {
@@ -182,7 +235,10 @@ export class UIManager {
       window.setTimeout(() => div.classList.remove('story-entry-enter'), 420);
     }
     if (scroll) {
-      this.elements.storyLog.scrollTop = this.elements.storyLog.scrollHeight;
+      if (this._storyNearBottom()) {
+        this.elements.storyLog.scrollTop = this.elements.storyLog.scrollHeight;
+      }
+      this._syncStoryJumpButton();
     }
   }
 

@@ -433,10 +433,13 @@ export function renderCareerSetupPanelHtml(profile) {
   if (!profile?.gamesPlayed) {
     return '<p class="career-panel-empty">Play a full season to start your career log.</p>';
   }
-  let html = '<ul class="career-panel-stats">';
-  html += `<li>${profile.wins} wins · ${profile.gamesPlayed} seasons · ${profile.totalWeeks || 0} weeks played</li>`;
-  html += `<li>${profile.totalHohWins || 0} career HOH · ${profile.totalVetoWins || 0} career POV</li>`;
-  html += '</ul>';
+  let html = '<div class="career-panel-stats-grid">';
+  html += `<div class="career-panel-stat"><span class="career-panel-stat-value">${profile.wins}</span><span class="career-panel-stat-label">Wins</span></div>`;
+  html += `<div class="career-panel-stat"><span class="career-panel-stat-value">${profile.gamesPlayed}</span><span class="career-panel-stat-label">Seasons</span></div>`;
+  html += `<div class="career-panel-stat"><span class="career-panel-stat-value">${profile.totalWeeks || 0}</span><span class="career-panel-stat-label">Weeks</span></div>`;
+  html += `<div class="career-panel-stat"><span class="career-panel-stat-value">${profile.totalHohWins || 0}</span><span class="career-panel-stat-label">Career HOH</span></div>`;
+  html += `<div class="career-panel-stat"><span class="career-panel-stat-value">${profile.totalVetoWins || 0}</span><span class="career-panel-stat-label">Career POV</span></div>`;
+  html += '</div>';
   const ids = Object.keys(profile.achievements || {});
   if (ids.length) {
     html += '<p class="career-panel-ach-title">Unlocked badges</p><ul class="career-panel-ach">';
@@ -445,9 +448,9 @@ export function renderCareerSetupPanelHtml(profile) {
       const def =
         ACHIEVEMENT_DEFS.find((d) => d.id === id) ||
         CAREER_ACHIEVEMENT_DEFS.find((d) => d.id === id);
-      html += `<li>★ ${escapeHtml(meta.title || def?.title || id)}</li>`;
+      html += `<li><span class="career-ach-star" aria-hidden="true">★</span><span>${escapeHtml(meta.title || def?.title || id)}</span></li>`;
     }
-    if (ids.length > 8) html += `<li>+${ids.length - 8} more</li>`;
+    if (ids.length > 8) html += `<li class="career-ach-more">+${ids.length - 8} more</li>`;
     html += '</ul>';
   }
   if (profile.lastRun) {
@@ -527,9 +530,9 @@ export function defaultProfile() {
 export function renderRunStatsEndHtml(run, profile, newAchievements = [], previousLastRun = null) {
   const resultLabel = run.won ? 'Victory' : run.wasJuror ? 'Jury exit' : run.evictedWeek ? `Evicted Week ${run.evictedWeek}` : 'Season over';
   let html = '<div class="run-stats-panel">';
+  html += `<div class="run-hero-card run-hero-${run.won ? 'win' : 'loss'}"><span class="run-hero-label">${escapeHtml(resultLabel)}</span><span class="run-hero-meta">${escapeHtml(run.castLabel)} · ${escapeHtml(run.difficulty)}</span></div>`;
   html += '<h3>This season</h3>';
-  html += '<ul class="run-stats-list">';
-  html += `<li><span class="run-stat-label">Result</span> ${escapeHtml(resultLabel)} · ${escapeHtml(run.castLabel)} · ${escapeHtml(run.difficulty)}</li>`;
+  html += '<ul class="run-stats-list run-stats-grid">';
   html += `<li><span class="run-stat-label">Weeks</span> ${run.week}</li>`;
   html += `<li><span class="run-stat-label">Nominations</span> ${run.timesNominated} · survived ${run.evictionVotesSurvived} vote${run.evictionVotesSurvived === 1 ? '' : 's'}</li>`;
   html += `<li><span class="run-stat-label">HOH / POV</span> ${run.hohWins} / ${run.vetoWins}</li>`;
@@ -631,4 +634,26 @@ export function formatCareerSetupHint(profile) {
   const ach = Object.keys(profile.achievements || {}).length;
   const total = ACHIEVEMENT_DEFS.length + CAREER_ACHIEVEMENT_DEFS.length;
   return `Career: ${profile.wins} win${profile.wins === 1 ? '' : 's'} · ${profile.gamesPlayed} season${profile.gamesPlayed === 1 ? '' : 's'} · ${ach}/${total} badges`;
+}
+
+/**
+ * Rich setup aside for career summary.
+ * @param {object|null} profile
+ */
+export function renderCareerSetupHintHtml(profile) {
+  if (!profile?.gamesPlayed) {
+    return '<p class="career-hint-empty">Finish a season to start your career log and unlock achievements.</p>';
+  }
+  const ach = Object.keys(profile.achievements || {}).length;
+  const total = ACHIEVEMENT_DEFS.length + CAREER_ACHIEVEMENT_DEFS.length;
+  const streak =
+    profile.currentWinStreak > 1
+      ? `<div class="career-hint-stat career-hint-streak"><span class="career-hint-value">${profile.currentWinStreak}</span><span class="career-hint-label">Win streak</span></div>`
+      : '';
+  return `<div class="career-hint-grid" role="group" aria-label="Career summary">
+    <div class="career-hint-stat"><span class="career-hint-value">${profile.wins}</span><span class="career-hint-label">Wins</span></div>
+    <div class="career-hint-stat"><span class="career-hint-value">${profile.gamesPlayed}</span><span class="career-hint-label">Seasons</span></div>
+    <div class="career-hint-stat"><span class="career-hint-value">${ach}<span class="career-hint-denom">/${total}</span></span><span class="career-hint-label">Badges</span></div>
+    ${streak}
+  </div>`;
 }

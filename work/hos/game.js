@@ -15,7 +15,7 @@ import { StorageManager } from './modules/Storage.js';
 import {
   compileLiveRunStats,
   compilePlayerRunStats,
-  formatCareerSetupHint,
+  renderCareerSetupHintHtml,
   getRunStatsBanner,
   renderCareerSetupPanelHtml,
   renderRunStatsEndHtml
@@ -149,7 +149,7 @@ class Game {
       this._resetGame();
       ui.showSetup();
       if (ui.elements.careerStatsHint) {
-        ui.elements.careerStatsHint.textContent = formatCareerSetupHint(StorageManager.loadProfile());
+        ui.elements.careerStatsHint.innerHTML = renderCareerSetupHintHtml(StorageManager.loadProfile());
       }
       if (ui.elements.careerPanelBody) {
         ui.elements.careerPanelBody.innerHTML = renderCareerSetupPanelHtml(StorageManager.loadProfile());
@@ -210,7 +210,7 @@ class Game {
     const refreshCareerPanel = () => {
       const profile = StorageManager.loadProfile();
       if (ui.elements.careerStatsHint) {
-        ui.elements.careerStatsHint.textContent = formatCareerSetupHint(profile);
+        ui.elements.careerStatsHint.innerHTML = renderCareerSetupHintHtml(profile);
       }
       if (ui.elements.careerPanelBody) {
         ui.elements.careerPanelBody.innerHTML = renderCareerSetupPanelHtml(profile);
@@ -349,6 +349,7 @@ class Game {
       this.state.challengeData = this.competition.challengeData;
     }
     if (StorageManager.save(this.state)) {
+      this.ui.pulseSaveButton();
       this.ui.showToast('Game saved!');
     } else {
       this.ui.showToast('Save failed.');
@@ -402,7 +403,7 @@ class Game {
     if (castBanner) twistParts.push(castBanner);
     const liveRun = compileLiveRunStats(state);
     const runBanner = liveRun && !state.gameOver ? getRunStatsBanner(liveRun) : '';
-    if (runBanner) twistParts.push(runBanner);
+    ui.updateRunStatsChip(runBanner);
     const previewLeans = (hoh, limit) => this.ai.previewNominationLeans(hoh, limit);
     const hohWatch = getHohWatchBanner(state, previewLeans);
     if (hohWatch) twistParts.push(hohWatch);
