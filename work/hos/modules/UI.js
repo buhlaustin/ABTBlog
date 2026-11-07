@@ -1,4 +1,5 @@
 import { PHASE_LABELS, PHASES, WEEKDAYS } from './GameState.js';
+import { renderDealIntelHtml } from './dealIntel.js';
 import { getHohNomPersonaTooltip } from './hohNomPersonas.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 
@@ -36,6 +37,9 @@ export class UIManager {
       juryCount: document.getElementById('jury-count'),
       jurySummary: document.getElementById('jury-summary'),
       juryList: document.getElementById('jury-list'),
+      intelPanel: document.getElementById('intel-panel'),
+      intelSummary: document.getElementById('intel-summary'),
+      intelBody: document.getElementById('intel-body'),
       actionPrompt: document.getElementById('action-prompt'),
       actionButtons: document.getElementById('action-buttons'),
       actionDetail: document.getElementById('action-detail'),
@@ -210,6 +214,25 @@ export class UIManager {
     }
 
     this.elements.allianceOverview.innerHTML = html;
+  }
+
+  renderDealIntelPanel(outlook) {
+    const panel = this.elements.intelPanel;
+    if (!panel) return;
+
+    const rendered = renderDealIntelHtml(outlook);
+    if (rendered.hidden) {
+      panel.classList.add('hidden');
+      return;
+    }
+
+    panel.classList.remove('hidden');
+    if (this.elements.intelSummary) {
+      this.elements.intelSummary.textContent = outlook.summary || '';
+    }
+    if (this.elements.intelBody) {
+      this.elements.intelBody.innerHTML = rendered.html;
+    }
   }
 
   renderJuryPanel(outlook, player, twistNote = '') {

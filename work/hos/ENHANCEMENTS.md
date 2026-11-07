@@ -80,10 +80,9 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Goal** | Data exists on `Contestant` (`promises`, `grudges`, `betrayals`); players should **see** consequences. |
-| **Player experience** | Story lines: “Alex remembers you broke your deal in Week 3.” Intel tab: active promises to you / by you. |
-| **Implementation** | Log on vote/nomination when `grudge`/`promise` affects AI; `PlayerActions` when breaking promise sets `kept: false`. |
-| **Priority** | High — high drama per line of code. |
+| **Status** | **Shipped:** Sidebar **Deals & grudges** (`dealIntel.js`) — active/broken/honored promises, grudges held vs against you, betrayals, gathered intel. `voteConsequences.js` logs Week N deal breaks on votes/noms; breaking a promise records betrayal + grudge; eviction votes honor/break deals with feed copy. |
+| **Follow-ups** | Promise type picker in UI; AI-initiated promises to player. |
+| **Priority** | Polish only. |
 
 ### Threat band warnings
 

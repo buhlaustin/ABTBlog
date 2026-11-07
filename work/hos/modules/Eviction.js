@@ -5,6 +5,11 @@ import {
   getNominationDramaNote,
   getHohNominationStyleLine
 } from './hohNomPersonas.js';
+import {
+  applyPlayerVotePromiseConsequences,
+  getNominationConsequenceLine,
+  getVoteConsequenceLine
+} from './voteConsequences.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -91,6 +96,10 @@ export class EvictionSystem {
         if (drama) {
           results.push({ type: 'narrative', text: drama });
         }
+      }
+      const nomFx = getNominationConsequenceLine(hoh, n);
+      if (nomFx) {
+        results.push(nomFx);
       }
       n.threat = clamp(n.threat - 5, 0, 100);
     }
@@ -393,6 +402,14 @@ export class EvictionSystem {
     // Player vote (HOH does not vote)
     const player = this.state.getPlayer();
     if (player && !player.evicted && !player.isNominated && !player.isHOH && playerVoteTarget) {
+      const promiseFx = applyPlayerVotePromiseConsequences(
+        player,
+        playerVoteTarget,
+        nominees,
+        this.state
+      );
+      results.push(...promiseFx.results);
+
       const vote = this.state.getContestant(playerVoteTarget);
       if (vote) {
         let ballotWeight = 1;
@@ -420,6 +437,13 @@ export class EvictionSystem {
         type: 'narrative',
         text: `${log.voter} votes to evict <strong>${log.target}</strong> — ${log.reason}.`
       });
+      if (player && !player.evicted) {
+        const voterC = voters.find((v) => v.name === log.voter);
+        if (voterC) {
+          const fx = getVoteConsequenceLine(player, log, voterC);
+          if (fx) results.push(fx);
+        }
+      }
     }
 
     // Determine evicted (most votes; tie = random)

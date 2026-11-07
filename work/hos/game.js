@@ -17,6 +17,7 @@ import {
   initNarrativeApiUrl,
   isNarrativeApiEnabled
 } from './modules/NarrativeApi.js';
+import { buildDealIntel } from './modules/dealIntel.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
 import {
   computeBattleBackScores,
@@ -275,6 +276,7 @@ class Game {
     const juryTwistNote = state.doubleEvictionWeekActive
       ? 'Double eviction this week — up to two new jurors may be seated after tonight.'
       : '';
+    ui.renderDealIntelPanel(buildDealIntel(state));
     ui.renderJuryPanel(buildJuryOutlook(state), state.getPlayer(), juryTwistNote);
     state.updateThreatLevels();
   }

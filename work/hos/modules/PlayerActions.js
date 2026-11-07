@@ -410,7 +410,7 @@ export class PlayerActions {
     this._consumeAction();
     return {
       success: true,
-      text: `You broke your promise to ${target.name}. They will not forget this betrayal.`,
+      text: `<strong>${target.name}</strong> will remember you broke your ${activePromise.type} deal from <strong>Week ${activePromise.week}</strong>.`,
       type: 'drama'
     };
   }
