@@ -10,6 +10,7 @@ import {
 import { getHohNomPersonaTooltip } from './hohNomPersonas.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 import { renderWeekCalendarHtml } from './weekCalendarStrip.js';
+import { getHouseguestCastMarks } from './castPresets.js';
 
 /**
  * DOM rendering and screen management.
@@ -339,7 +340,8 @@ export class UIManager {
       const dealMarks = player ? getHouseguestDealMarks(player, c) : [];
       const floaterMarks = state ? getHouseguestFloaterMarks(state, c) : [];
       const allianceMarks = state && player ? getHouseguestAllianceMarks(state, player, c) : [];
-      const allMarks = [...dealMarks, ...allianceMarks, ...floaterMarks];
+      const castMarks = getHouseguestCastMarks(c);
+      const allMarks = [...castMarks, ...dealMarks, ...allianceMarks, ...floaterMarks];
       const marksHtml = allMarks.length
         ? `<div class="deal-marks">${allMarks.map((m) =>
           `<span class="deal-mark deal-mark-${escapeHtml(m.key)}" title="${escapeHtml(m.title)}">${escapeHtml(m.label)}</span>`

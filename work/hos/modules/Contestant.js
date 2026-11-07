@@ -24,6 +24,10 @@ export class Contestant {
     this.name = name;
     this.isPlayer = isPlayer;
     this.personality = personality || pickRandom(PERSONALITY_TYPES);
+    /** All-Star returnee tag (display + AI threat bump). */
+    this.isVeteran = false;
+    this.veteranSeason = null;
+    this.isRookie = false;
     this.evicted = false;
     this.evictedWeek = null;
     this.isJuror = false;
@@ -171,6 +175,9 @@ export class Contestant {
       evicted: this.evicted,
       evictedWeek: this.evictedWeek,
       isJuror: this.isJuror,
+      isVeteran: this.isVeteran,
+      veteranSeason: this.veteranSeason,
+      isRookie: this.isRookie,
       loyalty: this.loyalty,
       intelligence: this.intelligence,
       social: this.social,
@@ -213,6 +220,9 @@ export class Contestant {
       evicted: data.evicted,
       evictedWeek: data.evictedWeek,
       isJuror: data.isJuror ?? false,
+      isVeteran: data.isVeteran ?? false,
+      veteranSeason: data.veteranSeason ?? null,
+      isRookie: data.isRookie ?? false,
       relationships: { ...data.relationships },
       trust: data.trust,
       threat: data.threat,

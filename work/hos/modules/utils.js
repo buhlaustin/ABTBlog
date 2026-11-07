@@ -43,14 +43,43 @@ export const CAST_PRESETS = {
     aiIntelligenceBonus: 1,
     defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: true }
   },
-  duo: {
-    id: 'duo',
-    label: 'Duo season (16 paired)',
-    aiCount: 15,
-    blurb: 'Seven pre-linked pairs at move-in. Battle Back suggested.',
-    seedDuos: true,
-    duoBond: 58,
-    defaultTwists: { doubleEviction: true, battleBack: true, mvpTwist: false }
+  supersized: {
+    id: 'supersized',
+    label: 'Supersized (20 HGs)',
+    aiCount: 19,
+    blurb: 'Biggest modern cast — jury begins at 12. Double eviction on.',
+    juryStartHouseCount: 12,
+    defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: true }
+  },
+  megacast: {
+    id: 'megacast',
+    label: 'Mega cast (24 HGs)',
+    aiCount: 23,
+    blurb: 'Chaos volume — 24 houseguests, one winner; jury at 14.',
+    juryStartHouseCount: 14,
+    defaultTwists: { doubleEviction: true, battleBack: true, mvpTwist: true }
+  },
+  all_stars: {
+    id: 'all_stars',
+    label: 'All-Stars + rookies (18)',
+    aiCount: 17,
+    blurb: 'Six returning legends vs twelve fresh faces — only one can win.',
+    veteranCount: 6,
+    juryStartHouseCount: 11,
+    veteranPersonalityWeights: {
+      strategist: 3,
+      competitor: 3,
+      aggressor: 1,
+      social: 1
+    },
+    rookiePersonalityWeights: {
+      social: 2,
+      floater: 2,
+      wildcard: 2,
+      loyalist: 1,
+      strategist: 1
+    },
+    defaultTwists: { doubleEviction: true, battleBack: true, mvpTwist: true }
   },
   jury_sprint: {
     id: 'jury_sprint',
@@ -66,7 +95,9 @@ export const FIRST_NAMES = [
   'Jordan', 'Alex', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Quinn', 'Avery',
   'Blake', 'Cameron', 'Dakota', 'Emery', 'Finley', 'Harper', 'Jamie', 'Kai',
   'Logan', 'Marley', 'Noah', 'Parker', 'Reese', 'Sage', 'Skyler', 'Tatum',
-  'Violet', 'Wren', 'Zion', 'Brooke', 'Chase', 'Drew', 'Ellis', 'Frankie'
+  'Violet', 'Wren', 'Zion', 'Brooke', 'Chase', 'Drew', 'Ellis', 'Frankie',
+  'Grey', 'Hayden', 'Indigo', 'Jules', 'Kit', 'Lane', 'Micah', 'Nico',
+  'Oakley', 'Phoenix', 'River', 'Shiloh', 'Tristan', 'Urban', 'Val', 'Winter'
 ];
 
 export const PERSONALITY_TYPES = [

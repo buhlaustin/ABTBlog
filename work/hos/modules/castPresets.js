@@ -4,11 +4,20 @@ import {
   PERSONALITY_TYPES,
   clamp,
   escapeHtml,
+  pickN,
+  randomInt,
   shuffle,
   weightedPick
 } from './utils.js';
 
 export { CAST_PRESETS };
+
+/** @deprecated preset removed — old saves map here */
+const LEGACY_CAST_PRESET_IDS = {
+  duo: 'standard'
+};
+
+const VETERAN_SEASON_TAGS = ['S8', 'S11', 'S14', 'S17', 'S19', 'S22', 'BBCAN3', 'S25'];
 
 /** @typedef {{ doubleEviction?: boolean, battleBack?: boolean, mvpTwist?: boolean }} TwistDefaults */
 
@@ -16,7 +25,8 @@ export { CAST_PRESETS };
  * @param {string} castPreset
  */
 export function getCastPreset(castPreset) {
-  return CAST_PRESETS[castPreset] || CAST_PRESETS.standard;
+  const key = LEGACY_CAST_PRESET_IDS[castPreset] || castPreset;
+  return CAST_PRESETS[key] || CAST_PRESETS.standard;
 }
 
 /**
@@ -44,17 +54,24 @@ export function resolveJuryStartHouseCount(state) {
 
 /**
  * @param {string} castPreset
- * @param {{ difficulty?: string }} options
+ * @param {{ difficulty?: string, veteran?: boolean, rookie?: boolean }} options
  * @returns {object | null}
  */
-export function pickPersonalityForCast(castPreset, { difficulty = 'normal' } = {}) {
+export function pickPersonalityForCast(castPreset, { difficulty = 'normal', veteran = false, rookie = false } = {}) {
   const preset = getCastPreset(castPreset);
   const floaterType = PERSONALITY_TYPES.find((p) => p.id === 'floater');
 
-  if (preset.personalityWeights) {
-    const pool = PERSONALITY_TYPES.filter((p) => (preset.personalityWeights[p.id] || 0) > 0);
+  let weights = preset.personalityWeights;
+  if (veteran && preset.veteranPersonalityWeights) {
+    weights = preset.veteranPersonalityWeights;
+  } else if (rookie && preset.rookiePersonalityWeights) {
+    weights = preset.rookiePersonalityWeights;
+  }
+
+  if (weights) {
+    const pool = PERSONALITY_TYPES.filter((p) => (weights[p.id] || 0) > 0);
     if (pool.length) {
-      return weightedPick(pool, (p) => preset.personalityWeights[p.id] || 0);
+      return weightedPick(pool, (p) => weights[p.id] || 0);
     }
   }
 
@@ -65,7 +82,7 @@ export function pickPersonalityForCast(castPreset, { difficulty = 'normal' } = {
 }
 
 /**
- * Duo pairs, intelligence bumps, and other cast shaping after relationships init.
+ * Stat bumps, all-star mix, jury threshold after relationships init.
  * @param {import('./GameState.js').GameState} state
  */
 export function applyCastPresetPostInit(state) {
@@ -80,8 +97,8 @@ export function applyCastPresetPostInit(state) {
     }
   }
 
-  if (preset.seedDuos) {
-    seedDuoAlliances(state, preset);
+  if (preset.id === 'all_stars') {
+    applyAllStarsMix(state, preset);
   }
 }
 
@@ -89,17 +106,38 @@ export function applyCastPresetPostInit(state) {
  * @param {import('./GameState.js').GameState} state
  * @param {object} preset
  */
-function seedDuoAlliances(state, preset) {
-  const ais = shuffle(state.getActiveContestants().filter((c) => !c.isPlayer));
-  const bond = preset.duoBond ?? 58;
-  let pairNum = 1;
-  for (let i = 0; i + 1 < ais.length; i += 2) {
-    const a = ais[i];
-    const b = ais[i + 1];
-    state.createAlliance(a.id, [b.id], `Duo ${pairNum}`);
-    a.modifyRelationship(b.id, bond + Math.floor(Math.random() * 8));
-    b.modifyRelationship(a.id, bond + Math.floor(Math.random() * 8));
-    pairNum += 1;
+function applyAllStarsMix(state, preset) {
+  const veteranCount = preset.veteranCount ?? 6;
+  const ais = shuffle(state.contestants.filter((c) => !c.isPlayer));
+  const veterans = ais.slice(0, veteranCount);
+  const rookies = ais.slice(veteranCount);
+  const seasonTags = pickN(VETERAN_SEASON_TAGS, veteranCount);
+
+  veterans.forEach((c, idx) => {
+    c.isVeteran = true;
+    c.isRookie = false;
+    c.veteranSeason = seasonTags[idx] || `S${randomInt(9, 24)}`;
+    const personality = pickPersonalityForCast('all_stars', { veteran: true });
+    if (personality) c.personality = { ...personality };
+    c.competition = clamp(c.competition + 1, 1, 10);
+    c.intelligence = clamp(c.intelligence + 1, 1, 10);
+    c.social = clamp(c.social + 1, 1, 10);
+    c.threat = clamp(c.threat + 10, 1, 100);
+    c.reputation = clamp(c.reputation + 12, 1, 100);
+  });
+
+  for (const c of rookies) {
+    c.isRookie = true;
+    c.isVeteran = false;
+    const personality = pickPersonalityForCast('all_stars', { rookie: true });
+    if (personality) c.personality = { ...personality };
+    c.threat = clamp(c.threat - 2, 1, 100);
+  }
+
+  const player = state.getPlayer();
+  if (player) {
+    player.isRookie = true;
+    player.isVeteran = false;
   }
 }
 
@@ -114,6 +152,24 @@ export function getCastPresetBlurb(castPreset) {
 
 /**
  * @param {import('./GameState.js').GameState} state
+ * @param {import('./Contestant.js').Contestant} c
+ * @returns {{ key: string, label: string, title: string }[]}
+ */
+export function getHouseguestCastMarks(c) {
+  const marks = [];
+  if (c.isVeteran) {
+    const tag = c.veteranSeason ? `Returnee · ${c.veteranSeason}` : 'All-Star returnee';
+    marks.push({ key: 'veteran', label: '★', title: tag });
+  } else if (c.isRookie && !c.isPlayer) {
+    marks.push({ key: 'rookie', label: 'R', title: 'Rookie — first time in the house' });
+  } else if (c.isRookie && c.isPlayer) {
+    marks.push({ key: 'rookie-you', label: 'R', title: 'You are the rookie the legends are hunting' });
+  }
+  return marks;
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
  * @returns {{ type: string, text: string }[]}
  */
 export function buildCastPresetPremiereLines(state) {
@@ -124,6 +180,9 @@ export function buildCastPresetPremiereLines(state) {
   if (state.battleBackEnabled) twistBits.push('Battle Back');
   if (state.mvpTwistEnabled) twistBits.push('MVP week');
 
+  const castN = state.getActiveContestants().length;
+  const juryAt = resolveJuryStartHouseCount(state);
+
   if (preset.id && preset.id !== 'standard') {
     lines.push({
       type: 'system',
@@ -131,10 +190,21 @@ export function buildCastPresetPremiereLines(state) {
     });
   }
 
-  if (preset.id === 'duo' && state.alliances.length) {
+  if (preset.id === 'supersized' || preset.id === 'megacast') {
     lines.push({
       type: 'narrative',
-      text: `Move-in pairs are set: <strong>${state.alliances.length} duos</strong> entered with pre-linked alliances (house still sees them as separate deals).`
+      text: `<strong>${castN} houseguests</strong> entered — only <strong>one</strong> walks away with the title. Jury starts at <strong>${juryAt}</strong> remaining.`
+    });
+  }
+
+  if (preset.id === 'all_stars') {
+    const vets = state.contestants.filter((c) => c.isVeteran);
+    const rookies = state.contestants.filter((c) => c.isRookie);
+    const vetNames = vets.slice(0, 4).map((c) => escapeHtml(c.name)).join(', ');
+    const more = vets.length > 4 ? ` +${vets.length - 4} more` : '';
+    lines.push({
+      type: 'narrative',
+      text: `All-Star twist: <strong>${vets.length} returnees</strong> (${vetNames}${more}) vs <strong>${rookies.length} rookies</strong> — past fame does not split the prize; one winner.`
     });
   }
 
@@ -146,10 +216,10 @@ export function buildCastPresetPremiereLines(state) {
     });
   }
 
-  if (preset.juryStartHouseCount && preset.juryStartHouseCount < JURY_START_HOUSE_COUNT) {
+  if (preset.juryStartHouseCount && preset.juryStartHouseCount !== JURY_START_HOUSE_COUNT) {
     lines.push({
       type: 'system',
-      text: `Jury sprint: jurors begin seating when <strong>${preset.juryStartHouseCount} houseguests</strong> remain (not ${JURY_START_HOUSE_COUNT}).`
+      text: `Jury seating: begins when <strong>${juryAt} houseguests</strong> remain (standard seasons use ${JURY_START_HOUSE_COUNT}).`
     });
   }
 
@@ -169,11 +239,17 @@ export function buildCastPresetPremiereLines(state) {
 export function buildCastPresetIntelSection(state) {
   const preset = getCastPreset(state.castPreset);
   const juryAt = resolveJuryStartHouseCount(state);
+  const active = state.getActiveContestants().length;
   const items = [
     {
       key: 'cast-preset',
       name: preset.label,
       detail: preset.blurb || 'Standard season'
+    },
+    {
+      key: 'cast-size',
+      name: 'Houseguests',
+      detail: `${active} active · one winner`
     },
     {
       key: 'cast-jury',
@@ -182,11 +258,18 @@ export function buildCastPresetIntelSection(state) {
     }
   ];
 
-  if (preset.id === 'duo') {
+  if (preset.id === 'all_stars') {
+    const vets = state.contestants.filter((c) => c.isVeteran);
+    const rookies = state.contestants.filter((c) => c.isRookie);
     items.push({
-      key: 'cast-duos',
-      name: 'Duo alliances',
-      detail: `${state.alliances.filter((a) => /^Duo /.test(a.name)).length} pre-linked pairs`
+      key: 'cast-vets',
+      name: 'Returnees',
+      detail: `${vets.length} all-stars (★ in list)`
+    });
+    items.push({
+      key: 'cast-rookies',
+      name: 'Rookies',
+      detail: `${rookies.length} first-timers (R tag)`
     });
   }
 

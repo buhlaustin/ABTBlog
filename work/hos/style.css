@@ -739,6 +739,17 @@ body {
 .tag.jury { background: rgba(244, 162, 97, 0.35); color: var(--gold); }
 .tag.evicted-player { background: rgba(231, 111, 81, 0.25); color: var(--danger); }
 
+.deal-mark-veteran {
+  color: var(--warning);
+  font-weight: 600;
+}
+
+.deal-mark-rookie,
+.deal-mark-rookie-you {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .cast-preset-blurb {
   margin: 0.35rem 0 0.75rem;
   font-size: 0.85rem;
