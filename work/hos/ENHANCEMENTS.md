@@ -235,7 +235,8 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 |--------|--------|
 | **Goal** | Post-game and cumulative stats. |
 | **Examples** | Times nominated, veto wins, alliance betrayals survived. |
-| **Implementation** | `StorageManager` profile object; `endGame()` summary. |
+| **Status** | **Shipped (v1):** `runStats.js` season stats from `history`; **14 achievements**; `localStorage` career profile; end-screen **This season / Career / Achievements**; setup **career hint**; **Deals → Career & run**; `node scripts/hos-run-stats-smoke.mjs`. |
+| **Implementation** | `StorageManager.loadProfile` / `recordRun`; `endGame()` persists profile. |
 | **Priority** | Low. |
 
 ### Sandbox / debug week jump

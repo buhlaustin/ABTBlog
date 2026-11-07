@@ -776,6 +776,97 @@ body {
   margin: 0.25rem 0;
 }
 
+.career-stats-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.run-stats-panel {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.run-stats-panel h3 {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 1rem;
+}
+
+.run-stats-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+}
+
+.run-stats-list li {
+  margin: 0.35rem 0;
+  line-height: 1.45;
+}
+
+.run-stat-label {
+  font-weight: 600;
+  margin-right: 0.35rem;
+}
+
+.ach-count {
+  font-weight: normal;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.ach-new-intro {
+  margin: 0.35rem 0;
+  font-size: 0.88rem;
+}
+
+.achievement-list {
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.achievement-item {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr;
+  grid-template-rows: auto auto;
+  gap: 0 0.5rem;
+  margin: 0.4rem 0;
+  font-size: 0.86rem;
+}
+
+.achievement-item .ach-badge {
+  grid-row: 1 / span 2;
+  align-self: center;
+  text-align: center;
+}
+
+.achievement-unlocked .ach-badge {
+  color: var(--warning);
+}
+
+.achievement-locked {
+  opacity: 0.55;
+}
+
+.ach-desc {
+  grid-column: 2;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.achievement-catalog {
+  margin-top: 0.65rem;
+  font-size: 0.86rem;
+}
+
+.achievement-catalog summary {
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
 .twist-fieldset {
   border: 1px solid var(--border-subtle, #333);
   border-radius: 8px;

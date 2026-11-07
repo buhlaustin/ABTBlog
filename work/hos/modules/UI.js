@@ -26,6 +26,7 @@ export class UIManager {
       castSelect: document.getElementById('cast-size'),
       castPresetBlurb: document.getElementById('cast-preset-blurb'),
       castPresetCheatList: document.getElementById('cast-preset-cheat-list'),
+      careerStatsHint: document.getElementById('career-stats-hint'),
       doubleEvictionToggle: document.getElementById('double-eviction'),
       battleBackToggle: document.getElementById('twist-battle-back'),
       mvpTwistToggle: document.getElementById('twist-mvp'),

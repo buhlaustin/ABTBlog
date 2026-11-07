@@ -12,6 +12,7 @@ import { EvictionSystem } from './modules/Eviction.js';
 import { PlayerActions } from './modules/PlayerActions.js';
 import { UIManager, setStorageRef } from './modules/UI.js';
 import { StorageManager } from './modules/Storage.js';
+import { compilePlayerRunStats, formatCareerSetupHint, renderRunStatsEndHtml } from './modules/runStats.js';
 import {
   fetchNarrativeBeat,
   initNarrativeApiUrl,
@@ -140,6 +141,9 @@ class Game {
     ui.elements.btnPlayAgain.addEventListener('click', () => {
       this._resetGame();
       ui.showSetup();
+      if (ui.elements.careerStatsHint) {
+        ui.elements.careerStatsHint.textContent = formatCareerSetupHint(StorageManager.loadProfile());
+      }
     });
 
     const refreshTwistCheat = () => {
@@ -192,6 +196,13 @@ class Game {
     };
     ui.elements.castSelect?.addEventListener('change', applyCastPresetUi);
     applyCastPresetUi();
+
+    const refreshCareerHint = () => {
+      if (ui.elements.careerStatsHint) {
+        ui.elements.careerStatsHint.textContent = formatCareerSetupHint(StorageManager.loadProfile());
+      }
+    };
+    refreshCareerHint();
 
     ui.showSetup();
   }
@@ -2218,7 +2229,11 @@ class Game {
   // ─── End game ──────────────────────────────────────────────────────
 
   endGame() {
-    const summary = this.narrative.generateEndgameSummary();
+    const run = compilePlayerRunStats(this.state);
+    const { profile, newAchievements } = StorageManager.recordRun(run);
+    const summary =
+      this.narrative.generateEndgameSummary() +
+      renderRunStatsEndHtml(run, profile, newAchievements);
     const won = this.state.winner?.isPlayer;
     this.ui.renderEndSummary(summary);
     this.ui.showEnd(won);
