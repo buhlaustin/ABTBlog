@@ -273,6 +273,25 @@ body {
   scrollbar-width: thin;
 }
 
+.week-calendar-wrap {
+  min-width: min-content;
+}
+
+.week-calendar-footer {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  max-width: 36rem;
+}
+
+.week-calendar-legend {
+  margin: 0.2rem 0 0;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
 .week-calendar {
   display: flex;
   flex-direction: row;
@@ -312,6 +331,26 @@ body {
   box-shadow: 0 0 0 1px rgba(69, 123, 157, 0.35);
 }
 
+.week-calendar .cal-cell.cal-now {
+  border-color: var(--gold, #e9c46a);
+  box-shadow: 0 0 0 1px rgba(233, 196, 106, 0.45);
+  animation: calPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes calPulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(233, 196, 106, 0.35); }
+  50% { box-shadow: 0 0 0 2px rgba(233, 196, 106, 0.65); }
+}
+
+.week-calendar .cal-cell.cal-event-done .cal-icon {
+  color: var(--success);
+}
+
+.week-calendar .cal-cell.cal-premiere.cal-today {
+  border-color: #9b59b6;
+  background: rgba(155, 89, 182, 0.15);
+}
+
 .week-calendar .cal-cell.cal-live .cal-icon {
   color: var(--gold, #e9c46a);
 }
@@ -332,11 +371,21 @@ body {
   margin-top: 0.1rem;
 }
 
-.week-calendar .cal-kind {
+.week-calendar .cal-tag {
   font-size: 0.58rem;
+  margin-top: 0.12rem;
+  max-width: 3.4rem;
+  text-align: center;
+  line-height: 1.15;
+  opacity: 0.92;
+}
+
+.week-calendar .cal-kind {
+  font-size: 0.52rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  opacity: 0.85;
+  opacity: 0.7;
+  margin-top: 0.08rem;
 }
 
 .week-calendar--finale .cal-cell {

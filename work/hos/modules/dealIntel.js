@@ -7,6 +7,7 @@ import { buildLayLowIntelSection } from './layLowFeedback.js';
 import { buildHostBeatIntelSection } from './hostPhaseBeats.js';
 import { buildConfessionalIntelSection } from './confessionals.js';
 import { buildWeekRecapIntelSection } from './weekEndRecap.js';
+import { buildWeekCalendarIntelSection } from './weekCalendarStrip.js';
 
 const PROMISE_LABELS = {
   vote: 'Vote deal',
@@ -104,6 +105,11 @@ export function buildDealIntel(state) {
     }));
 
   const sections = [];
+
+  const calendarSection = buildWeekCalendarIntelSection(state);
+  if (calendarSection) {
+    sections.push(calendarSection);
+  }
 
   const hostSection = buildHostBeatIntelSection(state);
   if (hostSection) {

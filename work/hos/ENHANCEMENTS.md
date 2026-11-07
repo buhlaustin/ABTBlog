@@ -190,7 +190,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Status** | **Shipped (v1):** `weekCalendarStrip.js` + header **Fri→Thu** strip; **today** highlight; **Live** (◆) vs **Social** (·); double-eviction Thu styling; finale mode; horizontal scroll; `scripts/hos-week-calendar-smoke.mjs`. |
+| **Status** | **Shipped (v2):** v1 plus per-day **tags** (HOH/Noms/POV…), **actions left** on social today, **Live now** pulse + **✓ done**, **DE R1/R2/break**, Week 1 **premiere** styling, **Up next** footer + **Deals** schedule section; legend. |
 | **Goal** | Prevent “what night is it?” confusion. |
 | **Player experience** | Fri→Thu strip with highlight on today and icon for live vs social. |
 | **Implementation** | `UI.renderWeekCalendar` on each `render()`. |
