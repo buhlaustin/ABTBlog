@@ -35,14 +35,15 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 | **Follow-ups** | On-screen rules cheat sheet; jury banner when Round 2 would seat jurors; dev shortcut to force DE week for testing. |
 | **Priority** | Polish only — core pacing landed in PR #42. |
 
-### Jury visibility
+### Jury visibility (shipped)
 
 | Field | Detail |
 |--------|--------|
 | **Goal** | Make jury phase readable before finale. |
-| **Player experience** | Sidebar: jurors, rough “favor you / against you” from relationships and evictions they witnessed. |
-| **Implementation** | `Finale.js` + `Contestant.isJuror`; compute score from `relationships`, `history` eviction entries, betrayals. |
-| **Priority** | Medium. |
+| **Player experience** | Sidebar **Jury** panel once jurors are seated: per-juror lean (for/against/undecided), week seated, aggregate summary. First seated juror announced in the feed. |
+| **Implementation** | `juryOutlook.js` + `UI.renderJuryPanel`; aligns with finale jury scoring (relationships, grudges, alliances, promises, HOH noms). |
+| **Follow-ups** | Final-2 mode comparing two finalists; jury tag on endgame summary. |
+| **Priority** | Polish only. |
 
 ### Finale structure options
 

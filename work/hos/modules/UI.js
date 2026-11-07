@@ -28,6 +28,10 @@ export class UIManager {
       guestCount: document.getElementById('guest-count'),
       houseguestList: document.getElementById('houseguest-list'),
       allianceOverview: document.getElementById('alliance-overview'),
+      juryPanel: document.getElementById('jury-panel'),
+      juryCount: document.getElementById('jury-count'),
+      jurySummary: document.getElementById('jury-summary'),
+      juryList: document.getElementById('jury-list'),
       actionPrompt: document.getElementById('action-prompt'),
       actionButtons: document.getElementById('action-buttons'),
       actionDetail: document.getElementById('action-detail'),
@@ -134,7 +138,8 @@ export class UIManager {
       const icons = [];
       if (c.isHOH) icons.push('👑');
       if (c.isNominated) icons.push('⚠️');
-      if (c.evicted) icons.push('❌');
+      if (c.evicted && c.isJuror) icons.push('⚖️');
+      else if (c.evicted) icons.push('❌');
 
       return `<li class="houseguest-item ${c.isPlayer ? 'is-player' : ''} ${c.evicted ? 'evicted' : ''}">
         <div>
@@ -183,6 +188,42 @@ export class UIManager {
     }
 
     this.elements.allianceOverview.innerHTML = html;
+  }
+
+  renderJuryPanel(outlook, player) {
+    const panel = this.elements.juryPanel;
+    if (!panel || !outlook?.total) {
+      if (panel) panel.classList.add('hidden');
+      return;
+    }
+
+    panel.classList.remove('hidden');
+    this.elements.juryCount.textContent = String(outlook.total);
+
+    if (player?.evicted && player.isJuror) {
+      this.elements.jurySummary.textContent =
+        'You are on the jury. Lean scores below show how seated jurors may view each remaining houseguest when the Final 2 is set.';
+    } else if (outlook.total > 0) {
+      const { favor, against, neutral } = outlook.counts;
+      const parts = [];
+      if (favor) parts.push(`${favor} leaning your way`);
+      if (against) parts.push(`${against} likely bitter`);
+      if (neutral) parts.push(`${neutral} undecided`);
+      this.elements.jurySummary.textContent = parts.join(' · ');
+    }
+
+    this.elements.juryList.innerHTML = outlook.rows
+      .map((row) => {
+        const week = row.evictedWeek != null ? `Week ${row.evictedWeek}` : '—';
+        return `<li class="jury-item ${row.tone}">
+          <div class="jury-item-main">
+            <span class="jury-name">${escapeHtml(row.juror.name)}</span>
+            <span class="jury-lean ${row.tone}">${escapeHtml(row.label)}</span>
+          </div>
+          <div class="jury-meta">Seated ${week} · score ${row.score > 0 ? '+' : ''}${row.score}</div>
+        </li>`;
+      })
+      .join('');
   }
 
   renderActions(actions, onAction) {

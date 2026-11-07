@@ -16,6 +16,7 @@ import {
   initNarrativeApiUrl,
   isNarrativeApiEnabled
 } from './modules/NarrativeApi.js';
+import { buildJuryOutlook } from './modules/juryOutlook.js';
 import { aiCountForCast, escapeHtml, totalCastSize } from './modules/utils.js';
 
 class Game {
@@ -197,6 +198,7 @@ class Game {
     ui.renderPlayer(state.getPlayer());
     ui.renderHouseguests(state.contestants, state.getPlayer());
     ui.renderAlliances(state.alliances, state.getPlayer());
+    ui.renderJuryPanel(buildJuryOutlook(state), state.getPlayer());
     state.updateThreatLevels();
   }
 

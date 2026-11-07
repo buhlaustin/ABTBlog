@@ -394,7 +394,19 @@ export class EvictionSystem {
       text: `By a vote of <strong>${voteCount} to ${runnerUpVotes}</strong>, ${evicted.name} is evicted from the Big Brother house.`
     });
 
+    const juryBefore = this.state.getJurors().length;
     this.state.processEviction(evicted, results);
+    if (evicted.isJuror && juryBefore === 0) {
+      results.push({
+        type: 'system',
+        text: '<strong>The jury is seated.</strong> Watch the sidebar for how evicted houseguests may lean toward you before finale.'
+      });
+    } else if (evicted.isJuror) {
+      results.push({
+        type: 'narrative',
+        text: `${evicted.name} joins the jury. (${this.state.getJurors().length} juror${this.state.getJurors().length === 1 ? '' : 's'} so far)`
+      });
+    }
 
     if (evicted.isPlayer) {
       results.push({ type: 'warning', text: 'Your journey in the house has come to an end.' });

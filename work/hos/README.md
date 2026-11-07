@@ -39,7 +39,7 @@ Then visit `http://localhost:8080`.
 
 ## Roadmap
 
-Future feature specs (move-in premiere, jury UI, Playwright coverage, etc.) are in [ENHANCEMENTS.md](./ENHANCEMENTS.md).
+Future feature specs (finale polish, Playwright coverage, etc.) are in [ENHANCEMENTS.md](./ENHANCEMENTS.md). Juror lean appears in the sidebar once the jury is seated.
 
 ## Project Structure
 

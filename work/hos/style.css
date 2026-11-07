@@ -450,6 +450,72 @@ body {
   cursor: pointer;
 }
 
+/* Jury sidebar */
+.jury-panel.hidden {
+  display: none;
+}
+
+.jury-summary {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.65rem;
+  line-height: 1.4;
+}
+
+.jury-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.jury-item {
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius);
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+}
+
+.jury-item-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.jury-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.jury-lean {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.jury-lean.favor,
+.jury-lean.lean-favor {
+  color: var(--success);
+}
+
+.jury-lean.against,
+.jury-lean.lean-against {
+  color: var(--danger);
+}
+
+.jury-lean.neutral {
+  color: var(--text-muted);
+}
+
+.jury-meta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
 /* Houseguest list */
 .houseguest-list {
   list-style: none;
