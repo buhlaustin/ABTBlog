@@ -19,7 +19,9 @@ import {
 } from './modules/NarrativeApi.js';
 import {
   getHostBeatKindForPhase,
-  getLocalHostPhaseBeat
+  getHostScheduleBanner,
+  getLocalHostPhaseBeat,
+  recordHostBeat
 } from './modules/hostPhaseBeats.js';
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
@@ -198,8 +200,8 @@ class Game {
         text: 'Enhanced host narration is <strong>on</strong> for this session.',
         type: 'system'
       });
-      void this._appendAiNarrative('host_line');
     }
+    void this._appendHostBeat('premiere_move_in');
 
     this.ui.showGame();
     this.render();
@@ -305,6 +307,8 @@ class Game {
     if (throwBanner) twistParts.push(throwBanner);
     const layLowBanner = getLayLowBanner(state);
     if (layLowBanner) twistParts.push(layLowBanner);
+    const hostScheduleBanner = getHostScheduleBanner(state);
+    if (hostScheduleBanner) twistParts.push(hostScheduleBanner);
     const vetoBlockBanner = buildVetoBlockBanner(state);
     if (vetoBlockBanner) twistParts.push(vetoBlockBanner);
     const threatAlert = getThreatNominationAlert(state, previewLeans);
@@ -338,14 +342,18 @@ class Game {
       ? await fetchNarrativeBeat(kind, this.state)
       : null;
     if (beat?.text) {
+      recordHostBeat(this.state, kind, 'api');
       this.logAndRender([{
         type: 'ai-host',
-        text: `<strong>Host:</strong> ${beat.text}`
+        text: `<strong>Host:</strong> ${beat.text}`,
+        hostBeatKind: kind
       }]);
       return true;
     }
     const local = getLocalHostPhaseBeat(kind, this.state, extra);
     if (local) {
+      recordHostBeat(this.state, kind, 'local');
+      if (!local.hostBeatKind) local.hostBeatKind = kind;
       this.logAndRender([local]);
       return true;
     }
@@ -1671,6 +1679,7 @@ class Game {
         text: 'Finale keeps all <strong>three</strong> HOH competitions, then Final HOH picks who to take to the Final 2, followed by <strong>Jury Q&A</strong> and the jury vote. Continue between each step.'
       }
     ]);
+    void this._appendHostBeat('finale_live');
     this.render();
     this._showFinaleContinuePrompt('r1');
   }

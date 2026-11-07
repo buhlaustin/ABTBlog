@@ -165,6 +165,12 @@ Kind: Julie Chen-style host reaction immediately AFTER the HOH names two nominee
 Use hohName, hohArchetype, hohNomStyle, nominees, and nominationLeanNames from context if present.
 Name both nominees. Under 320 characters. Context: ${ctx}`;
   }
+  if (kind === 'premiere_move_in') {
+    return `${base}\nKind: Season premiere / move-in speech. Use houseguestCount.\nContext: ${ctx}`;
+  }
+  if (kind === 'finale_live') {
+    return `${base}\nKind: Finale night open when inFinale is true.\nContext: ${ctx}`;
+  }
   if (kind === 'hoh_competition') {
     return `${base}\nKind: Lead-in before the Head of Household competition (live event starting).\nContext: ${ctx}`;
   }

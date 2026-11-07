@@ -131,6 +131,11 @@ export class GameState {
     this.playerLayLowRestsWeek = null;
     this.playerLayLowRestsThisWeek = 0;
 
+    /** Recent host narration beats (kind + source). */
+    this.hostBeatLog = [];
+    this.lastHostBeatKind = null;
+    this.lastHostBeatSource = null;
+
     this.lastPawnShieldWeek = null;
     this.lastPawnShieldNomineeNames = [];
     this.lastPawnShieldNomineeIds = [];
@@ -642,6 +647,9 @@ export class GameState {
       playerLayLowAfter: this.playerLayLowAfter,
       playerLayLowRestsWeek: this.playerLayLowRestsWeek,
       playerLayLowRestsThisWeek: this.playerLayLowRestsThisWeek,
+      hostBeatLog: this.hostBeatLog,
+      lastHostBeatKind: this.lastHostBeatKind,
+      lastHostBeatSource: this.lastHostBeatSource,
       lastPawnShieldWeek: this.lastPawnShieldWeek,
       lastPawnShieldNomineeNames: this.lastPawnShieldNomineeNames,
       lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
@@ -727,6 +735,9 @@ export class GameState {
     state.playerLayLowAfter = data.playerLayLowAfter ?? null;
     state.playerLayLowRestsWeek = data.playerLayLowRestsWeek ?? null;
     state.playerLayLowRestsThisWeek = data.playerLayLowRestsThisWeek ?? 0;
+    state.hostBeatLog = data.hostBeatLog ?? [];
+    state.lastHostBeatKind = data.lastHostBeatKind ?? null;
+    state.lastHostBeatSource = data.lastHostBeatSource ?? null;
     state.lastPawnShieldWeek = data.lastPawnShieldWeek ?? null;
     state.lastPawnShieldNomineeNames = data.lastPawnShieldNomineeNames ?? [];
     state.lastPawnShieldNomineeIds = data.lastPawnShieldNomineeIds ?? [];

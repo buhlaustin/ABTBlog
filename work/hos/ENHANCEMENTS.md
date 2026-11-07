@@ -156,7 +156,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Status** | **Shipped:** `hostPhaseBeats.js` — pre-event beat from `_beginScheduledHouseDay` (phase→kind); post-event beats after HOH result, veto comp/ceremony, nominations, eviction; **local** fallbacks + **NarrativeApi** kinds (Lambda prompts). |
+| **Status** | **Shipped (v2):** v1 beats plus **premiere** move-in, **Host & live nights** intel + header **schedule banner**, `hostBeatLog` history, twist-aware locals, player HOH/POV/eviction lines, randomized fallbacks, story `hostBeatKind` tags. |
 | **Goal** | One narrated line per live event type (HOH, noms, veto, eviction). |
 | **Player experience** | Consistent host voice when API enabled; local fallback lines when not. |
 | **Implementation** | `NarrativeApi` prompt kinds; call from `_beginScheduledHouseDay` with `phase` context. |

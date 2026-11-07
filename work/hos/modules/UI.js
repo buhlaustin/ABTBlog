@@ -104,7 +104,10 @@ export class UIManager {
   addStoryEntries(entries, scroll = true) {
     for (const entry of entries) {
       const div = document.createElement('div');
-      div.className = `story-entry ${entry.type || 'narrative'}`;
+      const hostTag = entry.hostBeatKind
+        ? ` story-entry-host-${entry.hostBeatKind.replace(/_/g, '-')}`
+        : '';
+      div.className = `story-entry ${entry.type || 'narrative'}${hostTag}`;
       div.innerHTML = entry.text;
       this.elements.storyLog.appendChild(div);
     }

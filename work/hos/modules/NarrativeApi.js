@@ -120,6 +120,12 @@ export function buildNarrativeContext(state) {
     competitionWinnerName: competitionWinner?.name || null,
     evictedTonightName: evictedTonight?.name || null,
     doubleEvictionNight: Boolean(state.doubleEvictionWeekActive),
+    battleBackTonight: Boolean(
+      state.battleBackWeekActive && !state.battleBackResolvedTonight
+    ),
+    mvpRaceOpen: Boolean(state.mvpTwistWeekActive && state.mvpRaceOpen),
+    inFinale: Boolean(state.inFinale),
+    lastHostBeatKind: state.lastHostBeatKind || null,
     playerIsNominated: Boolean(player?.isNominated),
     playerIsHOH: Boolean(player?.isHOH),
     playerAllianceCount: playerAlliances.length,
@@ -132,7 +138,7 @@ export function buildNarrativeContext(state) {
 }
 
 /**
- * @param {'daily_beat' | 'host_line' | 'week_recap' | 'nomination_ceremony' | 'hoh_competition' | 'hoh_competition_result' | 'nomination_pre_ceremony' | 'veto_competition' | 'veto_competition_result' | 'veto_ceremony_pre' | 'veto_ceremony' | 'eviction_pre' | 'eviction_ceremony'} kind
+ * @param {'daily_beat' | 'host_line' | 'week_recap' | 'premiere_move_in' | 'nomination_ceremony' | 'hoh_competition' | 'hoh_competition_result' | 'nomination_pre_ceremony' | 'veto_competition' | 'veto_competition_result' | 'veto_ceremony_pre' | 'veto_ceremony' | 'eviction_pre' | 'eviction_ceremony' | 'finale_live'} kind
  * @returns {Promise<{ text: string, type: string } | null>}
  */
 async function fetchNarrativeBeatDirect(kind, state, apiUrl) {

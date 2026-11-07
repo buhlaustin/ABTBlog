@@ -347,6 +347,15 @@ body {
 .story-entry.social { background: rgba(168, 218, 220, 0.12); border-left: 3px solid #7eb8bc; }
 .story-entry.ai-host { background: rgba(155, 89, 182, 0.15); border-left: 3px solid #9b59b6; font-style: italic; }
 
+.story-entry.ai-host.story-entry-host-eviction-ceremony {
+  border-left-color: var(--danger);
+  background: rgba(230, 57, 70, 0.12);
+}
+
+.story-entry.ai-host.story-entry-host-hoh-competition-result {
+  border-left-color: var(--gold);
+}
+
 .story-entry.veto-summary {
   background: rgba(212, 175, 55, 0.12);
   border-left: 3px solid var(--gold, #d4af37);
