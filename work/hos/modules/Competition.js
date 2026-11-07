@@ -1,4 +1,8 @@
 import { statCheck, randomInt, pickRandom, clamp } from './utils.js';
+import {
+  THROW_COMP_SCORE_PENALTY,
+  clearThrowCompetitionIntent
+} from './strategicVerbs.js';
 
 /**
  * Text-based competitions with stat-based outcomes and player choices.
@@ -198,6 +202,22 @@ export class CompetitionManager {
       text: `<strong>${winner.name}</strong> wins Head of Household!${winner.isPlayer ? ' You hold all the power this week.' : ` ${winner.name} will nominate two houseguests.`}`
     });
 
+    if (this.state.playerThrowCompetition) {
+      const threw = contestants.find((c) => c.isPlayer);
+      if (threw && winner?.id === threw.id) {
+        results.push({
+          type: 'narrative',
+          text: 'You still edged out the field despite throwing — the house raises an eyebrow.'
+        });
+      } else if (threw) {
+        results.push({
+          type: 'narrative',
+          text: 'You threw the competition on purpose — classic floater optics.'
+        });
+      }
+      clearThrowCompetitionIntent(this.state);
+    }
+
     return { winner, results, competition: comp };
   }
 
@@ -217,7 +237,11 @@ export class CompetitionManager {
     const secondary = contestant[comp.secondaryStat] || contestant.social;
     const bonus = this.state.config.competitionPlayerBonus;
     const playerBonus = contestant.isPlayer ? bonus : 0;
-    return primary * 3 + secondary + randomInt(-2, 4) + playerBonus;
+    let score = primary * 3 + secondary + randomInt(-2, 4) + playerBonus;
+    if (contestant.isPlayer && this.state.playerThrowCompetition) {
+      score -= THROW_COMP_SCORE_PENALTY;
+    }
+    return score;
   }
 
   _runTrivia(contestants, scores, results, challenge, playerChoice) {
@@ -336,6 +360,9 @@ export class CompetitionManager {
   /** Resolve a veto mini-competition for the player. */
   resolveVetoCompetition(playerHeldStrong) {
     const player = this.state.getPlayer();
+    if (this.state.playerThrowCompetition) {
+      return false;
+    }
     const base = player.competition + randomInt(-1, 3);
     return playerHeldStrong && base >= 6;
   }

@@ -112,6 +112,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
+| **Status** | **Shipped:** **Throw comp** (HOH/POV mingle, score penalty + threat trim); **Set backdoor target** while HOH — pawn/replacement lens, twist banner, completion feed line. |
 | **Goal** | More BB verbs without full multiplayer. |
 | **Options** | **Throw comp** (intentionally weaken comp score when not on the block — classic floater move); **backdoor path** (HOH: nominate pawns Sat, win/use veto Mon, replace with true target — same week, still leads to Thu vote). |
 | **Implementation** | New `PlayerActions` entries; hooks in `Competition.js` / `Eviction.js`. |

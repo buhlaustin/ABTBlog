@@ -128,6 +128,11 @@ export class GameState {
     this.lastPawnShieldNomineeNames = [];
     this.lastPawnShieldNomineeIds = [];
 
+    /** Intentionally tank the next comp the player enters (HOH or veto). */
+    this.playerThrowCompetition = false;
+    /** Player HOH backdoor replacement target id. */
+    this.backdoorTargetId = null;
+
     this.currentHOH = null;
     this.nominees = [];
     this.vetoUsed = false;
@@ -410,6 +415,8 @@ export class GameState {
     this.evictedThisWeek = null;
     this.competitionWinner = null;
     this.currentHOH = null;
+    this.backdoorTargetId = null;
+    this.playerThrowCompetition = false;
   }
 
   /** Clear HOH/nom/veto for Double Eviction round 2 on the same Thursday. */
@@ -614,6 +621,8 @@ export class GameState {
       lastPawnShieldWeek: this.lastPawnShieldWeek,
       lastPawnShieldNomineeNames: this.lastPawnShieldNomineeNames,
       lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
+      playerThrowCompetition: this.playerThrowCompetition,
+      backdoorTargetId: this.backdoorTargetId,
       currentHOH: this.currentHOH?.id ?? this.currentHOH,
       nominees: this.nominees,
       vetoUsed: this.vetoUsed,
@@ -687,6 +696,8 @@ export class GameState {
     state.lastPawnShieldWeek = data.lastPawnShieldWeek ?? null;
     state.lastPawnShieldNomineeNames = data.lastPawnShieldNomineeNames ?? [];
     state.lastPawnShieldNomineeIds = data.lastPawnShieldNomineeIds ?? [];
+    state.playerThrowCompetition = data.playerThrowCompetition ?? false;
+    state.backdoorTargetId = data.backdoorTargetId ?? null;
     state.currentHOH = data.currentHOH
       ? state.contestants.find((c) => c.id === data.currentHOH) || data.currentHOH
       : null;

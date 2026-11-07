@@ -12,6 +12,7 @@ import {
   getVoteConsequenceLine
 } from './voteConsequences.js';
 import { getFloaterShieldCeremonyNote } from './floaterShields.js';
+import { buildBackdoorCompletionLine, clearThrowCompetitionIntent } from './strategicVerbs.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -158,6 +159,13 @@ export class EvictionSystem {
     if (playerInComp && playerWonVeto) {
       vetoWinner = player;
     } else if (playerInComp && !playerWonVeto) {
+      if (this.state.playerThrowCompetition) {
+        clearThrowCompetitionIntent(this.state);
+        results.push({
+          type: 'narrative',
+          text: 'You threw the POV comp — the house thinks you are laying low.'
+        });
+      }
       const aiPlayers = vetoPlayers.filter((p) => !p.isPlayer);
       vetoWinner = aiPlayers.length
         ? aiPlayers.reduce((best, c) => (c.competition > best.competition ? c : best), aiPlayers[0])
@@ -352,6 +360,11 @@ export class EvictionSystem {
       if (hohLens) {
         const drama = getNominationDramaNote(hohLens, replacement);
         if (drama) results.push({ type: 'narrative', text: drama });
+      }
+      const backdoor = buildBackdoorCompletionLine(this.state, replacementId);
+      if (backdoor) {
+        results.push(backdoor);
+        this.state.backdoorTargetId = null;
       }
     }
     return results;

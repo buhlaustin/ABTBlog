@@ -21,6 +21,7 @@ import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
 import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
 import { countCastFloaters, getPawnShieldWatchBanner } from './modules/floaterShields.js';
+import { getBackdoorNomLens, getBackdoorPlanBanner } from './modules/strategicVerbs.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
 import {
   computeBattleBackScores,
@@ -283,6 +284,8 @@ class Game {
     if (hohWatch) twistParts.push(hohWatch);
     const pawnWatch = getPawnShieldWatchBanner(state, previewLeans);
     if (pawnWatch) twistParts.push(pawnWatch);
+    const backdoorBanner = getBackdoorPlanBanner(state);
+    if (backdoorBanner) twistParts.push(backdoorBanner);
     const threatAlert = getThreatNominationAlert(state, previewLeans);
     if (threatAlert) twistParts.push(threatAlert);
     ui.updateTwistBanner(twistParts.join(' · '));
@@ -554,7 +557,8 @@ class Game {
       'influence',
       'scheme_nom',
       'pregame',
-      'comfort_nominee'
+      'comfort_nominee',
+      'backdoor_plan'
     ].includes(action.id);
 
     if (needsTarget) {
@@ -1002,10 +1006,13 @@ class Game {
 
     const renderPicker = () => {
       let html = `<p class="hoh-nom-hint">${getPlayerHohPickerIntro(player)}</p>`;
+      if (this.state.backdoorTargetId) {
+        html += `<p class="backdoor-hint">${getBackdoorPlanBanner(this.state, { html: true })}</p>`;
+      }
       html += `<p>Select 2 nominees (${selected.length}/2):</p><div class="target-grid nomination-target-grid">`;
       for (const t of targets) {
         const isSelected = selected.includes(t.id);
-        const lens = getNomTargetLensLabel(hohLens, t);
+        const lens = getBackdoorNomLens(this.state, t) || getNomTargetLensLabel(hohLens, t);
         const lensHtml = lens ? `<span class="nom-lens">${escapeHtml(lens)}</span>` : '';
         html += `<button class="btn target-btn ${isSelected ? 'selected' : ''}" data-target="${t.id}">${escapeHtml(t.name)}${lensHtml}</button>`;
       }
@@ -1149,9 +1156,12 @@ class Game {
     const targets = this.state.getOthers(player).filter((c) => !nominees.has(c.id));
 
     let html = `<p class="hoh-nom-hint">${getPlayerHohPickerIntro(player)}</p>`;
+    if (this.state.backdoorTargetId) {
+      html += `<p class="backdoor-hint">${getBackdoorPlanBanner(this.state, { html: true })}</p>`;
+    }
     html += '<p>Pick a replacement nominee:</p><div class="target-grid nomination-target-grid">';
     for (const t of targets) {
-      const lens = getNomTargetLensLabel(hohLens, t);
+      const lens = getBackdoorNomLens(this.state, t) || getNomTargetLensLabel(hohLens, t);
       const lensHtml = lens ? `<span class="nom-lens">${escapeHtml(lens)}</span>` : '';
       html += `<button class="btn target-btn" data-replacement="${t.id}">${escapeHtml(t.name)}${lensHtml}</button>`;
     }

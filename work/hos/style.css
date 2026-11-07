@@ -640,6 +640,13 @@ body {
   color: var(--text-muted);
 }
 
+.backdoor-hint {
+  font-size: 0.82rem;
+  color: var(--accent-warm, #f0a030);
+  margin: 0.35rem 0 0.65rem;
+  line-height: 1.35;
+}
+
 .deal-vote-warn {
   text-transform: none;
   letter-spacing: normal;

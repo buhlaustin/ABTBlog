@@ -9,6 +9,7 @@ import { addMvpCampaignPoints, getMvpRaceLeader } from './SeasonTwists.js';
 import { formatHohNomIntelLine } from './hohNomPersonas.js';
 import { formatThreatChange } from './threatBands.js';
 import { formatPawnShieldSpyIntel } from './floaterShields.js';
+import { canThrowCompetition, canSetBackdoorPlan } from './strategicVerbs.js';
 
 /**
  * Player-initiated actions during the social phase.
@@ -75,6 +76,32 @@ export class PlayerActions {
         id: 'pregame',
         label: 'Pre-Competition Pep Talk',
         description: 'Rally allies before the HOH competition.'
+      });
+      if (canThrowCompetition(this.state, player)) {
+        actions.unshift({
+          id: 'throw_comp',
+          label: 'Throw Competition',
+          description: 'Tank HOH comp on purpose (not on the block) — lowers your threat.'
+        });
+      }
+    }
+
+    if (phase === PHASES.VETO_COMP && canThrowCompetition(this.state, player)) {
+      actions.unshift({
+        id: 'throw_comp',
+        label: 'Throw POV Comp',
+        description: 'Throw veto comp intentionally and stay off the golden veto radar.'
+      });
+    }
+
+    if (canSetBackdoorPlan(this.state, player)) {
+      const targetName = this.state.backdoorTargetId
+        ? this.state.getContestant(this.state.backdoorTargetId)?.name
+        : null;
+      actions.unshift({
+        id: 'backdoor_plan',
+        label: targetName ? `Backdoor: ${targetName}` : 'Set Backdoor Target',
+        description: 'Mark your real target — nominate pawns Sat, veto Mon, replace.'
       });
     }
 
@@ -165,6 +192,10 @@ export class PlayerActions {
         return this._comfortNominee(player, target);
       case 'campaign_mvp':
         return this._campaignMvp(player);
+      case 'throw_comp':
+        return this._throwCompetition(player);
+      case 'backdoor_plan':
+        return this._setBackdoorPlan(player, target);
       case 'end_day':
         return { success: true, text: 'You chose to end the day.', type: 'system', endDay: true };
       default:
@@ -538,6 +569,49 @@ export class PlayerActions {
     return {
       success: true,
       text,
+      type: 'drama'
+    };
+  }
+
+  _throwCompetition(player) {
+    if (!canThrowCompetition(this.state, player)) {
+      return {
+        success: false,
+        text: 'You can only throw a comp when you are safe from the block.',
+        type: 'warning'
+      };
+    }
+
+    this.state.playerThrowCompetition = true;
+    const threatBefore = player.threat;
+    player.threatOffset = clamp((player.threatOffset ?? 0) - randomInt(2, 4), -25, 25);
+    this.state.updateThreatLevels?.();
+    this._consumeAction();
+
+    const compLabel = this.state.phase === PHASES.VETO_COMP ? 'POV' : 'HOH';
+    return {
+      success: true,
+      text: `You commit to throwing the ${compLabel} comp — floaters notice. ${formatThreatChange(threatBefore, player.threat)}`,
+      type: 'system'
+    };
+  }
+
+  _setBackdoorPlan(player, target) {
+    if (!canSetBackdoorPlan(this.state, player)) {
+      return { success: false, text: 'You can only backdoor while reigning as HOH this week.', type: 'warning' };
+    }
+    if (!target) {
+      return { success: false, text: 'Choose your true backdoor target.', type: 'system' };
+    }
+    if (target.id === player.id) {
+      return { success: false, text: 'You cannot backdoor yourself.', type: 'system' };
+    }
+
+    this.state.backdoorTargetId = target.id;
+    this._consumeAction();
+    return {
+      success: true,
+      text: `Backdoor set on <strong>${target.name}</strong> — nominate pawns, win or trigger veto, then name them as the replacement.`,
       type: 'drama'
     };
   }
