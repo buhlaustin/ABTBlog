@@ -23,6 +23,7 @@ export class UIManager {
       playerNameInput: document.getElementById('player-name'),
       difficultySelect: document.getElementById('difficulty'),
       castSelect: document.getElementById('cast-size'),
+      castPresetBlurb: document.getElementById('cast-preset-blurb'),
       doubleEvictionToggle: document.getElementById('double-eviction'),
       battleBackToggle: document.getElementById('twist-battle-back'),
       mvpTwistToggle: document.getElementById('twist-mvp'),

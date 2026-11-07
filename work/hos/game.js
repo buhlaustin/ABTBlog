@@ -80,11 +80,16 @@ import {
 import {
   aiCountForCast,
   escapeHtml,
-  JURY_START_HOUSE_COUNT,
   pickRandom,
   randomInt,
   totalCastSize
 } from './modules/utils.js';
+import {
+  buildCastPresetPremiereLines,
+  getCastPresetBlurb,
+  getCastPresetTwistDefaults,
+  resolveJuryStartHouseCount
+} from './modules/castPresets.js';
 
 class Game {
   constructor() {
@@ -156,6 +161,26 @@ class Game {
     }
     refreshTwistCheat();
 
+    const applyCastPresetUi = () => {
+      const key = ui.elements.castSelect?.value || 'standard';
+      const twists = getCastPresetTwistDefaults(key);
+      if (ui.elements.doubleEvictionToggle) {
+        ui.elements.doubleEvictionToggle.checked = twists.doubleEviction;
+      }
+      if (ui.elements.battleBackToggle) {
+        ui.elements.battleBackToggle.checked = twists.battleBack;
+      }
+      if (ui.elements.mvpTwistToggle) {
+        ui.elements.mvpTwistToggle.checked = twists.mvpTwist;
+      }
+      if (ui.elements.castPresetBlurb) {
+        ui.elements.castPresetBlurb.textContent = getCastPresetBlurb(key);
+      }
+      refreshTwistCheat();
+    };
+    ui.elements.castSelect?.addEventListener('change', applyCastPresetUi);
+    applyCastPresetUi();
+
     ui.showSetup();
   }
 
@@ -212,6 +237,9 @@ class Game {
       text: 'Calendar: <strong>Fri</strong> HOH · <strong>Sat</strong> Nominations · <strong>Sun</strong> POV comp · <strong>Mon</strong> Veto meeting · <strong>Tue–Wed</strong> Strategy · <strong>Thu</strong> Eviction.',
       type: 'system'
     });
+    for (const line of buildCastPresetPremiereLines(this.state)) {
+      this.state.addStory(line);
+    }
     if (difficulty === 'easy') {
       const floaters = countCastFloaters(this.state);
       if (floaters >= 2) {
@@ -1604,7 +1632,7 @@ class Game {
     await this._appendConfessional(evicted, evictedKey);
 
     const remainingAfter = this.state.getActiveContestants().length;
-    if (remainingAfter < JURY_START_HOUSE_COUNT) {
+    if (remainingAfter < resolveJuryStartHouseCount(this.state)) {
       await this._appendConfessional(evicted, 'jury_seat');
     }
 

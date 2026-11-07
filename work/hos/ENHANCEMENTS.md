@@ -225,7 +225,8 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 |--------|--------|
 | **Goal** | Beyond Legacy / Quick / Standard. |
 | **Examples** | All-strategists (+AI int), “duo season” (pre-linked pairs), shortened jury cast. |
-| **Implementation** | `CAST_PRESETS` in `utils.js`; personality distribution in `_initContestants`. |
+| **Status** | **Shipped (v1):** **Brains**, **Duo season**, **Jury sprint** presets in setup; **twist defaults** sync on cast change; weighted personalities + **+INT**; **7 duos** at move-in; **jury @8** for sprint; premiere feed + **Deals → Cast & twists**; `castPresets.js`; `node scripts/hos-cast-presets-smoke.mjs`. |
+| **Implementation** | `CAST_PRESETS` in `utils.js`; `pickPersonalityForCast` / `applyCastPresetPostInit` in `GameState._initContestants`. |
 | **Priority** | Low. |
 
 ### Achievements / run stats

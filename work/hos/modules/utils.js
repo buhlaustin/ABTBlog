@@ -6,9 +6,60 @@ export const SAVE_VERSION = 2;
 export const JURY_START_HOUSE_COUNT = 10;
 
 export const CAST_PRESETS = {
-  legacy: { label: 'Legacy (11 HGs)', aiCount: 10 },
-  quick: { label: 'Quick (12 HGs)', aiCount: 11 },
-  standard: { label: 'Standard (16 HGs)', aiCount: 15, default: true }
+  legacy: {
+    id: 'legacy',
+    label: 'Legacy (11 HGs)',
+    aiCount: 10,
+    blurb: 'Shorter season — same jury rules as classic BB.',
+    defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: false }
+  },
+  quick: {
+    id: 'quick',
+    label: 'Quick (12 HGs)',
+    aiCount: 11,
+    blurb: 'Faster jury path with a 12-person cast.',
+    defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: false }
+  },
+  standard: {
+    id: 'standard',
+    label: 'Standard (16 HGs)',
+    aiCount: 15,
+    default: true,
+    blurb: 'Full 16-houseguest season — default twists below.',
+    defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: false }
+  },
+  brains: {
+    id: 'brains',
+    label: 'Brains (16 schemers)',
+    aiCount: 15,
+    blurb: 'Cast leans Strategist; AI gets +1 Intelligence. MVP week suggested.',
+    personalityWeights: {
+      strategist: 5,
+      competitor: 1,
+      loyalist: 1,
+      social: 1,
+      wildcard: 1
+    },
+    aiIntelligenceBonus: 1,
+    defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: true }
+  },
+  duo: {
+    id: 'duo',
+    label: 'Duo season (16 paired)',
+    aiCount: 15,
+    blurb: 'Seven pre-linked pairs at move-in. Battle Back suggested.',
+    seedDuos: true,
+    duoBond: 58,
+    defaultTwists: { doubleEviction: true, battleBack: true, mvpTwist: false }
+  },
+  jury_sprint: {
+    id: 'jury_sprint',
+    label: 'Jury sprint (12, jury @8)',
+    aiCount: 11,
+    blurb: '12 HGs; jury starts when 8 remain (not 10). Double eviction off by default.',
+    juryStartHouseCount: 8,
+    defaultTwists: { doubleEviction: false, battleBack: false, mvpTwist: false }
+  }
 };
 
 export const FIRST_NAMES = [

@@ -739,6 +739,13 @@ body {
 .tag.jury { background: rgba(244, 162, 97, 0.35); color: var(--gold); }
 .tag.evicted-player { background: rgba(231, 111, 81, 0.25); color: var(--danger); }
 
+.cast-preset-blurb {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
 .twist-fieldset {
   border: 1px solid var(--border-subtle, #333);
   border-radius: 8px;

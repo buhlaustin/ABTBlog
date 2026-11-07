@@ -9,6 +9,7 @@ import { buildConfessionalIntelSection } from './confessionals.js';
 import { buildWeekRecapIntelSection } from './weekEndRecap.js';
 import { buildWeekCalendarIntelSection } from './weekCalendarStrip.js';
 import { buildScheduleRepairIntelSection } from './scheduleRepair.js';
+import { buildCastPresetIntelSection } from './castPresets.js';
 
 const PROMISE_LABELS = {
   vote: 'Vote deal',
@@ -106,6 +107,8 @@ export function buildDealIntel(state) {
     }));
 
   const sections = [];
+
+  sections.push(buildCastPresetIntelSection(state));
 
   const calendarSection = buildWeekCalendarIntelSection(state);
   if (calendarSection) {

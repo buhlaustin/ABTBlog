@@ -1,4 +1,5 @@
-import { escapeHtml, JURY_START_HOUSE_COUNT, pickRandom } from './utils.js';
+import { escapeHtml, pickRandom } from './utils.js';
+import { resolveJuryStartHouseCount } from './castPresets.js';
 import { getThreatBand } from './threatBands.js';
 
 /**
@@ -87,7 +88,7 @@ function summarizeJuryWeek(state, week) {
   return {
     seated,
     total,
-    juryPhase: state.getActiveContestants().length < JURY_START_HOUSE_COUNT
+    juryPhase: state.getActiveContestants().length < resolveJuryStartHouseCount(state)
   };
 }
 

@@ -7,14 +7,18 @@ import {
 } from './allianceUtils.js';
 import {
   DIFFICULTY_CONFIG,
-  JURY_START_HOUSE_COUNT,
   generateAINames,
-  pickRandom,
-  PERSONALITY_TYPES,
   shuffle,
   uid,
   resetIdCounter
 } from './utils.js';
+import {
+  applyCastPresetPostInit,
+  getCastPreset,
+  pickPersonalityForCast,
+  resolveJuryStartHouseCount
+} from './castPresets.js';
+import { JURY_START_HOUSE_COUNT } from './utils.js';
 import { ensureEasyCastFloaters } from './floaterShields.js';
 import { evaluateTwistsForNewWeek, initTwistSchedule, trackFirstEvicted } from './SeasonTwists.js';
 import { runScheduleRepair } from './scheduleRepair.js';
@@ -104,6 +108,8 @@ export class GameState {
     this.difficulty = difficulty;
     this.config = DIFFICULTY_CONFIG[difficulty];
     this.castPreset = castPreset;
+    /** Jury seating threshold; preset may lower (e.g. jury sprint). */
+    this.juryStartHouseCount = null;
     this.doubleEvictionEnabled = doubleEvictionEnabled;
     this.battleBackEnabled = battleBackEnabled;
     this.mvpTwistEnabled = mvpTwistEnabled;
@@ -242,11 +248,8 @@ export class GameState {
       }
     });
 
-    const floaterType = PERSONALITY_TYPES.find((p) => p.id === 'floater');
     const aiContestants = aiNames.map((name) => {
-      const personality = this.difficulty === 'easy' && floaterType && Math.random() < 0.22
-        ? { ...floaterType }
-        : null;
+      const personality = pickPersonalityForCast(this.castPreset, { difficulty: this.difficulty });
       return new Contestant({
         name,
         difficultyBonus: this.config.aiStatBonus,
@@ -265,6 +268,7 @@ export class GameState {
     for (const c of all) {
       c.initRelationships(all, this.config.startingTrust);
     }
+    applyCastPresetPostInit(this);
   }
 
   getPlayer() {
@@ -524,7 +528,8 @@ export class GameState {
     trackFirstEvicted(this, evicted);
 
     const remaining = this.getActiveContestants().length;
-    if (remaining <= JURY_START_HOUSE_COUNT - 1) {
+    const juryStart = resolveJuryStartHouseCount(this);
+    if (remaining <= juryStart - 1) {
       evicted.isJuror = true;
     }
 
@@ -615,6 +620,7 @@ export class GameState {
     return {
       difficulty: this.difficulty,
       castPreset: this.castPreset,
+      juryStartHouseCount: this.juryStartHouseCount,
       doubleEvictionEnabled: this.doubleEvictionEnabled,
       battleBackEnabled: this.battleBackEnabled,
       mvpTwistEnabled: this.mvpTwistEnabled,
@@ -706,6 +712,10 @@ export class GameState {
     state.difficulty = data.difficulty;
     state.config = DIFFICULTY_CONFIG[data.difficulty];
     state.castPreset = data.castPreset ?? 'standard';
+    state.juryStartHouseCount =
+      data.juryStartHouseCount ??
+      getCastPreset(state.castPreset).juryStartHouseCount ??
+      JURY_START_HOUSE_COUNT;
     state.doubleEvictionEnabled = data.doubleEvictionEnabled ?? true;
     state.battleBackEnabled = data.battleBackEnabled ?? false;
     state.mvpTwistEnabled = data.mvpTwistEnabled ?? false;
