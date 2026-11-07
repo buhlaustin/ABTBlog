@@ -1,5 +1,40 @@
-import { randomInt, clamp } from './utils.js';
+import { randomInt, pickRandom } from './utils.js';
 import { FINALE_PHASES } from './GameState.js';
+
+const JURY_QA_TEMPLATES = [
+  {
+    prompt: 'What was the move you are most proud of this season?',
+    choices: [
+      { id: 'honest', label: 'Explain it clearly and own the blood on your hands', delta: 10 },
+      { id: 'humble', label: 'Downplay it and credit the house', delta: 4 },
+      { id: 'evasive', label: 'Dodge the question', delta: -8 }
+    ]
+  },
+  {
+    prompt: 'Why should this jury vote for you over your opponent?',
+    choices: [
+      { id: 'respect', label: 'Respect the jury and make a concise case', delta: 12 },
+      { id: 'shade', label: 'Trash your opponent\'s game', delta: 5 },
+      { id: 'plead', label: 'Beg without substance', delta: -10 }
+    ]
+  },
+  {
+    prompt: 'Did you stay true to who you are in this house?',
+    choices: [
+      { id: 'authentic', label: 'Yes — admit flaws and growth', delta: 9 },
+      { id: 'game', label: 'I played a character for the game', delta: 2 },
+      { id: 'deny', label: 'Deny ever lying', delta: -6 }
+    ]
+  },
+  {
+    prompt: 'If you lose, what will you regret most?',
+    choices: [
+      { id: 'human', label: 'A specific relationship you burned', delta: 8 },
+      { id: 'comp', label: 'A competition you should have won', delta: 5 },
+      { id: 'nothing', label: 'Nothing — you played perfectly', delta: -7 }
+    ]
+  }
+];
 
 /**
  * Big Brother Final 3: R1 (3-way) → R2 (R1 losers) → R3 (R1 winner vs R2 winner) → Final HOH pick → jury vote.
@@ -112,8 +147,8 @@ export class FinaleManager {
       text: `Final Head of Household <strong>${finalHOH.name}</strong> chooses to take <strong>${finalist.name}</strong> to the Final 2.`
     });
 
-    this.state.processEviction(evicted, results);
-    this.state.finalePhase = FINALE_PHASES.JURY_VOTE;
+    this.state.processEviction(evicted);
+    this.state.finalePhase = FINALE_PHASES.JURY_QA;
     return { results, finalist, evicted };
   }
 
@@ -214,19 +249,112 @@ export class FinaleManager {
 
   _jurorVote(juror, finalists) {
     if (this.ai?.decideJuryVote) {
-      return this.ai.decideJuryVote(juror, finalists);
+      return this.ai.decideJuryVote(juror, finalists, this.state.juryQAAdjustments);
     }
     let best = finalists[0];
     let bestScore = -Infinity;
     for (const f of finalists) {
       const rel = juror.getRelationship(f.id);
       const grudge = juror.grudges.find((g) => g.againstId === f.id);
-      const score = rel - (grudge ? grudge.intensity / 2 : 0) + randomInt(-5, 5);
+      const qa = this.state.juryQAAdjustments[juror.id]?.[f.id] || 0;
+      const score = rel - (grudge ? grudge.intensity / 2 : 0) + qa + randomInt(-5, 5);
       if (score > bestScore) {
         bestScore = score;
         best = f;
       }
     }
     return best;
+  }
+
+  /** How many jury Q&A rounds to run (capped by jury size). */
+  getJuryQARoundCount() {
+    const jury = this.state.getJurors();
+    return Math.min(JURY_QA_TEMPLATES.length, Math.max(1, jury.length));
+  }
+
+  getJuryQAQuestion(index) {
+    const jury = this.state.getJurors();
+    if (jury.length === 0) return null;
+    const template = JURY_QA_TEMPLATES[index % JURY_QA_TEMPLATES.length];
+    const juror = jury[index % jury.length];
+    return { juror, template };
+  }
+
+  /** AI finalist picks an answer style. */
+  aiPickQAResponse(finalist, template) {
+    const strategy = finalist.personality?.strategy;
+    let choice = template.choices[0];
+    if (strategy === 'manipulate' || strategy === 'attack') {
+      choice = template.choices.find((c) => c.id === 'shade') || pickRandom(template.choices);
+    } else if (strategy === 'befriend' || strategy === 'ally') {
+      choice = template.choices.find((c) => c.id === 'respect' || c.id === 'honest')
+        || pickRandom(template.choices);
+    } else {
+      choice = pickRandom(template.choices);
+    }
+    return choice;
+  }
+
+  applyFinalistQAAnswer(juror, finalist, choice) {
+    this.state.addJuryQAAdjustment(juror.id, finalist.id, choice.delta);
+    return {
+      type: 'narrative',
+      text: `<strong>${finalist.name}</strong> to ${juror.name}: “${choice.label}.”`
+    };
+  }
+
+  beginJuryQA() {
+    const results = [];
+    const finalists = this.state.getActiveContestants();
+    const jury = this.state.getJurors();
+    results.push({
+      type: 'drama',
+      text: '<strong>Jury Q&A</strong> — Finalists face the jury live before the vote. Each answer can sway votes.'
+    });
+    if (finalists.length !== 2) {
+      results.push({ type: 'warning', text: 'Jury Q&A requires two finalists.' });
+      return { results, ok: false };
+    }
+    if (jury.length === 0) {
+      results.push({
+        type: 'system',
+        text: 'No jurors are seated — Q&A is skipped; the jury vote follows.'
+      });
+      this.state.finalePhase = FINALE_PHASES.JURY_VOTE;
+      return { results, ok: false, skipQA: true };
+    }
+    this.state.finalePhase = FINALE_PHASES.JURY_QA;
+    this.state.finaleQAIndex = 0;
+    return { results, ok: true };
+  }
+
+  runJuryQARound(index) {
+    const results = [];
+    const qa = this.getJuryQAQuestion(index);
+    if (!qa) {
+      return { results: [{ type: 'system', text: 'No more jury questions.' }], done: true };
+    }
+    const { juror, template } = qa;
+    const finalists = this.state.getActiveContestants();
+    results.push({
+      type: 'drama',
+      text: `Juror <strong>${juror.name}</strong> asks: “${template.prompt}”`
+    });
+    return {
+      results,
+      juror,
+      template,
+      finalists,
+      done: false,
+      needsPlayerAnswer: finalists.some((f) => f.isPlayer)
+    };
+  }
+
+  finishJuryQA() {
+    this.state.finalePhase = FINALE_PHASES.JURY_VOTE;
+    return [{
+      type: 'system',
+      text: 'Jury Q&A is over. The jurors are ready to cast their votes for the winner.'
+    }];
   }
 }

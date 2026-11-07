@@ -414,6 +414,23 @@ export class AIController {
     return { use: Math.random() < 0.25, target: nominees[0] };
   }
 
+  /** Jury vote between two finalists (includes Q&A sway). */
+  decideJuryVote(juror, finalists, juryQAAdjustments = {}) {
+    let best = finalists[0];
+    let bestScore = -Infinity;
+    for (const f of finalists) {
+      const rel = juror.getRelationship(f.id);
+      const grudge = juror.grudges.find((g) => g.againstId === f.id);
+      const qa = juryQAAdjustments[juror.id]?.[f.id] || 0;
+      const score = rel - (grudge ? grudge.intensity / 2 : 0) + qa + randomInt(-5, 5);
+      if (score > bestScore) {
+        bestScore = score;
+        best = f;
+      }
+    }
+    return best;
+  }
+
   /** AI picks veto replacement nominee. */
   chooseVetoReplacement(hoh, currentNominees) {
     const others = this.state.getOthers(hoh).filter((c) => !currentNominees.some((n) => n.id === c.id));

@@ -59,6 +59,29 @@ export const DOUBLE_EVICTION_ROUND2_PHASES = [
   PHASES.EVICTION
 ];
 
+/** Final 3: three HOH comps → Final HOH pick → Jury Q&A → jury vote. */
+export const FINALE_PHASES = {
+  INTRO: 'intro',
+  R1: 'r1',
+  R2: 'r2',
+  R3: 'r3',
+  FINAL_PICK: 'final_pick',
+  JURY_QA: 'jury_qa',
+  JURY_VOTE: 'jury_vote',
+  COMPLETE: 'complete'
+};
+
+export const FINALE_PHASE_LABELS = {
+  [FINALE_PHASES.INTRO]: 'Finale — Final 3',
+  [FINALE_PHASES.R1]: 'Finale — HOH Part 1',
+  [FINALE_PHASES.R2]: 'Finale — HOH Part 2',
+  [FINALE_PHASES.R3]: 'Finale — HOH Part 3',
+  [FINALE_PHASES.FINAL_PICK]: 'Finale — Final HOH decision',
+  [FINALE_PHASES.JURY_QA]: 'Finale — Jury Q&A',
+  [FINALE_PHASES.JURY_VOTE]: 'Finale — Jury vote',
+  [FINALE_PHASES.COMPLETE]: 'Finale — Winner'
+};
+
 export { sharesAllianceWith, getAllianceIds, getContestantAlliances } from './allianceUtils.js';
 
 /**
@@ -112,6 +135,17 @@ export class GameState {
     this.doubleEvictionAwaitingRound2 = false;
     this.doubleEvictionRound2Cycle = false;
     this.doubleEvictionPendingNextPhase = null;
+
+    this.inFinale = false;
+    this.finalePhase = null;
+    this.finaleR1WinnerId = null;
+    this.finaleR2WinnerId = null;
+    this.finaleR3WinnerId = null;
+    this.finalePartLosers = [];
+    this.finaleAwaitingStep = null;
+    this.finaleQAIndex = 0;
+    /** @type {Record<string, Record<string, number>>} jurorId → finalistId → vote sway */
+    this.juryQAAdjustments = {};
 
     this._initContestants(playerName, aiCount);
     this.syncPhaseForWeekday();
@@ -429,7 +463,16 @@ export class GameState {
     return this.contestants.filter((c) => c.evicted && c.isJuror);
   }
 
+  addJuryQAAdjustment(jurorId, finalistId, delta) {
+    if (!this.juryQAAdjustments[jurorId]) this.juryQAAdjustments[jurorId] = {};
+    this.juryQAAdjustments[jurorId][finalistId] =
+      (this.juryQAAdjustments[jurorId][finalistId] || 0) + delta;
+  }
+
   getPhaseDisplayLabel() {
+    if (this.inFinale && this.finalePhase) {
+      return FINALE_PHASE_LABELS[this.finalePhase] || 'Finale';
+    }
     if (this.doubleEvictionWeekActive || this.doubleEvictionAwaitingRound2 || this.doubleEvictionRound2Cycle) {
       const round = this.doubleEvictionRound;
       const phase = PHASE_LABELS[this.phase] || this.phase;
@@ -470,19 +513,11 @@ export class GameState {
     this.evaluateDoubleEvictionWeek();
   }
 
-  checkWinCondition(allowFinalTwo = true) {
+  checkWinCondition() {
     const active = this.getActiveContestants();
     if (active.length === 1) {
       this.gameOver = true;
       this.winner = active[0];
-      return true;
-    }
-    if (allowFinalTwo && active.length === 2) {
-      const [a, b] = active;
-      const scoreA = a.competition * 2 + a.social + a.reputation / 10;
-      const scoreB = b.competition * 2 + b.social + b.reputation / 10;
-      this.gameOver = true;
-      this.winner = scoreA >= scoreB ? a : b;
       return true;
     }
     return false;
@@ -522,7 +557,16 @@ export class GameState {
       doubleEvictionRound: this.doubleEvictionRound,
       doubleEvictionAwaitingRound2: this.doubleEvictionAwaitingRound2,
       doubleEvictionRound2Cycle: this.doubleEvictionRound2Cycle,
-      doubleEvictionPendingNextPhase: this.doubleEvictionPendingNextPhase
+      doubleEvictionPendingNextPhase: this.doubleEvictionPendingNextPhase,
+      inFinale: this.inFinale,
+      finalePhase: this.finalePhase,
+      finaleR1WinnerId: this.finaleR1WinnerId,
+      finaleR2WinnerId: this.finaleR2WinnerId,
+      finaleR3WinnerId: this.finaleR3WinnerId,
+      finalePartLosers: this.finalePartLosers,
+      finaleAwaitingStep: this.finaleAwaitingStep,
+      finaleQAIndex: this.finaleQAIndex,
+      juryQAAdjustments: this.juryQAAdjustments
     };
   }
 
@@ -570,6 +614,15 @@ export class GameState {
     state.doubleEvictionAwaitingRound2 = data.doubleEvictionAwaitingRound2 ?? false;
     state.doubleEvictionRound2Cycle = data.doubleEvictionRound2Cycle ?? false;
     state.doubleEvictionPendingNextPhase = data.doubleEvictionPendingNextPhase ?? null;
+    state.inFinale = data.inFinale ?? false;
+    state.finalePhase = data.finalePhase ?? null;
+    state.finaleR1WinnerId = data.finaleR1WinnerId ?? null;
+    state.finaleR2WinnerId = data.finaleR2WinnerId ?? null;
+    state.finaleR3WinnerId = data.finaleR3WinnerId ?? null;
+    state.finalePartLosers = data.finalePartLosers ?? [];
+    state.finaleAwaitingStep = data.finaleAwaitingStep ?? null;
+    state.finaleQAIndex = data.finaleQAIndex ?? 0;
+    state.juryQAAdjustments = data.juryQAAdjustments ?? {};
     state.repairInvalidEvictionSchedule();
     return state;
   }

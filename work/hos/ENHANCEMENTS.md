@@ -45,14 +45,14 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 | **Follow-ups** | Final-2 mode comparing two finalists; jury tag on endgame summary. |
 | **Priority** | Polish only. |
 
-### Finale structure options
+### Finale structure (shipped core)
 
 | Field | Detail |
 |--------|--------|
-| **Goal** | BB-style Part 1 / 2 / 3 or single comp + jury Q&A. |
-| **Player experience** | Final three each win a part; jury votes; optional “jury speech” text beats. |
-| **Implementation** | Extend `Finale.js` state machine; reuse `Competition.js` with finalist-only pool. |
-| **Priority** | Low–medium. |
+| **Goal** | Final 3 at three houseguests: **HOH Part 1 → Part 2 → Part 3 → Final HOH pick → Jury Q&A → jury vote**, with Continue between each beat. |
+| **Player experience** | Player finalist picks Q&A answers; juror player casts winner vote; Q&A answers sway jurors via `juryQAAdjustments`. |
+| **Follow-ups** | Interactive comps for finale parts; more Q&A templates; jury recap in end screen. |
+| **Priority** | Polish only. |
 
 ### Twist nights (optional new-game toggles)
 

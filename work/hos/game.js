@@ -3,7 +3,8 @@
  * Orchestrates the weekly loop: social → competition → nominations → veto → eviction.
  */
 
-import { GameState, PHASES, PHASE_LABELS } from './modules/GameState.js';
+import { FinaleManager } from './modules/Finale.js';
+import { FINALE_PHASES, GameState, PHASES, PHASE_LABELS } from './modules/GameState.js';
 import { AIController } from './modules/AI.js';
 import { CompetitionManager } from './modules/Competition.js';
 import { NarrativeEngine } from './modules/Events.js';
@@ -27,9 +28,11 @@ class Game {
     this.competition = null;
     this.narrative = null;
     this.eviction = null;
+    this.finale = null;
     this.playerActions = null;
     this.pendingAction = null;
     this.pendingChallenge = null;
+    this._finaleQAPending = null;
     this._narrativeWarned = false;
 
     setStorageRef(StorageManager);
@@ -64,9 +67,11 @@ class Game {
     this.competition = null;
     this.narrative = null;
     this.eviction = null;
+    this.finale = null;
     this.playerActions = null;
     this.pendingAction = null;
     this.pendingChallenge = null;
+    this._finaleQAPending = null;
     window.__gameContestants = null;
     window.__gamePlayer = null;
   }
@@ -166,10 +171,15 @@ class Game {
     }
   }
 
-  /** If only two remain, resolve the winner instead of running eviction. */
-  _maybeEndAtFinalTwo() {
-    if (this.state.getActiveContestants().length <= 2) {
-      this.state.checkWinCondition(true);
+  /** Final 3 triggers BB-style finale (3 comps + Q&A + jury vote). */
+  _maybeTriggerFinale() {
+    const n = this.state.getActiveContestants().length;
+    if (n === 3 && !this.state.inFinale) {
+      this._beginFinale();
+      return true;
+    }
+    if (n <= 1) {
+      this.state.checkWinCondition();
       if (this.state.gameOver) {
         this.endGame();
         return true;
@@ -183,6 +193,7 @@ class Game {
     this.competition = new CompetitionManager(this.state);
     this.narrative = new NarrativeEngine(this.state);
     this.eviction = new EvictionSystem(this.state, this.ai);
+    this.finale = new FinaleManager(this.state, this.ai);
     this.playerActions = new PlayerActions(this.state);
   }
 
@@ -275,6 +286,17 @@ class Game {
     if (player.evicted && !this.state.gameOver) {
       this._spectateRemaining();
       return;
+    }
+
+    if (this.state.inFinale) {
+      if (this._finaleQAPending) {
+        this._showFinaleQAPicker();
+        return;
+      }
+      if (this.state.finaleAwaitingStep) {
+        this._showFinaleContinuePrompt(this.state.finaleAwaitingStep);
+        return;
+      }
     }
 
     if (this.state.doubleEvictionAwaitingRound2) {
@@ -380,6 +402,17 @@ class Game {
   }
 
   handlePlayerAction(action) {
+    if (action.id === 'finale_continue') {
+      void this._runFinaleStep(this.state.finaleAwaitingStep);
+      return;
+    }
+
+    if (action.id.startsWith('finale_qa_')) {
+      const choiceId = action.id.replace('finale_qa_', '');
+      this._resolveFinalePlayerQAAnswer(choiceId);
+      return;
+    }
+
     if (action.id === 'de_round2_continue') {
       this.state.startDoubleEvictionRound2();
       this.logAndRender([
@@ -551,6 +584,14 @@ class Game {
   }
 
   advanceDay() {
+    if (this.state.inFinale) {
+      this.ui.showToast('Finish the finale sequence before ending the day.');
+      if (this.state.finaleAwaitingStep) {
+        this._showFinaleContinuePrompt(this.state.finaleAwaitingStep);
+      }
+      return;
+    }
+
     if (
       this.state.doubleEvictionAwaitingRound2
       || this.state.doubleEvictionRound2Cycle
@@ -728,14 +769,14 @@ class Game {
   }
 
   _afterCompetition(winner) {
-    if (this._maybeEndAtFinalTwo()) return;
+    if (this._maybeTriggerFinale()) return;
     this._onHouseEventComplete();
   }
 
   // ─── Nominations ───────────────────────────────────────────────────
 
   runNominationPhase() {
-    if (this._maybeEndAtFinalTwo()) return;
+    if (this._maybeTriggerFinale()) return;
 
     const hoh = this.state.getActiveContestants().find((c) => c.isHOH);
 
@@ -916,7 +957,7 @@ class Game {
   // ─── Eviction ──────────────────────────────────────────────────────
 
   runEvictionPhase() {
-    if (this._maybeEndAtFinalTwo()) return;
+    if (this._maybeTriggerFinale()) return;
 
     if (this._recoverFromInvalidEviction()) return;
 
@@ -1038,6 +1079,10 @@ class Game {
       this.state.finalizeDoubleEvictionWeek();
     }
 
+    if (this._maybeTriggerFinale()) {
+      return;
+    }
+
     this.state.phase = PHASES.WEEK_END;
     this.render();
     this.runPhase();
@@ -1057,7 +1102,7 @@ class Game {
       await this._appendAiNarrative('week_recap');
     }
 
-    if (this.state.checkWinCondition(true)) {
+    if (this.state.checkWinCondition()) {
       this.endGame();
       return;
     }
@@ -1134,8 +1179,12 @@ class Game {
   _spectateRemaining() {
     while (!this.state.gameOver) {
       const activeCount = this.state.getActiveContestants().length;
-      if (activeCount <= 2) {
-        this.state.checkWinCondition(true);
+      if (activeCount === 3) {
+        this._spectateFinale();
+        break;
+      }
+      if (activeCount <= 1) {
+        this.state.checkWinCondition();
         break;
       }
 
@@ -1196,14 +1245,328 @@ class Game {
         this._spectateDoubleEvictionRound2();
       }
 
-      if (this.state.getActiveContestants().length <= 2) {
-        this.state.checkWinCondition(true);
+      if (this.state.getActiveContestants().length === 3) {
+        this._spectateFinale();
         break;
       }
     }
 
     this.render();
+    if (!this.state.gameOver) {
+      this.state.checkWinCondition();
+    }
     this.endGame();
+  }
+
+  // ─── Finale (Final 3 → 3 HOH comps → pick → Jury Q&A → vote) ───
+
+  _beginFinale() {
+    this.state.inFinale = true;
+    this.state.finalePhase = FINALE_PHASES.INTRO;
+    this.state.juryQAAdjustments = {};
+    this.state.finaleAwaitingStep = 'r1';
+    this.logAndRender([
+      {
+        type: 'success',
+        text: '<strong>Final 3!</strong> The last three houseguests fight for the last Head of Household.'
+      },
+      {
+        type: 'system',
+        text: 'Finale keeps all <strong>three</strong> HOH competitions, then Final HOH picks who to take to the Final 2, followed by <strong>Jury Q&A</strong> and the jury vote. Continue between each step.'
+      }
+    ]);
+    this.render();
+    this._showFinaleContinuePrompt('r1');
+  }
+
+  _showFinaleContinuePrompt(step) {
+    const labels = {
+      r1: 'Begin Final HOH — Part 1 (all three compete)',
+      r2: 'Begin Final HOH — Part 2 (Round 1 losers)',
+      r3: 'Begin Final HOH — Part 3 (Round 1 winner vs Round 2 winner)',
+      final_pick: 'Begin Final HOH eviction decision',
+      jury_qa: 'Begin Jury Q&A',
+      jury_vote: 'Begin jury vote'
+    };
+    this.state.finaleAwaitingStep = step;
+    this.ui.hideActionDetail();
+    this.ui.setActionPrompt(`Finale paused — ${labels[step] || step}`);
+    this.ui.renderActions(
+      [
+        {
+          id: 'finale_continue',
+          label: labels[step] || 'Continue finale',
+          description: 'Runs the next live finale beat; nothing auto-skips.'
+        }
+      ],
+      (action) => this.handlePlayerAction(action)
+    );
+  }
+
+  async _runFinaleStep(step) {
+    if (step === 'jury_qa_continue') {
+      this.state.finaleAwaitingStep = null;
+      this._runFinaleJuryQARound();
+      return;
+    }
+    this.state.finaleAwaitingStep = null;
+    switch (step) {
+      case 'r1': {
+        const { results, losers } = this.finale.runPart1();
+        this.logAndRender(results);
+        this.state.finalePartLosers = (losers || []).map((c) => c.id);
+        this.state.finalePhase = FINALE_PHASES.R1;
+        this._showFinaleContinuePrompt('r2');
+        break;
+      }
+      case 'r2': {
+        const losers = this.state.finalePartLosers
+          .map((id) => this.state.getContestant(id))
+          .filter((c) => c && !c.evicted);
+        const { results } = this.finale.runPart2(losers);
+        this.logAndRender(results);
+        this.state.finalePhase = FINALE_PHASES.R2;
+        this._showFinaleContinuePrompt('r3');
+        break;
+      }
+      case 'r3': {
+        const r1 = this.state.getContestant(this.state.finaleR1WinnerId);
+        const r2 = this.state.getContestant(this.state.finaleR2WinnerId);
+        const { results, finalHOH } = this.finale.runPart3(r1, r2);
+        this.logAndRender(results);
+        this.state.finalePhase = FINALE_PHASES.R3;
+        if (finalHOH) {
+          this._showFinaleContinuePrompt('final_pick');
+        }
+        break;
+      }
+      case 'final_pick':
+        this._runFinaleFinalPick();
+        break;
+      case 'jury_qa':
+        this._startFinaleJuryQA();
+        break;
+      case 'jury_vote':
+        this._runFinaleJuryVote();
+        break;
+      default:
+        break;
+    }
+    this.render();
+  }
+
+  _runFinaleFinalPick() {
+    const finalHOH = this.state.getContestant(this.state.finaleR3WinnerId)
+      || this.state.getActiveContestants().find((c) => c.isHOH);
+    const candidates = this.state.getActiveContestants().filter((c) => c.id !== finalHOH?.id);
+    if (!finalHOH || candidates.length !== 2) {
+      this.logAndRender([{ type: 'warning', text: 'Final HOH decision could not run.' }]);
+      return;
+    }
+    if (finalHOH.isPlayer) {
+      this.ui.setActionPrompt('You won Final HOH! Evict one houseguest — the other sits next to you in the Final 2.');
+      let html = '<p>Who do you evict?</p><div class="target-grid">';
+      for (const t of candidates) {
+        html += `<button class="btn target-btn btn-danger" data-final-evict="${t.id}">Evict ${escapeHtml(t.name)}</button>`;
+      }
+      html += '</div>';
+      this.ui.showActionDetail(html);
+      this.ui.renderActions([], () => {});
+      this.ui.elements.actionDetail.querySelectorAll('[data-final-evict]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const { results } = this.finale.applyFinalPick(finalHOH, btn.dataset.finalEvict);
+          this.ui.hideActionDetail();
+          this.logAndRender(results);
+          this.state.finalePhase = FINALE_PHASES.FINAL_PICK;
+          this._showFinaleContinuePrompt('jury_qa');
+          this.render();
+        });
+      });
+      return;
+    }
+    const evict = this.finale.aiChooseEvictee(finalHOH, candidates);
+    const { results } = this.finale.applyFinalPick(finalHOH, evict.id);
+    this.logAndRender(results);
+    this._showFinaleContinuePrompt('jury_qa');
+  }
+
+  _startFinaleJuryQA() {
+    const begin = this.finale.beginJuryQA();
+    this.logAndRender(begin.results);
+    if (begin.skipQA) {
+      this._showFinaleContinuePrompt('jury_vote');
+      return;
+    }
+    if (!begin.ok) return;
+    this._runFinaleJuryQARound();
+  }
+
+  _runFinaleJuryQARound() {
+    const total = this.finale.getJuryQARoundCount();
+    if (this.state.finaleQAIndex >= total) {
+      this.logAndRender(this.finale.finishJuryQA());
+      this.state.finalePhase = FINALE_PHASES.JURY_VOTE;
+      this._showFinaleContinuePrompt('jury_vote');
+      return;
+    }
+    const round = this.finale.runJuryQARound(this.state.finaleQAIndex);
+    this.logAndRender(round.results);
+    this._finaleQAPending = round;
+    const playerFinalist = round.finalists?.find((f) => f.isPlayer);
+    if (playerFinalist) {
+      this._showFinaleQAPicker();
+      return;
+    }
+    for (const finalist of round.finalists || []) {
+      const choice = this.finale.aiPickQAResponse(finalist, round.template);
+      this.logAndRender([
+        this.finale.applyFinalistQAAnswer(round.juror, finalist, choice)
+      ]);
+    }
+    this.state.finaleQAIndex += 1;
+    this._finaleQAPending = null;
+    this.state.finaleAwaitingStep = 'jury_qa_continue';
+    this.ui.setActionPrompt(`Jury Q&A — question ${this.state.finaleQAIndex} of ${total} done. Continue to the next question.`);
+    this.ui.renderActions(
+      [{ id: 'finale_continue', label: 'Continue Jury Q&A', description: 'Next jury question.' }],
+      (action) => this.handlePlayerAction(action)
+    );
+  }
+
+  _showFinaleQAPicker() {
+    const round = this._finaleQAPending;
+    if (!round?.template) return;
+    const player = this.state.getPlayer();
+    let html = `<p><strong>Your answer:</strong> “${escapeHtml(round.template.prompt)}”</p><div class="target-grid">`;
+    for (const choice of round.template.choices) {
+      html += `<button class="btn target-btn" data-qa-choice="${choice.id}">${escapeHtml(choice.label)}</button>`;
+    }
+    html += '</div>';
+    this.ui.showActionDetail(html);
+    this.ui.renderActions([], () => {});
+    this.ui.elements.actionDetail.querySelectorAll('[data-qa-choice]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this._resolveFinalePlayerQAAnswer(btn.dataset.qaChoice);
+      });
+    });
+  }
+
+  _resolveFinalePlayerQAAnswer(choiceId) {
+    const round = this._finaleQAPending;
+    if (!round) return;
+    const player = this.state.getPlayer();
+    const choice = round.template.choices.find((c) => c.id === choiceId) || round.template.choices[0];
+    this.ui.hideActionDetail();
+    this.logAndRender([
+      this.finale.applyFinalistQAAnswer(round.juror, player, choice)
+    ]);
+    for (const finalist of round.finalists) {
+      if (finalist.isPlayer) continue;
+      const aiChoice = this.finale.aiPickQAResponse(finalist, round.template);
+      this.logAndRender([
+        this.finale.applyFinalistQAAnswer(round.juror, finalist, aiChoice)
+      ]);
+    }
+    this.state.finaleQAIndex += 1;
+    this._finaleQAPending = null;
+    const total = this.finale.getJuryQARoundCount();
+    if (this.state.finaleQAIndex >= total) {
+      this.logAndRender(this.finale.finishJuryQA());
+      this._showFinaleContinuePrompt('jury_vote');
+    } else {
+      this.state.finaleAwaitingStep = 'jury_qa_continue';
+      this.ui.setActionPrompt(`Jury Q&A — continue to question ${this.state.finaleQAIndex + 1} of ${total}.`);
+      this.ui.renderActions(
+        [{ id: 'finale_continue', label: 'Continue Jury Q&A', description: 'Next jury question.' }],
+        (action) => this.handlePlayerAction(action)
+      );
+    }
+    this.render();
+  }
+
+  _runFinaleJuryVote() {
+    const player = this.state.getPlayer();
+    const finalists = this.state.getActiveContestants();
+    if (player.evicted && player.isJuror && finalists.length === 2) {
+      let html = '<p>You are on the jury — vote for the winner:</p><div class="target-grid">';
+      for (const f of finalists) {
+        html += `<button class="btn target-btn" data-jury-vote="${f.id}">Vote for ${escapeHtml(f.name)}</button>`;
+      }
+      html += '</div>';
+      this.ui.showActionDetail(html);
+      this.ui.renderActions([], () => {});
+      this.ui.elements.actionDetail.querySelectorAll('[data-jury-vote]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const { results } = this.finale.runJuryVote({ playerVoteForId: btn.dataset.juryVote });
+          this.ui.hideActionDetail();
+          this.logAndRender(results);
+          this.state.finaleAwaitingStep = null;
+          this.endGame();
+        });
+      });
+      return;
+    }
+    const { results } = this.finale.runJuryVote({});
+    this.logAndRender(results);
+    this.state.finaleAwaitingStep = null;
+    this.endGame();
+  }
+
+  _spectateFinale() {
+    this.state.inFinale = true;
+    this.state.juryQAAdjustments = {};
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Finale: HOH Part 1 ---' }],
+      PHASES.WEEK_END
+    );
+    const p1 = this.finale.runPart1();
+    this._pushSpectateEntries(p1.results, PHASES.WEEK_END);
+    this.state.finalePartLosers = (p1.losers || []).map((c) => c.id);
+    const losers = this.state.finalePartLosers.map((id) => this.state.getContestant(id)).filter(Boolean);
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Finale: HOH Part 2 ---' }],
+      PHASES.WEEK_END
+    );
+    const p2 = this.finale.runPart2(losers);
+    this._pushSpectateEntries(p2.results, PHASES.WEEK_END);
+    const r1 = this.state.getContestant(this.state.finaleR1WinnerId);
+    const r2 = this.state.getContestant(this.state.finaleR2WinnerId);
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Finale: HOH Part 3 ---' }],
+      PHASES.WEEK_END
+    );
+    const p3 = this.finale.runPart3(r1, r2);
+    this._pushSpectateEntries(p3.results, PHASES.WEEK_END);
+    const finalHOH = p3.finalHOH;
+    const candidates = this.state.getActiveContestants().filter((c) => c.id !== finalHOH?.id);
+    const evict = this.finale.aiChooseEvictee(finalHOH, candidates);
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Finale: Final HOH decision ---' }],
+      PHASES.WEEK_END
+    );
+    const pick = this.finale.applyFinalPick(finalHOH, evict.id);
+    this._pushSpectateEntries(pick.results, PHASES.WEEK_END);
+    this.finale.beginJuryQA();
+    const qaRounds = this.finale.getJuryQARoundCount();
+    for (let i = 0; i < qaRounds; i += 1) {
+      const round = this.finale.runJuryQARound(i);
+      this._pushSpectateEntries(round.results, PHASES.WEEK_END);
+      for (const finalist of round.finalists || []) {
+        const choice = this.finale.aiPickQAResponse(finalist, round.template);
+        this._pushSpectateEntries(
+          [this.finale.applyFinalistQAAnswer(round.juror, finalist, choice)],
+          PHASES.WEEK_END
+        );
+      }
+      this.state.finaleQAIndex = i + 1;
+    }
+    this._pushSpectateEntries(this.finale.finishJuryQA(), PHASES.WEEK_END);
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Finale: Jury vote ---' }],
+      PHASES.WEEK_END
+    );
+    const vote = this.finale.runJuryVote({});
+    this._pushSpectateEntries(vote.results, PHASES.WEEK_END);
   }
 
   // ─── End game ──────────────────────────────────────────────────────
