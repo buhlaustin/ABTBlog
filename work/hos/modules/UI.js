@@ -2,7 +2,11 @@ import { PHASE_LABELS, PHASES, WEEKDAYS } from './GameState.js';
 import { renderDealIntelHtml } from './dealIntel.js';
 import { getHouseguestDealMarks } from './houseguestDealMarks.js';
 import { getHouseguestFloaterMarks } from './floaterShields.js';
-import { buildAllianceMapOutlook, renderAllianceMapHtml } from './allianceMap.js';
+import {
+  buildAllianceMapOutlook,
+  getHouseguestAllianceMarks,
+  renderAllianceMapHtml
+} from './allianceMap.js';
 import { getHohNomPersonaTooltip } from './hohNomPersonas.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 
@@ -274,7 +278,8 @@ export class UIManager {
 
       const dealMarks = player ? getHouseguestDealMarks(player, c) : [];
       const floaterMarks = state ? getHouseguestFloaterMarks(state, c) : [];
-      const allMarks = [...dealMarks, ...floaterMarks];
+      const allianceMarks = state && player ? getHouseguestAllianceMarks(state, player, c) : [];
+      const allMarks = [...dealMarks, ...allianceMarks, ...floaterMarks];
       const marksHtml = allMarks.length
         ? `<div class="deal-marks">${allMarks.map((m) =>
           `<span class="deal-mark deal-mark-${escapeHtml(m.key)}" title="${escapeHtml(m.title)}">${escapeHtml(m.label)}</span>`

@@ -1,6 +1,52 @@
 import { getContestantAlliances, getAllianceIds } from './allianceUtils.js';
 import { escapeHtml } from './utils.js';
 
+const STATUS_SORT = { yours: 0, exposed: 1, hidden: 2, rumour: 3 };
+
+/**
+ * Sidebar chips for visible alliance memberships on other guests.
+ * @param {import('./GameState.js').GameState} state
+ * @param {import('./Contestant.js').Contestant} player
+ * @param {import('./Contestant.js').Contestant} guest
+ */
+export function getHouseguestAllianceMarks(state, player, guest) {
+  if (!state || !player || !guest || guest.isPlayer || guest.evicted) return [];
+
+  const visibleIds = new Set(state.getVisibleAlliances(player.id).map((a) => a.id));
+  const guestIds = getAllianceIds(guest).filter((id) => visibleIds.has(id));
+  if (!guestIds.length) return [];
+
+  /** @type {{ key: string, label: string, title: string }[]} */
+  const marks = [];
+
+  if (guestIds.length >= 2) {
+    const names = guestIds
+      .map((id) => state.alliances.find((a) => a.id === id)?.name)
+      .filter(Boolean);
+    marks.push({
+      key: 'multi-alliance',
+      label: `${guestIds.length} deals`,
+      title:
+        names.length > 1
+          ? `${guest.name} · ${names.join(' + ')}`
+          : `${guest.name} is in ${guestIds.length} alliances you can track.`
+    });
+    return marks;
+  }
+
+  const alliance = state.alliances.find((a) => a.id === guestIds[0]);
+  const shared = alliance?.members.includes(player.id);
+  marks.push({
+    key: shared ? 'ally' : 'in-deal',
+    label: shared ? 'Ally' : 'In deal',
+    title: shared
+      ? `Your alliance "${alliance?.name || 'deal'}" with ${guest.name}.`
+      : `${guest.name} in "${alliance?.name || 'exposed deal'}" (${alliance?.members.length || 2} members).`
+  });
+
+  return marks;
+}
+
 /**
  * @param {import('./GameState.js').GameState} state
  */
@@ -27,7 +73,7 @@ export function buildAllianceMapOutlook(state) {
     };
   }
 
-  const rows = visible.map((a) => formatAllianceRow(state, a, player.id));
+  let rows = visible.map((a) => formatAllianceRow(state, a, player.id));
 
   const shadowRows = hidden.map((a) => ({
     id: a.id,
@@ -41,7 +87,16 @@ export function buildAllianceMapOutlook(state) {
     size: a.members.length
   }));
 
+  rows = [...rows, ...shadowRows].sort((a, b) => {
+    const byStatus = STATUS_SORT[a.status] - STATUS_SORT[b.status];
+    if (byStatus !== 0) return byStatus;
+    return b.size - a.size;
+  });
+
   const overlap = buildMembershipOverlap(state, player);
+
+  const exposedCount = state.alliances.filter((a) => a.exposed).length;
+  const coachingTip = buildAllianceCoachingTip(state, player, hidden.length);
 
   const parts = [];
   if (playerAlliances.length) {
@@ -57,11 +112,42 @@ export function buildAllianceMapOutlook(state) {
   return {
     visible: true,
     summary: parts.length ? parts.join(' · ') : 'No alliances confirmed yet.',
-    rows: [...rows, ...shadowRows],
+    rows,
     hiddenCount: hidden.length,
     playerAllianceCount: playerAlliances.length,
-    overlap
+    overlap,
+    stats: {
+      total: state.alliances.length,
+      exposed: exposedCount,
+      visibleToYou: visible.length,
+      hiddenRumours: hidden.length,
+      yours: playerAlliances.length
+    },
+    coachingTip
   };
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ * @param {import('./Contestant.js').Contestant} player
+ * @param {number} hiddenCount
+ */
+function buildAllianceCoachingTip(state, player, hiddenCount) {
+  if (player.evicted) return '';
+  if (hiddenCount > 0) {
+    return `${hiddenCount} alliance${hiddenCount === 1 ? '' : 's'} still in the shadows — use Spy or wait for drama to expose them.`;
+  }
+  const overlap = buildMembershipOverlap(state, player);
+  if (overlap.length) {
+    return `Watch double dealers (${overlap[0].name} first) — they rarely stay loyal to every deal.`;
+  }
+  if (getAllianceIds(player).length > 1) {
+    return 'You are juggling multiple alliances; expand one deal or expect overlap suspicion.';
+  }
+  if (state.alliances.length && !getContestantAlliances(state, player.id).length) {
+    return 'No deal with your name on it yet — Propose Alliance is a separate move from promises.';
+  }
+  return '';
 }
 
 /**
@@ -95,6 +181,14 @@ function formatAllianceRow(state, alliance, playerId) {
     .map((m) => (m.you ? `${m.name} (you)` : m.name))
     .join(', ');
 
+  const leader = alliance.leaderId ? state.getContestant(alliance.leaderId) : null;
+  const leaderLabel =
+    leader && !leader.evicted
+      ? leader.id === playerId
+        ? 'Led by you'
+        : `Led by ${leader.name}`
+      : '';
+
   return {
     id: alliance.id,
     name: alliance.name,
@@ -104,6 +198,7 @@ function formatAllianceRow(state, alliance, playerId) {
     exposed: alliance.exposed,
     members,
     memberLabels,
+    leaderLabel,
     size: members.length
   };
 }
@@ -139,30 +234,53 @@ function buildMembershipOverlap(state, player) {
  */
 export function buildAllianceIntelSection(state) {
   const outlook = buildAllianceMapOutlook(state);
-  if (!outlook.visible || !outlook.rows.length) return null;
+  if (!outlook.visible) return null;
+  if (!outlook.rows.length && !outlook.hiddenCount && !outlook.coachingTip) return null;
 
-  const items = outlook.rows.slice(0, 8).map((row) => ({
-    key: `alliance-${row.id}`,
-    name: row.name,
-    detail:
-      row.status === 'rumour'
-        ? row.memberLabels
-        : `${row.statusLabel} · ${row.memberLabels || '—'}`
-  }));
+  /** @type {{ key: string, name: string, detail: string }[]} */
+  const items = [];
 
-  if (outlook.overlap.length) {
-    const multi = outlook.overlap[0];
+  if (outlook.stats) {
     items.push({
-      key: 'alliance-overlap',
-      name: 'Double deals',
-      detail: `${multi.name} in ${multi.alliances.length} visible alliances`
+      key: 'alliance-stats',
+      name: 'House deals',
+      detail: `${outlook.stats.total} active · ${outlook.stats.exposed} exposed · you in ${outlook.stats.yours}`
+    });
+  }
+
+  if (outlook.coachingTip) {
+    items.push({
+      key: 'alliance-coach',
+      name: 'Map read',
+      detail: outlook.coachingTip
+    });
+  }
+
+  for (const row of outlook.rows.slice(0, 8)) {
+    const sizeBit = row.status !== 'rumour' ? ` · ${row.size} HG` : '';
+    const leaderBit = row.leaderLabel ? ` · ${row.leaderLabel}` : '';
+    items.push({
+      key: `alliance-${row.id}`,
+      name: row.name,
+      detail:
+        row.status === 'rumour'
+          ? row.memberLabels
+          : `${row.statusLabel}${sizeBit}${leaderBit} — ${row.memberLabels || '—'}`
+    });
+  }
+
+  for (const entry of outlook.overlap.slice(0, 4)) {
+    items.push({
+      key: `alliance-overlap-${entry.name}`,
+      name: 'Double dealer',
+      detail: `${entry.name} · ${entry.alliances.join(', ')}`
     });
   }
 
   return {
     id: 'alliance-map',
     title: 'Alliance map',
-    tone: 'neutral',
+    tone: outlook.hiddenCount > 0 ? 'warning' : 'neutral',
     items
   };
 }
@@ -173,14 +291,36 @@ export function renderAllianceMapHtml(outlook) {
   }
 
   let html = `<p class="alliance-map-summary">${escapeHtml(outlook.summary)}</p>`;
+
+  if (outlook.stats?.total) {
+    html += '<div class="alliance-map-stats">';
+    html +=
+      `<span class="alliance-stat-chip">${outlook.stats.total} in house</span>` +
+      `<span class="alliance-stat-chip">${outlook.stats.exposed} exposed</span>` +
+      `<span class="alliance-stat-chip">${outlook.stats.visibleToYou} on your map</span>`;
+    if (outlook.stats.hiddenRumours) {
+      html += `<span class="alliance-stat-chip warn">${outlook.stats.hiddenRumours} hidden</span>`;
+    }
+    html += '</div>';
+  }
+
+  if (outlook.coachingTip) {
+    html += `<p class="alliance-map-coach">${escapeHtml(outlook.coachingTip)}</p>`;
+  }
+
   html += '<table class="alliance-map-table"><thead><tr>';
-  html += '<th>Alliance</th><th>Status</th><th>Members</th>';
+  html += '<th>Alliance</th><th>Status</th><th>Size</th><th>Members</th>';
   html += '</tr></thead><tbody>';
 
   for (const row of outlook.rows) {
     html += `<tr class="alliance-map-row alliance-status-${escapeHtml(row.status)}">`;
-    html += `<td>${escapeHtml(row.name)}</td>`;
+    const leader =
+      row.leaderLabel && row.status !== 'rumour'
+        ? `<span class="alliance-map-leader">${escapeHtml(row.leaderLabel)}</span>`
+        : '';
+    html += `<td>${escapeHtml(row.name)}${leader}</td>`;
     html += `<td><span class="alliance-status-chip">${escapeHtml(row.statusLabel)}</span></td>`;
+    html += `<td class="alliance-map-size">${row.size}</td>`;
     html += `<td>${escapeHtml(row.memberLabels || '—')}</td>`;
     html += '</tr>';
   }
