@@ -3,20 +3,104 @@
  * Orchestrates the weekly loop: social → competition → nominations → veto → eviction.
  */
 
-import { GameState, PHASES, PHASE_LABELS } from './modules/GameState.js';
+import { FinaleManager } from './modules/Finale.js';
+import { FINALE_PHASES, GameState, PHASES, PHASE_LABELS } from './modules/GameState.js';
 import { AIController } from './modules/AI.js';
-import { CompetitionManager } from './modules/Competition.js';
+import { COMPETITION_TYPES, CompetitionManager } from './modules/Competition.js';
 import { NarrativeEngine } from './modules/Events.js';
 import { EvictionSystem } from './modules/Eviction.js';
 import { PlayerActions } from './modules/PlayerActions.js';
 import { UIManager, setStorageRef } from './modules/UI.js';
 import { StorageManager } from './modules/Storage.js';
 import {
+  compileLiveRunStats,
+  compilePlayerRunStats,
+  renderCareerSetupHintHtml,
+  getRunStatsBanner,
+  renderCareerSetupPanelHtml,
+  renderRunStatsEndHtml
+} from './modules/runStats.js';
+import {
   fetchNarrativeBeat,
   initNarrativeApiUrl,
   isNarrativeApiEnabled
 } from './modules/NarrativeApi.js';
-import { aiCountForCast, escapeHtml, totalCastSize } from './modules/utils.js';
+import {
+  getHostBeatKindForPhase,
+  getHostScheduleBanner,
+  getLocalHostPhaseBeat,
+  recordHostBeat
+} from './modules/hostPhaseBeats.js';
+import {
+  buildConfessionalEntry,
+  getConfessionalFeedBanner,
+  markConfessionalPlayed,
+  pickConfessionalLine,
+  recordConfessional,
+  shouldSkipConfessional,
+  buildReplacementConfessionalExtras
+} from './modules/confessionals.js';
+import {
+  buildWeekRecapFeedEntries,
+  compileWeekRecap,
+  getLocalWeekRecapVoiceover,
+  getWeekRecapBanner
+} from './modules/weekEndRecap.js';
+import {
+  buildScheduleRepairFeedEntries,
+  getScheduleRepairBanner
+} from './modules/scheduleRepair.js';
+import { buildDealIntel } from './modules/dealIntel.js';
+import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
+import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
+import { getLayLowBanner } from './modules/layLowFeedback.js';
+import { countCastFloaters, getPawnShieldWatchBanner } from './modules/floaterShields.js';
+import {
+  getBackdoorNomLens,
+  getBackdoorPlanBanner,
+  getBackdoorVetoCeremonyHint,
+  getThrowCompBanner,
+  validateBackdoorNominations
+} from './modules/strategicVerbs.js';
+import {
+  buildVetoBlockBanner,
+  buildVetoBlockOutlook,
+  describePendingVetoReplacement
+} from './modules/vetoCeremonySummary.js';
+import { buildJuryOutlook } from './modules/juryOutlook.js';
+import {
+  computeBattleBackScores,
+  finalizeMvpRace,
+  getTwistRulesBanner,
+  getTwistWeekAnnouncements,
+  prepareBattleBack,
+  resolveBattleBack,
+  runBattleBack,
+  tickMvpCampaignAI
+} from './modules/SeasonTwists.js';
+import {
+  buildPlayerHohLens,
+  formatHohNomIntelLine,
+  getHohWatchBanner,
+  getNomTargetLensLabel,
+  getPlayerHohPickerIntro
+} from './modules/hohNomPersonas.js';
+import {
+  aiCountForCast,
+  escapeHtml,
+  pickRandom,
+  randomInt,
+  totalCastSize
+} from './modules/utils.js';
+import {
+  buildCastPresetPremiereLines,
+  getCastPresetBanner,
+  getCastPresetBlurb,
+  getCastPresetCheatRows,
+  getCastPresetTwistDefaults,
+  queueCastPresetPremiereConfessionals,
+  resolveJuryStartHouseCount
+} from './modules/castPresets.js';
 
 class Game {
   constructor() {
@@ -26,10 +110,13 @@ class Game {
     this.competition = null;
     this.narrative = null;
     this.eviction = null;
+    this.finale = null;
     this.playerActions = null;
     this.pendingAction = null;
     this.pendingChallenge = null;
+    this._finaleQAPending = null;
     this._narrativeWarned = false;
+    this._battleBackPrep = null;
 
     setStorageRef(StorageManager);
     this._bindSetupEvents();
@@ -43,7 +130,16 @@ class Game {
       const difficulty = ui.elements.difficultySelect.value;
       const castPreset = ui.elements.castSelect?.value || 'standard';
       const doubleEvictionEnabled = ui.elements.doubleEvictionToggle?.checked ?? true;
-      void this.startNewGame(name, difficulty, castPreset, doubleEvictionEnabled);
+      const battleBackEnabled = ui.elements.battleBackToggle?.checked ?? false;
+      const mvpTwistEnabled = ui.elements.mvpTwistToggle?.checked ?? false;
+      void this.startNewGame(
+        name,
+        difficulty,
+        castPreset,
+        doubleEvictionEnabled,
+        battleBackEnabled,
+        mvpTwistEnabled
+      );
     });
 
     ui.elements.btnLoadGame.addEventListener('click', () => this.loadGame());
@@ -52,7 +148,75 @@ class Game {
     ui.elements.btnPlayAgain.addEventListener('click', () => {
       this._resetGame();
       ui.showSetup();
+      if (ui.elements.careerStatsHint) {
+        ui.elements.careerStatsHint.innerHTML = renderCareerSetupHintHtml(StorageManager.loadProfile());
+      }
+      if (ui.elements.careerPanelBody) {
+        ui.elements.careerPanelBody.innerHTML = renderCareerSetupPanelHtml(StorageManager.loadProfile());
+      }
     });
+
+    const refreshTwistCheat = () => {
+      const map = [
+        ['double-eviction', ui.elements.doubleEvictionToggle],
+        ['twist-battle-back', ui.elements.battleBackToggle],
+        ['twist-mvp', ui.elements.mvpTwistToggle]
+      ];
+      for (const [ruleId, input] of map) {
+        const row = document.querySelector(`[data-twist-rule="${ruleId}"]`);
+        if (row && input) {
+          row.setAttribute('aria-disabled', input.checked ? 'false' : 'true');
+        }
+      }
+    };
+    for (const input of [
+      ui.elements.doubleEvictionToggle,
+      ui.elements.battleBackToggle,
+      ui.elements.mvpTwistToggle
+    ]) {
+      input?.addEventListener('change', refreshTwistCheat);
+    }
+    refreshTwistCheat();
+
+    const applyCastPresetUi = () => {
+      const key = ui.elements.castSelect?.value || 'standard';
+      const twists = getCastPresetTwistDefaults(key);
+      if (ui.elements.doubleEvictionToggle) {
+        ui.elements.doubleEvictionToggle.checked = twists.doubleEviction;
+      }
+      if (ui.elements.battleBackToggle) {
+        ui.elements.battleBackToggle.checked = twists.battleBack;
+      }
+      if (ui.elements.mvpTwistToggle) {
+        ui.elements.mvpTwistToggle.checked = twists.mvpTwist;
+      }
+      if (ui.elements.castPresetBlurb) {
+        ui.elements.castPresetBlurb.textContent = getCastPresetBlurb(key);
+      }
+      const cheatList = ui.elements.castPresetCheatList;
+      if (cheatList) {
+        cheatList.innerHTML = getCastPresetCheatRows(key)
+          .map(
+            (row) =>
+              `<li><strong>${escapeHtml(row.label)}</strong> — ${escapeHtml(row.detail)}</li>`
+          )
+          .join('');
+      }
+      refreshTwistCheat();
+    };
+    ui.elements.castSelect?.addEventListener('change', applyCastPresetUi);
+    applyCastPresetUi();
+
+    const refreshCareerPanel = () => {
+      const profile = StorageManager.loadProfile();
+      if (ui.elements.careerStatsHint) {
+        ui.elements.careerStatsHint.innerHTML = renderCareerSetupHintHtml(profile);
+      }
+      if (ui.elements.careerPanelBody) {
+        ui.elements.careerPanelBody.innerHTML = renderCareerSetupPanelHtml(profile);
+      }
+    };
+    refreshCareerPanel();
 
     ui.showSetup();
   }
@@ -63,14 +227,23 @@ class Game {
     this.competition = null;
     this.narrative = null;
     this.eviction = null;
+    this.finale = null;
     this.playerActions = null;
     this.pendingAction = null;
     this.pendingChallenge = null;
+    this._finaleQAPending = null;
     window.__gameContestants = null;
     window.__gamePlayer = null;
   }
 
-  async startNewGame(playerName, difficulty, castPreset = 'standard', doubleEvictionEnabled = true) {
+  async startNewGame(
+    playerName,
+    difficulty,
+    castPreset = 'standard',
+    doubleEvictionEnabled = true,
+    battleBackEnabled = false,
+    mvpTwistEnabled = false
+  ) {
     this._resetGame();
     await initNarrativeApiUrl();
 
@@ -80,7 +253,9 @@ class Game {
       difficulty,
       aiCount,
       castPreset,
-      doubleEvictionEnabled
+      doubleEvictionEnabled,
+      battleBackEnabled,
+      mvpTwistEnabled
     });
     this._initSystems();
     this._exposeGlobals();
@@ -92,20 +267,43 @@ class Game {
       type: 'success'
     });
     this.state.addStory({
-      text: 'Week 1 begins Tuesday. The house is open for social time until Friday’s first Head of Household.',
+      text: 'Week 1 begins <strong>Friday</strong>. Move-in mingling first — then the first Head of Household competition goes live tonight.',
       type: 'system'
     });
     this.state.addStory({
       text: 'Calendar: <strong>Fri</strong> HOH · <strong>Sat</strong> Nominations · <strong>Sun</strong> POV comp · <strong>Mon</strong> Veto meeting · <strong>Tue–Wed</strong> Strategy · <strong>Thu</strong> Eviction.',
       type: 'system'
     });
+    for (const line of buildCastPresetPremiereLines(this.state)) {
+      this.state.addStory(line);
+    }
+    if (difficulty === 'easy') {
+      const floaters = countCastFloaters(this.state);
+      if (floaters >= 2) {
+        this.state.addStory({
+          text: `Easy season: <strong>${floaters} Floaters</strong> in the house — AI HOHs may nominate pawn pairs to shield bigger threats.`,
+          type: 'system'
+        });
+      }
+    }
     if (isNarrativeApiEnabled()) {
       this.state.addStory({
         text: 'Enhanced host narration is <strong>on</strong> for this session.',
         type: 'system'
       });
-      void this._appendAiNarrative('host_line');
     }
+    void this._appendHostBeat('premiere_move_in');
+    const player = this.state.getPlayer();
+    if (player && !player.evicted) {
+      void this._appendConfessional(player, 'premiere');
+    }
+    const cast = this.state.getActiveContestants().filter((c) => !c.isPlayer);
+    if (cast.length) {
+      void this._appendConfessional(pickRandom(cast), 'premiere');
+    }
+    queueCastPresetPremiereConfessionals(this.state, (speaker, event) => {
+      void this._appendConfessional(speaker, event);
+    });
 
     this.ui.showGame();
     this.render();
@@ -132,8 +330,16 @@ class Game {
       return;
     }
 
+    const loadRepair = this.state.lastScheduleRepair;
+    if (loadRepair?.source === 'load') {
+      this.logAndRender(buildScheduleRepairFeedEntries(loadRepair));
+      this.ui.showToast('Save repaired — calendar adjusted. Expand “View what happened” in the feed.');
+    }
+
     this.runPhase();
-    this.ui.showToast('Game loaded!');
+    if (loadRepair?.source !== 'load') {
+      this.ui.showToast('Game loaded!');
+    }
   }
 
   saveGame() {
@@ -143,6 +349,7 @@ class Game {
       this.state.challengeData = this.competition.challengeData;
     }
     if (StorageManager.save(this.state)) {
+      this.ui.pulseSaveButton();
       this.ui.showToast('Game saved!');
     } else {
       this.ui.showToast('Save failed.');
@@ -156,10 +363,15 @@ class Game {
     }
   }
 
-  /** If only two remain, resolve the winner instead of running eviction. */
-  _maybeEndAtFinalTwo() {
-    if (this.state.getActiveContestants().length <= 2) {
-      this.state.checkWinCondition(true);
+  /** Final 3 triggers BB-style finale (3 comps + Q&A + jury vote). */
+  _maybeTriggerFinale() {
+    const n = this.state.getActiveContestants().length;
+    if (n === 3 && !this.state.inFinale) {
+      this._beginFinale();
+      return true;
+    }
+    if (n <= 1) {
+      this.state.checkWinCondition();
       if (this.state.gameOver) {
         this.endGame();
         return true;
@@ -173,6 +385,7 @@ class Game {
     this.competition = new CompetitionManager(this.state);
     this.narrative = new NarrativeEngine(this.state);
     this.eviction = new EvictionSystem(this.state, this.ai);
+    this.finale = new FinaleManager(this.state, this.ai);
     this.playerActions = new PlayerActions(this.state);
   }
 
@@ -183,23 +396,139 @@ class Game {
 
   render() {
     const { state, ui } = this;
-    ui.updateWeekDay(state.week, state.weekdayIndex, state.phase);
+    ui.updateWeekDay(state.week, state.weekdayIndex, state.phase, state.getPhaseDisplayLabel());
+    ui.renderWeekCalendar(state);
+    const twistParts = [getTwistRulesBanner(state)];
+    const castBanner = getCastPresetBanner(state);
+    if (castBanner) twistParts.push(castBanner);
+    const liveRun = compileLiveRunStats(state);
+    const runBanner = liveRun && !state.gameOver ? getRunStatsBanner(liveRun) : '';
+    ui.updateRunStatsChip(runBanner);
+    const previewLeans = (hoh, limit) => this.ai.previewNominationLeans(hoh, limit);
+    const hohWatch = getHohWatchBanner(state, previewLeans);
+    if (hohWatch) twistParts.push(hohWatch);
+    const pawnWatch = getPawnShieldWatchBanner(state, previewLeans);
+    if (pawnWatch) twistParts.push(pawnWatch);
+    const backdoorBanner = getBackdoorPlanBanner(state);
+    if (backdoorBanner) twistParts.push(backdoorBanner);
+    const throwBanner = getThrowCompBanner(state);
+    if (throwBanner) twistParts.push(throwBanner);
+    const layLowBanner = getLayLowBanner(state);
+    if (layLowBanner) twistParts.push(layLowBanner);
+    const hostScheduleBanner = getHostScheduleBanner(state);
+    if (hostScheduleBanner) twistParts.push(hostScheduleBanner);
+    const confessionalBanner = getConfessionalFeedBanner(state);
+    if (confessionalBanner) twistParts.push(confessionalBanner);
+    const weekRecapBanner = getWeekRecapBanner(state);
+    if (weekRecapBanner) twistParts.push(weekRecapBanner);
+    const scheduleRepairBanner = getScheduleRepairBanner(state);
+    if (scheduleRepairBanner) twistParts.push(scheduleRepairBanner);
+    const vetoBlockBanner = buildVetoBlockBanner(state);
+    if (vetoBlockBanner) twistParts.push(vetoBlockBanner);
+    const threatAlert = getThreatNominationAlert(state, previewLeans);
+    if (threatAlert) twistParts.push(threatAlert);
+    ui.updateTwistBanner(twistParts.join(' · '));
     ui.renderStoryLog(state.storyLog);
-    ui.renderPlayer(state.getPlayer());
-    ui.renderHouseguests(state.contestants, state.getPlayer());
-    ui.renderAlliances(state.alliances, state.getPlayer());
     state.updateThreatLevels();
+    ui.renderPlayer(state.getPlayer());
+    ui.renderThreatBand(buildThreatBandOutlook(state, previewLeans));
+    ui.renderVetoBlockPanel(buildVetoBlockOutlook(state));
+    ui.renderHouseguests(state.contestants, state.getPlayer(), state);
+    ui.renderAlliances(state.alliances, state.getPlayer(), state);
+    const juryTwistNote = state.doubleEvictionWeekActive
+      ? 'Double eviction this week — up to two new jurors may be seated after tonight.'
+      : '';
+    ui.renderDealIntelPanel(buildDealIntel(state));
+    ui.renderJuryPanel(buildJuryOutlook(state), state.getPlayer(), juryTwistNote);
   }
 
   async _appendAiNarrative(kind) {
-    const beat = await fetchNarrativeBeat(kind, this.state);
-    if (beat) {
+    await this._appendHostBeat(kind);
+  }
+
+  /**
+   * Phase host beat — narrate API when enabled, else local fallback.
+   * @param {string} kind
+   * @param {{ hoh?: object, nominees?: object[], winner?: object, evicted?: object | null }} [extra]
+   */
+  /**
+   * @param {import('./modules/Contestant.js').Contestant | null | undefined} speaker
+   * @param {string} eventKey
+   * @param {Record<string, string>} [ctx]
+   */
+  async _appendConfessional(speaker, eventKey, ctx = {}) {
+    if (!speaker) return;
+    if (shouldSkipConfessional(this.state, speaker.id, eventKey)) return;
+
+    this.state.confessionalPayload = {
+      speakerName: speaker.name,
+      speakerArchetype: speaker.personality?.name || null,
+      speakerStrategy: speaker.personality?.strategy || null,
+      event: eventKey,
+      ...ctx
+    };
+
+    let line = null;
+    let source = 'local';
+    if (isNarrativeApiEnabled()) {
+      const beat = await fetchNarrativeBeat('confessional', this.state);
+      if (beat?.text) {
+        line = beat.text;
+        source = 'api';
+      }
+    }
+    this.state.confessionalPayload = null;
+
+    if (!line) {
+      line = pickConfessionalLine(speaker, eventKey, ctx);
+    }
+    if (!line) return;
+
+    markConfessionalPlayed(this.state, speaker.id, eventKey);
+    recordConfessional(this.state, speaker, line, eventKey, source);
+    this.logAndRender([buildConfessionalEntry(speaker, line, eventKey)]);
+  }
+
+  _flushConfessionalsFromEntries(entries) {
+    for (const entry of entries) {
+      if (entry.confessional) {
+        const c = entry.confessional;
+        void this._appendConfessional(c.speaker, c.eventKey, c.ctx || {});
+      }
+      for (const extra of entry.confessionalExtras || []) {
+        void this._appendConfessional(extra.speaker, extra.eventKey, extra.ctx || {});
+      }
+    }
+  }
+
+  /**
+   * @param {{ speaker: import('./modules/Contestant.js').Contestant, eventKey: string, ctx?: Record<string, string> }[]} batch
+   */
+  async _appendConfessionals(batch) {
+    for (const item of batch) {
+      await this._appendConfessional(item.speaker, item.eventKey, item.ctx || {});
+    }
+  }
+
+  async _appendHostBeat(kind, extra = {}) {
+    const beat = isNarrativeApiEnabled()
+      ? await fetchNarrativeBeat(kind, this.state)
+      : null;
+    if (beat?.text) {
+      recordHostBeat(this.state, kind, 'api');
       this.logAndRender([{
-        ...beat,
         type: 'ai-host',
-        text: `<strong>Host:</strong> ${beat.text}`
+        text: `<strong>Host:</strong> ${beat.text}`,
+        hostBeatKind: kind
       }]);
-      return;
+      return true;
+    }
+    const local = getLocalHostPhaseBeat(kind, this.state, extra);
+    if (local) {
+      recordHostBeat(this.state, kind, 'local');
+      if (!local.hostBeatKind) local.hostBeatKind = kind;
+      this.logAndRender([local]);
+      return true;
     }
     if (isNarrativeApiEnabled() && !this._narrativeWarned) {
       this._narrativeWarned = true;
@@ -208,12 +537,12 @@ class Game {
         text: 'Host narration could not load (network or blocker). Local story continues.'
       }]);
     }
+    return false;
   }
 
   async _beginScheduledHouseDay() {
-    if (isNarrativeApiEnabled()) {
-      await this._appendAiNarrative('host_line');
-    }
+    const kind = getHostBeatKindForPhase(this.state.phase);
+    await this._appendHostBeat(kind);
     this._runScheduledHouseEvent();
   }
 
@@ -223,7 +552,7 @@ class Game {
         this.runCompetitionPhase();
         break;
       case PHASES.NOMINATION:
-        this.runNominationPhase();
+        void this.runNominationPhase();
         break;
       case PHASES.VETO_COMP:
         this.runVetoCompPhase();
@@ -252,6 +581,7 @@ class Game {
     }
     this.ui.addStoryEntries(entries);
     this.render();
+    this._flushConfessionalsFromEntries(entries);
   }
 
   runPhase() {
@@ -263,6 +593,31 @@ class Game {
     const player = this.state.getPlayer();
     if (player.evicted && !this.state.gameOver) {
       this._spectateRemaining();
+      return;
+    }
+
+    if (this.state.inFinale) {
+      if (this._finaleQAPending) {
+        this._showFinaleQAPicker();
+        return;
+      }
+      if (this.state.finaleAwaitingStep) {
+        this._showFinaleContinuePrompt(this.state.finaleAwaitingStep);
+        return;
+      }
+    }
+
+    if (this.state.doubleEvictionAwaitingRound2) {
+      this._showDoubleEvictionBridgePrompt();
+      return;
+    }
+
+    if (
+      this.state.doubleEvictionRound2Cycle
+      && this.state.doubleEvictionPendingNextPhase
+      && this.state.houseEventComplete
+    ) {
+      this._showDoubleEvictionPhaseContinuePrompt(this.state.doubleEvictionPendingNextPhase);
       return;
     }
 
@@ -287,7 +642,7 @@ class Game {
         this.runCompetitionPhase();
         break;
       case PHASES.NOMINATION:
-        this.runNominationPhase();
+        void this.runNominationPhase();
         break;
       case PHASES.VETO_COMP:
         this.runVetoCompPhase();
@@ -325,21 +680,71 @@ class Game {
   runEventDaySocialPhase() {
     const dayName = this.state.getWeekdayName();
     const eventLabel = PHASE_LABELS[this.state.phase] || 'House event';
-    this.ui.setActionPrompt(
-      `${dayName} — ${eventLabel}. Mingle in the house, then begin the live event when you're ready.`
-    );
+    const isMoveInHoh =
+      this.state.week === 1
+      && this.state.weekdayIndex === 0
+      && this.state.phase === PHASES.COMPETITION;
+    const deRound2 = this.state.doubleEvictionRound2Cycle && this.state.doubleEvictionRound === 2;
+    const mingleLine = isMoveInHoh
+      ? 'Move-in day — tour the house, meet the cast, and use your actions. When you\'re ready, start the first Head of Household competition.'
+      : deRound2
+        ? `Double Eviction Round 2 — ${eventLabel}. Read the latest in the feed, then start this live event when you're ready.`
+        : `${dayName} — ${eventLabel}. Mingle in the house, then begin the live event when you're ready.`;
+    this.ui.setActionPrompt(mingleLine);
+    const liveEventLabel = isMoveInHoh
+      ? 'Begin first HOH competition'
+      : deRound2
+        ? `Begin Round 2 — ${eventLabel.replace(' — live', '')}`
+        : `Begin ${dayName} live event`;
     const actions = [
       {
         id: 'begin_house_event',
-        label: `Begin ${dayName} live event`,
-        description: eventLabel
-      },
-      ...this.playerActions.getAvailableActions()
+        label: liveEventLabel,
+        description: isMoveInHoh ? 'Head of Household — live' : eventLabel
+      }
     ];
+    if (!deRound2) {
+      actions.push(...this.playerActions.getAvailableActions());
+    }
     this.ui.renderActions(actions, (action) => this.handlePlayerAction(action));
   }
 
   handlePlayerAction(action) {
+    if (action.id === 'finale_continue') {
+      void this._runFinaleStep(this.state.finaleAwaitingStep);
+      return;
+    }
+
+    if (action.id.startsWith('finale_qa_')) {
+      const choiceId = action.id.replace('finale_qa_', '');
+      this._resolveFinalePlayerQAAnswer(choiceId);
+      return;
+    }
+
+    if (action.id === 'de_round2_continue') {
+      this.state.startDoubleEvictionRound2();
+      this.logAndRender([
+        {
+          type: 'drama',
+          text: '<strong>Double Eviction — Round 2</strong> begins. A new Head of Household will be crowned.'
+        }
+      ]);
+      this.render();
+      this.runEventDaySocialPhase();
+      return;
+    }
+
+    if (action.id === 'de_round2_next_phase') {
+      const next = this.state.doubleEvictionPendingNextPhase;
+      if (!next) return;
+      this.state.phase = next;
+      this.state.doubleEvictionPendingNextPhase = null;
+      this.state.houseEventComplete = false;
+      this.render();
+      this.runEventDaySocialPhase();
+      return;
+    }
+
     if (action.id === 'continue_day' || action.id === 'begin_house_event') {
       void this._beginScheduledHouseDay();
       return;
@@ -350,19 +755,29 @@ class Game {
       return;
     }
 
+    if (action.id === 'read_hoh') {
+      this._runReadHohAction();
+      return;
+    }
+
+    if (action.id === 'promise') {
+      this._showPromiseTypePicker(action);
+      return;
+    }
+
     const needsTarget = [
       'talk',
       'befriend',
       'alliance',
       'expand_alliance',
       'spy',
-      'promise',
       'break_promise',
       'campaign',
       'influence',
       'scheme_nom',
       'pregame',
-      'comfort_nominee'
+      'comfort_nominee',
+      'backdoor_plan'
     ].includes(action.id);
 
     if (needsTarget) {
@@ -450,6 +865,49 @@ class Game {
     this.executePlayerAction(action.id);
   }
 
+  _showPromiseTypePicker(action) {
+    const types = [
+      { id: 'vote', label: 'Vote deal', desc: 'Pledge your eviction vote with them this week.' },
+      { id: 'safety', label: 'Safety', desc: 'Promise not to nominate or vote against them while it stands.' },
+      { id: 'loyalty', label: 'Loyalty', desc: 'Long-haul loyalty — harder to break without fallout.' }
+    ];
+
+    let html = '<p>What kind of deal?</p><div class="target-grid promise-type-grid">';
+    for (const t of types) {
+      html += `<button class="btn target-btn" data-promise-type="${t.id}" title="${escapeHtml(t.desc)}">${escapeHtml(t.label)}</button>`;
+    }
+    html += '</div><button class="btn btn-ghost" data-cancel>Cancel</button>';
+
+    this.ui.showActionDetail(html);
+    this.ui.setActionPrompt('Make a Promise — choose the deal type.');
+
+    this.ui.elements.actionDetail.querySelectorAll('[data-promise-type]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const promiseType = btn.dataset.promiseType;
+        const picker = this.ui.buildTargetPicker(
+          this.state.contestants,
+          'Who are you making this promise to?'
+        );
+        this.ui.showActionDetail(
+          picker.html + '<button class="btn btn-ghost" data-cancel>Cancel</button>',
+          null
+        );
+        this.ui.elements.actionDetail.querySelectorAll('[data-target]').forEach((tbtn) => {
+          tbtn.addEventListener('click', () => {
+            this.executePlayerAction(action.id, tbtn.dataset.target, { promiseType });
+          });
+        });
+        const cancelInner = this.ui.elements.actionDetail.querySelector('[data-cancel]');
+        cancelInner?.addEventListener('click', () => this.ui.hideActionDetail());
+      });
+    });
+
+    const cancel = this.ui.elements.actionDetail.querySelector('[data-cancel]');
+    if (cancel) {
+      cancel.addEventListener('click', () => this.ui.hideActionDetail());
+    }
+  }
+
   executePlayerAction(actionId, targetId = null, extra = {}) {
     const result = this.playerActions.execute(actionId, targetId, {
       promiseType: extra.promiseType,
@@ -470,7 +928,16 @@ class Game {
     }
 
     if (result.text) {
-      this.logAndRender([{ text: result.text, type: result.type || 'narrative' }]);
+      this.logAndRender([{
+        text: result.text,
+        type: result.type || 'narrative',
+        confessional: result.confessional,
+        confessionalExtras: result.confessionalExtras
+      }]);
+    }
+
+    if (result.threatFeedback) {
+      this.ui.pulseThreatFeedback(result.threatFeedback);
     }
 
     this._exposeGlobals();
@@ -487,6 +954,25 @@ class Game {
   }
 
   advanceDay() {
+    if (this.state.inFinale) {
+      this.ui.showToast('Finish the finale sequence before ending the day.');
+      if (this.state.finaleAwaitingStep) {
+        this._showFinaleContinuePrompt(this.state.finaleAwaitingStep);
+      }
+      return;
+    }
+
+    if (
+      this.state.doubleEvictionAwaitingRound2
+      || this.state.doubleEvictionRound2Cycle
+    ) {
+      this.ui.showToast('Finish Double Eviction night — use Continue between each live event.');
+      if (this.state.doubleEvictionAwaitingRound2) {
+        this._showDoubleEvictionBridgePrompt();
+      }
+      return;
+    }
+
     if (this.state.isScheduledHouseEventDay() && !this.state.houseEventComplete) {
       this.ui.showToast('Begin today’s live house event before ending the day.');
       this.runEventDaySocialPhase();
@@ -499,6 +985,14 @@ class Game {
     if (aiEvents.length > 0) {
       this.logAndRender(aiEvents);
     }
+
+    if (this.state.mvpRaceOpen) {
+      const mvpTicks = tickMvpCampaignAI(this.state);
+      if (mvpTicks.length > 0) {
+        this.logAndRender(mvpTicks);
+      }
+    }
+    this.state.mvpCampaignedToday = false;
 
     const event = this.narrative.generateDailyEvent();
     if (event) {
@@ -522,6 +1016,21 @@ class Game {
   _onHouseEventComplete() {
     this.state.houseEventComplete = true;
     this.state.actionsRemaining = this.state.config.actionsPerDay;
+
+    const deNext = this.state.getDoubleEvictionRound2NextPhase();
+    if (this.state.doubleEvictionRound2Cycle && deNext) {
+      this.state.doubleEvictionPendingNextPhase = deNext;
+      this.logAndRender([
+        {
+          type: 'system',
+          text: `Double Eviction Round 2 — <strong>${PHASE_LABELS[this.state.phase]}</strong> is over. Review the feed, then continue when ready.`
+        }
+      ]);
+      this.render();
+      this._showDoubleEvictionPhaseContinuePrompt(deNext);
+      return;
+    }
+
     this.logAndRender([
       {
         type: 'system',
@@ -530,6 +1039,39 @@ class Game {
     ]);
     this.render();
     this.runSocialPhase();
+  }
+
+  _showDoubleEvictionBridgePrompt() {
+    this.ui.hideActionDetail();
+    this.ui.setActionPrompt(
+      'Double Eviction Night — Round 1 is complete. Continue when you have read the vote breakdown above.'
+    );
+    this.ui.renderActions(
+      [
+        {
+          id: 'de_round2_continue',
+          label: 'Continue — Round 2 HOH competition',
+          description: 'Round 2 runs as separate steps: HOH, nominations, POV, then a second eviction vote.'
+        }
+      ],
+      (action) => this.handlePlayerAction(action)
+    );
+  }
+
+  _showDoubleEvictionPhaseContinuePrompt(nextPhase) {
+    this.ui.hideActionDetail();
+    const label = PHASE_LABELS[nextPhase] || nextPhase;
+    this.ui.setActionPrompt(`Double Eviction Round 2 paused — next: ${label}`);
+    this.ui.renderActions(
+      [
+        {
+          id: 'de_round2_next_phase',
+          label: `Continue — ${label}`,
+          description: 'Opens the next live event; nothing runs until you confirm.'
+        }
+      ],
+      (action) => this.handlePlayerAction(action)
+    );
   }
 
   // ─── Competition ─────────────────────────────────────────────────
@@ -542,6 +1084,13 @@ class Game {
       type: 'competition',
       text: `<strong>${comp.name}</strong>: ${comp.description}`
     }]);
+
+    if (this.state.playerThrowCompetition) {
+      this.logAndRender([{
+        type: 'warning',
+        text: 'Throw comp armed — you are tanking this Head of Household competition.'
+      }]);
+    }
 
     const player = this.state.getPlayer();
     if (player.evicted) {
@@ -604,15 +1153,19 @@ class Game {
     this._afterCompetition(winner);
   }
 
-  _afterCompetition(winner) {
-    if (this._maybeEndAtFinalTwo()) return;
+  async _afterCompetition(winner) {
+    await this._appendHostBeat('hoh_competition_result', { winner });
+    if (winner) {
+      await this._appendConfessional(winner, 'hoh_win');
+    }
+    if (this._maybeTriggerFinale()) return;
     this._onHouseEventComplete();
   }
 
   // ─── Nominations ───────────────────────────────────────────────────
 
-  runNominationPhase() {
-    if (this._maybeEndAtFinalTwo()) return;
+  async runNominationPhase() {
+    if (this._maybeTriggerFinale()) return;
 
     const hoh = this.state.getActiveContestants().find((c) => c.isHOH);
 
@@ -622,21 +1175,95 @@ class Game {
       return;
     }
 
-    const { results } = this.eviction.runNominations();
+    const { results, nominees } = this.eviction.runNominations();
     this.logAndRender(results);
+    await this._appendNominationHostBeat(hoh, nominees);
     this._onHouseEventComplete();
+  }
+
+  async _appendNominationHostBeat(hoh, nominees) {
+    if (!hoh || !nominees?.length) return;
+    this.state.nominationLeanNames = nominees.map((n) => n.name);
+    await this._appendHostBeat('nomination_ceremony', { hoh, nominees });
+    this.state.nominationLeanNames = [];
+    if (hoh && nominees.length >= 2) {
+      const batch = [
+        {
+          speaker: hoh,
+          eventKey: 'hoh_nominated',
+          ctx: { a: nominees[0].name, b: nominees[1].name }
+        },
+        {
+          speaker: nominees[0],
+          eventKey: 'on_block',
+          ctx: { other: nominees[1].name, hoh: hoh.name }
+        },
+        {
+          speaker: nominees[1],
+          eventKey: 'on_block',
+          ctx: { other: nominees[0].name, hoh: hoh.name }
+        }
+      ];
+      await this._appendConfessionals(batch);
+    }
+  }
+
+  _runReadHohAction() {
+    const hoh = this.state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
+    const player = this.state.getPlayer();
+    if (!hoh || player.evicted) return;
+
+    if (this.state.actionsRemaining <= 0) {
+      this.ui.showToast('No actions remaining today.');
+      return;
+    }
+
+    const success = player.intelligence + randomInt(2, 10) > 10;
+    this.state.actionsRemaining = Math.max(0, this.state.actionsRemaining - 1);
+
+    if (!success) {
+      this.logAndRender([{
+        type: 'warning',
+        text: `You read ${hoh.name} wrong — their poker face wins today.`
+      }]);
+      this.render();
+      return;
+    }
+
+    const leans = this.ai.previewNominationLeans(hoh, 3);
+    const lines = [
+      { type: 'narrative', text: formatHohNomIntelLine(hoh) },
+      ...leans.map((row, i) => ({
+        type: i === 0 ? 'warning' : 'narrative',
+        text: `#${i + 1} lean: <strong>${row.target.name}</strong> — ${row.reason}.`
+      }))
+    ];
+    this.logAndRender(lines);
+    this.state.playerIntel.push({
+      week: this.state.week,
+      about: hoh.id,
+      text: `HOH lean: ${leans.map((r) => r.target.name).join(', ')}.`
+    });
+    this.render();
   }
 
   _showNominationPicker() {
     const player = this.state.getPlayer();
+    const hohLens = buildPlayerHohLens(player);
     const targets = this.state.getOthers(player);
     let selected = [];
 
     const renderPicker = () => {
-      let html = `<p>Select 2 nominees (${selected.length}/2):</p><div class="target-grid">`;
+      let html = `<p class="hoh-nom-hint">${getPlayerHohPickerIntro(player)}</p>`;
+      if (this.state.backdoorTargetId) {
+        html += `<p class="backdoor-hint">${getBackdoorPlanBanner(this.state, { html: true })}</p>`;
+      }
+      html += `<p>Select 2 nominees (${selected.length}/2):</p><div class="target-grid nomination-target-grid">`;
       for (const t of targets) {
         const isSelected = selected.includes(t.id);
-        html += `<button class="btn target-btn ${isSelected ? 'selected' : ''}" data-target="${t.id}">${escapeHtml(t.name)}</button>`;
+        const lens = getBackdoorNomLens(this.state, t) || getNomTargetLensLabel(hohLens, t);
+        const lensHtml = lens ? `<span class="nom-lens">${escapeHtml(lens)}</span>` : '';
+        html += `<button class="btn target-btn ${isSelected ? 'selected' : ''}" data-target="${t.id}">${escapeHtml(t.name)}${lensHtml}</button>`;
       }
       html += `</div>`;
       if (selected.length === 2) {
@@ -660,10 +1287,15 @@ class Game {
       if (confirm) {
         confirm.addEventListener('click', () => {
           const picks = selected.map((id) => this.state.getContestant(id));
-          const { results } = this.eviction.runNominations(picks);
+          const backdoorCheck = validateBackdoorNominations(this.state, picks);
+          const { results, nominees } = this.eviction.runNominations(picks);
           this.ui.hideActionDetail();
-          this.logAndRender(results);
-          this._onHouseEventComplete();
+          const feed = backdoorCheck.feedLine ? [...results, backdoorCheck.feedLine] : results;
+          this.logAndRender(feed);
+          void (async () => {
+            await this._appendNominationHostBeat(hohLens, nominees);
+            this._onHouseEventComplete();
+          })();
         });
       }
     };
@@ -694,7 +1326,10 @@ class Game {
 
   _showVetoCompetition() {
     this.ui.setActionPrompt('Power of Veto — compete to save a nominee!');
-    const html = `<p>The veto competition is intense. Can you outlast the distractions?</p>
+    const throwNote = this.state.playerThrowCompetition
+      ? '<p class="backdoor-hint">Throw comp armed — you already committed to tanking this POV comp.</p>'
+      : '';
+    const html = `${throwNote}<p>The veto competition is intense. Can you outlast the distractions?</p>
       <div class="competition-choices">
         <button class="btn btn-action competition-choice" data-value="true">Push through and win!</button>
         <button class="btn btn-action competition-choice" data-value="false">Play it safe</button>
@@ -712,13 +1347,24 @@ class Game {
     });
   }
 
-  _finishVetoComp(playerWonVeto) {
+  async _finishVetoComp(playerWonVeto) {
     const result = this.eviction.runVetoCompetition(playerWonVeto);
     this.logAndRender(result.results);
+    await this._appendHostBeat('veto_competition_result');
+    const holder = this.state.vetoHolderId
+      ? this.state.getContestant(this.state.vetoHolderId)
+      : null;
+    if (holder) {
+      await this._appendConfessional(holder, 'veto_won');
+    }
     this._onHouseEventComplete();
   }
 
   _finishVetoCeremony(vetoWinner) {
+    const backdoorHint = getBackdoorVetoCeremonyHint(this.state, vetoWinner);
+    if (backdoorHint) {
+      this.logAndRender([{ type: 'narrative', text: backdoorHint }]);
+    }
     const result = this.eviction.runVetoCeremony(vetoWinner);
     this.logAndRender(result.results);
 
@@ -732,12 +1378,37 @@ class Game {
       return;
     }
 
+    void this._completeVetoCeremonyHostBeat();
+  }
+
+  async _completeVetoCeremonyHostBeat() {
+    const holder = this.state.vetoHolderId
+      ? this.state.getContestant(this.state.vetoHolderId)
+      : null;
+    if (holder) {
+      if (this.state.vetoUsed && this.state.vetoSavedNomineeId) {
+        const saved = this.state.getContestant(this.state.vetoSavedNomineeId);
+        await this._appendConfessional(holder, 'veto_saved', {
+          saved: saved?.name || 'a nominee'
+        });
+        if (saved && saved.id !== holder.id) {
+          await this._appendConfessional(saved, 'veto_spared', {
+            saver: holder.name
+          });
+        }
+      } else {
+        await this._appendConfessional(holder, 'veto_unused');
+      }
+    }
+    await this._appendHostBeat('veto_ceremony');
     this._onHouseEventComplete();
   }
 
   _showVetoChoice(vetoWinner) {
     const nominees = this.state.nominees.map((id) => this.state.getContestant(id)).filter(Boolean);
-    let html = '<p>You won the Veto! Use it?</p><div class="target-grid">';
+    const backdoorHint = getBackdoorVetoCeremonyHint(this.state, vetoWinner);
+    let html = backdoorHint ? `<p class="backdoor-hint">${backdoorHint}</p>` : '';
+    html += '<p>You won the Veto! Use it?</p><div class="target-grid">';
     for (const n of nominees) {
       html += `<button class="btn target-btn" data-veto-target="${n.id}">Save ${escapeHtml(n.name)}</button>`;
     }
@@ -752,7 +1423,7 @@ class Game {
         if (vetoResult.needsReplacementPick) {
           this._showReplacementPicker();
         } else {
-          this._onHouseEventComplete();
+          void this._completeVetoCeremonyHostBeat();
         }
       });
     });
@@ -763,37 +1434,173 @@ class Game {
         const vetoResult = this.eviction.playerUseVeto(vetoWinner, null, false);
         this.ui.hideActionDetail();
         this.logAndRender(vetoResult.results);
-        this._onHouseEventComplete();
+        void this._completeVetoCeremonyHostBeat();
       });
     }
   }
 
   _showReplacementPicker() {
     const player = this.state.getPlayer();
+    const hohLens = buildPlayerHohLens(player);
     const nominees = new Set(this.state.nominees);
     const targets = this.state.getOthers(player).filter((c) => !nominees.has(c.id));
 
-    let html = '<p>Pick a replacement nominee:</p><div class="target-grid">';
+    let html = `<p class="hoh-nom-hint">${getPlayerHohPickerIntro(player)}</p>`;
+    if (this.state.backdoorTargetId) {
+      html += `<p class="backdoor-hint">${getBackdoorPlanBanner(this.state, { html: true })}</p>`;
+    }
+    const pendingVeto = describePendingVetoReplacement(this.state);
+    if (pendingVeto) {
+      html += `<p class="veto-pending-hint">${pendingVeto}</p>`;
+    }
+    html += '<p>Pick a replacement nominee:</p><div class="target-grid nomination-target-grid">';
     for (const t of targets) {
-      html += `<button class="btn target-btn" data-replacement="${t.id}">${escapeHtml(t.name)}</button>`;
+      const lens = getBackdoorNomLens(this.state, t) || getNomTargetLensLabel(hohLens, t);
+      const lensHtml = lens ? `<span class="nom-lens">${escapeHtml(lens)}</span>` : '';
+      html += `<button class="btn target-btn" data-replacement="${t.id}">${escapeHtml(t.name)}${lensHtml}</button>`;
     }
     html += '</div>';
     this.ui.showActionDetail(html);
 
     this.ui.elements.actionDetail.querySelectorAll('[data-replacement]').forEach((btn) => {
       btn.addEventListener('click', () => {
+        const replacement = this.state.getContestant(btn.dataset.replacement);
         const results = this.eviction.playerPickReplacement(btn.dataset.replacement);
+        if (replacement && results.length) {
+          const tail = results[results.length - 1];
+          tail.confessionalExtras = [
+            ...(tail.confessionalExtras || []),
+            ...buildReplacementConfessionalExtras(this.state, replacement)
+          ];
+        }
         this.ui.hideActionDetail();
         this.logAndRender(results);
-        this._onHouseEventComplete();
+        void this._completeVetoCeremonyHostBeat();
       });
     });
   }
 
   // ─── Eviction ──────────────────────────────────────────────────────
 
+  _startBattleBackComp() {
+    this.competition.currentCompetition = COMPETITION_TYPES.find((c) => c.id === 'endurance');
+    const challenge = this.competition.createChallengeData(this.competition.currentCompetition);
+    const challengeData = this.competition.getPlayerChallengeData(challenge.type, challenge.data);
+    if (!challengeData) {
+      this._finishBattleBack(10);
+      return;
+    }
+
+    let html = `<p><strong>Battle Back — Endurance segment.</strong> ${escapeHtml(challengeData.prompt)}</p><div class="competition-choices">`;
+    for (const choice of challengeData.choices) {
+      const value = typeof choice.value === 'string' ? choice.value : String(choice.value);
+      html += `<button class="btn btn-action competition-choice" data-value="${escapeHtml(value)}">${escapeHtml(choice.label)}</button>`;
+    }
+    html += '</div>';
+
+    this.ui.showActionDetail(html);
+    this.ui.setActionPrompt('Battle Back competition — make your move.');
+    this.ui.renderActions([], () => {});
+
+    this.ui.elements.actionDetail.querySelectorAll('.competition-choice').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const heldStrong = btn.dataset.value === 'true';
+        this._finishBattleBack(heldStrong);
+      });
+    });
+  }
+
+  _finishBattleBack(heldStrong) {
+    const prep = this._battleBackPrep;
+    if (!prep) return;
+
+    const player = this.state.getPlayer();
+    let bonus = heldStrong ? 22 + randomInt(0, 8) : 6 + randomInt(0, 6);
+    bonus += Math.floor(player.competition * 1.8);
+
+    const scores = computeBattleBackScores(this.state, prep.competitors, bonus);
+    const resolved = resolveBattleBack(this.state, prep.competitors, scores, true);
+    this.state.battleBackResolvedTonight = true;
+    this.ui.hideActionDetail();
+    this.logAndRender([
+      {
+        type: 'competition',
+        text: heldStrong
+          ? 'You grit through every round — the house feels your comeback energy.'
+          : 'You slip once, but you still post a respectable Battle Back score.'
+      },
+      ...resolved.results
+    ]);
+    this._battleBackPrep = null;
+    this._afterBattleBack(resolved.reentered);
+  }
+
+  _afterBattleBack(reentered) {
+    this.render();
+    if (this.state.getActiveContestants().length <= 2) {
+      this._onHouseEventComplete();
+      return;
+    }
+    if (reentered?.isPlayer) {
+      this.logAndRender([
+        {
+          type: 'success',
+          text: 'You are back in the house. Eviction night continues — you can vote if you are not on the block.'
+        }
+      ]);
+      this.render();
+    }
+    this.runEvictionPhase();
+  }
+
   runEvictionPhase() {
-    if (this._maybeEndAtFinalTwo()) return;
+    if (this._maybeTriggerFinale()) return;
+
+    if (this._recoverFromInvalidEviction()) return;
+
+    if (this.state.battleBackWeekActive && !this.state.battleBackResolvedTonight) {
+      if (!this._battleBackPrep) {
+        const prep = prepareBattleBack(this.state);
+        this.logAndRender(prep.results);
+        if (prep.skip) {
+          this.state.battleBackResolvedTonight = true;
+          this.state.battleBackSeasonUsed = true;
+          this.state.battleBackWeekActive = false;
+          this.render();
+        } else if (prep.playerCompeting) {
+          this._battleBackPrep = prep;
+          this._startBattleBackComp();
+          return;
+        } else {
+          const scores = computeBattleBackScores(this.state, prep.competitors);
+          const resolved = resolveBattleBack(this.state, prep.competitors, scores, true);
+          this.state.battleBackResolvedTonight = true;
+          this.logAndRender(resolved.results);
+          this._afterBattleBack(resolved.reentered);
+          return;
+        }
+      }
+      return;
+    }
+
+    if (this.state.mvpTwistWeekActive && this.state.mvpRaceOpen) {
+      const mvpResults = finalizeMvpRace(this.state);
+      if (mvpResults.length > 0) {
+        this.logAndRender(mvpResults);
+        this.render();
+      }
+    }
+
+    if (this.state.doubleEvictionWeekActive && !this.state.houseEventComplete) {
+      this.logAndRender([
+        {
+          type: 'warning',
+          text: this.state.doubleEvictionRound === 2
+            ? '<strong>Double Eviction — Vote 2</strong> A second houseguest leaves tonight.'
+            : '<strong>Double Eviction — Vote 1</strong> The first houseguest leaves tonight; Round 2 follows after a pause.'
+        }
+      ]);
+    }
 
     const player = this.state.getPlayer();
 
@@ -807,11 +1614,40 @@ class Game {
     this._afterEviction(evicted);
   }
 
+  _recoverFromInvalidEviction() {
+    if (this.state.getActiveNominees().length >= 2) return false;
+
+    const repair = this.state.repairInvalidEvictionSchedule('recover');
+    if (!repair) return false;
+
+    this.logAndRender(buildScheduleRepairFeedEntries(repair));
+    this.render();
+    if (this.state.phase === PHASES.NOMINATION) {
+      void this.runNominationPhase();
+    } else {
+      this.runPhase();
+    }
+    return true;
+  }
+
   _showEvictionVote() {
-    const nominees = this.state.nominees.map((id) => this.state.getContestant(id)).filter(Boolean);
-    let html = '<p>Cast your vote to evict:</p><div class="target-grid">';
+    const nominees = this.state.getActiveNominees();
+    if (nominees.length < 2) {
+      this._recoverFromInvalidEviction();
+      return;
+    }
+    const player = this.state.getPlayer();
+    const mvpNote =
+      this.state.mvpPowerAvailable && player.id === this.state.mvpHolderId
+        ? '<p class="mvp-vote-hint"><strong>MVP power</strong> is active — your vote counts twice tonight.</p>'
+        : '';
+    let html = `${mvpNote}<p>Cast your vote to evict:</p><div class="target-grid nomination-target-grid">`;
     for (const n of nominees) {
-      html += `<button class="btn target-btn btn-danger" data-evict="${n.id}">Evict ${escapeHtml(n.name)}</button>`;
+      const warn = getEvictionVoteDealWarning(player, n);
+      const warnHtml = warn
+        ? `<span class="nom-lens deal-vote-warn">${escapeHtml(warn)}</span>`
+        : '';
+      html += `<button class="btn target-btn btn-danger" data-evict="${n.id}">${escapeHtml(n.name)}${warnHtml}</button>`;
     }
     html += '</div>';
     this.ui.showActionDetail(html);
@@ -828,7 +1664,35 @@ class Game {
     });
   }
 
-  _afterEviction(evicted) {
+  async _afterEviction(evicted) {
+    if (!evicted) {
+      if (this._recoverFromInvalidEviction()) return;
+      this._onHouseEventComplete();
+      return;
+    }
+
+    await this._appendHostBeat('eviction_ceremony', { evicted });
+    const deNight = this.state.doubleEvictionWeekActive;
+    const evictedKey =
+      deNight && this.state.doubleEvictionRound !== 2 ? 'double_eviction' : 'evicted';
+    await this._appendConfessional(evicted, evictedKey);
+
+    const remainingAfter = this.state.getActiveContestants().length;
+    if (remainingAfter < resolveJuryStartHouseCount(this.state)) {
+      await this._appendConfessional(evicted, 'jury_seat');
+    }
+
+    const survivors = this.state.getActiveNominees().filter((n) => n.id !== evicted.id);
+    const survivor = survivors[0];
+    if (survivor) {
+      const survKey = deNight && this.state.doubleEvictionRound !== 2
+        ? 'double_eviction'
+        : 'survived_vote';
+      await this._appendConfessional(survivor, survKey, {
+        other: evicted.name
+      });
+    }
+
     if (this.state.getPlayer().evicted) {
       const remaining = this.state.getActiveContestants().length;
       if (remaining > 1) {
@@ -844,6 +1708,32 @@ class Game {
       return;
     }
 
+    if (this.state.shouldRunDoubleEvictionRound2()) {
+      this.state.doubleEvictionAwaitingRound2 = true;
+      this.state.houseEventComplete = true;
+      this.logAndRender([
+        {
+          type: 'drama',
+          text: `<strong>${evicted.name}</strong> has left the house. Double Eviction Night continues — Round 2 (HOH, nominations, POV, eviction) is next.`
+        },
+        {
+          type: 'system',
+          text: 'Take a moment to read the vote results. Press <strong>Continue — Round 2 HOH competition</strong> when ready — each step runs separately.'
+        }
+      ]);
+      this.render();
+      this._showDoubleEvictionBridgePrompt();
+      return;
+    }
+
+    if (this.state.doubleEvictionRound2Cycle || this.state.doubleEvictionWeekActive) {
+      this.state.finalizeDoubleEvictionWeek();
+    }
+
+    if (this._maybeTriggerFinale()) {
+      return;
+    }
+
     this.state.phase = PHASES.WEEK_END;
     this.render();
     this.runPhase();
@@ -851,19 +1741,45 @@ class Game {
 
   // ─── Week end ──────────────────────────────────────────────────────
 
-  async runWeekEnd() {
-    const active = this.state.getActiveContestants().length;
-
-    this.logAndRender([{
-      type: 'system',
-      text: `Week ${this.state.week} is over. ${active} houseguests remain.`
-    }]);
-
+  async _appendWeekRecapVoiceover(recap) {
+    this.state.weekRecapPayload = recap;
+    let line = null;
     if (isNarrativeApiEnabled()) {
-      await this._appendAiNarrative('week_recap');
+      const beat = await fetchNarrativeBeat('week_recap', this.state);
+      if (beat?.text) line = beat.text;
+    }
+    this.state.weekRecapPayload = null;
+
+    if (line) {
+      recordHostBeat(this.state, 'week_recap', 'api');
+      this.logAndRender([{
+        type: 'ai-host',
+        text: `<strong>Recap:</strong> ${line}`,
+        hostBeatKind: 'week_recap'
+      }]);
+      return;
     }
 
-    if (this.state.checkWinCondition(true)) {
+    const local = getLocalWeekRecapVoiceover(recap);
+    if (local) {
+      recordHostBeat(this.state, 'week_recap', 'local');
+      this.logAndRender([local]);
+    }
+  }
+
+  async runWeekEnd() {
+    const recap = compileWeekRecap(this.state);
+    this.state.lastWeekRecap = recap;
+    if (!this.state.weekRecapLog) this.state.weekRecapLog = [];
+    this.state.weekRecapLog.push(recap);
+    if (this.state.weekRecapLog.length > 6) {
+      this.state.weekRecapLog = this.state.weekRecapLog.slice(-6);
+    }
+
+    this.logAndRender(buildWeekRecapFeedEntries(recap));
+    await this._appendWeekRecapVoiceover(recap);
+
+    if (this.state.checkWinCondition()) {
       this.endGame();
       return;
     }
@@ -875,8 +1791,61 @@ class Game {
       text: `<strong>Week ${this.state.week}</strong> begins. The game is heating up.`
     }]);
 
+    for (const entry of getTwistWeekAnnouncements(this.state)) {
+      this.logAndRender([entry]);
+    }
+
     this.render();
     this.runPhase();
+  }
+
+  _pushSpectateEntries(entries, phase) {
+    this.state.storyLog.push(
+      ...entries.map((r) => ({
+        ...r,
+        week: this.state.week,
+        day: this.state.day,
+        phase
+      }))
+    );
+  }
+
+  /** Spectator: run Round 2 as labeled steps (no single blur of all phases). */
+  _spectateDoubleEvictionRound2() {
+    this.state.startDoubleEvictionRound2();
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Double Eviction Round 2: Head of Household ---' }],
+      PHASES.COMPETITION
+    );
+
+    const comp = this.competition.runCompetition();
+    this._pushSpectateEntries(comp.results, PHASES.COMPETITION);
+
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Double Eviction Round 2: Nominations ---' }],
+      PHASES.NOMINATION
+    );
+    const nomResults = this.eviction.runNominations();
+    this._pushSpectateEntries(nomResults.results, PHASES.NOMINATION);
+
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Double Eviction Round 2: Power of Veto ---' }],
+      PHASES.VETO_COMP
+    );
+    const vetoComp = this.eviction.runVetoCompetition(false);
+    this._pushSpectateEntries(vetoComp.results, PHASES.VETO_COMP);
+
+    const vetoMeet = this.eviction.runVetoCeremony(vetoComp.vetoWinner);
+    this._pushSpectateEntries(vetoMeet.results, PHASES.VETO_CEREMONY);
+
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Double Eviction Round 2: Eviction vote ---' }],
+      PHASES.EVICTION
+    );
+    const evictResults = this.eviction.runEvictionVote(null);
+    this._pushSpectateEntries(evictResults.results, PHASES.EVICTION);
+
+    this.state.finalizeDoubleEvictionWeek();
   }
 
   // ─── Spectator mode (player evicted) ───────────────────────────────
@@ -884,8 +1853,12 @@ class Game {
   _spectateRemaining() {
     while (!this.state.gameOver) {
       const activeCount = this.state.getActiveContestants().length;
-      if (activeCount <= 2) {
-        this.state.checkWinCondition(true);
+      if (activeCount === 3) {
+        this._spectateFinale();
+        break;
+      }
+      if (activeCount <= 1) {
+        this.state.checkWinCondition();
         break;
       }
 
@@ -942,23 +1915,351 @@ class Game {
         }))
       );
 
-      if (this.state.getActiveContestants().length <= 2) {
-        this.state.checkWinCondition(true);
+      if (this.state.shouldRunDoubleEvictionRound2()) {
+        this._spectateDoubleEvictionRound2();
+      }
+
+      if (this.state.getActiveContestants().length === 3) {
+        this._spectateFinale();
         break;
       }
     }
 
     this.render();
+    if (!this.state.gameOver) {
+      this.state.checkWinCondition();
+    }
     this.endGame();
+  }
+
+  // ─── Finale (Final 3 → 3 HOH comps → pick → Jury Q&A → vote) ───
+
+  _beginFinale() {
+    this.state.inFinale = true;
+    this.state.finalePhase = FINALE_PHASES.INTRO;
+    this.state.juryQAAdjustments = {};
+    this.state.finaleAwaitingStep = 'r1';
+    this.logAndRender([
+      {
+        type: 'success',
+        text: '<strong>Final 3!</strong> The last three houseguests fight for the last Head of Household.'
+      },
+      {
+        type: 'system',
+        text: 'Finale keeps all <strong>three</strong> HOH competitions, then Final HOH picks who to take to the Final 2, followed by <strong>Jury Q&A</strong> and the jury vote. Continue between each step.'
+      }
+    ]);
+    void this._appendHostBeat('finale_live');
+    this.render();
+    this._showFinaleContinuePrompt('r1');
+  }
+
+  _showFinaleContinuePrompt(step) {
+    const labels = {
+      r1: 'Begin Final HOH — Part 1 (all three compete)',
+      r2: 'Begin Final HOH — Part 2 (Round 1 losers)',
+      r3: 'Begin Final HOH — Part 3 (Round 1 winner vs Round 2 winner)',
+      final_pick: 'Begin Final HOH eviction decision',
+      jury_qa: 'Begin Jury Q&A',
+      jury_vote: 'Begin jury vote'
+    };
+    this.state.finaleAwaitingStep = step;
+    this.ui.hideActionDetail();
+    this.ui.setActionPrompt(`Finale paused — ${labels[step] || step}`);
+    this.ui.renderActions(
+      [
+        {
+          id: 'finale_continue',
+          label: labels[step] || 'Continue finale',
+          description: 'Runs the next live finale beat; nothing auto-skips.'
+        }
+      ],
+      (action) => this.handlePlayerAction(action)
+    );
+  }
+
+  async _runFinaleStep(step) {
+    if (step === 'jury_qa_continue') {
+      this.state.finaleAwaitingStep = null;
+      this._runFinaleJuryQARound();
+      return;
+    }
+    this.state.finaleAwaitingStep = null;
+    switch (step) {
+      case 'r1': {
+        const { results, losers } = this.finale.runPart1();
+        this.logAndRender(results);
+        this.state.finalePartLosers = (losers || []).map((c) => c.id);
+        this.state.finalePhase = FINALE_PHASES.R1;
+        this._showFinaleContinuePrompt('r2');
+        break;
+      }
+      case 'r2': {
+        const losers = this.state.finalePartLosers
+          .map((id) => this.state.getContestant(id))
+          .filter((c) => c && !c.evicted);
+        const { results } = this.finale.runPart2(losers);
+        this.logAndRender(results);
+        this.state.finalePhase = FINALE_PHASES.R2;
+        this._showFinaleContinuePrompt('r3');
+        break;
+      }
+      case 'r3': {
+        const r1 = this.state.getContestant(this.state.finaleR1WinnerId);
+        const r2 = this.state.getContestant(this.state.finaleR2WinnerId);
+        const { results, finalHOH } = this.finale.runPart3(r1, r2);
+        this.logAndRender(results);
+        this.state.finalePhase = FINALE_PHASES.R3;
+        if (finalHOH) {
+          this._showFinaleContinuePrompt('final_pick');
+        }
+        break;
+      }
+      case 'final_pick':
+        this._runFinaleFinalPick();
+        break;
+      case 'jury_qa':
+        this._startFinaleJuryQA();
+        break;
+      case 'jury_vote':
+        this._runFinaleJuryVote();
+        break;
+      default:
+        break;
+    }
+    this.render();
+  }
+
+  _runFinaleFinalPick() {
+    const finalHOH = this.state.getContestant(this.state.finaleR3WinnerId)
+      || this.state.getActiveContestants().find((c) => c.isHOH);
+    const candidates = this.state.getActiveContestants().filter((c) => c.id !== finalHOH?.id);
+    if (!finalHOH || candidates.length !== 2) {
+      this.logAndRender([{ type: 'warning', text: 'Final HOH decision could not run.' }]);
+      return;
+    }
+    if (finalHOH.isPlayer) {
+      this.ui.setActionPrompt('You won Final HOH! Evict one houseguest — the other sits next to you in the Final 2.');
+      let html = '<p>Who do you evict?</p><div class="target-grid">';
+      for (const t of candidates) {
+        html += `<button class="btn target-btn btn-danger" data-final-evict="${t.id}">Evict ${escapeHtml(t.name)}</button>`;
+      }
+      html += '</div>';
+      this.ui.showActionDetail(html);
+      this.ui.renderActions([], () => {});
+      this.ui.elements.actionDetail.querySelectorAll('[data-final-evict]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const { results } = this.finale.applyFinalPick(finalHOH, btn.dataset.finalEvict);
+          this.ui.hideActionDetail();
+          this.logAndRender(results);
+          this.state.finalePhase = FINALE_PHASES.FINAL_PICK;
+          this._showFinaleContinuePrompt('jury_qa');
+          this.render();
+        });
+      });
+      return;
+    }
+    const evict = this.finale.aiChooseEvictee(finalHOH, candidates);
+    const { results } = this.finale.applyFinalPick(finalHOH, evict.id);
+    this.logAndRender(results);
+    this._showFinaleContinuePrompt('jury_qa');
+  }
+
+  _startFinaleJuryQA() {
+    const begin = this.finale.beginJuryQA();
+    this.logAndRender(begin.results);
+    if (begin.skipQA) {
+      this._showFinaleContinuePrompt('jury_vote');
+      return;
+    }
+    if (!begin.ok) return;
+    this._runFinaleJuryQARound();
+  }
+
+  _runFinaleJuryQARound() {
+    const total = this.finale.getJuryQARoundCount();
+    if (this.state.finaleQAIndex >= total) {
+      this.logAndRender(this.finale.finishJuryQA());
+      this.state.finalePhase = FINALE_PHASES.JURY_VOTE;
+      this._showFinaleContinuePrompt('jury_vote');
+      return;
+    }
+    const round = this.finale.runJuryQARound(this.state.finaleQAIndex);
+    this.logAndRender(round.results);
+    this._finaleQAPending = round;
+    const playerFinalist = round.finalists?.find((f) => f.isPlayer);
+    if (playerFinalist) {
+      this._showFinaleQAPicker();
+      return;
+    }
+    for (const finalist of round.finalists || []) {
+      const choice = this.finale.aiPickQAResponse(finalist, round.template);
+      this.logAndRender([
+        this.finale.applyFinalistQAAnswer(round.juror, finalist, choice)
+      ]);
+    }
+    this.state.finaleQAIndex += 1;
+    this._finaleQAPending = null;
+    this.state.finaleAwaitingStep = 'jury_qa_continue';
+    this.ui.setActionPrompt(`Jury Q&A — question ${this.state.finaleQAIndex} of ${total} done. Continue to the next question.`);
+    this.ui.renderActions(
+      [{ id: 'finale_continue', label: 'Continue Jury Q&A', description: 'Next jury question.' }],
+      (action) => this.handlePlayerAction(action)
+    );
+  }
+
+  _showFinaleQAPicker() {
+    const round = this._finaleQAPending;
+    if (!round?.template) return;
+    const player = this.state.getPlayer();
+    let html = `<p><strong>Your answer:</strong> “${escapeHtml(round.template.prompt)}”</p><div class="target-grid">`;
+    for (const choice of round.template.choices) {
+      html += `<button class="btn target-btn" data-qa-choice="${choice.id}">${escapeHtml(choice.label)}</button>`;
+    }
+    html += '</div>';
+    this.ui.showActionDetail(html);
+    this.ui.renderActions([], () => {});
+    this.ui.elements.actionDetail.querySelectorAll('[data-qa-choice]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this._resolveFinalePlayerQAAnswer(btn.dataset.qaChoice);
+      });
+    });
+  }
+
+  _resolveFinalePlayerQAAnswer(choiceId) {
+    const round = this._finaleQAPending;
+    if (!round) return;
+    const player = this.state.getPlayer();
+    const choice = round.template.choices.find((c) => c.id === choiceId) || round.template.choices[0];
+    this.ui.hideActionDetail();
+    this.logAndRender([
+      this.finale.applyFinalistQAAnswer(round.juror, player, choice)
+    ]);
+    for (const finalist of round.finalists) {
+      if (finalist.isPlayer) continue;
+      const aiChoice = this.finale.aiPickQAResponse(finalist, round.template);
+      this.logAndRender([
+        this.finale.applyFinalistQAAnswer(round.juror, finalist, aiChoice)
+      ]);
+    }
+    this.state.finaleQAIndex += 1;
+    this._finaleQAPending = null;
+    const total = this.finale.getJuryQARoundCount();
+    if (this.state.finaleQAIndex >= total) {
+      this.logAndRender(this.finale.finishJuryQA());
+      this._showFinaleContinuePrompt('jury_vote');
+    } else {
+      this.state.finaleAwaitingStep = 'jury_qa_continue';
+      this.ui.setActionPrompt(`Jury Q&A — continue to question ${this.state.finaleQAIndex + 1} of ${total}.`);
+      this.ui.renderActions(
+        [{ id: 'finale_continue', label: 'Continue Jury Q&A', description: 'Next jury question.' }],
+        (action) => this.handlePlayerAction(action)
+      );
+    }
+    this.render();
+  }
+
+  _runFinaleJuryVote() {
+    const player = this.state.getPlayer();
+    const finalists = this.state.getActiveContestants();
+    if (player.evicted && player.isJuror && finalists.length === 2) {
+      let html = '<p>You are on the jury — vote for the winner:</p><div class="target-grid">';
+      for (const f of finalists) {
+        html += `<button class="btn target-btn" data-jury-vote="${f.id}">Vote for ${escapeHtml(f.name)}</button>`;
+      }
+      html += '</div>';
+      this.ui.showActionDetail(html);
+      this.ui.renderActions([], () => {});
+      this.ui.elements.actionDetail.querySelectorAll('[data-jury-vote]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const { results } = this.finale.runJuryVote({ playerVoteForId: btn.dataset.juryVote });
+          this.ui.hideActionDetail();
+          this.logAndRender(results);
+          this.state.finaleAwaitingStep = null;
+          this.endGame();
+        });
+      });
+      return;
+    }
+    const { results } = this.finale.runJuryVote({});
+    this.logAndRender(results);
+    this.state.finaleAwaitingStep = null;
+    this.endGame();
+  }
+
+  _spectateFinale() {
+    this.state.inFinale = true;
+    this.state.juryQAAdjustments = {};
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Finale: HOH Part 1 ---' }],
+      PHASES.WEEK_END
+    );
+    const p1 = this.finale.runPart1();
+    this._pushSpectateEntries(p1.results, PHASES.WEEK_END);
+    this.state.finalePartLosers = (p1.losers || []).map((c) => c.id);
+    const losers = this.state.finalePartLosers.map((id) => this.state.getContestant(id)).filter(Boolean);
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Finale: HOH Part 2 ---' }],
+      PHASES.WEEK_END
+    );
+    const p2 = this.finale.runPart2(losers);
+    this._pushSpectateEntries(p2.results, PHASES.WEEK_END);
+    const r1 = this.state.getContestant(this.state.finaleR1WinnerId);
+    const r2 = this.state.getContestant(this.state.finaleR2WinnerId);
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Finale: HOH Part 3 ---' }],
+      PHASES.WEEK_END
+    );
+    const p3 = this.finale.runPart3(r1, r2);
+    this._pushSpectateEntries(p3.results, PHASES.WEEK_END);
+    const finalHOH = p3.finalHOH;
+    const candidates = this.state.getActiveContestants().filter((c) => c.id !== finalHOH?.id);
+    const evict = this.finale.aiChooseEvictee(finalHOH, candidates);
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Finale: Final HOH decision ---' }],
+      PHASES.WEEK_END
+    );
+    const pick = this.finale.applyFinalPick(finalHOH, evict.id);
+    this._pushSpectateEntries(pick.results, PHASES.WEEK_END);
+    this.finale.beginJuryQA();
+    const qaRounds = this.finale.getJuryQARoundCount();
+    for (let i = 0; i < qaRounds; i += 1) {
+      const round = this.finale.runJuryQARound(i);
+      this._pushSpectateEntries(round.results, PHASES.WEEK_END);
+      for (const finalist of round.finalists || []) {
+        const choice = this.finale.aiPickQAResponse(finalist, round.template);
+        this._pushSpectateEntries(
+          [this.finale.applyFinalistQAAnswer(round.juror, finalist, choice)],
+          PHASES.WEEK_END
+        );
+      }
+      this.state.finaleQAIndex = i + 1;
+    }
+    this._pushSpectateEntries(this.finale.finishJuryQA(), PHASES.WEEK_END);
+    this._pushSpectateEntries(
+      [{ type: 'system', text: '--- Finale: Jury vote ---' }],
+      PHASES.WEEK_END
+    );
+    const vote = this.finale.runJuryVote({});
+    this._pushSpectateEntries(vote.results, PHASES.WEEK_END);
   }
 
   // ─── End game ──────────────────────────────────────────────────────
 
   endGame() {
-    const summary = this.narrative.generateEndgameSummary();
+    const run = compilePlayerRunStats(this.state);
+    const { profile, newAchievements, previousLastRun } = StorageManager.recordRun(run);
+    const summary =
+      this.narrative.generateEndgameSummary() +
+      renderRunStatsEndHtml(run, profile, newAchievements, previousLastRun);
     const won = this.state.winner?.isPlayer;
     this.ui.renderEndSummary(summary);
     this.ui.showEnd(won);
+    if (newAchievements.length) {
+      this.ui.showToast(
+        `Unlocked ${newAchievements.length} badge${newAchievements.length === 1 ? '' : 's'} — see Achievements below.`
+      );
+    }
     StorageManager.clear();
   }
 }

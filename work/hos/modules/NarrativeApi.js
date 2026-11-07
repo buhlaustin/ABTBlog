@@ -63,10 +63,24 @@ export function buildNarrativeContext(state) {
   const player = state.getPlayer();
   const active = state.getActiveContestants();
   const hoh = active.find((c) => c.isHOH);
-  const nominees = state.nominees
+  const nomineeContestants = state.nominees
     .map((id) => state.getContestant(id))
-    .filter(Boolean)
-    .map((c) => c.name);
+    .filter(Boolean);
+  const nominees = nomineeContestants.map((c) => c.name);
+
+  const vetoHolder = state.vetoHolderId
+    ? state.getContestant(state.vetoHolderId)
+    : null;
+  const compWinnerRaw = state.competitionWinner;
+  const competitionWinner =
+    compWinnerRaw && typeof compWinnerRaw === 'object'
+      ? compWinnerRaw
+      : compWinnerRaw
+        ? state.getContestant(compWinnerRaw)
+        : null;
+  const evictedTonight = state.evictedThisWeek
+    ? state.getContestant(state.evictedThisWeek)
+    : null;
 
   const recentEvents = state.storyLog
     .slice(-8)
@@ -89,7 +103,31 @@ export function buildNarrativeContext(state) {
     playerName: player?.name || 'You',
     houseguestCount: active.length,
     hohName: hoh?.name || null,
+    hohArchetype: hoh?.personality?.name || null,
+    hohNomStyle:
+      hoh?.personality?.strategy && typeof hoh.personality.strategy === 'string'
+        ? hoh.personality.strategy
+        : null,
+    nominationLeanNames: Array.isArray(state.nominationLeanNames)
+      ? state.nominationLeanNames
+      : [],
     nominees,
+    vetoHolderName: vetoHolder?.name || null,
+    vetoUsed: Boolean(state.vetoUsed),
+    vetoSavedName: state.vetoSavedNomineeId
+      ? state.getContestant(state.vetoSavedNomineeId)?.name || null
+      : null,
+    competitionWinnerName: competitionWinner?.name || null,
+    evictedTonightName: evictedTonight?.name || null,
+    doubleEvictionNight: Boolean(state.doubleEvictionWeekActive),
+    battleBackTonight: Boolean(
+      state.battleBackWeekActive && !state.battleBackResolvedTonight
+    ),
+    mvpRaceOpen: Boolean(state.mvpTwistWeekActive && state.mvpRaceOpen),
+    inFinale: Boolean(state.inFinale),
+    lastHostBeatKind: state.lastHostBeatKind || null,
+    confessional: state.confessionalPayload || null,
+    weekRecap: state.weekRecapPayload || null,
     playerIsNominated: Boolean(player?.isNominated),
     playerIsHOH: Boolean(player?.isHOH),
     playerAllianceCount: playerAlliances.length,
@@ -102,7 +140,7 @@ export function buildNarrativeContext(state) {
 }
 
 /**
- * @param {'daily_beat' | 'host_line' | 'week_recap'} kind
+ * @param {'daily_beat' | 'host_line' | 'week_recap' | 'confessional' | 'premiere_move_in' | 'nomination_ceremony' | 'hoh_competition' | 'hoh_competition_result' | 'nomination_pre_ceremony' | 'veto_competition' | 'veto_competition_result' | 'veto_ceremony_pre' | 'veto_ceremony' | 'eviction_pre' | 'eviction_ceremony' | 'finale_live'} kind
  * @returns {Promise<{ text: string, type: string } | null>}
  */
 async function fetchNarrativeBeatDirect(kind, state, apiUrl) {

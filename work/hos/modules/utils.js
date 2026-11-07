@@ -6,16 +6,107 @@ export const SAVE_VERSION = 2;
 export const JURY_START_HOUSE_COUNT = 10;
 
 export const CAST_PRESETS = {
-  legacy: { label: 'Legacy (11 HGs)', aiCount: 10 },
-  quick: { label: 'Quick (12 HGs)', aiCount: 11 },
-  standard: { label: 'Standard (16 HGs)', aiCount: 15, default: true }
+  legacy: {
+    id: 'legacy',
+    label: 'Legacy (11 HGs)',
+    aiCount: 10,
+    blurb: 'Shorter season — same jury rules as classic BB.',
+    doubleEvictionAt: 7,
+    defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: false }
+  },
+  quick: {
+    id: 'quick',
+    label: 'Quick (12 HGs)',
+    aiCount: 11,
+    blurb: 'Faster jury path with a 12-person cast.',
+    defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: false }
+  },
+  standard: {
+    id: 'standard',
+    label: 'Standard (16 HGs)',
+    aiCount: 15,
+    default: true,
+    blurb: 'Full 16-houseguest season — default twists below.',
+    doubleEvictionAt: 8,
+    defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: false }
+  },
+  brains: {
+    id: 'brains',
+    label: 'Brains (16 schemers)',
+    aiCount: 15,
+    blurb: 'Cast leans Strategist; AI gets +1 Intelligence. MVP week suggested.',
+    personalityWeights: {
+      strategist: 5,
+      competitor: 1,
+      loyalist: 1,
+      social: 1,
+      wildcard: 1
+    },
+    aiIntelligenceBonus: 1,
+    defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: true }
+  },
+  supersized: {
+    id: 'supersized',
+    label: 'Supersized (20 HGs)',
+    aiCount: 19,
+    blurb: 'Biggest modern cast — jury begins at 12. Double eviction on.',
+    juryStartHouseCount: 12,
+    doubleEvictionAt: 10,
+    defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: true }
+  },
+  megacast: {
+    id: 'megacast',
+    label: 'Mega cast (24 HGs)',
+    aiCount: 23,
+    blurb: 'Chaos volume — 24 houseguests, one winner; jury at 14.',
+    juryStartHouseCount: 14,
+    doubleEvictionAt: 12,
+    defaultTwists: { doubleEviction: true, battleBack: true, mvpTwist: true }
+  },
+  all_stars: {
+    id: 'all_stars',
+    label: 'All-Stars + rookies (18)',
+    aiCount: 17,
+    blurb: 'Six returning legends vs twelve fresh faces — only one can win.',
+    veteranCount: 6,
+    juryStartHouseCount: 11,
+    doubleEvictionAt: 9,
+    veteranPersonalityWeights: {
+      strategist: 3,
+      competitor: 3,
+      aggressor: 1,
+      social: 1
+    },
+    rookiePersonalityWeights: {
+      social: 2,
+      floater: 2,
+      wildcard: 2,
+      loyalist: 1,
+      strategist: 1
+    },
+    defaultTwists: { doubleEviction: true, battleBack: true, mvpTwist: true }
+  },
+  jury_sprint: {
+    id: 'jury_sprint',
+    label: 'Jury sprint (12, jury @8)',
+    aiCount: 11,
+    blurb: '12 HGs; jury starts when 8 remain (not 10). Double eviction off by default.',
+    juryStartHouseCount: 8,
+    doubleEvictionAt: 7,
+    defaultTwists: { doubleEviction: false, battleBack: false, mvpTwist: false }
+  }
 };
+
+/** Classic BB double-eviction trigger for a 16-person cast. */
+export const DEFAULT_DOUBLE_EVICTION_AT = 8;
 
 export const FIRST_NAMES = [
   'Jordan', 'Alex', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Quinn', 'Avery',
   'Blake', 'Cameron', 'Dakota', 'Emery', 'Finley', 'Harper', 'Jamie', 'Kai',
   'Logan', 'Marley', 'Noah', 'Parker', 'Reese', 'Sage', 'Skyler', 'Tatum',
-  'Violet', 'Wren', 'Zion', 'Brooke', 'Chase', 'Drew', 'Ellis', 'Frankie'
+  'Violet', 'Wren', 'Zion', 'Brooke', 'Chase', 'Drew', 'Ellis', 'Frankie',
+  'Grey', 'Hayden', 'Indigo', 'Jules', 'Kit', 'Lane', 'Micah', 'Nico',
+  'Oakley', 'Phoenix', 'River', 'Shiloh', 'Tristan', 'Urban', 'Val', 'Winter'
 ];
 
 export const PERSONALITY_TYPES = [
@@ -36,7 +127,11 @@ export const DIFFICULTY_CONFIG = {
     competitionPlayerBonus: 2,
     aiAggressionMod: -1,
     startingTrust: 15,
-    actionsPerDay: 3
+    actionsPerDay: 3,
+    /** Flat reduction to AI HOH nomination score for the human player. */
+    playerNominationProtection: 14,
+    /** Baseline multiplier on nomination weight; rises toward 1 as player threat rises. */
+    playerNominationWeightFactor: 0.58
   },
   normal: {
     label: 'Normal',
@@ -45,7 +140,9 @@ export const DIFFICULTY_CONFIG = {
     competitionPlayerBonus: 0,
     aiAggressionMod: 0,
     startingTrust: 5,
-    actionsPerDay: 2
+    actionsPerDay: 2,
+    playerNominationProtection: 6,
+    playerNominationWeightFactor: 0.9
   },
   hard: {
     label: 'Hard',
@@ -54,7 +151,9 @@ export const DIFFICULTY_CONFIG = {
     competitionPlayerBonus: -1,
     aiAggressionMod: 1,
     startingTrust: 0,
-    actionsPerDay: 2
+    actionsPerDay: 2,
+    playerNominationProtection: 0,
+    playerNominationWeightFactor: 1.12
   }
 };
 

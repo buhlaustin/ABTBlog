@@ -159,8 +159,58 @@ Do not invent evictions or wins that are not in context. Stay dramatic but plaus
   if (kind === 'host_line') {
     return `${base}\nKind: Julie Chen-style host line before a live event.\nContext: ${ctx}`;
   }
+  if (kind === 'nomination_ceremony') {
+    return `${base}
+Kind: Julie Chen-style host reaction immediately AFTER the HOH names two nominees on the block.
+Use hohName, hohArchetype, hohNomStyle, nominees, and nominationLeanNames from context if present.
+Name both nominees. Under 320 characters. Context: ${ctx}`;
+  }
+  if (kind === 'confessional') {
+    return `${base}
+Kind: Diary confessional — first-person one sentence. Use confessional object in context (speakerName, speakerArchetype, speakerStrategy, event, and any partner/target/saver names).
+Events include hoh_win, on_block, veto_spared, lay_low, replacement_nom, jury_seat, double_eviction, alliance_exposed, betrayal, etc.
+Return plain text only in JSON text field. Under 200 characters. In-character for the archetype.
+Context: ${ctx}`;
+  }
+  if (kind === 'premiere_move_in') {
+    return `${base}\nKind: Season premiere / move-in speech. Use houseguestCount.\nContext: ${ctx}`;
+  }
+  if (kind === 'finale_live') {
+    return `${base}\nKind: Finale night open when inFinale is true.\nContext: ${ctx}`;
+  }
+  if (kind === 'hoh_competition') {
+    return `${base}\nKind: Lead-in before the Head of Household competition (live event starting).\nContext: ${ctx}`;
+  }
+  if (kind === 'hoh_competition_result') {
+    return `${base}\nKind: Announce the HOH winner using competitionWinnerName.\nContext: ${ctx}`;
+  }
+  if (kind === 'nomination_pre_ceremony') {
+    return `${base}\nKind: Open the nomination ceremony before nominees are named.\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_competition') {
+    return `${base}\nKind: Lead-in before the Power of Veto competition.\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_competition_result') {
+    return `${base}\nKind: Announce who won the veto (vetoHolderName).\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_ceremony_pre') {
+    return `${base}\nKind: Open the veto meeting / ceremony; nominees are on the block.\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_ceremony') {
+    return `${base}\nKind: React after veto decision — vetoUsed, vetoSavedName, nominees.\nContext: ${ctx}`;
+  }
+  if (kind === 'eviction_pre') {
+    return `${base}\nKind: Lead-in to the live eviction vote; name nominees if present.\nContext: ${ctx}`;
+  }
+  if (kind === 'eviction_ceremony') {
+    return `${base}\nKind: Dramatic eviction line for evictedTonightName.\nContext: ${ctx}`;
+  }
   if (kind === 'week_recap') {
-    return `${base}\nKind: End-of-week recap voiceover.\nContext: ${ctx}`;
+    return `${base}
+Kind: End-of-week recap voiceover after the structured recap card.
+Use weekRecap in context: hohWins, nominationSets, vetoMoves, evicted, remaining, jury.seated, playerWeek.roles, danger.topThreats, twists.
+Name evicted houseguests. Mention who is in danger next week. Under 320 characters. No markdown.
+Context: ${ctx}`;
   }
   return `${base}\nKind: Daily house drama or strategy beat during social time.\nContext: ${ctx}`;
 }

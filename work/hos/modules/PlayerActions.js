@@ -5,6 +5,17 @@ import {
   getContestantAlliances,
   sharesAllianceWith
 } from './allianceUtils.js';
+import { addMvpCampaignPoints, getMvpRaceLeader } from './SeasonTwists.js';
+import { formatHohNomIntelLine } from './hohNomPersonas.js';
+import { formatThreatChange, getThreatBand } from './threatBands.js';
+import { describeLayLowRestAction, recordLayLowRest } from './layLowFeedback.js';
+import { formatPawnShieldSpyIntel } from './floaterShields.js';
+import {
+  canCancelThrowCompetition,
+  canClearBackdoorPlan,
+  canSetBackdoorPlan,
+  canThrowCompetition
+} from './strategicVerbs.js';
 
 /**
  * Player-initiated actions during the social phase.
@@ -32,7 +43,11 @@ export class PlayerActions {
       { id: 'promise', label: 'Make a Promise', description: 'Pledge your vote or loyalty.' },
       { id: 'campaign', label: 'Campaign Against Target', description: 'Turn the house against someone.' },
       { id: 'reputation', label: 'Improve Reputation', description: 'Do something to look good to the house.' },
-      { id: 'rest', label: 'Rest & Observe', description: 'Skip action, lower threat slightly.' }
+      {
+        id: 'rest',
+        label: 'Rest & Observe',
+        description: describeLayLowRestAction(player)
+      }
     ];
 
     const playerAlliances = getContestantAlliances(this.state, player.id);
@@ -71,6 +86,75 @@ export class PlayerActions {
         id: 'pregame',
         label: 'Pre-Competition Pep Talk',
         description: 'Rally allies before the HOH competition.'
+      });
+      if (canThrowCompetition(this.state, player)) {
+        actions.unshift({
+          id: 'throw_comp',
+          label: 'Throw Competition',
+          description: 'Tank HOH comp on purpose (not on the block) — lowers your threat.'
+        });
+      }
+    }
+
+    if (phase === PHASES.VETO_COMP && canThrowCompetition(this.state, player)) {
+      actions.unshift({
+        id: 'throw_comp',
+        label: 'Throw POV Comp',
+        description: 'Throw veto comp intentionally and stay off the golden veto radar.'
+      });
+    }
+
+    if (canSetBackdoorPlan(this.state, player)) {
+      const targetName = this.state.backdoorTargetId
+        ? this.state.getContestant(this.state.backdoorTargetId)?.name
+        : null;
+      actions.unshift({
+        id: 'backdoor_plan',
+        label: targetName ? `Backdoor: ${targetName}` : 'Set Backdoor Target',
+        description: 'Mark your real target — nominate pawns Sat, veto Mon, replace.'
+      });
+    }
+
+    if (canClearBackdoorPlan(this.state, player)) {
+      actions.unshift({
+        id: 'clear_backdoor',
+        label: 'Clear Backdoor Plan',
+        description: 'Abandon the backdoor route this week.'
+      });
+    }
+
+    if (canCancelThrowCompetition(this.state, player)) {
+      actions.unshift({
+        id: 'cancel_throw',
+        label: 'Cancel Throw Comp',
+        description: 'Compete normally again before the live event starts.'
+      });
+    }
+
+    const aiHoh = this.state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
+    if (
+      aiHoh
+      && !this.state.houseEventComplete
+      && (phase === PHASES.SOCIAL || phase === PHASES.NOMINATION)
+      && !player.evicted
+    ) {
+      actions.unshift({
+        id: 'read_hoh',
+        label: 'Read the HOH',
+        description: `${aiHoh.name}'s nomination style — who is likeliest on the block?`
+      });
+    }
+
+    if (
+      this.state.mvpTwistWeekActive
+      && this.state.mvpRaceOpen
+      && !this.state.mvpCampaignedToday
+      && !player.evicted
+    ) {
+      actions.unshift({
+        id: 'campaign_mvp',
+        label: 'Campaign for MVP',
+        description: 'Rally the house for MVP votes — once per day during MVP week.'
       });
     }
 
@@ -132,6 +216,16 @@ export class PlayerActions {
         return this._pregameComp(player, target);
       case 'comfort_nominee':
         return this._comfortNominee(player, target);
+      case 'campaign_mvp':
+        return this._campaignMvp(player);
+      case 'throw_comp':
+        return this._throwCompetition(player);
+      case 'backdoor_plan':
+        return this._setBackdoorPlan(player, target);
+      case 'clear_backdoor':
+        return this._clearBackdoorPlan(player);
+      case 'cancel_throw':
+        return this._cancelThrowComp(player);
       case 'end_day':
         return { success: true, text: 'You chose to end the day.', type: 'system', endDay: true };
       default:
@@ -227,10 +321,23 @@ export class PlayerActions {
       player.trust = clamp(player.trust + 5, 0, 100);
 
       this._consumeAction();
+      const extras = target.isPlayer
+        ? []
+        : [{
+          speaker: target,
+          eventKey: 'alliance_formed',
+          ctx: { partner: player.name }
+        }];
       return {
         success: true,
         text: `${target.name} shook on a new secret alliance with you — separate from any other deals in the house.`,
-        type: 'success'
+        type: 'success',
+        confessional: {
+          speaker: player,
+          eventKey: 'alliance_formed',
+          ctx: { partner: target.name }
+        },
+        confessionalExtras: extras
       };
     }
 
@@ -278,10 +385,23 @@ export class PlayerActions {
     player.modifyRelationship(target.id, 10);
     target.modifyRelationship(player.id, 8);
     this._consumeAction();
+    const extras = target.isPlayer
+      ? []
+      : [{
+        speaker: target,
+        eventKey: 'alliance_formed',
+        ctx: { partner: player.name }
+      }];
     return {
       success: true,
       text: `${target.name} joined your alliance "${alliance.name}".`,
-      type: 'success'
+      type: 'success',
+      confessional: {
+        speaker: player,
+        eventKey: 'alliance_formed',
+        ctx: { partner: target.name }
+      },
+      confessionalExtras: extras
     };
   }
 
@@ -314,6 +434,15 @@ export class PlayerActions {
       `You caught ${subject.name} rehearsing what to say if they win HOH.`
     ];
 
+    if (subject.isHOH) {
+      intelTypes.push(formatHohNomIntelLine(subject));
+      intelTypes.push(
+        `${subject.name}'s allies say their nominations will match a ${subject.personality?.name || 'wildcard'} playbook.`
+      );
+      const pawnIntel = formatPawnShieldSpyIntel(subject, this.state);
+      if (pawnIntel) intelTypes.push(pawnIntel);
+    }
+
     const intel = intelTypes[randomInt(0, intelTypes.length - 1)];
     this.state.playerIntel.push({
       week: this.state.week,
@@ -337,6 +466,15 @@ export class PlayerActions {
   _makePromise(player, target, promiseType = 'vote') {
     if (!target) return { success: false, text: 'Choose who to make a promise to.', type: 'system' };
 
+    const existing = player.promises.find((p) => p.targetId === target.id && p.kept === null);
+    if (existing) {
+      return {
+        success: false,
+        text: `You already have an active ${existing.type} deal with ${target.name}. Break it first or honor it.`,
+        type: 'system'
+      };
+    }
+
     player.makePromise(target.id, promiseType, this.state.week);
     target.modifyRelationship(player.id, randomInt(8, 14));
     player.trust = clamp(player.trust + 3, 0, 100);
@@ -351,7 +489,12 @@ export class PlayerActions {
     return {
       success: true,
       text: promises[promiseType] || promises.vote,
-      type: 'narrative'
+      type: 'narrative',
+      confessional: {
+        speaker: player,
+        eventKey: 'new_promise',
+        ctx: { partner: target.name, dealType: promiseType }
+      }
     };
   }
 
@@ -370,10 +513,23 @@ export class PlayerActions {
     player.trust = clamp(player.trust - 10, 0, 100);
 
     this._consumeAction();
+    const extras = target.isPlayer
+      ? []
+      : [{
+        speaker: target,
+        eventKey: 'betrayed_by',
+        ctx: { betrayer: player.name }
+      }];
     return {
       success: true,
-      text: `You broke your promise to ${target.name}. They will not forget this betrayal.`,
-      type: 'drama'
+      text: `<strong>${target.name}</strong> will remember you broke your ${activePromise.type} deal from <strong>Week ${activePromise.week}</strong>.`,
+      type: 'drama',
+      confessional: {
+        speaker: player,
+        eventKey: 'betrayal',
+        ctx: { target: target.name }
+      },
+      confessionalExtras: extras
     };
   }
 
@@ -392,17 +548,35 @@ export class PlayerActions {
     }
 
     target.reputation = clamp(target.reputation - randomInt(3, 8), 0, 100);
-    player.threat = clamp(player.threat + 5, 0, 100);
+    const threatBefore = player.threat;
+    player.threatOffset = clamp((player.threatOffset ?? 0) + 5, -25, 25);
+    this.state.updateThreatLevels?.();
+    const threatLine = formatThreatChange(threatBefore, player.threat);
     target.addGrudge(player.id, 'campaign', 15);
 
     this._consumeAction();
-    return {
+    const base = influenced > 0
+      ? `Your whisper campaign against ${target.name} landed with ${influenced} houseguest(s) ${this._phaseFlavor()}.`
+      : `Your shots at ${target.name} bounced off — for now.`;
+    const result = {
       success: true,
-      text: influenced > 0
-        ? `Your whisper campaign against ${target.name} landed with ${influenced} houseguest(s) ${this._phaseFlavor()}.`
-        : `Your shots at ${target.name} bounced off — for now.`,
+      text: `${base} ${threatLine}`,
+      threatFeedback: {
+        before: threatBefore,
+        after: player.threat,
+        delta: player.threat - threatBefore,
+        offsetTotal: player.threatOffset ?? 0
+      },
       type: 'drama'
     };
+    if (influenced > 0) {
+      result.confessional = {
+        speaker: player,
+        eventKey: 'campaign',
+        ctx: { target: target.name }
+      };
+    }
+    return result;
   }
 
   _influenceVotes(player, target) {
@@ -448,17 +622,44 @@ export class PlayerActions {
   }
 
   _rest(player) {
-    player.threat = clamp(player.threat - randomInt(3, 6), 0, 100);
+    const before = player.threat;
+    const beforeOff = player.threatOffset ?? 0;
+    const delta = randomInt(3, 6);
+    player.threatOffset = clamp(beforeOff - delta, -25, 0);
+    const applied = beforeOff - player.threatOffset;
+    this.state.updateThreatLevels?.();
+    const after = player.threat;
+    recordLayLowRest(this.state, before, after);
     this._consumeAction();
-    return {
+    const capNote =
+      player.threatOffset <= -25 && applied < delta
+        ? ' Cushion hit the −25 cap.'
+        : '';
+    const restResult = {
       success: true,
-      text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first.`,
-      type: 'system'
+      text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first. ${formatThreatChange(before, after)}${capNote}`,
+      type: 'success',
+      threatFeedback: {
+        before,
+        after,
+        delta: after - before,
+        offsetTotal: player.threatOffset ?? 0,
+        bandCrossed: getThreatBand(before).id !== getThreatBand(after).id
+      }
     };
+    if (applied > 0 || after < before) {
+      restResult.confessional = {
+        speaker: player,
+        eventKey: 'lay_low',
+        ctx: { delta: String(Math.max(0, before - after)) }
+      };
+    }
+    return restResult;
   }
 
   _schemeNominees(player, target) {
     if (!target) return { success: false, text: 'Choose who to test as a nominee name.', type: 'system' };
+    const aiHoh = this.state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
     const reactions = this.state.getOthers(player).filter((c) => c.id !== target.id);
     let stirred = 0;
     for (const c of reactions) {
@@ -469,12 +670,99 @@ export class PlayerActions {
     }
     target.threat = clamp(target.threat + randomInt(2, 5), 0, 100);
     this._consumeAction();
+    let text = stirred
+      ? `You floated ${target.name}'s name ${this._phaseFlavor()}; ${stirred} people visibly flinched.`
+      : `You casually dropped ${target.name}'s name — the house played poker faces.`;
+    if (aiHoh && this.state.phase === PHASES.NOMINATION) {
+      text += ` ${formatHohNomIntelLine(aiHoh).replace(/^As HOH, /, 'Meanwhile, ')}`;
+    }
     return {
       success: true,
-      text: stirred
-        ? `You floated ${target.name}'s name ${this._phaseFlavor()}; ${stirred} people visibly flinched.`
-        : `You casually dropped ${target.name}'s name — the house played poker faces.`,
+      text,
       type: 'drama'
+    };
+  }
+
+  _throwCompetition(player) {
+    if (!canThrowCompetition(this.state, player)) {
+      return {
+        success: false,
+        text: 'You can only throw a comp when you are safe from the block.',
+        type: 'warning'
+      };
+    }
+
+    this.state.playerThrowCompetition = true;
+    const threatBefore = player.threat;
+    player.threatOffset = clamp((player.threatOffset ?? 0) - randomInt(2, 4), -25, 25);
+    this.state.updateThreatLevels?.();
+    this._consumeAction();
+
+    const compLabel = this.state.phase === PHASES.VETO_COMP ? 'POV' : 'HOH';
+    return {
+      success: true,
+      text: `You commit to throwing the ${compLabel} comp — floaters notice. ${formatThreatChange(threatBefore, player.threat)}`,
+      type: 'system',
+      threatFeedback: {
+        before: threatBefore,
+        after: player.threat,
+        delta: player.threat - threatBefore,
+        offsetTotal: player.threatOffset ?? 0
+      }
+    };
+  }
+
+  _clearBackdoorPlan(player) {
+    if (!canClearBackdoorPlan(this.state, player)) {
+      return { success: false, text: 'No backdoor plan to clear.', type: 'system' };
+    }
+    const name = this.state.getContestant(this.state.backdoorTargetId)?.name ?? 'target';
+    this.state.backdoorTargetId = null;
+    this.state.backdoorPawnsLocked = false;
+    this._consumeAction();
+    return {
+      success: true,
+      text: `You shelved the backdoor on <strong>${name}</strong> and pivoted to a straight-forward week.`,
+      type: 'narrative'
+    };
+  }
+
+  _cancelThrowComp(player) {
+    if (!canCancelThrowCompetition(this.state, player)) {
+      return { success: false, text: 'You are not throwing a competition.', type: 'system' };
+    }
+    this.state.playerThrowCompetition = false;
+    this._consumeAction();
+    return {
+      success: true,
+      text: 'You will compete at full strength when the live comp begins.',
+      type: 'system'
+    };
+  }
+
+  _setBackdoorPlan(player, target) {
+    if (!canSetBackdoorPlan(this.state, player)) {
+      return { success: false, text: 'You can only backdoor while reigning as HOH this week.', type: 'warning' };
+    }
+    if (!target) {
+      return { success: false, text: 'Choose your true backdoor target.', type: 'system' };
+    }
+    if (target.id === player.id) {
+      return { success: false, text: 'You cannot backdoor yourself.', type: 'system' };
+    }
+
+    this.state.backdoorTargetId = target.id;
+    this.state.backdoorPawnsLocked = false;
+    this._consumeAction();
+    return {
+      success: true,
+      text: `Backdoor set on <strong>${target.name}</strong> — nominate pawns, win or trigger veto, then name them as the replacement.`,
+      type: 'drama',
+      confessional: {
+        speaker: player,
+        eventKey: 'backdoor',
+        ctx: { target: target.name }
+      }
     };
   }
 
@@ -486,10 +774,15 @@ export class PlayerActions {
     if (sharesAllianceWith(player, target)) {
       target.competition = clamp(target.competition + 1, 1, 10);
     }
+    const aiHoh = this.state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
+    let text = `You hyped ${target.name} before the comp — whether they win or not, they remember.`;
+    if (aiHoh) {
+      text += ` ${formatHohNomIntelLine(aiHoh).replace(/^As HOH, /, 'Current HOH ')}`;
+    }
     this._consumeAction();
     return {
       success: true,
-      text: `You hyped ${target.name} before the comp — whether they win or not, they remember.`,
+      text,
       type: 'narrative'
     };
   }
@@ -509,6 +802,28 @@ export class PlayerActions {
         ? `You sat with ${target.name} on the block — real comfort in a cruel week.`
         : `You performed sympathy for ${target.name}. The cameras might buy it; they might not.`,
       type: genuine ? 'success' : 'narrative'
+    };
+  }
+
+  _campaignMvp(player) {
+    if (!this.state.mvpTwistWeekActive || !this.state.mvpRaceOpen) {
+      return { success: false, text: 'There is no MVP race right now.', type: 'system' };
+    }
+    if (this.state.mvpCampaignedToday) {
+      return { success: false, text: 'You already campaigned for MVP today.', type: 'system' };
+    }
+    const pts = randomInt(14, 24) + Math.floor(player.social / 4) + Math.floor(player.reputation / 15);
+    addMvpCampaignPoints(this.state, player.id, pts);
+    this.state.mvpCampaignedToday = true;
+    this._consumeAction();
+    const lead = getMvpRaceLeader(this.state);
+    const leadText = lead
+      ? ` ${lead.contestant.isPlayer ? 'You lead' : `${lead.contestant.name} leads`} with ${lead.points} support.`
+      : '';
+    return {
+      success: true,
+      text: `You work the house on MVP talk (+${pts} support).${leadText}`,
+      type: 'success'
     };
   }
 

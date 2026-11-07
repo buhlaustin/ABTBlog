@@ -4,6 +4,11 @@ import {
   getContestantAlliances,
   sharesAllianceWith
 } from './allianceUtils.js';
+import { applyHohPersonaNominationBias, describeNominationReason } from './hohNomPersonas.js';
+import {
+  easyFloaterNominationBonus,
+  tryEasyFloaterShieldNominations
+} from './floaterShields.js';
 
 /**
  * Autonomous AI decision-making for alliances, social moves, nominations, and votes.
@@ -42,8 +47,49 @@ export class AIController {
       if (side) events.push(side);
     }
 
+    if (Math.random() < 0.22 && this.state.week > 1) {
+      const offer = this._tryOfferPromiseToPlayer();
+      if (offer) events.push(offer.event);
+    }
+
     this.state.updateThreatLevels();
     return events;
+  }
+
+  _tryOfferPromiseToPlayer() {
+    const player = this.state.getPlayer();
+    if (!player || player.evicted) return null;
+
+    const candidates = this.state
+      .getActiveContestants()
+      .filter((c) => !c.isPlayer && c.getRelationship(player.id) >= 22);
+
+    if (candidates.length === 0) return null;
+
+    const ai = pickRandom(candidates);
+    if (ai.promises.some((p) => p.targetId === player.id && p.kept === null)) {
+      return null;
+    }
+
+    const typeRoll = Math.random();
+    const type = typeRoll < 0.5 ? 'vote' : typeRoll < 0.82 ? 'safety' : 'loyalty';
+    ai.makePromise(player.id, type, this.state.week);
+
+    const labels = { vote: 'vote with them', safety: 'keep you safe this week', loyalty: 'ride with you to the end' };
+    const text = `${ai.name} seals a deal: they promise to ${labels[type] || 'work with you'} (Week ${this.state.week}).`;
+
+    this.state.playerIntel.push({
+      week: this.state.week,
+      about: ai.id,
+      text: `${ai.name} promised you ${type} support.`
+    });
+
+    return {
+      event: {
+        type: 'warning',
+        text
+      }
+    };
   }
 
   _ambientHouseMoment() {
@@ -105,7 +151,10 @@ export class AIController {
         target.reputation = clamp(target.reputation - 5, 0, 100);
         return {
           type: 'drama',
-          text: `${ai.name} has been quietly campaigning against ${target.name} in the house.`
+          text: `${ai.name} has been quietly campaigning against ${target.name} in the house.`,
+          confessional: Math.random() < 0.35
+            ? { speaker: ai, eventKey: 'campaign', ctx: { target: target.name } }
+            : undefined
         };
       }
       case 'gather_intel': {
@@ -155,7 +204,10 @@ export class AIController {
         ai.threat = clamp(ai.threat - 3, 0, 100);
         return {
           type: 'system',
-          text: `${ai.name} kept a low profile today.`
+          text: `${ai.name} kept a low profile today.`,
+          confessional: Math.random() < 0.45
+            ? { speaker: ai, eventKey: 'lay_low' }
+            : undefined
         };
       }
       case 'train': {
@@ -212,13 +264,23 @@ export class AIController {
       alliance.exposed = true;
       return {
         type: 'drama',
-        text: `The house caught ${leader.name} and ${member.name} plotting — their alliance is exposed!`
+        text: `The house caught ${leader.name} and ${member.name} plotting — their alliance is exposed!`,
+        confessionalExtras: [
+          { speaker: leader, eventKey: 'alliance_exposed', ctx: { partner: member.name } },
+          { speaker: member, eventKey: 'alliance_exposed', ctx: { partner: leader.name } }
+        ]
       };
     }
 
     return {
       type: 'drama',
-      text: `${leader.name} and ${member.name} seem to be forming a secret alliance.`
+      text: `${leader.name} and ${member.name} seem to be forming a secret alliance.`,
+      confessionalExtras: Math.random() < 0.4
+        ? [
+          { speaker: leader, eventKey: 'alliance_formed', ctx: { partner: member.name } },
+          { speaker: member, eventKey: 'alliance_formed', ctx: { partner: leader.name } }
+        ]
+        : undefined
     };
   }
 
@@ -252,7 +314,19 @@ export class AIController {
 
     return {
       type: 'drama',
-      text: `${betrayer.name} betrayed their alliance with ${victim.name}! The house is reeling.`
+      text: `${betrayer.name} betrayed their alliance with ${victim.name}! The house is reeling.`,
+      confessionalExtras: [
+        {
+          speaker: betrayer,
+          eventKey: 'betrayal',
+          ctx: { target: victim.name }
+        },
+        {
+          speaker: victim,
+          eventKey: 'betrayed_by',
+          ctx: { betrayer: betrayer.name }
+        }
+      ]
     };
   }
 
@@ -262,15 +336,51 @@ export class AIController {
     if (others.length === 0) return [];
     if (others.length === 1) return [others[0]];
 
-    const sorted = [...others].sort((a, b) => {
-      const scoreA = this._nominationScore(hoh, a);
-      const scoreB = this._nominationScore(hoh, b);
-      return scoreB - scoreA;
-    });
+    const pickWeight = (target) => this._nominationPickWeight(hoh, target);
 
-    const first = sorted[0];
-    const second = sorted.find((c) => c.id !== first.id);
+    const shieldPair = tryEasyFloaterShieldNominations(
+      this.state,
+      hoh,
+      others,
+      pickWeight
+    );
+    if (shieldPair?.length === 2) {
+      return shieldPair;
+    }
+
+    const first = weightedPick(others, pickWeight);
+    const remaining = others.filter((c) => c.id !== first.id);
+    const second = weightedPick(remaining, pickWeight);
     return second ? [first, second] : [first];
+  }
+
+  _nominationPickWeight(hoh, target) {
+    let score = this._nominationScore(hoh, target);
+    score += randomInt(-4, 4);
+
+    if (target.isPlayer) {
+      const { weightFactor } = this._playerNominationEase(target);
+      score *= weightFactor;
+    }
+
+    return Math.max(1, Math.round(score));
+  }
+
+  /**
+   * Easy/normal shrink early-week nominating the human; high threat pulls back toward
+   * a normal nomination profile so easy still puts a target on the block sometimes.
+   */
+  _playerNominationEase(target) {
+    const baseProt = this.state.config.playerNominationProtection ?? 0;
+    const baseFactor = this.state.config.playerNominationWeightFactor ?? 1;
+    if (!target.isPlayer) {
+      return { protection: 0, weightFactor: 1 };
+    }
+    const threatNorm = clamp(target.threat / 52, 0, 1);
+    return {
+      protection: baseProt * (1 - threatNorm * 0.75),
+      weightFactor: baseFactor + (1 - baseFactor) * threatNorm
+    };
   }
 
   _nominationScore(hoh, target) {
@@ -288,7 +398,18 @@ export class AIController {
     const grudge = hoh.grudges.find((g) => g.againstId === target.id);
     if (grudge) score += grudge.intensity / 3;
 
-    return score;
+    if (target.isPlayer) {
+      const { protection } = this._playerNominationEase(target);
+      score -= protection;
+      if (hoh.getRelationship(target.id) > 5) {
+        score -= Math.min(20, hoh.getRelationship(target.id) / 2);
+      }
+    }
+
+    score += easyFloaterNominationBonus(this.state, target);
+    score = applyHohPersonaNominationBias(hoh, target, score);
+
+    return Math.max(0, score);
   }
 
   /** AI decides eviction vote with reasoning. */
@@ -367,17 +488,63 @@ export class AIController {
 
   /** AI uses veto decision. */
   decideVetoUse(holder, nominees) {
+    const strat = holder.personality?.strategy || 'survive';
     const ally = nominees.find((n) => sharesAllianceWith(holder, n));
     if (ally && holder.getRelationship(ally.id) > 10) {
+      if (strat === 'manipulate' && ally.threat < 42 && Math.random() < 0.35) {
+        return { use: false, target: null };
+      }
+      if (strat === 'attack' && ally.aggression >= 7 && holder.getRelationship(ally.id) < 25) {
+        return { use: Math.random() < 0.4, target: ally };
+      }
+      if (strat === 'ally' || strat === 'befriend') {
+        return { use: true, target: ally };
+      }
+      if (strat === 'chaos') {
+        return { use: Math.random() < 0.55, target: ally };
+      }
       return { use: true, target: ally };
     }
     if (holder.isNominated && Math.random() < 0.85) {
       return { use: true, target: holder };
     }
-    if (holder.personality.strategy === 'survive' && holder.getRelationship(nominees[0].id) < -10) {
+    if (strat === 'survive' && holder.getRelationship(nominees[0].id) < -10) {
       return { use: false, target: null };
     }
+    if (strat === 'win' && holder.competition >= 7) {
+      return { use: Math.random() < 0.35, target: nominees[0] };
+    }
     return { use: Math.random() < 0.25, target: nominees[0] };
+  }
+
+  /** Jury vote between two finalists (includes Q&A sway). */
+  decideJuryVote(juror, finalists, juryQAAdjustments = {}) {
+    let best = finalists[0];
+    let bestScore = -Infinity;
+    for (const f of finalists) {
+      const rel = juror.getRelationship(f.id);
+      const grudge = juror.grudges.find((g) => g.againstId === f.id);
+      const qa = juryQAAdjustments[juror.id]?.[f.id] || 0;
+      const score = rel - (grudge ? grudge.intensity / 2 : 0) + qa + randomInt(-5, 5);
+      if (score > bestScore) {
+        bestScore = score;
+        best = f;
+      }
+    }
+    return best;
+  }
+
+  /** Likely nomination targets for intel / “read the HOH” (deterministic weights, no extra jitter). */
+  previewNominationLeans(hoh, limit = 3) {
+    const others = this.state.getOthers(hoh);
+    return others
+      .map((target) => ({
+        target,
+        score: this._nominationScore(hoh, target),
+        reason: describeNominationReason(hoh, target)
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
   }
 
   /** AI picks veto replacement nominee. */
