@@ -38,9 +38,9 @@ export const DIFFICULTY_CONFIG = {
     startingTrust: 15,
     actionsPerDay: 3,
     /** Flat reduction to AI HOH nomination score for the human player. */
-    playerNominationProtection: 18,
-    /** Multiplier on nomination weight (0–1 = rarer picks). */
-    playerNominationWeightFactor: 0.48
+    playerNominationProtection: 14,
+    /** Baseline multiplier on nomination weight; rises toward 1 as player threat rises. */
+    playerNominationWeightFactor: 0.58
   },
   normal: {
     label: 'Normal',

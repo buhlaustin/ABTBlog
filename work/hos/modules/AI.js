@@ -275,10 +275,28 @@ export class AIController {
     score += randomInt(-4, 4);
 
     if (target.isPlayer) {
-      score *= this.state.config.playerNominationWeightFactor ?? 1;
+      const { weightFactor } = this._playerNominationEase(target);
+      score *= weightFactor;
     }
 
     return Math.max(1, Math.round(score));
+  }
+
+  /**
+   * Easy/normal shrink early-week nominating the human; high threat pulls back toward
+   * a normal nomination profile so easy still puts a target on the block sometimes.
+   */
+  _playerNominationEase(target) {
+    const baseProt = this.state.config.playerNominationProtection ?? 0;
+    const baseFactor = this.state.config.playerNominationWeightFactor ?? 1;
+    if (!target.isPlayer) {
+      return { protection: 0, weightFactor: 1 };
+    }
+    const threatNorm = clamp(target.threat / 52, 0, 1);
+    return {
+      protection: baseProt * (1 - threatNorm * 0.75),
+      weightFactor: baseFactor + (1 - baseFactor) * threatNorm
+    };
   }
 
   _nominationScore(hoh, target) {
@@ -297,7 +315,7 @@ export class AIController {
     if (grudge) score += grudge.intensity / 3;
 
     if (target.isPlayer) {
-      const protection = this.state.config.playerNominationProtection ?? 0;
+      const { protection } = this._playerNominationEase(target);
       score -= protection;
       if (hoh.getRelationship(target.id) > 5) {
         score -= Math.min(20, hoh.getRelationship(target.id) / 2);
