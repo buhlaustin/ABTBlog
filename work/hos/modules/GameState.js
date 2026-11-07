@@ -68,8 +68,8 @@ export class GameState {
     this.doubleEvictionEnabled = doubleEvictionEnabled;
     this.week = 1;
     /** 0 = Friday … 6 = Thursday */
-    this.weekdayIndex = 4;
-    this.day = 5;
+    this.weekdayIndex = 0;
+    this.day = 1;
     this.phase = PHASES.SOCIAL;
     this.actionsRemaining = this.config.actionsPerDay;
     this.maxDaysPerWeek = 7;
@@ -96,6 +96,8 @@ export class GameState {
     this.houseEventComplete = false;
 
     this._initContestants(playerName, aiCount);
+    this.syncPhaseForWeekday();
+    this.houseEventComplete = false;
   }
 
   _initContestants(playerName, aiCount) {
@@ -182,6 +184,43 @@ export class GameState {
     }
     this.houseEventComplete = false;
     this.syncPhaseForWeekday();
+  }
+
+  /** Active nominees on the block (excludes evicted / cleared flags). */
+  getActiveNominees() {
+    return this.nominees
+      .map((id) => this.getContestant(id))
+      .filter((c) => c && !c.evicted && c.isNominated);
+  }
+
+  /**
+   * Heal saves that reached eviction night without HOH and/or two nominees
+   * (e.g. Week 1 starting mid-week before this fix).
+   */
+  repairInvalidEvictionSchedule() {
+    if (this.gameOver) return false;
+    if (this.phase !== PHASES.EVICTION) return false;
+    if (this.getActiveNominees().length >= 2) return false;
+
+    this._scheduleRepaired = true;
+
+    const hoh =
+      this.currentHOH ||
+      this.getActiveContestants().find((c) => c.isHOH) ||
+      null;
+
+    if (!hoh) {
+      this.nominees = [];
+      this.weekdayIndex = 0;
+      this.houseEventComplete = false;
+      this.syncPhaseForWeekday();
+    } else {
+      this.weekdayIndex = 1;
+      this.houseEventComplete = false;
+      this.phase = PHASES.NOMINATION;
+      this.day = 2;
+    }
+    return true;
   }
 
   isScheduledHouseEventDay() {
@@ -394,6 +433,7 @@ export class GameState {
     state.gameOver = data.gameOver;
     state.winner = data.winner ? state.contestants.find((c) => c.id === data.winner) : null;
     state.houseEventComplete = data.houseEventComplete ?? false;
+    state.repairInvalidEvictionSchedule();
     return state;
   }
 }

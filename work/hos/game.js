@@ -92,7 +92,7 @@ class Game {
       type: 'success'
     });
     this.state.addStory({
-      text: 'Week 1 begins Tuesday. The house is open for social time until Friday’s first Head of Household.',
+      text: 'Week 1 begins <strong>Friday</strong>. Move-in mingling first — then the first Head of Household competition goes live tonight.',
       type: 'system'
     });
     this.state.addStory({
@@ -130,6 +130,15 @@ class Game {
     if (this.state.gameOver) {
       this.endGame();
       return;
+    }
+
+    if (this.state._scheduleRepaired) {
+      this.logAndRender([
+        {
+          type: 'warning',
+          text: 'Your save was stuck on eviction night without nominees. The calendar was adjusted so you can keep playing.'
+        }
+      ]);
     }
 
     this.runPhase();
@@ -795,6 +804,8 @@ class Game {
   runEvictionPhase() {
     if (this._maybeEndAtFinalTwo()) return;
 
+    if (this._recoverFromInvalidEviction()) return;
+
     const player = this.state.getPlayer();
 
     if (!player.isNominated && !player.isHOH && !player.evicted) {
@@ -807,8 +818,38 @@ class Game {
     this._afterEviction(evicted);
   }
 
+  _recoverFromInvalidEviction() {
+    if (this.state.getActiveNominees().length >= 2) return false;
+
+    const hadHoh =
+      this.state.currentHOH ||
+      this.state.getActiveContestants().some((c) => c.isHOH);
+
+    this.logAndRender([
+      {
+        type: 'warning',
+        text: hadHoh
+          ? 'Eviction night arrived without two nominees on the block. The schedule jumps to Saturday’s nomination ceremony.'
+          : 'Eviction night arrived before a Head of Household was crowned. The week rewinds to Friday’s HOH competition.'
+      }
+    ]);
+
+    this.state.repairInvalidEvictionSchedule();
+    this.render();
+    if (this.state.phase === PHASES.NOMINATION) {
+      this.runNominationPhase();
+    } else {
+      this.runPhase();
+    }
+    return true;
+  }
+
   _showEvictionVote() {
-    const nominees = this.state.nominees.map((id) => this.state.getContestant(id)).filter(Boolean);
+    const nominees = this.state.getActiveNominees();
+    if (nominees.length < 2) {
+      this._recoverFromInvalidEviction();
+      return;
+    }
     let html = '<p>Cast your vote to evict:</p><div class="target-grid">';
     for (const n of nominees) {
       html += `<button class="btn target-btn btn-danger" data-evict="${n.id}">Evict ${escapeHtml(n.name)}</button>`;
@@ -829,6 +870,12 @@ class Game {
   }
 
   _afterEviction(evicted) {
+    if (!evicted) {
+      if (this._recoverFromInvalidEviction()) return;
+      this._onHouseEventComplete();
+      return;
+    }
+
     if (this.state.getPlayer().evicted) {
       const remaining = this.state.getActiveContestants().length;
       if (remaining > 1) {
