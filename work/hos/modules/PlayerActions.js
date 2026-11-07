@@ -6,6 +6,7 @@ import {
   sharesAllianceWith
 } from './allianceUtils.js';
 import { addMvpCampaignPoints, getMvpRaceLeader } from './SeasonTwists.js';
+import { formatHohNomIntelLine } from './hohNomPersonas.js';
 
 /**
  * Player-initiated actions during the social phase.
@@ -72,6 +73,20 @@ export class PlayerActions {
         id: 'pregame',
         label: 'Pre-Competition Pep Talk',
         description: 'Rally allies before the HOH competition.'
+      });
+    }
+
+    const aiHoh = this.state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
+    if (
+      aiHoh
+      && !this.state.houseEventComplete
+      && (phase === PHASES.SOCIAL || phase === PHASES.NOMINATION)
+      && !player.evicted
+    ) {
+      actions.unshift({
+        id: 'read_hoh',
+        label: 'Read the HOH',
+        description: `${aiHoh.name}'s nomination style — who is likeliest on the block?`
       });
     }
 
@@ -330,6 +345,13 @@ export class PlayerActions {
       `You caught ${subject.name} rehearsing what to say if they win HOH.`
     ];
 
+    if (subject.isHOH) {
+      intelTypes.push(formatHohNomIntelLine(subject));
+      intelTypes.push(
+        `${subject.name}'s allies say their nominations will match a ${subject.personality?.name || 'wildcard'} playbook.`
+      );
+    }
+
     const intel = intelTypes[randomInt(0, intelTypes.length - 1)];
     this.state.playerIntel.push({
       week: this.state.week,
@@ -475,6 +497,7 @@ export class PlayerActions {
 
   _schemeNominees(player, target) {
     if (!target) return { success: false, text: 'Choose who to test as a nominee name.', type: 'system' };
+    const aiHoh = this.state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
     const reactions = this.state.getOthers(player).filter((c) => c.id !== target.id);
     let stirred = 0;
     for (const c of reactions) {
@@ -485,11 +508,15 @@ export class PlayerActions {
     }
     target.threat = clamp(target.threat + randomInt(2, 5), 0, 100);
     this._consumeAction();
+    let text = stirred
+      ? `You floated ${target.name}'s name ${this._phaseFlavor()}; ${stirred} people visibly flinched.`
+      : `You casually dropped ${target.name}'s name — the house played poker faces.`;
+    if (aiHoh && this.state.phase === PHASES.NOMINATION) {
+      text += ` ${formatHohNomIntelLine(aiHoh).replace(/^As HOH, /, 'Meanwhile, ')}`;
+    }
     return {
       success: true,
-      text: stirred
-        ? `You floated ${target.name}'s name ${this._phaseFlavor()}; ${stirred} people visibly flinched.`
-        : `You casually dropped ${target.name}'s name — the house played poker faces.`,
+      text,
       type: 'drama'
     };
   }

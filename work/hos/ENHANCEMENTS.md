@@ -72,8 +72,8 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Status** | **Shipped:** `hohNomPersonas.js` biases `_nominationScore` by `personality.strategy` (backdoor/manipulate, loyalist/ally, chaos, floater/survive, comp/win, attack, social/befriend). Nomination ceremony logs persona line + per-nominee reason; HOH sidebar row shows tooltip. `decideVetoUse` aligned to persona. |
-| **Follow-ups** | Show persona hint on player HOH picker by archetype; AI host narration beat. |
+| **Status** | **Shipped (v2):** Persona biases + ceremony copy + veto alignment; **player HOH picker** infers archetype from stats with on-brand target tags; **Read the HOH** social intel + spy/HOH lines; local/API **host beat** after noms; veto replacement reasons; nomination history stores `hohStrategy`. |
+| **Follow-ups** | LLM prompt tuning for `nomination_ceremony` kind on narrate API. |
 | **Priority** | Polish only. |
 
 ### Promises, grudges, and betrayal — surface in UI

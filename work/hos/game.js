@@ -28,6 +28,13 @@ import {
   runBattleBack,
   tickMvpCampaignAI
 } from './modules/SeasonTwists.js';
+import {
+  buildPlayerHohLens,
+  formatHohNomIntelLine,
+  getLocalNominationHostBeat,
+  getNomTargetLensLabel,
+  getPlayerHohPickerIntro
+} from './modules/hohNomPersonas.js';
 import { aiCountForCast, escapeHtml, randomInt, totalCastSize } from './modules/utils.js';
 
 class Game {
@@ -300,7 +307,7 @@ class Game {
         this.runCompetitionPhase();
         break;
       case PHASES.NOMINATION:
-        this.runNominationPhase();
+        void this.runNominationPhase();
         break;
       case PHASES.VETO_COMP:
         this.runVetoCompPhase();
@@ -389,7 +396,7 @@ class Game {
         this.runCompetitionPhase();
         break;
       case PHASES.NOMINATION:
-        this.runNominationPhase();
+        void this.runNominationPhase();
         break;
       case PHASES.VETO_COMP:
         this.runVetoCompPhase();
@@ -499,6 +506,11 @@ class Game {
 
     if (action.id === 'end_day') {
       this.advanceDay();
+      return;
+    }
+
+    if (action.id === 'read_hoh') {
+      this._runReadHohAction();
       return;
     }
 
@@ -838,7 +850,7 @@ class Game {
 
   // ─── Nominations ───────────────────────────────────────────────────
 
-  runNominationPhase() {
+  async runNominationPhase() {
     if (this._maybeTriggerFinale()) return;
 
     const hoh = this.state.getActiveContestants().find((c) => c.isHOH);
@@ -849,22 +861,80 @@ class Game {
       return;
     }
 
-    const { results } = this.eviction.runNominations();
+    const { results, nominees } = this.eviction.runNominations();
     this.logAndRender(results);
+    await this._appendNominationHostBeat(hoh, nominees);
     this._onHouseEventComplete();
+  }
+
+  async _appendNominationHostBeat(hoh, nominees) {
+    if (!hoh || !nominees?.length) return;
+    const beat = await fetchNarrativeBeat('nomination_ceremony', this.state);
+    if (beat) {
+      this.logAndRender([{
+        ...beat,
+        type: 'ai-host',
+        text: `<strong>Host:</strong> ${beat.text}`
+      }]);
+      return;
+    }
+    const local = getLocalNominationHostBeat(hoh, nominees);
+    if (local) this.logAndRender([local]);
+  }
+
+  _runReadHohAction() {
+    const hoh = this.state.getActiveContestants().find((c) => c.isHOH && !c.isPlayer);
+    const player = this.state.getPlayer();
+    if (!hoh || player.evicted) return;
+
+    if (this.state.actionsRemaining <= 0) {
+      this.ui.showToast('No actions remaining today.');
+      return;
+    }
+
+    const success = player.intelligence + randomInt(2, 10) > 10;
+    this.state.actionsRemaining = Math.max(0, this.state.actionsRemaining - 1);
+
+    if (!success) {
+      this.logAndRender([{
+        type: 'warning',
+        text: `You read ${hoh.name} wrong — their poker face wins today.`
+      }]);
+      this.render();
+      return;
+    }
+
+    const leans = this.ai.previewNominationLeans(hoh, 3);
+    const lines = [
+      { type: 'narrative', text: formatHohNomIntelLine(hoh) },
+      ...leans.map((row, i) => ({
+        type: i === 0 ? 'warning' : 'narrative',
+        text: `#${i + 1} lean: <strong>${row.target.name}</strong> — ${row.reason}.`
+      }))
+    ];
+    this.logAndRender(lines);
+    this.state.playerIntel.push({
+      week: this.state.week,
+      about: hoh.id,
+      text: `HOH lean: ${leans.map((r) => r.target.name).join(', ')}.`
+    });
+    this.render();
   }
 
   _showNominationPicker() {
     const player = this.state.getPlayer();
+    const hohLens = buildPlayerHohLens(player);
     const targets = this.state.getOthers(player);
     let selected = [];
 
     const renderPicker = () => {
-      let html = '<p class="hoh-nom-hint">As HOH, your nominations set the tone — the house will react to who you put on the block.</p>';
-      html += `<p>Select 2 nominees (${selected.length}/2):</p><div class="target-grid">`;
+      let html = `<p class="hoh-nom-hint">${getPlayerHohPickerIntro(player)}</p>`;
+      html += `<p>Select 2 nominees (${selected.length}/2):</p><div class="target-grid nomination-target-grid">`;
       for (const t of targets) {
         const isSelected = selected.includes(t.id);
-        html += `<button class="btn target-btn ${isSelected ? 'selected' : ''}" data-target="${t.id}">${escapeHtml(t.name)}</button>`;
+        const lens = getNomTargetLensLabel(hohLens, t);
+        const lensHtml = lens ? `<span class="nom-lens">${escapeHtml(lens)}</span>` : '';
+        html += `<button class="btn target-btn ${isSelected ? 'selected' : ''}" data-target="${t.id}">${escapeHtml(t.name)}${lensHtml}</button>`;
       }
       html += `</div>`;
       if (selected.length === 2) {
@@ -888,10 +958,13 @@ class Game {
       if (confirm) {
         confirm.addEventListener('click', () => {
           const picks = selected.map((id) => this.state.getContestant(id));
-          const { results } = this.eviction.runNominations(picks);
+          const { results, nominees } = this.eviction.runNominations(picks);
           this.ui.hideActionDetail();
           this.logAndRender(results);
-          this._onHouseEventComplete();
+          void (async () => {
+            await this._appendNominationHostBeat(hohLens, nominees);
+            this._onHouseEventComplete();
+          })();
         });
       }
     };
@@ -1171,7 +1244,7 @@ class Game {
     this.state.repairInvalidEvictionSchedule();
     this.render();
     if (this.state.phase === PHASES.NOMINATION) {
-      this.runNominationPhase();
+      void this.runNominationPhase();
     } else {
       this.runPhase();
     }

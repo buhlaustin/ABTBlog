@@ -128,3 +128,96 @@ export function getHohNomPersonaTooltip(hoh) {
   const hint = HOH_NOM_PERSONA_HINTS[hoh.personality?.strategy] || HOH_NOM_PERSONA_HINTS.survive;
   return `${hoh.name} as HOH: ${hint}`;
 }
+
+const INFERRED_PERSONA_LABELS = {
+  manipulate: 'Strategist',
+  ally: 'Loyalist',
+  befriend: 'Social Butterfly',
+  attack: 'Aggressor',
+  chaos: 'Wildcard',
+  survive: 'Floater',
+  win: 'Competitor'
+};
+
+/**
+ * Guess how the human player tends to nominate from current stats.
+ */
+export function inferPlayerNomPersona(player) {
+  const scores = [
+    { strategy: 'manipulate', score: player.intelligence * 1.25 + player.threat * 0.35 },
+    { strategy: 'ally', score: player.loyalty * 1.35 + player.trust * 0.25 },
+    { strategy: 'befriend', score: player.social * 1.45 + player.reputation * 0.2 },
+    { strategy: 'attack', score: player.aggression * 1.55 },
+    { strategy: 'win', score: player.competition * 1.4 },
+    { strategy: 'survive', score: (10 - player.aggression) * 0.8 + player.social * 0.35 },
+    { strategy: 'chaos', score: player.aggression * 0.6 + randomInt(6, 14) }
+  ];
+  scores.sort((a, b) => b.score - a.score);
+  const strategy = scores[0].strategy;
+  return {
+    strategy,
+    label: INFERRED_PERSONA_LABELS[strategy] || 'Houseguest',
+    hint: HOH_NOM_PERSONA_HINTS[strategy] || HOH_NOM_PERSONA_HINTS.survive
+  };
+}
+
+/** Contestant-shaped lens for applying persona bias to the human HOH. */
+export function buildPlayerHohLens(player) {
+  const inferred = inferPlayerNomPersona(player);
+  const lens = Object.create(Object.getPrototypeOf(player));
+  Object.assign(lens, player, {
+    personality: {
+      ...(player.personality || {}),
+      strategy: inferred.strategy,
+      name: inferred.label
+    }
+  });
+  return lens;
+}
+
+export function getNomTargetLensLabel(hoh, target) {
+  let score = target.threat + Math.max(0, -hoh.getRelationship(target.id) / 3);
+  score = applyHohPersonaNominationBias(hoh, target, score);
+  if (sharesAllianceWith(hoh, target)) return 'Ally — risky';
+  if (score >= 44) return 'Strong fit';
+  if (score >= 32) return 'On-brand';
+  if (target.threat >= 52) return 'Big threat';
+  if (getAllianceIds(target).length === 0 && target.threat >= 22) return 'Floater radar';
+  return '';
+}
+
+export function getPlayerHohPickerIntro(player) {
+  const inferred = inferPlayerNomPersona(player);
+  return `Your stats read like a <strong>${inferred.label}</strong> HOH — you ${inferred.hint}. Tags below show who fits that style.`;
+}
+
+/**
+ * @param {import('./Contestant.js').Contestant} hoh
+ * @param {import('./Contestant.js').Contestant[]} nominees
+ */
+export function getLocalNominationHostBeat(hoh, nominees) {
+  if (!hoh || nominees.length < 2) return null;
+  const a = nominees[0].name;
+  const b = nominees[1].name;
+  const strat = hoh.personality?.strategy || 'survive';
+  const hostLines = {
+    manipulate: `${hoh.name} just backdoored ${a} and ${b}. The house knows it was calculated.`,
+    ally: `${hoh.name} keeps the alliance safe and puts ${a} and ${b} on blast.`,
+    befriend: `Social lines are drawn — ${a} and ${b} are on the block after ${hoh.name}'s picks.`,
+    attack: `${hoh.name} swings hard: ${a} and ${b} are in the line of fire.`,
+    chaos: `Nobody saw this pair coming — ${a} and ${b}, courtesy of ${hoh.name}.`,
+    survive: `${hoh.name} floats to safety and tosses ${a} and ${b} on the block.`,
+    win: `${hoh.name} targets the threats: ${a} and ${b} have to fight for their lives.`,
+    custom: `The block is set: ${a} and ${b}, chosen by ${hoh.name}.`
+  };
+  const line = hostLines[strat] || hostLines.survive;
+  return {
+    type: 'ai-host',
+    text: `<strong>Host:</strong> ${line}`
+  };
+}
+
+export function formatHohNomIntelLine(hoh) {
+  const hint = HOH_NOM_PERSONA_HINTS[hoh.personality?.strategy] || HOH_NOM_PERSONA_HINTS.survive;
+  return `As HOH, ${hoh.name} ${hint}.`;
+}

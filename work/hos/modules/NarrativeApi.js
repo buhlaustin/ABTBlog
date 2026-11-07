@@ -89,6 +89,11 @@ export function buildNarrativeContext(state) {
     playerName: player?.name || 'You',
     houseguestCount: active.length,
     hohName: hoh?.name || null,
+    hohArchetype: hoh?.personality?.name || null,
+    hohNomStyle:
+      hoh?.personality?.strategy && typeof hoh.personality.strategy === 'string'
+        ? hoh.personality.strategy
+        : null,
     nominees,
     playerIsNominated: Boolean(player?.isNominated),
     playerIsHOH: Boolean(player?.isHOH),

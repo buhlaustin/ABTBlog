@@ -4,7 +4,7 @@ import {
   getContestantAlliances,
   sharesAllianceWith
 } from './allianceUtils.js';
-import { applyHohPersonaNominationBias } from './hohNomPersonas.js';
+import { applyHohPersonaNominationBias, describeNominationReason } from './hohNomPersonas.js';
 
 /**
  * Autonomous AI decision-making for alliances, social moves, nominations, and votes.
@@ -448,6 +448,19 @@ export class AIController {
       }
     }
     return best;
+  }
+
+  /** Likely nomination targets for intel / “read the HOH” (deterministic weights, no extra jitter). */
+  previewNominationLeans(hoh, limit = 3) {
+    const others = this.state.getOthers(hoh);
+    return others
+      .map((target) => ({
+        target,
+        score: this._nominationScore(hoh, target),
+        reason: describeNominationReason(hoh, target)
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
   }
 
   /** AI picks veto replacement nominee. */

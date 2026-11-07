@@ -85,7 +85,13 @@ export class EvictionSystem {
     }
     this.state.nominees = nominees.map((n) => n.id);
 
-    this.state.addHistory({ type: 'nominations', hoh: hoh.id, nominees: this.state.nominees });
+    this.state.addHistory({
+      type: 'nominations',
+      hoh: hoh.id,
+      nominees: this.state.nominees,
+      hohStrategy: hoh.personality?.strategy ?? null,
+      hohArchetype: hoh.personality?.name ?? null
+    });
     return { results, nominees };
   }
 
@@ -276,9 +282,10 @@ export class EvictionSystem {
     if (replacement) {
       replacement.isNominated = true;
       this.state.nominees.push(replacement.id);
+      const reason = describeNominationReason(hoh, replacement);
       results.push({
         type: 'drama',
-        text: `${hoh.name} nominates <strong>${replacement.name}</strong> as the replacement.`
+        text: `${hoh.name} nominates <strong>${replacement.name}</strong> as the replacement — ${reason}.`
       });
     }
 
