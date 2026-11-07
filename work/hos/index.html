@@ -33,10 +33,21 @@
           <option value="legacy">Legacy — 11 houseguests</option>
         </select>
 
-        <label class="checkbox-label">
-          <input type="checkbox" id="double-eviction" checked>
-          Double eviction week (once per season, when 8 or fewer remain)
-        </label>
+        <fieldset class="twist-fieldset">
+          <legend>Season twists (optional)</legend>
+          <label class="checkbox-label">
+            <input type="checkbox" id="double-eviction" checked>
+            Double eviction (once when 8 or fewer remain)
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="twist-battle-back">
+            Battle Back (first boot can re-enter via comp, once)
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="twist-mvp">
+            MVP twist week (one-time double eviction vote, once)
+          </label>
+        </fieldset>
 
         <div class="setup-actions">
           <button id="btn-new-game" class="btn btn-primary">Start New Game</button>
@@ -54,6 +65,7 @@
           <div class="week-indicator">
             <span id="week-day">Week 1 — Tuesday</span>
             <span id="phase-label" class="phase-badge">Social Phase</span>
+            <p id="twist-banner" class="twist-banner hidden" aria-live="polite"></p>
           </div>
         </div>
         <div class="header-right">

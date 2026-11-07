@@ -14,6 +14,7 @@ import {
   uid,
   resetIdCounter
 } from './utils.js';
+import { evaluateTwistsForNewWeek, initTwistSchedule, trackFirstEvicted } from './SeasonTwists.js';
 
 /** Calendar: Friday → Thursday (Big Brother–style week). */
 export const WEEKDAYS = [
@@ -93,12 +94,16 @@ export class GameState {
     difficulty = 'normal',
     aiCount = 10,
     castPreset = 'standard',
-    doubleEvictionEnabled = true
+    doubleEvictionEnabled = true,
+    battleBackEnabled = false,
+    mvpTwistEnabled = false
   } = {}) {
     this.difficulty = difficulty;
     this.config = DIFFICULTY_CONFIG[difficulty];
     this.castPreset = castPreset;
     this.doubleEvictionEnabled = doubleEvictionEnabled;
+    this.battleBackEnabled = battleBackEnabled;
+    this.mvpTwistEnabled = mvpTwistEnabled;
     this.week = 1;
     /** 0 = Friday … 6 = Thursday */
     this.weekdayIndex = 0;
@@ -136,6 +141,18 @@ export class GameState {
     this.doubleEvictionRound2Cycle = false;
     this.doubleEvictionPendingNextPhase = null;
 
+    this.battleBackSeasonUsed = false;
+    this.battleBackWeekActive = false;
+    this.battleBackScheduledWeek = null;
+    this.battleBackResolvedTonight = false;
+    this.firstEvictedId = null;
+
+    this.mvpTwistSeasonUsed = false;
+    this.mvpTwistWeekActive = false;
+    this.mvpTwistScheduledWeek = null;
+    this.mvpHolderId = null;
+    this.mvpPowerAvailable = false;
+
     this.inFinale = false;
     this.finalePhase = null;
     this.finaleR1WinnerId = null;
@@ -150,6 +167,8 @@ export class GameState {
     this.juryQAAdjustments = {};
 
     this._initContestants(playerName, aiCount);
+    initTwistSchedule(this);
+
     this.syncPhaseForWeekday();
     this.houseEventComplete = false;
   }
@@ -449,6 +468,7 @@ export class GameState {
     evicted.hasVeto = false;
     this.evictedThisWeek = evicted.id;
     this.addHistory({ type: 'eviction', evictedId: evicted.id });
+    trackFirstEvicted(this, evicted);
 
     const remaining = this.getActiveContestants().length;
     if (remaining <= JURY_START_HOUSE_COUNT - 1) {
@@ -513,6 +533,7 @@ export class GameState {
     this.resetWeeklyFlags();
     this.syncPhaseForWeekday();
     this.evaluateDoubleEvictionWeek();
+    evaluateTwistsForNewWeek(this);
   }
 
   checkWinCondition() {
@@ -530,6 +551,18 @@ export class GameState {
       difficulty: this.difficulty,
       castPreset: this.castPreset,
       doubleEvictionEnabled: this.doubleEvictionEnabled,
+      battleBackEnabled: this.battleBackEnabled,
+      mvpTwistEnabled: this.mvpTwistEnabled,
+      battleBackSeasonUsed: this.battleBackSeasonUsed,
+      battleBackWeekActive: this.battleBackWeekActive,
+      battleBackScheduledWeek: this.battleBackScheduledWeek,
+      battleBackResolvedTonight: this.battleBackResolvedTonight,
+      firstEvictedId: this.firstEvictedId,
+      mvpTwistSeasonUsed: this.mvpTwistSeasonUsed,
+      mvpTwistWeekActive: this.mvpTwistWeekActive,
+      mvpTwistScheduledWeek: this.mvpTwistScheduledWeek,
+      mvpHolderId: this.mvpHolderId,
+      mvpPowerAvailable: this.mvpPowerAvailable,
       week: this.week,
       weekdayIndex: this.weekdayIndex,
       day: this.day,
@@ -580,6 +613,18 @@ export class GameState {
     state.config = DIFFICULTY_CONFIG[data.difficulty];
     state.castPreset = data.castPreset ?? 'standard';
     state.doubleEvictionEnabled = data.doubleEvictionEnabled ?? true;
+    state.battleBackEnabled = data.battleBackEnabled ?? false;
+    state.mvpTwistEnabled = data.mvpTwistEnabled ?? false;
+    state.battleBackSeasonUsed = data.battleBackSeasonUsed ?? false;
+    state.battleBackWeekActive = data.battleBackWeekActive ?? false;
+    state.battleBackScheduledWeek = data.battleBackScheduledWeek ?? null;
+    state.battleBackResolvedTonight = data.battleBackResolvedTonight ?? false;
+    state.firstEvictedId = data.firstEvictedId ?? null;
+    state.mvpTwistSeasonUsed = data.mvpTwistSeasonUsed ?? false;
+    state.mvpTwistWeekActive = data.mvpTwistWeekActive ?? false;
+    state.mvpTwistScheduledWeek = data.mvpTwistScheduledWeek ?? null;
+    state.mvpHolderId = data.mvpHolderId ?? null;
+    state.mvpPowerAvailable = data.mvpPowerAvailable ?? false;
     state.week = data.week;
     state.weekdayIndex =
       data.weekdayIndex ??

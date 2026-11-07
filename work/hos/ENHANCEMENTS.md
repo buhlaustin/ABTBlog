@@ -58,11 +58,11 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
+| **Status** | **Shipped (v1):** setup toggles + `SeasonTwists.js`. **Double eviction** (existing flow). **Battle Back** — comp on scheduled week (~3 weeks after first boot) before vote 1; pre-jury evictees eligible. **MVP week** — random week 5–9, crown + one **double eviction vote**. Header **twist banner** + week-start rules in House Feed. |
 | **Goal** | Season-flavored beats that exist on real shows, still ending in someone leaving when eviction night fires. |
-| **Examples** | **Double eviction** (two votes one night, already partly in state); **Battle Back** (first evictee of the season re-enters via comp, rare); **MVP-style bonus** (one social/comp action grants a one-time vote sway or POV-style safety, not a free skip of eviction). |
-| **Player experience** | Host announces twist at week start; rules appear in UI before live events. |
-| **Implementation** | Flags on `GameState`; hooks in `Eviction.js` / `Events.js`; no “deferred eviction” after noms/veto. |
-| **Priority** | Low. |
+| **Follow-ups** | Player-facing rules cheat sheet on setup; interactive Battle Back if the player was first boot; MVP earn via social action (not only week-start crown). |
+| **Constraints** | No “deferred eviction” after noms/veto. |
+| **Priority** | Polish / follow-ups only. |
 
 ---
 

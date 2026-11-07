@@ -335,7 +335,19 @@ export class EvictionSystem {
       if (voter.isPlayer) continue;
 
       const decision = this.ai.decideVote(voter, nominees);
-      decision.target.votesReceived += 1;
+      let ballotWeight = 1;
+      if (
+        this.state.mvpPowerAvailable
+        && voter.id === this.state.mvpHolderId
+      ) {
+        ballotWeight = 2;
+        this.state.mvpPowerAvailable = false;
+        results.push({
+          type: 'success',
+          text: `<strong>${voter.name}</strong> uses <strong>MVP power</strong> — their vote counts twice!`
+        });
+      }
+      decision.target.votesReceived += ballotWeight;
       voteLog.push({
         voter: voter.name,
         target: decision.target.name,
@@ -348,7 +360,16 @@ export class EvictionSystem {
     if (player && !player.evicted && !player.isNominated && !player.isHOH && playerVoteTarget) {
       const vote = this.state.getContestant(playerVoteTarget);
       if (vote) {
-        vote.votesReceived += 1;
+        let ballotWeight = 1;
+        if (this.state.mvpPowerAvailable && player.id === this.state.mvpHolderId) {
+          ballotWeight = 2;
+          this.state.mvpPowerAvailable = false;
+          results.push({
+            type: 'success',
+            text: 'You use <strong>MVP power</strong> — your vote counts twice!'
+          });
+        }
+        vote.votesReceived += ballotWeight;
         voteLog.push({
           voter: player.name,
           target: vote.name,

@@ -18,6 +18,11 @@ import {
   isNarrativeApiEnabled
 } from './modules/NarrativeApi.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
+import {
+  getTwistRulesBanner,
+  getTwistWeekAnnouncements,
+  runBattleBack
+} from './modules/SeasonTwists.js';
 import { aiCountForCast, escapeHtml, totalCastSize } from './modules/utils.js';
 
 class Game {
@@ -47,7 +52,16 @@ class Game {
       const difficulty = ui.elements.difficultySelect.value;
       const castPreset = ui.elements.castSelect?.value || 'standard';
       const doubleEvictionEnabled = ui.elements.doubleEvictionToggle?.checked ?? true;
-      void this.startNewGame(name, difficulty, castPreset, doubleEvictionEnabled);
+      const battleBackEnabled = ui.elements.battleBackToggle?.checked ?? false;
+      const mvpTwistEnabled = ui.elements.mvpTwistToggle?.checked ?? false;
+      void this.startNewGame(
+        name,
+        difficulty,
+        castPreset,
+        doubleEvictionEnabled,
+        battleBackEnabled,
+        mvpTwistEnabled
+      );
     });
 
     ui.elements.btnLoadGame.addEventListener('click', () => this.loadGame());
@@ -76,7 +90,14 @@ class Game {
     window.__gamePlayer = null;
   }
 
-  async startNewGame(playerName, difficulty, castPreset = 'standard', doubleEvictionEnabled = true) {
+  async startNewGame(
+    playerName,
+    difficulty,
+    castPreset = 'standard',
+    doubleEvictionEnabled = true,
+    battleBackEnabled = false,
+    mvpTwistEnabled = false
+  ) {
     this._resetGame();
     await initNarrativeApiUrl();
 
@@ -86,7 +107,9 @@ class Game {
       difficulty,
       aiCount,
       castPreset,
-      doubleEvictionEnabled
+      doubleEvictionEnabled,
+      battleBackEnabled,
+      mvpTwistEnabled
     });
     this._initSystems();
     this._exposeGlobals();
@@ -205,6 +228,7 @@ class Game {
   render() {
     const { state, ui } = this;
     ui.updateWeekDay(state.week, state.weekdayIndex, state.phase, state.getPhaseDisplayLabel());
+    ui.updateTwistBanner(getTwistRulesBanner(state));
     ui.renderStoryLog(state.storyLog);
     ui.renderPlayer(state.getPlayer());
     ui.renderHouseguests(state.contestants, state.getPlayer());
@@ -961,6 +985,17 @@ class Game {
 
     if (this._recoverFromInvalidEviction()) return;
 
+    if (this.state.battleBackWeekActive && !this.state.battleBackResolvedTonight) {
+      const { results } = runBattleBack(this.state);
+      this.state.battleBackResolvedTonight = true;
+      this.logAndRender(results);
+      this.render();
+      if (this.state.getActiveContestants().length <= 2) {
+        this._onHouseEventComplete();
+        return;
+      }
+    }
+
     if (this.state.doubleEvictionWeekActive && !this.state.houseEventComplete) {
       this.logAndRender([
         {
@@ -1016,7 +1051,12 @@ class Game {
       this._recoverFromInvalidEviction();
       return;
     }
-    let html = '<p>Cast your vote to evict:</p><div class="target-grid">';
+    const player = this.state.getPlayer();
+    const mvpNote =
+      this.state.mvpPowerAvailable && player.id === this.state.mvpHolderId
+        ? '<p class="mvp-vote-hint"><strong>MVP power</strong> is active — your vote counts twice tonight.</p>'
+        : '';
+    let html = `${mvpNote}<p>Cast your vote to evict:</p><div class="target-grid">`;
     for (const n of nominees) {
       html += `<button class="btn target-btn btn-danger" data-evict="${n.id}">Evict ${escapeHtml(n.name)}</button>`;
     }
@@ -1114,11 +1154,8 @@ class Game {
       text: `<strong>Week ${this.state.week}</strong> begins. The game is heating up.`
     }]);
 
-    if (this.state.doubleEvictionWeekActive) {
-      this.logAndRender([{
-        type: 'warning',
-        text: '<strong>Double Eviction week</strong> — Thursday will feature two eviction votes with a full power cycle in between. The game pauses after each live event so you can follow along.'
-      }]);
+    for (const entry of getTwistWeekAnnouncements(this.state)) {
+      this.logAndRender([entry]);
     }
 
     this.render();

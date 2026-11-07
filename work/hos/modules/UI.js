@@ -14,6 +14,9 @@ export class UIManager {
       difficultySelect: document.getElementById('difficulty'),
       castSelect: document.getElementById('cast-size'),
       doubleEvictionToggle: document.getElementById('double-eviction'),
+      battleBackToggle: document.getElementById('twist-battle-back'),
+      mvpTwistToggle: document.getElementById('twist-mvp'),
+      twistBanner: document.getElementById('twist-banner'),
       btnNewGame: document.getElementById('btn-new-game'),
       btnLoadGame: document.getElementById('btn-load-game'),
       btnSave: document.getElementById('btn-save'),
@@ -68,6 +71,19 @@ export class UIManager {
     this.elements.phaseLabel.textContent = label;
     const deActive = typeof phaseLabel === 'string' && phaseLabel.startsWith('Double Eviction');
     this.elements.phaseLabel.classList.toggle('double-eviction', deActive);
+  }
+
+  updateTwistBanner(text) {
+    const el = this.elements.twistBanner;
+    if (!el) return;
+    const trimmed = (text || '').trim();
+    if (!trimmed) {
+      el.textContent = '';
+      el.classList.add('hidden');
+      return;
+    }
+    el.textContent = trimmed;
+    el.classList.remove('hidden');
   }
 
   /** Append entries to story log. */
