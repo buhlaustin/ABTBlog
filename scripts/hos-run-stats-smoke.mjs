@@ -4,9 +4,15 @@
 import { GameState } from '../work/hos/modules/GameState.js';
 import {
   ACHIEVEMENT_DEFS,
+  CAREER_ACHIEVEMENT_DEFS,
+  compileLiveRunStats,
   compilePlayerRunStats,
   defaultProfile,
   evaluateNewAchievements,
+  evaluateNewCareerAchievements,
+  getNearMissAchievements,
+  getRunStatsBanner,
+  getSeasonAchievementProgress,
   mergeRunIntoProfile,
   renderRunStatsEndHtml
 } from '../work/hos/modules/runStats.js';
@@ -32,6 +38,8 @@ state.week = 8;
 state.winner = player;
 state.gameOver = true;
 player.threat = 72;
+state.playerPeakThreat = 78;
+state.playerStatCounters = { confessionals: 10, layLowDr: 0 };
 player.promises = [
   { targetId: 'a', type: 'vote', week: 2, kept: true },
   { targetId: 'b', type: 'safety', week: 3, kept: true },
@@ -63,6 +71,19 @@ if (!html.includes('This season') || !html.includes('Career')) fail('html');
 const intel = buildRunStatsIntelSection(state);
 if (!intel?.items?.some((i) => i.key === 'run-noms')) fail('intel');
 
-if (ACHIEVEMENT_DEFS.length < 10) fail('ach defs');
+if (ACHIEVEMENT_DEFS.length < 20) fail('ach defs');
+
+const live = compileLiveRunStats(state);
+if (!live || !getRunStatsBanner(live).includes('HOH 3')) fail('banner');
+
+const prog = getSeasonAchievementProgress(run);
+if (!prog.some((p) => p.id === 'comp_beast')) fail('progress');
+
+const near = getNearMissAchievements({ ...run, hohWins: 2, won: false }, defaultProfile());
+if (!near.length) fail('near');
+
+const careerUnlock = evaluateNewCareerAchievements({ ...defaultProfile(), gamesPlayed: 5, achievements: {} });
+if (!careerUnlock.some((a) => a.id === 'mainstay')) fail('career');
+if (CAREER_ACHIEVEMENT_DEFS.length < 4) fail('career defs');
 
 console.log('OK: hos run stats smoke');

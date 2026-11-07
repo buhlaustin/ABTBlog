@@ -235,7 +235,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 |--------|--------|
 | **Goal** | Post-game and cumulative stats. |
 | **Examples** | Times nominated, veto wins, alliance betrayals survived. |
-| **Status** | **Shipped (v1):** `runStats.js` season stats from `history`; **14 achievements**; `localStorage` career profile; end-screen **This season / Career / Achievements**; setup **career hint**; **Deals → Career & run**; `node scripts/hos-run-stats-smoke.mjs`. |
+| **Status** | **Shipped (v2):** v1 plus **23 season + 4 career** badges, live **Run ·** banner, Deals **achievement progress** rows, **peak threat** + persistent DR counters, **Almost unlocked** + **Vs last season**, setup **Your career** panel, unlock **toast**; `node scripts/hos-run-stats-smoke.mjs`. |
 | **Implementation** | `StorageManager.loadProfile` / `recordRun`; `endGame()` persists profile. |
 | **Priority** | Low. |
 

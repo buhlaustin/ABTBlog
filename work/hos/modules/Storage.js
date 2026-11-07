@@ -1,6 +1,7 @@
 import {
   defaultProfile,
   evaluateNewAchievements,
+  evaluateNewCareerAchievements,
   mergeRunIntoProfile
 } from './runStats.js';
 
@@ -74,10 +75,24 @@ export class StorageManager {
   /** Merge finished run into career profile. */
   static recordRun(run) {
     const profile = StorageManager.loadProfile() || defaultProfile();
+    const previousLastRun = profile.lastRun;
     const newAchievements = evaluateNewAchievements(run, profile);
     const next = mergeRunIntoProfile(profile, run, newAchievements);
+    const newCareerAchievements = evaluateNewCareerAchievements(next);
+    for (const def of newCareerAchievements) {
+      next.achievements[def.id] = {
+        title: def.title,
+        unlockedAt: new Date(run.endedAt).toISOString(),
+        times: 1,
+        career: true
+      };
+    }
     StorageManager.saveProfile(next);
-    return { profile: next, newAchievements };
+    return {
+      profile: next,
+      newAchievements: [...newAchievements, ...newCareerAchievements],
+      previousLastRun
+    };
   }
 
   static clearProfile() {

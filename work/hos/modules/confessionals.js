@@ -729,6 +729,11 @@ export function buildConfessionalIntelSection(state) {
  * @param {string} line
  */
 export function recordConfessional(state, speaker, line, eventKey = null, source = 'local') {
+  if (speaker.isPlayer) {
+    if (!state.playerStatCounters) state.playerStatCounters = { confessionals: 0, layLowDr: 0 };
+    state.playerStatCounters.confessionals += 1;
+    if (eventKey === 'lay_low') state.playerStatCounters.layLowDr += 1;
+  }
   if (!state.confessionalLog) state.confessionalLog = [];
   state.confessionalLog.push({
     week: state.week,

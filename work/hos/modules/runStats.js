@@ -7,11 +7,12 @@ export const PROFILE_VERSION = 1;
 
 /**
  * @param {GameState} state
+ * @param {{ live?: boolean }} [opts]
  */
-export function compilePlayerRunStats(state) {
+export function buildRunMetrics(state, { live = false } = {}) {
   const player = state.getPlayer();
   if (!player) {
-    return emptyRunStats();
+    return null;
   }
   const pid = player.id;
   const history = state.history || [];
@@ -48,17 +49,21 @@ export function compilePlayerRunStats(state) {
     betrayalsByPlayer += (c.betrayals || []).filter((b) => b.byId === pid).length;
   }
 
-  const confessionalCount = (state.confessionalLog || []).filter((e) => e.speakerId === pid).length;
+  const confessionalCount =
+    state.playerStatCounters?.confessionals ??
+    (state.confessionalLog || []).filter((e) => e.speakerId === pid).length;
+  const layLowDr = state.playerStatCounters?.layLowDr ?? 0;
   const allianceCount = player.allianceIds?.length || 0;
-  const won = Boolean(state.winner?.isPlayer);
+  const won = !live && Boolean(state.winner?.isPlayer);
   const wasJuror = Boolean(player.isJuror);
-  const reachedFinale = won || (state.inFinale && !player.evicted) || (
-    !player.evicted && state.getActiveContestants().length <= 3
-  );
+  const reachedFinale =
+    won ||
+    (state.inFinale && !player.evicted) ||
+    (!player.evicted && state.getActiveContestants().length <= 3);
+  const twistsAll =
+    state.doubleEvictionEnabled && state.battleBackEnabled && state.mvpTwistEnabled;
 
   return {
-    version: 1,
-    endedAt: Date.now(),
     castPreset: state.castPreset || 'standard',
     castLabel: getCastPreset(state.castPreset).label,
     difficulty: state.difficulty,
@@ -80,14 +85,37 @@ export function compilePlayerRunStats(state) {
     betrayalsByPlayer,
     alliancesJoined: allianceCount,
     confessionalCount,
+    layLowDr,
+    peakThreat: Math.round(state.playerPeakThreat ?? player.threat),
     finalThreat: Math.round(player.threat),
     finalSocial: player.social,
     finalCompetition: player.competition,
     evictedWeek: player.evictedWeek,
     doubleEvictionEnabled: Boolean(state.doubleEvictionEnabled),
     battleBackEnabled: Boolean(state.battleBackEnabled),
-    mvpTwistEnabled: Boolean(state.mvpTwistEnabled)
+    mvpTwistEnabled: Boolean(state.mvpTwistEnabled),
+    twistsAll
   };
+}
+
+/**
+ * @param {GameState} state
+ */
+export function compilePlayerRunStats(state) {
+  const m = buildRunMetrics(state);
+  if (!m) return emptyRunStats();
+  return {
+    version: 1,
+    endedAt: Date.now(),
+    ...m
+  };
+}
+
+/** @param {GameState} state */
+export function compileLiveRunStats(state) {
+  const m = buildRunMetrics(state, { live: true });
+  if (!m) return null;
+  return { ...m, live: true };
 }
 
 function emptyRunStats() {
@@ -115,7 +143,10 @@ function emptyRunStats() {
     betrayalsByPlayer: 0,
     alliancesJoined: 0,
     confessionalCount: 0,
+    layLowDr: 0,
+    peakThreat: 0,
     finalThreat: 0,
+    twistsAll: false,
     finalSocial: 0,
     finalCompetition: 0,
     evictedWeek: null,
@@ -210,6 +241,82 @@ export const ACHIEVEMENT_DEFS = [
     title: 'Confessional King',
     description: 'Record ten confessionals in one season.',
     test: (r) => r.confessionalCount >= 10
+  },
+  {
+    id: 'hard_mode_hero',
+    title: 'Hard Mode Hero',
+    description: 'Win on Hard difficulty.',
+    test: (r) => r.won && r.difficulty === 'hard'
+  },
+  {
+    id: 'easy_does_it',
+    title: 'Cruise Control',
+    description: 'Win on Easy difficulty.',
+    test: (r) => r.won && r.difficulty === 'easy'
+  },
+  {
+    id: 'betrayal_survivor',
+    title: 'Forgive & Forget',
+    description: 'Win after suffering two betrayals.',
+    test: (r) => r.won && r.betrayalsAgainst >= 2
+  },
+  {
+    id: 'twist_master',
+    title: 'Twist Master',
+    description: 'Win with every season twist enabled.',
+    test: (r) => r.won && r.twistsAll
+  },
+  {
+    id: 'jury_sprint_champ',
+    title: 'Sprint Winner',
+    description: 'Win a Jury Sprint cast.',
+    test: (r) => r.won && r.castPreset === 'jury_sprint'
+  },
+  {
+    id: 'brains_trust',
+    title: 'Brains Trust',
+    description: 'Win a Brains season.',
+    test: (r) => r.won && r.castPreset === 'brains'
+  },
+  {
+    id: 'peak_monster',
+    title: 'Peak Monster',
+    description: 'Hit 85 threat and still win.',
+    test: (r) => r.won && r.peakThreat >= 85
+  },
+  {
+    id: 'ghost_mode',
+    title: 'Ghost Mode',
+    description: 'Five lay-low confessionals in one season.',
+    test: (r) => r.layLowDr >= 5
+  }
+];
+
+/** Career milestones (profile-level). */
+export const CAREER_ACHIEVEMENT_DEFS = [
+  {
+    id: 'mainstay',
+    title: 'Mainstay',
+    description: 'Finish five seasons.',
+    test: (p) => (p.gamesPlayed || 0) >= 5
+  },
+  {
+    id: 'dynasty',
+    title: 'Dynasty',
+    description: 'Win three seasons in a row.',
+    test: (p) => (p.currentWinStreak || 0) >= 3
+  },
+  {
+    id: 'hall_of_fame',
+    title: 'Hall of Fame',
+    description: 'Unlock fifteen achievements (any type).',
+    test: (p) => Object.keys(p.achievements || {}).length >= 15
+  },
+  {
+    id: 'comp_collector',
+    title: 'Comp Collector',
+    description: 'Win twenty HOH or POV competitions across your career.',
+    test: (p) => (p.totalCompWins || 0) >= 20
   }
 ];
 
@@ -226,6 +333,128 @@ export function evaluateNewAchievements(run, profile) {
     unlocked.push(def);
   }
   return unlocked;
+}
+
+/**
+ * @param {object} profile
+ */
+export function evaluateNewCareerAchievements(profile) {
+  const existing = profile?.achievements || {};
+  const unlocked = [];
+  for (const def of CAREER_ACHIEVEMENT_DEFS) {
+    if (!def.test(profile)) continue;
+    if (existing[def.id]) continue;
+    unlocked.push(def);
+  }
+  return unlocked;
+}
+
+/**
+ * @param {ReturnType<typeof compilePlayerRunStats>} run
+ * @param {object|null} profile
+ * @returns {{ id: string, title: string, detail: string, done: boolean }[]}
+ */
+export function getSeasonAchievementProgress(run, profile = null) {
+  const lines = [];
+  const unlocked = profile?.achievements || {};
+  const track = [
+    { id: 'triple_hoh', title: 'Reigning Monarch', detail: () => `${run.hohWins}/3 HOH`, done: run.hohWins >= 3 },
+    { id: 'veto_king', title: 'Veto King', detail: () => `${run.vetoWins}/2 POV`, done: run.vetoWins >= 2 },
+    { id: 'block_beast', title: 'Block Beast', detail: () => `${run.evictionVotesSurvived}/3 survives`, done: run.evictionVotesSurvived >= 3 },
+    { id: 'dr_machine', title: 'Confessional King', detail: () => `${run.confessionalCount}/10 DRs`, done: run.confessionalCount >= 10 },
+    { id: 'ghost_mode', title: 'Ghost Mode', detail: () => `${run.layLowDr}/5 lay-low DRs`, done: run.layLowDr >= 5 },
+    { id: 'comp_beast', title: 'Comp Beast', detail: () => `${run.competitionWins}/4 comps`, done: run.competitionWins >= 4 }
+  ];
+  for (const row of track) {
+    if (unlocked[row.id]) continue;
+    lines.push({
+      id: row.id,
+      title: row.title,
+      detail: row.detail(),
+      done: row.done
+    });
+  }
+  return lines;
+}
+
+/**
+ * @param {ReturnType<typeof compileLiveRunStats>} live
+ */
+export function getRunStatsBanner(live) {
+  if (!live) return '';
+  const parts = [`HOH ${live.hohWins}`, `POV ${live.vetoWins}`, `noms ${live.timesNominated}`];
+  parts.push(`peak threat ${live.peakThreat}`);
+  return `Run · ${parts.join(' · ')}`;
+}
+
+/**
+ * Near-miss achievements at season end.
+ * @param {ReturnType<typeof compilePlayerRunStats>} run
+ * @param {object} profile
+ */
+export function getNearMissAchievements(run, profile) {
+  const existing = profile?.achievements || {};
+  const misses = [];
+  for (const def of ACHIEVEMENT_DEFS) {
+    if (existing[def.id] || def.test(run)) continue;
+    const near = isNearMiss(def, run);
+    if (near) misses.push({ ...def, near });
+  }
+  return misses.slice(0, 4);
+}
+
+function isNearMiss(def, run) {
+  switch (def.id) {
+    case 'triple_hoh':
+      return run.hohWins === 2 ? 'one HOH short' : false;
+    case 'veto_king':
+      return run.vetoWins === 1 ? 'one POV short' : false;
+    case 'block_beast':
+      return run.evictionVotesSurvived === 2 ? 'one vote shy' : false;
+    case 'comp_beast':
+      return run.competitionWins === 3 ? 'one comp short' : false;
+    case 'dr_machine':
+      return run.confessionalCount >= 7 ? `${10 - run.confessionalCount} DRs short` : false;
+    case 'ghost_mode':
+      return run.layLowDr >= 3 ? `${5 - run.layLowDr} lay-low DRs short` : false;
+    case 'big_target':
+      return run.won && run.finalThreat >= 60 && run.finalThreat < 70 ? 'threat under 70' : false;
+    case 'peak_monster':
+      return run.won && run.peakThreat >= 75 && run.peakThreat < 85 ? 'peak under 85' : false;
+    default:
+      return false;
+  }
+}
+
+/**
+ * @param {object|null} profile
+ */
+export function renderCareerSetupPanelHtml(profile) {
+  if (!profile?.gamesPlayed) {
+    return '<p class="career-panel-empty">Play a full season to start your career log.</p>';
+  }
+  let html = '<ul class="career-panel-stats">';
+  html += `<li>${profile.wins} wins · ${profile.gamesPlayed} seasons · ${profile.totalWeeks || 0} weeks played</li>`;
+  html += `<li>${profile.totalHohWins || 0} career HOH · ${profile.totalVetoWins || 0} career POV</li>`;
+  html += '</ul>';
+  const ids = Object.keys(profile.achievements || {});
+  if (ids.length) {
+    html += '<p class="career-panel-ach-title">Unlocked badges</p><ul class="career-panel-ach">';
+    for (const id of ids.slice(0, 8)) {
+      const meta = profile.achievements[id];
+      const def =
+        ACHIEVEMENT_DEFS.find((d) => d.id === id) ||
+        CAREER_ACHIEVEMENT_DEFS.find((d) => d.id === id);
+      html += `<li>★ ${escapeHtml(meta.title || def?.title || id)}</li>`;
+    }
+    if (ids.length > 8) html += `<li>+${ids.length - 8} more</li>`;
+    html += '</ul>';
+  }
+  if (profile.lastRun) {
+    const lr = profile.lastRun;
+    html += `<p class="career-panel-last">Last season: ${lr.won ? 'Win' : 'Loss'} · Wk ${lr.week} · ${lr.hohWins} HOH / ${lr.vetoWins} POV</p>`;
+  }
+  return html;
 }
 
 /**
@@ -295,7 +524,7 @@ export function defaultProfile() {
  * @param {object} profile
  * @param {typeof ACHIEVEMENT_DEFS[number][]} newAchievements
  */
-export function renderRunStatsEndHtml(run, profile, newAchievements = []) {
+export function renderRunStatsEndHtml(run, profile, newAchievements = [], previousLastRun = null) {
   const resultLabel = run.won ? 'Victory' : run.wasJuror ? 'Jury exit' : run.evictedWeek ? `Evicted Week ${run.evictedWeek}` : 'Season over';
   let html = '<div class="run-stats-panel">';
   html += '<h3>This season</h3>';
@@ -305,8 +534,33 @@ export function renderRunStatsEndHtml(run, profile, newAchievements = []) {
   html += `<li><span class="run-stat-label">Nominations</span> ${run.timesNominated} · survived ${run.evictionVotesSurvived} vote${run.evictionVotesSurvived === 1 ? '' : 's'}</li>`;
   html += `<li><span class="run-stat-label">HOH / POV</span> ${run.hohWins} / ${run.vetoWins}</li>`;
   html += `<li><span class="run-stat-label">Deals</span> ${run.promisesKept} kept · ${run.promisesBroken} broken · ${run.promisesOpen} open</li>`;
-  html += `<li><span class="run-stat-label">Threat</span> ${run.finalThreat} · DRs ${run.confessionalCount}</li>`;
+  html += `<li><span class="run-stat-label">Threat</span> ${run.finalThreat} (peak ${run.peakThreat ?? run.finalThreat}) · DRs ${run.confessionalCount}</li>`;
+  if (run.layLowDr > 0) {
+    html += `<li><span class="run-stat-label">Lay-low DRs</span> ${run.layLowDr}</li>`;
+  }
+  if (run.betrayalsAgainst > 0) {
+    html += `<li><span class="run-stat-label">Betrayals suffered</span> ${run.betrayalsAgainst}</li>`;
+  }
   html += '</ul>';
+
+  const near = getNearMissAchievements(run, profile);
+  if (near.length) {
+    html += '<p class="ach-near-miss">Almost unlocked:</p><ul class="run-stats-list ach-near-list">';
+    for (const n of near) {
+      html += `<li>${escapeHtml(n.title)} — ${escapeHtml(n.near)}</li>`;
+    }
+    html += '</ul>';
+  }
+
+  if (previousLastRun && profile?.gamesPlayed > 1) {
+    const prev = previousLastRun;
+    html += '<h3>Vs last season</h3><ul class="run-stats-list">';
+    const compDelta = run.competitionWins - (prev.competitionWins || 0);
+    const nomDelta = run.timesNominated - (prev.timesNominated || 0);
+    html += `<li><span class="run-stat-label">Comps</span> ${formatDelta(compDelta)}</li>`;
+    html += `<li><span class="run-stat-label">Nominations</span> ${formatDelta(nomDelta, true)}</li>`;
+    html += '</ul>';
+  }
 
   if (profile && profile.gamesPlayed > 0) {
     html += '<h3>Career</h3>';
@@ -319,8 +573,9 @@ export function renderRunStatsEndHtml(run, profile, newAchievements = []) {
     html += '</ul>';
   }
 
+  const totalDefs = ACHIEVEMENT_DEFS.length + CAREER_ACHIEVEMENT_DEFS.length;
   const achCount = Object.keys(profile?.achievements || {}).length;
-  html += `<h3>Achievements <span class="ach-count">${achCount}/${ACHIEVEMENT_DEFS.length}</span></h3>`;
+  html += `<h3>Achievements <span class="ach-count">${achCount}/${totalDefs}</span></h3>`;
 
   if (newAchievements.length) {
     html += '<p class="ach-new-intro">Unlocked this season:</p>';
@@ -335,19 +590,35 @@ export function renderRunStatsEndHtml(run, profile, newAchievements = []) {
     html += '</ul>';
   }
 
-  html += '<details class="achievement-catalog"><summary>All achievements</summary><ul class="achievement-list">';
+  html += '<details class="achievement-catalog" open><summary>Season achievements</summary><ul class="achievement-list">';
   for (const def of ACHIEVEMENT_DEFS) {
-    const have = profile?.achievements?.[def.id];
-    const cls = have ? 'achievement-unlocked' : 'achievement-locked';
-    const badge = have ? '★' : '○';
-    html += `<li class="achievement-item ${cls}" title="${escapeHtml(def.description)}">
+    html += renderAchievementCatalogItem(def, profile);
+  }
+  html += '</ul></details>';
+  html += '<details class="achievement-catalog"><summary>Career milestones</summary><ul class="achievement-list">';
+  for (const def of CAREER_ACHIEVEMENT_DEFS) {
+    html += renderAchievementCatalogItem(def, profile);
+  }
+  html += '</ul></details></div>';
+  return html;
+}
+
+function renderAchievementCatalogItem(def, profile) {
+  const have = profile?.achievements?.[def.id];
+  const cls = have ? 'achievement-unlocked' : 'achievement-locked';
+  const badge = have ? '★' : '○';
+  return `<li class="achievement-item ${cls}" title="${escapeHtml(def.description)}">
       <span class="ach-badge">${badge}</span>
       <span class="ach-title">${escapeHtml(def.title)}</span>
       <span class="ach-desc">${escapeHtml(def.description)}</span>
     </li>`;
-  }
-  html += '</ul></details></div>';
-  return html;
+}
+
+function formatDelta(n, invertGood = false) {
+  if (n === 0) return 'same';
+  const good = invertGood ? n < 0 : n > 0;
+  const sign = n > 0 ? '+' : '';
+  return `<span class="${good ? 'delta-good' : 'delta-bad'}">${sign}${n}</span>`;
 }
 
 /**
@@ -358,5 +629,6 @@ export function formatCareerSetupHint(profile) {
     return 'No career stats yet — finish a season to unlock achievements.';
   }
   const ach = Object.keys(profile.achievements || {}).length;
-  return `Career: ${profile.wins} win${profile.wins === 1 ? '' : 's'} · ${profile.gamesPlayed} season${profile.gamesPlayed === 1 ? '' : 's'} · ${ach} achievement${ach === 1 ? '' : 's'}`;
+  const total = ACHIEVEMENT_DEFS.length + CAREER_ACHIEVEMENT_DEFS.length;
+  return `Career: ${profile.wins} win${profile.wins === 1 ? '' : 's'} · ${profile.gamesPlayed} season${profile.gamesPlayed === 1 ? '' : 's'} · ${ach}/${total} badges`;
 }

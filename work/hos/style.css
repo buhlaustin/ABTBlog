@@ -783,6 +783,60 @@ body {
   text-align: center;
 }
 
+.career-panel {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 0.84rem;
+}
+
+.career-panel summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.career-panel-body {
+  margin-top: 0.45rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+}
+
+.career-panel-stats,
+.career-panel-ach {
+  margin: 0.25rem 0;
+  padding-left: 1.1rem;
+}
+
+.career-panel-ach-title {
+  margin: 0.5rem 0 0.2rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.career-panel-last {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.ach-near-miss {
+  margin: 0.5rem 0 0.15rem;
+  font-size: 0.86rem;
+}
+
+.ach-near-list {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.delta-good {
+  color: var(--success, #3d9a5a);
+}
+
+.delta-bad {
+  color: var(--danger, #c44);
+}
+
 .run-stats-panel {
   margin-top: 1.25rem;
   padding-top: 1rem;

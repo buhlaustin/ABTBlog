@@ -133,6 +133,10 @@ export class GameState {
     /** Player threat at week open — for band panel week delta. */
     this.playerThreatWeekStart = null;
     this.playerThreatWeekSnapshotWeek = null;
+    /** High-water threat this season (player). */
+    this.playerPeakThreat = null;
+    /** Persistent counters for run stats (confessionals survive log trim). */
+    this.playerStatCounters = { confessionals: 0, layLowDr: 0 };
 
     /** Last Rest & Observe feedback (lay-low intel). */
     this.playerLayLowWeek = null;
@@ -422,6 +426,11 @@ export class GameState {
     for (const c of this.getActiveContestants()) {
       c.recalculateThreat(this);
     }
+    const player = this.getPlayer();
+    if (player && !player.evicted) {
+      const t = Math.round(player.threat);
+      this.playerPeakThreat = Math.max(this.playerPeakThreat ?? t, t);
+    }
   }
 
   resetWeeklyFlags() {
@@ -655,6 +664,8 @@ export class GameState {
       storyLog: this.storyLog,
       playerThreatWeekStart: this.playerThreatWeekStart,
       playerThreatWeekSnapshotWeek: this.playerThreatWeekSnapshotWeek,
+      playerPeakThreat: this.playerPeakThreat,
+      playerStatCounters: this.playerStatCounters,
       playerLayLowWeek: this.playerLayLowWeek,
       playerLayLowBefore: this.playerLayLowBefore,
       playerLayLowAfter: this.playerLayLowAfter,
@@ -756,6 +767,8 @@ export class GameState {
     state.history = data.history;
     state.storyLog = data.storyLog;
     state.playerThreatWeekStart = data.playerThreatWeekStart ?? null;
+    state.playerPeakThreat = data.playerPeakThreat ?? null;
+    state.playerStatCounters = data.playerStatCounters ?? { confessionals: 0, layLowDr: 0 };
     state.playerThreatWeekSnapshotWeek = data.playerThreatWeekSnapshotWeek ?? null;
     state.playerLayLowWeek = data.playerLayLowWeek ?? null;
     state.playerLayLowBefore = data.playerLayLowBefore ?? null;

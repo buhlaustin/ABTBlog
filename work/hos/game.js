@@ -12,7 +12,14 @@ import { EvictionSystem } from './modules/Eviction.js';
 import { PlayerActions } from './modules/PlayerActions.js';
 import { UIManager, setStorageRef } from './modules/UI.js';
 import { StorageManager } from './modules/Storage.js';
-import { compilePlayerRunStats, formatCareerSetupHint, renderRunStatsEndHtml } from './modules/runStats.js';
+import {
+  compileLiveRunStats,
+  compilePlayerRunStats,
+  formatCareerSetupHint,
+  getRunStatsBanner,
+  renderCareerSetupPanelHtml,
+  renderRunStatsEndHtml
+} from './modules/runStats.js';
 import {
   fetchNarrativeBeat,
   initNarrativeApiUrl,
@@ -144,6 +151,9 @@ class Game {
       if (ui.elements.careerStatsHint) {
         ui.elements.careerStatsHint.textContent = formatCareerSetupHint(StorageManager.loadProfile());
       }
+      if (ui.elements.careerPanelBody) {
+        ui.elements.careerPanelBody.innerHTML = renderCareerSetupPanelHtml(StorageManager.loadProfile());
+      }
     });
 
     const refreshTwistCheat = () => {
@@ -197,12 +207,16 @@ class Game {
     ui.elements.castSelect?.addEventListener('change', applyCastPresetUi);
     applyCastPresetUi();
 
-    const refreshCareerHint = () => {
+    const refreshCareerPanel = () => {
+      const profile = StorageManager.loadProfile();
       if (ui.elements.careerStatsHint) {
-        ui.elements.careerStatsHint.textContent = formatCareerSetupHint(StorageManager.loadProfile());
+        ui.elements.careerStatsHint.textContent = formatCareerSetupHint(profile);
+      }
+      if (ui.elements.careerPanelBody) {
+        ui.elements.careerPanelBody.innerHTML = renderCareerSetupPanelHtml(profile);
       }
     };
-    refreshCareerHint();
+    refreshCareerPanel();
 
     ui.showSetup();
   }
@@ -386,6 +400,9 @@ class Game {
     const twistParts = [getTwistRulesBanner(state)];
     const castBanner = getCastPresetBanner(state);
     if (castBanner) twistParts.push(castBanner);
+    const liveRun = compileLiveRunStats(state);
+    const runBanner = liveRun && !state.gameOver ? getRunStatsBanner(liveRun) : '';
+    if (runBanner) twistParts.push(runBanner);
     const previewLeans = (hoh, limit) => this.ai.previewNominationLeans(hoh, limit);
     const hohWatch = getHohWatchBanner(state, previewLeans);
     if (hohWatch) twistParts.push(hohWatch);
@@ -2230,13 +2247,18 @@ class Game {
 
   endGame() {
     const run = compilePlayerRunStats(this.state);
-    const { profile, newAchievements } = StorageManager.recordRun(run);
+    const { profile, newAchievements, previousLastRun } = StorageManager.recordRun(run);
     const summary =
       this.narrative.generateEndgameSummary() +
-      renderRunStatsEndHtml(run, profile, newAchievements);
+      renderRunStatsEndHtml(run, profile, newAchievements, previousLastRun);
     const won = this.state.winner?.isPlayer;
     this.ui.renderEndSummary(summary);
     this.ui.showEnd(won);
+    if (newAchievements.length) {
+      this.ui.showToast(
+        `Unlocked ${newAchievements.length} badge${newAchievements.length === 1 ? '' : 's'} — see Achievements below.`
+      );
+    }
     StorageManager.clear();
   }
 }

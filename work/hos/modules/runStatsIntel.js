@@ -1,55 +1,87 @@
-import { ACHIEVEMENT_DEFS } from './runStats.js';
-import { escapeHtml } from './utils.js';
+import { ACHIEVEMENT_DEFS, CAREER_ACHIEVEMENT_DEFS, compileLiveRunStats, getSeasonAchievementProgress } from './runStats.js';
 import { StorageManager } from './Storage.js';
 
 /**
  * @param {import('./GameState.js').GameState} state
  */
 export function buildRunStatsIntelSection(state) {
-  const profile = StorageManager.loadProfile();
-  if (!profile?.gamesPlayed && !state) {
+  let profileSafe = null;
+  try {
+    profileSafe = StorageManager.loadProfile();
+  } catch {
+    profileSafe = null;
+  }
+
+  if (!profileSafe?.gamesPlayed && !state?.getPlayer?.()) {
     return null;
   }
 
   const items = [];
-  if (profile?.gamesPlayed) {
+  const totalBadges = ACHIEVEMENT_DEFS.length + CAREER_ACHIEVEMENT_DEFS.length;
+
+  if (profileSafe?.gamesPlayed) {
     items.push({
       key: 'career-record',
       name: 'Career',
-      detail: `${profile.wins}/${profile.gamesPlayed} wins`
+      detail: `${profileSafe.wins}/${profileSafe.gamesPlayed} wins`
     });
     items.push({
       key: 'career-comps',
       name: 'All-time comps',
-      detail: `${profile.totalHohWins || 0} HOH · ${profile.totalVetoWins || 0} POV`
+      detail: `${profileSafe.totalHohWins || 0} HOH · ${profileSafe.totalVetoWins || 0} POV`
     });
-    const ach = Object.keys(profile.achievements || {}).length;
+    const ach = Object.keys(profileSafe.achievements || {}).length;
     items.push({
       key: 'career-ach',
       name: 'Achievements',
-      detail: `${ach}/${ACHIEVEMENT_DEFS.length} unlocked`
+      detail: `${ach}/${totalBadges} unlocked`
     });
+    if (profileSafe.currentWinStreak > 1) {
+      items.push({
+        key: 'career-streak',
+        name: 'Win streak',
+        detail: `${profileSafe.currentWinStreak} active`
+      });
+    }
   }
 
+  const live = state ? compileLiveRunStats(state) : null;
   const player = state?.getPlayer?.();
-  if (player && state.week >= 1) {
-    const promisesBroken = (player.promises || []).filter((p) => p.kept === false).length;
-    const noms = countPlayerNominations(state, player.id);
+  if (live && player && !player.evicted) {
+    items.push({
+      key: 'run-comps',
+      name: 'This run — comps',
+      detail: `${live.hohWins} HOH · ${live.vetoWins} POV`
+    });
     items.push({
       key: 'run-noms',
-      name: 'This run — noms',
-      detail: `${noms} so far`
+      name: 'Nominations',
+      detail: `${live.timesNominated} · ${live.evictionVotesSurvived} survived`
     });
     items.push({
       key: 'run-threat',
       name: 'Threat',
-      detail: `${Math.round(player.threat)}`
+      detail: `${live.finalThreat} (peak ${live.peakThreat})`
     });
-    if (promisesBroken > 0) {
+    items.push({
+      key: 'run-dr',
+      name: 'Confessionals',
+      detail: `${live.confessionalCount} DRs`
+    });
+    if (live.promisesBroken > 0) {
       items.push({
         key: 'run-broken',
         name: 'Broken deals',
-        detail: `${promisesBroken} this season`
+        detail: `${live.promisesBroken}`
+      });
+    }
+
+    const progress = getSeasonAchievementProgress(live, profileSafe).filter((p) => !p.done).slice(0, 3);
+    for (const p of progress) {
+      items.push({
+        key: `ach-prog-${p.id}`,
+        name: `→ ${p.title}`,
+        detail: p.detail
       });
     }
   }
@@ -61,26 +93,4 @@ export function buildRunStatsIntelSection(state) {
     tone: 'neutral',
     items
   };
-}
-
-function countPlayerNominations(state, pid) {
-  const weeks = new Set();
-  for (const e of state.history || []) {
-    if (e.type === 'nominations' && (e.nominees || []).includes(pid)) weeks.add(e.week);
-  }
-  return weeks.size;
-}
-
-export function buildProfileAchievementsDrawerHtml(profile) {
-  if (!profile?.achievements || !Object.keys(profile.achievements).length) {
-    return '';
-  }
-  const rows = Object.entries(profile.achievements)
-    .map(([id, meta]) => {
-      const def = ACHIEVEMENT_DEFS.find((d) => d.id === id);
-      const title = meta.title || def?.title || id;
-      return `<li>${escapeHtml(title)}</li>`;
-    })
-    .join('');
-  return `<ul class="intel-ach-list">${rows}</ul>`;
 }
