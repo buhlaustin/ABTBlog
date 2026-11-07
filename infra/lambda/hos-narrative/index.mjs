@@ -165,6 +165,12 @@ Kind: Julie Chen-style host reaction immediately AFTER the HOH names two nominee
 Use hohName, hohArchetype, hohNomStyle, nominees, and nominationLeanNames from context if present.
 Name both nominees. Under 320 characters. Context: ${ctx}`;
   }
+  if (kind === 'confessional') {
+    return `${base}
+Kind: Diary confessional — first-person one sentence. Use confessional object in context (speaker, event).
+Return plain text only in JSON text field. Under 200 characters.
+Context: ${ctx}`;
+  }
   if (kind === 'premiere_move_in') {
     return `${base}\nKind: Season premiere / move-in speech. Use houseguestCount.\nContext: ${ctx}`;
   }

@@ -126,6 +126,7 @@ export function buildNarrativeContext(state) {
     mvpRaceOpen: Boolean(state.mvpTwistWeekActive && state.mvpRaceOpen),
     inFinale: Boolean(state.inFinale),
     lastHostBeatKind: state.lastHostBeatKind || null,
+    confessional: state.confessionalPayload || null,
     playerIsNominated: Boolean(player?.isNominated),
     playerIsHOH: Boolean(player?.isHOH),
     playerAllianceCount: playerAlliances.length,
@@ -138,7 +139,7 @@ export function buildNarrativeContext(state) {
 }
 
 /**
- * @param {'daily_beat' | 'host_line' | 'week_recap' | 'premiere_move_in' | 'nomination_ceremony' | 'hoh_competition' | 'hoh_competition_result' | 'nomination_pre_ceremony' | 'veto_competition' | 'veto_competition_result' | 'veto_ceremony_pre' | 'veto_ceremony' | 'eviction_pre' | 'eviction_ceremony' | 'finale_live'} kind
+ * @param {'daily_beat' | 'host_line' | 'week_recap' | 'confessional' | 'premiere_move_in' | 'nomination_ceremony' | 'hoh_competition' | 'hoh_competition_result' | 'nomination_pre_ceremony' | 'veto_competition' | 'veto_competition_result' | 'veto_ceremony_pre' | 'veto_ceremony' | 'eviction_pre' | 'eviction_ceremony' | 'finale_live'} kind
  * @returns {Promise<{ text: string, type: string } | null>}
  */
 async function fetchNarrativeBeatDirect(kind, state, apiUrl) {

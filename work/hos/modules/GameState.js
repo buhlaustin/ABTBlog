@@ -136,6 +136,11 @@ export class GameState {
     this.lastHostBeatKind = null;
     this.lastHostBeatSource = null;
 
+    /** Transient narrate payload for confessional kind (not saved). */
+    this.confessionalPayload = null;
+    /** Recent confessional lines for intel panel. */
+    this.confessionalLog = [];
+
     this.lastPawnShieldWeek = null;
     this.lastPawnShieldNomineeNames = [];
     this.lastPawnShieldNomineeIds = [];
@@ -650,6 +655,7 @@ export class GameState {
       hostBeatLog: this.hostBeatLog,
       lastHostBeatKind: this.lastHostBeatKind,
       lastHostBeatSource: this.lastHostBeatSource,
+      confessionalLog: this.confessionalLog,
       lastPawnShieldWeek: this.lastPawnShieldWeek,
       lastPawnShieldNomineeNames: this.lastPawnShieldNomineeNames,
       lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
@@ -738,6 +744,7 @@ export class GameState {
     state.hostBeatLog = data.hostBeatLog ?? [];
     state.lastHostBeatKind = data.lastHostBeatKind ?? null;
     state.lastHostBeatSource = data.lastHostBeatSource ?? null;
+    state.confessionalLog = data.confessionalLog ?? [];
     state.lastPawnShieldWeek = data.lastPawnShieldWeek ?? null;
     state.lastPawnShieldNomineeNames = data.lastPawnShieldNomineeNames ?? [];
     state.lastPawnShieldNomineeIds = data.lastPawnShieldNomineeIds ?? [];

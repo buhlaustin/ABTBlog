@@ -5,6 +5,7 @@ import { buildVetoBlockIntelSection } from './vetoCeremonySummary.js';
 import { buildAllianceIntelSection } from './allianceMap.js';
 import { buildLayLowIntelSection } from './layLowFeedback.js';
 import { buildHostBeatIntelSection } from './hostPhaseBeats.js';
+import { buildConfessionalIntelSection } from './confessionals.js';
 
 const PROMISE_LABELS = {
   vote: 'Vote deal',
@@ -106,6 +107,11 @@ export function buildDealIntel(state) {
   const hostSection = buildHostBeatIntelSection(state);
   if (hostSection) {
     sections.push(hostSection);
+  }
+
+  const confessionalSection = buildConfessionalIntelSection(state);
+  if (confessionalSection) {
+    sections.push(confessionalSection);
   }
 
   const pawnSection = buildFloaterShieldIntelSection(state);

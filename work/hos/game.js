@@ -23,6 +23,11 @@ import {
   getLocalHostPhaseBeat,
   recordHostBeat
 } from './modules/hostPhaseBeats.js';
+import {
+  buildConfessionalEntry,
+  pickConfessionalLine,
+  recordConfessional
+} from './modules/confessionals.js';
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
 import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
@@ -337,6 +342,47 @@ class Game {
    * @param {string} kind
    * @param {{ hoh?: object, nominees?: object[], winner?: object, evicted?: object | null }} [extra]
    */
+  /**
+   * @param {import('./modules/Contestant.js').Contestant | null | undefined} speaker
+   * @param {string} eventKey
+   * @param {Record<string, string>} [ctx]
+   */
+  async _appendConfessional(speaker, eventKey, ctx = {}) {
+    if (!speaker) return;
+
+    this.state.confessionalPayload = {
+      speakerName: speaker.name,
+      speakerArchetype: speaker.personality?.name || null,
+      speakerStrategy: speaker.personality?.strategy || null,
+      event: eventKey,
+      ...ctx
+    };
+
+    let line = null;
+    if (isNarrativeApiEnabled()) {
+      const beat = await fetchNarrativeBeat('confessional', this.state);
+      if (beat?.text) line = beat.text;
+    }
+    this.state.confessionalPayload = null;
+
+    if (!line) {
+      line = pickConfessionalLine(speaker, eventKey, ctx);
+    }
+    if (!line) return;
+
+    recordConfessional(this.state, speaker, line);
+    this.logAndRender([buildConfessionalEntry(speaker, line)]);
+  }
+
+  /**
+   * @param {{ speaker: import('./modules/Contestant.js').Contestant, eventKey: string, ctx?: Record<string, string> }[]} batch
+   */
+  async _appendConfessionals(batch) {
+    for (const item of batch) {
+      await this._appendConfessional(item.speaker, item.eventKey, item.ctx || {});
+    }
+  }
+
   async _appendHostBeat(kind, extra = {}) {
     const beat = isNarrativeApiEnabled()
       ? await fetchNarrativeBeat(kind, this.state)
@@ -761,6 +807,11 @@ class Game {
       this.ui.pulseThreatFeedback(result.threatFeedback);
     }
 
+    if (result.confessional) {
+      const c = result.confessional;
+      void this._appendConfessional(c.speaker, c.eventKey, c.ctx || {});
+    }
+
     this._exposeGlobals();
 
     if (this.state.actionsRemaining <= 0) {
@@ -976,6 +1027,9 @@ class Game {
 
   async _afterCompetition(winner) {
     await this._appendHostBeat('hoh_competition_result', { winner });
+    if (winner) {
+      await this._appendConfessional(winner, 'hoh_win');
+    }
     if (this._maybeTriggerFinale()) return;
     this._onHouseEventComplete();
   }
@@ -1004,6 +1058,20 @@ class Game {
     this.state.nominationLeanNames = nominees.map((n) => n.name);
     await this._appendHostBeat('nomination_ceremony', { hoh, nominees });
     this.state.nominationLeanNames = [];
+    if (hoh && nominees.length >= 2) {
+      await this._appendConfessionals([
+        {
+          speaker: hoh,
+          eventKey: 'hoh_nominated',
+          ctx: { a: nominees[0].name, b: nominees[1].name }
+        },
+        {
+          speaker: nominees[0],
+          eventKey: 'on_block',
+          ctx: { other: nominees[1].name, hoh: hoh.name }
+        }
+      ]);
+    }
   }
 
   _runReadHohAction() {
@@ -1174,6 +1242,19 @@ class Game {
   }
 
   async _completeVetoCeremonyHostBeat() {
+    const holder = this.state.vetoHolderId
+      ? this.state.getContestant(this.state.vetoHolderId)
+      : null;
+    if (holder) {
+      if (this.state.vetoUsed && this.state.vetoSavedNomineeId) {
+        const saved = this.state.getContestant(this.state.vetoSavedNomineeId);
+        await this._appendConfessional(holder, 'veto_saved', {
+          saved: saved?.name || 'a nominee'
+        });
+      } else {
+        await this._appendConfessional(holder, 'veto_unused');
+      }
+    }
     await this._appendHostBeat('veto_ceremony');
     this._onHouseEventComplete();
   }
@@ -1448,6 +1529,15 @@ class Game {
     }
 
     await this._appendHostBeat('eviction_ceremony', { evicted });
+    await this._appendConfessional(evicted, 'evicted');
+
+    const survivors = this.state.getActiveNominees().filter((n) => n.id !== evicted.id);
+    const survivor = survivors[0];
+    if (survivor) {
+      await this._appendConfessional(survivor, 'survived_vote', {
+        other: evicted.name
+      });
+    }
 
     if (this.state.getPlayer().evicted) {
       const remaining = this.state.getActiveContestants().length;

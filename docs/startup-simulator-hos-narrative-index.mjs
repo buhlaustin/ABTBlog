@@ -172,6 +172,12 @@ Kind: Julie Chen-style host reaction immediately AFTER the HOH names two nominee
 Use hohName, hohArchetype, hohNomStyle, nominees, and nominationLeanNames from context if present — reflect the HOH's persona (e.g. backdoor/strategist, loyalist, chaos) without inventing extra nominees.
 Name both nominees. Under 320 characters. Context: ${ctx}`;
   }
+  if (kind === 'confessional') {
+    return `${base}
+Kind: DR diary confessional — first person, one quoted sentence in plain text (no quotes in JSON — return {"text":"sentence"}).
+Use confessional.speakerName, speakerStrategy, event, and any nominee/eviction names in context. Under 200 characters. Stay in character.
+Context: ${ctx}`;
+  }
   if (kind === 'premiere_move_in') {
     return `${base}\nKind: Season premiere / move-in speech. houseguestCount, week 1 Friday context.\nContext: ${ctx}`;
   }

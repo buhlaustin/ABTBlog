@@ -485,7 +485,12 @@ export class PlayerActions {
     return {
       success: true,
       text: `<strong>${target.name}</strong> will remember you broke your ${activePromise.type} deal from <strong>Week ${activePromise.week}</strong>.`,
-      type: 'drama'
+      type: 'drama',
+      confessional: {
+        speaker: player,
+        eventKey: 'betrayal',
+        ctx: { target: target.name }
+      }
     };
   }
 
