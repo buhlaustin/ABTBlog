@@ -1,4 +1,5 @@
 import { getAllianceIds, sharesAllianceWith } from './allianceUtils.js';
+import { isNominationFloater } from './floaterShields.js';
 import { PHASES } from './GameState.js';
 import { randomInt } from './utils.js';
 
@@ -23,7 +24,7 @@ export function applyHohPersonaNominationBias(hoh, target, baseScore) {
   const strat = hoh.personality?.strategy || 'survive';
   let score = baseScore;
   const targetAlliances = getAllianceIds(target).length;
-  const isFloater = targetAlliances === 0 && target.threat >= 20 && target.threat <= 50;
+  const isFloater = isNominationFloater(target);
   const rel = hoh.getRelationship(target.id);
 
   switch (strat) {

@@ -10,10 +10,12 @@ import {
   JURY_START_HOUSE_COUNT,
   generateAINames,
   pickRandom,
+  PERSONALITY_TYPES,
   shuffle,
   uid,
   resetIdCounter
 } from './utils.js';
+import { ensureEasyCastFloaters } from './floaterShields.js';
 import { evaluateTwistsForNewWeek, initTwistSchedule, trackFirstEvicted } from './SeasonTwists.js';
 
 /** Calendar: Friday → Thursday (Big Brother–style week). */
@@ -196,10 +198,17 @@ export class GameState {
       }
     });
 
-    const aiContestants = aiNames.map((name) => new Contestant({
-      name,
-      difficultyBonus: this.config.aiStatBonus
-    }));
+    const floaterType = PERSONALITY_TYPES.find((p) => p.id === 'floater');
+    const aiContestants = aiNames.map((name) => {
+      const personality = this.difficulty === 'easy' && floaterType && Math.random() < 0.22
+        ? { ...floaterType }
+        : null;
+      return new Contestant({
+        name,
+        difficultyBonus: this.config.aiStatBonus,
+        personality: personality || undefined
+      });
+    });
 
     // Aggression modifier from difficulty
     for (const ai of aiContestants) {
@@ -207,6 +216,7 @@ export class GameState {
     }
 
     this.contestants = shuffle([player, ...aiContestants]);
+    ensureEasyCastFloaters(this.contestants, this.difficulty);
     const all = this.contestants;
     for (const c of all) {
       c.initRelationships(all, this.config.startingTrust);

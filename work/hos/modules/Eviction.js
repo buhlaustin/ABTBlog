@@ -11,6 +11,7 @@ import {
   getNominationConsequenceLine,
   getVoteConsequenceLine
 } from './voteConsequences.js';
+import { getFloaterShieldCeremonyNote } from './floaterShields.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -71,6 +72,11 @@ export class EvictionSystem {
     if (!nominees || nominees.length === 0) {
       results.push({ type: 'system', text: 'No nominees could be selected.' });
       return { results, nominees: [] };
+    }
+
+    const floaterShieldNote = getFloaterShieldCeremonyNote(this.state, nominees);
+    if (floaterShieldNote) {
+      results.push(floaterShieldNote);
     }
 
     if (nominees.length < 2) {

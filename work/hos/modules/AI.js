@@ -5,6 +5,10 @@ import {
   sharesAllianceWith
 } from './allianceUtils.js';
 import { applyHohPersonaNominationBias, describeNominationReason } from './hohNomPersonas.js';
+import {
+  easyFloaterNominationBonus,
+  tryEasyFloaterShieldNominations
+} from './floaterShields.js';
 
 /**
  * Autonomous AI decision-making for alliances, social moves, nominations, and votes.
@@ -306,6 +310,16 @@ export class AIController {
 
     const pickWeight = (target) => this._nominationPickWeight(hoh, target);
 
+    const shieldPair = tryEasyFloaterShieldNominations(
+      this.state,
+      hoh,
+      others,
+      pickWeight
+    );
+    if (shieldPair?.length === 2) {
+      return shieldPair;
+    }
+
     const first = weightedPick(others, pickWeight);
     const remaining = others.filter((c) => c.id !== first.id);
     const second = weightedPick(remaining, pickWeight);
@@ -364,6 +378,7 @@ export class AIController {
       }
     }
 
+    score += easyFloaterNominationBonus(this.state, target);
     score = applyHohPersonaNominationBias(hoh, target, score);
 
     return Math.max(0, score);

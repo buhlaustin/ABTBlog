@@ -20,6 +20,7 @@ import {
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
 import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
+import { countCastFloaters } from './modules/floaterShields.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
 import {
   computeBattleBackScores,
@@ -167,6 +168,15 @@ class Game {
       text: 'Calendar: <strong>Fri</strong> HOH · <strong>Sat</strong> Nominations · <strong>Sun</strong> POV comp · <strong>Mon</strong> Veto meeting · <strong>Tue–Wed</strong> Strategy · <strong>Thu</strong> Eviction.',
       type: 'system'
     });
+    if (difficulty === 'easy') {
+      const floaters = countCastFloaters(this.state);
+      if (floaters >= 2) {
+        this.state.addStory({
+          text: `Easy season: <strong>${floaters} Floaters</strong> in the house — AI HOHs may nominate pawn pairs to shield bigger threats.`,
+          type: 'system'
+        });
+      }
+    }
     if (isNarrativeApiEnabled()) {
       this.state.addStory({
         text: 'Enhanced host narration is <strong>on</strong> for this session.',

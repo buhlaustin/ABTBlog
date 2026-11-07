@@ -1,5 +1,6 @@
 import { clamp } from './utils.js';
 import { PHASES } from './GameState.js';
+import { describeEasyFloaterShield } from './floaterShields.js';
 
 export const THREAT_BAND_RADAR = 32;
 export const THREAT_BAND_TARGET = 52;
@@ -214,7 +215,11 @@ export function buildThreatBandOutlook(state, previewLeans) {
     advice = 'Veto in hand: threat is up, but you hold endgame insurance.';
   }
 
-  const shield = describeNominationShield(state, player);
+  let shield = describeNominationShield(state, player);
+  const floaterShield = describeEasyFloaterShield(state);
+  if (floaterShield) {
+    shield = shield ? `${shield} ${floaterShield}` : floaterShield;
+  }
   const drivers = computeThreatDrivers(player, state);
   const { rank, total } = getThreatHouseRank(state, player);
   const nextBand = getNextThreatBandHint(player.threat);
