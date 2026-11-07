@@ -362,6 +362,65 @@ body {
   color: var(--gold, #d4af37);
 }
 
+.veto-block-panel {
+  margin: 0.45rem 0 0.65rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(212, 175, 55, 0.08);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.veto-block-panel.hidden {
+  display: none;
+}
+
+.veto-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.veto-block-title {
+  font-weight: 700;
+  color: var(--gold, #d4af37);
+}
+
+.veto-block-flag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-warm, #f0a030);
+}
+
+.veto-block-names {
+  margin: 0;
+  font-weight: 600;
+}
+
+.veto-block-meta {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.veto-block-banner {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.veto-pending-hint {
+  font-size: 0.85rem;
+  color: var(--gold, #d4af37);
+  margin: 0 0 0.65rem;
+  line-height: 1.4;
+}
+
 .story-entry strong {
   color: var(--gold);
 }

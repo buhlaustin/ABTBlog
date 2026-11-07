@@ -13,7 +13,7 @@ import {
 } from './voteConsequences.js';
 import { getFloaterShieldCeremonyNote } from './floaterShields.js';
 import { buildBackdoorCompletionLine, clearThrowCompetitionIntent } from './strategicVerbs.js';
-import { appendVetoCeremonySummary } from './vetoCeremonySummary.js';
+import { appendVetoCeremonySummary, snapshotVetoWeekBlock } from './vetoCeremonySummary.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -142,6 +142,7 @@ export class EvictionSystem {
 
   /** Sunday — POV competition only. */
   runVetoCompetition(playerWonVeto = false) {
+    snapshotVetoWeekBlock(this.state);
     const results = [];
     const { vetoPlayers } = this.getVetoSetup();
     const player = this.state.getPlayer();
@@ -195,6 +196,7 @@ export class EvictionSystem {
 
   /** Monday — veto meeting & replacement noms. */
   runVetoCeremony(vetoWinner) {
+    snapshotVetoWeekBlock(this.state);
     const results = [];
     const nominees = this.state.nominees.map((id) => this.state.getContestant(id)).filter(Boolean);
 

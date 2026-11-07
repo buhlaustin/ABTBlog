@@ -28,6 +28,11 @@ import {
   getThrowCompBanner,
   validateBackdoorNominations
 } from './modules/strategicVerbs.js';
+import {
+  buildVetoBlockBanner,
+  buildVetoBlockOutlook,
+  describePendingVetoReplacement
+} from './modules/vetoCeremonySummary.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
 import {
   computeBattleBackScores,
@@ -294,6 +299,8 @@ class Game {
     if (backdoorBanner) twistParts.push(backdoorBanner);
     const throwBanner = getThrowCompBanner(state);
     if (throwBanner) twistParts.push(throwBanner);
+    const vetoBlockBanner = buildVetoBlockBanner(state);
+    if (vetoBlockBanner) twistParts.push(vetoBlockBanner);
     const threatAlert = getThreatNominationAlert(state, previewLeans);
     if (threatAlert) twistParts.push(threatAlert);
     ui.updateTwistBanner(twistParts.join(' · '));
@@ -301,6 +308,7 @@ class Game {
     state.updateThreatLevels();
     ui.renderPlayer(state.getPlayer());
     ui.renderThreatBand(buildThreatBandOutlook(state, previewLeans));
+    ui.renderVetoBlockPanel(buildVetoBlockOutlook(state));
     ui.renderHouseguests(state.contestants, state.getPlayer(), state);
     ui.renderAlliances(state.alliances, state.getPlayer());
     const juryTwistNote = state.doubleEvictionWeekActive
@@ -1184,6 +1192,10 @@ class Game {
     let html = `<p class="hoh-nom-hint">${getPlayerHohPickerIntro(player)}</p>`;
     if (this.state.backdoorTargetId) {
       html += `<p class="backdoor-hint">${getBackdoorPlanBanner(this.state, { html: true })}</p>`;
+    }
+    const pendingVeto = describePendingVetoReplacement(this.state);
+    if (pendingVeto) {
+      html += `<p class="veto-pending-hint">${pendingVeto}</p>`;
     }
     html += '<p>Pick a replacement nominee:</p><div class="target-grid nomination-target-grid">';
     for (const t of targets) {

@@ -138,6 +138,9 @@ export class GameState {
     this.nominees = [];
     this.vetoUsed = false;
     this.vetoSavedNomineeId = null;
+    this.vetoWeekBlockSnapshot = [];
+    this.lastVetoRecapText = null;
+    this.lastVetoRecapWeek = null;
     this.vetoReplacements = [];
     this.evictedThisWeek = null;
     this.competitionWinner = null;
@@ -414,6 +417,9 @@ export class GameState {
     this.nominees = [];
     this.vetoUsed = false;
     this.vetoSavedNomineeId = null;
+    this.vetoWeekBlockSnapshot = [];
+    this.lastVetoRecapText = null;
+    this.lastVetoRecapWeek = null;
     this.vetoReplacements = [];
     this.evictedThisWeek = null;
     this.competitionWinner = null;
@@ -632,6 +638,9 @@ export class GameState {
       nominees: this.nominees,
       vetoUsed: this.vetoUsed,
       vetoSavedNomineeId: this.vetoSavedNomineeId,
+      vetoWeekBlockSnapshot: this.vetoWeekBlockSnapshot,
+      lastVetoRecapText: this.lastVetoRecapText,
+      lastVetoRecapWeek: this.lastVetoRecapWeek,
       vetoReplacements: this.vetoReplacements,
       evictedThisWeek: this.evictedThisWeek,
       competitionWinner: this.competitionWinner?.id ?? this.competitionWinner,
@@ -711,6 +720,9 @@ export class GameState {
     state.nominees = data.nominees;
     state.vetoUsed = data.vetoUsed;
     state.vetoSavedNomineeId = data.vetoSavedNomineeId ?? null;
+    state.vetoWeekBlockSnapshot = data.vetoWeekBlockSnapshot ?? [];
+    state.lastVetoRecapText = data.lastVetoRecapText ?? null;
+    state.lastVetoRecapWeek = data.lastVetoRecapWeek ?? null;
     state.vetoReplacements = data.vetoReplacements;
     state.evictedThisWeek = data.evictedThisWeek;
     state.competitionWinner = data.competitionWinner

@@ -32,6 +32,7 @@ export class UIManager {
       playerNameDisplay: document.getElementById('player-name-display'),
       playerStats: document.getElementById('player-stats'),
       threatBand: document.getElementById('threat-band'),
+      vetoBlockPanel: document.getElementById('veto-block-panel'),
       playerStatus: document.getElementById('player-status'),
       guestCount: document.getElementById('guest-count'),
       houseguestList: document.getElementById('houseguest-list'),
@@ -150,6 +151,37 @@ export class UIManager {
     if (!player.isNominated && !player.isHOH) tags.push('<span class="tag safe">Safe</span>');
 
     this.elements.playerStatus.innerHTML = tags.join('');
+  }
+
+  renderVetoBlockPanel(outlook) {
+    const el = this.elements.vetoBlockPanel;
+    if (!el) return;
+    if (!outlook?.visible) {
+      el.classList.add('hidden');
+      el.innerHTML = '';
+      return;
+    }
+    el.classList.remove('hidden');
+    const status = outlook.awaitingReplacement
+      ? '<span class="veto-block-flag">Replacement needed</span>'
+      : outlook.vetoUsed
+        ? '<span class="veto-block-flag">Veto used</span>'
+        : '';
+    const holder = outlook.vetoHolder
+      ? `<span class="veto-block-meta">Veto · ${escapeHtml(outlook.vetoHolder)}</span>`
+      : '';
+    const noms = outlook.nomineeNames?.length
+      ? outlook.nomineeNames.map((n) => escapeHtml(n)).join(' vs ')
+      : '—';
+    el.innerHTML = `
+      <div class="veto-block-head">
+        <span class="veto-block-title">Eviction block</span>
+        ${status}
+      </div>
+      <p class="veto-block-names">${noms}</p>
+      ${holder}
+      <p class="veto-block-banner">${escapeHtml(outlook.banner)}</p>
+    `;
   }
 
   renderThreatBand(outlook) {
