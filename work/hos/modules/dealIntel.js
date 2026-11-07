@@ -2,6 +2,7 @@ import { escapeHtml } from './utils.js';
 import { buildFloaterShieldIntelSection } from './floaterShields.js';
 import { buildStrategicVerbsIntelSection } from './strategicVerbs.js';
 import { buildVetoBlockIntelSection } from './vetoCeremonySummary.js';
+import { buildAllianceIntelSection } from './allianceMap.js';
 
 const PROMISE_LABELS = {
   vote: 'Vote deal',
@@ -113,6 +114,11 @@ export function buildDealIntel(state) {
   const vetoSection = buildVetoBlockIntelSection(state);
   if (vetoSection) {
     sections.push(vetoSection);
+  }
+
+  const allianceSection = buildAllianceIntelSection(state);
+  if (allianceSection) {
+    sections.push(allianceSection);
   }
 
   if (promisesByYou.active.length) {

@@ -132,6 +132,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
+| **Status** | **Shipped:** `allianceMap.js` — sidebar **table** (yours/exposed/hidden/rumor), overlap list, **Alliance map** intel section. |
 | **Goal** | Multiple `allianceIds` are hard to track in list UI. |
 | **Player experience** | Simple graph or table: members, exposed/hidden, your memberships. |
 | **Implementation** | `UI.js` panel from `GameState.alliances` + `getVisibleAlliances`. |

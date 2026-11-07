@@ -2,6 +2,7 @@ import { PHASE_LABELS, PHASES, WEEKDAYS } from './GameState.js';
 import { renderDealIntelHtml } from './dealIntel.js';
 import { getHouseguestDealMarks } from './houseguestDealMarks.js';
 import { getHouseguestFloaterMarks } from './floaterShields.js';
+import { buildAllianceMapOutlook, renderAllianceMapHtml } from './allianceMap.js';
 import { getHohNomPersonaTooltip } from './hohNomPersonas.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 
@@ -291,7 +292,13 @@ export class UIManager {
     }).join('');
   }
 
-  renderAlliances(alliances, player) {
+  renderAlliances(alliances, player, state = null) {
+    if (state) {
+      const outlook = buildAllianceMapOutlook(state);
+      this.elements.allianceOverview.innerHTML = renderAllianceMapHtml(outlook);
+      return;
+    }
+
     const visible = alliances.filter(
       (a) => a.exposed || (player?.id && a.members.includes(player.id))
     );
@@ -306,28 +313,21 @@ export class UIManager {
       return;
     }
 
-    let html = visible
-      .map((a) => {
-        const isPlayerAlliance = a.members.includes(player?.id);
-        const memberNames = a.members
-          .map((id) => {
-            const c = window.__gameContestants?.get(id);
-            return c ? c.name : 'Unknown';
-          })
-          .join(', ');
-
-        return `<div class="alliance-group ${isPlayerAlliance ? 'player-alliance' : ''}">
-        <h3>${a.name}${a.exposed && !isPlayerAlliance ? ' (exposed)' : ''}</h3>
-        <div class="alliance-members">${memberNames}</div>
-      </div>`;
-      })
-      .join('');
-
-    if (hiddenCount > 0) {
-      html += `<p class="alliance-rumor">${hiddenCount} other alliance${hiddenCount === 1 ? '' : 's'} may be active — not confirmed.</p>`;
-    }
-
-    this.elements.allianceOverview.innerHTML = html;
+    this.elements.allianceOverview.innerHTML = renderAllianceMapHtml({
+      visible: true,
+      summary: `${visible.length} known alliance${visible.length === 1 ? '' : 's'}`,
+      rows: visible.map((a) => ({
+        id: a.id,
+        name: a.name,
+        status: a.members.includes(player?.id) ? 'yours' : 'exposed',
+        statusLabel: a.members.includes(player?.id) ? 'Yours' : 'Exposed',
+        memberLabels: a.members
+          .map((id) => window.__gameContestants?.get(id)?.name ?? 'Unknown')
+          .join(', ')
+      })),
+      hiddenCount,
+      overlap: []
+    });
   }
 
   renderDealIntelPanel(outlook) {

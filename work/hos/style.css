@@ -983,6 +983,95 @@ body {
   font-size: 0.85rem;
 }
 
+.alliance-panel-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: -0.25rem 0 0.65rem;
+}
+
+.alliance-map-summary {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 0.55rem;
+}
+
+.alliance-map-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.alliance-map-table th {
+  text-align: left;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 0.35rem 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.alliance-map-table td {
+  padding: 0.45rem 0.25rem;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.alliance-map-row.alliance-status-yours td:first-child {
+  font-weight: 600;
+}
+
+.alliance-status-chip {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(139, 156, 179, 0.15);
+}
+
+.alliance-status-yours .alliance-status-chip {
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--gold, #d4af37);
+}
+
+.alliance-status-exposed .alliance-status-chip {
+  background: rgba(69, 123, 157, 0.2);
+  color: var(--info);
+}
+
+.alliance-status-rumour .alliance-status-chip {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.alliance-overlap {
+  margin-top: 0.65rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.alliance-overlap-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.alliance-overlap ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.alliance-overlap li {
+  margin-bottom: 0.25rem;
+}
+
 .alliance-group {
   margin-bottom: 0.65rem;
   padding: 0.5rem;

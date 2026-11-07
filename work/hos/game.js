@@ -310,7 +310,7 @@ class Game {
     ui.renderThreatBand(buildThreatBandOutlook(state, previewLeans));
     ui.renderVetoBlockPanel(buildVetoBlockOutlook(state));
     ui.renderHouseguests(state.contestants, state.getPlayer(), state);
-    ui.renderAlliances(state.alliances, state.getPlayer());
+    ui.renderAlliances(state.alliances, state.getPlayer(), state);
     const juryTwistNote = state.doubleEvictionWeekActive
       ? 'Double eviction this week — up to two new jurors may be seated after tonight.'
       : '';
