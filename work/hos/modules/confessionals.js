@@ -1,8 +1,111 @@
 import { escapeHtml, pickRandom } from './utils.js';
 
 /**
- * @typedef {'hoh_win' | 'hoh_nominated' | 'on_block' | 'veto_saved' | 'veto_unused' | 'evicted' | 'survived_vote' | 'betrayal'} ConfessionalEvent
+ * @typedef {'hoh_win' | 'hoh_nominated' | 'on_block' | 'veto_saved' | 'veto_unused' | 'veto_won' | 'evicted' | 'survived_vote' | 'betrayal' | 'betrayed_by' | 'alliance_formed' | 'new_promise' | 'campaign' | 'backdoor' | 'premiere'} ConfessionalEvent
  */
+
+export const CONFESSIONAL_EVENT_LABELS = {
+  hoh_win: 'HOH win',
+  hoh_nominated: 'Sent to block',
+  on_block: 'On the block',
+  veto_saved: 'Veto used',
+  veto_unused: 'Veto held',
+  veto_won: 'Won POV',
+  evicted: 'Evicted',
+  survived_vote: 'Survived vote',
+  betrayal: 'Broke a deal',
+  betrayed_by: 'Betrayed',
+  alliance_formed: 'New alliance',
+  new_promise: 'Promise',
+  campaign: 'Campaign',
+  backdoor: 'Backdoor plan',
+  premiere: 'Move-in'
+};
+
+/** @type {Record<string, ((ctx: Record<string, string>) => string)[]>} */
+const GENERIC_LINES = {
+  alliance_formed: [
+    (ctx) => `Shaking with ${ctx.partner} — this could carry me to the end.`,
+    (ctx) => `Secret deal with ${ctx.partner}. The house can’t know yet.`
+  ],
+  new_promise: [
+    (ctx) => `Promised ${ctx.partner} my vote — hope they hold up their end.`,
+    (ctx) => `Made a ${ctx.dealType || 'deal'} with ${ctx.partner}. That’s binding.`
+  ],
+  campaign: [
+    (ctx) => `The house is turning on ${ctx.target} — I started that fire.`,
+    (ctx) => `${ctx.target} is the villain this week. I need it to stick.`
+  ],
+  backdoor: [
+    (ctx) => `Backdoor is set on ${ctx.target} — pawns first, truth later.`,
+    (ctx) => `${ctx.target} won’t see the block coming if this works.`
+  ],
+  betrayed_by: [
+    (ctx) => `${ctx.betrayer} flipped — I won’t forget it.`,
+    (ctx) => `I trusted ${ctx.betrayer}. That was the mistake.`
+  ],
+  veto_won: [
+    () => 'Golden veto in my hands — someone’s getting saved or I’m saving myself.',
+    () => 'POV win. The block just became negotiable.'
+  ],
+  premiere: [
+    () => 'First day energy — smile now, strategize in the shower.',
+    () => 'Nobody knows my game yet. That’s the advantage.'
+  ]
+};
+
+/** Player diary lines override archetype templates when `speaker.isPlayer`. */
+/** @type {Record<string, ((ctx: Record<string, string>) => string)[]>} */
+const PLAYER_LINES = {
+  hoh_win: [
+    () => 'I’ve got the keys — every nom has to serve my game.',
+    () => 'HOH was the plan. Now I have to look like it wasn’t.'
+  ],
+  hoh_nominated: [
+    (ctx) => `Putting ${ctx.a} and ${ctx.b} up — brutal, but necessary.`,
+    (ctx) => `${ctx.a} and ${ctx.b} drew the short sticks. I hate it, I need it.`
+  ],
+  on_block: [
+    (ctx) => `On the block with ${ctx.other} — I need votes tonight.`,
+    () => 'I did not come here to be the first boot.'
+  ],
+  veto_saved: [
+    (ctx) => `Used the veto on ${ctx.saved} — the house will talk.`,
+    () => 'Veto burned. Worth it.'
+  ],
+  veto_unused: [
+    () => 'Holding the veto — the block stays messy on purpose.',
+    () => 'Didn’t use it. Let them sweat.'
+  ],
+  evicted: [
+    () => 'My game is over — jury, remember who played.',
+    () => 'Evicted. I gave this house everything.'
+  ],
+  survived_vote: [
+    (ctx) => `Stayed over ${ctx.other} — I’m still in control.`,
+    () => 'Another vote survived. They’ll come for me again.'
+  ],
+  betrayal: [
+    (ctx) => `Had to break my word to ${ctx.target} — survival first.`,
+    (ctx) => `${ctx.target} was a liability. Sorry, not sorry.`
+  ],
+  alliance_formed: [
+    (ctx) => `New secret deal with ${ctx.partner} — separate from everything else.`,
+    () => 'Another alliance chip in my pocket.'
+  ],
+  new_promise: [
+    (ctx) => `Locked a ${ctx.dealType || 'deal'} with ${ctx.partner}. I’ll honor it… for now.`,
+    () => 'Promises are currency. I just spent some.'
+  ],
+  campaign: [
+    (ctx) => `Campaign against ${ctx.target} is working — threat’s worth it.`,
+    () => 'Whisper game strong. The house is moving my way.'
+  ],
+  backdoor: [
+    (ctx) => `Backdoor lane open on ${ctx.target} — don’t blow this.`,
+    () => 'Pawns, veto, replacement — I’ve got the route mapped.'
+  ]
+};
 
 /** @type {Record<string, Record<ConfessionalEvent, ((ctx: Record<string, string>, speaker: import('./Contestant.js').Contestant) => string)[]>>} */
 const CONFESSIONAL_LINES = {
@@ -252,24 +355,79 @@ const CONFESSIONAL_LINES = {
  * @param {Record<string, string>} [ctx]
  */
 export function pickConfessionalLine(speaker, eventKey, ctx = {}) {
+  if (speaker.isPlayer && PLAYER_LINES[eventKey]?.length) {
+    const playerTemplate = pickRandom(PLAYER_LINES[eventKey]);
+    return typeof playerTemplate === 'function'
+      ? playerTemplate(ctx, speaker)
+      : playerTemplate;
+  }
+
   const strat = speaker.personality?.strategy || 'survive';
-  const bucket =
+  let bucket =
     CONFESSIONAL_LINES[strat]?.[eventKey] ||
     CONFESSIONAL_LINES.survive[eventKey];
+  if (!bucket?.length) {
+    bucket = GENERIC_LINES[eventKey];
+  }
   if (!bucket?.length) return null;
   const template = pickRandom(bucket);
   return typeof template === 'function' ? template(ctx, speaker) : template;
 }
 
 /**
+ * @param {import('./GameState.js').GameState} state
+ */
+export function getConfessionalFeedBanner(state) {
+  const last = state.confessionalLog?.[state.confessionalLog.length - 1];
+  if (!last) return '';
+  const label = CONFESSIONAL_EVENT_LABELS[last.eventKey] || 'Diary';
+  const snippet =
+    last.line.length > 42 ? `${last.line.slice(0, 40)}…` : last.line;
+  return `Confessional · ${last.speakerName} (${label}): “${snippet}”`;
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ * @param {string} speakerId
+ * @param {string} eventKey
+ */
+export function shouldSkipConfessional(state, speakerId, eventKey) {
+  const key = `${state.week}:${state.day}:${speakerId}:${eventKey}`;
+  const seen = state.confessionalDedupeKeys || [];
+  if (seen.includes(key)) return true;
+  return false;
+}
+
+/**
+ * @param {import('./GameState.js').GameState} state
+ * @param {string} speakerId
+ * @param {string} eventKey
+ */
+export function markConfessionalPlayed(state, speakerId, eventKey) {
+  if (!state.confessionalDedupeKeys) state.confessionalDedupeKeys = [];
+  const key = `${state.week}:${state.day}:${speakerId}:${eventKey}`;
+  if (!state.confessionalDedupeKeys.includes(key)) {
+    state.confessionalDedupeKeys.push(key);
+  }
+  if (state.confessionalDedupeKeys.length > 40) {
+    state.confessionalDedupeKeys = state.confessionalDedupeKeys.slice(-40);
+  }
+}
+
+/**
  * @param {import('./Contestant.js').Contestant} speaker
  * @param {string} line
  */
-export function buildConfessionalEntry(speaker, line) {
+export function buildConfessionalEntry(speaker, line, eventKey = null) {
+  const arch = speaker.personality?.name;
+  const who = arch && !speaker.isPlayer
+    ? `${speaker.name} (${arch})`
+    : speaker.name;
   return {
     type: 'confessional',
     confessionalSpeakerId: speaker.id,
-    text: `Confessional — <strong>${escapeHtml(speaker.name)}</strong>: “${escapeHtml(line)}”`
+    confessionalEvent: eventKey,
+    text: `Confessional — <strong>${escapeHtml(who)}</strong>: “${escapeHtml(line)}”`
   };
 }
 
@@ -283,18 +441,29 @@ export function buildConfessionalIntelSection(state) {
   const log = state.confessionalLog || [];
   if (!log.length) return null;
 
+  const thisWeek = log.filter((r) => r.week === state.week).length;
+
   return {
     id: 'confessionals',
     title: 'Confessionals',
     tone: 'neutral',
-    items: log
-      .slice(-4)
-      .reverse()
-      .map((row) => ({
-        key: `conf-${row.week}-${row.day}-${row.speakerId}`,
-        name: row.speakerName,
-        detail: row.line
-      }))
+    items: [
+      ...(thisWeek
+        ? [{
+          key: 'conf-week-count',
+          name: 'This week',
+          detail: `${thisWeek} diary line${thisWeek === 1 ? '' : 's'} in the feed.`
+        }]
+        : []),
+      ...log
+        .slice(-5)
+        .reverse()
+        .map((row) => ({
+          key: `conf-${row.week}-${row.day}-${row.speakerId}-${row.eventKey || 'x'}`,
+          name: row.speakerName,
+          detail: `${CONFESSIONAL_EVENT_LABELS[row.eventKey] || row.eventKey || 'Diary'} · “${row.line}”`
+        }))
+    ].slice(0, 7)
   };
 }
 
@@ -303,13 +472,16 @@ export function buildConfessionalIntelSection(state) {
  * @param {import('./Contestant.js').Contestant} speaker
  * @param {string} line
  */
-export function recordConfessional(state, speaker, line) {
+export function recordConfessional(state, speaker, line, eventKey = null, source = 'local') {
   if (!state.confessionalLog) state.confessionalLog = [];
   state.confessionalLog.push({
     week: state.week,
     day: state.day,
     speakerId: speaker.id,
     speakerName: speaker.name,
+    eventKey,
+    source,
+    archetype: speaker.personality?.name || null,
     line
   });
   if (state.confessionalLog.length > 12) {

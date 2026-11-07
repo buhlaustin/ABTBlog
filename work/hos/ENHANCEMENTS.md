@@ -166,7 +166,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Status** | **Shipped:** `confessionals.js` — personality **templates** after HOH win, nominations, veto, eviction, broken deals; optional **`confessional`** narrate kind; **Deals → Confessionals** log. |
+| **Status** | **Shipped (v2):** v1 plus **player** diary overrides; **alliance / promise / campaign / backdoor / POV win / premiere / AI betrayal** hooks; **both nominees** on the block; dedupe; **feed banner**; intel labels + week count; archetype tags. |
 | **Goal** | Short flavor after big moves. |
 | **Player experience** | “Confessional — Riley: ‘I had to put them up; they’re coming for me next.’” |
 | **Implementation** | Template + personality from `Contestant`; optional LLM beat. |

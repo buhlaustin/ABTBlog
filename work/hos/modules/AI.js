@@ -298,7 +298,19 @@ export class AIController {
 
     return {
       type: 'drama',
-      text: `${betrayer.name} betrayed their alliance with ${victim.name}! The house is reeling.`
+      text: `${betrayer.name} betrayed their alliance with ${victim.name}! The house is reeling.`,
+      confessionalExtras: [
+        {
+          speaker: betrayer,
+          eventKey: 'betrayal',
+          ctx: { target: victim.name }
+        },
+        {
+          speaker: victim,
+          eventKey: 'betrayed_by',
+          ctx: { betrayer: betrayer.name }
+        }
+      ]
     };
   }
 

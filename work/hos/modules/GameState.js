@@ -140,6 +140,8 @@ export class GameState {
     this.confessionalPayload = null;
     /** Recent confessional lines for intel panel. */
     this.confessionalLog = [];
+    /** Dedupe keys week:day:speaker:event. */
+    this.confessionalDedupeKeys = [];
 
     this.lastPawnShieldWeek = null;
     this.lastPawnShieldNomineeNames = [];
@@ -656,6 +658,7 @@ export class GameState {
       lastHostBeatKind: this.lastHostBeatKind,
       lastHostBeatSource: this.lastHostBeatSource,
       confessionalLog: this.confessionalLog,
+      confessionalDedupeKeys: this.confessionalDedupeKeys,
       lastPawnShieldWeek: this.lastPawnShieldWeek,
       lastPawnShieldNomineeNames: this.lastPawnShieldNomineeNames,
       lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
@@ -745,6 +748,7 @@ export class GameState {
     state.lastHostBeatKind = data.lastHostBeatKind ?? null;
     state.lastHostBeatSource = data.lastHostBeatSource ?? null;
     state.confessionalLog = data.confessionalLog ?? [];
+    state.confessionalDedupeKeys = data.confessionalDedupeKeys ?? [];
     state.lastPawnShieldWeek = data.lastPawnShieldWeek ?? null;
     state.lastPawnShieldNomineeNames = data.lastPawnShieldNomineeNames ?? [];
     state.lastPawnShieldNomineeIds = data.lastPawnShieldNomineeIds ?? [];

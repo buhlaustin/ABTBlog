@@ -321,10 +321,23 @@ export class PlayerActions {
       player.trust = clamp(player.trust + 5, 0, 100);
 
       this._consumeAction();
+      const extras = target.isPlayer
+        ? []
+        : [{
+          speaker: target,
+          eventKey: 'alliance_formed',
+          ctx: { partner: player.name }
+        }];
       return {
         success: true,
         text: `${target.name} shook on a new secret alliance with you — separate from any other deals in the house.`,
-        type: 'success'
+        type: 'success',
+        confessional: {
+          speaker: player,
+          eventKey: 'alliance_formed',
+          ctx: { partner: target.name }
+        },
+        confessionalExtras: extras
       };
     }
 
@@ -463,7 +476,12 @@ export class PlayerActions {
     return {
       success: true,
       text: promises[promiseType] || promises.vote,
-      type: 'narrative'
+      type: 'narrative',
+      confessional: {
+        speaker: player,
+        eventKey: 'new_promise',
+        ctx: { partner: target.name, dealType: promiseType }
+      }
     };
   }
 
@@ -519,7 +537,7 @@ export class PlayerActions {
     const base = influenced > 0
       ? `Your whisper campaign against ${target.name} landed with ${influenced} houseguest(s) ${this._phaseFlavor()}.`
       : `Your shots at ${target.name} bounced off — for now.`;
-    return {
+    const result = {
       success: true,
       text: `${base} ${threatLine}`,
       threatFeedback: {
@@ -530,6 +548,14 @@ export class PlayerActions {
       },
       type: 'drama'
     };
+    if (influenced > 0) {
+      result.confessional = {
+        speaker: player,
+        eventKey: 'campaign',
+        ctx: { target: target.name }
+      };
+    }
+    return result;
   }
 
   _influenceVotes(player, target) {
@@ -702,7 +728,12 @@ export class PlayerActions {
     return {
       success: true,
       text: `Backdoor set on <strong>${target.name}</strong> — nominate pawns, win or trigger veto, then name them as the replacement.`,
-      type: 'drama'
+      type: 'drama',
+      confessional: {
+        speaker: player,
+        eventKey: 'backdoor',
+        ctx: { target: target.name }
+      }
     };
   }
 

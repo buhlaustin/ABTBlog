@@ -25,8 +25,11 @@ import {
 } from './modules/hostPhaseBeats.js';
 import {
   buildConfessionalEntry,
+  getConfessionalFeedBanner,
+  markConfessionalPlayed,
   pickConfessionalLine,
-  recordConfessional
+  recordConfessional,
+  shouldSkipConfessional
 } from './modules/confessionals.js';
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
@@ -63,7 +66,7 @@ import {
   getNomTargetLensLabel,
   getPlayerHohPickerIntro
 } from './modules/hohNomPersonas.js';
-import { aiCountForCast, escapeHtml, randomInt, totalCastSize } from './modules/utils.js';
+import { aiCountForCast, escapeHtml, pickRandom, randomInt, totalCastSize } from './modules/utils.js';
 
 class Game {
   constructor() {
@@ -207,6 +210,10 @@ class Game {
       });
     }
     void this._appendHostBeat('premiere_move_in');
+    const cast = this.state.getActiveContestants().filter((c) => !c.isPlayer);
+    if (cast.length) {
+      void this._appendConfessional(pickRandom(cast), 'premiere');
+    }
 
     this.ui.showGame();
     this.render();
@@ -314,6 +321,8 @@ class Game {
     if (layLowBanner) twistParts.push(layLowBanner);
     const hostScheduleBanner = getHostScheduleBanner(state);
     if (hostScheduleBanner) twistParts.push(hostScheduleBanner);
+    const confessionalBanner = getConfessionalFeedBanner(state);
+    if (confessionalBanner) twistParts.push(confessionalBanner);
     const vetoBlockBanner = buildVetoBlockBanner(state);
     if (vetoBlockBanner) twistParts.push(vetoBlockBanner);
     const threatAlert = getThreatNominationAlert(state, previewLeans);
@@ -349,6 +358,7 @@ class Game {
    */
   async _appendConfessional(speaker, eventKey, ctx = {}) {
     if (!speaker) return;
+    if (shouldSkipConfessional(this.state, speaker.id, eventKey)) return;
 
     this.state.confessionalPayload = {
       speakerName: speaker.name,
@@ -359,9 +369,13 @@ class Game {
     };
 
     let line = null;
+    let source = 'local';
     if (isNarrativeApiEnabled()) {
       const beat = await fetchNarrativeBeat('confessional', this.state);
-      if (beat?.text) line = beat.text;
+      if (beat?.text) {
+        line = beat.text;
+        source = 'api';
+      }
     }
     this.state.confessionalPayload = null;
 
@@ -370,8 +384,21 @@ class Game {
     }
     if (!line) return;
 
-    recordConfessional(this.state, speaker, line);
-    this.logAndRender([buildConfessionalEntry(speaker, line)]);
+    markConfessionalPlayed(this.state, speaker.id, eventKey);
+    recordConfessional(this.state, speaker, line, eventKey, source);
+    this.logAndRender([buildConfessionalEntry(speaker, line, eventKey)]);
+  }
+
+  _flushConfessionalsFromEntries(entries) {
+    for (const entry of entries) {
+      if (entry.confessional) {
+        const c = entry.confessional;
+        void this._appendConfessional(c.speaker, c.eventKey, c.ctx || {});
+      }
+      for (const extra of entry.confessionalExtras || []) {
+        void this._appendConfessional(extra.speaker, extra.eventKey, extra.ctx || {});
+      }
+    }
   }
 
   /**
@@ -454,6 +481,7 @@ class Game {
     }
     this.ui.addStoryEntries(entries);
     this.render();
+    this._flushConfessionalsFromEntries(entries);
   }
 
   runPhase() {
@@ -800,16 +828,16 @@ class Game {
     }
 
     if (result.text) {
-      this.logAndRender([{ text: result.text, type: result.type || 'narrative' }]);
+      this.logAndRender([{
+        text: result.text,
+        type: result.type || 'narrative',
+        confessional: result.confessional,
+        confessionalExtras: result.confessionalExtras
+      }]);
     }
 
     if (result.threatFeedback) {
       this.ui.pulseThreatFeedback(result.threatFeedback);
-    }
-
-    if (result.confessional) {
-      const c = result.confessional;
-      void this._appendConfessional(c.speaker, c.eventKey, c.ctx || {});
     }
 
     this._exposeGlobals();
@@ -1059,7 +1087,7 @@ class Game {
     await this._appendHostBeat('nomination_ceremony', { hoh, nominees });
     this.state.nominationLeanNames = [];
     if (hoh && nominees.length >= 2) {
-      await this._appendConfessionals([
+      const batch = [
         {
           speaker: hoh,
           eventKey: 'hoh_nominated',
@@ -1069,8 +1097,14 @@ class Game {
           speaker: nominees[0],
           eventKey: 'on_block',
           ctx: { other: nominees[1].name, hoh: hoh.name }
+        },
+        {
+          speaker: nominees[1],
+          eventKey: 'on_block',
+          ctx: { other: nominees[0].name, hoh: hoh.name }
         }
-      ]);
+      ];
+      await this._appendConfessionals(batch);
     }
   }
 
@@ -1217,6 +1251,12 @@ class Game {
     const result = this.eviction.runVetoCompetition(playerWonVeto);
     this.logAndRender(result.results);
     await this._appendHostBeat('veto_competition_result');
+    const holder = this.state.vetoHolderId
+      ? this.state.getContestant(this.state.vetoHolderId)
+      : null;
+    if (holder) {
+      await this._appendConfessional(holder, 'veto_won');
+    }
     this._onHouseEventComplete();
   }
 
