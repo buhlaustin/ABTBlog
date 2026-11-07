@@ -88,7 +88,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
-| **Status** | **Shipped:** `threatBands.js` + `#threat-band` panel; advice for under/radar/target; Easy/Normal/Hard nomination-shield copy; Rest shows threat delta; `updateThreatLevels()` before player render. |
+| **Status** | **Shipped (v2):** Band meter (32/52 ticks), top threat drivers, house rank + week delta, nomination **threat alert** in header; `threatOffset` for Rest/Campaign; `formatThreatChange` log copy. |
 | **Goal** | Tie UI to easy’s threat-scaled nomination protection. |
 | **Player experience** | Bands: Under radar / On the radar / Big target, with one sentence of advice. |
 | **Implementation** | `Contestant.threat` thresholds in `UI.js`; update after `updateThreatLevels()`. |
@@ -138,6 +138,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
+| **Status** | **Shipped:** `formatThreatChange` + persistent `threatOffset` so lay-low sticks until recalc/week decay. |
 | **Goal** | `rest` lowers threat; player should see delta. |
 | **Player experience** | “Threat −4 (now 32 — Under the radar).” |
 | **Implementation** | Return structure from `PlayerActions`; `logAndRender` on success. |

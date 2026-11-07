@@ -19,7 +19,7 @@ import {
 } from './modules/NarrativeApi.js';
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
-import { buildThreatBandOutlook } from './modules/threatBands.js';
+import { buildThreatBandOutlook, getThreatNominationAlert } from './modules/threatBands.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
 import {
   computeBattleBackScores,
@@ -268,13 +268,16 @@ class Game {
     const { state, ui } = this;
     ui.updateWeekDay(state.week, state.weekdayIndex, state.phase, state.getPhaseDisplayLabel());
     const twistParts = [getTwistRulesBanner(state)];
-    const hohWatch = getHohWatchBanner(state, (hoh, limit) => this.ai.previewNominationLeans(hoh, limit));
+    const previewLeans = (hoh, limit) => this.ai.previewNominationLeans(hoh, limit);
+    const hohWatch = getHohWatchBanner(state, previewLeans);
     if (hohWatch) twistParts.push(hohWatch);
+    const threatAlert = getThreatNominationAlert(state, previewLeans);
+    if (threatAlert) twistParts.push(threatAlert);
     ui.updateTwistBanner(twistParts.join(' · '));
     ui.renderStoryLog(state.storyLog);
     state.updateThreatLevels();
     ui.renderPlayer(state.getPlayer());
-    ui.renderThreatBand(buildThreatBandOutlook(state));
+    ui.renderThreatBand(buildThreatBandOutlook(state, previewLeans));
     ui.renderHouseguests(state.contestants, state.getPlayer());
     ui.renderAlliances(state.alliances, state.getPlayer());
     const juryTwistNote = state.doubleEvictionWeekActive

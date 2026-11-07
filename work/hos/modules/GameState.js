@@ -118,6 +118,10 @@ export class GameState {
     this.history = [];
     this.storyLog = [];
 
+    /** Player threat at week open — for band panel week delta. */
+    this.playerThreatWeekStart = null;
+    this.playerThreatWeekSnapshotWeek = null;
+
     this.currentHOH = null;
     this.nominees = [];
     this.vetoUsed = false;
@@ -538,6 +542,16 @@ export class GameState {
     this.syncPhaseForWeekday();
     this.evaluateDoubleEvictionWeek();
     evaluateTwistsForNewWeek(this);
+    for (const c of this.getActiveContestants()) {
+      if (c.threatOffset) {
+        c.threatOffset = Math.round(c.threatOffset * 0.5);
+        if (Math.abs(c.threatOffset) < 1) c.threatOffset = 0;
+      }
+    }
+    this.updateThreatLevels();
+    const player = this.getPlayer();
+    this.playerThreatWeekStart = player?.threat ?? null;
+    this.playerThreatWeekSnapshotWeek = this.week;
   }
 
   checkWinCondition() {
@@ -581,6 +595,8 @@ export class GameState {
       alliances: this.alliances,
       history: this.history,
       storyLog: this.storyLog,
+      playerThreatWeekStart: this.playerThreatWeekStart,
+      playerThreatWeekSnapshotWeek: this.playerThreatWeekSnapshotWeek,
       currentHOH: this.currentHOH?.id ?? this.currentHOH,
       nominees: this.nominees,
       vetoUsed: this.vetoUsed,
@@ -649,6 +665,8 @@ export class GameState {
     state.alliances = data.alliances;
     state.history = data.history;
     state.storyLog = data.storyLog;
+    state.playerThreatWeekStart = data.playerThreatWeekStart ?? null;
+    state.playerThreatWeekSnapshotWeek = data.playerThreatWeekSnapshotWeek ?? null;
     state.currentHOH = data.currentHOH
       ? state.contestants.find((c) => c.id === data.currentHOH) || data.currentHOH
       : null;

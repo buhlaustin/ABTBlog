@@ -43,6 +43,8 @@ export class Contestant {
     this.relationships = {}; // id -> score (-100 to 100)
     this.trust = 50; // house-wide trust in this person
     this.threat = 10;
+    /** Lay-low / campaign adjustments applied after base threat calc. */
+    this.threatOffset = 0;
     this.reputation = 50; // how the house perceives them
     /** @type {string[]} Secret alliance memberships (multiple pairwise / group deals). */
     this.allianceIds = [];
@@ -118,6 +120,7 @@ export class Contestant {
     if (avgRel > 30) threat += 10;
     if (avgRel < -20) threat -= 5;
 
+    threat += this.threatOffset ?? 0;
     this.threat = clamp(Math.round(threat), 0, 100);
   }
 
@@ -176,6 +179,7 @@ export class Contestant {
       relationships: { ...this.relationships },
       trust: this.trust,
       threat: this.threat,
+      threatOffset: this.threatOffset ?? 0,
       reputation: this.reputation,
       allianceIds: [...(this.allianceIds || [])],
       allianceId: this.allianceId,
@@ -212,6 +216,7 @@ export class Contestant {
       relationships: { ...data.relationships },
       trust: data.trust,
       threat: data.threat,
+      threatOffset: data.threatOffset ?? 0,
       reputation: data.reputation,
       allianceIds: data.allianceIds?.length
         ? [...data.allianceIds]

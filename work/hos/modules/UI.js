@@ -162,15 +162,60 @@ export class UIManager {
     }
 
     el.classList.remove('hidden');
-    const shield = outlook.shield
-      ? `<p class="threat-band-shield">${outlook.shield}</p>`
+
+    const alert = outlook.nominationAlert
+      ? `<p class="threat-band-alert">${escapeHtml(outlook.nominationAlert)}</p>`
       : '';
+
+    const metaParts = [];
+    if (outlook.houseTotal > 1) {
+      metaParts.push(`#${outlook.houseRank} threat in the house`);
+    }
+    if (typeof outlook.weekDelta === 'number' && outlook.weekDelta !== 0) {
+      const sign = outlook.weekDelta > 0 ? '+' : '−';
+      metaParts.push(`${sign}${Math.abs(outlook.weekDelta)} this week`);
+    } else if (typeof outlook.weekDelta === 'number') {
+      metaParts.push('Flat this week');
+    }
+    if (outlook.nextBand) {
+      metaParts.push(outlook.nextBand);
+    }
+    const meta = metaParts.length
+      ? `<p class="threat-band-meta">${metaParts.map((p) => escapeHtml(p)).join(' · ')}</p>`
+      : '';
+
+    const radarPct = outlook.radarAt ?? 32;
+    const targetPct = outlook.targetAt ?? 52;
+    const meter = `
+      <div class="threat-band-meter" role="img" aria-label="Threat ${outlook.threat} of 100">
+        <div class="threat-band-meter-track">
+          <span class="threat-band-tick threat-band-tick-radar" style="left:${radarPct}%"></span>
+          <span class="threat-band-tick threat-band-tick-target" style="left:${targetPct}%"></span>
+          <div class="threat-band-meter-fill threat-tone-${outlook.tone}" style="width:${outlook.threat}%"></div>
+        </div>
+      </div>`;
+
+    const drivers = outlook.drivers?.length
+      ? `<ul class="threat-band-drivers">${outlook.drivers.map((d) => {
+        const sign = d.pts > 0 ? '+' : '';
+        return `<li title="Threat driver">${escapeHtml(d.label)} <span class="threat-driver-pts">${sign}${d.pts}</span></li>`;
+      }).join('')}</ul>`
+      : '';
+
+    const shield = outlook.shield
+      ? `<p class="threat-band-shield">${escapeHtml(outlook.shield)}</p>`
+      : '';
+
     el.innerHTML = `
       <div class="threat-band-head threat-tone-${outlook.tone}">
         <span class="threat-band-label">${escapeHtml(outlook.label)}</span>
         <span class="threat-band-score">${outlook.threat}</span>
       </div>
+      ${alert}
+      ${meter}
+      ${meta}
       <p class="threat-band-advice">${escapeHtml(outlook.advice)}</p>
+      ${drivers}
       ${shield}
     `;
   }

@@ -7,6 +7,7 @@ import {
 } from './allianceUtils.js';
 import { addMvpCampaignPoints, getMvpRaceLeader } from './SeasonTwists.js';
 import { formatHohNomIntelLine } from './hohNomPersonas.js';
+import { formatThreatChange } from './threatBands.js';
 
 /**
  * Player-initiated actions during the social phase.
@@ -439,15 +440,19 @@ export class PlayerActions {
     }
 
     target.reputation = clamp(target.reputation - randomInt(3, 8), 0, 100);
-    player.threat = clamp(player.threat + 5, 0, 100);
+    const threatBefore = player.threat;
+    player.threatOffset = clamp((player.threatOffset ?? 0) + 5, -25, 25);
+    this.state.updateThreatLevels?.();
+    const threatLine = formatThreatChange(threatBefore, player.threat);
     target.addGrudge(player.id, 'campaign', 15);
 
     this._consumeAction();
+    const base = influenced > 0
+      ? `Your whisper campaign against ${target.name} landed with ${influenced} houseguest(s) ${this._phaseFlavor()}.`
+      : `Your shots at ${target.name} bounced off — for now.`;
     return {
       success: true,
-      text: influenced > 0
-        ? `Your whisper campaign against ${target.name} landed with ${influenced} houseguest(s) ${this._phaseFlavor()}.`
-        : `Your shots at ${target.name} bounced off — for now.`,
+      text: `${base} ${threatLine}`,
       type: 'drama'
     };
   }
@@ -497,13 +502,13 @@ export class PlayerActions {
   _rest(player) {
     const before = player.threat;
     const delta = randomInt(3, 6);
-    player.threat = clamp(player.threat - delta, 0, 100);
+    player.threatOffset = clamp((player.threatOffset ?? 0) - delta, -25, 0);
     this.state.updateThreatLevels?.();
     const after = player.threat;
     this._consumeAction();
     return {
       success: true,
-      text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first. Threat ${before} → ${after} (−${before - after}).`,
+      text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first. ${formatThreatChange(before, after)}`,
       type: 'system'
     };
   }
