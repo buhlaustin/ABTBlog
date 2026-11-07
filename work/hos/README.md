@@ -37,6 +37,10 @@ Then visit `http://localhost:8080`.
 - Three difficulty levels
 - Endgame summary explaining your win or loss
 
+## Roadmap
+
+Future feature specs (move-in premiere, jury UI, Playwright coverage, etc.) are in [ENHANCEMENTS.md](./ENHANCEMENTS.md).
+
 ## Project Structure
 
 ```

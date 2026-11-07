@@ -334,14 +334,19 @@ class Game {
   runEventDaySocialPhase() {
     const dayName = this.state.getWeekdayName();
     const eventLabel = PHASE_LABELS[this.state.phase] || 'House event';
-    this.ui.setActionPrompt(
-      `${dayName} — ${eventLabel}. Mingle in the house, then begin the live event when you're ready.`
-    );
+    const isMoveInHoh =
+      this.state.week === 1
+      && this.state.weekdayIndex === 0
+      && this.state.phase === PHASES.COMPETITION;
+    const mingleLine = isMoveInHoh
+      ? 'Move-in day — tour the house, meet the cast, and use your actions. When you\'re ready, start the first Head of Household competition.'
+      : `${dayName} — ${eventLabel}. Mingle in the house, then begin the live event when you're ready.`;
+    this.ui.setActionPrompt(mingleLine);
     const actions = [
       {
         id: 'begin_house_event',
-        label: `Begin ${dayName} live event`,
-        description: eventLabel
+        label: isMoveInHoh ? 'Begin first HOH competition' : `Begin ${dayName} live event`,
+        description: isMoveInHoh ? 'Head of Household — live' : eventLabel
       },
       ...this.playerActions.getAvailableActions()
     ];
