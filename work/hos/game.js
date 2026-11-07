@@ -19,6 +19,7 @@ import {
 } from './modules/NarrativeApi.js';
 import { buildDealIntel } from './modules/dealIntel.js';
 import { getEvictionVoteDealWarning } from './modules/voteConsequences.js';
+import { buildThreatBandOutlook } from './modules/threatBands.js';
 import { buildJuryOutlook } from './modules/juryOutlook.js';
 import {
   computeBattleBackScores,
@@ -271,7 +272,9 @@ class Game {
     if (hohWatch) twistParts.push(hohWatch);
     ui.updateTwistBanner(twistParts.join(' · '));
     ui.renderStoryLog(state.storyLog);
+    state.updateThreatLevels();
     ui.renderPlayer(state.getPlayer());
+    ui.renderThreatBand(buildThreatBandOutlook(state));
     ui.renderHouseguests(state.contestants, state.getPlayer());
     ui.renderAlliances(state.alliances, state.getPlayer());
     const juryTwistNote = state.doubleEvictionWeekActive
@@ -279,7 +282,6 @@ class Game {
       : '';
     ui.renderDealIntelPanel(buildDealIntel(state));
     ui.renderJuryPanel(buildJuryOutlook(state), state.getPlayer(), juryTwistNote);
-    state.updateThreatLevels();
   }
 
   async _appendAiNarrative(kind) {

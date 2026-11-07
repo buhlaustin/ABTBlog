@@ -30,6 +30,7 @@ export class UIManager {
       storyLog: document.getElementById('story-log'),
       playerNameDisplay: document.getElementById('player-name-display'),
       playerStats: document.getElementById('player-stats'),
+      threatBand: document.getElementById('threat-band'),
       playerStatus: document.getElementById('player-status'),
       guestCount: document.getElementById('guest-count'),
       houseguestList: document.getElementById('houseguest-list'),
@@ -148,6 +149,30 @@ export class UIManager {
     if (!player.isNominated && !player.isHOH) tags.push('<span class="tag safe">Safe</span>');
 
     this.elements.playerStatus.innerHTML = tags.join('');
+  }
+
+  renderThreatBand(outlook) {
+    const el = this.elements.threatBand;
+    if (!el) return;
+
+    if (!outlook?.visible) {
+      el.classList.add('hidden');
+      el.innerHTML = '';
+      return;
+    }
+
+    el.classList.remove('hidden');
+    const shield = outlook.shield
+      ? `<p class="threat-band-shield">${outlook.shield}</p>`
+      : '';
+    el.innerHTML = `
+      <div class="threat-band-head threat-tone-${outlook.tone}">
+        <span class="threat-band-label">${escapeHtml(outlook.label)}</span>
+        <span class="threat-band-score">${outlook.threat}</span>
+      </div>
+      <p class="threat-band-advice">${escapeHtml(outlook.advice)}</p>
+      ${shield}
+    `;
   }
 
   renderHouseguests(contestants, player) {

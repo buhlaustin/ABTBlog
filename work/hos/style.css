@@ -632,6 +632,61 @@ body {
   line-height: 1.2;
 }
 
+/* Threat band (player panel) */
+.threat-band {
+  margin: 0.5rem 0 0.65rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-dark);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.threat-band.hidden {
+  display: none;
+}
+
+.threat-band-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.threat-band-score {
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+.threat-tone-low .threat-band-label {
+  color: #6bc98a;
+}
+
+.threat-tone-mid .threat-band-label {
+  color: var(--accent-warm, #f0a030);
+}
+
+.threat-tone-high .threat-band-label {
+  color: #e07070;
+}
+
+.threat-band-advice {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.threat-band-shield {
+  margin: 0.4rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 0.35rem;
+}
+
 /* Jury sidebar */
 .jury-panel.hidden {
   display: none;

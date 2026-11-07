@@ -495,11 +495,15 @@ export class PlayerActions {
   }
 
   _rest(player) {
-    player.threat = clamp(player.threat - randomInt(3, 6), 0, 100);
+    const before = player.threat;
+    const delta = randomInt(3, 6);
+    player.threat = clamp(player.threat - delta, 0, 100);
+    this.state.updateThreatLevels?.();
+    const after = player.threat;
     this._consumeAction();
     return {
       success: true,
-      text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first.`,
+      text: `You watched from the corners ${this._phaseFlavor()}, letting everyone else talk first. Threat ${before} → ${after} (−${before - after}).`,
       type: 'system'
     };
   }

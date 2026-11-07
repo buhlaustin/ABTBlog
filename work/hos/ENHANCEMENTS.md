@@ -88,6 +88,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 
 | Field | Detail |
 |--------|--------|
+| **Status** | **Shipped:** `threatBands.js` + `#threat-band` panel; advice for under/radar/target; Easy/Normal/Hard nomination-shield copy; Rest shows threat delta; `updateThreatLevels()` before player render. |
 | **Goal** | Tie UI to easy’s threat-scaled nomination protection. |
 | **Player experience** | Bands: Under radar / On the radar / Big target, with one sentence of advice. |
 | **Implementation** | `Contestant.threat` thresholds in `UI.js`; update after `updateThreatLevels()`. |
