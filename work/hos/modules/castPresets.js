@@ -1,12 +1,15 @@
 import {
   CAST_PRESETS,
+  DEFAULT_DOUBLE_EVICTION_AT,
   JURY_START_HOUSE_COUNT,
   PERSONALITY_TYPES,
   clamp,
   escapeHtml,
   pickN,
+  pickRandom,
   randomInt,
   shuffle,
+  totalCastSize,
   weightedPick
 } from './utils.js';
 
@@ -53,6 +56,82 @@ export function resolveJuryStartHouseCount(state) {
 }
 
 /**
+ * @param {import('./GameState.js').GameState} state
+ */
+export function resolveDoubleEvictionHouseCount(state) {
+  if (state.doubleEvictionAt != null) return state.doubleEvictionAt;
+  const preset = getCastPreset(state.castPreset);
+  return preset.doubleEvictionAt ?? DEFAULT_DOUBLE_EVICTION_AT;
+}
+
+/**
+ * @param {import('./Contestant.js').Contestant} c
+ */
+export function formatHouseguestDisplayName(c) {
+  if (c.isVeteran && c.veteranSeason) {
+    return `${c.name} (${c.veteranSeason})`;
+  }
+  return c.name;
+}
+
+/**
+ * @param {string} castPreset
+ * @returns {{ label: string, detail: string }[]}
+ */
+export function getCastPresetCheatRows(castPreset) {
+  const preset = getCastPreset(castPreset);
+  const size = totalCastSize(preset.aiCount);
+  const jury = preset.juryStartHouseCount ?? JURY_START_HOUSE_COUNT;
+  const deAt = preset.doubleEvictionAt ?? DEFAULT_DOUBLE_EVICTION_AT;
+  const rows = [
+    { label: 'Houseguests', detail: `${size} enter · 1 winner` },
+    { label: 'Jury starts', detail: `When ${jury} remain` },
+    { label: 'Double eviction', detail: `Once at ≤${deAt} (if enabled)` }
+  ];
+  if (preset.id === 'all_stars') {
+    rows.push({
+      label: 'All-Stars mix',
+      detail: `${preset.veteranCount || 6} returnees ★ vs rookies R — no shared prize`
+    });
+  }
+  if (preset.id === 'brains') {
+    rows.push({ label: 'Brains skew', detail: 'Heavy Strategists · AI +1 INT' });
+  }
+  if (preset.id === 'megacast' || preset.id === 'supersized') {
+    rows.push({ label: 'Volume', detail: 'Higher DE trigger scales with cast size' });
+  }
+  const twists = getCastPresetTwistDefaults(castPreset);
+  const twistList = [];
+  if (twists.doubleEviction) twistList.push('DE');
+  if (twists.battleBack) twistList.push('Battle Back');
+  if (twists.mvpTwist) twistList.push('MVP week');
+  rows.push({
+    label: 'Suggested twists',
+    detail: twistList.length ? twistList.join(' · ') : 'None (change below)'
+  });
+  return rows;
+}
+
+/**
+ * Compact header strip for non-standard casts (week 1 emphasis).
+ * @param {import('./GameState.js').GameState} state
+ */
+export function getCastPresetBanner(state) {
+  const preset = getCastPreset(state.castPreset);
+  if (!preset.id || preset.id === 'standard') return '';
+  const jury = resolveJuryStartHouseCount(state);
+  const deAt = resolveDoubleEvictionHouseCount(state);
+  const size = state.getActiveContestants().length;
+  const parts = [`${preset.label}`, `${size} HGs`, `jury@${jury}`];
+  if (state.doubleEvictionEnabled) parts.push(`DE≤${deAt}`);
+  if (preset.id === 'all_stars') {
+    const vets = state.contestants.filter((c) => c.isVeteran).length;
+    parts.push(`${vets}★ vs rookies`);
+  }
+  return `Cast · ${parts.join(' · ')}`;
+}
+
+/**
  * @param {string} castPreset
  * @param {{ difficulty?: string, veteran?: boolean, rookie?: boolean }} options
  * @returns {object | null}
@@ -89,6 +168,8 @@ export function applyCastPresetPostInit(state) {
   const preset = getCastPreset(state.castPreset);
   state.juryStartHouseCount =
     preset.juryStartHouseCount ?? state.juryStartHouseCount ?? JURY_START_HOUSE_COUNT;
+  state.doubleEvictionAt =
+    preset.doubleEvictionAt ?? state.doubleEvictionAt ?? DEFAULT_DOUBLE_EVICTION_AT;
 
   if (preset.aiIntelligenceBonus) {
     for (const c of state.contestants) {
@@ -138,6 +219,39 @@ function applyAllStarsMix(state, preset) {
   if (player) {
     player.isRookie = true;
     player.isVeteran = false;
+    for (const vet of veterans) {
+      vet.modifyRelationship(player.id, -randomInt(14, 26));
+      player.modifyRelationship(vet.id, randomInt(-8, 4));
+    }
+  }
+}
+
+/**
+ * Extra move-in DRs keyed to cast preset.
+ * @param {import('./GameState.js').GameState} state
+ * @param {(speaker: import('./Contestant.js').Contestant, event: string, ctx?: object) => void} append
+ */
+export function queueCastPresetPremiereConfessionals(state, append) {
+  const preset = getCastPreset(state.castPreset);
+  const player = state.getPlayer();
+  if (preset.id === 'all_stars') {
+    const vet = pickRandom(state.contestants.filter((c) => c.isVeteran));
+    if (vet) append(vet, 'veteran_return');
+    if (player?.isRookie) append(player, 'rookie_pressure');
+    else {
+      const rookie = pickRandom(state.contestants.filter((c) => c.isRookie && !c.isPlayer));
+      if (rookie) append(rookie, 'rookie_pressure');
+    }
+  }
+  if (preset.id === 'megacast' || preset.id === 'supersized') {
+    const guest = pickRandom(state.getActiveContestants().filter((c) => !c.isPlayer));
+    if (guest) append(guest, 'crowded_house');
+  }
+  if (preset.id === 'brains') {
+    const brain = pickRandom(
+      state.contestants.filter((c) => !c.isPlayer && c.personality?.id === 'strategist')
+    );
+    if (brain) append(brain, 'brains_season');
   }
 }
 
@@ -258,6 +372,15 @@ export function buildCastPresetIntelSection(state) {
     }
   ];
 
+  const deAt = resolveDoubleEvictionHouseCount(state);
+  if (state.doubleEvictionEnabled) {
+    items.push({
+      key: 'cast-de',
+      name: 'Double eviction',
+      detail: `Fires at ≤${deAt} houseguests`
+    });
+  }
+
   if (preset.id === 'all_stars') {
     const vets = state.contestants.filter((c) => c.isVeteran);
     const rookies = state.contestants.filter((c) => c.isRookie);
@@ -265,6 +388,16 @@ export function buildCastPresetIntelSection(state) {
       key: 'cast-vets',
       name: 'Returnees',
       detail: `${vets.length} all-stars (★ in list)`
+    });
+    const vetRoll = vets
+      .slice(0, 4)
+      .map((c) => `${c.name} (${c.veteranSeason || '?'})`)
+      .join(', ');
+    const vetMore = vets.length > 4 ? ` +${vets.length - 4}` : '';
+    items.push({
+      key: 'cast-vet-roll',
+      name: 'Legend watch',
+      detail: vetRoll + vetMore
     });
     items.push({
       key: 'cast-rookies',

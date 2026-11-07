@@ -39,11 +39,16 @@
         </select>
         <p id="cast-preset-blurb" class="cast-preset-blurb" aria-live="polite"></p>
 
+        <details class="cast-preset-cheat" id="cast-preset-cheat">
+          <summary>Cast preset cheat sheet</summary>
+          <ul class="cast-preset-cheat-list" id="cast-preset-cheat-list"></ul>
+        </details>
+
         <fieldset class="twist-fieldset">
           <legend>Season twists (optional)</legend>
           <label class="checkbox-label">
             <input type="checkbox" id="double-eviction" checked>
-            Double eviction (once when 8 or fewer remain)
+            Double eviction (once at preset threshold — see cast cheat sheet)
           </label>
           <label class="checkbox-label">
             <input type="checkbox" id="twist-battle-back">

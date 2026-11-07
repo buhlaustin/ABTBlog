@@ -16,9 +16,10 @@ import {
   applyCastPresetPostInit,
   getCastPreset,
   pickPersonalityForCast,
+  resolveDoubleEvictionHouseCount,
   resolveJuryStartHouseCount
 } from './castPresets.js';
-import { JURY_START_HOUSE_COUNT } from './utils.js';
+import { DEFAULT_DOUBLE_EVICTION_AT, JURY_START_HOUSE_COUNT } from './utils.js';
 import { ensureEasyCastFloaters } from './floaterShields.js';
 import { evaluateTwistsForNewWeek, initTwistSchedule, trackFirstEvicted } from './SeasonTwists.js';
 import { runScheduleRepair } from './scheduleRepair.js';
@@ -110,6 +111,8 @@ export class GameState {
     this.castPreset = castPreset;
     /** Jury seating threshold; preset may lower (e.g. jury sprint). */
     this.juryStartHouseCount = null;
+    /** Active count that triggers double eviction week. */
+    this.doubleEvictionAt = null;
     this.doubleEvictionEnabled = doubleEvictionEnabled;
     this.battleBackEnabled = battleBackEnabled;
     this.mvpTwistEnabled = mvpTwistEnabled;
@@ -469,7 +472,8 @@ export class GameState {
     this.doubleEvictionPendingNextPhase = null;
     if (!this.doubleEvictionEnabled || this.doubleEvictionSeasonUsed) return;
     const remaining = this.getActiveContestants().length;
-    if (remaining <= 8 && remaining > 3) {
+    const deAt = resolveDoubleEvictionHouseCount(this);
+    if (remaining <= deAt && remaining > 3) {
       this.doubleEvictionWeekActive = true;
     }
   }
@@ -621,6 +625,7 @@ export class GameState {
       difficulty: this.difficulty,
       castPreset: this.castPreset,
       juryStartHouseCount: this.juryStartHouseCount,
+      doubleEvictionAt: this.doubleEvictionAt,
       doubleEvictionEnabled: this.doubleEvictionEnabled,
       battleBackEnabled: this.battleBackEnabled,
       mvpTwistEnabled: this.mvpTwistEnabled,
@@ -716,6 +721,10 @@ export class GameState {
       data.juryStartHouseCount ??
       getCastPreset(state.castPreset).juryStartHouseCount ??
       JURY_START_HOUSE_COUNT;
+    state.doubleEvictionAt =
+      data.doubleEvictionAt ??
+      getCastPreset(state.castPreset).doubleEvictionAt ??
+      DEFAULT_DOUBLE_EVICTION_AT;
     state.doubleEvictionEnabled = data.doubleEvictionEnabled ?? true;
     state.battleBackEnabled = data.battleBackEnabled ?? false;
     state.mvpTwistEnabled = data.mvpTwistEnabled ?? false;

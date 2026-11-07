@@ -86,8 +86,11 @@ import {
 } from './modules/utils.js';
 import {
   buildCastPresetPremiereLines,
+  getCastPresetBanner,
   getCastPresetBlurb,
+  getCastPresetCheatRows,
   getCastPresetTwistDefaults,
+  queueCastPresetPremiereConfessionals,
   resolveJuryStartHouseCount
 } from './modules/castPresets.js';
 
@@ -175,6 +178,15 @@ class Game {
       }
       if (ui.elements.castPresetBlurb) {
         ui.elements.castPresetBlurb.textContent = getCastPresetBlurb(key);
+      }
+      const cheatList = ui.elements.castPresetCheatList;
+      if (cheatList) {
+        cheatList.innerHTML = getCastPresetCheatRows(key)
+          .map(
+            (row) =>
+              `<li><strong>${escapeHtml(row.label)}</strong> — ${escapeHtml(row.detail)}</li>`
+          )
+          .join('');
       }
       refreshTwistCheat();
     };
@@ -264,6 +276,9 @@ class Game {
     if (cast.length) {
       void this._appendConfessional(pickRandom(cast), 'premiere');
     }
+    queueCastPresetPremiereConfessionals(this.state, (speaker, event) => {
+      void this._appendConfessional(speaker, event);
+    });
 
     this.ui.showGame();
     this.render();
@@ -358,6 +373,8 @@ class Game {
     ui.updateWeekDay(state.week, state.weekdayIndex, state.phase, state.getPhaseDisplayLabel());
     ui.renderWeekCalendar(state);
     const twistParts = [getTwistRulesBanner(state)];
+    const castBanner = getCastPresetBanner(state);
+    if (castBanner) twistParts.push(castBanner);
     const previewLeans = (hoh, limit) => this.ai.previewNominationLeans(hoh, limit);
     const hohWatch = getHohWatchBanner(state, previewLeans);
     if (hohWatch) twistParts.push(hohWatch);

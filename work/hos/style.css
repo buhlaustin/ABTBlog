@@ -757,6 +757,25 @@ body {
   color: var(--text-muted);
 }
 
+.cast-preset-cheat {
+  margin: 0 0 0.85rem;
+  font-size: 0.84rem;
+}
+
+.cast-preset-cheat summary {
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.cast-preset-cheat-list {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.cast-preset-cheat-list li {
+  margin: 0.25rem 0;
+}
+
 .twist-fieldset {
   border: 1px solid var(--border-subtle, #333);
   border-radius: 8px;

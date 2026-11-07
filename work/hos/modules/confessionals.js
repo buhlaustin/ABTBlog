@@ -1,7 +1,7 @@
 import { escapeHtml, pickRandom } from './utils.js';
 
 /**
- * @typedef {'hoh_win' | 'hoh_nominated' | 'on_block' | 'veto_saved' | 'veto_unused' | 'veto_won' | 'veto_spared' | 'evicted' | 'survived_vote' | 'double_eviction' | 'jury_seat' | 'betrayal' | 'betrayed_by' | 'alliance_formed' | 'alliance_exposed' | 'new_promise' | 'campaign' | 'backdoor' | 'lay_low' | 'replacement_nom' | 'replacement_pick' | 'premiere'} ConfessionalEvent
+ * @typedef {'hoh_win' | 'hoh_nominated' | 'on_block' | 'veto_saved' | 'veto_unused' | 'veto_won' | 'veto_spared' | 'evicted' | 'survived_vote' | 'double_eviction' | 'jury_seat' | 'betrayal' | 'betrayed_by' | 'alliance_formed' | 'alliance_exposed' | 'new_promise' | 'campaign' | 'backdoor' | 'lay_low' | 'replacement_nom' | 'replacement_pick' | 'premiere' | 'veteran_return' | 'rookie_pressure' | 'crowded_house' | 'brains_season'} ConfessionalEvent
  */
 
 export const CONFESSIONAL_EVENT_LABELS = {
@@ -26,7 +26,11 @@ export const CONFESSIONAL_EVENT_LABELS = {
   lay_low: 'Lay low',
   replacement_nom: 'Replacement nom',
   replacement_pick: 'Replacement pick',
-  premiere: 'Move-in'
+  premiere: 'Move-in',
+  veteran_return: 'All-Star return',
+  rookie_pressure: 'Rookie lane',
+  crowded_house: 'Crowded cast',
+  brains_season: 'Brains twist'
 };
 
 /** @type {Record<string, ((ctx: Record<string, string>) => string)[]>} */
@@ -58,6 +62,25 @@ const GENERIC_LINES = {
   premiere: [
     () => 'First day energy — smile now, strategize in the shower.',
     () => 'Nobody knows my game yet. That’s the advantage.'
+  ],
+  veteran_return: [
+    () => 'The house knows my resume — I still have to prove it again.',
+    () => 'Returnee target on my back. Good. I play better under pressure.',
+    () => 'Second (or third) time in — the fans remember; the jury will too.'
+  ],
+  rookie_pressure: [
+    () => 'Rookie in a house of legends. Fine — they underestimate hunger.',
+    () => 'No past footage on me. That’s the only edge I need this week.',
+    () => 'They want the all-stars safe. I’m not here to applaud.'
+  ],
+  crowded_house: [
+    () => 'Twenty-plus people in one house — someone will snap by Week 3.',
+    () => 'Worst bathroom line in history. Best social game ever.',
+    () => 'Mega cast means mega threats. Float or get drowned.'
+  ],
+  brains_season: [
+    () => 'This cast is all chess — one dumb move and they eat you alive.',
+    () => 'Brains twist? Perfect. I was born for this cast.'
   ],
   lay_low: [
     () => 'I stayed invisible today — the radar can’t find what it doesn’t see.',

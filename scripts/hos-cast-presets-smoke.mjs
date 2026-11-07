@@ -6,8 +6,12 @@ import {
   getCastPreset,
   getCastPresetTwistDefaults,
   resolveJuryStartHouseCount,
+  resolveDoubleEvictionHouseCount,
   buildCastPresetIntelSection,
-  getHouseguestCastMarks
+  getHouseguestCastMarks,
+  getCastPresetBanner,
+  getCastPresetCheatRows,
+  formatHouseguestDisplayName
 } from '../work/hos/modules/castPresets.js';
 import { CAST_PRESETS, totalCastSize } from '../work/hos/modules/utils.js';
 
@@ -41,6 +45,8 @@ const megaState = new GameState({
 });
 if (megaState.getActiveContestants().length !== 24) fail('megacast size');
 if (resolveJuryStartHouseCount(megaState) !== 14) fail('megacast jury');
+if (resolveDoubleEvictionHouseCount(megaState) !== 12) fail('megacast DE');
+if (!getCastPresetBanner(megaState).includes('DE≤12')) fail('mega banner');
 
 const superState = new GameState({
   playerName: 'Tester',
@@ -62,6 +68,10 @@ if (rookies.length !== 12) fail(`rookies ${rookies.length}`);
 if (!starsState.getPlayer()?.isRookie) fail('player rookie');
 if (!vets.every((c) => c.veteranSeason)) fail('vet seasons');
 if (!getHouseguestCastMarks(vets[0]).some((m) => m.key === 'veteran')) fail('vet mark');
+if (!formatHouseguestDisplayName(vets[0]).includes('(')) fail('vet display name');
+const player = starsState.getPlayer();
+if (vets.some((v) => v.getRelationship(player.id) > -4)) fail('vet rookie tension');
+if (!getCastPresetCheatRows('all_stars').some((r) => r.label === 'All-Stars mix')) fail('cheat');
 
 const sprintState = new GameState({
   playerName: 'Tester',
@@ -72,5 +82,6 @@ if (resolveJuryStartHouseCount(sprintState) !== 8) fail('jury sprint threshold')
 
 const intel = buildCastPresetIntelSection(starsState);
 if (!intel.items.some((i) => i.key === 'cast-vets')) fail('intel vets');
+if (!intel.items.some((i) => i.key === 'cast-vet-roll')) fail('intel vet roll');
 
 console.log('OK: hos cast presets smoke');

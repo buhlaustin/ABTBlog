@@ -11,6 +11,7 @@ export const CAST_PRESETS = {
     label: 'Legacy (11 HGs)',
     aiCount: 10,
     blurb: 'Shorter season — same jury rules as classic BB.',
+    doubleEvictionAt: 7,
     defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: false }
   },
   quick: {
@@ -26,6 +27,7 @@ export const CAST_PRESETS = {
     aiCount: 15,
     default: true,
     blurb: 'Full 16-houseguest season — default twists below.',
+    doubleEvictionAt: 8,
     defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: false }
   },
   brains: {
@@ -49,6 +51,7 @@ export const CAST_PRESETS = {
     aiCount: 19,
     blurb: 'Biggest modern cast — jury begins at 12. Double eviction on.',
     juryStartHouseCount: 12,
+    doubleEvictionAt: 10,
     defaultTwists: { doubleEviction: true, battleBack: false, mvpTwist: true }
   },
   megacast: {
@@ -57,6 +60,7 @@ export const CAST_PRESETS = {
     aiCount: 23,
     blurb: 'Chaos volume — 24 houseguests, one winner; jury at 14.',
     juryStartHouseCount: 14,
+    doubleEvictionAt: 12,
     defaultTwists: { doubleEviction: true, battleBack: true, mvpTwist: true }
   },
   all_stars: {
@@ -66,6 +70,7 @@ export const CAST_PRESETS = {
     blurb: 'Six returning legends vs twelve fresh faces — only one can win.',
     veteranCount: 6,
     juryStartHouseCount: 11,
+    doubleEvictionAt: 9,
     veteranPersonalityWeights: {
       strategist: 3,
       competitor: 3,
@@ -87,9 +92,13 @@ export const CAST_PRESETS = {
     aiCount: 11,
     blurb: '12 HGs; jury starts when 8 remain (not 10). Double eviction off by default.',
     juryStartHouseCount: 8,
+    doubleEvictionAt: 7,
     defaultTwists: { doubleEviction: false, battleBack: false, mvpTwist: false }
   }
 };
+
+/** Classic BB double-eviction trigger for a 16-person cast. */
+export const DEFAULT_DOUBLE_EVICTION_AT = 8;
 
 export const FIRST_NAMES = [
   'Jordan', 'Alex', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Quinn', 'Avery',

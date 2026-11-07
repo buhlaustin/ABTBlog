@@ -225,7 +225,7 @@ Living design notes for features **not yet built**. Items marked **shipped** are
 |--------|--------|
 | **Goal** | Beyond Legacy / Quick / Standard. |
 | **Examples** | All-strategists (+AI int), all-stars vs rookies, mega casts (20–24), shortened jury sprint. |
-| **Status** | **Shipped (v2):** v1 minus duo pairs; **Supersized (20)** / **Mega (24)** with scaled jury; **All-Stars + rookies (18)** — **6 returnees** (★, season tag, stat/threat bump) vs **12 rookies** + player rookie tag; house list **★ / R** marks; `node scripts/hos-cast-presets-smoke.mjs`. |
+| **Status** | **Shipped (v3):** v2 plus **scaled DE trigger** (8–12 by cast), **cast cheat sheet** + header **Cast ·** banner; returnee names **(S14)**; **legend watch** + DE row in Deals; premiere DRs (**veteran_return**, **rookie_pressure**, **crowded_house**, **brains_season**); vets start **cold on rookie player**; `node scripts/hos-cast-presets-smoke.mjs`. |
 | **Implementation** | `CAST_PRESETS` in `utils.js`; `pickPersonalityForCast` / `applyCastPresetPostInit` in `GameState._initContestants`. |
 | **Priority** | Low. |
 

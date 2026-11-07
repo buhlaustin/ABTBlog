@@ -10,7 +10,7 @@ import {
 import { getHohNomPersonaTooltip } from './hohNomPersonas.js';
 import { relationshipClass, formatRelationship, escapeHtml } from './utils.js';
 import { renderWeekCalendarHtml } from './weekCalendarStrip.js';
-import { getHouseguestCastMarks } from './castPresets.js';
+import { formatHouseguestDisplayName, getHouseguestCastMarks } from './castPresets.js';
 
 /**
  * DOM rendering and screen management.
@@ -25,6 +25,7 @@ export class UIManager {
       difficultySelect: document.getElementById('difficulty'),
       castSelect: document.getElementById('cast-size'),
       castPresetBlurb: document.getElementById('cast-preset-blurb'),
+      castPresetCheatList: document.getElementById('cast-preset-cheat-list'),
       doubleEvictionToggle: document.getElementById('double-eviction'),
       battleBackToggle: document.getElementById('twist-battle-back'),
       mvpTwistToggle: document.getElementById('twist-mvp'),
@@ -350,7 +351,7 @@ export class UIManager {
 
       return `<li class="houseguest-item ${c.isPlayer ? 'is-player' : ''} ${c.evicted ? 'evicted' : ''}">
         <div>
-          <span class="name">${icons.join(' ')} ${escapeHtml(c.name)}</span>
+          <span class="name">${icons.join(' ')} ${escapeHtml(formatHouseguestDisplayName(c))}</span>
           <div${personaAttrs}>${escapeHtml(c.personality.name)}${c.isHOH ? ' · HOH' : ''}</div>
           ${marksHtml}
         </div>
