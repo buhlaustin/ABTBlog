@@ -24,6 +24,10 @@ export class Contestant {
     this.name = name;
     this.isPlayer = isPlayer;
     this.personality = personality || pickRandom(PERSONALITY_TYPES);
+    /** All-Star returnee tag (display + AI threat bump). */
+    this.isVeteran = false;
+    this.veteranSeason = null;
+    this.isRookie = false;
     this.evicted = false;
     this.evictedWeek = null;
     this.isJuror = false;
@@ -43,6 +47,8 @@ export class Contestant {
     this.relationships = {}; // id -> score (-100 to 100)
     this.trust = 50; // house-wide trust in this person
     this.threat = 10;
+    /** Lay-low / campaign adjustments applied after base threat calc. */
+    this.threatOffset = 0;
     this.reputation = 50; // how the house perceives them
     /** @type {string[]} Secret alliance memberships (multiple pairwise / group deals). */
     this.allianceIds = [];
@@ -118,6 +124,7 @@ export class Contestant {
     if (avgRel > 30) threat += 10;
     if (avgRel < -20) threat -= 5;
 
+    threat += this.threatOffset ?? 0;
     this.threat = clamp(Math.round(threat), 0, 100);
   }
 
@@ -168,6 +175,9 @@ export class Contestant {
       evicted: this.evicted,
       evictedWeek: this.evictedWeek,
       isJuror: this.isJuror,
+      isVeteran: this.isVeteran,
+      veteranSeason: this.veteranSeason,
+      isRookie: this.isRookie,
       loyalty: this.loyalty,
       intelligence: this.intelligence,
       social: this.social,
@@ -176,6 +186,7 @@ export class Contestant {
       relationships: { ...this.relationships },
       trust: this.trust,
       threat: this.threat,
+      threatOffset: this.threatOffset ?? 0,
       reputation: this.reputation,
       allianceIds: [...(this.allianceIds || [])],
       allianceId: this.allianceId,
@@ -209,9 +220,13 @@ export class Contestant {
       evicted: data.evicted,
       evictedWeek: data.evictedWeek,
       isJuror: data.isJuror ?? false,
+      isVeteran: data.isVeteran ?? false,
+      veteranSeason: data.veteranSeason ?? null,
+      isRookie: data.isRookie ?? false,
       relationships: { ...data.relationships },
       trust: data.trust,
       threat: data.threat,
+      threatOffset: data.threatOffset ?? 0,
       reputation: data.reputation,
       allianceIds: data.allianceIds?.length
         ? [...data.allianceIds]

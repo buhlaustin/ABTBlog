@@ -1,4 +1,5 @@
-import { randomInt, clamp } from './utils.js';
+import { JURY_QA_TEMPLATES } from './juryQABank.js';
+import { randomInt, pickRandom, shuffle } from './utils.js';
 import { FINALE_PHASES } from './GameState.js';
 
 /**
@@ -112,8 +113,8 @@ export class FinaleManager {
       text: `Final Head of Household <strong>${finalHOH.name}</strong> chooses to take <strong>${finalist.name}</strong> to the Final 2.`
     });
 
-    this.state.processEviction(evicted, results);
-    this.state.finalePhase = FINALE_PHASES.JURY_VOTE;
+    this.state.processEviction(evicted);
+    this.state.finalePhase = FINALE_PHASES.JURY_QA;
     return { results, finalist, evicted };
   }
 
@@ -214,19 +215,140 @@ export class FinaleManager {
 
   _jurorVote(juror, finalists) {
     if (this.ai?.decideJuryVote) {
-      return this.ai.decideJuryVote(juror, finalists);
+      return this.ai.decideJuryVote(juror, finalists, this.state.juryQAAdjustments);
     }
     let best = finalists[0];
     let bestScore = -Infinity;
     for (const f of finalists) {
       const rel = juror.getRelationship(f.id);
       const grudge = juror.grudges.find((g) => g.againstId === f.id);
-      const score = rel - (grudge ? grudge.intensity / 2 : 0) + randomInt(-5, 5);
+      const qa = this.state.juryQAAdjustments[juror.id]?.[f.id] || 0;
+      const score = rel - (grudge ? grudge.intensity / 2 : 0) + qa + randomInt(-5, 5);
       if (score > bestScore) {
         bestScore = score;
         best = f;
       }
     }
     return best;
+  }
+
+  /** How many jury Q&A rounds to run (up to jury size, max seven questions). */
+  getJuryQARoundCount() {
+    const jury = this.state.getJurors();
+    const cap = Math.min(7, jury.length, JURY_QA_TEMPLATES.length);
+    return Math.max(1, cap);
+  }
+
+  _buildJuryQAQuestionOrder() {
+    const rounds = this.getJuryQARoundCount();
+    const indices = shuffle(JURY_QA_TEMPLATES.map((_, i) => i));
+    return indices.slice(0, rounds);
+  }
+
+  getJuryQAQuestion(index) {
+    const jury = this.state.getJurors();
+    if (jury.length === 0) return null;
+    const order = this.state.finaleQAQuestionOrder?.length
+      ? this.state.finaleQAQuestionOrder
+      : this._buildJuryQAQuestionOrder();
+    const templateIdx = order[index] ?? index % JURY_QA_TEMPLATES.length;
+    const template = JURY_QA_TEMPLATES[templateIdx];
+    const juror = jury[index % jury.length];
+    return { juror, template };
+  }
+
+  /** AI finalist picks an answer style. */
+  aiPickQAResponse(finalist, template) {
+    const strategy = finalist.personality?.strategy;
+    const byId = (id) => template.choices.find((c) => c.id === id);
+    const bestDelta = () =>
+      template.choices.reduce((a, b) => (b.delta > a.delta ? b : a));
+
+    if (strategy === 'manipulate' || strategy === 'attack') {
+      return byId('shade') || byId('blame') || byId('petty') || pickRandom(template.choices);
+    }
+    if (strategy === 'befriend' || strategy === 'ally' || strategy === 'loyalist') {
+      return (
+        byId('respect')
+        || byId('honest')
+        || byId('gratitude')
+        || byId('loyal')
+        || bestDelta()
+      );
+    }
+    if (strategy === 'win' || strategy === 'competitor') {
+      return byId('comp') || byId('own_game') || byId('comp_brag') || bestDelta();
+    }
+    if (strategy === 'survive' || strategy === 'floater') {
+      return byId('humble') || byId('human') || byId('humble_throw') || bestDelta();
+    }
+    if (strategy === 'chaos') {
+      return pickRandom(template.choices);
+    }
+    return bestDelta();
+  }
+
+  applyFinalistQAAnswer(juror, finalist, choice) {
+    this.state.addJuryQAAdjustment(juror.id, finalist.id, choice.delta);
+    return {
+      type: 'narrative',
+      text: `<strong>${finalist.name}</strong> to ${juror.name}: “${choice.label}.”`
+    };
+  }
+
+  beginJuryQA() {
+    const results = [];
+    const finalists = this.state.getActiveContestants();
+    const jury = this.state.getJurors();
+    results.push({
+      type: 'drama',
+      text: '<strong>Jury Q&A</strong> — Finalists face the jury live before the vote. Each answer can sway votes.'
+    });
+    if (finalists.length !== 2) {
+      results.push({ type: 'warning', text: 'Jury Q&A requires two finalists.' });
+      return { results, ok: false };
+    }
+    if (jury.length === 0) {
+      results.push({
+        type: 'system',
+        text: 'No jurors are seated — Q&A is skipped; the jury vote follows.'
+      });
+      this.state.finalePhase = FINALE_PHASES.JURY_VOTE;
+      return { results, ok: false, skipQA: true };
+    }
+    this.state.finalePhase = FINALE_PHASES.JURY_QA;
+    this.state.finaleQAIndex = 0;
+    this.state.finaleQAQuestionOrder = this._buildJuryQAQuestionOrder();
+    return { results, ok: true };
+  }
+
+  runJuryQARound(index) {
+    const results = [];
+    const qa = this.getJuryQAQuestion(index);
+    if (!qa) {
+      return { results: [{ type: 'system', text: 'No more jury questions.' }], done: true };
+    }
+    const { juror, template } = qa;
+    const finalists = this.state.getActiveContestants();
+    results.push({
+      type: 'drama',
+      text: `Juror <strong>${juror.name}</strong> asks: “${template.prompt}”`
+    });
+    return {
+      results,
+      juror,
+      template,
+      finalists,
+      done: false,
+      needsPlayerAnswer: finalists.some((f) => f.isPlayer)
+    };
+  }
+
+  finishJuryQA() {
+    this.state.finalePhase = FINALE_PHASES.JURY_VOTE;
+    return [{
+      type: 'system',
+      text: 'Jury Q&A is over. The jurors are ready to cast their votes for the winner.'
+    }];
   }
 }

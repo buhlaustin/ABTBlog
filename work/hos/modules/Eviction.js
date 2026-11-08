@@ -1,4 +1,20 @@
 import { randomInt, clamp, pickRandom } from './utils.js';
+import {
+  buildPlayerHohLens,
+  describeNominationReason,
+  getNominationDramaNote,
+  getHohNominationStyleLine
+} from './hohNomPersonas.js';
+import {
+  applyAiVotePromiseBreak,
+  applyPlayerVotePromiseConsequences,
+  getNominationConsequenceLine,
+  getVoteConsequenceLine
+} from './voteConsequences.js';
+import { getFloaterShieldCeremonyNote } from './floaterShields.js';
+import { buildBackdoorCompletionLine, clearThrowCompetitionIntent } from './strategicVerbs.js';
+import { appendVetoCeremonySummary, snapshotVetoWeekBlock } from './vetoCeremonySummary.js';
+import { buildReplacementConfessionalExtras } from './confessionals.js';
 
 /**
  * Nomination ceremony, veto/power events, and eviction voting.
@@ -34,6 +50,13 @@ export class EvictionSystem {
       text: `<strong>Nomination Ceremony</strong> — ${hoh.name} must nominate two houseguests for eviction.`
     });
 
+    if (!hoh.isPlayer) {
+      results.push({
+        type: 'narrative',
+        text: getHohNominationStyleLine(hoh)
+      });
+    }
+
     let nominees;
 
     if (hoh.isPlayer && playerPicks && playerPicks.length === 2) {
@@ -54,6 +77,11 @@ export class EvictionSystem {
       return { results, nominees: [] };
     }
 
+    const floaterShieldNote = getFloaterShieldCeremonyNote(this.state, nominees);
+    if (floaterShieldNote) {
+      results.push(floaterShieldNote);
+    }
+
     if (nominees.length < 2) {
       results.push({
         type: 'system',
@@ -66,15 +94,35 @@ export class EvictionSystem {
 
     for (const n of nominees) {
       n.isNominated = true;
+      const reason = hoh.isPlayer
+        ? 'your strategic choice'
+        : describeNominationReason(hoh, n);
       results.push({
         type: 'drama',
-        text: `${hoh.name} nominates <strong>${n.name}</strong> for eviction.`
+        text: `${hoh.name} nominates <strong>${n.name}</strong> for eviction — ${reason}.`
       });
+      if (!hoh.isPlayer) {
+        const drama = getNominationDramaNote(hoh, n);
+        if (drama) {
+          results.push({ type: 'narrative', text: drama });
+        }
+      }
+      const nomFx = getNominationConsequenceLine(hoh, n);
+      if (nomFx) {
+        results.push(nomFx);
+      }
       n.threat = clamp(n.threat - 5, 0, 100);
     }
     this.state.nominees = nominees.map((n) => n.id);
 
-    this.state.addHistory({ type: 'nominations', hoh: hoh.id, nominees: this.state.nominees });
+    this.state.addHistory({
+      type: 'nominations',
+      hoh: hoh.id,
+      nominees: this.state.nominees,
+      hohStrategy: hoh.personality?.strategy ?? null,
+      hohArchetype: hoh.personality?.name ?? null,
+      powerRound: this.state.doubleEvictionRound > 1 ? 2 : 1
+    });
     return { results, nominees };
   }
 
@@ -96,6 +144,7 @@ export class EvictionSystem {
 
   /** Sunday — POV competition only. */
   runVetoCompetition(playerWonVeto = false) {
+    snapshotVetoWeekBlock(this.state);
     const results = [];
     const { vetoPlayers } = this.getVetoSetup();
     const player = this.state.getPlayer();
@@ -114,6 +163,13 @@ export class EvictionSystem {
     if (playerInComp && playerWonVeto) {
       vetoWinner = player;
     } else if (playerInComp && !playerWonVeto) {
+      if (this.state.playerThrowCompetition) {
+        clearThrowCompetitionIntent(this.state);
+        results.push({
+          type: 'narrative',
+          text: 'You threw the POV comp — the house thinks you are laying low.'
+        });
+      }
       const aiPlayers = vetoPlayers.filter((p) => !p.isPlayer);
       vetoWinner = aiPlayers.length
         ? aiPlayers.reduce((best, c) => (c.competition > best.competition ? c : best), aiPlayers[0])
@@ -133,6 +189,11 @@ export class EvictionSystem {
 
     vetoWinner.hasVeto = true;
     this.state.vetoHolderId = vetoWinner.id;
+    this.state.addHistory({
+      type: 'veto_win',
+      holderId: vetoWinner.id,
+      powerRound: this.state.doubleEvictionRound > 1 ? 2 : 1
+    });
     results.push({
       type: 'success',
       text: `<strong>${vetoWinner.name}</strong> wins the Power of Veto!`
@@ -142,6 +203,7 @@ export class EvictionSystem {
 
   /** Monday — veto meeting & replacement noms. */
   runVetoCeremony(vetoWinner) {
+    snapshotVetoWeekBlock(this.state);
     const results = [];
     const nominees = this.state.nominees.map((id) => this.state.getContestant(id)).filter(Boolean);
 
@@ -174,6 +236,7 @@ export class EvictionSystem {
       type: 'narrative',
       text: `${vetoWinner.name} chose not to use the Power of Veto.`
     });
+    appendVetoCeremonySummary(results, this.state, { vetoWinner, vetoUsed: false });
     return { results, vetoWinner, vetoUsed: false };
   }
 
@@ -239,6 +302,7 @@ export class EvictionSystem {
       type: 'narrative',
       text: `${vetoWinner.name} chose not to use the Power of Veto.`
     });
+    appendVetoCeremonySummary(results, this.state, { vetoWinner, vetoUsed: false });
     return { results, vetoWinner, vetoUsed: false };
   }
 
@@ -247,6 +311,7 @@ export class EvictionSystem {
     savedNominee.isNominated = false;
     this.state.nominees = this.state.nominees.filter((id) => id !== savedNominee.id);
     this.state.vetoUsed = true;
+    this.state.vetoSavedNomineeId = savedNominee.id;
 
     results.push({
       type: 'success',
@@ -265,11 +330,21 @@ export class EvictionSystem {
     if (replacement) {
       replacement.isNominated = true;
       this.state.nominees.push(replacement.id);
-      results.push({
+      const reason = describeNominationReason(hoh, replacement);
+      const drama = {
         type: 'drama',
-        text: `${hoh.name} nominates <strong>${replacement.name}</strong> as the replacement.`
-      });
+        text: `${hoh.name} nominates <strong>${replacement.name}</strong> as the replacement — ${reason}.`,
+        confessionalExtras: buildReplacementConfessionalExtras(this.state, replacement)
+      };
+      results.push(drama);
     }
+
+    appendVetoCeremonySummary(results, this.state, {
+      vetoWinner,
+      savedNominee,
+      replacement: replacement ?? null,
+      vetoUsed: true
+    });
 
     return { results, vetoWinner, vetoUsed: true };
   }
@@ -281,6 +356,7 @@ export class EvictionSystem {
 
     if (!useVeto) {
       results.push({ type: 'narrative', text: 'You chose not to use the Power of Veto.' });
+      appendVetoCeremonySummary(results, this.state, { vetoWinner, vetoUsed: false });
       return { results, vetoUsed: false };
     }
 
@@ -298,10 +374,42 @@ export class EvictionSystem {
       replacement.isNominated = true;
       this.state.nominees.push(replacement.id);
       const hoh = this._getHOH();
+      const hohLens = hoh?.isPlayer ? buildPlayerHohLens(hoh) : hoh;
+      const reason = hohLens ? describeNominationReason(hohLens, replacement) : 'strategic choice';
       results.push({
         type: 'drama',
-        text: `${hoh?.name || 'The HOH'} nominates <strong>${replacement.name}</strong> as the replacement.`
+        text: `${hoh?.name || 'The HOH'} nominates <strong>${replacement.name}</strong> as the replacement — ${reason}.`
       });
+      if (hohLens) {
+        const drama = getNominationDramaNote(hohLens, replacement);
+        if (drama) results.push({ type: 'narrative', text: drama });
+      }
+      const backdoor = buildBackdoorCompletionLine(this.state, replacementId);
+      if (backdoor) {
+        results.push(backdoor);
+        this.state.backdoorTargetId = null;
+        this.state.backdoorPawnsLocked = false;
+      }
+
+      const saved = this.state.vetoSavedNomineeId
+        ? this.state.getContestant(this.state.vetoSavedNomineeId)
+        : null;
+      const vetoWinner = this.state.vetoHolderId
+        ? this.state.getContestant(this.state.vetoHolderId)
+        : null;
+      appendVetoCeremonySummary(results, this.state, {
+        vetoWinner,
+        savedNominee: saved,
+        replacement,
+        vetoUsed: true
+      });
+      if (results.length) {
+        const tail = results[results.length - 1];
+        tail.confessionalExtras = [
+          ...(tail.confessionalExtras || []),
+          ...buildReplacementConfessionalExtras(this.state, replacement)
+        ];
+      }
     }
     return results;
   }
@@ -335,20 +443,53 @@ export class EvictionSystem {
       if (voter.isPlayer) continue;
 
       const decision = this.ai.decideVote(voter, nominees);
-      decision.target.votesReceived += 1;
+      let ballotWeight = 1;
+      if (
+        this.state.mvpPowerAvailable
+        && voter.id === this.state.mvpHolderId
+      ) {
+        ballotWeight = 2;
+        this.state.mvpPowerAvailable = false;
+        results.push({
+          type: 'success',
+          text: `<strong>${voter.name}</strong> uses <strong>MVP power</strong> — their vote counts twice!`
+        });
+      }
+      decision.target.votesReceived += ballotWeight;
       voteLog.push({
         voter: voter.name,
         target: decision.target.name,
         reason: decision.reason
       });
+      const aiBreak = applyAiVotePromiseBreak(voter, decision.target.id, this.state);
+      if (aiBreak) {
+        results.push(aiBreak);
+      }
     }
 
     // Player vote (HOH does not vote)
     const player = this.state.getPlayer();
     if (player && !player.evicted && !player.isNominated && !player.isHOH && playerVoteTarget) {
+      const promiseFx = applyPlayerVotePromiseConsequences(
+        player,
+        playerVoteTarget,
+        nominees,
+        this.state
+      );
+      results.push(...promiseFx.results);
+
       const vote = this.state.getContestant(playerVoteTarget);
       if (vote) {
-        vote.votesReceived += 1;
+        let ballotWeight = 1;
+        if (this.state.mvpPowerAvailable && player.id === this.state.mvpHolderId) {
+          ballotWeight = 2;
+          this.state.mvpPowerAvailable = false;
+          results.push({
+            type: 'success',
+            text: 'You use <strong>MVP power</strong> — your vote counts twice!'
+          });
+        }
+        vote.votesReceived += ballotWeight;
         voteLog.push({
           voter: player.name,
           target: vote.name,
@@ -364,6 +505,13 @@ export class EvictionSystem {
         type: 'narrative',
         text: `${log.voter} votes to evict <strong>${log.target}</strong> — ${log.reason}.`
       });
+      if (player && !player.evicted) {
+        const voterC = voters.find((v) => v.name === log.voter);
+        if (voterC) {
+          const fx = getVoteConsequenceLine(player, log, voterC);
+          if (fx) results.push(fx);
+        }
+      }
     }
 
     // Determine evicted (most votes; tie = random)
@@ -394,7 +542,19 @@ export class EvictionSystem {
       text: `By a vote of <strong>${voteCount} to ${runnerUpVotes}</strong>, ${evicted.name} is evicted from the Big Brother house.`
     });
 
+    const juryBefore = this.state.getJurors().length;
     this.state.processEviction(evicted, results);
+    if (evicted.isJuror && juryBefore === 0) {
+      results.push({
+        type: 'system',
+        text: '<strong>The jury is seated.</strong> Watch the sidebar for how evicted houseguests may lean toward you before finale.'
+      });
+    } else if (evicted.isJuror) {
+      results.push({
+        type: 'narrative',
+        text: `${evicted.name} joins the jury. (${this.state.getJurors().length} juror${this.state.getJurors().length === 1 ? '' : 's'} so far)`
+      });
+    }
 
     if (evicted.isPlayer) {
       results.push({ type: 'warning', text: 'Your journey in the house has come to an end.' });

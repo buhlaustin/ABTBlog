@@ -166,6 +166,51 @@ Do not invent evictions or wins that are not in context. Stay dramatic but plaus
   if (kind === 'host_line') {
     return `${base}\nKind: Julie Chen-style host line before a live event.\nContext: ${ctx}`;
   }
+  if (kind === 'nomination_ceremony') {
+    return `${base}
+Kind: Julie Chen-style host reaction immediately AFTER the HOH names two nominees on the block.
+Use hohName, hohArchetype, hohNomStyle, nominees, and nominationLeanNames from context if present — reflect the HOH's persona (e.g. backdoor/strategist, loyalist, chaos) without inventing extra nominees.
+Name both nominees. Under 320 characters. Context: ${ctx}`;
+  }
+  if (kind === 'confessional') {
+    return `${base}
+Kind: DR diary confessional — first person, one quoted sentence in plain text (no quotes in JSON — return {"text":"sentence"}).
+Use confessional.speakerName, speakerStrategy, event, and any nominee/eviction names in context. Under 200 characters. Stay in character.
+Context: ${ctx}`;
+  }
+  if (kind === 'premiere_move_in') {
+    return `${base}\nKind: Season premiere / move-in speech. houseguestCount, week 1 Friday context.\nContext: ${ctx}`;
+  }
+  if (kind === 'finale_live') {
+    return `${base}\nKind: Finale night open — inFinale true, jury voting ahead.\nContext: ${ctx}`;
+  }
+  if (kind === 'hoh_competition') {
+    return `${base}\nKind: Lead-in before the Head of Household competition (live event starting).\nContext: ${ctx}`;
+  }
+  if (kind === 'hoh_competition_result') {
+    return `${base}\nKind: Announce the HOH winner using competitionWinnerName and hohName if present.\nContext: ${ctx}`;
+  }
+  if (kind === 'nomination_pre_ceremony') {
+    return `${base}\nKind: Open the nomination ceremony before nominees are named.\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_competition') {
+    return `${base}\nKind: Lead-in before the Power of Veto competition.\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_competition_result') {
+    return `${base}\nKind: Announce who won the veto (vetoHolderName).\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_ceremony_pre') {
+    return `${base}\nKind: Open the veto meeting / ceremony; nominees are on the block.\nContext: ${ctx}`;
+  }
+  if (kind === 'veto_ceremony') {
+    return `${base}\nKind: React after veto decision — vetoUsed, vetoSavedName, nominees.\nContext: ${ctx}`;
+  }
+  if (kind === 'eviction_pre') {
+    return `${base}\nKind: Lead-in to the live eviction vote; name nominees if present; mention doubleEvictionNight if true.\nContext: ${ctx}`;
+  }
+  if (kind === 'eviction_ceremony') {
+    return `${base}\nKind: Dramatic eviction line for evictedTonightName.\nContext: ${ctx}`;
+  }
   if (kind === 'week_recap') {
     return `${base}\nKind: End-of-week recap voiceover.\nContext: ${ctx}`;
   }

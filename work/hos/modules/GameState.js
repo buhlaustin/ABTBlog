@@ -8,11 +8,21 @@ import {
 import {
   DIFFICULTY_CONFIG,
   generateAINames,
-  pickRandom,
   shuffle,
   uid,
   resetIdCounter
 } from './utils.js';
+import {
+  applyCastPresetPostInit,
+  getCastPreset,
+  pickPersonalityForCast,
+  resolveDoubleEvictionHouseCount,
+  resolveJuryStartHouseCount
+} from './castPresets.js';
+import { DEFAULT_DOUBLE_EVICTION_AT, JURY_START_HOUSE_COUNT } from './utils.js';
+import { ensureEasyCastFloaters } from './floaterShields.js';
+import { evaluateTwistsForNewWeek, initTwistSchedule, trackFirstEvicted } from './SeasonTwists.js';
+import { runScheduleRepair } from './scheduleRepair.js';
 
 /** Calendar: Friday → Thursday (Big Brother–style week). */
 export const WEEKDAYS = [
@@ -49,6 +59,38 @@ export const PHASE_LABELS = {
   [PHASES.WEEK_END]: 'Week summary'
 };
 
+/** Second power cycle on Double Eviction Thursday (stays on calendar Thursday). */
+export const DOUBLE_EVICTION_ROUND2_PHASES = [
+  PHASES.COMPETITION,
+  PHASES.NOMINATION,
+  PHASES.VETO_COMP,
+  PHASES.VETO_CEREMONY,
+  PHASES.EVICTION
+];
+
+/** Final 3: three HOH comps → Final HOH pick → Jury Q&A → jury vote. */
+export const FINALE_PHASES = {
+  INTRO: 'intro',
+  R1: 'r1',
+  R2: 'r2',
+  R3: 'r3',
+  FINAL_PICK: 'final_pick',
+  JURY_QA: 'jury_qa',
+  JURY_VOTE: 'jury_vote',
+  COMPLETE: 'complete'
+};
+
+export const FINALE_PHASE_LABELS = {
+  [FINALE_PHASES.INTRO]: 'Finale — Final 3',
+  [FINALE_PHASES.R1]: 'Finale — HOH Part 1',
+  [FINALE_PHASES.R2]: 'Finale — HOH Part 2',
+  [FINALE_PHASES.R3]: 'Finale — HOH Part 3',
+  [FINALE_PHASES.FINAL_PICK]: 'Finale — Final HOH decision',
+  [FINALE_PHASES.JURY_QA]: 'Finale — Jury Q&A',
+  [FINALE_PHASES.JURY_VOTE]: 'Finale — Jury vote',
+  [FINALE_PHASES.COMPLETE]: 'Finale — Winner'
+};
+
 export { sharesAllianceWith, getAllianceIds, getContestantAlliances } from './allianceUtils.js';
 
 /**
@@ -60,16 +102,24 @@ export class GameState {
     difficulty = 'normal',
     aiCount = 10,
     castPreset = 'standard',
-    doubleEvictionEnabled = true
+    doubleEvictionEnabled = true,
+    battleBackEnabled = false,
+    mvpTwistEnabled = false
   } = {}) {
     this.difficulty = difficulty;
     this.config = DIFFICULTY_CONFIG[difficulty];
     this.castPreset = castPreset;
+    /** Jury seating threshold; preset may lower (e.g. jury sprint). */
+    this.juryStartHouseCount = null;
+    /** Active count that triggers double eviction week. */
+    this.doubleEvictionAt = null;
     this.doubleEvictionEnabled = doubleEvictionEnabled;
+    this.battleBackEnabled = battleBackEnabled;
+    this.mvpTwistEnabled = mvpTwistEnabled;
     this.week = 1;
     /** 0 = Friday … 6 = Thursday */
-    this.weekdayIndex = 4;
-    this.day = 5;
+    this.weekdayIndex = 0;
+    this.day = 1;
     this.phase = PHASES.SOCIAL;
     this.actionsRemaining = this.config.actionsPerDay;
     this.maxDaysPerWeek = 7;
@@ -80,9 +130,60 @@ export class GameState {
     this.history = [];
     this.storyLog = [];
 
+    /** Player threat at week open — for band panel week delta. */
+    this.playerThreatWeekStart = null;
+    this.playerThreatWeekSnapshotWeek = null;
+    /** High-water threat this season (player). */
+    this.playerPeakThreat = null;
+    /** Persistent counters for run stats (confessionals survive log trim). */
+    this.playerStatCounters = { confessionals: 0, layLowDr: 0 };
+
+    /** Last Rest & Observe feedback (lay-low intel). */
+    this.playerLayLowWeek = null;
+    this.playerLayLowBefore = null;
+    this.playerLayLowAfter = null;
+    this.playerLayLowRestsWeek = null;
+    this.playerLayLowRestsThisWeek = 0;
+
+    /** Recent host narration beats (kind + source). */
+    this.hostBeatLog = [];
+    this.lastHostBeatKind = null;
+    this.lastHostBeatSource = null;
+
+    /** Transient narrate payload for confessional kind (not saved). */
+    this.confessionalPayload = null;
+    /** Recent confessional lines for intel panel. */
+    this.confessionalLog = [];
+    /** Dedupe keys week:day:speaker:event. */
+    this.confessionalDedupeKeys = [];
+
+    /** Last completed week structured recap (Deals drawer + banner). */
+    this.lastWeekRecap = null;
+    this.weekRecapLog = [];
+    /** Transient payload for narrate week_recap (not saved). */
+    this.weekRecapPayload = null;
+
+    /** Last calendar rewind/jump (load or live recovery). */
+    this.lastScheduleRepair = null;
+    this.scheduleRepairLog = [];
+
+    this.lastPawnShieldWeek = null;
+    this.lastPawnShieldNomineeNames = [];
+    this.lastPawnShieldNomineeIds = [];
+
+    /** Intentionally tank the next comp the player enters (HOH or veto). */
+    this.playerThrowCompetition = false;
+    /** Player HOH backdoor replacement target id. */
+    this.backdoorTargetId = null;
+    this.backdoorPawnsLocked = false;
+
     this.currentHOH = null;
     this.nominees = [];
     this.vetoUsed = false;
+    this.vetoSavedNomineeId = null;
+    this.vetoWeekBlockSnapshot = [];
+    this.lastVetoRecapText = null;
+    this.lastVetoRecapWeek = null;
     this.vetoReplacements = [];
     this.evictedThisWeek = null;
     this.competitionWinner = null;
@@ -95,7 +196,48 @@ export class GameState {
     /** True after HOH / noms / veto / eviction finishes for the current calendar day. */
     this.houseEventComplete = false;
 
+    this.doubleEvictionSeasonUsed = false;
+    this.doubleEvictionWeekActive = false;
+    /** 1 = first eviction vote tonight; 2 = second cycle. */
+    this.doubleEvictionRound = 1;
+    this.doubleEvictionAwaitingRound2 = false;
+    this.doubleEvictionRound2Cycle = false;
+    this.doubleEvictionPendingNextPhase = null;
+
+    this.battleBackSeasonUsed = false;
+    this.battleBackWeekActive = false;
+    this.battleBackScheduledWeek = null;
+    this.battleBackResolvedTonight = false;
+    this.firstEvictedId = null;
+
+    this.mvpTwistSeasonUsed = false;
+    this.mvpTwistWeekActive = false;
+    this.mvpTwistScheduledWeek = null;
+    this.mvpHolderId = null;
+    this.mvpPowerAvailable = false;
+    this.mvpRaceOpen = false;
+    /** @type {Record<string, number>} */
+    this.mvpCampaignPoints = {};
+    this.mvpCampaignedToday = false;
+
+    this.inFinale = false;
+    this.finalePhase = null;
+    this.finaleR1WinnerId = null;
+    this.finaleR2WinnerId = null;
+    this.finaleR3WinnerId = null;
+    this.finalePartLosers = [];
+    this.finaleAwaitingStep = null;
+    this.finaleQAIndex = 0;
+    /** Shuffled indices into JURY_QA_TEMPLATES for this finale. */
+    this.finaleQAQuestionOrder = [];
+    /** @type {Record<string, Record<string, number>>} jurorId → finalistId → vote sway */
+    this.juryQAAdjustments = {};
+
     this._initContestants(playerName, aiCount);
+    initTwistSchedule(this);
+
+    this.syncPhaseForWeekday();
+    this.houseEventComplete = false;
   }
 
   _initContestants(playerName, aiCount) {
@@ -113,10 +255,14 @@ export class GameState {
       }
     });
 
-    const aiContestants = aiNames.map((name) => new Contestant({
-      name,
-      difficultyBonus: this.config.aiStatBonus
-    }));
+    const aiContestants = aiNames.map((name) => {
+      const personality = pickPersonalityForCast(this.castPreset, { difficulty: this.difficulty });
+      return new Contestant({
+        name,
+        difficultyBonus: this.config.aiStatBonus,
+        personality: personality || undefined
+      });
+    });
 
     // Aggression modifier from difficulty
     for (const ai of aiContestants) {
@@ -124,10 +270,12 @@ export class GameState {
     }
 
     this.contestants = shuffle([player, ...aiContestants]);
+    ensureEasyCastFloaters(this.contestants, this.difficulty);
     const all = this.contestants;
     for (const c of all) {
       c.initRelationships(all, this.config.startingTrust);
     }
+    applyCastPresetPostInit(this);
   }
 
   getPlayer() {
@@ -182,6 +330,23 @@ export class GameState {
     }
     this.houseEventComplete = false;
     this.syncPhaseForWeekday();
+  }
+
+  /** Active nominees on the block (excludes evicted / cleared flags). */
+  getActiveNominees() {
+    return this.nominees
+      .map((id) => this.getContestant(id))
+      .filter((c) => c && !c.evicted && c.isNominated);
+  }
+
+  /**
+   * Heal saves that reached eviction night without HOH and/or two nominees
+   * (e.g. Week 1 starting mid-week before this fix).
+   * @param {'load' | 'recover' | 'runtime'} [source]
+   * @returns {object | null} repair record when adjusted
+   */
+  repairInvalidEvictionSchedule(source = 'runtime') {
+    return runScheduleRepair(this, source);
   }
 
   isScheduledHouseEventDay() {
@@ -261,6 +426,11 @@ export class GameState {
     for (const c of this.getActiveContestants()) {
       c.recalculateThreat(this);
     }
+    const player = this.getPlayer();
+    if (player && !player.evicted) {
+      const t = Math.round(player.threat);
+      this.playerPeakThreat = Math.max(this.playerPeakThreat ?? t, t);
+    }
   }
 
   resetWeeklyFlags() {
@@ -272,10 +442,139 @@ export class GameState {
     }
     this.nominees = [];
     this.vetoUsed = false;
+    this.vetoSavedNomineeId = null;
+    this.vetoWeekBlockSnapshot = [];
+    this.lastVetoRecapText = null;
+    this.lastVetoRecapWeek = null;
     this.vetoReplacements = [];
     this.evictedThisWeek = null;
     this.competitionWinner = null;
     this.currentHOH = null;
+    this.backdoorTargetId = null;
+    this.backdoorPawnsLocked = false;
+    this.playerThrowCompetition = false;
+  }
+
+  /** Clear HOH/nom/veto for Double Eviction round 2 on the same Thursday. */
+  resetPowerCycleForDoubleEvictionRound2() {
+    for (const c of this.getActiveContestants()) {
+      c.isHOH = false;
+      c.isNominated = false;
+      c.hasVeto = false;
+      c.votesReceived = 0;
+    }
+    this.nominees = [];
+    this.vetoUsed = false;
+    this.vetoReplacements = [];
+    this.vetoHolderId = null;
+    this.competitionWinner = null;
+    this.currentHOH = null;
+    this.currentCompetition = null;
+    this.challengeData = null;
+  }
+
+  evaluateDoubleEvictionWeek() {
+    this.doubleEvictionWeekActive = false;
+    this.doubleEvictionRound = 1;
+    this.doubleEvictionAwaitingRound2 = false;
+    this.doubleEvictionRound2Cycle = false;
+    this.doubleEvictionPendingNextPhase = null;
+    if (!this.doubleEvictionEnabled || this.doubleEvictionSeasonUsed) return;
+    const remaining = this.getActiveContestants().length;
+    const deAt = resolveDoubleEvictionHouseCount(this);
+    if (remaining <= deAt && remaining > 3) {
+      this.doubleEvictionWeekActive = true;
+    }
+  }
+
+  getDoubleEvictionRound2NextPhase() {
+    if (!this.doubleEvictionRound2Cycle) return null;
+    const idx = DOUBLE_EVICTION_ROUND2_PHASES.indexOf(this.phase);
+    if (idx < 0 || idx >= DOUBLE_EVICTION_ROUND2_PHASES.length - 1) return null;
+    return DOUBLE_EVICTION_ROUND2_PHASES[idx + 1];
+  }
+
+  startDoubleEvictionRound2() {
+    this.doubleEvictionRound = 2;
+    this.doubleEvictionAwaitingRound2 = false;
+    this.doubleEvictionRound2Cycle = true;
+    this.doubleEvictionPendingNextPhase = null;
+    this.doubleEvictionSeasonUsed = true;
+    this.resetPowerCycleForDoubleEvictionRound2();
+    this.weekdayIndex = 6;
+    this.day = 7;
+    this.phase = PHASES.COMPETITION;
+    this.houseEventComplete = false;
+  }
+
+  finalizeDoubleEvictionWeek() {
+    this.doubleEvictionWeekActive = false;
+    this.doubleEvictionRound2Cycle = false;
+    this.doubleEvictionAwaitingRound2 = false;
+    this.doubleEvictionPendingNextPhase = null;
+    this.doubleEvictionRound = 1;
+  }
+
+  shouldRunDoubleEvictionRound2() {
+    return (
+      this.doubleEvictionWeekActive
+      && this.doubleEvictionRound === 1
+      && !this.doubleEvictionAwaitingRound2
+      && !this.doubleEvictionRound2Cycle
+      && this.getActiveContestants().length > 2
+    );
+  }
+
+  processEviction(evicted) {
+    if (!evicted || evicted.evicted) return;
+    evicted.evicted = true;
+    evicted.evictedWeek = this.week;
+    evicted.isNominated = false;
+    evicted.isHOH = false;
+    evicted.hasVeto = false;
+    this.evictedThisWeek = evicted.id;
+    this.addHistory({
+      type: 'eviction',
+      evictedId: evicted.id,
+      powerRound: this.doubleEvictionRound > 1 ? 2 : 1
+    });
+    trackFirstEvicted(this, evicted);
+
+    const remaining = this.getActiveContestants().length;
+    const juryStart = resolveJuryStartHouseCount(this);
+    if (remaining <= juryStart - 1) {
+      evicted.isJuror = true;
+    }
+
+    this.nominees = this.nominees.filter((id) => id !== evicted.id);
+    for (const c of this.contestants) {
+      c.isNominated = this.nominees.includes(c.id);
+    }
+  }
+
+  getJurors() {
+    return this.contestants.filter((c) => c.evicted && c.isJuror);
+  }
+
+  addJuryQAAdjustment(jurorId, finalistId, delta) {
+    if (!this.juryQAAdjustments[jurorId]) this.juryQAAdjustments[jurorId] = {};
+    this.juryQAAdjustments[jurorId][finalistId] =
+      (this.juryQAAdjustments[jurorId][finalistId] || 0) + delta;
+  }
+
+  getPhaseDisplayLabel() {
+    if (this.inFinale && this.finalePhase) {
+      return FINALE_PHASE_LABELS[this.finalePhase] || 'Finale';
+    }
+    if (this.doubleEvictionWeekActive || this.doubleEvictionAwaitingRound2 || this.doubleEvictionRound2Cycle) {
+      const round = this.doubleEvictionRound;
+      const phase = PHASE_LABELS[this.phase] || this.phase;
+      if (this.doubleEvictionAwaitingRound2) {
+        return `Double Eviction · Vote 1 complete`;
+      }
+      return `Double Eviction · Round ${round} · ${phase}`;
+    }
+    return PHASE_LABELS[this.phase] || this.phase;
   }
 
   advancePhase() {
@@ -304,21 +603,27 @@ export class GameState {
     this.actionsRemaining = this.config.actionsPerDay;
     this.resetWeeklyFlags();
     this.syncPhaseForWeekday();
+    this.evaluateDoubleEvictionWeek();
+    evaluateTwistsForNewWeek(this);
+    for (const c of this.getActiveContestants()) {
+      if (c.threatOffset) {
+        c.threatOffset = Math.round(c.threatOffset * 0.5);
+        if (Math.abs(c.threatOffset) < 1) c.threatOffset = 0;
+      }
+    }
+    this.updateThreatLevels();
+    const player = this.getPlayer();
+    this.playerThreatWeekStart = player?.threat ?? null;
+    this.playerThreatWeekSnapshotWeek = this.week;
+    this.playerLayLowRestsWeek = this.week;
+    this.playerLayLowRestsThisWeek = 0;
   }
 
-  checkWinCondition(allowFinalTwo = true) {
+  checkWinCondition() {
     const active = this.getActiveContestants();
     if (active.length === 1) {
       this.gameOver = true;
       this.winner = active[0];
-      return true;
-    }
-    if (allowFinalTwo && active.length === 2) {
-      const [a, b] = active;
-      const scoreA = a.competition * 2 + a.social + a.reputation / 10;
-      const scoreB = b.competition * 2 + b.social + b.reputation / 10;
-      this.gameOver = true;
-      this.winner = scoreA >= scoreB ? a : b;
       return true;
     }
     return false;
@@ -328,7 +633,24 @@ export class GameState {
     return {
       difficulty: this.difficulty,
       castPreset: this.castPreset,
+      juryStartHouseCount: this.juryStartHouseCount,
+      doubleEvictionAt: this.doubleEvictionAt,
       doubleEvictionEnabled: this.doubleEvictionEnabled,
+      battleBackEnabled: this.battleBackEnabled,
+      mvpTwistEnabled: this.mvpTwistEnabled,
+      battleBackSeasonUsed: this.battleBackSeasonUsed,
+      battleBackWeekActive: this.battleBackWeekActive,
+      battleBackScheduledWeek: this.battleBackScheduledWeek,
+      battleBackResolvedTonight: this.battleBackResolvedTonight,
+      firstEvictedId: this.firstEvictedId,
+      mvpTwistSeasonUsed: this.mvpTwistSeasonUsed,
+      mvpTwistWeekActive: this.mvpTwistWeekActive,
+      mvpTwistScheduledWeek: this.mvpTwistScheduledWeek,
+      mvpHolderId: this.mvpHolderId,
+      mvpPowerAvailable: this.mvpPowerAvailable,
+      mvpRaceOpen: this.mvpRaceOpen,
+      mvpCampaignPoints: this.mvpCampaignPoints,
+      mvpCampaignedToday: this.mvpCampaignedToday,
       week: this.week,
       weekdayIndex: this.weekdayIndex,
       day: this.day,
@@ -340,9 +662,37 @@ export class GameState {
       alliances: this.alliances,
       history: this.history,
       storyLog: this.storyLog,
+      playerThreatWeekStart: this.playerThreatWeekStart,
+      playerThreatWeekSnapshotWeek: this.playerThreatWeekSnapshotWeek,
+      playerPeakThreat: this.playerPeakThreat,
+      playerStatCounters: this.playerStatCounters,
+      playerLayLowWeek: this.playerLayLowWeek,
+      playerLayLowBefore: this.playerLayLowBefore,
+      playerLayLowAfter: this.playerLayLowAfter,
+      playerLayLowRestsWeek: this.playerLayLowRestsWeek,
+      playerLayLowRestsThisWeek: this.playerLayLowRestsThisWeek,
+      hostBeatLog: this.hostBeatLog,
+      lastHostBeatKind: this.lastHostBeatKind,
+      lastHostBeatSource: this.lastHostBeatSource,
+      confessionalLog: this.confessionalLog,
+      confessionalDedupeKeys: this.confessionalDedupeKeys,
+      lastWeekRecap: this.lastWeekRecap,
+      weekRecapLog: this.weekRecapLog,
+      lastScheduleRepair: this.lastScheduleRepair,
+      scheduleRepairLog: this.scheduleRepairLog,
+      lastPawnShieldWeek: this.lastPawnShieldWeek,
+      lastPawnShieldNomineeNames: this.lastPawnShieldNomineeNames,
+      lastPawnShieldNomineeIds: this.lastPawnShieldNomineeIds,
+      playerThrowCompetition: this.playerThrowCompetition,
+      backdoorTargetId: this.backdoorTargetId,
+      backdoorPawnsLocked: this.backdoorPawnsLocked,
       currentHOH: this.currentHOH?.id ?? this.currentHOH,
       nominees: this.nominees,
       vetoUsed: this.vetoUsed,
+      vetoSavedNomineeId: this.vetoSavedNomineeId,
+      vetoWeekBlockSnapshot: this.vetoWeekBlockSnapshot,
+      lastVetoRecapText: this.lastVetoRecapText,
+      lastVetoRecapWeek: this.lastVetoRecapWeek,
       vetoReplacements: this.vetoReplacements,
       evictedThisWeek: this.evictedThisWeek,
       competitionWinner: this.competitionWinner?.id ?? this.competitionWinner,
@@ -352,7 +702,23 @@ export class GameState {
       playerIntel: this.playerIntel,
       gameOver: this.gameOver,
       winner: this.winner ? this.winner.id : null,
-      houseEventComplete: this.houseEventComplete
+      houseEventComplete: this.houseEventComplete,
+      doubleEvictionSeasonUsed: this.doubleEvictionSeasonUsed,
+      doubleEvictionWeekActive: this.doubleEvictionWeekActive,
+      doubleEvictionRound: this.doubleEvictionRound,
+      doubleEvictionAwaitingRound2: this.doubleEvictionAwaitingRound2,
+      doubleEvictionRound2Cycle: this.doubleEvictionRound2Cycle,
+      doubleEvictionPendingNextPhase: this.doubleEvictionPendingNextPhase,
+      inFinale: this.inFinale,
+      finalePhase: this.finalePhase,
+      finaleR1WinnerId: this.finaleR1WinnerId,
+      finaleR2WinnerId: this.finaleR2WinnerId,
+      finaleR3WinnerId: this.finaleR3WinnerId,
+      finalePartLosers: this.finalePartLosers,
+      finaleAwaitingStep: this.finaleAwaitingStep,
+      finaleQAIndex: this.finaleQAIndex,
+      finaleQAQuestionOrder: this.finaleQAQuestionOrder,
+      juryQAAdjustments: this.juryQAAdjustments
     };
   }
 
@@ -362,7 +728,30 @@ export class GameState {
     state.difficulty = data.difficulty;
     state.config = DIFFICULTY_CONFIG[data.difficulty];
     state.castPreset = data.castPreset ?? 'standard';
+    state.juryStartHouseCount =
+      data.juryStartHouseCount ??
+      getCastPreset(state.castPreset).juryStartHouseCount ??
+      JURY_START_HOUSE_COUNT;
+    state.doubleEvictionAt =
+      data.doubleEvictionAt ??
+      getCastPreset(state.castPreset).doubleEvictionAt ??
+      DEFAULT_DOUBLE_EVICTION_AT;
     state.doubleEvictionEnabled = data.doubleEvictionEnabled ?? true;
+    state.battleBackEnabled = data.battleBackEnabled ?? false;
+    state.mvpTwistEnabled = data.mvpTwistEnabled ?? false;
+    state.battleBackSeasonUsed = data.battleBackSeasonUsed ?? false;
+    state.battleBackWeekActive = data.battleBackWeekActive ?? false;
+    state.battleBackScheduledWeek = data.battleBackScheduledWeek ?? null;
+    state.battleBackResolvedTonight = data.battleBackResolvedTonight ?? false;
+    state.firstEvictedId = data.firstEvictedId ?? null;
+    state.mvpTwistSeasonUsed = data.mvpTwistSeasonUsed ?? false;
+    state.mvpTwistWeekActive = data.mvpTwistWeekActive ?? false;
+    state.mvpTwistScheduledWeek = data.mvpTwistScheduledWeek ?? null;
+    state.mvpHolderId = data.mvpHolderId ?? null;
+    state.mvpPowerAvailable = data.mvpPowerAvailable ?? false;
+    state.mvpRaceOpen = data.mvpRaceOpen ?? false;
+    state.mvpCampaignPoints = data.mvpCampaignPoints ?? {};
+    state.mvpCampaignedToday = data.mvpCampaignedToday ?? false;
     state.week = data.week;
     state.weekdayIndex =
       data.weekdayIndex ??
@@ -377,11 +766,40 @@ export class GameState {
     state.alliances = data.alliances;
     state.history = data.history;
     state.storyLog = data.storyLog;
+    state.playerThreatWeekStart = data.playerThreatWeekStart ?? null;
+    state.playerPeakThreat = data.playerPeakThreat ?? null;
+    state.playerStatCounters = data.playerStatCounters ?? { confessionals: 0, layLowDr: 0 };
+    state.playerThreatWeekSnapshotWeek = data.playerThreatWeekSnapshotWeek ?? null;
+    state.playerLayLowWeek = data.playerLayLowWeek ?? null;
+    state.playerLayLowBefore = data.playerLayLowBefore ?? null;
+    state.playerLayLowAfter = data.playerLayLowAfter ?? null;
+    state.playerLayLowRestsWeek = data.playerLayLowRestsWeek ?? null;
+    state.playerLayLowRestsThisWeek = data.playerLayLowRestsThisWeek ?? 0;
+    state.hostBeatLog = data.hostBeatLog ?? [];
+    state.lastHostBeatKind = data.lastHostBeatKind ?? null;
+    state.lastHostBeatSource = data.lastHostBeatSource ?? null;
+    state.confessionalLog = data.confessionalLog ?? [];
+    state.confessionalDedupeKeys = data.confessionalDedupeKeys ?? [];
+    state.lastWeekRecap = data.lastWeekRecap ?? null;
+    state.weekRecapLog = data.weekRecapLog ?? [];
+    state.lastScheduleRepair = data.lastScheduleRepair ?? null;
+    state.scheduleRepairLog = data.scheduleRepairLog ?? [];
+    state.weekRecapPayload = null;
+    state.lastPawnShieldWeek = data.lastPawnShieldWeek ?? null;
+    state.lastPawnShieldNomineeNames = data.lastPawnShieldNomineeNames ?? [];
+    state.lastPawnShieldNomineeIds = data.lastPawnShieldNomineeIds ?? [];
+    state.playerThrowCompetition = data.playerThrowCompetition ?? false;
+    state.backdoorTargetId = data.backdoorTargetId ?? null;
+    state.backdoorPawnsLocked = data.backdoorPawnsLocked ?? false;
     state.currentHOH = data.currentHOH
       ? state.contestants.find((c) => c.id === data.currentHOH) || data.currentHOH
       : null;
     state.nominees = data.nominees;
     state.vetoUsed = data.vetoUsed;
+    state.vetoSavedNomineeId = data.vetoSavedNomineeId ?? null;
+    state.vetoWeekBlockSnapshot = data.vetoWeekBlockSnapshot ?? [];
+    state.lastVetoRecapText = data.lastVetoRecapText ?? null;
+    state.lastVetoRecapWeek = data.lastVetoRecapWeek ?? null;
     state.vetoReplacements = data.vetoReplacements;
     state.evictedThisWeek = data.evictedThisWeek;
     state.competitionWinner = data.competitionWinner
@@ -394,6 +812,23 @@ export class GameState {
     state.gameOver = data.gameOver;
     state.winner = data.winner ? state.contestants.find((c) => c.id === data.winner) : null;
     state.houseEventComplete = data.houseEventComplete ?? false;
+    state.doubleEvictionSeasonUsed = data.doubleEvictionSeasonUsed ?? false;
+    state.doubleEvictionWeekActive = data.doubleEvictionWeekActive ?? false;
+    state.doubleEvictionRound = data.doubleEvictionRound ?? 1;
+    state.doubleEvictionAwaitingRound2 = data.doubleEvictionAwaitingRound2 ?? false;
+    state.doubleEvictionRound2Cycle = data.doubleEvictionRound2Cycle ?? false;
+    state.doubleEvictionPendingNextPhase = data.doubleEvictionPendingNextPhase ?? null;
+    state.inFinale = data.inFinale ?? false;
+    state.finalePhase = data.finalePhase ?? null;
+    state.finaleR1WinnerId = data.finaleR1WinnerId ?? null;
+    state.finaleR2WinnerId = data.finaleR2WinnerId ?? null;
+    state.finaleR3WinnerId = data.finaleR3WinnerId ?? null;
+    state.finalePartLosers = data.finalePartLosers ?? [];
+    state.finaleAwaitingStep = data.finaleAwaitingStep ?? null;
+    state.finaleQAIndex = data.finaleQAIndex ?? 0;
+    state.finaleQAQuestionOrder = data.finaleQAQuestionOrder ?? [];
+    state.juryQAAdjustments = data.juryQAAdjustments ?? {};
+    state.repairInvalidEvictionSchedule('load');
     return state;
   }
 }

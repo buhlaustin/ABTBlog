@@ -24,24 +24,35 @@ Then visit `http://localhost:8080`.
 
 ## Features
 
-- **16 houseguests** by default (you + 15 AI); optional 12 or 11 cast
-- Big Brother-style week: HOH → nominations → Power of Veto → live eviction
-- Jury of 7 (starts when 9 remain), Final 3 comp chain, jury vote for the win
-- Optional **double eviction** week (once per season, when ≤8 remain; default on)
-- Autonomous AI that forms alliances, betrays allies, and votes strategically
-- Optional **OpenAI host narration** via AWS Lambda + Secrets Manager ([docs/hos-openai-aws.md](../../docs/hos-openai-aws.md))
-- Five competition types: trivia, memory, logic, endurance, and chance
-- Full eviction system with vote breakdowns and reasoning
-- Random drama events and intel gathering
-- Save/load via localStorage
-- Three difficulty levels
-- Endgame summary explaining your win or loss
+- **Cast presets** — standard through mega (24); All-Stars vs rookies; Brains; jury sprint; twist defaults per preset
+- Big Brother-style week: HOH → nominations → Power of Veto → live eviction (Week 1 premiere: mingle, then first HOH)
+- **Finale:** Final 3 HOH parts, jury Q&A, jury vote; sidebar **Jury** panel with lean once seated
+- Optional season twists: **double eviction**, **Battle Back**, **MVP week** (setup cheat sheet)
+- **Deals & grudges**, threat bands, alliance map, veto block clarity, week calendar strip, confessionals, week-end recap
+- **Achievements & career stats** — end-game breakdown, badges, `localStorage` profile
+- Schedule repair transparency on bad saves
+- Autonomous AI; optional **OpenAI host narration** ([docs/hos-openai-aws.md](../../docs/hos-openai-aws.md))
+- Five competition types; save/load; Easy / Normal / Hard
+
+## Smoke tests
+
+From the repo root:
+
+```bash
+node scripts/hos-confessionals-smoke.mjs
+node scripts/hos-week-recap-smoke.mjs
+node scripts/hos-week-calendar-smoke.mjs
+node scripts/hos-schedule-repair-smoke.mjs
+node scripts/hos-cast-presets-smoke.mjs
+node scripts/hos-run-stats-smoke.mjs
+```
 
 ## Project Structure
 
 ```
 index.html          # Game shell and layout
-style.css           # UI styling
+style.css           # Base UI
+ui-refresh.css      # Layout, typography, and surface refresh layer
 game.js             # Main game controller and weekly loop
 modules/
   Contestant.js     # Houseguest class and stats
@@ -52,7 +63,9 @@ modules/
   Eviction.js       # Nominations, veto, and eviction votes
   PlayerActions.js  # Player social actions
   UI.js             # DOM rendering
-  Storage.js        # localStorage save/load
+  Storage.js        # localStorage save/load + career profile
+  runStats.js       # Achievements and run stats
+  castPresets.js    # Cast presets and twist defaults
   utils.js          # Shared helpers
 ```
 
