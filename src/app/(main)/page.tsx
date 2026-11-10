@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
 import { JsonLd } from "@/components/json-ld";
-import { SiteLogo } from "@/components/site-logo";
 import { profile, siteConfig } from "@/lib/profile";
 import { pageMetadata, personJsonLd } from "@/lib/seo";
 import { workItems } from "@/lib/work-registry";
@@ -72,8 +71,7 @@ export default function HomePage() {
   const featuredWork = workItems.filter((item) => item.featured);
   const otherFeatured = featuredWork.filter((item) => item.slug !== "startup-sim");
   const latestPost = getAllPosts()[0];
-  const bioLead = profile.hero.lead;
-  const bioSide = profile.hero.support;
+  const { hero } = profile;
 
   return (
     <>
@@ -87,24 +85,25 @@ export default function HomePage() {
         />
         <div className="relative mx-auto grid max-w-5xl gap-10 px-safe py-12 sm:py-20 lg:grid-cols-[1fr_minmax(0,17rem)] lg:items-start lg:gap-14">
           <div className="min-w-0">
-            <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted">
-              {siteConfig.location}
-            </p>
-            <h1 className="mt-4 max-w-lg">
-              <SiteLogo variant="hero" />
+            <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+              {siteConfig.name}
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-foreground">
-              {bioLead}
+            <p className="mt-3 font-mono text-sm text-muted sm:text-base">
+              {hero.tagline}
             </p>
-            <p className="mt-3 max-w-xl text-base leading-relaxed text-muted">
-              {bioSide}
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-foreground">
+              {hero.lead}
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
+              {hero.support}
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 href="/work/"
-                className="inline-flex min-h-11 items-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 active:bg-zinc-700"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 active:bg-zinc-700"
               >
-                Explore work
+                {hero.sideProjectsCta}
+                <span aria-hidden>↓</span>
               </Link>
               <Link
                 href="/about/"
@@ -132,7 +131,7 @@ export default function HomePage() {
               />
               <div className="min-w-0 text-sm leading-snug">
                 <p className="font-semibold text-foreground">{siteConfig.name}</p>
-                <p className="text-muted">{profile.workLine}</p>
+                <p className="text-muted">{profile.hero.tagline}</p>
               </div>
             </div>
             <Link

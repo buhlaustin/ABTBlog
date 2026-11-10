@@ -49,7 +49,7 @@ export const profileWorkLine =
   "Co-Founder & CEO, ClassQuip · Founder, Novux Games";
 
 export const profile = {
-  role: "Software Engineer & Founder",
+  role: "Software Engineer & Builder",
   ventures: founderVentures,
   workLine: profileWorkLine,
   /** Primary edtech company — prefer `ventures.classQuip` for links. */
@@ -60,11 +60,14 @@ export const profile = {
   avatarUrl: "https://avatars.githubusercontent.com/u/287395945?v=4",
   linkedIn: "https://www.linkedin.com/in/austinbuhl20",
   email: "abuhl@classquip.com",
-  /** Homepage hero only—short, human, no founding dates. */
+  /** Homepage hero only. */
   hero: {
-    lead: "I'm a software engineer in Knoxville. I co-founded ClassQuip and run Novux Games.",
+    tagline: "Software Engineer & Builder | Knoxville, TN",
+    lead:
+      "Driven by hard problems, clean architectures, and data-heavy systems. My work spans everything from founding and building ed-tech infrastructure at ClassQuip to engineering possession-level simulation engines with Novux Games (Dynasty: College Basketball).",
     support:
-      "Novux is working on Dynasty: College Basketball for Android. The games and simulators under Work on this site are my own side projects—not Novux releases.",
+      "The projects under Work are my personal sandbox—simulators, tools, and side projects built to explore mechanics independently of Novux releases.",
+    sideProjectsCta: "View Side Projects",
   } as const,
   bioParagraphs: [
     "I'm a builder in Knoxville—Co-Founder and CEO of ClassQuip and founder of Novux Games.",
