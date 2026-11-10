@@ -15,7 +15,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "About",
-  description: `About ${siteConfig.name}, a software engineer and founder in Knoxville, TN—ClassQuip (edtech), Novux Games (browser games), and open source.`,
+  description: `About ${siteConfig.name}, a software engineer and founder in Knoxville, TN—ClassQuip (edtech), Novux Games (Dynasty: College Basketball on Android), and personal open-source projects.`,
   path: "/about/",
 });
 
@@ -159,7 +159,8 @@ export default function AboutPage() {
 
         <AboutSection title="Side projects & open source">
           <p>
-            Games and simulations through{" "}
+            Browser games and simulators on this site are personal projects.
+            Commercial game work runs through{" "}
             <a
               href={ventures.novuxGames.url}
               className="font-semibold text-accent underline-offset-2 hover:underline"
@@ -168,8 +169,8 @@ export default function AboutPage() {
             >
               Novux Games
             </a>
-            , plus devtools I ship publicly on GitHub when an idea won&apos;t
-            leave me alone.
+            . I also ship devtools on GitHub when an idea won&apos;t leave me
+            alone.
           </p>
           <ul className="list-none space-y-6 pl-0">
             {openSourceHighlights.map((project) => (
