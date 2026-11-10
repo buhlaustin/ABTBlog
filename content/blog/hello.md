@@ -2,7 +2,7 @@
 title: "Hello World: Building Real-Time Systems, Tackling EdTech Friction, and Engineering in the Open"
 slug: hello
 date: 2026-10-27
-description: A decade in K–12 edtech ops and real-time software—and why I built ClassQuip and write about the work in public.
+description: A decade in K–12 edtech ops and real-time software—founding ClassQuip, Novux Games, and writing about the work in public.
 author: Austin Buhl
 tags:
   - intro
@@ -48,7 +48,7 @@ That led to building ClassQuip from the ground up—not as a general video meeti
 
 ## Engineering Beyond the Day Job
 
-While ClassQuip is my core focus, I'm a builder at heart. When I'm not actively working on scalable edtech infrastructure or tuning media pipelines, I'm usually pursuing whatever technical idea won't leave me alone until I build it.
+ClassQuip remains my core edtech focus. In November 2026 I founded [Novux Games](https://novux.dev) for browser simulations and indie games—the playable work you'll see under Work on this site. I'm still a builder at heart: when an idea won't leave me alone, it ships through ClassQuip, Novux, or open source.
 
 I believe the best engineers are relentless hobbyists—people who build prototypes simply to see how far a browser API can be pushed, or how clean an algorithm can be structured. For me, that manifests in a few key areas:
 

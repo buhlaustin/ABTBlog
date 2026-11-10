@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: "Austin Buhl",
   /** Default `<title>` and Open Graph title for the homepage (no domain name). */
-  defaultTitle: "Austin Buhl — Software Engineer",
+  defaultTitle: "Austin Buhl — Software Engineer & Founder",
   /** Appended by root layout for inner pages: `%s · Austin Buhl`. */
   description:
-    "Software engineer and indie game designer in Knoxville, TN. Real-time edtech, browser games, simulations, and open source.",
+    "Software engineer and founder in Knoxville, TN. ClassQuip (real-time K–12 edtech) and Novux Games (browser games and simulations), plus open source.",
   url: "https://austinbuhltech.com",
   locale: "en_US",
   github: "https://github.com/buhlaustin",
@@ -14,10 +14,10 @@ export const siteConfig = {
   favicon: "/ab-favicon.svg",
   ogImage: "/social-open-graph.png",
   ogImageAlt:
-    "Austin Buhl — software engineer and indie game designer in Knoxville, TN",
+    "Austin Buhl — software engineer and founder (ClassQuip, Novux Games) in Knoxville, TN",
   rss: {
     channelTitle: "Austin Buhl",
     channelDescription:
-      "Writing on software engineering, edtech, browser games, and side projects by Austin Buhl.",
+      "Writing on software engineering, edtech, browser games, and projects from ClassQuip and Novux Games.",
   },
 } as const;

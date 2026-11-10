@@ -6,6 +6,7 @@ import {
   profile,
   quickFacts,
   siteConfig,
+  ventures,
 } from "@/lib/profile";
 import { focusAreas, resumeGroups } from "@/lib/resume";
 import { workItems } from "@/lib/work-registry";
@@ -14,7 +15,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "About",
-  description: `About ${siteConfig.name}, a software engineer and indie game designer in Knoxville, TN—real-time edtech, browser games, and open source.`,
+  description: `About ${siteConfig.name}, a software engineer and founder in Knoxville, TN—ClassQuip (edtech), Novux Games (browser games), and open source.`,
   path: "/about/",
 });
 
@@ -158,8 +159,17 @@ export default function AboutPage() {
 
         <AboutSection title="Side projects & open source">
           <p>
-            Games, simulations, and devtools I ship publicly on GitHub when an
-            idea won&apos;t leave me alone.
+            Games and simulations through{" "}
+            <a
+              href={ventures.novuxGames.url}
+              className="font-semibold text-accent underline-offset-2 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Novux Games
+            </a>
+            , plus devtools I ship publicly on GitHub when an idea won&apos;t
+            leave me alone.
           </p>
           <ul className="list-none space-y-6 pl-0">
             {openSourceHighlights.map((project) => (
@@ -240,12 +250,21 @@ export default function AboutPage() {
             </a>
             {" · "}
             <a
-              href={profile.companyUrl}
+              href={ventures.classQuip.url}
               className="font-medium text-accent underline-offset-2 hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
               ClassQuip
+            </a>
+            {" · "}
+            <a
+              href={ventures.novuxGames.url}
+              className="font-medium text-accent underline-offset-2 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Novux Games
             </a>
           </p>
         </AboutSection>

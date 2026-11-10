@@ -42,6 +42,18 @@ export const resumeGroups: ResumeGroup[] = [
     name: "Executive & founder leadership",
     roles: [
       {
+        title: "Founder & CEO",
+        organization: "Novux Games",
+        organizationUrl: "https://novux.dev",
+        period: "Nov 2026 – Present",
+        location: "Knoxville, TN",
+        highlights: [
+          "Indie games studio for browser-native simulations and strategy titles—shipping playable work at novux.dev and hosting select demos on this site.",
+          "Product home for in-browser games and experiments (including House of Strategy, Startup Simulator, and related prototypes) built with the same real-time and state-management discipline as production edtech.",
+          "Brand, distribution, and engineering for Novux-owned titles separate from the ClassQuip classroom stack.",
+        ],
+      },
+      {
         title: "Co-Founder, CEO & Chief Architect",
         organization: "ClassQuip",
         organizationUrl: "https://classquip.com",

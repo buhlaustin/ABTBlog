@@ -5,22 +5,59 @@ import { siteConfig } from "@/lib/site";
 export const authorCard = {
   name: "Austin Buhl",
   shortBio:
-    "Co-Founder & CEO of ClassQuip in Knoxville, TN. I build low-latency WebRTC for K–12, browser games like House of Strategy, and open-source tools when I’m not in the classroom stack.",
+    "Co-Founder & CEO of ClassQuip and Founder of Novux Games in Knoxville, TN. I build low-latency WebRTC for K–12, browser games and simulations at novux.dev, and open-source tools when an idea won’t leave me alone.",
 } as const;
 
+export type Venture = {
+  name: string;
+  url: string;
+  role: string;
+  /** Human-readable founding month/year for bios and quick facts. */
+  founded: string;
+};
+
+export const ventures = {
+  classQuip: {
+    name: "ClassQuip",
+    url: "https://www.classquip.com",
+    role: "Co-Founder & CEO",
+    founded: "September 2026",
+  },
+  novuxGames: {
+    name: "Novux Games",
+    url: "https://novux.dev",
+    role: "Founder",
+    founded: "November 2026",
+  },
+} satisfies Record<string, Venture>;
+
+/** Founder roles in display order (newest venture first). */
+export const founderVentures: Venture[] = [
+  ventures.novuxGames,
+  ventures.classQuip,
+];
+
+/** Single-line summary for bylines, hero asides, and quick scanning. */
+export const profileWorkLine =
+  "Co-Founder & CEO, ClassQuip · Founder, Novux Games";
+
 export const profile = {
-  role: "Software Engineer",
-  company: "ClassQuip",
-  companyUrl: "https://www.classquip.com",
+  role: "Software Engineer & Founder",
+  ventures: founderVentures,
+  workLine: profileWorkLine,
+  /** Primary edtech company — prefer `ventures.classQuip` for links. */
+  company: ventures.classQuip.name,
+  companyUrl: ventures.classQuip.url,
+  novuxUrl: ventures.novuxGames.url,
   previousEmployer: "Stride / K12",
   avatarUrl: "https://avatars.githubusercontent.com/u/287395945?v=4",
   linkedIn: "https://www.linkedin.com/in/austinbuhl20",
   email: "abuhl@classquip.com",
   bioParagraphs: [
-    "I'm a builder and software engineer in Knoxville, TN—Co-Founder and CEO of ClassQuip.",
+    `I'm a builder and software engineer in Knoxville, TN—Co-Founder and CEO of ClassQuip (founded ${ventures.classQuip.founded}) and Founder of Novux Games (founded ${ventures.novuxGames.founded}).`,
     "For the better part of a decade I've worked inside real-time software and K–12 edtech, mostly on the ground: support with IT directors at 7 AM, teachers mid-lesson when a tab freezes, and streams that die on district firewalls and student Chromebooks. That work taught me to treat a live classroom as an environment, not a feature checklist.",
     "I founded ClassQuip to build a classroom engine from scratch for those constraints—custom low-latency WebRTC on AWS, unified teacher workflows, and compliance tooling (LTI 1.3, OneRoster) so attendance and participation logging doesn't land on teachers after school.",
-    "When I'm not in the edtech stack, I build browser simulations, games, and open-source tools—the same engineering muscle, different playgrounds.",
+    "Novux Games is the home for browser simulations, indie games, and playable experiments—the work you'll find at novux.dev and under Work on this site—using the same engineering discipline, different product lane.",
   ] as const,
 } as const;
 
@@ -34,7 +71,14 @@ export const quickFacts: QuickFact[] = [
   { label: "Sign", value: "Gemini" },
   { label: "Based in", value: "Knoxville, TN" },
   { label: "Politics", value: "Independent" },
-  { label: "Work", value: "Co-Founder & CEO, ClassQuip" },
+  {
+    label: "ClassQuip",
+    value: `${ventures.classQuip.role} (founded ${ventures.classQuip.founded})`,
+  },
+  {
+    label: "Novux Games",
+    value: `${ventures.novuxGames.role} (founded ${ventures.novuxGames.founded})`,
+  },
   { label: "Before that", value: "Stride / K12 (edtech operations)" },
 ];
 

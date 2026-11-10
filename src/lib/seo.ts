@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ventures } from "@/lib/profile";
 import { siteConfig } from "@/lib/site";
 
 const ogImage = {
@@ -114,7 +115,7 @@ export function personJsonLd() {
     "@type": "Person",
     name: siteConfig.name,
     url: siteConfig.url,
-    jobTitle: "Software Engineer",
+    jobTitle: "Founder & Software Engineer",
     description: siteConfig.description,
     address: {
       "@type": "PostalAddress",
@@ -122,6 +123,18 @@ export function personJsonLd() {
       addressRegion: "TN",
       addressCountry: "US",
     },
+    worksFor: [
+      {
+        "@type": "Organization",
+        name: ventures.classQuip.name,
+        url: ventures.classQuip.url,
+      },
+      {
+        "@type": "Organization",
+        name: ventures.novuxGames.name,
+        url: ventures.novuxGames.url,
+      },
+    ],
     sameAs: [siteConfig.github, "https://www.linkedin.com/in/austinbuhl20"],
   };
 }

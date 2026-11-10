@@ -22,7 +22,7 @@ const focusPillars = [
   },
   {
     title: "Simulations & games",
-    body: "Interactive physics, social strategy, and browser prototypes—things you can run without installing anything.",
+    body: "Novux Games—interactive physics, social strategy, and browser prototypes you can run without installing anything.",
   },
   {
     title: "Open source",
@@ -132,7 +132,7 @@ export default function HomePage() {
               />
               <div className="min-w-0 text-sm leading-snug">
                 <p className="font-semibold text-foreground">{siteConfig.name}</p>
-                <p className="text-muted">{profile.role}</p>
+                <p className="text-muted">{profile.workLine}</p>
               </div>
             </div>
             <Link
@@ -238,8 +238,8 @@ export default function HomePage() {
               Resume, experience &amp; quick facts
             </h2>
             <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
-              Eight years in real-time software and K–12 edtech—platform
-              operations, ClassQuip, and side projects collected in one place.
+              Eight years in real-time software and K–12 edtech—ClassQuip,
+              Novux Games, and open projects collected in one place.
             </p>
             <Link
               href="/about/"
