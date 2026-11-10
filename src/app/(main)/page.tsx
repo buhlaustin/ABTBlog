@@ -22,7 +22,7 @@ const focusPillars = [
   },
   {
     title: "Simulations & games",
-    body: "Novux Games—interactive physics, social strategy, and browser prototypes you can run without installing anything.",
+    body: "Personal browser prototypes—strategy games, tycoon sims, physics toys—hosted here so you can play without installing anything.",
   },
   {
     title: "Open source",
@@ -72,8 +72,8 @@ export default function HomePage() {
   const featuredWork = workItems.filter((item) => item.featured);
   const otherFeatured = featuredWork.filter((item) => item.slug !== "startup-sim");
   const latestPost = getAllPosts()[0];
-  const bioLead = profile.bioParagraphs[0];
-  const bioSide = profile.bioParagraphs[3];
+  const bioLead = profile.hero.lead;
+  const bioSide = profile.hero.support;
 
   return (
     <>
@@ -238,8 +238,8 @@ export default function HomePage() {
               Resume, experience &amp; quick facts
             </h2>
             <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
-              Eight years in real-time software and K–12 edtech—ClassQuip,
-              Novux Games, and open projects collected in one place.
+              Eight years in K–12 edtech, ClassQuip, Novux, and the personal
+              projects collected here.
             </p>
             <Link
               href="/about/"

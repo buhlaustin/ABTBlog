@@ -48,7 +48,7 @@ That led to building ClassQuip from the ground up—not as a general video meeti
 
 ## Engineering Beyond the Day Job
 
-ClassQuip remains my core edtech focus. In November 2026 I founded [Novux Games](https://novux.dev) for browser simulations and indie games—the playable work you'll see under Work on this site. I'm still a builder at heart: when an idea won't leave me alone, it ships through ClassQuip, Novux, or open source.
+ClassQuip remains my core edtech focus. I also founded [Novux Games](https://novux.dev), where we're building *Dynasty: College Basketball* for Android. The browser games and simulators on this site are personal projects—not Novux catalog titles. When an idea won't leave me alone, it ships through ClassQuip, Novux, open source, or here under Work.
 
 I believe the best engineers are relentless hobbyists—people who build prototypes simply to see how far a browser API can be pushed, or how clean an algorithm can be structured. For me, that manifests in a few key areas:
 

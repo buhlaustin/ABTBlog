@@ -48,9 +48,8 @@ export const resumeGroups: ResumeGroup[] = [
         period: "Nov 2026 – Present",
         location: "Knoxville, TN",
         highlights: [
-          "Indie games studio for browser-native simulations and strategy titles—shipping playable work at novux.dev and hosting select demos on this site.",
-          "Product home for in-browser games and experiments (including House of Strategy, Startup Simulator, and related prototypes) built with the same real-time and state-management discipline as production edtech.",
-          "Brand, distribution, and engineering for Novux-owned titles separate from the ClassQuip classroom stack.",
+          "Indie studio building Dynasty: College Basketball—an Android title in active development (see novux.dev).",
+          "Product, engineering, and publishing for Novux-owned games, separate from ClassQuip and from personal browser experiments hosted on austinbuhltech.com.",
         ],
       },
       {

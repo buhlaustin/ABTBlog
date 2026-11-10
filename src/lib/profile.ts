@@ -5,14 +5,14 @@ import { siteConfig } from "@/lib/site";
 export const authorCard = {
   name: "Austin Buhl",
   shortBio:
-    "Co-Founder & CEO of ClassQuip and Founder of Novux Games in Knoxville, TN. I build low-latency WebRTC for K–12, browser games and simulations at novux.dev, and open-source tools when an idea won’t leave me alone.",
+    "Co-Founder & CEO of ClassQuip and founder of Novux Games in Knoxville. K–12 classroom software by day; Dynasty: College Basketball on Android at Novux; browser toys and open source when I can't help myself.",
 } as const;
 
 export type Venture = {
   name: string;
   url: string;
   role: string;
-  /** Human-readable founding month/year for bios and quick facts. */
+  /** For resume timeline / long-form copy only—not hero intros. */
   founded: string;
 };
 
@@ -30,6 +30,13 @@ export const ventures = {
     founded: "November 2026",
   },
 } satisfies Record<string, Venture>;
+
+/** Novux’s in-development title (not the personal projects on this site). */
+export const novuxFlagship = {
+  name: "Dynasty: College Basketball",
+  platform: "Android",
+  status: "in development",
+} as const;
 
 /** Founder roles in display order (newest venture first). */
 export const founderVentures: Venture[] = [
@@ -53,11 +60,17 @@ export const profile = {
   avatarUrl: "https://avatars.githubusercontent.com/u/287395945?v=4",
   linkedIn: "https://www.linkedin.com/in/austinbuhl20",
   email: "abuhl@classquip.com",
+  /** Homepage hero only—short, human, no founding dates. */
+  hero: {
+    lead: "I'm a software engineer in Knoxville. I co-founded ClassQuip and run Novux Games.",
+    support:
+      "Novux is working on Dynasty: College Basketball for Android. The games and simulators under Work on this site are my own side projects—not Novux releases.",
+  } as const,
   bioParagraphs: [
-    `I'm a builder and software engineer in Knoxville, TN—Co-Founder and CEO of ClassQuip (founded ${ventures.classQuip.founded}) and Founder of Novux Games (founded ${ventures.novuxGames.founded}).`,
+    "I'm a builder in Knoxville—Co-Founder and CEO of ClassQuip and founder of Novux Games.",
     "For the better part of a decade I've worked inside real-time software and K–12 edtech, mostly on the ground: support with IT directors at 7 AM, teachers mid-lesson when a tab freezes, and streams that die on district firewalls and student Chromebooks. That work taught me to treat a live classroom as an environment, not a feature checklist.",
     "I founded ClassQuip to build a classroom engine from scratch for those constraints—custom low-latency WebRTC on AWS, unified teacher workflows, and compliance tooling (LTI 1.3, OneRoster) so attendance and participation logging doesn't land on teachers after school.",
-    "Novux Games is the home for browser simulations, indie games, and playable experiments—the work you'll find at novux.dev and under Work on this site—using the same engineering discipline, different product lane.",
+    `At Novux Games the focus is ${novuxFlagship.name}, an ${novuxFlagship.platform} title ${novuxFlagship.status}. I still ship browser experiments and open source on my own—House of Strategy, Startup Simulator, and the rest live here under Work, separate from the studio.`,
   ] as const,
 } as const;
 
@@ -71,13 +84,10 @@ export const quickFacts: QuickFact[] = [
   { label: "Sign", value: "Gemini" },
   { label: "Based in", value: "Knoxville, TN" },
   { label: "Politics", value: "Independent" },
-  {
-    label: "ClassQuip",
-    value: `${ventures.classQuip.role} (founded ${ventures.classQuip.founded})`,
-  },
+  { label: "ClassQuip", value: ventures.classQuip.role },
   {
     label: "Novux Games",
-    value: `${ventures.novuxGames.role} (founded ${ventures.novuxGames.founded})`,
+    value: `${ventures.novuxGames.role} — ${novuxFlagship.name} (${novuxFlagship.platform})`,
   },
   { label: "Before that", value: "Stride / K12 (edtech operations)" },
 ];
