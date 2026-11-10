@@ -21,9 +21,9 @@ Novux is where commercial releases will live. **[House of Strategy](/work/hos/)*
 
 First game is **Dynasty: College Basketball** on **Android**.
 
-I grew up on **[Campus Dynasty](https://www.gmgames.org/)**—GM Games’ college sports managers. Text on screen, recruit kids, ride out bad seasons, watch your program climb or fall apart. No fancy graphics required. There are still people playing those games; there still isn’t much on mobile that scratches the same itch. So that’s what we’re building.
+College basketball management sim. Text and numbers, not highlight reels—you run the program, recruit, survive bad years, stack good ones. Seasons carry over so your roster decisions actually matter next year.
 
-It’s a management sim. You run a college basketball program—roster, recruiting, seasons that carry over. I’m not trying to clone Campus Dynasty screen-for-screen. Some things from 2009 shouldn’t survive unchanged. But if you liked reading stats and living in the roster more than watching animated dunks, you’re the audience.
+There’s not a lot like that on mobile that isn’t wrapped in card pulls and live-service noise. That gap is basically the pitch.
 
 **Dynasty** is in development. No ship date in this post; I’ll post updates on [novux.dev](https://novux.dev) when there’s something real to show.
 
@@ -33,4 +33,4 @@ ClassQuip is still my day job. Novux is nights-and-weekends game work with a log
 
 I’ll still write here about edtech, WebRTC, and whatever else I’m building. When Novux has news worth its own post, it’ll probably land here too—but the studio site is the better place for release stuff.
 
-If you played Campus Dynasty and have opinions—or you just want to say hi—[abuhl@classquip.com](mailto:abuhl@classquip.com) works.
+Questions or ideas—[abuhl@classquip.com](mailto:abuhl@classquip.com).
