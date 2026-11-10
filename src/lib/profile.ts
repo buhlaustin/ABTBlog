@@ -109,7 +109,6 @@ export const quickFacts: QuickFact[] = [
     label: "Novux Games",
     value: `${ventures.novuxGames.role} — ${novuxFlagship.name} (${novuxFlagship.platform})`,
   },
-  { label: "Before that", value: "Stride / K12 (edtech operations)" },
 ];
 
 export type OpenSourceHighlight = {
