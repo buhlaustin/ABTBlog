@@ -2,7 +2,7 @@
 title: "Launching Novux Games"
 slug: launching-novux-games
 date: 2026-11-10
-description: "After a few weeks heads-down on game design and builds, Novux Games is live. First title—Dynasty College Basketball, a modern take on Campus Dynasty for Android."
+description: "Spent a few weeks building games and learning a lot; Novux Games is live now. First project is Dynasty College Basketball for Android."
 author: Austin Buhl
 tags:
   - novux
@@ -11,36 +11,26 @@ tags:
   - android
 ---
 
-I've been building games on the side for years—browser prototypes, jam-sized sims, the stuff under [Work](/work/) on this site. The last few weeks were different: I treated it like a real product sprint, not a weekend experiment. I wrote more design docs than code some days, broke mechanics on purpose, and relearned how much simulation design is just *data modeling with feelings attached*.
+I’ve spent the last few weeks building games and learning more in a few weeks than I did in the previous few months of dabbling. Paper designs, broken prototypes, throwing away ideas that only sounded good in my head—that kind of stretch. It pushed me to stop treating “studio” as a someday label and actually put a name on the work.
 
-That sprint is why I'm launching **[Novux Games](https://novux.dev)** today.
+That’s **[Novux Games](https://novux.dev)**.
 
-Novux is the studio lane—commercial games, a public home at [novux.dev](https://novux.dev), and a clean split from my personal lab. [House of Strategy](/work/hos/), [Startup Simulator](/work/startup-sim/), and the rest stay here on austinbuhltech.com. They're mine, not the Novux catalog. If you only bookmark one thing for studio news, use Novux; if you want playable experiments, stay on Work.
+Novux is where commercial releases will live. **[House of Strategy](/work/hos/)**, **[Startup Simulator](/work/startup-sim/)**, and the other stuff under [Work](/work/) are still just me messing around in the browser. Same person, different bucket. Studio news → novux.dev. Playable side projects → this site.
 
-## First game: Dynasty: College Basketball
+## Dynasty: College Basketball
 
-Our first title is **Dynasty: College Basketball** for **Android**: a modern take on **[Campus Dynasty](https://www.gmgames.org/)** from GM Games—the long-running, text-heavy college sports management series a lot of us burned late nights on in high school and college.
+First game is **Dynasty: College Basketball** on **Android**.
 
-If you never played Campus Dynasty, the hook is simple: you are the program. Recruit, scheme, survive bad years, stack wins, and live inside the spreadsheet drama of college athletics without needing a graphics card from 2032. If you *did* play it, you already know why a spiritual successor is worth doing—the genre never really got a credible mobile-native heir.
+I grew up on **[Campus Dynasty](https://www.gmgames.org/)**—GM Games’ college sports managers. Text on screen, recruit kids, ride out bad seasons, watch your program climb or fall apart. No fancy graphics required. There are still people playing those games; there still isn’t much on mobile that scratches the same itch. So that’s what we’re building.
 
-**Dynasty: College Basketball** keeps the DNA:
+It’s a management sim. You run a college basketball program—roster, recruiting, seasons that carry over. I’m not trying to clone Campus Dynasty screen-for-screen. Some things from 2009 shouldn’t survive unchanged. But if you liked reading stats and living in the roster more than watching animated dunks, you’re the audience.
 
-- Text-forward management—decisions over decals
-- Season-to-season continuity where roster math and reputation compound
-- The kind of depth that rewards reading the box score and the recruiting board, not mashing a play button
+**Dynasty** is in development. No ship date in this post; I’ll post updates on [novux.dev](https://novux.dev) when there’s something real to show.
 
-We're not shipping a reskin. The goal is a game that *feels* like the GM Games lineage—patient, numbers-heavy, a little cruel to bad roster planning—but built for how people actually play on phones in 2026: shorter sessions, clearer information hierarchy, and systems that don't hide the consequences of your choices three menus deep.
+ClassQuip is still my day job. Novux is nights-and-weekends game work with a logo on it.
 
-I'm **Founder & Game Director** on this one. ClassQuip doesn't slow down; Novux is just the place where basketball roster spreadsheets get to be the whole job.
+## One note on this blog
 
-## What "launched" means right now
+I’ll still write here about edtech, WebRTC, and whatever else I’m building. When Novux has news worth its own post, it’ll probably land here too—but the studio site is the better place for release stuff.
 
-Novux exists as a studio today. **Dynasty** is **in development**—no fake release date on this post. You'll hear more as recruiting loops, season simulation, and pacing lock in. Follow along at [novux.dev](https://novux.dev) if you want studio updates without wading through my edtech architecture essays.
-
-## Why write about it here
-
-This blog still covers whatever I'm building and learning. Launching a studio is part of that stack now—alongside WebRTC classrooms, attendance clocks, and the occasional browser tycoon.
-
-If Campus Dynasty shaped how you think about sports sims, or if you've got strong opinions on what a mobile dynasty game should steal versus leave behind, I'd like to hear from you: [abuhl@classquip.com](mailto:abuhl@classquip.com) or the usual [GitHub](https://github.com/buhlaustin) / [LinkedIn](https://www.linkedin.com/in/austinbuhl20) routes.
-
-More soon—from the court, not the classroom.
+If you played Campus Dynasty and have opinions—or you just want to say hi—[abuhl@classquip.com](mailto:abuhl@classquip.com) works.
