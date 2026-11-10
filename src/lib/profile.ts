@@ -26,7 +26,7 @@ export const ventures = {
   novuxGames: {
     name: "Novux Games",
     url: "https://novux.dev",
-    role: "Founder",
+    role: "Founder & Game Director",
     founded: "November 2026",
   },
 } satisfies Record<string, Venture>;
@@ -47,7 +47,7 @@ export const founderVentures: Venture[] = [
 
 /** Single-line summary for bylines, hero asides, and quick scanning. */
 export const profileWorkLine =
-  "Co-Founder & CEO, ClassQuip · Founder, Novux Games";
+  "Co-Founder & CEO, ClassQuip · Founder & Game Director, Novux Games";
 
 export const profile = {
   role: "Software Engineer & Builder",
@@ -105,10 +105,7 @@ export const quickFacts: QuickFact[] = [
   { label: "Based in", value: "Knoxville, TN" },
   { label: "Politics", value: "Independent" },
   { label: "ClassQuip", value: ventures.classQuip.role },
-  {
-    label: "Novux Games",
-    value: `${ventures.novuxGames.role} — ${novuxFlagship.name} (${novuxFlagship.platform})`,
-  },
+  { label: "Novux Games", value: ventures.novuxGames.role },
 ];
 
 export type OpenSourceHighlight = {
