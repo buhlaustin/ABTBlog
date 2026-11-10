@@ -36,6 +36,7 @@ export const novuxFlagship = {
   name: "Dynasty: College Basketball",
   platform: "Android",
   status: "in development",
+  pitch: "text-based sports management sim",
 } as const;
 
 /** Founder roles in display order (newest venture first). */
@@ -69,12 +70,28 @@ export const profile = {
       "The projects under Work are my personal sandbox—simulators, tools, and side projects built to explore mechanics independently of Novux releases.",
     sideProjectsCta: "View Side Projects",
   } as const,
-  bioParagraphs: [
-    "I'm a builder in Knoxville—Co-Founder and CEO of ClassQuip and founder of Novux Games.",
-    "For the better part of a decade I've worked inside real-time software and K–12 edtech, mostly on the ground: support with IT directors at 7 AM, teachers mid-lesson when a tab freezes, and streams that die on district firewalls and student Chromebooks. That work taught me to treat a live classroom as an environment, not a feature checklist.",
-    "I founded ClassQuip to build a classroom engine from scratch for those constraints—custom low-latency WebRTC on AWS, unified teacher workflows, and compliance tooling (LTI 1.3, OneRoster) so attendance and participation logging doesn't land on teachers after school.",
-    `At Novux Games the focus is ${novuxFlagship.name}, an ${novuxFlagship.platform} title ${novuxFlagship.status}. I still ship browser experiments and open source on my own—House of Strategy, Startup Simulator, and the rest live here under Work, separate from the studio.`,
-  ] as const,
+  /** About page header — longer than homepage hero. */
+  about: {
+    tagline: "Builder & Software Engineer • Knoxville, TN",
+    headline:
+      "Co-Founder & CEO of ClassQuip and founder of Novux Games.",
+    intro:
+      "For nearly a decade, I've engineered real-time software inside the brutal constraints of K–12 edtech—solving 7 AM IT escalations, frozen mid-lesson tabs, and stream failures on district firewalls. That ground-level work shaped how I build:",
+    pillars: [
+      {
+        label: "ClassQuip",
+        body: "Custom classroom engine built from scratch using low-latency WebRTC on AWS, streamlined educator workflows, and full interoperability (LTI 1.3, OneRoster).",
+      },
+      {
+        label: "Novux Games",
+        body: `Developing ${novuxFlagship.name}, an upcoming ${novuxFlagship.pitch} for ${novuxFlagship.platform}.`,
+      },
+      {
+        label: "Personal Lab (Work)",
+        body: "Independent browser experiments and open-source builds like House of Strategy and Startup Simulator—built independently of studio releases.",
+      },
+    ],
+  } as const,
 } as const;
 
 export type QuickFact = {

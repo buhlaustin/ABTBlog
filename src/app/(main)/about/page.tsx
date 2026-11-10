@@ -15,7 +15,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "About",
-  description: `About ${siteConfig.name}, a software engineer and founder in Knoxville, TN—ClassQuip (edtech), Novux Games (Dynasty: College Basketball on Android), and personal open-source projects.`,
+  description: `About ${siteConfig.name}—builder and software engineer in Knoxville. ClassQuip, Novux Games (Dynasty: College Basketball), and personal Work lab.`,
   path: "/about/",
 });
 
@@ -66,14 +66,23 @@ export default function AboutPage() {
           <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
             {siteConfig.name}
           </h1>
-          <p className="mt-2 font-mono text-sm text-muted">
-            {siteConfig.location}
+          <p className="mt-2 font-mono text-sm text-muted">{profile.about.tagline}</p>
+          <p className="mt-4 text-base font-semibold leading-relaxed text-foreground">
+            {profile.about.headline}
           </p>
-          <div className="mt-5 space-y-4 text-base leading-relaxed text-foreground">
-            {profile.bioParagraphs.map((paragraph) => (
-              <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+          <p className="mt-4 text-base leading-relaxed text-muted">
+            {profile.about.intro}
+          </p>
+          <ul className="mt-4 list-none space-y-4 pl-0 text-base leading-relaxed text-foreground">
+            {profile.about.pillars.map((pillar) => (
+              <li key={pillar.label}>
+                <span className="font-semibold text-foreground">
+                  {pillar.label}:
+                </span>{" "}
+                <span className="text-muted">{pillar.body}</span>
+              </li>
             ))}
-          </div>
+          </ul>
           <p className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
             <a
               href={siteConfig.github}
