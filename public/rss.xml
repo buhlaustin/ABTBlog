@@ -3,8 +3,24 @@
   <channel>
     <title>Austin Buhl</title>
     <link>https://austinbuhltech.com</link>
-    <description>Writing on software engineering, edtech, browser games, and side projects by Austin Buhl.</description>
+    <description>Writing on software engineering, edtech, browser games, and projects from ClassQuip and Novux Games.</description>
     
+    <item>
+      <title>Live Class Attendance Is a Clock Problem (Not a Checkbox)</title>
+      <link>https://austinbuhltech.com/blog/live-class-attendance-is-a-clock-problem/</link>
+      <guid>https://austinbuhltech.com/blog/live-class-attendance-is-a-clock-problem/</guid>
+      <pubDate>Mon, 09 Nov 2026 00:00:00 GMT</pubDate>
+      <description>Why K–12 compliance wants &quot;time in room&quot; but your stack only tracks logins—and the reconciliation pattern that keeps audits, teachers, and WebRTC sessions from disagreeing.</description>
+      <author>Austin Buhl</author>
+    </item>
+    <item>
+      <title>Startup Simulator got weird (in a good way)</title>
+      <link>https://austinbuhltech.com/blog/startup-simulator-november-updates/</link>
+      <guid>https://austinbuhltech.com/blog/startup-simulator-november-updates/</guid>
+      <pubDate>Thu, 05 Nov 2026 00:00:00 GMT</pubDate>
+      <description>A quick tour of what changed in Startup Simulator lately—CEO money, space startups, crowdfunding, a hireable COO, and numbers that finally use commas.</description>
+      <author>Austin Buhl</author>
+    </item>
     <item>
       <title>Introducing Startup Simulator</title>
       <link>https://austinbuhltech.com/blog/introducing-startup-simulator/</link>
@@ -42,7 +58,7 @@
       <link>https://austinbuhltech.com/blog/hello/</link>
       <guid>https://austinbuhltech.com/blog/hello/</guid>
       <pubDate>Tue, 27 Oct 2026 00:00:00 GMT</pubDate>
-      <description>A decade in K–12 edtech ops and real-time software—and why I built ClassQuip and write about the work in public.</description>
+      <description>A decade in K–12 edtech ops and real-time software—founding ClassQuip, Novux Games, and writing about the work in public.</description>
       <author>Austin Buhl</author>
     </item>
   </channel>

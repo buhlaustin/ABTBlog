@@ -69,9 +69,7 @@ export function PostAuthorCard({
           </>
         )}
         {isByline && (
-          <p className="text-xs text-muted">
-            {profile.role}, {profile.company}
-          </p>
+          <p className="text-xs text-muted">{profile.workLine}</p>
         )}
       </div>
     </div>
