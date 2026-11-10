@@ -48,7 +48,7 @@ export const resumeGroups: ResumeGroup[] = [
         period: "Nov 2026 – Present",
         location: "Knoxville, TN",
         highlights: [
-          "Indie studio building Dynasty: College Basketball—an Android title in active development (see novux.dev).",
+          "Indie studio building Dynasty: College Basketball—a text-based sports management sim for Android in active development (see novux.dev).",
           "Product, engineering, and publishing for Novux-owned games, separate from ClassQuip and from personal browser experiments hosted on austinbuhltech.com.",
         ],
       },
