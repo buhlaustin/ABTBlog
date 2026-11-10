@@ -24,11 +24,9 @@ Novux is where commercial titles will live. [House of Strategy](/work/hos/), [St
 
 Our first title is **Dynasty: College Basketball**, heading to **Android**.
 
-I grew up on Campus Dynasty and classic GM sports sims—pure text on screen, recruiting classes, surviving rebuild years, watching a mid-major rise or implode over a decade. No 3D cutscenes required. People still play those games because mobile still doesn’t have enough deep management sims that actually scratch that itch.
+Text on screen, recruiting classes, rebuild years, watching a program climb or fall apart over multiple seasons. No cutscenes required. Mobile still doesn’t have enough of that kind of depth without card pulls and live-service padding wrapped around it.
 
-That’s what we’re building.
-
-You run a college basketball program: roster, recruiting, seasons that carry over. Data-driven, text-first, built for phones—not a screen-for-screen clone of anything from 2009, but if you’d rather live in the stats and recruiting board than watch canned dunk animations, you’re the audience.
+You run a college basketball program: roster, recruiting, seasons that carry over. Data-driven and text-first, built for phones. If you’d rather live in the stats and recruiting board than watch canned dunk animations, you’re the audience.
 
 **Dynasty** is in active development. No release date in this post. Dev logs and milestones go on [novux.dev](https://novux.dev) as stuff actually locks in.
 
