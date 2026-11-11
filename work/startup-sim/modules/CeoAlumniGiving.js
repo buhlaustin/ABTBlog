@@ -4,6 +4,11 @@ import { payFromPersonalBank } from './CeoEconomics.js';
 import { calendarTurn } from './GameCalendar.js';
 import { escapeHtml, panelStatCard, panelMetricGrid } from './PanelChrome.js';
 import bundledAlmaMaterCatalog from '../data/ceo-alma-maters.json' with { type: 'json' };
+import {
+  ALUMNI_INVESTMENT_VEHICLES,
+  alumniInvestingBalance,
+  alumniInvestorRecognitionLabel
+} from './CeoAlumniInvesting.js';
 
 const BUILTIN_ALMA_MATERS = Array.isArray(bundledAlmaMaterCatalog) ? bundledAlmaMaterCatalog : [];
 
@@ -46,6 +51,36 @@ export const ALUMNI_GIFT_FUNDS = [
     label: 'Capital campaign',
     blurb: 'Business school wing, research lab, or campus building naming.',
     chips: [500_000, 5_000_000, 25_000_000]
+  },
+  {
+    id: 'research-innovation',
+    label: 'Research & innovation fund',
+    blurb: 'Labs, endowed chairs, and commercialization bridges.',
+    chips: [75_000, 400_000, 2_500_000]
+  },
+  {
+    id: 'entrepreneurship-center',
+    label: 'Entrepreneurship center',
+    blurb: 'Incubator, demo days, and founder-in-residence stipends.',
+    chips: [100_000, 750_000, 4_000_000]
+  },
+  {
+    id: 'arts-culture',
+    label: 'Arts & culture endowment',
+    blurb: 'Museum wing, performance hall, or visiting artist series.',
+    chips: [50_000, 350_000, 3_000_000]
+  },
+  {
+    id: 'diversity-equity',
+    label: 'Access & equity fund',
+    blurb: 'First-gen scholarships, mentorship, and bridge programs.',
+    chips: [25_000, 200_000, 1_500_000]
+  },
+  {
+    id: 'global-programs',
+    label: 'Global campus programs',
+    blurb: 'Study abroad, satellite campuses, and faculty exchange.',
+    chips: [80_000, 500_000, 2_000_000]
   }
 ];
 
@@ -378,6 +413,30 @@ export function renderCeoAlumniSection(state, { disabled = '' } = {}) {
 
   const athleticsLifetime = alumniAthleticsLifetime(state);
   const booster = athleticsBoosterLabel(athleticsLifetime);
+  const investBalance = alumniInvestingBalance(state);
+  const investLifetime = state.ceo?.alumniInvestLifetime ?? 0;
+  const investorRecognition = alumniInvestorRecognitionLabel(investLifetime);
+
+  const investBlocks = ALUMNI_INVESTMENT_VEHICLES.map((vehicle) => {
+    const pos = state.ceo?.alumniInvestPositions?.[vehicle.id];
+    const bal = pos?.balance ?? 0;
+    const chips = vehicle.chips
+      .map(
+        (amt) =>
+          `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-alumni-invest="${amt}" data-ceo-alumni-vehicle="${escapeHtml(vehicle.id)}" ${disabled}>${formatMoney(amt)}</button>`
+      )
+      .join('');
+  const withdraw =
+    vehicle.withdrawable && bal > 0
+      ? `<button type="button" class="btn btn-ghost btn-small" data-ceo-alumni-invest-withdraw="${Math.min(bal, Math.max(1000, Math.round(bal * 0.25)))}" data-ceo-alumni-vehicle="${escapeHtml(vehicle.id)}" ${disabled}>Withdraw ${formatMoney(Math.min(bal, Math.max(1000, Math.round(bal * 0.25))))}</button>`
+      : '';
+    return `<div class="finance-action ceo-alumni-invest-vehicle">
+      <p><strong>${escapeHtml(vehicle.label)}</strong>${bal > 0 ? ` <span class="task-tag">${formatMoney(bal)}</span>` : ''}</p>
+      <p class="fine-print">${escapeHtml(vehicle.blurb)}</p>
+      <div class="finance-charity-chips">${chips}</div>
+      ${withdraw}
+    </div>`;
+  }).join('');
 
   const athleticsBlocks = ALUMNI_ATHLETICS_PROGRAMS.map((program) => {
     const chips = program.chips
@@ -415,18 +474,26 @@ export function renderCeoAlumniSection(state, { disabled = '' } = {}) {
       <h3 class="finance-section-title">Alma mater giving</h3>
       <span class="growth-channel-badge growth-channel-badge--inline">${escapeHtml(school.shortLabel ?? school.label)}</span>
     </div>
-    <p class="fine-print">Personal gifts to <strong>${escapeHtml(school.label)}</strong>${regionLabel ? ` (${escapeHtml(regionLabel)}${typeLabel ? ` · ${escapeHtml(typeLabel)}` : ''})` : ''} — separate from general philanthropy and from company charity on Finance. Large gifts can move sentiment and buzz; recognition tracks lifetime alumni giving.</p>
+    <p class="fine-print">Personal gifts to <strong>${escapeHtml(school.label)}</strong>${regionLabel ? ` (${escapeHtml(regionLabel)}${typeLabel ? ` · ${escapeHtml(typeLabel)}` : ''})` : ''} — gifts, athletics, and <strong>alumni investment sleeves</strong> (DAF, venture LP, endowment pools) from your personal bank. Large gifts can move sentiment and buzz.</p>
     ${panelMetricGrid('3', [
       panelStatCard('Personal bank', formatMoney(bank), { hero: bank > 0 }),
       panelStatCard('Lifetime to alma mater', formatMoney(lifetime), { hero: lifetime > 0 }),
       panelStatCard('Recognition', recognition)
     ])}
-    ${panelMetricGrid('2', [
+    ${panelMetricGrid('3', [
       panelStatCard('Athletics giving', athleticsLifetime > 0 ? formatMoney(athleticsLifetime) : '—', {
         hero: athleticsLifetime > 0
       }),
-      panelStatCard('Booster status', booster)
+      panelStatCard('Booster status', booster),
+      panelStatCard('Alumni investing', investBalance > 0 ? formatMoney(investBalance) : '—', { hero: investBalance > 0 })
     ])}
+    ${panelMetricGrid('2', [
+      panelStatCard('Committed to sleeves', investLifetime > 0 ? formatMoney(investLifetime) : '—'),
+      panelStatCard('Investor status', investorRecognition)
+    ])}
+    <h4 class="finance-subhead">Alumni investing</h4>
+    <p class="fine-print">Capital that stays on campus balance sheets — monthly marks, partial giving credit toward recognition, taxable returns in your personal filing.</p>
+    ${investBlocks}
     <h4 class="finance-subhead">Academic &amp; campus funds</h4>
     ${fundBlocks}
     <h4 class="finance-subhead">Athletics funding</h4>

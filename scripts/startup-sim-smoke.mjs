@@ -69,6 +69,9 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
 } else if (!getTaskDefinitions().some((t) => t.id === 'public-ipo-first-earnings-dry-run')) {
   console.error('FAIL: public post-IPO handcrafted pack not merged');
   failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'public-tier0-lockup-tour')) {
+  console.error('FAIL: public post-IPO engine pack not merged');
+  failed = true;
 } else if (!getTaskDefinitions().some((t) => t.id === 'mid-soc2-type2-evidence-sprint')) {
   console.error('FAIL: mid-game handcrafted pack not merged');
   failed = true;
@@ -1318,6 +1321,22 @@ if (!ipo.ok) {
     console.log(
       `OK: IPO primary + float (${formatMoney(ipo.primaryProceeds)} primary, float ${floatPct}%, founder ${founder?.pct}%, ${formatMoney(listPrice)}/share)`
     );
+    if ((pub.publicMarket?.lockupMonthsRemaining ?? 0) !== 6) {
+      console.error(`FAIL: founder lockup should be 6 months (got ${pub.publicMarket?.lockupMonthsRemaining})`);
+      failed = true;
+    }
+    const { publicWealthHeat, scalePublicStockPctMove } = await import(
+      `file://${join(sim, 'modules/PublicPostIpoEconomy.js')}`
+    );
+    if (publicWealthHeat(pub) > 0.25) {
+      console.error(`FAIL: public wealth heat should be low at IPO (got ${publicWealthHeat(pub)})`);
+      failed = true;
+    } else if (scalePublicStockPctMove(pub, 0.1) >= 0.05) {
+      console.error('FAIL: stock move scaling should dampen early public moves');
+      failed = true;
+    } else {
+      console.log('OK: public wealth heat ramp (slow post-IPO scaling)');
+    }
     pub.finance.cash = 1_000_000_000_000;
     pub.finance.mrr = 250_000;
     const fundPx = computeFundamentalSharePrice(pub);
@@ -1485,8 +1504,11 @@ if (!ipo.ok) {
     console.log('OK: public IR event (analyst briefing, credibility, activity log)');
   }
   pub.publicMarket.lockupMonthsRemaining = 0;
+  pub.publicMarket.monthsPublic = 30;
+  const { publicFounderSellPctCap } = await import(`file://${join(sim, 'modules/PublicPostIpoEconomy.js')}`);
+  const sellPct = Math.min(10, publicFounderSellPctCap(pub));
   const founderBefore = getFounderRow(pub)?.shares ?? 0;
-  const partial = sellFounderSharesPartial(pub, 10);
+  const partial = sellFounderSharesPartial(pub, sellPct);
   const founderAfter = getFounderRow(pub)?.shares ?? 0;
   if (!partial.ok || partial.proceeds <= 0) {
     console.error(`FAIL: partial founder stock sale: ${partial.reason ?? 'bad result'}`);
@@ -3246,6 +3268,23 @@ if (!signConf.ok) {
     } else {
       console.log('OK: CEO alma mater alumni giving (incl. athletics funding)');
     }
+  }
+  const { commitAlumniInvestment, alumniInvestingBalance } = await import(
+    `file://${join(sim, 'modules/CeoAlumniInvesting.js')}`
+  );
+  const investState = createInitialState({
+    companyName: 'Alumni Invest Co',
+    categoryId: 'b2b-saas',
+    mode: 'sandbox',
+    almaMaterId: 'maryville-college'
+  });
+  investState.ceo.bankBalance = 400_000;
+  const invest = commitAlumniInvestment(investState, 50_000, 'university-daf');
+  if (!invest.ok || alumniInvestingBalance(investState) !== 50_000) {
+    console.error(`FAIL: alumni investing commit: ${invest.reason ?? 'balance'}`);
+    failed = true;
+  } else {
+    console.log('OK: CEO alumni investing sleeves');
   }
 }
 

@@ -27,6 +27,13 @@ import { recordCashOutflow } from './Finance.js';
 import { ensureFiscal } from './CorporateTax.js';
 import { totalSubsidiaryMrr } from './Acquisitions.js';
 import { panelStatCard, panelMetricGroup, panelMetricGrid, panelMetricStack } from './PanelChrome.js';
+import {
+  publicFundamentalPsCap,
+  publicFounderSellPctCap,
+  publicWealthHeat,
+  scalePublicMonthlyDelta,
+  scalePublicStockPctMove
+} from './PublicPostIpoEconomy.js';
 
 /** Calendar-year revenue booked in fiscal.current (YTD through the closing month). */
 function calendarYtdRevenue(state) {
@@ -159,7 +166,7 @@ export function fileIpo(state) {
   state.publicMarket.priorYtdRunRateMrr = blendedRunRateMrr(state);
   state.publicMarket.priceHistory = [{ month: state.calendar.monthIndex, year: state.calendar.year, price: openPrice }];
   state.publicMarket.monthsPublic = 0;
-  state.publicMarket.lockupMonthsRemaining = 1;
+  state.publicMarket.lockupMonthsRemaining = 6;
   state.publicMarket.guidanceTone = 'inline';
   state.publicMarket.whisperRevenueTarget = whisperRevenueTarget(state);
   state.publicMarket.priorSharePrice = openPrice;
@@ -256,7 +263,7 @@ export function computeFundamentalSharePrice(state) {
   if (pm.guidanceTone === 'sandbag') ps *= 1.04;
   if (pm.guidanceTone === 'aggressive') ps *= 0.96;
   if (pm.indexMember) ps += 0.8;
-  ps = Math.max(4, Math.min(26, ps));
+  ps = Math.max(4, Math.min(publicFundamentalPsCap(state), ps));
 
   pm.priceSalesMultiple = Math.round(ps * 10) / 10;
   const operatingCap = arr * ps;
@@ -340,9 +347,10 @@ function pushPriceHistory(state, price) {
 /** Instant move (crises, desk, buybacks). Returns new price. */
 export function applyStockPctMove(state, pct) {
   if (!isPublicCompany(state) || state.flags?.cashedOut || !pct) return null;
+  const scaledPct = scalePublicStockPctMove(state, pct);
   const pm = state.publicMarket;
   const price = pm.sharePrice ?? pm.ipoPrice ?? 1;
-  const next = Math.max(priceFloor(state, price), Math.round(price * (1 + Number(pct)) * 100) / 100);
+  const next = Math.max(priceFloor(state, price), Math.round(price * (1 + Number(scaledPct)) * 100) / 100);
   pm.priorSharePrice = price;
   pm.sharePrice = next;
   pushPriceHistory(state, next);
@@ -657,7 +665,8 @@ export function tickPublicMarket(state) {
     deltaPct += earningsShock + prepBoost;
     drivers.push({ label: 'Earnings vs whisper', pct: earningsShock });
     if (prepBoost > 0) drivers.push({ label: 'IR / earnings prep', pct: prepBoost });
-    deltaPct *= 1.35;
+    const earnHeat = 1.08 + publicWealthHeat(state) * 0.22;
+    deltaPct *= earnHeat;
     pm.earningsPrepLevel = 0;
     pm.lastEarningsMonth = `${state.calendar.year}-${state.calendar.monthIndex}`;
     if ((pm.guidanceBeatStreak ?? 0) >= 2) {
@@ -669,6 +678,8 @@ export function tickPublicMarket(state) {
     }
     pm.buybackAuthorized = (pm.buybackAuthorized ?? 0) + Math.round(marketCap(state) * 0.008);
   }
+
+  deltaPct = scalePublicMonthlyDelta(state, deltaPct);
 
   const floor = priceFloor(state, price);
   const next = Math.max(floor, Math.round(price * (1 + deltaPct) * 100) / 100);
@@ -770,8 +781,9 @@ export function sellFounderSharesPartial(state, pctOfFounderRaw) {
     return { ok: false, reason: 'Stock sales unlock after IPO once lockup ends.' };
   }
   const pct = Number(pctOfFounderRaw);
-  if (!Number.isFinite(pct) || pct <= 0 || pct > 99) {
-    return { ok: false, reason: 'Sell 1%–99% of your founder shares per trade.' };
+  const maxPct = publicFounderSellPctCap(state);
+  if (!Number.isFinite(pct) || pct <= 0 || pct > maxPct) {
+    return { ok: false, reason: `Sell 1%–${maxPct}% of your founder block per trade (scales up as the company matures).` };
   }
 
   const founder = getFounderRow(state);

@@ -1,5 +1,6 @@
 import { getArr, getWorkspaceTier, WORKSPACE_TIER } from './Workspace.js';
 import { isPublicCompany } from './IPO.js';
+import { publicWealthHeat } from './PublicPostIpoEconomy.js';
 
 /** True when the company listed after Series A without closing Series B. */
 export function skippedSeriesBToIpo(state) {
@@ -151,7 +152,12 @@ export function eraBaseRevenueScaleForTask(taskDef, state) {
   const anchor = taskCatalogAnchorTier(taskDef);
   const cur = TIER_ERA_BASE_REVENUE_MULT[tier] ?? 1;
   const anch = TIER_ERA_BASE_REVENUE_MULT[anchor] ?? 1;
-  return cur / anch;
+  let scale = cur / anch;
+  if (tier === 7 && isPublicCompany(state)) {
+    const heat = publicWealthHeat(state);
+    scale *= 0.2 + 0.8 * heat;
+  }
+  return scale;
 }
 
 export function eraBaseRevenueScaleForCampaign(def, state) {
@@ -183,7 +189,10 @@ export function progressionRevenueMult(state) {
   if (tier === WORKSPACE_TIER.CAMPUS) m *= 2.5;
   if (tier === WORKSPACE_TIER.HUB) m *= 4;
 
-  if (isPublicCompany(state)) m *= 6;
+  if (isPublicCompany(state)) {
+    const heat = publicWealthHeat(state);
+    m *= 1 + 5 * heat;
+  }
 
   /** Flat ARR milestones — no continuous feedback from monthly desk revenue. */
   const arr = getArr(state);

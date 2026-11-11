@@ -231,6 +231,9 @@ export function normalizeSave(raw) {
       if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
       if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
       if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
+      if (!state.ceo.alumniInvestPositions) state.ceo.alumniInvestPositions = {};
+      if (state.ceo.alumniInvestLifetime == null) state.ceo.alumniInvestLifetime = 0;
+      if (state.ceo.alumniInvestReturns == null) state.ceo.alumniInvestReturns = 0;
       if (state.ceo.personalHappiness == null) state.ceo.personalHappiness = 62;
       if (!state.ceo.wlbOffers) state.ceo.wlbOffers = [];
       if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];
@@ -458,6 +461,9 @@ export function normalizeSave(raw) {
       if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
       if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
       if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
+      if (!state.ceo.alumniInvestPositions) state.ceo.alumniInvestPositions = {};
+      if (state.ceo.alumniInvestLifetime == null) state.ceo.alumniInvestLifetime = 0;
+      if (state.ceo.alumniInvestReturns == null) state.ceo.alumniInvestReturns = 0;
       if (state.ceo.personalHappiness == null) state.ceo.personalHappiness = 62;
       if (!state.ceo.wlbOffers) state.ceo.wlbOffers = [];
       if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];

@@ -11,6 +11,7 @@ import {
   whisperRevenueTarget,
   marketCap
 } from './IPO.js';
+import { postIpoDeskEngineNote, publicCapTierLabel, publicWealthHeat } from './PublicPostIpoEconomy.js';
 import { adjustSentiment, hasInstitutionalBoard, sentimentLabel } from './Sentiment.js';
 import { calendarTurn } from './XC.js';
 import { formatCalendarStamp } from './GameCalendar.js';
@@ -690,6 +691,7 @@ export function renderFinancePublicSection(container, state) {
     <div class="finance-public-panel">
       <header class="finance-public-head">
         <p class="panel-lede">You are public — manage the quote, the calendar, and how the CEO shows up to the street.</p>
+        <p class="fine-print">${escapeHtml(postIpoDeskEngineNote(state) ?? '')} · ${escapeHtml(publicCapTierLabel(state))} · heat ${Math.round(publicWealthHeat(state) * 100)}%</p>
       </header>
       ${renderPublicSubnav(state, section)}
       ${headStats}

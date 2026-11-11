@@ -89,6 +89,9 @@ export function createInitialCeoState() {
     alumniGivingLifetime: 0,
     alumniAthleticsLifetime: 0,
     alumniDonationLog: [],
+    alumniInvestPositions: {},
+    alumniInvestLifetime: 0,
+    alumniInvestReturns: 0,
     netWorthHistory: [],
     investmentBalance: 0,
     careerInvestmentReturns: 0,
@@ -362,7 +365,7 @@ export function recommendedPersonalBurnMonthly(state) {
   return typicalPersonalExpenseMonthly(state);
 }
 
-function creditPersonalBank(state, amount, label, kind) {
+export function creditCeoPersonalBank(state, amount, label, kind) {
   const pay = Math.round(Number(amount) || 0);
   if (pay <= 0) return 0;
   const ceo = ceoState(state);
@@ -574,7 +577,7 @@ export function recordCeoSalaryForMonth(state) {
     month: state.calendar?.monthIndex,
     year: state.calendar?.year
   });
-  creditPersonalBank(state, pay, 'CEO salary deposit', 'salary');
+  creditCeoPersonalBank(state, pay, 'CEO salary deposit', 'salary');
   accrueCeoTaxableIncome(state, pay);
   return [
     `CEO salary ${formatMoney(pay)} deposited — personal bank ${formatMoney(ceo.bankBalance)} (career ${formatMoney(ceo.careerSalaryPaid)}).`
@@ -761,7 +764,7 @@ export function payCeoArrBonus(state, pctRaw) {
     year: state.calendar?.year,
     monthIndex: state.calendar?.monthIndex
   };
-  creditPersonalBank(
+  creditCeoPersonalBank(
     state,
     pay,
     `CEO ARR bonus (${pct}% of prior-year revenue)`,
@@ -803,7 +806,7 @@ export function takeOwnerDraw(state, amount) {
     month: state.calendar?.monthIndex,
     year: state.calendar?.year
   });
-  creditPersonalBank(state, draw, 'Owner draw deposit', 'draw');
+  creditCeoPersonalBank(state, draw, 'Owner draw deposit', 'draw');
   accrueCeoTaxableIncome(state, draw);
   return {
     ok: true,
@@ -813,7 +816,7 @@ export function takeOwnerDraw(state, amount) {
 }
 
 export function depositStockCashOutToPersonalBank(state, payout) {
-  const pay = creditPersonalBank(state, payout, 'Founder stake cash-out', 'cash_out');
+  const pay = creditCeoPersonalBank(state, payout, 'Founder stake cash-out', 'cash_out');
   accrueCeoTaxableIncome(state, pay);
   return pay;
 }
@@ -951,7 +954,7 @@ export function withdrawPersonalInvestment(state, amountRaw) {
     return { ok: false, reason: `Portfolio holds ${formatMoney(bal)}.` };
   }
   ceo.investmentBalance = bal - amount;
-  creditPersonalBank(state, amount, 'Portfolio withdrawal', 'invest_withdraw');
+  creditCeoPersonalBank(state, amount, 'Portfolio withdrawal', 'invest_withdraw');
   return {
     ok: true,
     amount,
@@ -1013,10 +1016,16 @@ export function ceoFinancialHealth(state) {
   };
 }
 
+export function alumniInvestingBalanceFromState(state) {
+  const positions = state.ceo?.alumniInvestPositions ?? {};
+  return Object.values(positions).reduce((sum, p) => sum + Math.max(0, Math.round(p.balance ?? 0)), 0);
+}
+
 export function ceoNetWorth(state) {
   return (
     ceoPersonalBankBalance(state) +
     personalInvestmentBalance(state) +
+    alumniInvestingBalanceFromState(state) +
     (founderEquityValue(state) ?? 0) +
     ceoHomeEquity(state)
   );

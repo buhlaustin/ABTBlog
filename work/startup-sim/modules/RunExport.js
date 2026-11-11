@@ -67,6 +67,12 @@ export function buildRunExportText(state) {
         `  Athletics: ${formatMoney(athleticsLifetime)} — ${athleticsBoosterLabel(athleticsLifetime)}`
       );
     }
+    const investBal = state.ceo?.alumniInvestPositions
+      ? Object.values(state.ceo.alumniInvestPositions).reduce((s, p) => s + (p.balance ?? 0), 0)
+      : 0;
+    if (investBal > 0) {
+      lines.push(`  Alumni investing: ${formatMoney(investBal)} in campus sleeves`);
+    }
   }
 
   const sponsorMrr = sponsoredMrrMonthly(state);

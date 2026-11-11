@@ -29,6 +29,7 @@ import bundledPublicMegawhaleHandcrafted from '../data/tasks-public-megawhale-ha
 import bundledPublicAiMegawhaleGovHandcrafted from '../data/tasks-public-ai-megawhale-gov-handcrafted.json' with { type: 'json' };
 import bundledPublicLateHandcrafted from '../data/tasks-public-late-handcrafted-pack.json' with { type: 'json' };
 import bundledPublicPostIpoHandcrafted from '../data/tasks-public-post-ipo-handcrafted-pack.json' with { type: 'json' };
+import bundledPublicPostIpoEngine from '../data/tasks-public-post-ipo-engine-pack.json' with { type: 'json' };
 import bundledMidGameHandcrafted from '../data/tasks-mid-game-handcrafted-pack.json' with { type: 'json' };
 import bundledPostXcPreSeed from '../data/post-xc-pre-seed-tasks.json' with { type: 'json' };
 import bundledXcDemoDay from '../data/xc-demo-day-task.json' with { type: 'json' };
@@ -41,6 +42,7 @@ import {
   isConferenceKeynoteMandatory
 } from './StartupConference.js';
 import { isPublicCompany } from './IPO.js';
+import { publicCapTier, publicWealthHeat } from './PublicPostIpoEconomy.js';
 import { isMegawhalePlay } from './WhaleScale.js';
 import {
   isXcDemoDayMonth,
@@ -160,18 +162,21 @@ function mergePublicLateGameTasks(base) {
         mergeTaskPack(
           mergeTaskPack(
             mergeTaskPack(
-              mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
-              bundledPublicLateExtra?.tasks ?? []
+              mergeTaskPack(
+                mergeTaskPack(base, bundledPublicLate?.tasks ?? []),
+                bundledPublicLateExtra?.tasks ?? []
+              ),
+              bundledPublicWhaleHandcrafted?.tasks ?? []
             ),
-            bundledPublicWhaleHandcrafted?.tasks ?? []
+            bundledPublicMegawhaleHandcrafted?.tasks ?? []
           ),
-          bundledPublicMegawhaleHandcrafted?.tasks ?? []
+          bundledPublicAiMegawhaleGovHandcrafted?.tasks ?? []
         ),
-        bundledPublicAiMegawhaleGovHandcrafted?.tasks ?? []
+        bundledPublicLateHandcrafted?.tasks ?? []
       ),
-      bundledPublicLateHandcrafted?.tasks ?? []
+      bundledPublicPostIpoHandcrafted?.tasks ?? []
     ),
-    bundledPublicPostIpoHandcrafted?.tasks ?? []
+    bundledPublicPostIpoEngine?.tasks ?? []
   );
 }
 
@@ -398,10 +403,19 @@ function inferredTierBand(task) {
   return { min, max };
 }
 
+function publicMarketTierAllowed(task, state) {
+  if (!isPublicCompany(state)) return true;
+  if (task.publicTierMin == null && task.publicTierMax == null) return true;
+  const pt = publicCapTier(state);
+  const min = task.publicTierMin ?? 0;
+  const max = task.publicTierMax ?? 99;
+  return pt >= min && pt <= max;
+}
+
 function taskTierAllowed(task, state) {
   const tier = progressionTierForUnlocks(state);
   const { min, max } = inferredTierBand(task);
-  return tier >= min && tier <= max;
+  return tier >= min && tier <= max && publicMarketTierAllowed(task, state);
 }
 
 function mandatoryDeskTasks(state) {
@@ -576,7 +590,11 @@ export function dealMonthlyTasks(state) {
       offered = mergeUniqueTaskOffers(offered, shuffle(pickFrom)[0], offerCount);
     }
   }
-  if ((isPublicCompany(state) || taskStage === STAGES.PUBLIC) && !offered.some(isMegawhalePlay)) {
+  if (
+    (isPublicCompany(state) || taskStage === STAGES.PUBLIC) &&
+    publicWealthHeat(state) >= 0.55 &&
+    !offered.some(isMegawhalePlay)
+  ) {
     const megaPool = pool.filter(isMegawhalePlay);
     if (megaPool.length) {
       const recentIds = new Set(state.calendar.recentTaskIds ?? []);
