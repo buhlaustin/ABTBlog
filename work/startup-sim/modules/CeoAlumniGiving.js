@@ -9,7 +9,15 @@ import {
   alumniInvestingBalance,
   alumniInvestorRecognitionLabel
 } from './CeoAlumniInvesting.js';
-import { ensureAlmaMaterGrades, influenceAlmaGradesFromGift, renderAlmaMaterGradesPanel } from './CeoAlmaMaterGrades.js';
+import {
+  athleticsGradeBoostTags,
+  giftGradeBoostTags,
+  ensureAlmaMaterGrades,
+  influenceAlmaGradesFromGift,
+  investGradeBoostTags,
+  renderAlmaMaterGradesPanel,
+  renderGradeBoostTagHtml
+} from './CeoAlmaMaterGrades.js';
 
 const BUILTIN_ALMA_MATERS = Array.isArray(bundledAlmaMaterCatalog) ? bundledAlmaMaterCatalog : [];
 
@@ -436,16 +444,20 @@ export function renderCeoAlumniSection(state, { disabled = '' } = {}) {
           `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-alumni-invest="${amt}" data-ceo-alumni-vehicle="${escapeHtml(vehicle.id)}" ${disabled}>${formatMoney(amt)}</button>`
       )
       .join('');
-  const withdraw =
-    vehicle.withdrawable && bal > 0
-      ? `<button type="button" class="btn btn-ghost btn-small" data-ceo-alumni-invest-withdraw="${Math.min(bal, Math.max(1000, Math.round(bal * 0.25)))}" data-ceo-alumni-vehicle="${escapeHtml(vehicle.id)}" ${disabled}>Withdraw ${formatMoney(Math.min(bal, Math.max(1000, Math.round(bal * 0.25))))}</button>`
-      : '';
-    return `<div class="finance-action ceo-alumni-invest-vehicle">
-      <p><strong>${escapeHtml(vehicle.label)}</strong>${bal > 0 ? ` <span class="task-tag">${formatMoney(bal)}</span>` : ''}</p>
+    const withdraw =
+      vehicle.withdrawable && bal > 0
+        ? `<button type="button" class="btn btn-ghost btn-small" data-ceo-alumni-invest-withdraw="${Math.min(bal, Math.max(1000, Math.round(bal * 0.25)))}" data-ceo-alumni-vehicle="${escapeHtml(vehicle.id)}" ${disabled}>Withdraw ${formatMoney(Math.min(bal, Math.max(1000, Math.round(bal * 0.25))))}</button>`
+        : '';
+    return `<article class="ceo-alumni-action-card ceo-alumni-invest-vehicle">
+      <header class="ceo-alumni-action-card__head">
+        <strong>${escapeHtml(vehicle.label)}</strong>
+        ${bal > 0 ? `<span class="task-tag">${formatMoney(bal)} sleeve</span>` : ''}
+      </header>
       <p class="fine-print">${escapeHtml(vehicle.blurb)}</p>
+      ${renderGradeBoostTagHtml(investGradeBoostTags(vehicle.id))}
       <div class="finance-charity-chips">${chips}</div>
-      ${withdraw}
-    </div>`;
+      ${withdraw ? `<div class="ceo-alumni-action-card__foot">${withdraw}</div>` : ''}
+    </article>`;
   }).join('');
 
   const athleticsBlocks = ALUMNI_ATHLETICS_PROGRAMS.map((program) => {
@@ -455,11 +467,12 @@ export function renderCeoAlumniSection(state, { disabled = '' } = {}) {
           `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-alumni-athletics-give="${amt}" data-ceo-alumni-athletics-program="${escapeHtml(program.id)}" ${disabled}>${formatMoney(amt)}</button>`
       )
       .join('');
-    return `<div class="finance-action ceo-alumni-athletics-program">
-      <p><strong>${escapeHtml(program.label)}</strong></p>
+    return `<article class="ceo-alumni-action-card ceo-alumni-athletics-program">
+      <header class="ceo-alumni-action-card__head"><strong>${escapeHtml(program.label)}</strong></header>
       <p class="fine-print">${escapeHtml(program.blurb)}</p>
+      ${renderGradeBoostTagHtml(athleticsGradeBoostTags(program.id))}
       <div class="finance-charity-chips">${chips}</div>
-    </div>`;
+    </article>`;
   }).join('');
 
   const fundBlocks = ALUMNI_GIFT_FUNDS.map((fund) => {
@@ -469,64 +482,75 @@ export function renderCeoAlumniSection(state, { disabled = '' } = {}) {
           `<button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-ceo-alumni-give="${amt}" data-ceo-alumni-fund="${escapeHtml(fund.id)}" ${disabled}>${formatMoney(amt)}</button>`
       )
       .join('');
-    return `<div class="finance-action ceo-alumni-fund">
-      <p><strong>${escapeHtml(fund.label)}</strong></p>
+    return `<article class="ceo-alumni-action-card ceo-alumni-fund">
+      <header class="ceo-alumni-action-card__head"><strong>${escapeHtml(fund.label)}</strong></header>
       <p class="fine-print">${escapeHtml(fund.blurb)}</p>
+      ${renderGradeBoostTagHtml(giftGradeBoostTags(fund.id))}
       <div class="finance-charity-chips">${chips}</div>
-    </div>`;
+    </article>`;
   }).join('');
 
   const typeLabel = school.type ? alumniSchoolTypeLabel(school.type) : null;
   const regionLabel = school.region ?? null;
 
-  return `<section class="finance-section finance-card ceo-alumni-section" aria-label="Alumni donations">
+  return `<section class="finance-section finance-card ceo-alumni-section" aria-label="Alma mater hub">
     <div class="finance-section-head">
-      <h3 class="finance-section-title">Alma mater giving</h3>
+      <h3 class="finance-section-title">Alma mater hub</h3>
       <span class="growth-channel-badge growth-channel-badge--inline">${escapeHtml(school.shortLabel ?? school.label)}</span>
     </div>
-    <p class="fine-print">Personal gifts to <strong>${escapeHtml(school.label)}</strong>${regionLabel ? ` (${escapeHtml(regionLabel)}${typeLabel ? ` · ${escapeHtml(typeLabel)}` : ''})` : ''} — gifts, athletics, and <strong>alumni investment sleeves</strong> (DAF, venture LP, endowment pools) from your personal bank. Large gifts can move sentiment and buzz.</p>
-    ${panelMetricGrid('3', [
+    <p class="fine-print">Shape a fictional <strong>A–F campus report card</strong>, climb alumni recognition, and park capital in campus sleeves — all from your personal bank${regionLabel ? ` (${escapeHtml(regionLabel)}${typeLabel ? ` · ${escapeHtml(typeLabel)}` : ''})` : ''}.</p>
+    <div class="ceo-alumni-kpi-strip">
+    ${panelMetricGrid('4', [
       panelStatCard('Personal bank', formatMoney(bank), { hero: bank > 0 }),
-      panelStatCard('Lifetime to alma mater', formatMoney(lifetime), { hero: lifetime > 0 }),
-      panelStatCard('Recognition', recognition)
+      panelStatCard('Lifetime giving', formatMoney(lifetime), { hero: lifetime > 0 }),
+      panelStatCard('Recognition', recognition),
+      panelStatCard('Investing', investBalance > 0 ? formatMoney(investBalance) : '—', { hero: investBalance > 0 })
     ])}
+    </div>
     ${panelMetricGrid('3', [
-      panelStatCard('Athletics giving', athleticsLifetime > 0 ? formatMoney(athleticsLifetime) : '—', {
-        hero: athleticsLifetime > 0
-      }),
-      panelStatCard('Booster status', booster),
-      panelStatCard('Alumni investing', investBalance > 0 ? formatMoney(investBalance) : '—', { hero: investBalance > 0 })
-    ])}
-    ${panelMetricGrid('2', [
-      panelStatCard('Committed to sleeves', investLifetime > 0 ? formatMoney(investLifetime) : '—'),
+      panelStatCard('Booster track', booster),
+      panelStatCard('Athletics giving', athleticsLifetime > 0 ? formatMoney(athleticsLifetime) : '—'),
       panelStatCard('Investor status', investorRecognition)
     ])}
-    ${renderAlmaMaterGradesPanel(state)}
-    <h4 class="finance-subhead">Alumni investing</h4>
-    <p class="fine-print">Capital that stays on campus balance sheets — monthly marks, partial giving credit toward recognition, taxable returns in your personal filing.</p>
-    ${investBlocks}
-    <h4 class="finance-subhead">Academic &amp; campus funds</h4>
-    ${fundBlocks}
-    <h4 class="finance-subhead">Athletics funding</h4>
-    <p class="fine-print">Support ${escapeHtml(school.shortLabel ?? school.label)} varsity programs from your personal bank. Athletics gifts count toward total alumni recognition and build a separate <strong>booster status</strong> track.</p>
-    ${athleticsBlocks}
-    <div class="finance-inline-form ceo-salary-row">
-      <label class="visually-hidden" for="ceo-alumni-give-input">Custom alumni gift</label>
-      <select id="ceo-alumni-fund-select" aria-label="Gift fund" ${disabled}>
-        <optgroup label="Academic &amp; campus">
-          ${ALUMNI_GIFT_FUNDS.map(
-            (f) => `<option value="${escapeHtml(f.id)}">${escapeHtml(f.label)}</option>`
-          ).join('')}
-        </optgroup>
-        <optgroup label="Athletics">
-          ${ALUMNI_ATHLETICS_PROGRAMS.map(
-            (p) => `<option value="athletics:${escapeHtml(p.id)}">${escapeHtml(p.label)}</option>`
-          ).join('')}
-        </optgroup>
-      </select>
-      <input id="ceo-alumni-give-input" type="number" min="500" step="500" placeholder="Custom amount" ${disabled}>
-      <button type="button" class="btn btn-ghost btn-small" id="btn-ceo-alumni-give-custom" ${disabled}>Give</button>
+    <div class="finance-panel ceo-alumni-panel">
+      ${renderAlmaMaterGradesPanel(state)}
+      <details class="finance-details ceo-alumni-lane" open>
+        <summary>Investment sleeves</summary>
+        <p class="fine-print">Monthly marks · partial giving credit · taxable returns in April · commits can shift report-card letters.</p>
+        <div class="ceo-alumni-action-grid">${investBlocks}</div>
+      </details>
+      <details class="finance-details ceo-alumni-lane" open>
+        <summary>Campus &amp; academic gifts</summary>
+        <p class="fine-print">Minimum $500 per gift. Large checks can move buzz and sentiment.</p>
+        <div class="ceo-alumni-action-grid">${fundBlocks}</div>
+      </details>
+      <details class="finance-details ceo-alumni-lane">
+        <summary>Varsity &amp; athletics</summary>
+        <p class="fine-print">Counts toward lifetime giving and builds booster status at ${escapeHtml(school.shortLabel ?? school.label)}.</p>
+        <div class="ceo-alumni-action-grid">${athleticsBlocks}</div>
+      </details>
+      <div class="ceo-alumni-quick-give finance-card finance-card--inset">
+        <h4 class="finance-subhead">Quick gift</h4>
+        <p class="fine-print">Pick any lane — academic or athletics — and enter a custom amount.</p>
+        <div class="finance-inline-form ceo-salary-row">
+          <label class="visually-hidden" for="ceo-alumni-give-input">Custom alumni gift</label>
+          <select id="ceo-alumni-fund-select" aria-label="Gift fund" ${disabled}>
+            <optgroup label="Academic &amp; campus">
+              ${ALUMNI_GIFT_FUNDS.map(
+                (f) => `<option value="${escapeHtml(f.id)}">${escapeHtml(f.label)}</option>`
+              ).join('')}
+            </optgroup>
+            <optgroup label="Athletics">
+              ${ALUMNI_ATHLETICS_PROGRAMS.map(
+                (p) => `<option value="athletics:${escapeHtml(p.id)}">${escapeHtml(p.label)}</option>`
+              ).join('')}
+            </optgroup>
+          </select>
+          <input id="ceo-alumni-give-input" type="number" min="500" step="500" placeholder="Custom amount" ${disabled}>
+          <button type="button" class="btn btn-ghost btn-small" id="btn-ceo-alumni-give-custom" ${disabled}>Give</button>
+        </div>
+      </div>
+      ${renderDonationHistory(state)}
     </div>
-    ${renderDonationHistory(state)}
   </section>`;
 }
