@@ -364,12 +364,15 @@ export function renderFinancePanel(container, state) {
     : '';
 
   const corpTaxDue = sum.fiscalTaxLiability > 0 && !sum.fiscalTaxPaid;
+  const quarterlyDue = (sum.fiscalQuarterlyTaxLiability ?? 0) > 0 && !sum.fiscalQuarterlyTaxPaid;
   const ceoTaxDue = sum.ceoPersonalTaxFilingRequired && !sum.ceoPersonalTaxPaid;
   let taxAprilNote = '';
-  if (corpTaxDue || ceoTaxDue) {
+  if (quarterlyDue) {
+    taxAprilNote = `<p class="finance-alert finance-alert--tax" role="status"><strong>Quarterly estimated tax due</strong> — ${sum.fiscalQuarterlyTaxLiabilityLabel} (21% × ${sum.fiscalQuarterlyRevenueEstimateLabel} next-3-mo revenue est. · desk task · company cash). Paid estimates credit toward April.</p>`;
+  } else if (corpTaxDue || ceoTaxDue) {
     const parts = [];
     if (corpTaxDue) {
-      parts.push(`${sum.fiscalTaxLiabilityLabel} corporate (desk task · company cash)`);
+      parts.push(`${sum.fiscalTaxLiabilityLabel} corporate annual (desk task · company cash)`);
     }
     if (ceoTaxDue) {
       parts.push(`${sum.ceoPersonalTaxLiabilityLabel} personal (desk task · personal bank)`);

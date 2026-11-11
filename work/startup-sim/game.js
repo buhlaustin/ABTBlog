@@ -51,7 +51,11 @@ import {
   shouldUseNarrativeAi
 } from './modules/NarrativeApi.js';
 import { applyTaskOutcome, rollTaskOutcome } from './modules/Finance.js';
-import { completeTaxFilingTask, donateToCharity } from './modules/CorporateTax.js';
+import {
+  completeTaxFilingTask,
+  completeQuarterlyEstimatedTaxTask,
+  donateToCharity
+} from './modules/CorporateTax.js';
 import { completeCeoPersonalTaxFilingTask } from './modules/CeoPersonalTax.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
 import {
@@ -391,6 +395,23 @@ function handleCompleteTask(instanceId) {
     if (!result.ok) return;
     appendLog(sessionState, tax.summary);
     showDeskFeedback(tax.summary);
+    playUiClick();
+    refresh();
+    return;
+  }
+
+  if (def.quarterlyTaxEstimate) {
+    const est = completeQuarterlyEstimatedTaxTask(sessionState);
+    if (!est.ok) {
+      showDeskFeedback(est.reason || 'Cannot pay quarterly estimate.', true);
+      return;
+    }
+    const rolled = rollTaskOutcome(def, sessionState);
+    applyTaskOutcome(sessionState, def, rolled);
+    const result = completeTaskInstance(sessionState, instanceId, def, rolled);
+    if (!result.ok) return;
+    appendLog(sessionState, est.summary);
+    showDeskFeedback(est.summary);
     playUiClick();
     refresh();
     return;
