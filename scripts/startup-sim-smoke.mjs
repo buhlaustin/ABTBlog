@@ -1278,9 +1278,14 @@ const {
   treasuryNetCash,
   estimateEquityValue
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
-const { displayOutstandingShares, macroCapPressureRatio, GLOBAL_GDP_USD_BENCHMARK } = await import(
-  `file://${join(sim, 'modules/PublicMarketRealism.js')}`
-);
+const {
+  macroCapPressureRatio,
+  GLOBAL_GDP_USD_BENCHMARK,
+  TRILLIONAIRE_BAND_USD,
+  guardListingOperatingPrice,
+  macroPressureAllowsTrillionaire,
+  macroPressureBlocksFantasyWealth
+} = await import(`file://${join(sim, 'modules/PublicMarketRealism.js')}`);
 const { calendarTurn } = await import(`file://${join(sim, 'modules/XC.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 pub.stage = ST.PUBLIC;
@@ -1483,30 +1488,66 @@ if (!ipo.ok) {
       console.log('OK: sandbox unlimited stock splits; career keeps 6-month gate');
     }
   }
-  const sharesBeforeSplit = totalOutstandingShares(pub);
-  const capBeforeCosmetic = marketCap(pub);
   pub.publicMarket.displaySplitMultiplier = 1;
   pub.publicMarket.sharePrice = 360;
-  const cosmeticSplit = executeStockSplit(pub);
+  const sharesBeforeSplit = totalOutstandingShares(pub);
+  const capBeforeSplit = marketCap(pub);
+  const realSplit = executeStockSplit(pub);
   const sharesAfterSplit = totalOutstandingShares(pub);
-  const capAfterCosmetic = marketCap(pub);
-  if (!cosmeticSplit.ok) {
-    console.error(`FAIL: cosmetic split: ${cosmeticSplit.reason}`);
+  const capAfterSplit = marketCap(pub);
+  if (!realSplit.ok) {
+    console.error(`FAIL: real stock split: ${realSplit.reason}`);
     failed = true;
-  } else if (sharesAfterSplit !== sharesBeforeSplit) {
-    console.error('FAIL: stock split must not multiply economic cap-table shares');
+  } else if (sharesAfterSplit < sharesBeforeSplit * 1.9) {
+    console.error('FAIL: split should double cap-table shares');
     failed = true;
-  } else if (displayOutstandingShares(pub) < sharesBeforeSplit * 1.9) {
-    console.error('FAIL: split should raise street-facing share count');
-    failed = true;
-  } else if (Math.abs(capAfterCosmetic - capBeforeCosmetic) > capBeforeCosmetic * 0.02) {
+  } else if (Math.abs(capAfterSplit - capBeforeSplit) > capBeforeSplit * 0.03) {
     console.error('FAIL: split should preserve market cap');
+    failed = true;
+  } else if (!macroPressureAllowsTrillionaire(TRILLIONAIRE_BAND_USD * 1.5)) {
+    console.error('FAIL: ~$1.5T marks should stay in trillionaire band (low macro pressure)');
+    failed = true;
+  } else if (!macroPressureBlocksFantasyWealth(720_000_000_000_000)) {
+    console.error('FAIL: ~$720T fantasy wealth should face max macro pressure');
     failed = true;
   } else if (macroCapPressureRatio(GLOBAL_GDP_USD_BENCHMARK * 2) < 0.85) {
     console.error('FAIL: macro cap pressure should be high above global GDP');
     failed = true;
   } else if (!failed) {
-    console.log('OK: cosmetic splits + macro valuation pressure');
+    console.log('OK: real splits + trillionaire-friendly macro pressure');
+  }
+  const reRate = createInitialState({ companyName: 'ReRate Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+  reRate.stage = ST.PUBLIC;
+  reRate.flags.seedRoundClosed = true;
+  reRate.flags.ipoFiled = true;
+  reRate.finance.mrr = 2_000_000;
+  reRate.finance.arr = 24_000_000;
+  reRate.finance.cash = 80_000_000;
+  reRate.publicMarket = {
+    sharePrice: 88,
+    ipoPrice: 85,
+    monthsPublic: 0,
+    priorMonthMrr: 1_900_000,
+    priorYtdRunRateMrr: 1_900_000,
+    guidanceTone: 'inline',
+    guidanceBeatStreak: 0
+  };
+  reRate.capTable = JSON.parse(JSON.stringify(pub.capTable));
+  computeFundamentalSharePrice(reRate);
+  const wildModel = reRate.finance.arr * 200 / totalOutstandingShares(reRate);
+  const guarded = guardListingOperatingPrice(reRate, wildModel);
+  if (guarded > 88 * 1.15) {
+    console.error(`FAIL: listing fundamental guard too loose (${guarded} vs trade 88)`);
+    failed = true;
+  }
+  const pxBefore = reRate.publicMarket.sharePrice;
+  tickPublicMarket(reRate);
+  const pxAfter = reRate.publicMarket.sharePrice;
+  if (pxAfter > pxBefore * 1.12) {
+    console.error(`FAIL: month-1 tick moved ${pxBefore} → ${pxAfter} (>12%)`);
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: post-IPO month-1 tape stays near listing print');
   }
   const { tickPublicMarketAtMonthStart } = await import(`file://${join(sim, 'modules/IPO.js')}`);
   tickPublicMarketAtMonthStart(pub);

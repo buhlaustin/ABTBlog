@@ -54,7 +54,7 @@ export function publicWealthHeat(state) {
 export function scalePublicStockPctMove(state, pct) {
   if (!pct || !isPublicCompany(state)) return pct;
   const heat = publicWealthHeat(state);
-  const floor = 0.15;
+  const floor = 0.08;
   const scale = floor + (1 - floor) * heat;
   return Number(pct) * scale;
 }
@@ -63,15 +63,16 @@ export function scalePublicStockPctMove(state, pct) {
 export function scalePublicMonthlyDelta(state, deltaPct) {
   if (!isPublicCompany(state)) return deltaPct;
   const heat = publicWealthHeat(state);
-  const floor = 0.22;
-  const scale = floor + (1 - floor) * heat;
+  const months = state.publicMarket?.monthsPublic ?? 0;
+  const early = months <= 3 ? 0.45 : months <= 6 ? 0.62 : 0.78;
+  const scale = early * (0.1 + 0.9 * heat);
   return deltaPct * scale;
 }
 
 /** Model P/S ceiling eases up with heat (IPO starts capped). */
 export function publicFundamentalPsCap(state) {
   const heat = publicWealthHeat(state);
-  return 9 + heat * 17;
+  return 6.5 + heat * 14;
 }
 
 /** Max founder block sold per trade (%), ramping with heat. */

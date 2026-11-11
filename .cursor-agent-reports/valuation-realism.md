@@ -9,8 +9,9 @@
 
 ## Design (no hard cashout cap)
 
-- **`PublicMarketRealism.js`**: ~$142T GDP reference, `macroCapPressureRatio`, stronger mean reversion, softer private valuation curve, trading-price reconciliation vs ARR × P/S + cash.
-- **Cosmetic splits**: `displaySplitMultiplier` + `streetSharePrice()` for UI; economic `sharePrice` and cap table unchanged; market cap stable.
+- **`PublicMarketRealism.js`**: ~$142T GDP reference, `macroCapPressureRatio` tuned so **~$1–3T** (trillionaire band) stays playable and **hundreds of trillions** (e.g. ~$720T) hits max pressure / reconciliation — not a hard cap on selling out.
+- **Splits**: Real 2-for-1 cap-table splits when sticker is high; rare if listing price and month-1 clamps stay sane.
+- **`guardListingOperatingPrice`**: Post-IPO re-rating guard applies to **operating** value only so balance-sheet cash still flows into model cap.
 - **IPO**: Float-sized share count; lift **listing price** when needed instead of minting shares.
 - **Post-IPO**: `reconcileTradingPriceToMacro` on monthly and instant moves; macro drag on wealth heat and fundamental P/S cap.
 

@@ -5,6 +5,9 @@ import { totalOutstandingShares } from './CapTable.js';
 /** Rough 2026 global GDP (USD) — soft anchor, not a hard wealth cap. */
 export const GLOBAL_GDP_USD_BENCHMARK = 142_000_000_000_000;
 
+/** Personal / company marks around here are rare but plausible (≈ trillionaire). */
+export const TRILLIONAIRE_BAND_USD = 1_000_000_000_000;
+
 function isPublicCompanyState(state) {
   return Boolean(state.flags?.ipoFiled && state.stage === STAGES.PUBLIC);
 }
@@ -30,12 +33,14 @@ export function marketCapFromState(state) {
 export function macroCapPressureRatio(marketCapUsd) {
   const cap = Math.max(0, Number(marketCapUsd) || 0);
   const gdp = GLOBAL_GDP_USD_BENCHMARK;
-  if (cap <= gdp * 0.008) return 0;
-  if (cap <= gdp * 0.05) return ((cap - gdp * 0.008) / (gdp * 0.042)) * 0.12;
-  if (cap <= gdp * 0.25) return 0.12 + ((cap - gdp * 0.05) / (gdp * 0.2)) * 0.28;
-  if (cap <= gdp) return 0.4 + ((cap - gdp * 0.25) / (gdp * 0.75)) * 0.35;
+  const tri = TRILLIONAIRE_BAND_USD;
+  if (cap <= 50_000_000_000) return 0;
+  if (cap <= 500_000_000_000) return ((cap - 50_000_000_000) / 450_000_000_000) * 0.1;
+  if (cap <= tri * 3) return 0.1 + ((cap - 500_000_000_000) / (tri * 2.5)) * 0.18;
+  if (cap <= tri * 30) return 0.28 + ((cap - tri * 3) / (tri * 27)) * 0.32;
+  if (cap <= gdp) return 0.6 + ((cap - tri * 30) / Math.max(tri, gdp - tri * 30)) * 0.25;
   const logExcess = Math.log10(Math.max(1, cap / gdp));
-  return Math.min(0.92, 0.75 + logExcess * 0.14);
+  return Math.min(0.98, 0.85 + logExcess * 0.28);
 }
 
 export function macroMeanReversionBoost(state) {
@@ -71,21 +76,67 @@ export function softPrivateEquityCap(rawEstimate, state) {
   return Math.round(Math.min(rawEstimate, Math.max(blended, softened)));
 }
 
-export function splitDisplayMultiplier(state) {
-  return Math.max(1, state.publicMarket?.displaySplitMultiplier ?? 1);
+/** Cap model price right after listing so the tape cannot “catch up” 50× in one month. */
+/** Slow re-rating of operating value after IPO — does not clip balance-sheet cash / share. */
+export function guardListingOperatingPrice(state, operatingPx) {
+  const pm = state.publicMarket ?? {};
+  const trade = pm.sharePrice ?? pm.ipoPrice ?? operatingPx;
+  const ipo = pm.ipoPrice ?? trade;
+  const months = pm.monthsPublic ?? 0;
+  if (months > 30) return operatingPx;
+  const monthMult =
+    months <= 1 ? 1.1 : months <= 3 ? 1.22 : months <= 6 ? 1.38 : months <= 12 ? 1.65 : 2.4;
+  const ceiling = Math.max(trade * 1.04, ipo * monthMult);
+  const floor = Math.min(trade * 0.96, ipo * 0.84);
+  return Math.round(Math.min(Math.max(operatingPx, floor), ceiling) * 100) / 100;
 }
 
-/** Sticker price after cumulative splits (economic price is unchanged). */
-export function streetSharePrice(state) {
-  const economic = state.publicMarket?.sharePrice ?? 0;
-  if (economic <= 0) return 0;
-  return Math.round((economic / splitDisplayMultiplier(state)) * 100) / 100;
+/** @deprecated name — use guardListingOperatingPrice */
+export function guardListingFundamentalPrice(state, modelPx) {
+  return guardListingOperatingPrice(state, modelPx);
 }
 
-/** Street-facing share count (splits adjust this, not the cap table). */
-export function displayOutstandingShares(state) {
-  const economic = totalOutstandingShares(state);
-  return Math.round(economic * splitDisplayMultiplier(state));
+/** Hard cap on monthly % move (applied after wealth-heat scaling). */
+export function clampPublicMonthlyDelta(state, deltaPct) {
+  const months = state.publicMarket?.monthsPublic ?? 0;
+  let maxUp = months <= 1 ? 0.07 : months <= 3 ? 0.1 : months <= 6 ? 0.14 : months <= 18 ? 0.2 : 0.32;
+  const maxDown = months <= 6 ? -0.14 : -0.22;
+  return Math.max(maxDown, Math.min(maxUp, deltaPct));
+}
+
+/** Snaps trading price into a fundamental band — loose when mature. */
+export function clampPriceToFundamentalBand(state, price, fundamental) {
+  const months = state.publicMarket?.monthsPublic ?? 0;
+  const fund = Math.max(0.01, Number(fundamental) || price);
+  const lo = fund * (months <= 6 ? 0.9 : 0.78);
+  const hi = fund * (months <= 6 ? 1.12 : 1.38);
+  return Math.round(Math.min(Math.max(price, lo), hi) * 100) / 100;
+}
+
+/** Per-month budget for desk / IR instant moves (resets at month open). */
+export function consumeInstantStockMoveBudget(state, scaledPct) {
+  const pm = state.publicMarket;
+  if (!pm) return scaledPct;
+  const months = pm.monthsPublic ?? 0;
+  const cap = months <= 3 ? 0.09 : months <= 12 ? 0.14 : 0.22;
+  if (pm.instantMoveBudgetPct == null) pm.instantMoveBudgetPct = cap;
+  const mag = Math.min(Math.abs(scaledPct), pm.instantMoveBudgetPct);
+  pm.instantMoveBudgetPct = Math.max(0, pm.instantMoveBudgetPct - mag);
+  return Math.sign(scaledPct || 1) * mag;
+}
+
+export function resetInstantStockMoveBudget(state) {
+  const pm = state.publicMarket;
+  if (!pm) return;
+  const months = pm.monthsPublic ?? 0;
+  pm.instantMoveBudgetPct = months <= 3 ? 0.09 : months <= 12 ? 0.14 : 0.22;
+}
+
+/** Optional board split when sticker runs hot — max once per 6 months (same gate as manual). */
+export function autoStockSplitIfNeeded(state) {
+  const price = state.publicMarket?.sharePrice ?? 0;
+  if (price < 420) return null;
+  return { needed: true, reason: 'high sticker' };
 }
 
 /**
@@ -101,12 +152,24 @@ export function reconcileTradingPriceToMacro(state, proposedPrice) {
   const tradingCap = shares * proposedPrice;
   const pressure = macroCapPressureRatio(tradingCap);
   const ps = Math.min(45, (pm.priceSalesMultiple ?? 12) * (1 - pressure * 0.35));
-  const fairCap = arr * ps + netCash;
-  if (pressure < 0.2 || fairCap <= 0) return proposedPrice;
-  const maxPremium = 1.35 + (1 - pressure) * 0.85;
+  let fairCap = arr * ps + netCash;
+  if (tradingCap > GLOBAL_GDP_USD_BENCHMARK * 0.5) {
+    fairCap = Math.min(fairCap, GLOBAL_GDP_USD_BENCHMARK * (0.45 + (1 - pressure) * 0.35));
+  }
+  if (pressure < 0.08 || fairCap <= 0) return proposedPrice;
+  const maxPremium = 1.22 + (1 - pressure) * 0.55;
   const capAllowed = fairCap * maxPremium;
   if (tradingCap <= capAllowed) return proposedPrice;
   const floor = (pm.ipoPrice ?? proposedPrice) * 0.15;
   const clamped = Math.max(floor, capAllowed / shares);
   return Math.round(clamped * 100) / 100;
+}
+
+/** Headless: $1T-scale marks are fine; hundreds of trillions are not. */
+export function macroPressureAllowsTrillionaire(capUsd) {
+  return macroCapPressureRatio(capUsd) < 0.35;
+}
+
+export function macroPressureBlocksFantasyWealth(capUsd) {
+  return macroCapPressureRatio(capUsd) > 0.88;
 }

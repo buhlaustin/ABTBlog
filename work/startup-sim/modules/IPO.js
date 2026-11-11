@@ -35,13 +35,15 @@ import {
   scalePublicStockPctMove
 } from './PublicPostIpoEconomy.js';
 import {
-  displayOutstandingShares,
+  clampPriceToFundamentalBand,
+  clampPublicMonthlyDelta,
+  consumeInstantStockMoveBudget,
+  guardListingOperatingPrice,
   macroAdjustedPsCap,
   macroMeanReversionBoost,
   reconcileTradingPriceToMacro,
-  softPrivateEquityCap,
-  splitDisplayMultiplier,
-  streetSharePrice
+  resetInstantStockMoveBudget,
+  softPrivateEquityCap
 } from './PublicMarketRealism.js';
 
 /** Calendar-year revenue booked in fiscal.current (YTD through the closing month). */
@@ -285,7 +287,9 @@ export function computeFundamentalSharePrice(state) {
   pm.fundamentalOperatingCap = Math.round(operatingCap);
   pm.treasuryNetCashInModel = netCash;
   const floor = priceFloor(state, pm.sharePrice ?? pm.ipoPrice ?? 1);
-  const px = Math.round((fairCap / shares) * 100) / 100;
+  const operatingPx = operatingCap / shares;
+  const guardedOperating = guardListingOperatingPrice(state, operatingPx);
+  const px = Math.round(((guardedOperating * shares + netCash) / shares) * 100) / 100;
   pm.fundamentalPrice = Math.max(floor, px);
   return pm.fundamentalPrice;
 }
@@ -360,10 +364,13 @@ function pushPriceHistory(state, price) {
 /** Instant move (crises, desk, buybacks). Returns new price. */
 export function applyStockPctMove(state, pct) {
   if (!isPublicCompany(state) || state.flags?.cashedOut || !pct) return null;
-  const scaledPct = scalePublicStockPctMove(state, pct);
+  const scaledPct = consumeInstantStockMoveBudget(state, scalePublicStockPctMove(state, pct));
+  if (!scaledPct) return null;
   const pm = state.publicMarket;
   const price = pm.sharePrice ?? pm.ipoPrice ?? 1;
   let next = Math.max(priceFloor(state, price), Math.round(price * (1 + Number(scaledPct)) * 100) / 100);
+  const fund = pm.fundamentalPrice ?? computeFundamentalSharePrice(state) ?? next;
+  next = clampPriceToFundamentalBand(state, next, fund);
   next = reconcileTradingPriceToMacro(state, next);
   pm.priorSharePrice = price;
   pm.sharePrice = next;
@@ -464,11 +471,11 @@ export function fileFollowOnOffering(state) {
   };
 }
 
-export function executeStockSplit(state) {
+export function executeStockSplit(state, { auto = false } = {}) {
   if (!isPublicCompany(state)) return { ok: false, reason: 'Splits require a listed stock.' };
   const pm = state.publicMarket;
-  const street = streetSharePrice(state);
-  if (street < 180) {
+  const price = pm.sharePrice ?? 0;
+  if (price < 180) {
     return { ok: false, reason: 'Board waits until the share price is at least $180.' };
   }
   const turn = calendarTurn(state);
@@ -481,11 +488,28 @@ export function executeStockSplit(state) {
     return { ok: false, reason: 'One split every 6 months max.' };
   }
   if (!sandbox) pm.lastSplitTurn = turn;
-  pm.displaySplitMultiplier = splitDisplayMultiplier(state) * 2;
-  pushMarketTape(state, '2-for-1 split — retail traders celebrate the lower sticker price.');
+  for (const row of state.capTable ?? []) {
+    if (row.shares) row.shares *= 2;
+  }
+  state.capTable = recalculateCapTablePercentages(state.capTable);
+  pm.sharePrice = Math.round((price / 2) * 100) / 100;
+  pm.ipoPrice = Math.round(((pm.ipoPrice ?? price) / 2) * 100) / 100;
+  if (pm.fundamentalPrice) pm.fundamentalPrice = Math.round((pm.fundamentalPrice / 2) * 100) / 100;
+  if (pm.priorSharePrice) pm.priorSharePrice = Math.round((pm.priorSharePrice / 2) * 100) / 100;
+  if (pm.high52) pm.high52 = Math.round((pm.high52 / 2) * 100) / 100;
+  if (pm.low52) pm.low52 = Math.round((pm.low52 / 2) * 100) / 100;
+  if (pm.analystTarget) pm.analystTarget = Math.round((pm.analystTarget / 2) * 100) / 100;
+  pm.displaySplitMultiplier = 1;
+  state.finance.valuation = Math.round(pm.sharePrice * totalOutstandingShares(state));
+  pushMarketTape(
+    state,
+    auto
+      ? 'Board declared a 2-for-1 split to bring the sticker price back to retail-friendly levels.'
+      : '2-for-1 split — retail traders celebrate the lower sticker price.'
+  );
   return {
     ok: true,
-    summary: `2-for-1 split — sticker ${formatMoney(streetSharePrice(state))}; ${displayOutstandingShares(state).toLocaleString('en-US')} street shares (cap table economics unchanged).`
+    summary: `2-for-1 split — ${totalOutstandingShares(state).toLocaleString('en-US')} shares @ ${formatMoney(pm.sharePrice)} (cap table updated).`
   };
 }
 
@@ -557,6 +581,7 @@ export function tickPublicMarketAtMonthStart(state) {
   if (!isPublicCompany(state) || state.flags?.cashedOut) return [];
   const pm = state.publicMarket;
   const lines = [];
+  resetInstantStockMoveBudget(state);
   pm.institutionalHoldPct = Math.min(82, (pm.institutionalHoldPct ?? 42) + (pm.indexMember ? 0.4 : 0.15));
   if (!pm.indexMember && (pm.monthsPublic ?? 0) >= 6 && marketCap(state) >= 500_000_000) {
     pm.indexMember = true;
@@ -618,7 +643,14 @@ export function tickPublicMarket(state) {
 
   const fundamental = computeFundamentalSharePrice(state) ?? price;
   const richPct = fundamental > 0 ? (price - fundamental) / fundamental : 0;
-  const meanRevert = -richPct * (0.16 + macroMeanReversionBoost(state));
+  let meanRevert = -richPct * (0.16 + macroMeanReversionBoost(state));
+  if (richPct < 0) {
+    const months = pm.monthsPublic ?? 0;
+    const maxCatchUp = months <= 1 ? 0.04 : months <= 3 ? 0.06 : months <= 6 ? 0.09 : 0.14;
+    meanRevert = Math.min(meanRevert, maxCatchUp);
+  } else if (richPct > 0.15) {
+    meanRevert *= 1.15;
+  }
 
   const burn = state.finance?.monthlyBurn ?? 0;
   const cash = state.finance?.cash ?? 0;
@@ -692,9 +724,12 @@ export function tickPublicMarket(state) {
   }
 
   deltaPct = scalePublicMonthlyDelta(state, deltaPct);
+  deltaPct = clampPublicMonthlyDelta(state, deltaPct);
 
   const floor = priceFloor(state, price);
   let next = Math.max(floor, Math.round(price * (1 + deltaPct) * 100) / 100);
+  const guardedFund = computeFundamentalSharePrice(state) ?? fundamental;
+  next = clampPriceToFundamentalBand(state, next, guardedFund);
   next = reconcileTradingPriceToMacro(state, next);
 
   pm.sharePrice = next;
@@ -711,6 +746,13 @@ export function tickPublicMarket(state) {
 
   const squeezeLine = maybeShortSqueeze(state, deltaPct);
   if (squeezeLine) lines.push(squeezeLine);
+
+  if (pm.sharePrice >= 480) {
+    const autoSplit = executeStockSplit(state, { auto: true });
+    if (autoSplit.ok) {
+      lines.push(`Board auto-split: ${autoSplit.summary}`);
+    }
+  }
 
   lines.unshift(
     `Stock (${pm.ticker}) ${deltaPct >= 0 ? '+' : ''}${(deltaPct * 100).toFixed(1)}% → ${formatMoney(pm.sharePrice)}/share (model ${formatMoney(pm.fundamentalPrice ?? fundamental)}).`
@@ -989,8 +1031,8 @@ export function renderPublicStockPanel(mount, state) {
         : '<p class="fine-print">Price drivers appear after the first monthly close as a public company.</p>';
     block = `<div class="finance-action ipo-action stock-panel">
       <div class="stock-panel-header">
-        <p class="stock-headline"><strong>${escapeHtml(pm.ticker ?? '—')}</strong> <span class="stock-spot">${formatMoney(streetSharePrice(state))}</span><span class="stat-value ${chClass}">${sessionCh >= 0 ? '+' : ''}${sessionCh.toFixed(1)}% vs last mark</span></p>
-        <p class="fine-print">Mkt cap ${formatMoney(cap)} · ${displayOutstandingShares(state).toLocaleString()} shares outstanding (street count; splits are sticker-only)</p>
+        <p class="stock-headline"><strong>${escapeHtml(pm.ticker ?? '—')}</strong> <span class="stock-spot">${formatMoney(pm.sharePrice ?? 0)}</span><span class="stat-value ${chClass}">${sessionCh >= 0 ? '+' : ''}${sessionCh.toFixed(1)}% vs last mark</span></p>
+        <p class="fine-print">Mkt cap ${formatMoney(cap)} · ${totalOutstandingShares(state).toLocaleString()} shares outstanding</p>
       </div>
       ${renderStockSparkline(pm.priceHistory)}
       <div class="stock-metric-stack">

@@ -11,7 +11,7 @@ export function targetIpoSharePrice(state, valuation) {
   const fromVal = Math.sqrt(valuation / 40_000_000) * 4.2;
   let price = Math.round(((fromArr + fromVal) / 2) * 100) / 100;
   if (ps > 35) price *= 0.72;
-  return Math.max(8, Math.min(420, price));
+  return Math.max(8, Math.min(165, price));
 }
 
 /** ESOP created at seed — 8% fully-diluted (was 10%). */
