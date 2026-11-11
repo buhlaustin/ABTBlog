@@ -1209,6 +1209,13 @@ if (!buy.ok) {
     console.log(`OK: acquisition + portfolio MRR (${formatMoney(totalSubsidiaryMrr(acqState))}/mo)`);
   }
   const holding = acqState.acquisitions.owned[0];
+  if (subsidiarySalePrice(acqState, holding, small) < buy.price) {
+    console.error('FAIL: acquisition exit mark should not start below purchase price');
+    failed = true;
+  } else if ((holding.health ?? 1) < 0.99) {
+    console.error(`FAIL: new acquisition should open at 1.0× health (got ${holding.health})`);
+    failed = true;
+  }
   const implied = subsidiarySalePrice(acqState, holding, small);
   const quote5 = computeReinvestQuote(acqState, small.id, 5, 'product');
   if (!quote5.ok) {
@@ -1223,9 +1230,14 @@ if (!buy.ok) {
       );
       failed = true;
     } else {
-      const rein = reinvestInSubsidiary(acqState, small.id, { pctOfValue: 2, program: 'gtm' });
+      const healthBeforeReinvest = holding.health ?? 1;
+      const markBeforeReinvest = subsidiaryValuationMark(holding);
+      const rein = reinvestInSubsidiary(acqState, small.id, { pctOfValue: 2, program: 'integration' });
       if (!rein.ok || rein.pctOfValue !== 2) {
         console.error(`FAIL: pct-based reinvest: ${rein.reason ?? 'bad result'}`);
+        failed = true;
+      } else if ((holding.health ?? 1) < healthBeforeReinvest || subsidiaryValuationMark(holding) < markBeforeReinvest) {
+        console.error('FAIL: reinvest should only raise health and valuation mark');
         failed = true;
       } else {
         console.log(`OK: portfolio reinvest scales with value (${formatMoney(rein.amount)} for 2%)`);
@@ -1242,14 +1254,14 @@ if (!buy.ok) {
   tickAcquisitionsAtMonthStart(acqState);
   const markAfter = subsidiaryValuationMark(holding);
   const exitAfter = subsidiarySalePrice(acqState, holding, small);
-  if (markAfter === markBefore && exitAfter === exitBefore) {
-    console.error('FAIL: portfolio valuation mark should drift monthly');
+  if (markAfter < markBefore || exitAfter < exitBefore) {
+    console.error(`FAIL: portfolio mark should not fall month-one (${markBefore}→${markAfter}, exit ${exitBefore}→${exitAfter})`);
     failed = true;
   } else if (markAfter < 0.65 || markAfter > 1.85) {
     console.error(`FAIL: valuation mark out of bounds (${markAfter})`);
     failed = true;
   } else {
-    console.log(`OK: portfolio mark drift (${markBefore.toFixed(3)}× → ${markAfter.toFixed(3)}×)`);
+    console.log(`OK: portfolio mark stable/up (${markBefore.toFixed(3)}× → ${markAfter.toFixed(3)}×)`);
   }
   const pulse = portfolioPulseSummary(acqState);
   if (pulse.portfolioMrr < 1 || pulse.exitVal <= 0 || pulse.invested <= 0) {
@@ -2411,9 +2423,14 @@ if (!failed) {
         console.error('FAIL: take-private quote should exist while float remains');
         failed = true;
       } else {
-        const { purchaseTargetPersonal, getAcquisitionCatalog, targetAskPrice } = await import(
-          `file://${join(sim, 'modules/Acquisitions.js')}`
-        );
+        const {
+          purchaseTargetPersonal,
+          getAcquisitionCatalog,
+          targetAskPrice,
+          applyPersonalSubsidiaryMrrPayout,
+          portfolioSynergyMult,
+          PERSONAL_PORTFOLIO_MRR_MULT
+        } = await import(`file://${join(sim, 'modules/Acquisitions.js')}`);
         const cashBefore = stockTrade.finance.cash;
         const target = getAcquisitionCatalog().find((c) => targetAskPrice(stockTrade, c) <= 5_000_000);
         if (target) {
@@ -2425,7 +2442,17 @@ if (!failed) {
             console.error('FAIL: personal acquisition should not debit company cash');
             failed = true;
           } else {
-            console.log('OK: founder stock buy + personal M&A (company cash untouched)');
+            const corpEquiv = Math.round(personalBuy.mrr * portfolioSynergyMult(stockTrade));
+            const personalPayout = applyPersonalSubsidiaryMrrPayout(stockTrade);
+            const expectedFloor = corpEquiv * PERSONAL_PORTFOLIO_MRR_MULT * 0.95;
+            if (personalPayout.total < expectedFloor) {
+              console.error(
+                `FAIL: personal portfolio MRR should be ~10× corporate (got ${personalPayout.total} vs floor ${expectedFloor})`
+              );
+              failed = true;
+            } else {
+              console.log('OK: founder stock buy + personal M&A (10× MRR, company cash untouched)');
+            }
           }
         } else {
           console.log('OK: founder stock buy');

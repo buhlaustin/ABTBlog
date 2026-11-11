@@ -12,6 +12,8 @@ import bundled from '../data/acquisition-targets.json' with { type: 'json' };
 
 export const MARKET_PAGE_SIZE = 18;
 export const ACQUISITION_DILIGENCE_COST = 10_000;
+/** Personal portfolio subsidiaries pay this multiple vs the same target owned on the balance sheet. */
+export const PERSONAL_PORTFOLIO_MRR_MULT = 10;
 const CATEGORY_IDS = [
   'b2b-saas',
   'consumer-social',
@@ -192,12 +194,8 @@ function integrationMonthsForSegment(segment, isRival) {
   return 0;
 }
 
-export function holdingIntegrationMrrFactor(holding) {
-  const left = Math.max(0, holding.integrationMonthsLeft ?? 0);
-  if (left === 0) return 1;
-  if (left === 1) return 0.78;
-  if (left === 2) return 0.55;
-  return 0.4;
+export function holdingIntegrationMrrFactor(_holding) {
+  return 1;
 }
 
 function integrationMrrFactor(holding) {
@@ -267,7 +265,10 @@ function applyMonthlyValuationDrift(state, holding) {
   if (holding.lastMarkTurn === turn) return null;
   holding.lastMarkTurn = turn;
   if (holding.valuationMark == null) holding.valuationMark = 1;
-  const drift = monthlyValuationDriftPct(state, holding.id);
+  let drift = monthlyValuationDriftPct(state, holding.id);
+  const held = monthsHeld(state, holding);
+  if (held <= 2) drift = Math.max(0, drift);
+  if (holding.lastReinvestTurn === turn) drift = Math.max(drift, 0.012);
   holding.lastValuationDriftPct = drift;
   holding.valuationMark = Math.max(
     VALUATION_MARK_MIN,
@@ -315,7 +316,9 @@ export function subsidiarySalePrice(state, holding, company) {
   const held = monthsHeld(state, holding);
   const holdBonus = 1 + Math.min(0.12, Math.floor(held / 6) * 0.02);
   const core = company.basePrice * health * mark * categorySynergyMult(state, company) * holdBonus;
-  return Math.round(core + invested * 0.82);
+  const sale = Math.round(core + invested * 0.82);
+  const costBasis = (holding.purchasePrice ?? 0) + (holding.investedTotal ?? 0);
+  return Math.max(sale, costBasis);
 }
 
 /** Implied equity value for reinvestment sizing (exit mark, not purchase price). */
@@ -342,7 +345,7 @@ export const REINVEST_PROGRAMS = [
     id: 'integration',
     label: 'Integration sprint',
     blurb: 'PMO, systems migration, and synergy capture.',
-    healthFactor: 0.75,
+    healthFactor: 1.1,
     integrationMonths: 1
   },
   {
@@ -389,8 +392,8 @@ export function computeReinvestQuote(state, targetId, pctOfValue, programId = 'p
   }
 
   const program = reinvestProgram(programId);
-  const healthDelta = (amount / Math.max(impliedValue, 1)) * 0.42 * program.healthFactor;
-  const projectedHealth = Math.min(2.2, holdingHealth(holding) + healthDelta);
+  const healthDelta = (amount / Math.max(impliedValue, 1)) * 0.42 * Math.max(1, program.healthFactor);
+  const projectedHealth = Math.min(2.2, holdingHealth(holding) + Math.max(healthDelta, 0.01));
 
   return {
     ok: true,
@@ -460,10 +463,10 @@ export function runDueDiligence(state, targetId) {
   state.finance.cash -= DILIGENCE_COST;
   recordCashOutflow(state, DILIGENCE_COST, 'acquisition-diligence');
   const seed = state.meta?.runSeed ?? 1;
-  const healthRoll = Math.round((0.9 + hash01(seed, targetId, 404) * 0.18) * 100) / 100;
+  const qualityScore = Math.round((0.96 + hash01(seed, targetId, 404) * 0.08) * 100) / 100;
   const hiddenDebt = hash01(seed, targetId, 405) > 0.82;
   state.acquisitions.diligenceReports[targetId] = {
-    healthRoll,
+    qualityScore,
     hiddenDebt,
     integrationExtra: hiddenDebt ? 1 : 0
   };
@@ -472,11 +475,11 @@ export function runDueDiligence(state, targetId) {
     ok: true,
     company,
     name,
-    healthRoll,
+    qualityScore,
     hiddenDebt,
     summary: hiddenDebt
-      ? `${name}: opens at ${healthRoll}× health — hidden integration debt (+1 mo).`
-      : `${name}: clean file — expect ~${healthRoll}× starting health.`
+      ? `${name}: quality ${qualityScore} — hidden integration debt (+1 mo); closes at 1.0× health like any deal.`
+      : `${name}: clean file — quality ${qualityScore}; all acquisitions open at 1.0× health.`
   };
 }
 
@@ -514,6 +517,22 @@ function filteredMarketTargets(state) {
   return list;
 }
 
+function newAcquisitionHolding(state, company, price, report, integrationMonthsLeft) {
+  return {
+    id: company.id,
+    acquiredTurn: calendarTurn(state),
+    purchasePrice: price,
+    health: 1,
+    investedTotal: 0,
+    integrationMonthsLeft,
+    lastReinvestTurn: calendarTurn(state),
+    valuationMark: 1,
+    lastValuationDriftPct: 0,
+    lastMarkTurn: calendarTurn(state),
+    dueDiligenceQuality: report?.qualityScore ?? null
+  };
+}
+
 export function purchaseTarget(state, targetId) {
   if (!acquisitionsUnlocked(state)) {
     return { ok: false, reason: 'Finish your X Combinator batch before buying companies.' };
@@ -534,18 +553,7 @@ export function purchaseTarget(state, targetId) {
   const report = state.acquisitions.diligenceReports?.[company.id];
   let integrationMonthsLeft = integrationMonthsForSegment(company.segment, company.isRival);
   if (report?.integrationExtra) integrationMonthsLeft += 1;
-  const holding = {
-    id: company.id,
-    acquiredTurn: calendarTurn(state),
-    purchasePrice: price,
-    health: report?.healthRoll ?? 1,
-    investedTotal: 0,
-    integrationMonthsLeft,
-    lastReinvestTurn: calendarTurn(state),
-    valuationMark: 1,
-    lastValuationDriftPct: 0,
-    lastMarkTurn: null
-  };
+  const holding = newAcquisitionHolding(state, company, price, report, integrationMonthsLeft);
   state.acquisitions.owned.push(holding);
   if (report) delete state.acquisitions.diligenceReports[company.id];
   state.acquisitions.fireSaleIds = (state.acquisitions.fireSaleIds ?? []).filter((id) => id !== company.id);
@@ -593,19 +601,7 @@ export function purchaseTargetPersonal(state, targetId) {
   const report = state.acquisitions.diligenceReports?.[company.id];
   let integrationMonthsLeft = integrationMonthsForSegment(company.segment, company.isRival);
   if (report?.integrationExtra) integrationMonthsLeft += 1;
-  const holding = {
-    id: company.id,
-    acquiredTurn: calendarTurn(state),
-    purchasePrice: price,
-    health: report?.healthRoll ?? 1,
-    investedTotal: 0,
-    integrationMonthsLeft,
-    lastReinvestTurn: calendarTurn(state),
-    valuationMark: 1,
-    lastValuationDriftPct: 0,
-    lastMarkTurn: null,
-    funding: 'personal'
-  };
+  const holding = { ...newAcquisitionHolding(state, company, price, report, integrationMonthsLeft), funding: 'personal' };
   state.acquisitions.personalOwned.push(holding);
   if (report) delete state.acquisitions.diligenceReports[company.id];
   state.acquisitions.fireSaleIds = (state.acquisitions.fireSaleIds ?? []).filter((id) => id !== company.id);
@@ -635,7 +631,7 @@ function totalPersonalSubsidiaryMrr(state) {
     const def = catalog.find((c) => c.id === h.id);
     if (def) sum += subsidiaryMrr(state, h, def);
   }
-  return Math.round(sum * portfolioSynergyMult(state));
+  return Math.round(sum * portfolioSynergyMult(state) * PERSONAL_PORTFOLIO_MRR_MULT);
 }
 
 export function applyPersonalSubsidiaryMrrPayout(state) {
@@ -692,8 +688,16 @@ export function reinvestInSubsidiary(state, targetId, options = {}) {
   holding.lastReinvestTurn = calendarTurn(state);
   holding.lastReinvestProgram = program.id;
 
-  const delta = (amount / Math.max(impliedValue, 1)) * 0.42 * program.healthFactor;
-  holding.health = holdingHealth(holding) + delta;
+  const delta = Math.max(
+    0.01,
+    (amount / Math.max(impliedValue, 1)) * 0.42 * Math.max(1, program.healthFactor)
+  );
+  holding.health = Math.min(2.2, holdingHealth(holding) + delta);
+  const markBoost = (amount / Math.max(impliedValue, 1)) * 0.06;
+  holding.valuationMark = Math.min(
+    VALUATION_MARK_MAX,
+    subsidiaryValuationMark(holding) + Math.max(markBoost, 0.005)
+  );
   if (holding.integrationMonthsLeft > 0 && program.integrationMonths > 0) {
     holding.integrationMonthsLeft = Math.max(
       0,

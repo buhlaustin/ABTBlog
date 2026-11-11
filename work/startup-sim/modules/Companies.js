@@ -32,7 +32,8 @@ import {
   listMarketTargets,
   isAcquisitionFireSale,
   MARKET_PAGE_SIZE,
-  ACQUISITION_DILIGENCE_COST
+  ACQUISITION_DILIGENCE_COST,
+  PERSONAL_PORTFOLIO_MRR_MULT
 } from './Acquisitions.js';
 
 export { setCompaniesSection, portfolioPulseSummary };
@@ -115,7 +116,7 @@ function renderHoldingCard(state, h, options = {}) {
     <header class="companies-holding-head">
       <div>
         <h4 class="companies-holding-title">${escapeHtml(name)}</h4>
-        <p class="fine-print">${escapeHtml(segmentLabel(co.segment))} · held ${monthsHeld(state, h)} mo${personal ? ' · personal deal' : ''} ${syn}</p>
+        <p class="fine-print">${escapeHtml(segmentLabel(co.segment))} · held ${monthsHeld(state, h)} mo${personal ? ` · personal (${PERSONAL_PORTFOLIO_MRR_MULT}× MRR payout)` : ''} ${syn}</p>
       </div>
       ${markDriftChip(h)}
     </header>
@@ -237,7 +238,7 @@ function renderMarketSection(state) {
       const fire = isAcquisitionFireSale(state, co.id) ? '<span class="tag tag-fire">Fire sale −15%</span> ' : '';
       const diligenced = state.acquisitions?.diligenceReports?.[co.id];
       const ddNote = diligenced
-        ? `<span class="fine-print">DD: ~${diligenced.healthRoll}× health${diligenced.hiddenDebt ? ', +1 mo integration' : ''}</span>`
+        ? `<span class="fine-print">DD quality ${diligenced.qualityScore ?? diligenced.healthRoll ?? '—'}${diligenced.hiddenDebt ? ', +1 mo integration' : ''}</span>`
         : '';
       return `<tr>
         <td><strong>${escapeHtml(name)}</strong>${co.isRival ? ' <span class="tag tag-rival">Rival</span>' : ''} ${fire}<br><span class="fine-print">${escapeHtml(co.description)}</span><br>${fit}${ddNote ? `<br>${ddNote}` : ''}</td>
@@ -333,7 +334,7 @@ export function renderCompaniesPanel(container, state) {
   container.innerHTML = `
     <div class="companies-panel finance-panel">
       <header class="finance-hero companies-hero">
-        <p class="panel-lede">Roll up operators for MRR — acquire with company cash or <strong>buy personally</strong> (CEO bank; MRR to your personal account).</p>
+        <p class="panel-lede">Roll up operators for MRR — company deals pay treasury; <strong>personal deals pay ${PERSONAL_PORTFOLIO_MRR_MULT}×</strong> the same subsidiary cash flow to your CEO bank (all closes start at 1.0× health).</p>
         <p class="companies-market-chip" role="status">${escapeHtml(marketBrief(state))}</p>
       </header>
       ${lockNote}
