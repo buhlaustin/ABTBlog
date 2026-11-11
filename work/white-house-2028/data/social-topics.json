@@ -1,0 +1,10 @@
+[
+  { "id": "kitchen_table", "label": "Kitchen-table costs", "safe": true, "baseBuzz": 3 },
+  { "id": "future_work", "label": "Future of work", "safe": true, "baseBuzz": 4 },
+  { "id": "rural_broadband", "label": "Rural broadband", "safe": true, "baseBuzz": 2 },
+  { "id": "rival_contrast", "label": "Contrast with a rival", "safe": false, "baseBuzz": 9, "gaffeRisk": 0.1 },
+  { "id": "policy_thread", "label": "Policy thread (6 posts)", "safe": true, "baseBuzz": 5 },
+  { "id": "meme_reply", "label": "Reply to a meme account", "safe": false, "baseBuzz": 14, "gaffeRisk": 0.22 },
+  { "id": "veterans", "label": "Veterans care", "safe": true, "baseBuzz": 3 },
+  { "id": "family_story", "label": "Family story", "safe": true, "baseBuzz": 4 }
+]

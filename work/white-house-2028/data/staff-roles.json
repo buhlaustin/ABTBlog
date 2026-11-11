@@ -1,0 +1,32 @@
+[
+  {
+    "id": "campaign_manager",
+    "label": "Campaign manager",
+    "salaryWeekly": 28000,
+    "effects": { "organization": 8, "apBonus": 1, "burn": 28000 }
+  },
+  {
+    "id": "finance_chair",
+    "label": "Finance chair",
+    "salaryWeekly": 22000,
+    "effects": { "fundraisingMult": 0.12, "burn": 22000 }
+  },
+  {
+    "id": "comms_director",
+    "label": "Communications director",
+    "salaryWeekly": 24000,
+    "effects": { "media": 10, "gaffeReduce": 0.06, "burn": 24000 }
+  },
+  {
+    "id": "field_director",
+    "label": "Field director",
+    "salaryWeekly": 20000,
+    "effects": { "stateVisitBoost": 2, "petitionBoost": 0.08, "burn": 20000 }
+  },
+  {
+    "id": "pollster",
+    "label": "Lead pollster",
+    "salaryWeekly": 18000,
+    "effects": { "battleIntel": true, "debateInsight": 2, "burn": 18000 }
+  }
+]

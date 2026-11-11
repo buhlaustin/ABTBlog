@@ -1,4 +1,4 @@
-const KEY = 'wh2028_save_v1';
+const KEY = 'wh2028_save_v2';
 
 export const Storage = {
   save(state) {
@@ -11,7 +11,7 @@ export const Storage = {
   },
   load() {
     try {
-      const raw = localStorage.getItem(KEY);
+      const raw = localStorage.getItem(KEY) ?? localStorage.getItem('wh2028_save_v1');
       return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
@@ -19,8 +19,9 @@ export const Storage = {
   },
   clear() {
     localStorage.removeItem(KEY);
+    localStorage.removeItem('wh2028_save_v1');
   },
   hasSave() {
-    return Boolean(localStorage.getItem(KEY));
+    return Boolean(localStorage.getItem(KEY) || localStorage.getItem('wh2028_save_v1'));
   }
 };

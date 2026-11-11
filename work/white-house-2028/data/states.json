@@ -6,7 +6,9 @@
     "region": "south",
     "cx": 720,
     "cy": 420,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 15,
+    "battleground": false
   },
   {
     "id": "AK",
@@ -15,7 +17,9 @@
     "region": "west",
     "cx": 80,
     "cy": 80,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": 12,
+    "battleground": false
   },
   {
     "id": "AZ",
@@ -24,7 +28,9 @@
     "region": "west",
     "cx": 180,
     "cy": 380,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": 3,
+    "battleground": true
   },
   {
     "id": "AR",
@@ -33,7 +39,9 @@
     "region": "south",
     "cx": 580,
     "cy": 400,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 18,
+    "battleground": false
   },
   {
     "id": "CA",
@@ -42,7 +50,9 @@
     "region": "west",
     "cx": 60,
     "cy": 320,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": -12,
+    "battleground": false
   },
   {
     "id": "CO",
@@ -51,7 +61,9 @@
     "region": "west",
     "cx": 280,
     "cy": 300,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": -2,
+    "battleground": true
   },
   {
     "id": "CT",
@@ -60,7 +72,9 @@
     "region": "northeast",
     "cx": 880,
     "cy": 220,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -8,
+    "battleground": false
   },
   {
     "id": "DE",
@@ -69,7 +83,9 @@
     "region": "south",
     "cx": 860,
     "cy": 280,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -6,
+    "battleground": false
   },
   {
     "id": "DC",
@@ -78,7 +94,9 @@
     "region": "south",
     "cx": 840,
     "cy": 300,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -35,
+    "battleground": false
   },
   {
     "id": "FL",
@@ -87,7 +105,9 @@
     "region": "south",
     "cx": 780,
     "cy": 480,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": 4,
+    "battleground": false
   },
   {
     "id": "GA",
@@ -96,7 +116,9 @@
     "region": "south",
     "cx": 720,
     "cy": 440,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": 3,
+    "battleground": true
   },
   {
     "id": "HI",
@@ -105,7 +127,9 @@
     "region": "west",
     "cx": 200,
     "cy": 520,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": -18,
+    "battleground": false
   },
   {
     "id": "ID",
@@ -114,7 +138,9 @@
     "region": "west",
     "cx": 140,
     "cy": 200,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": 15,
+    "battleground": false
   },
   {
     "id": "IL",
@@ -123,7 +149,9 @@
     "region": "midwest",
     "cx": 620,
     "cy": 280,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": -8,
+    "battleground": false
   },
   {
     "id": "IN",
@@ -132,7 +160,9 @@
     "region": "midwest",
     "cx": 660,
     "cy": 260,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 8,
+    "battleground": false
   },
   {
     "id": "IA",
@@ -141,7 +171,9 @@
     "region": "midwest",
     "cx": 560,
     "cy": 240,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 1,
+    "battleground": true
   },
   {
     "id": "KS",
@@ -150,7 +182,9 @@
     "region": "midwest",
     "cx": 480,
     "cy": 320,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 12,
+    "battleground": false
   },
   {
     "id": "KY",
@@ -159,7 +193,9 @@
     "region": "south",
     "cx": 680,
     "cy": 340,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 12,
+    "battleground": false
   },
   {
     "id": "LA",
@@ -168,7 +204,9 @@
     "region": "south",
     "cx": 600,
     "cy": 460,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 12,
+    "battleground": false
   },
   {
     "id": "ME",
@@ -177,7 +215,9 @@
     "region": "northeast",
     "cx": 900,
     "cy": 120,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -5,
+    "battleground": false
   },
   {
     "id": "MD",
@@ -186,7 +226,9 @@
     "region": "south",
     "cx": 840,
     "cy": 260,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -12,
+    "battleground": false
   },
   {
     "id": "MA",
@@ -195,7 +237,9 @@
     "region": "northeast",
     "cx": 900,
     "cy": 200,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -15,
+    "battleground": false
   },
   {
     "id": "MI",
@@ -204,7 +248,9 @@
     "region": "midwest",
     "cx": 660,
     "cy": 200,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 0,
+    "battleground": true
   },
   {
     "id": "MN",
@@ -213,7 +259,9 @@
     "region": "midwest",
     "cx": 540,
     "cy": 180,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": -2,
+    "battleground": true
   },
   {
     "id": "MS",
@@ -222,7 +270,9 @@
     "region": "south",
     "cx": 640,
     "cy": 440,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 14,
+    "battleground": false
   },
   {
     "id": "MO",
@@ -231,7 +281,9 @@
     "region": "midwest",
     "cx": 580,
     "cy": 320,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 10,
+    "battleground": false
   },
   {
     "id": "MT",
@@ -240,7 +292,9 @@
     "region": "west",
     "cx": 260,
     "cy": 140,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": 12,
+    "battleground": false
   },
   {
     "id": "NE",
@@ -249,7 +303,9 @@
     "region": "midwest",
     "cx": 460,
     "cy": 260,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 14,
+    "battleground": false
   },
   {
     "id": "NV",
@@ -258,7 +314,9 @@
     "region": "west",
     "cx": 120,
     "cy": 300,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": 0,
+    "battleground": true
   },
   {
     "id": "NH",
@@ -267,7 +325,9 @@
     "region": "northeast",
     "cx": 880,
     "cy": 160,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -1,
+    "battleground": true
   },
   {
     "id": "NJ",
@@ -276,7 +336,9 @@
     "region": "northeast",
     "cx": 860,
     "cy": 240,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -6,
+    "battleground": false
   },
   {
     "id": "NM",
@@ -285,7 +347,9 @@
     "region": "west",
     "cx": 300,
     "cy": 400,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": -4,
+    "battleground": false
   },
   {
     "id": "NY",
@@ -294,7 +358,9 @@
     "region": "northeast",
     "cx": 840,
     "cy": 180,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -10,
+    "battleground": false
   },
   {
     "id": "NC",
@@ -303,7 +369,9 @@
     "region": "south",
     "cx": 800,
     "cy": 380,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": 1,
+    "battleground": true
   },
   {
     "id": "ND",
@@ -312,7 +380,9 @@
     "region": "midwest",
     "cx": 500,
     "cy": 160,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 15,
+    "battleground": false
   },
   {
     "id": "OH",
@@ -321,7 +391,9 @@
     "region": "midwest",
     "cx": 700,
     "cy": 260,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 2,
+    "battleground": true
   },
   {
     "id": "OK",
@@ -330,7 +402,9 @@
     "region": "south",
     "cx": 500,
     "cy": 380,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 20,
+    "battleground": false
   },
   {
     "id": "OR",
@@ -339,7 +413,9 @@
     "region": "west",
     "cx": 80,
     "cy": 180,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": -8,
+    "battleground": false
   },
   {
     "id": "PA",
@@ -348,7 +424,9 @@
     "region": "northeast",
     "cx": 820,
     "cy": 240,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": 0,
+    "battleground": true
   },
   {
     "id": "RI",
@@ -357,7 +435,9 @@
     "region": "northeast",
     "cx": 900,
     "cy": 240,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -8,
+    "battleground": false
   },
   {
     "id": "SC",
@@ -366,7 +446,9 @@
     "region": "south",
     "cx": 760,
     "cy": 420,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": 10,
+    "battleground": false
   },
   {
     "id": "SD",
@@ -375,7 +457,9 @@
     "region": "midwest",
     "cx": 480,
     "cy": 200,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 15,
+    "battleground": false
   },
   {
     "id": "TN",
@@ -384,7 +468,9 @@
     "region": "south",
     "cx": 680,
     "cy": 400,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 12,
+    "battleground": false
   },
   {
     "id": "TX",
@@ -393,7 +479,9 @@
     "region": "south",
     "cx": 420,
     "cy": 440,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 10,
+    "battleground": false
   },
   {
     "id": "UT",
@@ -402,7 +490,9 @@
     "region": "west",
     "cx": 200,
     "cy": 260,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": 18,
+    "battleground": false
   },
   {
     "id": "VT",
@@ -411,7 +501,9 @@
     "region": "northeast",
     "cx": 880,
     "cy": 140,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -18,
+    "battleground": false
   },
   {
     "id": "VA",
@@ -420,7 +512,9 @@
     "region": "south",
     "cx": 800,
     "cy": 320,
-    "timezone": "eastern"
+    "timezone": "eastern",
+    "partisanLean": -3,
+    "battleground": true
   },
   {
     "id": "WA",
@@ -429,7 +523,9 @@
     "region": "west",
     "cx": 100,
     "cy": 120,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": -10,
+    "battleground": false
   },
   {
     "id": "WV",
@@ -438,7 +534,9 @@
     "region": "south",
     "cx": 760,
     "cy": 300,
-    "timezone": "pacific"
+    "timezone": "pacific",
+    "partisanLean": 22,
+    "battleground": false
   },
   {
     "id": "WI",
@@ -447,7 +545,9 @@
     "region": "midwest",
     "cx": 600,
     "cy": 200,
-    "timezone": "central"
+    "timezone": "central",
+    "partisanLean": 0,
+    "battleground": true
   },
   {
     "id": "WY",
@@ -456,6 +556,8 @@
     "region": "west",
     "cx": 320,
     "cy": 240,
-    "timezone": "mountain"
+    "timezone": "mountain",
+    "partisanLean": 25,
+    "battleground": false
   }
 ]

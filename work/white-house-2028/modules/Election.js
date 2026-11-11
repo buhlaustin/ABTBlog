@@ -89,8 +89,15 @@ export function simulateElectionNight(state, rng) {
   let indEv = 0;
 
   for (const st of STATES) {
+    const lean = st.partisanLean ?? 0;
     let player = state.stateSupport[st.id] ?? 45;
-    let opponent = opp.approval + (st.region === 'south' && opp.party === 'R' ? 5 : 0) + (st.region === 'northeast' && opp.party === 'D' ? 5 : 0);
+    if (party === 'R') player += lean * 0.25;
+    if (party === 'D') player -= lean * 0.25;
+    let opponent =
+      opp.approval +
+      (party === 'R' ? -lean * 0.2 : lean * 0.2) +
+      (st.region === 'south' && opp.party === 'R' ? 4 : 0) +
+      (st.region === 'northeast' && opp.party === 'D' ? 4 : 0);
     let independent = ind ? ind.approval - 6 : 0;
     if (party === 'I') {
       player -= 4;

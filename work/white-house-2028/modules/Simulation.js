@@ -1,4 +1,4 @@
-import { ACTIONS, EVENTS, TUNING, STATES, getState } from './Data.js';
+import { ACTIONS, EVENTS, TUNING, STATES } from './Data.js';
 import { createRng } from './Rng.js';
 import {
   derivePhase,
@@ -8,14 +8,26 @@ import {
   ballotAccessEv,
   gameOverPrimary,
   gameOverBallot,
-  freshWeekPlan
+  gameOverScandal,
+  refreshDerived
 } from './GameState.js';
-import { rivalWeeklyTick } from './Rivals.js';
-import { resolvePrimaryWeek, accruePrimaryDelegates, simulateElectionNight, ensureGeneralOpponent } from './Election.js';
-import { startConventionPrep, resolveConvention } from './Convention.js';
+import { rivalWeeklyTick, rivalsAct } from './Rivals.js';
+import { resolvePrimaryWeek, simulateElectionNight, ensureGeneralOpponent } from './Election.js';
+import { startConventionPrep } from './Convention.js';
+import { applyAction } from './ActionResolver.js';
+import { resolveWeeklyPrimaries } from './PrimaryCalendar.js';
+import { isDebateWeek, resolveDebatePerformance } from './Debate.js';
 
 export function weekRng(state, salt = 0) {
   return createRng((state.seed ^ (state.week * 7919) ^ salt) >>> 0);
+}
+
+function clamp(n, lo, hi) {
+  return Math.max(lo, Math.min(hi, n));
+}
+
+function money(n) {
+  return `$${Math.abs(n).toLocaleString('en-US')}`;
 }
 
 export function actionsForPhase(state) {
@@ -33,19 +45,13 @@ export function actionsForPhase(state) {
 export function canAddAction(state, actionId) {
   const def = ACTIONS.find((a) => a.id === actionId);
   if (!def) return { ok: false, reason: 'Unknown action.' };
-  const phase = derivePhase(state.week, state.candidate.party);
-  if (def.phase !== 'any' && def.phase !== phase && !(def.phase === 'independent_primary' && phase === 'independent_primary')) {
-    if (def.phase === 'convention_prep' && phase !== 'convention_prep') {
-      return { ok: false, reason: 'Not available this phase.' };
-    }
-    if (def.phase !== 'convention_prep' && def.phase !== 'any') {
-      /* allow convention_prep vet only in that phase */
-    }
-  }
   if (state.weekPlan.apLeft < def.ap) return { ok: false, reason: 'Not enough action points.' };
   if ((state.resources.cash ?? 0) < (def.cashCost ?? 0)) return { ok: false, reason: 'Not enough cash.' };
   if ((state.resources.energy ?? 0) < (def.energy ?? 0) && def.id !== 'rest') {
     return { ok: false, reason: 'Too tired — rest or lighten the schedule.' };
+  }
+  if (def.id === 'hire_role' && (state.staffRoles?.length ?? 0) >= TUNING.maxStaffRoles) {
+    return { ok: false, reason: 'Senior team full.' };
   }
   return { ok: true, def };
 }
@@ -63,145 +69,53 @@ export function queueAction(state, actionId, picks = {}) {
   return { ok: true, label: def.label };
 }
 
-function rollEffect(rng, val) {
-  if (Array.isArray(val)) return rng.int(val[0], val[1]);
-  return val ?? 0;
+export function unqueueAction(state, index) {
+  const row = state.weekPlan.actions[index];
+  if (!row) return false;
+  const def = ACTIONS.find((a) => a.id === row.id);
+  state.weekPlan.apLeft += def?.ap ?? 1;
+  if (def?.cashCost) {
+    state.resources.cash += def.cashCost;
+    state.statsRecap.cashSpent -= def.cashCost;
+  }
+  state.weekPlan.actions.splice(index, 1);
+  return true;
 }
 
-function applyActionEffects(state, def, picks, rng) {
-  const r = state.resources;
-  const eff = def.effects ?? {};
-  const deltas = {};
-
-  if (eff.cash) {
-    const mult = state.candidate.party === 'I' ? TUNING.independentFundraisingMult : 1;
-    const skill = 0.8 + state.candidate.stats.fundraising / 120;
-    const gained = Math.round(rollEffect(rng, eff.cash) * mult * skill);
-    r.cash += gained;
-    state.statsRecap.cashRaised += gained;
-    deltas.cash = gained;
-  }
-  if (eff.cash && eff.cash < 0) {
-    r.cash += eff.cash;
-    deltas.cash = eff.cash;
-  }
-
-  for (const key of ['approval', 'buzz', 'base', 'nameRec', 'momentum']) {
-    if (eff[key] != null) {
-      const v = rollEffect(rng, eff[key]);
-      if (key === 'approval') r.approval = clamp(r.approval + v, 15, 72);
-      if (key === 'buzz') r.momentum = clamp(r.momentum + Math.round(v / 2), 0, 30);
-      if (key === 'base') r.base = clamp(r.base + v, 10, 85);
-      if (key === 'nameRec') r.nameRec = clamp(r.nameRec + v, 5, 95);
-      deltas[key] = v;
-    }
-  }
-
-  if (eff.staff) {
-    state.staff += eff.staff;
-    state.weeklyBurn += eff.weeklyBurn ?? 8000;
-  }
-  if (eff.debateBuff) state.debateBuff += eff.debateBuff;
-
-  const gaffeRisk = eff.gaffeRisk ?? 0;
-  if (gaffeRisk && rng.chance(gaffeRisk + (r.energy < TUNING.gaffeEnergyThreshold ? 0.12 : 0))) {
-    r.approval = clamp(r.approval - rng.int(2, 6), 10, 72);
-    r.momentum = clamp(r.momentum - 3, 0, 30);
-    pushNews(state, 'Gaffe cycle: a clip is playing on repeat.', { approval: -4 });
-    state.statsRecap.keyMoments.push(`Week ${state.week}: viral gaffe`);
-  }
-
-  if (eff.energyRestore) {
-    r.energy = clamp(r.energy + eff.energyRestore, 0, TUNING.energyMax);
-  } else if (def.id !== 'rest') {
-    r.energy = clamp(r.energy - (def.energy ?? 0), 0, TUNING.energyMax);
-  }
-
-  if (eff.stateBoost && picks.stateId) {
-    const st = state.stateSupport[picks.stateId] ?? 40;
-    const bump = rollEffect(rng, eff.stateBoost);
-    state.stateSupport[picks.stateId] = clamp(st + bump, 20, 78);
-    deltas.state = `${picks.stateId} +${bump}`;
-  }
-
-  if (eff.petitionProgress && picks.stateId && state.candidate.party === 'I') {
-    if (!state.ballotAccess[picks.stateId]) {
-      const cost = picks.stateId === state.candidate.homeState ? 0.85 : 1;
-      if (rng.chance(0.55 * cost + state.candidate.stats.organization / 140)) {
-        state.ballotAccess[picks.stateId] = true;
-        pushNews(state, `Ballot access secured: ${getState(picks.stateId)?.name}.`, { ballot: picks.stateId });
-      } else {
-        pushNews(state, `Petition drive falls short in ${getState(picks.stateId)?.name} — try again.`);
-      }
-    }
-  }
-
-  if (eff.vetReveal && picks.vpId) {
-    const vp = state.vpShortlist.find((v) => v.id === picks.vpId);
-    if (vp) {
-      vp.hiddenRevealed = true;
-      pushNews(state, `Vetting memo on ${vp.name}: "${vp.hidden}"`, { vet: vp.id });
-    }
-  }
-
-  if (eff.rivalDamage) {
-    for (const rival of state.rivals) {
-      if (rival.alive) rival.approval -= rollEffect(rng, eff.rivalDamage);
-    }
-  }
-
-  if (def.requiresRegionPick && picks.region) {
-    for (const st of STATES.filter((s) => s.region === picks.region)) {
-      state.stateSupport[st.id] = clamp((state.stateSupport[st.id] ?? 40) + rollEffect(rng, 2), 20, 78);
-    }
-  }
-
-  return deltas;
-}
-
-function clamp(n, lo, hi) {
-  return Math.max(lo, Math.min(hi, n));
-}
-
-export function resolveQueuedActions(state) {
+function resolveQueuedActions(state) {
   const rng = weekRng(state, 33);
   const lines = [];
   for (const queued of state.weekPlan.actions) {
     const def = ACTIONS.find((a) => a.id === queued.id);
     if (!def) continue;
-    const deltas = applyActionEffects(state, def, queued.picks ?? {}, rng);
-    lines.push(`${def.label}${formatDeltas(deltas)}`);
+    const deltas = applyAction(state, def, queued.picks ?? {}, rng);
+    const parts = [];
+    if (deltas.cash) parts.push(`cash ${deltas.cash >= 0 ? '+' : ''}${money(deltas.cash)}`);
+    if (deltas.approval) parts.push(`approval ${deltas.approval >= 0 ? '+' : ''}${deltas.approval}`);
+    if (deltas.state) parts.push(deltas.state);
+    lines.push(`${def.label}${parts.length ? ` (${parts.join(', ')})` : ''}`);
   }
   return lines;
 }
 
-function formatDeltas(d) {
-  const parts = [];
-  if (d.cash) parts.push(`cash ${d.cash >= 0 ? '+' : ''}${money(d.cash)}`);
-  if (d.approval) parts.push(`approval ${d.approval >= 0 ? '+' : ''}${d.approval}`);
-  return parts.length ? ` (${parts.join(', ')})` : '';
-}
-
-function money(n) {
-  return `$${Math.abs(n).toLocaleString('en-US')}`;
-}
-
 function pickWeeklyEvent(state, rng) {
   const phase = derivePhase(state.week, state.candidate.party);
-  if (TUNING.debateWeeksPrimary.includes(state.week) && phase === 'primary') {
-    return EVENTS.find((e) => e.id === 'debate_night');
-  }
-  if (TUNING.debateWeeksGeneral.includes(state.week) && phase === 'general') {
-    return EVENTS.find((e) => e.id === 'debate_night');
+  if (isDebateWeek(state) && state.debateResolvedWeek !== state.week) {
+    state.pendingDebate = true;
+    return null;
   }
   const pool = EVENTS.filter((e) => {
     if (e.weight <= 0) return false;
+    if (e.minWeek && state.week < e.minWeek) return false;
     if (e.phase === 'any') return true;
     if (e.phase === 'primary' && (phase === 'primary' || phase === 'independent_primary')) return true;
     if (e.phase === 'general' && phase === 'general') return true;
+    if (e.phase === 'convention_prep' && phase === 'convention_prep') return true;
+    if (e.phase === 'independent_primary' && phase === 'independent_primary') return true;
     return false;
   });
   const total = pool.reduce((s, e) => s + e.weight, 0);
+  if (total <= 0) return null;
   let roll = rng.next() * total;
   for (const ev of pool) {
     roll -= ev.weight;
@@ -210,45 +124,70 @@ function pickWeeklyEvent(state, rng) {
   return pool[0] ?? null;
 }
 
-export function endWeek(state) {
-  const rng = weekRng(state, 77);
-  const summaries = resolveQueuedActions(state);
+export function resolveDebate(state, styleId) {
+  const rng = weekRng(state, 441);
+  resolveDebatePerformance(state, styleId, rng);
+  state.pendingDebate = false;
+  return { ok: true };
+}
 
+export function endWeek(state) {
+  if (state.pendingEvent) return { ok: false, reason: 'Respond to the weekly decision first.' };
+  if (state.pendingDebate) return { ok: false, reason: 'Pick a debate style before ending the week.' };
+
+  const rng = weekRng(state, 77);
+  const before = snapshotResources(state);
+
+  const summaries = resolveQueuedActions(state);
   state.resources.cash -= state.weeklyBurn;
   state.statsRecap.cashSpent += state.weeklyBurn;
 
   const event = pickWeeklyEvent(state, rng);
-  if (event?.effects?.debateCheck) {
-    const perf = state.debateBuff + state.candidate.stats.debate / 10 + rng.int(-2, 4);
-    const delta = perf >= 10 ? 4 : perf >= 6 ? 1 : -3;
-    state.resources.approval = clamp(state.resources.approval + delta, 10, 72);
-    state.resources.momentum = clamp(state.resources.momentum + delta, 0, 30);
-    pushNews(state, `Debate night: ${delta >= 2 ? 'pundits score a win' : delta < 0 ? 'rough night on stage' : 'split screen'}`.trim(), {
-      approval: delta
-    });
-  } else if (event?.choices) {
+  if (event?.choices) {
     state.pendingEvent = { ...event, picked: false };
     pushNews(state, event.text);
-    return { ok: true, lines: summaries, needsChoice: true };
-  } else if (event) {
+    state.lastWeekRecap = buildRecap(before, state, summaries);
+    return { ok: true, lines: summaries, needsChoice: true, recap: state.lastWeekRecap };
+  }
+  if (event?.effects && !event.choices) {
     applyEventEffects(state, event.effects ?? {}, rng);
     pushNews(state, event.text);
   }
 
+  if (isDebateWeek(state) && state.debateResolvedWeek !== state.week) {
+    state.pendingDebate = true;
+    state.lastWeekRecap = buildRecap(before, state, summaries);
+    return { ok: true, lines: summaries, needsDebate: true, recap: state.lastWeekRecap };
+  }
+
+  return completeWeekAfterResolution(state, rng, summaries, before);
+}
+
+function completeWeekAfterResolution(state, rng, summaries, before) {
   for (const rival of state.rivals) {
     if (rival.alive) rivalWeeklyTick(rival, rng, state.resources.momentum);
   }
+  rivalsAct(state, rng);
 
   if (state.week < 26 && state.candidate.party !== 'I') {
-    accruePrimaryDelegates(state, rng);
+    resolveWeeklyPrimaries(state, rng);
   }
 
   if (state.week === TUNING.generalStart) {
     ensureGeneralOpponent(state);
-    pushNews(state, `General election: ${state.generalOpponent?.name} (${state.generalOpponent?.partyLabel}) wins rival nod.`);
+    pushNews(state, `General election: ${state.generalOpponent?.name} (${state.generalOpponent?.partyLabel}) clinches rival nod.`);
   }
 
-  syncStateSupportFromNational(state);
+  syncStateSupportFromNational(state, rng);
+
+  if ((state.resources.scandal ?? 0) >= TUNING.scandalCrisis) {
+    gameOverScandal(state);
+    return { ok: true, gameOver: true, reason: 'scandal' };
+  }
+
+  refreshDerived(state);
+  state.lastWeekRecap = buildRecap(before, state, summaries);
+  trackBestWorstWeek(state, before);
 
   if (state.week === TUNING.conventionWeek && !state.conventionDone) {
     return { ok: false, reason: 'Confirm your running mate at the convention before advancing.' };
@@ -262,16 +201,14 @@ export function applyEventChoice(state, choiceIndex) {
   if (!ev?.choices?.[choiceIndex]) return { ok: false };
   const choice = ev.choices[choiceIndex];
   const rng = weekRng(state, 909);
+  const before = snapshotResources(state);
   applyEventEffects(state, choice.effects ?? {}, rng);
   pushNews(state, `${ev.text} → ${choice.label}`);
   state.pendingEvent = null;
-  return finishWeekAdvance(state, rng, []);
+  return completeWeekAfterResolution(state, rng, [], before);
 }
 
-/** Advance calendar after a week is fully resolved (including post-choice). */
 export function finishWeekAdvance(state, rng, summaries = []) {
-  const phase = derivePhase(state.week, state.candidate.party);
-
   if (state.week === TUNING.conventionWeek && !state.conventionDone) {
     return { ok: false, reason: 'Confirm your running mate at the convention before advancing.' };
   }
@@ -283,7 +220,7 @@ export function finishWeekAdvance(state, rng, summaries = []) {
         gameOverBallot(state);
         return { ok: true, gameOver: true };
       }
-      pushNews(state, `Ballot check cleared — ${ev} electoral votes (access path open).`);
+      pushNews(state, `Ballot check cleared — ${ev} electoral votes on the line.`);
       state.nomineeWonPrimary = true;
     } else {
       const prim = resolvePrimaryWeek(state, rng);
@@ -292,11 +229,8 @@ export function finishWeekAdvance(state, rng, summaries = []) {
         return { ok: true, gameOver: true, primary: prim };
       }
       state.nomineeWonPrimary = true;
-      pushNews(state, `Primary season: ${state.candidate.name} wins the nomination.`);
+      pushNews(state, `Primary season: ${state.candidate.name} wins the nomination (${prim.playerDelegates} delegates).`);
     }
-  }
-
-  if (state.week === 26 && state.nomineeWonPrimary) {
     startConventionPrep(state);
   }
 
@@ -304,47 +238,90 @@ export function finishWeekAdvance(state, rng, summaries = []) {
     const night = simulateElectionNight(state, rng);
     state.election = night;
     resetWeekPlan(state);
-    return { ok: true, electionNight: true, lines: summaries };
+    return { ok: true, electionNight: true, lines: summaries, recap: state.lastWeekRecap };
   }
 
   state.history.push({
     week: state.week,
     approval: nationalApproval(state),
     cash: state.resources.cash,
-    momentum: state.resources.momentum
+    momentum: state.resources.momentum,
+    scandal: state.resources.scandal
   });
 
   state.week += 1;
   resetWeekPlan(state);
-  pushNews(state, `— Week ${state.week} begins — AP points refresh.`);
-  return { ok: true, lines: summaries };
+  pushNews(state, `— Week ${state.week} begins — ${phaseHeadline(state)}`);
+  refreshDerived(state);
+  return { ok: true, lines: summaries, recap: state.lastWeekRecap };
+}
+
+function phaseHeadline(state) {
+  const p = derivePhase(state.week, state.candidate.party);
+  if (p === 'primary') return 'primary contests on the calendar';
+  if (p === 'independent_primary') return 'petition drives continue';
+  if (p === 'general') return 'battleground map tightens';
+  return 'AP points refresh';
 }
 
 function applyEventEffects(state, effects, rng) {
   const r = state.resources;
   if (effects.approval) r.approval = clamp(r.approval + effects.approval, 10, 72);
-  if (effects.base) r.base = clamp(r.base + effects.base, 10, 85);
+  if (effects.base) r.base = clamp(r.base + effects.base, 10, 88);
   if (effects.buzz) r.momentum = clamp(r.momentum + Math.round(effects.buzz / 2), 0, 30);
+  if (effects.momentum) r.momentum = clamp(r.momentum + effects.momentum, 0, 30);
+  if (effects.nameRec) r.nameRec = clamp(r.nameRec + effects.nameRec, 5, 96);
+  if (effects.scandal) r.scandal = clamp((r.scandal ?? 0) + effects.scandal, 0, TUNING.scandalMax);
+  if (effects.energy) r.energy = clamp(r.energy + effects.energy, 0, TUNING.energyMax);
   if (effects.cash) {
     r.cash += effects.cash;
     if (effects.cash > 0) state.statsRecap.cashRaised += effects.cash;
     else state.statsRecap.cashSpent -= effects.cash;
   }
-  if (effects.energy) r.energy = clamp(r.energy + effects.energy, 0, TUNING.energyMax);
-  if (effects.momentum) r.momentum = clamp(r.momentum + effects.momentum, 0, 30);
-}
-
-function syncStateSupportFromNational(state) {
-  const nat = nationalApproval(state);
-  const drift = (nat - 48) / 40;
-  const rng = weekRng(state, 12);
-  for (const st of STATES) {
-    const cur = state.stateSupport[st.id] ?? 40;
-  const noise = rng.int(-1, 1);
-    state.stateSupport[st.id] = clamp(cur + drift + noise, 22, 76);
+  if (effects.securityStates) {
+    for (const st of STATES.filter((s) => (s.partisanLean ?? 0) > 0)) {
+      state.stateSupport[st.id] = clamp((state.stateSupport[st.id] ?? 45) + 1, 20, 79);
+    }
   }
 }
 
-export function resolveEventDebateOnly(state) {
-  /* handled in endWeek */
+function syncStateSupportFromNational(state, rng) {
+  const nat = nationalApproval(state);
+  const drift = (nat - 48) / 35;
+  const scandalDrag = (state.resources.scandal ?? 0) > 40 ? -0.4 : 0;
+  for (const st of STATES) {
+    const lean = st.partisanLean ?? 0;
+    const party = state.candidate.party;
+    let leanPull = party === 'R' ? lean * 0.05 : party === 'D' ? -lean * 0.05 : 0;
+    const cur = state.stateSupport[st.id] ?? 45;
+    const noise = rng.int(-1, 1);
+    state.stateSupport[st.id] = clamp(cur + drift + leanPull + scandalDrag + noise, 22, 78);
+  }
+}
+
+function snapshotResources(state) {
+  return {
+    approval: nationalApproval(state),
+    cash: state.resources.cash,
+    momentum: state.resources.momentum,
+    scandal: state.resources.scandal ?? 0
+  };
+}
+
+function buildRecap(before, state, lines) {
+  const after = snapshotResources(state);
+  return {
+    approvalDelta: after.approval - before.approval,
+    cashDelta: after.cash - before.cash,
+    momentumDelta: after.momentum - before.momentum,
+    scandalDelta: after.scandal - before.scandal,
+    lines
+  };
+}
+
+function trackBestWorstWeek(state, before) {
+  const delta = nationalApproval(state) - before.approval;
+  const recap = state.statsRecap;
+  if (!recap.bestWeek || delta > recap.bestWeek.delta) recap.bestWeek = { week: state.week, delta };
+  if (!recap.worstWeek || delta < recap.worstWeek.delta) recap.worstWeek = { week: state.week, delta };
 }

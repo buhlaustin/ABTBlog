@@ -1,7 +1,7 @@
 /**
  * 2028: Win the White House — campaign manager (52 weeks)
  */
-import { STATES, BACKGROUNDS, ANNOUNCEMENTS, TUNING, PARTY_LABELS, getState } from './modules/Data.js';
+import { STATES, BACKGROUNDS, ANNOUNCEMENTS, ACTIONS, TUNING, PARTY_LABELS, getState } from './modules/Data.js';
 import { Storage } from './modules/Storage.js';
 import {
   createNewGame,
@@ -9,22 +9,62 @@ import {
   derivePhase,
   nationalApproval,
   normalizeLoaded,
-  ballotAccessEv
+  ballotAccessEv,
+  refreshDerived
 } from './modules/GameState.js';
+import { setPoliciesFromSliders } from './modules/Policies.js';
 import {
   actionsForPhase,
   queueAction,
+  unqueueAction,
   endWeek,
   applyEventChoice,
   canAddAction,
+  resolveDebate
 } from './modules/Simulation.js';
 import { resolveConvention } from './modules/Convention.js';
 import { renderMapSvg, downloadMapPng } from './modules/ElectoralMap.js';
 import { openCertificate } from './modules/Certificate.js';
+import { statesVotingThisWeek } from './modules/PrimaryCalendar.js';
+import { DEBATE_STYLES } from './modules/Debate.js';
+import {
+  initPolicySliders,
+  readPolicySliders,
+  openModal,
+  closeModal,
+  statePickerHtml,
+  regionPickerHtml,
+  policyPickerHtml,
+  staffPickerHtml,
+  socialPickerHtml,
+  endorsementPickerHtml,
+  vpPickerHtml,
+  renderBattlegroundList,
+  renderCoalitionPanel,
+  renderStaffPanel,
+  weekRecapHtml,
+  wireModalCancel
+} from './modules/UI.js';
 
 let state = null;
+let setupDraft = null;
 let selectedVp = null;
+let actionCategory = 'all';
 let lastMapSvg = '';
+
+const ACTION_CATEGORIES = [
+  ['all', 'All'],
+  ['fundraising', 'Raise'],
+  ['outreach', 'Outreach'],
+  ['paid', 'Paid media'],
+  ['comms', 'Comms'],
+  ['prep', 'Prep'],
+  ['staff', 'Staff'],
+  ['oppo', 'Oppo'],
+  ['personal', 'Personal'],
+  ['ballot', 'Ballot'],
+  ['convention', 'Convention']
+];
 
 const $ = (id) => document.getElementById(id);
 
@@ -74,14 +114,24 @@ function initSetup() {
 
 function startNew() {
   const seedRaw = $('cand-seed').value;
-  state = createNewGame({
+  const party = $('cand-party').value;
+  setupDraft = {
     name: $('cand-name').value,
     homeState: $('cand-state').value,
     backgroundId: $('cand-bg').value,
-    party: $('cand-party').value,
+    party,
     seed: seedRaw ? Number(seedRaw) : undefined
-  });
+  };
+  initPolicySliders($('policy-sliders'), party);
+  showScreen('policy');
+}
+
+function finishPolicyStep() {
+  const sliders = readPolicySliders($('policy-sliders'));
+  const policies = setPoliciesFromSliders(sliders);
+  state = createNewGame({ ...setupDraft, policies });
   state._announcements = ANNOUNCEMENTS;
+  setupDraft = null;
   renderAnnouncement();
   showScreen('announce');
 }
@@ -116,6 +166,7 @@ function renderAnnouncement() {
 
 function routeScreen() {
   if (!state) return showScreen('setup');
+  if (state.screen === 'policy') return showScreen('policy');
   if (state.screen === 'announcement') return showScreen('announce');
   if (state.screen === 'election_night') {
     showScreen('night');
@@ -134,8 +185,11 @@ function renderAll() {
   if (!state) return;
   const c = state.candidate;
   $('hud-title').textContent = `Week ${state.week} · ${phaseLabel(state.week, c.party)}`;
-  $('hud-sub').textContent = `${c.name} · ${PARTY_LABELS[c.party]} · ${getState(c.homeState)?.name ?? c.homeState}`;
+  const voting = statesVotingThisWeek(state.week);
+  const voteNote = voting.length ? ` · contests: ${voting.join(', ')}` : '';
+  $('hud-sub').textContent = `${c.name} · ${PARTY_LABELS[c.party]} · ${getState(c.homeState)?.name ?? c.homeState}${voteNote}`;
 
+  refreshDerived(state);
   const r = state.resources;
   $('resource-panel').innerHTML = `
     <h3>Resources</h3>
@@ -146,7 +200,8 @@ function renderAll() {
     <div class="stat-line"><span>Momentum</span><span>${r.momentum}</span></div>
     <div class="stat-line"><span>Base</span><span>${r.base}%</span></div>
     <div class="stat-line"><span>Energy</span><span>${r.energy}/${TUNING.energyMax}</span></div>
-    <div class="stat-line"><span>Staff</span><span>${state.staff}</span></div>`;
+    <div class="stat-line"><span>Scandal heat</span><span>${r.scandal ?? 0}/${TUNING.scandalMax}</span></div>
+    <div class="stat-line"><span>Field staff</span><span>${state.staff}</span></div>`;
 
   const delPanel = $('delegate-panel');
   if (c.party !== 'I' && state.week <= 26) {
@@ -161,14 +216,20 @@ function renderAll() {
   if (c.party === 'I') {
     bal.hidden = false;
     const ev = ballotAccessEv(state);
-    bal.innerHTML = `<h3>Ballot access</h3><div class="stat-line"><span>EV qualified</span><span>${ev} / ${TUNING.independentBallotTargetEv}</span></div>`;
+    const open = STATES.filter((s) => !state.ballotAccess[s.id]).length;
+    bal.innerHTML = `<h3>Ballot access</h3>
+      <div class="stat-line"><span>EV qualified</span><span>${ev} / ${TUNING.independentBallotTargetEv}</span></div>
+      <div class="stat-line"><span>States left</span><span>${open}</span></div>`;
   } else bal.hidden = true;
 
   $('ap-label').textContent = `${state.weekPlan.apLeft} AP left`;
-  $('queued-actions').textContent =
-    state.weekPlan.actions.map((a) => a.id).join(', ') || '—';
+  renderCoalitionPanel(state, $('coalition-panel'));
+  renderStaffPanel(state, $('staff-panel'));
+  renderBattlegroundList(state, $('battleground-panel'));
 
   renderActions();
+  renderQueue();
+  renderDebate();
   renderNews();
   renderMapPreview();
   renderRivals();
@@ -191,14 +252,31 @@ function renderRivals() {
 }
 
 function renderActions() {
+  const tabs = $('action-categories');
+  tabs.innerHTML = ACTION_CATEGORIES.map(([id, label]) => {
+    const on = actionCategory === id ? 'active' : '';
+    return `<button type="button" class="tab ${on}" data-cat="${id}">${label}</button>`;
+  }).join('');
+  tabs.querySelectorAll('[data-cat]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      actionCategory = btn.dataset.cat;
+      renderActions();
+    });
+  });
+
   const list = $('actions-list');
-  const actions = actionsForPhase(state);
+  let actions = actionsForPhase(state);
+  if (actionCategory !== 'all') actions = actions.filter((a) => a.category === actionCategory);
   list.innerHTML = actions
     .map((a) => {
       const check = canAddAction(state, a.id);
       const disabled = check.ok ? '' : 'disabled';
+      const costNote =
+        state.candidate.party === 'I' && (a.id === 'ads_regional' || a.id === 'ads_state')
+          ? ` · ×${TUNING.independentAdCostMult} I`
+          : '';
       return `<button type="button" class="btn btn-action" data-action="${a.id}" ${disabled} title="${check.reason ?? ''}">
-        <strong>${a.label}</strong> (${a.ap} AP${a.cashCost ? ` · ${money(a.cashCost)}` : ''})<br>
+        <strong>${a.label}</strong> (${a.ap} AP${a.cashCost ? ` · ${money(a.cashCost)}` : ''}${costNote})<br>
         <span class="muted small">${a.description}</span>
       </button>`;
     })
@@ -208,29 +286,177 @@ function renderActions() {
   });
 }
 
-function onActionClick(actionId) {
-  const def = actionsForPhase(state).find((a) => a.id === actionId);
+function renderQueue() {
+  const host = $('queue-panel');
+  if (!host) return;
+  const rows = state.weekPlan.actions.map((row, i) => {
+    const def = ACTIONS.find((a) => a.id === row.id);
+    const label = def?.label ?? row.id;
+    const bits = [];
+    if (row.picks?.stateId) bits.push(row.picks.stateId);
+    if (row.picks?.region) bits.push(row.picks.region);
+    if (row.picks?.socialTopicId) bits.push(row.picks.socialTopicId);
+    return `<div class="queue-row"><span>${label}${bits.length ? ` (${bits.join(' · ')})` : ''}</span>
+      <button type="button" class="btn btn-small btn-ghost" data-unqueue="${i}">Remove</button></div>`;
+  });
+  host.innerHTML = rows.length ? `<h4 class="small muted">Queued this week</h4>${rows.join('')}` : '';
+  host.querySelectorAll('[data-unqueue]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      unqueueAction(state, Number(btn.dataset.unqueue));
+      Storage.save(state);
+      renderAll();
+    });
+  });
+}
+
+function renderDebate() {
+  const card = $('debate-card');
+  if (!card) return;
+  card.hidden = !state.pendingDebate;
+  if (card.hidden) return;
+  $('debate-choices').innerHTML = DEBATE_STYLES.map(
+    (s) => `<button type="button" class="btn" data-debate="${s.id}">${s.label}</button>`
+  ).join('');
+  $('debate-choices').querySelectorAll('[data-debate]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      resolveDebate(state, btn.dataset.debate);
+      Storage.save(state);
+      renderAll();
+      toast('Debate approach set.');
+    });
+  });
+}
+
+async function pickStateModal(title = 'Target state') {
+  const promise = openModal(title, statePickerHtml(state.candidate.homeState));
+  $('modal-body').onclick = (e) => {
+    const cell = e.target.closest('[data-state]');
+    if (cell) closeModal(cell.dataset.state);
+  };
+  return promise;
+}
+
+async function pickRegionModal() {
+  const promise = openModal('Target region', regionPickerHtml());
+  $('modal-body').onclick = (e) => {
+    const btn = e.target.closest('[data-region]');
+    if (btn) closeModal(btn.dataset.region);
+  };
+  return promise;
+}
+
+async function pickPolicyModal() {
+  const promise = openModal('Highlight an issue', policyPickerHtml());
+  $('modal-body').onclick = (e) => {
+    const btn = e.target.closest('[data-policy]');
+    if (btn) closeModal(btn.dataset.policy);
+  };
+  return promise;
+}
+
+async function pickStaffModal() {
+  const html = staffPickerHtml(state);
+  if (!html) {
+    toast('Every senior role is filled or unavailable.');
+    return null;
+  }
+  const promise = openModal('Senior hire', html);
+  $('modal-body').onclick = (e) => {
+    const btn = e.target.closest('[data-staff]');
+    if (btn) closeModal(btn.dataset.staff);
+  };
+  return promise;
+}
+
+async function pickSocialModal() {
+  let topicId = null;
+  let tone = 'safe';
+  $('modal-footer').innerHTML =
+    '<button type="button" class="btn btn-primary" id="social-confirm">Queue post</button>';
+  const promise = openModal('Social post', socialPickerHtml());
+  const body = $('modal-body');
+  body.onclick = (e) => {
+    const topic = e.target.closest('[data-topic]');
+    if (topic) {
+      topicId = topic.dataset.topic;
+      body.querySelectorAll('[data-topic]').forEach((b) => b.classList.toggle('sel', b === topic));
+    }
+    const toneBtn = e.target.closest('[data-tone]');
+    if (toneBtn) tone = toneBtn.dataset.tone;
+    if (e.target.id === 'social-confirm' && topicId) closeModal({ socialTopicId: topicId, socialTone: tone });
+  };
+  const result = await promise;
+  $('modal-footer').innerHTML = '';
+  body.onclick = null;
+  return result;
+}
+
+async function pickEndorsementModal() {
+  const promise = openModal('Court an endorsement', endorsementPickerHtml());
+  $('modal-body').onclick = (e) => {
+    const btn = e.target.closest('[data-endorse]');
+    if (btn) closeModal(btn.dataset.endorse);
+  };
+  return promise;
+}
+
+async function pickVpModal() {
+  const promise = openModal('Running mate', vpPickerHtml(state.vpShortlist));
+  $('modal-body').onclick = (e) => {
+    const btn = e.target.closest('[data-vp]');
+    if (btn) closeModal(btn.dataset.vp);
+  };
+  return promise;
+}
+
+function independentAdPremium(def) {
+  if (state.candidate.party !== 'I' || !def?.cashCost) return 0;
+  if (def.id !== 'ads_regional' && def.id !== 'ads_state') return 0;
+  return Math.round(def.cashCost * (TUNING.independentAdCostMult - 1));
+}
+
+async function onActionClick(actionId) {
+  const def = ACTIONS.find((a) => a.id === actionId);
+  if (!def) return;
   let picks = {};
-  if (def?.requiresStatePick) {
-    const options = STATES.filter((s) => s.id !== 'DC' || state.candidate.party !== 'I')
-      .slice(0, 51)
-      .map((s) => s.id);
-    const pick = prompt(`Target state (e.g. OH). Options include ${options.slice(0, 8).join(', ')}…`, state.candidate.homeState);
-    if (!pick) return;
-    picks.stateId = pick.toUpperCase().slice(0, 2);
+  if (def.requiresStatePick) {
+    const stateId = await pickStateModal();
+    if (!stateId) return;
+    picks.stateId = stateId;
   }
-  if (def?.requiresRegionPick) {
-    picks.region = prompt('Region: northeast, south, midwest, west', 'midwest');
-    if (!picks.region) return;
+  if (def.requiresRegionPick) {
+    const region = await pickRegionModal();
+    if (!region) return;
+    picks.region = region;
   }
-  if (def?.requiresVpPick) {
-    picks.vpId = selectedVp ?? state.vpShortlist[0]?.id;
-    if (!picks.vpId) return toast('Pick a running mate to vet.');
+  if (def.requiresPolicyPick) {
+    const policyId = await pickPolicyModal();
+    if (!policyId) return;
+    picks.policyId = policyId;
   }
-  const mult = state.candidate.party === 'I' && actionId === 'ads_regional' ? TUNING.independentAdCostMult : 1;
-  if (mult > 1 && def?.cashCost) {
-    const extra = Math.round(def.cashCost * (mult - 1));
-    if (state.resources.cash < def.cashCost + extra) return toast('Not enough cash (independent ad premium).');
+  if (def.requiresStaffPick) {
+    const roleId = await pickStaffModal();
+    if (!roleId) return;
+    picks.staffRoleId = roleId;
+  }
+  if (def.requiresSocialPick) {
+    const social = await pickSocialModal();
+    if (!social) return;
+    picks = { ...picks, ...social };
+  }
+  if (def.requiresEndorsementPick) {
+    const endId = await pickEndorsementModal();
+    if (!endId) return;
+    picks.endorsementId = endId;
+  }
+  if (def.requiresVpPick) {
+    const vpId = await pickVpModal();
+    if (!vpId) return;
+    picks.vpId = vpId;
+  }
+  const extra = independentAdPremium(def);
+  if (extra > 0) {
+    if (state.resources.cash < (def.cashCost ?? 0) + extra) return toast('Not enough cash (independent ad premium).');
     state.resources.cash -= extra;
     state.statsRecap.cashSpent += extra;
   }
@@ -239,6 +465,21 @@ function onActionClick(actionId) {
   Storage.save(state);
   renderAll();
   toast(`Queued: ${res.label}`);
+}
+
+function showWeekRecap(recap) {
+  if (!recap) return;
+  openModal(`Week ${Math.max(1, state.week - 1)} recap`, weekRecapHtml(recap));
+  $('modal-footer').innerHTML =
+    '<button type="button" class="btn btn-primary" id="recap-done">Continue</button>';
+  $('recap-done')?.addEventListener(
+    'click',
+    () => {
+      closeModal(true);
+      $('modal-footer').innerHTML = '';
+    },
+    { once: true }
+  );
 }
 
 function renderNews() {
@@ -261,7 +502,20 @@ function renderMapPreview() {
     partial[st.id] = { winner: sup >= 50 ? 'player' : 'opponent' };
   }
   lastMapSvg = renderMapSvg(state, partial, state.candidate.party, 480, 280);
-  $('map-preview').innerHTML = lastMapSvg;
+  const host = $('map-preview');
+  host.innerHTML = lastMapSvg;
+  host.onclick = (e) => {
+    const id = e.target.closest('[data-state]')?.dataset?.state;
+    if (!id) return;
+    const st = getState(id);
+    const sup = state.stateSupport[id] ?? 45;
+    const petition =
+      state.candidate.party === 'I'
+        ? ` · petition ${state.petitionProgress?.[id] ?? 0}%${state.ballotAccess[id] ? ' · ✓ ballot' : ''}`
+        : '';
+    $('state-detail').textContent = `${st.name} (${st.ev} EV) — you ${sup}% support${petition}`;
+  };
+  $('map-legend').textContent = state.week >= TUNING.generalStart ? 'General election lean · click a state' : 'Campaign strength · click a state';
 }
 
 function renderConvention() {
@@ -326,6 +580,7 @@ function renderEvent() {
 
 function onEndWeek() {
   if (state.pendingEvent) return toast('Make this week\'s decision first.');
+  if (state.pendingDebate) return toast('Choose a debate style first.');
   const res = endWeek(state);
   if (!res.ok) return toast(res.reason);
   Storage.save(state);
@@ -340,8 +595,16 @@ function onEndWeek() {
     return;
   }
   renderAll();
-  if (res.needsChoice) toast('Decision required before the next week.');
-  else if (res.lines?.length) toast(res.lines[0]);
+  if (res.needsChoice) {
+    toast('Decision required before the next week.');
+    if (res.recap) showWeekRecap(res.recap);
+  } else if (res.needsDebate) {
+    toast('Debate night — pick your approach, then end the week again.');
+    if (res.recap) showWeekRecap(res.recap);
+  } else {
+    if (res.recap) showWeekRecap(res.recap);
+    else if (res.lines?.length) toast(res.lines[0]);
+  }
 }
 
 function onConvention() {
@@ -405,6 +668,9 @@ function renderEnd() {
   } else if (o?.type === 'ballot_fail') {
     $('end-title').textContent = 'Ballot access failed';
     $('end-lede').textContent = `You qualified only ${o.ev} electoral votes; need ${o.required} to compete.`;
+  } else if (o?.type === 'scandal_out') {
+    $('end-title').textContent = 'Campaign implosion';
+    $('end-lede').textContent = `Scandal meter hit ${o.scandal} in week ${o.week}. The party and donors walk away.`;
   } else if (o?.type === 'win') {
     $('end-title').textContent = 'Victory';
     $('end-lede').textContent = `${state.candidate.name} wins ${o.playerEv}–${o.oppEv} in the Electoral College.`;
@@ -423,11 +689,15 @@ function renderEnd() {
     <div class="stat-line"><span>Cash raised</span><span>${money(recap.cashRaised)}</span></div>
     <div class="stat-line"><span>Cash spent</span><span>${money(recap.cashSpent)}</span></div>
     <div class="stat-line"><span>Popular vote (sim)</span><span>${o?.popularVotePct ?? '—'}%</span></div>
+    <div class="stat-line"><span>Best week</span><span>${recap.bestWeek ? `W${recap.bestWeek.week} (+${recap.bestWeek.delta} appr.)` : '—'}</span></div>
+    <div class="stat-line"><span>Worst week</span><span>${recap.worstWeek ? `W${recap.worstWeek.week} (${recap.worstWeek.delta} appr.)` : '—'}</span></div>
     <p class="muted small">${(recap.keyMoments ?? []).join(' · ')}</p>`;
 }
 
 function wire() {
   $('btn-new').addEventListener('click', startNew);
+  $('btn-policy-done')?.addEventListener('click', finishPolicyStep);
+  wireModalCancel();
   $('btn-continue').addEventListener('click', loadSave);
   $('btn-save').addEventListener('click', () => {
     if (Storage.save(state)) toast('Saved.');

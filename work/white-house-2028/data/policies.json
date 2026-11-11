@@ -1,0 +1,50 @@
+[
+  {
+    "id": "economy",
+    "label": "Economy",
+    "blurb": "Jobs, trade, and industrial policy.",
+    "leftLabel": "Public investment",
+    "rightLabel": "Market-first",
+    "partyDefault": { "D": -1, "R": 1, "I": 0 }
+  },
+  {
+    "id": "health",
+    "label": "Health care",
+    "blurb": "Coverage expansion vs. consumer choice.",
+    "leftLabel": "Universal coverage",
+    "rightLabel": "Private-led system",
+    "partyDefault": { "D": -2, "R": 2, "I": 0 }
+  },
+  {
+    "id": "climate",
+    "label": "Energy & climate",
+    "blurb": "Transition pace and regulation.",
+    "leftLabel": "Rapid transition",
+    "rightLabel": "Gradual / fossil mix",
+    "partyDefault": { "D": -1, "R": 2, "I": 1 }
+  },
+  {
+    "id": "security",
+    "label": "National security",
+    "blurb": "Defense posture and alliances.",
+    "leftLabel": "Diplomacy-first",
+    "rightLabel": "Strength-first",
+    "partyDefault": { "D": 0, "R": 2, "I": 1 }
+  },
+  {
+    "id": "education",
+    "label": "Education",
+    "blurb": "Federal role in schools and college.",
+    "leftLabel": "Federal support",
+    "rightLabel": "Local control",
+    "partyDefault": { "D": -1, "R": 1, "I": 0 }
+  },
+  {
+    "id": "immigration",
+    "label": "Immigration",
+    "blurb": "Border management and pathways.",
+    "leftLabel": "Pathways & reform",
+    "rightLabel": "Enforcement-first",
+    "partyDefault": { "D": -2, "R": 2, "I": 0 }
+  }
+]

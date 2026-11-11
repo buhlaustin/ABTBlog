@@ -1,20 +1,22 @@
-import { TUNING, STATES, BACKGROUNDS, getState } from './Data.js';
-import { hashSeed } from './Rng.js';
+import { TUNING, STATES, BACKGROUNDS, getState, battlegroundStates } from './Data.js';
+import { defaultPolicies, applyPolicyGeography, coalitionScore } from './Policies.js';
 import { buildRunningMatePool, pickVpShortlist } from './RunningMates.js';
 import { spawnPartyRivals, spawnGeneralOpponent } from './Rivals.js';
+import { recomputePayroll, staffBonuses } from './Staff.js';
 
-export function initialStateSupport(homeStateId, party) {
+export function initialStateSupport(homeStateId, party, policies) {
   const support = {};
   const homeLean = party === 'R' ? 8 : party === 'D' ? 8 : 2;
   for (const st of STATES) {
-    let base = 42 + ((st.id.charCodeAt(0) + st.id.charCodeAt(1)) % 9);
-    if (party === 'R') base += st.region === 'south' ? 6 : st.region === 'northeast' ? -5 : 0;
-    if (party === 'D') base += st.region === 'northeast' ? 6 : st.region === 'south' ? -4 : 0;
-    if (party === 'I') base -= 4;
+    const lean = st.partisanLean ?? 0;
+    let base = 46 - lean * (party === 'R' ? 0.35 : party === 'D' ? -0.35 : 0.15);
     if (st.id === homeStateId) base += homeLean;
-    support[st.id] = Math.max(28, Math.min(62, base));
+    if (party === 'I') base -= 3;
+    support[st.id] = Math.max(26, Math.min(64, Math.round(base)));
   }
-  return support;
+  const stub = { candidate: { party, policies: policies ?? defaultPolicies(party) }, stateSupport: support, resources: {} };
+  applyPolicyGeography(stub);
+  return stub.stateSupport;
 }
 
 export function derivePhase(week, party) {
@@ -27,10 +29,11 @@ export function derivePhase(week, party) {
   return 'campaign';
 }
 
-export function createNewGame({ name, homeState, backgroundId, party, seed }) {
+export function createNewGame({ name, homeState, backgroundId, party, seed, policies }) {
   const bg = BACKGROUNDS.find((b) => b.id === backgroundId) ?? BACKGROUNDS[0];
   const runSeed = seed ?? (Date.now() & 0xffffffff);
   const home = getState(homeState)?.id ?? 'OH';
+  const pol = policies ?? defaultPolicies(party);
   const stats = {
     organization: 50 + (bg.mods.organization ?? 0),
     fundraising: 50 + (bg.mods.fundraising ?? 0),
@@ -40,8 +43,8 @@ export function createNewGame({ name, homeState, backgroundId, party, seed }) {
   };
   const matePool = buildRunningMatePool(runSeed);
   const oppParty = party === 'R' ? 'D' : party === 'D' ? 'R' : 'R';
-  return {
-    version: 1,
+  const state = {
+    version: 2,
     screen: 'announcement',
     seed: runSeed,
     week: 0,
@@ -51,25 +54,28 @@ export function createNewGame({ name, homeState, backgroundId, party, seed }) {
       backgroundId: bg.id,
       backgroundLabel: bg.label,
       party,
-      stats
+      stats,
+      policies: pol
     },
     resources: {
-      cash: party === 'I' ? 650000 : 1200000,
+      cash: party === 'I' ? 620000 : 1250000,
       approval: 44,
-      nameRec: 38,
-      momentum: 6,
-      base: 48,
-      energy: 88
+      nameRec: 36,
+      momentum: 5,
+      base: 47,
+      energy: 90,
+      scandal: 8
     },
-    stateSupport: initialStateSupport(home, party),
-    staff: party === 'I' ? 8 : 14,
-    weeklyBurn: TUNING.weeklyPayrollBase + (party === 'I' ? 8 : 14) * TUNING.payrollPerStaff,
+    stateSupport: initialStateSupport(home, party, pol),
+    staff: party === 'I' ? 8 : 12,
+    staffRoles: [],
+    weeklyBurn: 0,
     delegates: 0,
-    delegateRivals: {},
     ballotAccess: party === 'I' ? { [home]: true } : {},
-    ballotEv: party === 'I' ? (getState(home)?.ev ?? 0) : 0,
-    weekPlan: { actions: [], apLeft: TUNING.actionPointsPerWeek },
+    petitionProgress: party === 'I' ? { [home]: 100 } : {},
+    weekPlan: freshWeekPlan(null),
     pendingEvent: null,
+    pendingDebate: false,
     rivals: party === 'I' ? [] : spawnPartyRivals(party, runSeed),
     generalOpponent: null,
     independentNpc: party !== 'I' ? spawnGeneralOpponent('I', runSeed) : null,
@@ -78,7 +84,9 @@ export function createNewGame({ name, homeState, backgroundId, party, seed }) {
     vpShortlist: [],
     runningMate: null,
     conventionBounce: 0,
+    conventionDone: false,
     debateBuff: 0,
+    endorsements: [],
     news: [],
     statsRecap: {
       cashRaised: 0,
@@ -90,8 +98,11 @@ export function createNewGame({ name, homeState, backgroundId, party, seed }) {
     history: [],
     election: null,
     outcome: null,
-    opponentParty: oppParty
+    opponentParty: oppParty,
+    lastWeekRecap: null
   };
+  recomputePayroll(state);
+  return state;
 }
 
 export function applyAnnouncement(state, announcementId) {
@@ -105,19 +116,21 @@ export function applyAnnouncement(state, announcementId) {
   state.mediaRisk = e.mediaRisk ?? 0;
   state.screen = 'play';
   state.week = 1;
-  state.weekPlan = freshWeekPlan();
+  state.weekPlan = freshWeekPlan(state);
   pushNews(state, `Week 1: ${state.candidate.name} launches — "${ann.label}" message lands.`);
   state.statsRecap.keyMoments.push(`Announcement: ${ann.label}`);
+  refreshDerived(state);
   return { ok: true };
 }
 
-export function freshWeekPlan() {
-  return { actions: [], apLeft: TUNING.actionPointsPerWeek, picks: {} };
+export function freshWeekPlan(state) {
+  const bonus = state ? (state._staffApBonus ?? 0) : 0;
+  return { actions: [], apLeft: TUNING.actionPointsPerWeek + bonus, picks: {} };
 }
 
 export function pushNews(state, text, deltas = null) {
   state.news.unshift({ week: state.week, text, deltas, t: Date.now() });
-  state.news = state.news.slice(0, 40);
+  state.news = state.news.slice(0, 50);
 }
 
 export function nationalApproval(state) {
@@ -128,7 +141,7 @@ export function nationalApproval(state) {
 }
 
 export function ballotAccessEv(state) {
-  if (state.candidate.party !== 'I') return totalEvAll();
+  if (state.candidate.party !== 'I') return STATES.reduce((s, x) => s + x.ev, 0);
   let ev = 0;
   for (const [id, ok] of Object.entries(state.ballotAccess)) {
     if (ok) ev += getState(id)?.ev ?? 0;
@@ -136,29 +149,36 @@ export function ballotAccessEv(state) {
   return ev;
 }
 
-function totalEvAll() {
-  return STATES.reduce((s, x) => s + x.ev, 0);
+export function resetWeekPlan(state) {
+  const b = staffBonuses(state);
+  state._staffApBonus = b.apBonus;
+  state.weekPlan = freshWeekPlan(state);
+  state.debateBuff = Math.max(0, (state.debateBuff ?? 0) - 3);
 }
 
-export function resetWeekPlan(state) {
-  state.weekPlan = freshWeekPlan();
-  state.debateBuff = Math.max(0, state.debateBuff - 3);
+export function refreshDerived(state) {
+  state._coalitionScore = coalitionScore(state);
+  state._battlegrounds = battlegroundStates(state);
 }
 
 export function normalizeLoaded(state) {
-  if (!state.weekPlan) state.weekPlan = freshWeekPlan();
+  if (!state.weekPlan) state.weekPlan = freshWeekPlan(state);
   if (!state.statsRecap) state.statsRecap = { cashRaised: 0, cashSpent: 0, keyMoments: [] };
   if (!state.ballotAccess) state.ballotAccess = {};
+  if (!state.petitionProgress) state.petitionProgress = {};
+  if (!state.candidate.policies) state.candidate.policies = defaultPolicies(state.candidate.party);
+  if (!state.staffRoles) state.staffRoles = [];
+  if (state.resources.scandal == null) state.resources.scandal = 10;
+  if (!state.endorsements) state.endorsements = [];
+  state.version = 2;
+  recomputePayroll(state);
+  refreshDerived(state);
   return state;
 }
 
 export function gameOverPrimary(state, winnerName) {
   state.screen = 'ended';
-  state.outcome = {
-    type: 'primary_loss',
-    winner: winnerName,
-    week: state.week
-  };
+  state.outcome = { type: 'primary_loss', winner: winnerName, week: state.week };
 }
 
 export function gameOverBallot(state) {
@@ -168,4 +188,9 @@ export function gameOverBallot(state) {
     ev: ballotAccessEv(state),
     required: TUNING.independentBallotTargetEv
   };
+}
+
+export function gameOverScandal(state) {
+  state.screen = 'ended';
+  state.outcome = { type: 'scandal_out', week: state.week, scandal: state.resources.scandal };
 }

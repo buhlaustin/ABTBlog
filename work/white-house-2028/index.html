@@ -12,7 +12,7 @@
       <header class="hero">
         <p class="eyebrow">52-week campaign simulation</p>
         <h1>2028: Win the White House</h1>
-        <p class="lede">Build a fictional candidacy from announcement through election night. Manage time, money, and energy across primaries, convention, and the general. Fictional candidates only — no real politicians.</p>
+        <p class="lede">Run a fictional presidential campaign: primaries or ballot access, convention, general election, and election night on a 538-vote map. No real politicians. You set the platform and live with the tradeoffs.</p>
       </header>
       <div class="setup-grid">
         <label>Name<input id="cand-name" type="text" maxlength="40" placeholder="Alex Morgan" autocomplete="off"></label>
@@ -22,15 +22,22 @@
           <select id="cand-party">
             <option value="D">Democrat</option>
             <option value="R">Republican</option>
-            <option value="I">Independent (ballot access — no primary)</option>
+            <option value="I">Independent (no primary — ballot access)</option>
           </select>
         </label>
         <label>Run seed (optional)<input id="cand-seed" type="number" placeholder="Random" min="1"></label>
       </div>
       <div class="setup-actions">
-        <button id="btn-new" class="btn btn-primary" type="button">New campaign</button>
+        <button id="btn-new" class="btn btn-primary" type="button">Continue to platform</button>
         <button id="btn-continue" class="btn btn-ghost" type="button" hidden>Continue save</button>
       </div>
+    </section>
+
+    <section id="screen-policy" class="screen" hidden>
+      <h2>Platform and issue stances</h2>
+      <p class="muted">Generic issue sliders (-2 to +2). They shape coalitions, regional appeal, and vulnerability.</p>
+      <div id="policy-sliders" class="policy-panel"></div>
+      <button id="btn-policy-done" class="btn btn-primary" type="button">Launch announcement week</button>
     </section>
 
     <section id="screen-announce" class="screen" hidden>
@@ -52,14 +59,23 @@
           <div class="stat-block" id="resource-panel"></div>
           <div class="stat-block" id="delegate-panel" hidden></div>
           <div class="stat-block" id="ballot-panel" hidden></div>
+          <div class="stat-block" id="coalition-panel"></div>
+          <div class="stat-block" id="staff-panel"></div>
+          <div class="stat-block" id="battleground-panel"></div>
         </aside>
         <main class="main">
           <div class="card" id="rival-panel"></div>
+          <div class="card" id="debate-card" hidden>
+            <h3>Debate night</h3>
+            <p class="muted small">Choose your approach before ending the week.</p>
+            <div id="debate-choices" class="choice-row"></div>
+          </div>
           <button id="btn-end-week" class="btn btn-primary end-week" type="button">End week</button>
           <section class="card" id="actions-card">
-            <h3>Schedule <span id="ap-label" class="tag"></span></h3>
+            <h3>Weekly schedule <span id="ap-label" class="tag"></span></h3>
+            <div id="action-categories" class="category-tabs"></div>
             <div id="actions-list"></div>
-            <p class="muted small">Queued: <span id="queued-actions">—</span></p>
+            <div id="queue-panel" class="queue-panel"></div>
           </section>
           <section class="card" id="event-card" hidden>
             <h3>This week's decision</h3>
@@ -85,8 +101,10 @@
         </main>
         <aside class="sidebar map-side">
           <div class="card map-card">
-            <h3>Map snapshot</h3>
+            <h3>Electoral map</h3>
+            <p id="map-legend" class="muted small"></p>
             <div id="map-preview"></div>
+            <div id="state-detail" class="state-detail muted small"></div>
           </div>
         </aside>
       </div>
@@ -113,6 +131,17 @@
         <button id="btn-new-game" class="btn btn-ghost" type="button">New campaign</button>
       </div>
     </section>
+
+    <div id="modal-overlay" class="modal-overlay" hidden>
+      <div class="modal" role="dialog" aria-modal="true">
+        <header class="modal-head">
+          <h3 id="modal-title">Choose</h3>
+          <button id="modal-close" class="btn btn-small btn-ghost" type="button">Cancel</button>
+        </header>
+        <div id="modal-body" class="modal-body"></div>
+        <footer id="modal-footer" class="modal-footer"></footer>
+      </div>
+    </div>
 
     <div id="toast" class="toast" role="status" hidden></div>
   </div>

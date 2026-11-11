@@ -6,120 +6,205 @@
     "ap": 1,
     "cashCost": 0,
     "energy": 8,
+    "category": "fundraising",
     "description": "Work the phones with major donors.",
-    "effects": { "cash": [85000, 140000], "approval": 0, "buzz": 1, "base": 2 }
+    "effects": { "cash": [85000, 145000], "base": [1, 3] }
   },
   {
     "id": "fundraise_event",
     "label": "Fundraising gala",
     "phase": "any",
     "ap": 2,
-    "cashCost": 25000,
+    "cashCost": 28000,
     "energy": 12,
+    "category": "fundraising",
     "description": "Black-tie dinner with bundlers.",
-    "effects": { "cash": [180000, 320000], "approval": -1, "buzz": 3, "base": 4 }
+    "effects": { "cash": [190000, 340000], "approval": -1, "buzz": 3, "base": 4 }
   },
   {
     "id": "small_dollar",
     "label": "Small-dollar push",
     "phase": "any",
     "ap": 2,
-    "cashCost": 15000,
+    "cashCost": 12000,
     "energy": 10,
+    "category": "fundraising",
     "description": "Email and text burst to grassroots lists.",
-    "effects": { "cash": [60000, 110000], "approval": 1, "buzz": 4, "base": 7, "nameRec": 2 }
+    "effects": { "cash": [65000, 120000], "approval": 1, "buzz": 4, "base": 7, "nameRec": 2 }
   },
   {
-    "id": "social_safe",
-    "label": "Social — on-message post",
-    "phase": "any",
-    "ap": 1,
-    "cashCost": 0,
-    "energy": 4,
-    "description": "Policy clip or family snapshot.",
-    "effects": { "buzz": [2, 5], "nameRec": 2, "gaffeRisk": 0.04 }
-  },
-  {
-    "id": "social_hot",
-    "label": "Social — edgy post",
+    "id": "social_post",
+    "label": "Social media push",
     "phase": "any",
     "ap": 1,
     "cashCost": 0,
     "energy": 5,
-    "description": "Quote-tweet a rival; could go viral or blow up.",
-    "effects": { "buzz": [-3, 14], "nameRec": [3, 9], "gaffeRisk": 0.18 }
+    "category": "comms",
+    "description": "Pick a topic and tone; viral upside or gaffe risk.",
+    "requiresSocialPick": true,
+    "effects": { "socialPost": true }
   },
   {
     "id": "town_hall",
     "label": "Town hall",
     "phase": "any",
     "ap": 2,
-    "cashCost": 35000,
+    "cashCost": 38000,
     "energy": 14,
-    "description": "Take unfiltered questions in a key state.",
-    "effects": { "approval": [2, 6], "base": 4, "stateBoost": 5, "nameRec": 3 }
+    "category": "outreach",
+    "description": "Unfiltered questions in a state you choose.",
+    "requiresStatePick": true,
+    "effects": { "approval": [2, 7], "base": 5, "stateBoost": 6, "nameRec": 3 }
   },
   {
     "id": "state_visit",
     "label": "Targeted state visit",
     "phase": "any",
     "ap": 2,
-    "cashCost": 45000,
-    "energy": 12,
-    "description": "Rally and local ops in one state you pick.",
+    "cashCost": 48000,
+    "energy": 13,
+    "category": "outreach",
+    "description": "Rally and local ops in one state.",
     "requiresStatePick": true,
-    "effects": { "stateBoost": 8, "approval": 1, "nameRec": 2 }
+    "effects": { "stateBoost": 9, "approval": 1, "nameRec": 2, "momentum": 1 }
+  },
+  {
+    "id": "grassroots_canvass",
+    "label": "Door-knock canvass",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 22000,
+    "energy": 16,
+    "category": "outreach",
+    "description": "Neighbor-to-neighbor turnout in one state.",
+    "requiresStatePick": true,
+    "effects": { "stateBoost": 5, "base": 4, "approval": [1, 3] }
+  },
+  {
+    "id": "coalition_meet",
+    "label": "Coalition meeting",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 18000,
+    "energy": 10,
+    "category": "outreach",
+    "description": "Court an interest group aligned (or not) with your platform.",
+    "requiresEndorsementPick": true,
+    "effects": { "endorsementMeet": true }
   },
   {
     "id": "endorsement",
     "label": "Endorsement hunt",
     "phase": "any",
+    "ap": 1,
+    "cashCost": 15000,
+    "energy": 8,
+    "category": "outreach",
+    "description": "Local officials and validators.",
+    "effects": { "approval": [1, 4], "base": [2, 5], "buzz": 2 }
+  },
+  {
+    "id": "ads_state",
+    "label": "State ad buy",
+    "phase": "any",
     "ap": 2,
-    "cashCost": 20000,
-    "energy": 10,
-    "description": "Courts mayors, labor, or niche groups.",
-    "effects": { "approval": [1, 4], "base": [3, 7], "buzz": 2 }
+    "cashCost": 95000,
+    "energy": 6,
+    "category": "paid",
+    "description": "TV and digital in one state.",
+    "requiresStatePick": true,
+    "effects": { "stateBoost": 7, "nameRec": 3, "approval": [1, 3] }
   },
   {
     "id": "ads_regional",
-    "label": "TV/digital ad buy",
+    "label": "Regional ad buy",
     "phase": "any",
     "ap": 2,
-    "cashCost": 120000,
+    "cashCost": 130000,
     "energy": 6,
-    "description": "Positive spots in a region you select.",
+    "category": "paid",
+    "description": "Positive spots across a region.",
     "requiresRegionPick": true,
-    "effects": { "approval": [2, 5], "nameRec": 4, "stateBoost": 4 }
+    "effects": { "approval": [2, 5], "nameRec": 4, "regionalBoost": 4 }
+  },
+  {
+    "id": "policy_rollout",
+    "label": "Policy rollout",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 35000,
+    "energy": 10,
+    "category": "comms",
+    "description": "Stage a detailed plank on one issue dimension.",
+    "requiresPolicyPick": true,
+    "effects": { "policySpotlight": true }
   },
   {
     "id": "debate_prep",
     "label": "Debate prep retreat",
     "phase": "any",
     "ap": 2,
-    "cashCost": 40000,
+    "cashCost": 42000,
     "energy": 10,
+    "category": "prep",
     "description": "Mock debates and briefing books.",
-    "effects": { "debateBuff": 8, "approval": 0, "buzz": 1 }
+    "effects": { "debateBuff": 9, "buzz": 1 }
   },
   {
-    "id": "hire_staff",
-    "label": "Hire campaign staff",
+    "id": "interview_prep",
+    "label": "Sunday show prep",
+    "phase": "any",
+    "ap": 1,
+    "cashCost": 12000,
+    "energy": 6,
+    "category": "prep",
+    "description": "Talking points for hostile interviews.",
+    "effects": { "debateBuff": 4, "gaffeReduce": 0.05, "nameRec": 1 }
+  },
+  {
+    "id": "hire_role",
+    "label": "Hire senior staff",
     "phase": "any",
     "ap": 2,
-    "cashCost": 60000,
+    "cashCost": 45000,
     "energy": 8,
-    "description": "Field organizers and comms deputies.",
-    "effects": { "staff": 1, "organization": 1, "weeklyBurn": 8000 }
+    "category": "staff",
+    "description": "Fill a strategic role (max 4 senior hires).",
+    "requiresStaffPick": true,
+    "effects": { "hireRole": true }
   },
   {
     "id": "oppo",
     "label": "Opposition research",
     "phase": "any",
     "ap": 1,
-    "cashCost": 35000,
+    "cashCost": 38000,
     "energy": 6,
-    "description": "Dirt and contrast memos on rivals.",
-    "effects": { "rivalDamage": [2, 5], "buzz": 2, "gaffeRisk": 0.06 }
+    "category": "oppo",
+    "description": "Contrast memos on rivals.",
+    "effects": { "rivalDamage": [2, 6], "buzz": 2, "gaffeRisk": 0.05 }
+  },
+  {
+    "id": "oppo_drop",
+    "label": "Opposition dump",
+    "phase": "primary",
+    "ap": 2,
+    "cashCost": 55000,
+    "energy": 10,
+    "category": "oppo",
+    "description": "Push unverified hit on a rival — high upside, scandal risk.",
+    "effects": { "rivalDamage": [6, 12], "scandal": 10, "gaffeRisk": 0.12 }
+  },
+  {
+    "id": "scandal_response",
+    "label": "Crisis response war room",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 60000,
+    "energy": 12,
+    "category": "comms",
+    "description": "Lawyers, comms, and surrogate cleanup.",
+    "effects": { "scandal": -18, "approval": [0, 2], "energy": -8 }
   },
   {
     "id": "rest",
@@ -127,30 +212,45 @@
     "phase": "any",
     "ap": 1,
     "cashCost": 0,
-    "energy": -30,
-    "description": "Sleep, exercise, hide from cameras.",
-    "effects": { "energyRestore": 35, "buzz": -1 }
+    "energy": -32,
+    "category": "personal",
+    "description": "Sleep, exercise, off-camera time.",
+    "effects": { "energyRestore": 38, "scandal": -4, "buzz": -1 }
   },
   {
     "id": "petition",
     "label": "Ballot access petition drive",
     "phase": "independent_primary",
     "ap": 2,
-    "cashCost": 80000,
-    "energy": 14,
-    "description": "Qualify for the ballot in another state.",
+    "cashCost": 85000,
+    "energy": 15,
+    "category": "ballot",
+    "description": "Collect signatures in a state not yet qualified.",
     "requiresStatePick": true,
-    "effects": { "petitionProgress": 1 }
+    "effects": { "petitionProgress": true }
+  },
+  {
+    "id": "national_tour",
+    "label": "Multi-state fly-around",
+    "phase": "general",
+    "ap": 3,
+    "cashCost": 110000,
+    "energy": 18,
+    "category": "outreach",
+    "description": "Battleground blitz — pick a region.",
+    "requiresRegionPick": true,
+    "effects": { "regionalBoost": 6, "momentum": 3, "nameRec": 2 }
   },
   {
     "id": "vet_vp",
     "label": "Vet running mate",
     "phase": "convention_prep",
     "ap": 2,
-    "cashCost": 25000,
+    "cashCost": 28000,
     "energy": 8,
-    "description": "Reveal a hidden trait on a shortlist candidate.",
+    "category": "convention",
+    "description": "Reveal hidden traits on a shortlist name.",
     "requiresVpPick": true,
-    "effects": { "vetReveal": 1 }
+    "effects": { "vetReveal": true }
   }
 ]

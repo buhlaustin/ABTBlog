@@ -1,0 +1,10 @@
+[
+  { "id": "labor_fed", "label": "Federation of Industrial Workers", "align": { "economy": -1, "health": -1 } },
+  { "id": "chamber", "label": "National Commerce Council", "align": { "economy": 2, "climate": 1 } },
+  { "id": "teachers", "label": "Teachers United", "align": { "education": -2 } },
+  { "id": "veterans_org", "label": "Veterans Civic Trust", "align": { "security": 1 } },
+  { "id": "climate_coalition", "label": "Climate Action Coalition", "align": { "climate": -2 } },
+  { "id": "law_enforcement_assoc", "label": "Law Enforcement Partnership", "align": { "security": 2, "immigration": 2 } },
+  { "id": "suburban_parents", "label": "Suburban Parents PAC", "align": { "education": 1, "health": 0 } },
+  { "id": "farm_bureau", "label": "Farm Bureau Alliance", "align": { "economy": 1, "climate": 1 } }
+]
