@@ -6,7 +6,7 @@ import {
   projectMonthlyBurn,
   companyRunwayDisplay
 } from './Finance.js';
-import { founderStakeValue, isPublicCompany, canCashOut } from './IPO.js';
+import { founderLiquidationValue, founderStakeValue, isPublicCompany, canCashOut } from './IPO.js';
 import { getFounderRow } from './CapTable.js';
 import { calendarTurn } from './XC.js';
 import {
@@ -837,6 +837,7 @@ export function founderShareStats(state) {
   const impliedPrivatePx = val > 0 && totalShares > 0 ? val / totalShares : 0;
   const markPx = publicCo ? pm.sharePrice ?? 0 : impliedPrivatePx;
   const stakeValue = publicCo ? founderStakeValue(state) : founderValuationStake(state) ?? Math.round(shares * markPx);
+  const liquidationValue = publicCo ? founderLiquidationValue(state) : stakeValue;
   const ipoPx = pm.ipoPrice ?? markPx;
   const gainSinceIpo =
     publicCo && ipoPx > 0 ? Math.round((markPx - ipoPx) * shares) : null;
@@ -850,6 +851,7 @@ export function founderShareStats(state) {
     pct,
     markPx,
     stakeValue: stakeValue ?? 0,
+    liquidationValue: liquidationValue ?? stakeValue ?? 0,
     ipoPx,
     gainSinceIpo,
     lastDividend,
@@ -1137,10 +1139,11 @@ export function cashOutPreview(state) {
   if (!canCashOut(state) && !isPublicCompany(state)) return null;
   const stats = founderShareStats(state);
   if (!stats.publicCo) return null;
-  const payout = founderStakeValue(state);
+  const payout = founderLiquidationValue(state);
   const bank = ceoPersonalBankBalance(state);
   return {
     payout,
+    paperStake: stats.stakeValue,
     liquid: bank,
     combined: payout + bank,
     sharePrice: stats.markPx,

@@ -1,6 +1,6 @@
 import { STAGES } from './constants.js';
 import { getArr } from './Workspace.js';
-import { totalOutstandingShares } from './CapTable.js';
+import { PUBLIC_FLOAT_ROW_ID, totalOutstandingShares } from './CapTable.js';
 
 /** Rough 2026 global GDP (USD) — soft anchor, not a hard wealth cap. */
 export const GLOBAL_GDP_USD_BENCHMARK = 142_000_000_000_000;
@@ -172,4 +172,77 @@ export function macroPressureAllowsTrillionaire(capUsd) {
 
 export function macroPressureBlocksFantasyWealth(capUsd) {
   return macroCapPressureRatio(capUsd) > 0.88;
+}
+
+const PUBLIC_CAP_TIER_FLOORS = [
+  0,
+  500_000_000,
+  2_000_000_000,
+  10_000_000_000,
+  50_000_000_000,
+  200_000_000_000
+];
+
+/** How deep the public book is — deeper float over time, not a dampener on displayed stock %. */
+function publicMarketDepth(state) {
+  if (!isPublicCompanyState(state)) return 0;
+  const months = Math.max(0, state.publicMarket?.monthsPublic ?? 0);
+  const monthsRamp = 1 - Math.exp(-months / 20);
+  const cap = marketCapFromState(state);
+  let tier = 0;
+  for (let i = 1; i < PUBLIC_CAP_TIER_FLOORS.length; i += 1) {
+    if (cap >= PUBLIC_CAP_TIER_FLOORS[i]) tier = i;
+  }
+  const capRamp = (tier + 1) / 6;
+  return Math.min(1, Math.max(0, monthsRamp * 0.52 + capRamp * 0.48));
+}
+
+export function publicFloatShares(state) {
+  const row = (state.capTable ?? []).find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
+  return Math.max(1, Math.round(row?.shares ?? 0));
+}
+
+/**
+ * Haircut when selling a block into the float — sticker price is not what you bank.
+ * Thin books and macro-sized caps bite harder (trillionaire exits still work; fantasy caps do not).
+ */
+export function blockSaleLiquidityHaircut(state, sharesToSell) {
+  if (!isPublicCompanyState(state) || sharesToSell <= 0) return 0;
+  const float = publicFloatShares(state);
+  const participation = Math.min(1, sharesToSell / float);
+  const depth = publicMarketDepth(state);
+  let impact = participation * (0.22 + (1 - depth) * 0.42);
+  const tradingPx = state.publicMarket?.sharePrice ?? 0;
+  const fairPx = state.publicMarket?.fundamentalPrice ?? tradingPx;
+  if (fairPx > 0 && tradingPx > fairPx * 1.12) {
+    const disconnect = (tradingPx - fairPx) / tradingPx;
+    impact += disconnect * 0.55;
+  }
+  const pressure = macroCapPressureRatio(marketCapFromState(state));
+  impact += pressure * participation * 0.38;
+  return Math.min(0.88, Math.max(0, impact));
+}
+
+/** Per-share cash you actually receive when selling `sharesToSell` (fees + liquidity). */
+export function effectiveBlockSalePrice(state, sharesToSell) {
+  const quote = state.publicMarket?.sharePrice ?? 0;
+  if (quote <= 0 || sharesToSell <= 0) return 0;
+  const saleCost = 0.006;
+  const haircut = blockSaleLiquidityHaircut(state, sharesToSell);
+  return Math.round(quote * (1 - haircut - saleCost) * 100) / 100;
+}
+
+/**
+ * When the tape rejects an inflated quote, treasury pays real stabilization (buybacks, liquidity).
+ */
+export function macroStabilizationFee(state, priceBefore, priceAfterReconcile) {
+  if (!isPublicCompanyState(state)) return 0;
+  const shares = totalOutstandingShares(state);
+  if (shares <= 0 || priceAfterReconcile >= priceBefore) return 0;
+  const gapCap = shares * (priceBefore - priceAfterReconcile);
+  if (gapCap <= 0) return 0;
+  const pressure = macroCapPressureRatio(shares * priceBefore);
+  const fee = Math.round(gapCap * 0.018 * (0.35 + pressure * 0.65));
+  const cash = state.finance?.cash ?? 0;
+  return Math.min(cash, Math.max(0, fee));
 }

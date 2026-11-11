@@ -11,6 +11,7 @@
 
 - **`PublicMarketRealism.js`**: ~$142T GDP reference, `macroCapPressureRatio` tuned so **~$1–3T** (trillionaire band) stays playable and **hundreds of trillions** (e.g. ~$720T) hits max pressure / reconciliation — not a hard cap on selling out.
 - **Splits**: Real 2-for-1 cap-table splits when sticker is high; rare if listing price and month-1 clamps stay sane.
+- **Money is economic, not cosmetic**: Desk/IR stock % moves hit the real tape (monthly budget only); rejected inflated quotes cost **company treasury** stabilization. Founder sales and cash-out use **liquidity-adjusted** prices (float depth, macro pressure, sale costs) — paper mark stays on the Finance tape.
 - **`guardListingOperatingPrice`**: Post-IPO re-rating guard applies to **operating** value only so balance-sheet cash still flows into model cap.
 - **IPO**: Float-sized share count; lift **listing price** when needed instead of minting shares.
 - **Post-IPO**: `reconcileTradingPriceToMacro` on monthly and instant moves; macro drag on wealth heat and fundamental P/S cap.

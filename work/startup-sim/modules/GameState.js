@@ -343,7 +343,6 @@ export function normalizeSave(raw) {
       const pm = state.publicMarket;
       if (pm.guidanceTone === undefined) pm.guidanceTone = 'inline';
       if (pm.priorSharePrice === undefined) pm.priorSharePrice = pm.sharePrice ?? null;
-      if (pm.displaySplitMultiplier == null || pm.displaySplitMultiplier < 1) pm.displaySplitMultiplier = 1;
       if (pm.whisperRevenueTarget === undefined) pm.whisperRevenueTarget = 0;
       if (pm.analystRating === undefined) pm.analystRating = null;
       if (pm.analystTarget === undefined) pm.analystTarget = null;

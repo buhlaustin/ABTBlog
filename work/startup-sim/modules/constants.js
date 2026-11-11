@@ -58,7 +58,6 @@ export function createInitialPublicMarket() {
     marketTape: [],
     institutionalHoldPct: 42,
     lastSplitTurn: null,
-    displaySplitMultiplier: 1,
     lastDividendTurn: null,
     lastAnalystActionTurn: null,
     fundamentalPrice: null,

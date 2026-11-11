@@ -1333,17 +1333,27 @@ if (!ipo.ok) {
       console.error(`FAIL: founder lockup should be 6 months (got ${pub.publicMarket?.lockupMonthsRemaining})`);
       failed = true;
     }
-    const { publicWealthHeat, scalePublicStockPctMove } = await import(
-      `file://${join(sim, 'modules/PublicPostIpoEconomy.js')}`
-    );
+    const { publicWealthHeat } = await import(`file://${join(sim, 'modules/PublicPostIpoEconomy.js')}`);
+    const { founderLiquidationValue, founderStakeValue } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+    const { effectiveBlockSalePrice } = await import(`file://${join(sim, 'modules/PublicMarketRealism.js')}`);
     if (publicWealthHeat(pub) > 0.25) {
       console.error(`FAIL: public wealth heat should be low at IPO (got ${publicWealthHeat(pub)})`);
       failed = true;
-    } else if (scalePublicStockPctMove(pub, 0.1) >= 0.05) {
-      console.error('FAIL: stock move scaling should dampen early public moves');
-      failed = true;
     } else {
-      console.log('OK: public wealth heat ramp (slow post-IPO scaling)');
+      const founder = getFounderRow(pub);
+      const paper = founderStakeValue(pub);
+      const liquid = founderLiquidationValue(pub);
+      const effPx = effectiveBlockSalePrice(pub, founder?.shares ?? 0);
+      const tape = pub.publicMarket?.sharePrice ?? 0;
+      if (effPx >= tape * 0.98) {
+        console.error('FAIL: full-block sale should haircut vs last trade when float is thin at IPO');
+        failed = true;
+      } else if (liquid >= paper * 0.98) {
+        console.error('FAIL: founder liquidation should be below paper mark at IPO');
+        failed = true;
+      } else {
+        console.log('OK: public wealth heat + real liquidity on stock sales (not cosmetic tape)');
+      }
     }
     pub.finance.cash = 1_000_000_000_000;
     pub.finance.mrr = 250_000;
@@ -1472,7 +1482,6 @@ if (!ipo.ok) {
       ...pub.publicMarket,
       sharePrice: 400,
       ipoPrice: 400,
-      displaySplitMultiplier: 1,
       lastSplitTurn: null
     };
     careerSplitState.capTable = JSON.parse(JSON.stringify(pub.capTable));
@@ -1488,7 +1497,6 @@ if (!ipo.ok) {
       console.log('OK: sandbox unlimited stock splits; career keeps 6-month gate');
     }
   }
-  pub.publicMarket.displaySplitMultiplier = 1;
   pub.publicMarket.sharePrice = 360;
   const sharesBeforeSplit = totalOutstandingShares(pub);
   const capBeforeSplit = marketCap(pub);
@@ -1902,11 +1910,25 @@ if (!failed) {
     seedEra.flags.seedRoundClosed = true;
     const pubEra = createInitialState({ companyName: 'Era', categoryId: 'b2b-saas', mode: 'career' });
     pubEra.flags.ipoFiled = true;
+    pubEra.flags.seedRoundClosed = true;
     pubEra.stage = STAGES.PUBLIC;
-    const seedRoll = rollTaskOutcome(sharedTask, seedEra).revenue;
-    const pubRoll = rollTaskOutcome(sharedTask, pubEra).revenue;
-    if (pubRoll <= seedRoll * 50) {
-      console.error(`FAIL: era base scale seed=${seedRoll} public=${pubRoll}`);
+    pubEra.finance.mrr = 4_000_000;
+    pubEra.capTable = [
+      { id: 'founder', name: 'Founder', shares: 52_000_000, pct: 74, class: 'founder' },
+      { id: 'public-float', name: 'Float', shares: 18_000_000, pct: 26, class: 'public' }
+    ];
+    pubEra.publicMarket = {
+      sharePrice: 220,
+      ipoPrice: 180,
+      monthsPublic: 18,
+      ticker: 'ERA'
+    };
+    pubEra.finance.valuation = Math.round(70_000_000 * 220);
+    const { estimateTaskPayoutBand } = await import(`file://${join(sim, 'modules/Finance.js')}`);
+    const seedBand = estimateTaskPayoutBand(sharedTask, seedEra);
+    const pubBand = estimateTaskPayoutBand(sharedTask, pubEra);
+    if (pubBand.max <= seedBand.max * 50) {
+      console.error(`FAIL: era base scale seed=${seedBand.max} public=${pubBand.max}`);
       failed = true;
     }
   }

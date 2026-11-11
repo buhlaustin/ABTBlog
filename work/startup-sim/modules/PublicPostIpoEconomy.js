@@ -50,15 +50,6 @@ export function publicWealthHeat(state) {
   return Math.min(1, Math.max(0, Math.round((blended * (1 - macroDrag)) * 1000) / 1000));
 }
 
-/** Scale instant stock moves (desk, IR, board) — floor 15% of catalog pct at IPO. */
-export function scalePublicStockPctMove(state, pct) {
-  if (!pct || !isPublicCompany(state)) return pct;
-  const heat = publicWealthHeat(state);
-  const floor = 0.08;
-  const scale = floor + (1 - floor) * heat;
-  return Number(pct) * scale;
-}
-
 /** Monthly tick magnitude scale (fundamentals still drift; tape is calmer early). */
 export function scalePublicMonthlyDelta(state, deltaPct) {
   if (!isPublicCompany(state)) return deltaPct;
@@ -87,5 +78,5 @@ export function postIpoDeskEngineNote(state) {
   const tier = publicCapTierLabel(state);
   const cap = marketCap(state);
   const pct = Math.round(heat * 100);
-  return `${tier} · cap ${formatMoney(cap)} · public wealth heat ${pct}% (desk payouts and stock moves scale with heat).`;
+  return `${tier} · cap ${formatMoney(cap)} · wealth heat ${pct}% (desk revenue ramps; stock sales face float depth at low heat).`;
 }

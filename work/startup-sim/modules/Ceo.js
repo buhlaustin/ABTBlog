@@ -421,7 +421,11 @@ function renderCeoWealthSection(ctx) {
         <h3 class="finance-section-title">Founder stake (public)</h3>
         <span class="ceo-ticker-pill">${escapeHtml(shares.ticker ?? '—')} ${formatMoney(shares.markPx)}/sh</span>
       </div>
-      <p class="ceo-stake-headline">Your block <strong>${formatMoney(shares.stakeValue)}</strong></p>
+      <p class="ceo-stake-headline">Paper <strong>${formatMoney(shares.stakeValue)}</strong>${
+        shares.liquidationValue < shares.stakeValue * 0.98
+          ? ` · est. cash-out <strong>${formatMoney(shares.liquidationValue)}</strong> after float depth`
+          : ''
+      }</p>
       ${panelMetricGrid('3', [
         panelStatCard('Your shares', shares.shares.toLocaleString('en-US')),
         panelStatCard('Ownership', `${comp.pct}%`),
@@ -433,7 +437,7 @@ function renderCeoWealthSection(ctx) {
       ])}
       ${
         exitPrev
-          ? `<p class="fine-print">Step-down today ≈ ${formatMoney(exitPrev.combined)} (${formatMoney(exitPrev.payout)} stock + ${formatMoney(exitPrev.liquid)} bank).</p>`
+          ? `<p class="fine-print">Step-down today ≈ ${formatMoney(exitPrev.combined)} (${formatMoney(exitPrev.payout)} after liquidity, ${formatMoney(exitPrev.paperStake ?? exitPrev.payout)} on tape + ${formatMoney(exitPrev.liquid)} bank).</p>`
           : lockup > 0
             ? `<p class="fine-print">Paper value after lockup: ${formatMoney(shares.stakeValue)} (credits personal bank on step-down).</p>`
             : ''
@@ -452,7 +456,7 @@ function renderCeoWealthSection(ctx) {
     publicCo && !state.flags?.cashedOut
       ? `<section class="finance-section finance-card">
         <h3 class="finance-section-title">Sell founder stock (secondary)</h3>
-        <p class="fine-print">Market price · you stay CEO · proceeds to personal bank</p>
+        <p class="fine-print">Last trade minus liquidity + sale costs · you stay CEO · net proceeds to personal bank</p>
         ${
           lockup > 0
             ? `<p class="fine-print">Lockup: ${lockup} month(s) remaining.</p>`
