@@ -13,7 +13,10 @@ export function acceleratorProgramsUsed(state) {
 
 export function isAcceleratorFundraisingClosed(state) {
   return Boolean(
-    state.flags?.seriesAClosed || state.flags?.ipoFiled || state.stage === STAGES.PUBLIC
+    state.flags?.seedRoundClosed ||
+      state.flags?.seriesAClosed ||
+      state.flags?.ipoFiled ||
+      state.stage === STAGES.PUBLIC
   );
 }
 
@@ -56,7 +59,9 @@ export function canJoinAccelerator(state, programId) {
   if (isAcceleratorFundraisingClosed(state)) {
     return {
       ok: false,
-      reason: 'After Series A or going public, new accelerator programs are closed.'
+      reason: state.flags?.seedRoundClosed
+        ? 'After your priced seed round, new accelerator SAFE programs are closed.'
+        : 'After Series A or going public, new accelerator programs are closed.'
     };
   }
   if (acceleratorProgramsUsed(state) >= MAX_ACCELERATOR_PROGRAMS) {
@@ -121,6 +126,7 @@ function escapeHtml(s) {
 }
 
 export function renderAcceleratorsBlock(state) {
+  if (isAcceleratorFundraisingClosed(state)) return '';
   const joined = new Set(state.accelerators?.joined ?? []);
   const programs = getAcceleratorPrograms().filter((p) => !joined.has(p.id));
   if (!programs.length) return '';
@@ -138,6 +144,6 @@ export function renderAcceleratorsBlock(state) {
     })
     .join('');
 
-  const capNote = `<p class="fine-print">Limit: ${MAX_ACCELERATOR_PROGRAMS} accelerator programs total (X Combinator counts as one), plus seed. After Series A / IPO, new programs close.</p>`;
+  const capNote = `<p class="fine-print">Limit: ${MAX_ACCELERATOR_PROGRAMS} accelerator programs total (X Combinator counts as one), before priced seed. Programs hide after seed close.</p>`;
   return `<h3 class="log-head">Other accelerators & SAFE paths</h3>${capNote}${cards}`;
 }

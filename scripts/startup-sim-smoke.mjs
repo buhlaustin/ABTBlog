@@ -1554,6 +1554,19 @@ if (!ja.ok) {
   console.error('FAIL: third accelerator should be blocked');
   failed = true;
 }
+const postSeedAccel = createInitialState({ companyName: 'Post Seed', categoryId: 'b2b-saas', mode: 'sandbox' });
+postSeedAccel.flags.seedRoundClosed = true;
+postSeedAccel.finance.arr = 200_000;
+postSeedAccel.finance.mrr = Math.round(200_000 / 12);
+if (joinAccelerator(postSeedAccel, 'angel-rail').ok) {
+  console.error('FAIL: accelerator after seed close should be blocked');
+  failed = true;
+}
+const { renderAcceleratorsBlock } = await import(`file://${join(sim, 'modules/Accelerators.js')}`);
+if (renderAcceleratorsBlock(postSeedAccel)) {
+  console.error('FAIL: other accelerator SAFE UI should hide after seed');
+  failed = true;
+}
 const postASeries = createInitialState({ companyName: 'Post A', categoryId: 'b2b-saas', mode: 'sandbox' });
 postASeries.flags.seriesAClosed = true;
 postASeries.finance.arr = 5_000_000;
