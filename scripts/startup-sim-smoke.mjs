@@ -2832,7 +2832,7 @@ const {
 await preloadCeoLifestyleCatalog();
 const lifestyleCatalogCount = getCeoLifestylePurchasesSync().length;
 const lifestyleCategoryCount = getCeoLifestyleCategoriesSync().length;
-if (lifestyleCatalogCount < 68) {
+if (lifestyleCatalogCount < 105) {
   console.error(`FAIL: CEO lifestyle catalog too small (${lifestyleCatalogCount})`);
   failed = true;
 } else if (lifestyleCategoryCount < 9) {
@@ -2907,21 +2907,24 @@ if (!bought.ok) {
             categoryId: 'b2b-saas',
             mode: 'sandbox'
           });
-          lifestyleState.ceo.bankBalance = 300_000;
+          lifestyleState.ceo.bankBalance = 600_000;
           const gym = purchaseCeoLifestyle(lifestyleState, 'premium-gym');
           const car = purchaseCeoLifestyle(lifestyleState, 'electric-sedan');
-          const carClash = purchaseCeoLifestyle(lifestyleState, 'sports-car');
+          const car2 = purchaseCeoLifestyle(lifestyleState, 'sports-car');
+          const car3 = purchaseCeoLifestyle(lifestyleState, 'hybrid-crossover');
           const resale = sellCeoLifestyle(lifestyleState, 'electric-sedan');
-          if (!gym.ok || ceoLifestyleMonthlyDebit(lifestyleState) !== 380) {
+          if (!gym.ok || ceoLifestyleMonthlyDebit(lifestyleState) !== 380 + 320) {
             console.error(`FAIL: CEO lifestyle purchase: ${gym.reason ?? 'debit bump'}`);
             failed = true;
-          } else if (!car.ok || carClash.ok) {
-            console.error('FAIL: CEO lifestyle exclusive vehicle group');
+          } else if (!car.ok || !car2.ok || !car3.ok) {
+            console.error(
+              `FAIL: CEO lifestyle multi-vehicle garage: ${car.reason ?? ''} ${car2.reason ?? ''} ${car3.reason ?? ''}`
+            );
             failed = true;
           } else if (!resale.ok || resale.proceeds <= 0) {
             console.error(`FAIL: CEO lifestyle resale: ${resale.reason ?? 'proceeds'}`);
             failed = true;
-          } else if (ceoLifestyleLifetimeSpend(lifestyleState) !== 4200 + 78000) {
+          } else if (ceoLifestyleLifetimeSpend(lifestyleState) !== 4200 + 78000 + 185000 + 68000) {
             console.error('FAIL: CEO lifestyle lifetime spend');
             failed = true;
           } else {

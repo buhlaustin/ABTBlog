@@ -136,8 +136,7 @@
       "monthlyDebitBump": 1500,
       "exclusiveGroup": "private-club",
       "blurb": "Track days in a controlled environment — your board slides call it “team building”.",
-      "minNetWorth": 1500000,
-      "requiresOwned": ["sports-car", "supercar", "luxury-suv", "electric-sedan"]
+      "minNetWorth": 1500000
     },
     {
       "id": "designer-watch",
@@ -208,7 +207,6 @@
       "monthlyDebitBump": 18000,
       "blurb": "Dock fees, crew, and fuel — discretionary line never recovers.",
       "minNetWorth": 3000000,
-      "requiresOwned": ["jet-card"],
       "sentimentOnPurchase": 2
     },
     {
@@ -218,9 +216,7 @@
       "cost": 1200000,
       "monthlyDebitBump": 8500,
       "blurb": "Skip traffic to the airport you already fly private from.",
-      "minNetWorth": 4000000,
-      "requiresPublic": true,
-      "requiresOwned": ["jet-card"]
+      "minNetWorth": 4000000
     },
     {
       "id": "philanthropy-gala",
@@ -441,8 +437,6 @@
       "monthlyDebitBump": 22000,
       "blurb": "Transcontinental without the jet-card math — CFO weeps quietly.",
       "minNetWorth": 12000000,
-      "requiresPublic": true,
-      "requiresOwned": ["jet-card"],
       "sentimentOnPurchase": 2
     },
     {
@@ -452,8 +446,7 @@
       "cost": 1800000,
       "monthlyDebitBump": 14000,
       "blurb": "Summer in the Med — crew, chef, and fuel billed separately in spirit.",
-      "minNetWorth": 8000000,
-      "requiresOwned": ["yacht-slip", "jet-card"]
+      "minNetWorth": 8000000
     },
     {
       "id": "sneaker-vault",
@@ -666,8 +659,7 @@
       "cost": 68000,
       "monthlyDebitBump": 1100,
       "blurb": "Allocations and cellar slots — dinners become “investor relations”.",
-      "minNetWorth": 650000,
-      "requiresOwned": ["wine-cellar"]
+      "minNetWorth": 650000
     },
     {
       "id": "two-seater-plane-share",
@@ -677,7 +669,6 @@
       "monthlyDebitBump": 3200,
       "blurb": "Hop between campuses — weather delays are a personality trait.",
       "minNetWorth": 2500000,
-      "requiresOwned": ["jet-card"],
       "resalePct": 0.45
     }
   ]

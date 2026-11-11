@@ -1,0 +1,448 @@
+{
+  "purchases": [
+    {
+      "id": "compact-ev-city",
+      "category": "mobility",
+      "label": "Compact city EV",
+      "cost": 42000,
+      "monthlyDebitBump": 180,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Alley parking and one-pedal driving — still a \"fleet vehicle\" on taxes.",
+      "resalePct": 0.64
+    },
+    {
+      "id": "hybrid-crossover",
+      "category": "mobility",
+      "label": "Plug-in hybrid crossover",
+      "cost": 68000,
+      "monthlyDebitBump": 320,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "School pickup and range anxiety in one package.",
+      "resalePct": 0.6
+    },
+    {
+      "id": "german-executive-sedan",
+      "category": "mobility",
+      "label": "German executive sedan",
+      "cost": 118000,
+      "monthlyDebitBump": 580,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Rear-seat tablets and a dealership relationship.",
+      "resalePct": 0.57,
+      "minNetWorth": 450000
+    },
+    {
+      "id": "american-muscle",
+      "category": "mobility",
+      "label": "American muscle coupe",
+      "cost": 92000,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "V8 soundtrack — HOA noise complaints included.",
+      "resalePct": 0.61
+    },
+    {
+      "id": "british-grand-tourer",
+      "category": "mobility",
+      "label": "British grand tourer",
+      "cost": 245000,
+      "monthlyDebitBump": 1100,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Hand-stitched guilt and walnut trim.",
+      "resalePct": 0.52,
+      "minNetWorth": 900000
+    },
+    {
+      "id": "japanese-super-sedan",
+      "category": "mobility",
+      "label": "Japanese super sedan",
+      "cost": 165000,
+      "monthlyDebitBump": 720,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Four doors, drift mode, and a restraint nobody uses.",
+      "resalePct": 0.56,
+      "minNetWorth": 650000
+    },
+    {
+      "id": "offroad-adventure-truck",
+      "category": "mobility",
+      "label": "Off-road adventure truck",
+      "cost": 88000,
+      "monthlyDebitBump": 410,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Lift kit, rooftop tent, and dust in the cupholders.",
+      "resalePct": 0.63
+    },
+    {
+      "id": "performance-electric-suv",
+      "category": "mobility",
+      "label": "Tri-motor electric SUV",
+      "cost": 142000,
+      "monthlyDebitBump": 890,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Ludicrous family hauler — charger share with the sedan.",
+      "resalePct": 0.59,
+      "minNetWorth": 550000
+    },
+    {
+      "id": "hypercar-allocation",
+      "category": "mobility",
+      "label": "Hypercar allocation",
+      "cost": 2850000,
+      "monthlyDebitBump": 4200,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Waitlisted carbon — insurance is a second mortgage.",
+      "minNetWorth": 12000000,
+      "resalePct": 0.42,
+      "sentimentOnPurchase": 2
+    },
+    {
+      "id": "vintage-convertible",
+      "category": "mobility",
+      "label": "Vintage convertible",
+      "cost": 195000,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Summer Sundays only — mechanic on speed dial.",
+      "resalePct": 0.66,
+      "minNetWorth": 700000
+    },
+    {
+      "id": "track-spec-coupe",
+      "category": "mobility",
+      "label": "Track-spec coupe",
+      "cost": 215000,
+      "monthlyDebitBump": 980,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Roll cage, tire trailer, and nerve on a calendar slot.",
+      "resalePct": 0.54,
+      "minNetWorth": 800000
+    },
+    {
+      "id": "limousine-retainer",
+      "category": "mobility",
+      "label": "Armored limousine retainer",
+      "cost": 385000,
+      "monthlyDebitBump": 6200,
+      "exclusiveGroup": "vehicle-fleet",
+      "blurb": "Glass you cannot see through — board calls from the back.",
+      "minNetWorth": 3000000
+    },
+    {
+      "id": "defender-overland",
+      "category": "mobility",
+      "label": "Defender overland build",
+      "cost": 128000,
+      "monthlyDebitBump": 520,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "Winch, fridge, and photos for the annual letter.",
+      "resalePct": 0.58
+    },
+    {
+      "id": "restomod-pickup",
+      "category": "mobility",
+      "label": "Restomod pickup",
+      "cost": 165000,
+      "exclusiveGroup": "performance-vehicle",
+      "blurb": "LS swap and patina — coffee shop parking only.",
+      "resalePct": 0.64,
+      "minNetWorth": 500000
+    },
+    {
+      "id": "electric-superbike",
+      "category": "mobility",
+      "label": "Electric superbike",
+      "cost": 32000,
+      "blurb": "Silent canyon runs — spouse veto not included.",
+      "resalePct": 0.7
+    },
+    {
+      "id": "pontoon-boat",
+      "category": "mobility",
+      "label": "Pontoon boat & lift",
+      "cost": 95000,
+      "monthlyDebitBump": 650,
+      "blurb": "Sunset cruises and a marina slip waiting list.",
+      "resalePct": 0.55,
+      "minNetWorth": 400000
+    },
+    {
+      "id": "sailing-yacht-40",
+      "category": "mobility",
+      "label": "40 ft sailing yacht",
+      "cost": 385000,
+      "monthlyDebitBump": 2200,
+      "blurb": "Wind and patience — crew optional ego.",
+      "minNetWorth": 1500000,
+      "resalePct": 0.5
+    },
+    {
+      "id": "golf-cart-fleet",
+      "category": "mobility",
+      "label": "Neighborhood golf cart fleet (×2)",
+      "cost": 28000,
+      "blurb": "HOA-approved parade vehicle — kids repaint it quarterly.",
+      "resalePct": 0.72
+    },
+    {
+      "id": "yacht-club-initiation",
+      "category": "wellness",
+      "label": "Yacht club initiation",
+      "cost": 88000,
+      "monthlyDebitBump": 1400,
+      "exclusiveGroup": "private-club",
+      "blurb": "Slip lottery, regatta invites, and dock politics.",
+      "minNetWorth": 900000
+    },
+    {
+      "id": "golf-club-legacy",
+      "category": "wellness",
+      "label": "Legacy golf club membership",
+      "cost": 145000,
+      "monthlyDebitBump": 2800,
+      "exclusiveGroup": "private-club",
+      "blurb": "Caddie fund, guest rounds, and the member-guest you dread.",
+      "minNetWorth": 1800000
+    },
+    {
+      "id": "city-athletic-club",
+      "category": "wellness",
+      "label": "City athletic club",
+      "cost": 38000,
+      "monthlyDebitBump": 820,
+      "exclusiveGroup": "private-club",
+      "blurb": "Rooftop pool and steam room between back-to-backs."
+    },
+    {
+      "id": "wine-country-club",
+      "category": "wellness",
+      "label": "Wine country club",
+      "cost": 72000,
+      "monthlyDebitBump": 1250,
+      "exclusiveGroup": "private-club",
+      "blurb": "Vineyard views and a sommelier who remembers your name.",
+      "minNetWorth": 650000
+    },
+    {
+      "id": "equestrian-club",
+      "category": "wellness",
+      "label": "Equestrian club deposit",
+      "cost": 95000,
+      "monthlyDebitBump": 1800,
+      "exclusiveGroup": "private-club",
+      "blurb": "Ring time and hay invoices — kids optional.",
+      "minNetWorth": 1200000
+    },
+    {
+      "id": "social-club-rooftop",
+      "category": "wellness",
+      "label": "Rooftop social club",
+      "cost": 45000,
+      "monthlyDebitBump": 1100,
+      "exclusiveGroup": "private-club",
+      "blurb": "Members-only sunsets — no laptops after 7 p.m. (theoretically)."
+    },
+    {
+      "id": "backup-generator-estate",
+      "category": "tech",
+      "label": "Whole-estate backup power",
+      "cost": 185000,
+      "monthlyDebitBump": 280,
+      "blurb": "Natural gas genset — uptime flex during outages.",
+      "minNetWorth": 1100000
+    },
+    {
+      "id": "private-cinema-duo",
+      "category": "tech",
+      "label": "Secondary private cinema",
+      "cost": 220000,
+      "monthlyDebitBump": 950,
+      "blurb": "Guest wing screening room — Dolby Atmos for the kids.",
+      "minNetWorth": 2000000
+    },
+    {
+      "id": "chef-kitchen-upgrade",
+      "category": "tech",
+      "label": "Chef's kitchen upgrade",
+      "cost": 340000,
+      "monthlyDebitBump": 1200,
+      "blurb": "Wolf range, walk-in pantry, and a dumbwaiter joke.",
+      "minNetWorth": 2500000,
+      "minHomeEquity": 400000
+    },
+    {
+      "id": "indoor-pickleball-court",
+      "category": "wellness",
+      "label": "Indoor pickleball court",
+      "cost": 295000,
+      "monthlyDebitBump": 780,
+      "blurb": "Court lighting and hype playlist — investor doubles mandatory.",
+      "minNetWorth": 1800000,
+      "minHomeEquity": 300000
+    },
+    {
+      "id": "float-tank-suite",
+      "category": "wellness",
+      "label": "Sensory float suite",
+      "cost": 68000,
+      "monthlyDebitBump": 220,
+      "blurb": "Epsom, darkness, and thoughts about runway.",
+      "minNetWorth": 350000
+    },
+    {
+      "id": "alpine-chalet-weeks",
+      "category": "travel",
+      "label": "Alpine chalet share (4 weeks)",
+      "cost": 520000,
+      "monthlyDebitBump": 1800,
+      "blurb": "Ski-in closet and a hot tub you share with three other founders.",
+      "minNetWorth": 2200000
+    },
+    {
+      "id": "global-expedition-ship",
+      "category": "travel",
+      "label": "Expedition ship cabin (annual)",
+      "cost": 275000,
+      "blurb": "Polar routes and lectures — Wi‑Fi is aspirational.",
+      "minNetWorth": 1400000
+    },
+    {
+      "id": "monaco-grand-prix-week",
+      "category": "travel",
+      "label": "Monaco Grand Prix week",
+      "cost": 195000,
+      "blurb": "Yacht tie-up and terrace — sunglasses required in meetings.",
+      "minNetWorth": 1600000,
+      "sentimentOnPurchase": 1
+    },
+    {
+      "id": "superyacht-week-charter",
+      "category": "travel",
+      "label": "Superyacht week charter",
+      "cost": 950000,
+      "monthlyDebitBump": 0,
+      "blurb": "Crew of twelve — you still check email in the tender.",
+      "minNetWorth": 5500000,
+      "sentimentOnPurchase": 2
+    },
+    {
+      "id": "orbital-training-camp",
+      "category": "travel",
+      "label": "Orbital training camp",
+      "cost": 420000,
+      "blurb": "Centrifuge and zero-G flight — space deposit sold separately.",
+      "minNetWorth": 4500000,
+      "buzzOnPurchase": 2
+    },
+    {
+      "id": "patek-annual-buy",
+      "category": "fashion",
+      "label": "Grail watch annual allocation",
+      "cost": 185000,
+      "blurb": "Waitlist whisper network — handshake accessory v2.",
+      "resalePct": 0.72,
+      "minNetWorth": 2000000
+    },
+    {
+      "id": "couture-season",
+      "category": "fashion",
+      "label": "Couture season retainer",
+      "cost": 125000,
+      "monthlyDebitBump": 900,
+      "blurb": "Fittings in Paris — hoodie embargo at board dinners.",
+      "minNetWorth": 1500000
+    },
+    {
+      "id": "sports-team-suite",
+      "category": "experiences",
+      "label": "NBA / NFL suite (partial)",
+      "cost": 480000,
+      "monthlyDebitBump": 2200,
+      "blurb": "Twenty games, catering minimums, and client invites.",
+      "minNetWorth": 3500000,
+      "buzzOnPurchase": 1
+    },
+    {
+      "id": "coachella-vip-compound",
+      "category": "experiences",
+      "label": "Festival VIP compound",
+      "cost": 165000,
+      "blurb": "Shaded oasis and security — culture deck not included.",
+      "buzzOnPurchase": 2,
+      "minNetWorth": 800000
+    },
+    {
+      "id": "olympics-hospitality",
+      "category": "experiences",
+      "label": "Olympics hospitality package",
+      "cost": 285000,
+      "blurb": "Opening ceremony and finals — jet lag included.",
+      "minNetWorth": 2200000,
+      "sentimentOnPurchase": 1
+    },
+    {
+      "id": "private-concert",
+      "category": "experiences",
+      "label": "Private concert (home estate)",
+      "cost": 850000,
+      "blurb": "One night, one artist, NDAs for the neighbors.",
+      "minNetWorth": 6000000,
+      "sentimentOnPurchase": 2
+    },
+    {
+      "id": "stables-buy-in",
+      "category": "collectibles",
+      "label": "Racehorse stable buy-in",
+      "cost": 520000,
+      "monthlyDebitBump": 1900,
+      "blurb": "Silo finery — losses are \"experiential\".",
+      "minNetWorth": 3000000,
+      "resalePct": 0.4
+    },
+    {
+      "id": "private-jet-hangar",
+      "category": "collectibles",
+      "label": "Private hangar share",
+      "cost": 890000,
+      "monthlyDebitBump": 5800,
+      "blurb": "Your metal, your ramp — FBO small talk forever.",
+      "minNetWorth": 8000000,
+      "resalePct": 0.48
+    },
+    {
+      "id": "driver-escort-team",
+      "category": "staff",
+      "label": "Driver & escort team",
+      "cost": 220000,
+      "monthlyDebitBump": 6800,
+      "blurb": "Two shifts, one Sprinter, and calendar sync hell.",
+      "minNetWorth": 4000000
+    },
+    {
+      "id": "aviation-dispatcher",
+      "category": "staff",
+      "label": "Personal aviation dispatcher",
+      "cost": 95000,
+      "monthlyDebitBump": 3200,
+      "blurb": "WX, catering, and tail swaps at 3 a.m.",
+      "minNetWorth": 3500000
+    },
+    {
+      "id": "impact-fund-gp",
+      "category": "philanthropy",
+      "label": "Impact fund GP commitment",
+      "cost": 750000,
+      "blurb": "Double bottom line slide for the LP letter.",
+      "minNetWorth": 5000000,
+      "sentimentOnPurchase": 2,
+      "buzzOnPurchase": 1
+    },
+    {
+      "id": "national-park-endowment",
+      "category": "philanthropy",
+      "label": "National park endowment gift",
+      "cost": 1200000,
+      "blurb": "Trail naming rights — ranger picnic mandatory.",
+      "minNetWorth": 6500000,
+      "sentimentOnPurchase": 3
+    }
+  ]
+}

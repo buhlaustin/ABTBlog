@@ -39,7 +39,8 @@ import {
   ceoLifestyleLifetimeSpend,
   lifestylePurchaseGate,
   standardMortgagePayment,
-  HOUSING_MODE
+  HOUSING_MODE,
+  STACKABLE_EXCLUSIVE_GROUPS
 } from './CeoLifestyle.js';
 import { isPublicCompany, canSellFounderStock } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
@@ -640,12 +641,14 @@ function renderCeoLifestyleSection(ctx) {
     const gate = lifestylePurchaseGate(state, item, { ok: !item.minNetWorth || netWorth >= item.minNetWorth });
     const canBuy = gate.ok && !disabled;
     const tags = [
-      item.exclusiveGroup ? 'One per category' : null,
-      item.requiresPublic ? 'Public co.' : null,
+      item.exclusiveGroup && STACKABLE_EXCLUSIVE_GROUPS.has(item.exclusiveGroup)
+        ? 'Garage / club collectible'
+        : item.exclusiveGroup
+          ? 'One per category'
+          : null,
       item.resalePct ? `Resell ~${Math.round(item.resalePct * 100)}%` : null,
       item.buzzOnPurchase ? `+${item.buzzOnPurchase} buzz` : null,
       item.sentimentOnPurchase ? `+${item.sentimentOnPurchase} sentiment` : null,
-      item.requiresOwned?.length ? 'Requires prior purchase' : null,
       item.minHomeEquity ? `≥${formatMoney(item.minHomeEquity)} home equity` : null
     ]
       .filter(Boolean)
@@ -690,7 +693,7 @@ function renderCeoLifestyleSection(ctx) {
             return `<li><strong>${escapeHtml(p.label)}</strong>${p.monthlyDebitBump ? ` · +${formatMoney(p.monthlyDebitBump)}/mo` : ''}${sell}</li>`;
           })
           .join('')}</ul>`
-      : '<p class="fine-print">No splurges yet — e-bike, standing desk, or premium gym are affordable early; cars and clubs are exclusive picks.</p>';
+      : '<p class="fine-print">No splurges yet — e-bike, standing desk, or premium gym are affordable early; build a full garage and stack club memberships as you scale.</p>';
 
   const housingStatusLine =
     housing.mode === HOUSING_MODE.RENT
@@ -752,7 +755,7 @@ function renderCeoLifestyleSection(ctx) {
       <h4 class="finance-section-title">Homes</h4>
       <div class="people-perk-grid ceo-home-grid">${homeCards}</div>
       <h4 class="finance-section-title">Splurge catalog</h4>
-      <p class="fine-print">${getCeoLifestylePurchasesSync().length} purchases across ${getCeoLifestyleCategoriesSync().length} categories — exclusive groups (one car, one club), prerequisites, resell on select items, optional buzz/sentiment on flagship buys.</p>
+      <p class="fine-print">${getCeoLifestylePurchasesSync().length} purchases across ${getCeoLifestyleCategoriesSync().length} categories — collect every vehicle and club tier (net worth and cash gates still apply), resell on select items, optional buzz/sentiment on flagship buys.</p>
       ${lifestyleByCategory}
     </section>
   `;

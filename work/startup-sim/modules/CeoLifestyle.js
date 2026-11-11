@@ -1,10 +1,14 @@
 import { formatMoney } from './constants.js';
 import { fetchGameJson } from './utils.js';
 import { calendarTurn } from './XC.js';
-import { isPublicCompany } from './IPO.js';
 import bundledCatalog from '../data/ceo-lifestyle-catalog.json' with { type: 'json' };
 
-const BUILTIN_PURCHASES = Array.isArray(bundledCatalog?.purchases) ? bundledCatalog.purchases : [];
+import bundledExpansion from '../data/ceo-lifestyle-catalog-expansion.json' with { type: 'json' };
+
+const BUILTIN_PURCHASES = [
+  ...(Array.isArray(bundledCatalog?.purchases) ? bundledCatalog.purchases : []),
+  ...(Array.isArray(bundledExpansion?.purchases) ? bundledExpansion.purchases : [])
+];
 const BUILTIN_CATEGORIES = Array.isArray(bundledCatalog?.categories)
   ? bundledCatalog.categories
   : [
@@ -27,7 +31,10 @@ export async function preloadCeoLifestyleCatalog() {
         lifestyleCatalogCache = {
           categories:
             Array.isArray(data.categories) && data.categories.length ? data.categories : BUILTIN_CATEGORIES,
-          purchases: data.purchases
+          purchases: [
+            ...data.purchases,
+            ...(Array.isArray(bundledExpansion?.purchases) ? bundledExpansion.purchases : [])
+          ]
         };
       }
     } catch {
@@ -64,8 +71,20 @@ export const HOUSING_MODE = {
   MORTGAGE: 'mortgage'
 };
 
+/** Exclusive groups where you can own every item in the group (full garage, multiple clubs). */
+export const STACKABLE_EXCLUSIVE_GROUPS = new Set(['performance-vehicle', 'private-club', 'vehicle-fleet']);
+
 /** Purchasable homes — cashPrice is list; mortgage uses downPct of price. */
 export const CEO_HOME_TIERS = [
+  {
+    id: 'micro-studio',
+    label: 'Micro studio',
+    cashPrice: 245_000,
+    downPct: 0.12,
+    mortgageApr: 0.071,
+    maintenanceMo: 420,
+    blurb: '450 sq ft, murphy bed, building laundry — maximalist founder cosplay.'
+  },
   {
     id: 'tech-loft',
     label: 'Tech loft',
@@ -103,6 +122,25 @@ export const CEO_HOME_TIERS = [
     blurb: 'Good schools, two-car garage, lawn you never use.'
   },
   {
+    id: 'duplex-rental',
+    label: 'Duplex (house hack)',
+    cashPrice: 625_000,
+    downPct: 0.18,
+    mortgageApr: 0.068,
+    maintenanceMo: 880,
+    blurb: 'You live in one unit — the other pays half the mortgage in theory.'
+  },
+  {
+    id: 'lake-house',
+    label: 'Lake house',
+    cashPrice: 1_850_000,
+    downPct: 0.2,
+    mortgageApr: 0.0645,
+    maintenanceMo: 1_850,
+    blurb: 'Dock, pontoon parking, and a mosquito strategy.',
+    minNetWorth: 650_000
+  },
+  {
     id: 'luxury-home',
     label: 'Luxury home',
     cashPrice: 4_200_000,
@@ -120,6 +158,26 @@ export const CEO_HOME_TIERS = [
     maintenanceMo: 2_100,
     blurb: 'A-frame adjacent to a ski lift — short-term rental fantasy included.',
     minNetWorth: 1_200_000
+  },
+  {
+    id: 'beach-house',
+    label: 'Beach house',
+    cashPrice: 2_750_000,
+    downPct: 0.22,
+    mortgageApr: 0.0635,
+    maintenanceMo: 2_400,
+    blurb: 'Salt air, hurricane shutters, and renters who ignore the rules.',
+    minNetWorth: 900_000
+  },
+  {
+    id: 'vineyard-estate',
+    label: 'Vineyard estate',
+    cashPrice: 5_400_000,
+    downPct: 0.25,
+    mortgageApr: 0.062,
+    maintenanceMo: 4_800,
+    blurb: 'Tasting room, guest cottages, and harvest interns on payroll.',
+    minNetWorth: 2_000_000
   },
   {
     id: 'mansion',
@@ -140,6 +198,46 @@ export const CEO_HOME_TIERS = [
     maintenanceMo: 7_200,
     blurb: 'Corner unit, concierge, helicopter pad optional.',
     minNetWorth: 4_000_000
+  },
+  {
+    id: 'sky-manor',
+    label: 'Sky manor (full-floor)',
+    cashPrice: 12_500_000,
+    downPct: 0.28,
+    mortgageApr: 0.0595,
+    maintenanceMo: 9_500,
+    blurb: 'Private elevator, skyline views, board dinners at home.',
+    minNetWorth: 6_000_000
+  },
+  {
+    id: 'international-flat',
+    label: 'London / NYC pied-à-terre',
+    cashPrice: 3_250_000,
+    downPct: 0.3,
+    mortgageApr: 0.065,
+    maintenanceMo: 2_200,
+    blurb: 'Red-eye landing pad — foreign bank paperwork sold separately.',
+    minNetWorth: 1_800_000
+  },
+  {
+    id: 'equestrian-compound',
+    label: 'Equestrian compound',
+    cashPrice: 9_800_000,
+    downPct: 0.28,
+    mortgageApr: 0.06,
+    maintenanceMo: 8_400,
+    blurb: 'Barn, arena, and twelve acres your calendar cannot justify.',
+    minNetWorth: 5_000_000
+  },
+  {
+    id: 'ultra-compound',
+    label: 'Gated ultra compound',
+    cashPrice: 24_000_000,
+    downPct: 0.35,
+    mortgageApr: 0.058,
+    maintenanceMo: 18_500,
+    blurb: 'Guest villas, screening room, security hut — the charity gala lives here.',
+    minNetWorth: 15_000_000
   }
 ];
 
@@ -153,6 +251,7 @@ function ownedLifestyleIds(state) {
 
 function ownedInExclusiveGroup(state, group) {
   if (!group) return null;
+  if (STACKABLE_EXCLUSIVE_GROUPS.has(group)) return null;
   const owned = ownedLifestyleIds(state);
   return getCeoLifestylePurchasesSync().find((p) => owned.has(p.id) && p.exclusiveGroup === group) ?? null;
 }
@@ -177,19 +276,9 @@ export function lifestylePurchaseGate(state, def, netWorthGate = null) {
   if (ownedLifestyleIds(state).has(def.id)) {
     return { ok: false, reason: 'Already purchased this run.' };
   }
-  if (def.requiresPublic && !isPublicCompany(state)) {
-    return { ok: false, reason: 'Unlocks after your company is public.' };
-  }
   const clash = ownedInExclusiveGroup(state, def.exclusiveGroup);
   if (clash) {
     return { ok: false, reason: `Already own ${clash.label} (one per ${def.exclusiveGroup.replace(/-/g, ' ')}).` };
-  }
-  if (def.requiresOwned?.length) {
-    const owned = ownedLifestyleIds(state);
-    const hasAny = def.requiresOwned.some((id) => owned.has(id));
-    if (!hasAny) {
-      return { ok: false, reason: 'Requires another lifestyle purchase first (see catalog note).' };
-    }
   }
   if (def.minHomeEquity) {
     const eq = ceoHomeEquity(state);
