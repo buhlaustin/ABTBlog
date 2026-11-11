@@ -657,6 +657,8 @@ export function normalizeSave(raw) {
     }
     if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
     if (!state.acquisitions.owned) state.acquisitions.owned = [];
+    if (!state.acquisitions.personalOwned) state.acquisitions.personalOwned = [];
+    if (state.flags?.takenPrivate === undefined) state.flags.takenPrivate = false;
     if (!state.acquisitions.dealLog) state.acquisitions.dealLog = [];
     if (state.acquisitions.marketSegment === undefined) state.acquisitions.marketSegment = 'all';
     if (state.acquisitions.marketPage === undefined) state.acquisitions.marketPage = 0;

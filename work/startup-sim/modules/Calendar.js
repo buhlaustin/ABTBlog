@@ -54,7 +54,11 @@ import {
   scorePublicGuidanceBeat
 } from './WorldDynamics.js';
 import { tickScenarioModifiers } from './ScenarioEffects.js';
-import { applySubsidiaryMrrPayout, tickAcquisitionsAtMonthStart } from './Acquisitions.js';
+import {
+  applyPersonalSubsidiaryMrrPayout,
+  applySubsidiaryMrrPayout,
+  tickAcquisitionsAtMonthStart
+} from './Acquisitions.js';
 import { dealCeoWlbOffers, tickPersonalHappinessAtMonthEnd } from './CeoHappiness.js';
 import {
   tickStartupConferenceAtMonthStart,
@@ -199,7 +203,11 @@ export function endMonth(state) {
     appendLog(state, line);
   }
   const portfolio = applySubsidiaryMrrPayout(state);
+  const personalPortfolio = applyPersonalSubsidiaryMrrPayout(state);
   for (const line of portfolio.lines ?? []) {
+    appendLog(state, line);
+  }
+  for (const line of personalPortfolio.lines ?? []) {
     appendLog(state, line);
   }
   onMonthEndSentiment(state, priorMonthRevenue, state.finance?.monthlyRevenue ?? 0);

@@ -4,6 +4,7 @@ import { calendarTurn } from './XC.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow } from './Finance.js';
+import { ensureCeoPersonalBank } from './CeoEconomics.js';
 import { accrueFiscalRevenue } from './CorporateTax.js';
 import { easeCompetitorPressure, bumpCompetitorPressure } from './Competitor.js';
 import { setGameFeedback } from './GameFeedback.js';
@@ -31,6 +32,7 @@ let hydrated = false;
 export function createInitialAcquisitionsState() {
   return {
     owned: [],
+    personalOwned: [],
     marketSegment: 'all',
     marketSort: 'ask',
     marketSearch: '',
@@ -80,6 +82,7 @@ export function acquisitionsUnlocked(state) {
 function ensureAcquisitions(state) {
   if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
   if (!state.acquisitions.owned) state.acquisitions.owned = [];
+  if (!state.acquisitions.personalOwned) state.acquisitions.personalOwned = [];
   if (!state.acquisitions.dealLog) state.acquisitions.dealLog = [];
   if (!state.acquisitions.marketSegment) state.acquisitions.marketSegment = 'all';
   if (state.acquisitions.marketPage == null) state.acquisitions.marketPage = 0;
@@ -147,7 +150,12 @@ export function portfolioMix(state) {
 }
 
 function ownedIds(state) {
-  return new Set((state.acquisitions?.owned ?? []).map((h) => h.id));
+  ensureAcquisitions(state);
+  const ids = [
+    ...(state.acquisitions.owned ?? []).map((h) => h.id),
+    ...(state.acquisitions.personalOwned ?? []).map((h) => h.id)
+  ];
+  return new Set(ids);
 }
 
 export function isTargetVisible(state, company) {
@@ -560,6 +568,116 @@ export function purchaseTarget(state, targetId) {
   return { ok: true, company, price, mrr, integrationMonthsLeft };
 }
 
+/** Buy a target with CEO personal bank — MRR pays to personal cash, not the company. */
+export function purchaseTargetPersonal(state, targetId) {
+  if (!acquisitionsUnlocked(state)) {
+    return { ok: false, reason: 'Finish your X Combinator batch before buying companies.' };
+  }
+  ensureAcquisitions(state);
+  const company = catalog.find((c) => c.id === targetId);
+  if (!company) return { ok: false, reason: 'Company not on the market.' };
+  if (!isTargetVisible(state, company)) return { ok: false, reason: 'That target is not in your market.' };
+  if (ownedIds(state).has(company.id)) return { ok: false, reason: 'You already own this company.' };
+
+  const price = targetAskPrice(state, company);
+  ensureCeoPersonalBank(state);
+  const bank = state.ceo?.bankBalance ?? 0;
+  if (bank < price) {
+    return {
+      ok: false,
+      reason: `Need ${formatMoney(price)} in your personal bank (have ${formatMoney(bank)}).`
+    };
+  }
+
+  state.ceo.bankBalance = bank - price;
+  const report = state.acquisitions.diligenceReports?.[company.id];
+  let integrationMonthsLeft = integrationMonthsForSegment(company.segment, company.isRival);
+  if (report?.integrationExtra) integrationMonthsLeft += 1;
+  const holding = {
+    id: company.id,
+    acquiredTurn: calendarTurn(state),
+    purchasePrice: price,
+    health: report?.healthRoll ?? 1,
+    investedTotal: 0,
+    integrationMonthsLeft,
+    lastReinvestTurn: calendarTurn(state),
+    valuationMark: 1,
+    lastValuationDriftPct: 0,
+    lastMarkTurn: null,
+    funding: 'personal'
+  };
+  state.acquisitions.personalOwned.push(holding);
+  if (report) delete state.acquisitions.diligenceReports[company.id];
+  state.acquisitions.fireSaleIds = (state.acquisitions.fireSaleIds ?? []).filter((id) => id !== company.id);
+
+  if (company.isRival) {
+    state.world.competitorAcquired = true;
+    if (state.world?.competitor) state.world.competitor.pressure = 0;
+    easeCompetitorPressure(state, 5);
+  }
+
+  const mrr = subsidiaryMrr(state, holding, company);
+  pushDealLog(state, {
+    kind: 'buy-personal',
+    name: company.isRival ? state.world?.competitor?.name ?? company.name : company.name,
+    amount: price,
+    detail: integrationMonthsLeft
+      ? `Personal deal · integration ${integrationMonthsLeft} mo`
+      : 'Personal deal · fully integrated'
+  });
+  return { ok: true, company, price, mrr, integrationMonthsLeft, personal: true };
+}
+
+function totalPersonalSubsidiaryMrr(state) {
+  if (!state.acquisitions?.personalOwned?.length) return 0;
+  let sum = 0;
+  for (const h of state.acquisitions.personalOwned) {
+    const def = catalog.find((c) => c.id === h.id);
+    if (def) sum += subsidiaryMrr(state, h, def);
+  }
+  return Math.round(sum * portfolioSynergyMult(state));
+}
+
+export function applyPersonalSubsidiaryMrrPayout(state) {
+  const total = totalPersonalSubsidiaryMrr(state);
+  if (!total) return { total: 0, lines: [] };
+  ensureCeoPersonalBank(state);
+  state.ceo.bankBalance = (state.ceo.bankBalance ?? 0) + total;
+  state.ceo.careerPersonalPortfolioIncome = (state.ceo.careerPersonalPortfolioIncome ?? 0) + total;
+  return {
+    total,
+    lines: [`Personal portfolio MRR: +${formatMoney(total)} deposited to your bank.`]
+  };
+}
+
+export function sellPersonalSubsidiary(state, targetId) {
+  ensureAcquisitions(state);
+  const idx = (state.acquisitions.personalOwned ?? []).findIndex((h) => h.id === targetId);
+  if (idx < 0) return { ok: false, reason: 'You do not personally own that company.' };
+  const holding = state.acquisitions.personalOwned[idx];
+  const company = catalog.find((c) => c.id === targetId);
+  if (!company) return { ok: false, reason: 'Unknown subsidiary.' };
+
+  const proceeds = subsidiarySalePrice(state, holding, company);
+  ensureCeoPersonalBank(state);
+  state.ceo.bankBalance = (state.ceo.bankBalance ?? 0) + proceeds;
+  state.acquisitions.personalOwned.splice(idx, 1);
+
+  if (company.isRival) {
+    state.world.competitorAcquired = false;
+    bumpCompetitorPressure(state, 2);
+  }
+
+  pushDealLog(state, {
+    kind: 'sell-personal',
+    name: company.isRival ? state.world?.competitor?.name ?? company.name : company.name,
+    amount: proceeds,
+    detail: 'Personal exit'
+  });
+
+  return { ok: true, company, proceeds, personal: true };
+}
+
 /** Deploy capital as a % of implied subsidiary value (see computeReinvestQuote). */
 export function reinvestInSubsidiary(state, targetId, options = {}) {
   const pct = options.pctOfValue ?? options.pct;
@@ -639,9 +757,13 @@ export function tickAcquisitionsAtMonthStart(state) {
   if ((state.acquisitions?.fireSaleIds?.length ?? 0) > 0) {
     lines.push('M&A desk: fire-sale listings live on the Companies tab (−15% ask).');
   }
-  if (!state.acquisitions?.owned?.length) return lines;
+  const ownedAll = [
+    ...(state.acquisitions?.owned ?? []),
+    ...(state.acquisitions?.personalOwned ?? [])
+  ];
+  if (!ownedAll.length) return lines;
   const turn = calendarTurn(state);
-  for (const h of state.acquisitions.owned) {
+  for (const h of ownedAll) {
     h.monthsHeld = monthsHeld(state, h);
     const def = catalog.find((c) => c.id === h.id);
     if (!def) continue;
@@ -693,7 +815,8 @@ export function portfolioPulseSummary(state) {
   const unrealized = exitVal - invested;
   const unrealizedPct = invested > 0 ? (unrealized / invested) * 100 : 0;
   const synergy = portfolioSynergyMult(state);
-  const owned = state.acquisitions?.owned?.length ?? 0;
+  const owned =
+    (state.acquisitions?.owned?.length ?? 0) + (state.acquisitions?.personalOwned?.length ?? 0);
   return {
     portfolioMrr,
     exitVal,

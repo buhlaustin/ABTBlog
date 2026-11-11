@@ -2382,6 +2382,57 @@ if (!failed) {
       console.log(`OK: cash-only exec team (CFO ${cfoMo}/mo < COO ${cooMo}/mo, 4 roles, no CFO equity)`);
     }
   }
+  const { buyFounderSharesPartial, takePrivateQuote } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+  const stockTrade = createInitialState({ companyName: 'Buy Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+  stockTrade.flags.seedRoundClosed = true;
+  stockTrade.flags.ipoUnlocked = true;
+  stockTrade.flags.xcResidencyComplete = true;
+  stockTrade.finance.mrr = 4_000_000;
+  stockTrade.finance.cash = 80_000_000;
+  const { fileIpo: fileIpoFn } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+  const listed = fileIpoFn(stockTrade);
+  if (!listed.ok) {
+    console.error(`FAIL: buy-stock smoke IPO: ${listed.reason}`);
+    failed = true;
+  } else {
+    stockTrade.publicMarket.lockupMonthsRemaining = 0;
+    stockTrade.ceo.bankBalance = 500_000_000;
+    const founderBefore = stockTrade.capTable?.find((r) => r.id === 'founder')?.shares ?? 0;
+    const buy = buyFounderSharesPartial(stockTrade, 5);
+    if (!buy.ok) {
+      console.error(`FAIL: founder stock buy: ${buy.reason}`);
+      failed = true;
+    } else {
+      const founderAfter = stockTrade.capTable?.find((r) => r.id === 'founder')?.shares ?? 0;
+      if (founderAfter <= founderBefore) {
+        console.error('FAIL: founder block should grow after open-market buy');
+        failed = true;
+      } else if (!takePrivateQuote(stockTrade)) {
+        console.error('FAIL: take-private quote should exist while float remains');
+        failed = true;
+      } else {
+        const { purchaseTargetPersonal, getAcquisitionCatalog, targetAskPrice } = await import(
+          `file://${join(sim, 'modules/Acquisitions.js')}`
+        );
+        const cashBefore = stockTrade.finance.cash;
+        const target = getAcquisitionCatalog().find((c) => targetAskPrice(stockTrade, c) <= 5_000_000);
+        if (target) {
+          const personalBuy = purchaseTargetPersonal(stockTrade, target.id);
+          if (!personalBuy.ok) {
+            console.error(`FAIL: personal acquisition smoke: ${personalBuy.reason}`);
+            failed = true;
+          } else if (stockTrade.finance.cash !== cashBefore) {
+            console.error('FAIL: personal acquisition should not debit company cash');
+            failed = true;
+          } else {
+            console.log('OK: founder stock buy + personal M&A (company cash untouched)');
+          }
+        } else {
+          console.log('OK: founder stock buy');
+        }
+      }
+    }
+  }
 }
 
 const {

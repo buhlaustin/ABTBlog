@@ -9,7 +9,7 @@ export const GLOBAL_GDP_USD_BENCHMARK = 142_000_000_000_000;
 export const TRILLIONAIRE_BAND_USD = 1_000_000_000_000;
 
 function isPublicCompanyState(state) {
-  return Boolean(state.flags?.ipoFiled && state.stage === STAGES.PUBLIC);
+  return Boolean(state.flags?.ipoFiled && state.stage === STAGES.PUBLIC && !state.flags?.takenPrivate);
 }
 
 function treasuryNetCash(state) {
@@ -230,6 +230,15 @@ export function effectiveBlockSalePrice(state, sharesToSell) {
   const saleCost = 0.006;
   const haircut = blockSaleLiquidityHaircut(state, sharesToSell);
   return Math.round(quote * (1 - haircut - saleCost) * 100) / 100;
+}
+
+/** Per-share cost when buying a block on the open market (slippage + fees). */
+export function effectiveBlockBuyPrice(state, sharesToBuy) {
+  const quote = state.publicMarket?.sharePrice ?? 0;
+  if (quote <= 0 || sharesToBuy <= 0) return 0;
+  const tradeCost = 0.008;
+  const slippage = blockSaleLiquidityHaircut(state, sharesToBuy);
+  return Math.round(quote * (1 + slippage + tradeCost) * 100) / 100;
 }
 
 /**

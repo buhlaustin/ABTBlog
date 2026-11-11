@@ -42,7 +42,13 @@ import {
   HOUSING_MODE,
   STACKABLE_EXCLUSIVE_GROUPS
 } from './CeoLifestyle.js';
-import { isPublicCompany, canSellFounderStock } from './IPO.js';
+import {
+  isPublicCompany,
+  canSellFounderStock,
+  canBuyFounderStock,
+  canTakeCompanyPrivate,
+  takePrivateQuote
+} from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { ceoPersonalTaxDisplay } from './CeoPersonalTax.js';
 import { ceoAgeDisplayLine } from './CeoProfile.js';
@@ -155,6 +161,9 @@ function buildCeoPanelContext(state) {
   const monthly = ceoSalaryMonthly(state);
   const comp = renderCeoCompBreakdown(state);
   const canSellStock = canSellFounderStock(state);
+  const canBuyStock = canBuyFounderStock(state);
+  const takePrivateGate = canTakeCompanyPrivate(state);
+  const takePrivate = takePrivateQuote(state);
   const equityLabel = comp.publicCo ? 'Founder stake (public)' : 'Founder stake (@ valuation)';
   const lockup = state.publicMarket?.lockupMonthsRemaining ?? 0;
   const band = suggestedCeoSalaryBand(state);
@@ -475,6 +484,37 @@ function renderCeoWealthSection(ctx) {
       </section>`
       : '';
 
+  const buyStockBlock =
+    publicCo && !state.flags?.cashedOut
+      ? `<section class="finance-section finance-card">
+        <h3 class="finance-section-title">Buy your company’s stock (open market)</h3>
+        <p class="fine-print">Uses personal bank · slippage + fees vs last trade · shares move from public float to your founder block</p>
+        ${
+          lockup > 0
+            ? `<p class="fine-print">Lockup: ${lockup} month(s) remaining.</p>`
+            : `<div class="finance-charity-chips">
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-buy-founder-pct="2" ${canBuyStock ? '' : disabled}>2% float</button>
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-buy-founder-pct="5" ${canBuyStock ? '' : disabled}>5%</button>
+            <button type="button" class="btn btn-ghost btn-small finance-chip-btn" data-buy-founder-pct="10" ${canBuyStock ? '' : disabled}>10%</button>
+          </div>
+          <div class="finance-inline-form ceo-salary-row">
+            <label class="visually-hidden" for="ceo-buy-pct-input">Percent of float</label>
+            <input id="ceo-buy-pct-input" type="number" min="1" max="50" step="1" placeholder="% of float" ${canBuyStock ? '' : disabled}>
+            <button type="button" class="btn btn-ghost btn-small" id="btn-buy-founder-custom" ${canBuyStock ? '' : disabled}>Buy %</button>
+          </div>
+          ${
+            takePrivate
+              ? `<p class="fine-print">Go-private tender (≥50% ownership): ~${formatMoney(takePrivate.totalCost)} for ${takePrivate.floatShares.toLocaleString('en-US')} remaining float shares.</p>
+          <button type="button" class="btn btn-primary btn-small" id="btn-take-private" ${takePrivateGate.ok ? '' : disabled} title="${escapeHtml(takePrivateGate.reason ?? '')}">Take company private</button>
+          ${!takePrivateGate.ok && takePrivateGate.reason ? `<p class="fine-print">${escapeHtml(takePrivateGate.reason)}</p>` : ''}`
+              : ''
+          }`
+        }
+      </section>`
+      : state.flags?.takenPrivate
+        ? `<section class="finance-section finance-card"><p class="fine-print"><strong>Company is private again</strong> — you delisted after buying out the float. No public tape; subsidiary M&amp;A and operations continue.</p></section>`
+        : '';
+
   const stepDownBlock =
     publicCo && !state.flags?.cashedOut
       ? `<section class="finance-section finance-card ceo-step-down">
@@ -514,6 +554,7 @@ function renderCeoWealthSection(ctx) {
       </div>
     </section>
     ${sellStockBlock}
+    ${buyStockBlock}
     ${stepDownBlock}
   `;
 }

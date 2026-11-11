@@ -7,6 +7,7 @@ import {
   panelMetricGrid,
   panelMetricStack
 } from './PanelChrome.js';
+import { ceoPersonalBankBalance } from './CeoEconomics.js';
 import {
   acquisitionsUnlocked,
   portfolioPulseSummary,
@@ -86,7 +87,8 @@ function renderPortfolioMixBar(mix) {
   <p class="fine-print companies-mix-legend">Small ${formatMoney(mix.small)} · Mid ${formatMoney(mix.mid)} · Enterprise ${formatMoney(mix.enterprise)} · Giant ${formatMoney(mix.giant)}</p>`;
 }
 
-function renderHoldingCard(state, h) {
+function renderHoldingCard(state, h, options = {}) {
+  const personal = Boolean(options.personal);
   const co = catalog().find((c) => c.id === h.id);
   if (!co) return '';
   const mrr = subsidiaryMrr(state, h, co);
@@ -113,7 +115,7 @@ function renderHoldingCard(state, h) {
     <header class="companies-holding-head">
       <div>
         <h4 class="companies-holding-title">${escapeHtml(name)}</h4>
-        <p class="fine-print">${escapeHtml(segmentLabel(co.segment))} · held ${monthsHeld(state, h)} mo ${syn}</p>
+        <p class="fine-print">${escapeHtml(segmentLabel(co.segment))} · held ${monthsHeld(state, h)} mo${personal ? ' · personal deal' : ''} ${syn}</p>
       </div>
       ${markDriftChip(h)}
     </header>
@@ -125,8 +127,11 @@ function renderHoldingCard(state, h) {
       panelStatCard('ROI', `${roi >= 0 ? '+' : ''}${roi.toFixed(0)}%`, { tone: roiTone })
     ])}
     <div class="companies-holding-actions">
-      <button type="button" class="btn btn-small btn-danger" data-acquisition-sell="${escapeHtml(co.id)}">Sell</button>
-      <details class="reinvest-panel companies-reinvest-optional">
+      <button type="button" class="btn btn-small btn-danger" ${personal ? `data-acquisition-sell-personal="${escapeHtml(co.id)}"` : `data-acquisition-sell="${escapeHtml(co.id)}"`}>Sell</button>
+      ${
+        personal
+          ? ''
+          : `<details class="reinvest-panel companies-reinvest-optional">
         <summary class="fine-print">Optional capital</summary>
         <p class="fine-print">Marks drift monthly — deploy capital only for a health boost.</p>
         <label class="visually-hidden" for="reinvest-program-${escapeHtml(co.id)}">Program</label>
@@ -142,7 +147,8 @@ function renderHoldingCard(state, h) {
           <input id="reinvest-pct-${escapeHtml(co.id)}" type="number" min="0.5" max="25" step="0.5" value="3" class="reinvest-pct-input" data-reinvest-pct-input="${escapeHtml(co.id)}">
           <button type="button" class="btn btn-primary btn-small" data-acquisition-reinvest-submit="${escapeHtml(co.id)}">Deploy</button>
         </div>
-      </details>
+      </details>`
+      }
     </div>
   </article>`;
 }
@@ -185,14 +191,27 @@ function renderPulseSection(state, pulse, mix, marketAll) {
 
 function renderHoldingsSection(state) {
   const owned = state.acquisitions?.owned ?? [];
-  if (!owned.length) {
-    return `<p class="fine-print">No holdings yet — open the <strong>Market</strong> tab for bolt-ons.</p>`;
+  const personal = state.acquisitions?.personalOwned ?? [];
+  if (!owned.length && !personal.length) {
+    return `<p class="fine-print">No holdings yet — open the <strong>Market</strong> tab (company cash or <strong>Buy personally</strong> from your CEO bank).</p>`;
   }
-  return `<div class="companies-holding-grid">${owned.map((h) => renderHoldingCard(state, h)).join('')}</div>`;
+  const parts = [];
+  if (personal.length) {
+    parts.push(
+      `<h4 class="log-head">Personal portfolio</h4><div class="companies-holding-grid">${personal.map((h) => renderHoldingCard(state, h, { personal: true })).join('')}</div>`
+    );
+  }
+  if (owned.length) {
+    parts.push(
+      `<h4 class="log-head">Corporate subsidiaries</h4><div class="companies-holding-grid">${owned.map((h) => renderHoldingCard(state, h)).join('')}</div>`
+    );
+  }
+  return parts.join('');
 }
 
 function renderMarketSection(state) {
   const cash = state.finance?.cash ?? 0;
+  const personalCash = ceoPersonalBankBalance(state);
   const filter = state.acquisitions?.marketSegment ?? 'all';
   const sort = state.acquisitions?.marketSort ?? 'ask';
   const search = state.acquisitions?.marketSearch ?? '';
@@ -214,6 +233,7 @@ function renderMarketSection(state) {
           ? `<span class="tag tag-synergy">Fits ${escapeHtml(state.company?.categoryLabel ?? 'your vertical')}</span>`
           : `<span class="fine-print">${escapeHtml(cat.replace(/-/g, ' '))}</span>`;
       const canAfford = cash >= ask;
+      const canAffordPersonal = personalCash >= ask;
       const fire = isAcquisitionFireSale(state, co.id) ? '<span class="tag tag-fire">Fire sale −15%</span> ' : '';
       const diligenced = state.acquisitions?.diligenceReports?.[co.id];
       const ddNote = diligenced
@@ -225,7 +245,8 @@ function renderMarketSection(state) {
         <td class="num">${formatMoney(co.baseMrr)}/mo</td>
         <td class="num">${formatMoney(ask)} ${trendBadge(trend)}<br><span class="fine-print">Fair ~${formatMoney(fair)}${escapeHtml(vsFair ?? '')} · ${multiple}× rev</span></td>
         <td class="num companies-actions">
-          <button type="button" class="btn btn-primary btn-small" data-acquisition-buy="${escapeHtml(co.id)}" ${canAfford ? '' : 'disabled'}>Acquire</button>
+          <button type="button" class="btn btn-primary btn-small" data-acquisition-buy="${escapeHtml(co.id)}" ${canAfford ? '' : 'disabled'} title="Company cash">Acquire</button>
+          <button type="button" class="btn btn-ghost btn-small" data-acquisition-buy-personal="${escapeHtml(co.id)}" ${canAffordPersonal ? '' : 'disabled'} title="CEO personal bank">Buy personally</button>
           ${
             diligenced
               ? ''
@@ -312,7 +333,7 @@ export function renderCompaniesPanel(container, state) {
   container.innerHTML = `
     <div class="companies-panel finance-panel">
       <header class="finance-hero companies-hero">
-        <p class="panel-lede">Roll up operators for MRR — subsidiary marks drift each month; hold and collect cash without micromanaging.</p>
+        <p class="panel-lede">Roll up operators for MRR — acquire with company cash or <strong>buy personally</strong> (CEO bank; MRR to your personal account).</p>
         <p class="companies-market-chip" role="status">${escapeHtml(marketBrief(state))}</p>
       </header>
       ${lockNote}

@@ -74,6 +74,8 @@ import {
   fetchIpoPress,
   cashOut,
   sellFounderSharesPartial,
+  buyFounderSharesPartial,
+  takeCompanyPrivate,
   applyStockPctMove,
   setPublicGuidanceTone,
   executeStockBuyback,
@@ -219,7 +221,9 @@ import { parseSandboxTuning } from './modules/SandboxTuning.js';
 import { applyPivot } from './modules/Pivot.js';
 import {
   purchaseTarget,
+  purchaseTargetPersonal,
   sellSubsidiary,
+  sellPersonalSubsidiary,
   reinvestInSubsidiary,
   computeReinvestQuote,
   REINVEST_PROGRAMS,
@@ -720,6 +724,81 @@ function handleSellFounderStock(pctRaw) {
   showFinanceFeedback(
     `Sold ${result.pctOfFounder}% of your block for ${formatMoney(result.proceeds)} (deposited to personal bank).`
   );
+  refresh();
+}
+
+function handleBuyFounderStock(pctRaw) {
+  if (!sessionState) return;
+  const pct = Number(pctRaw);
+  if (!window.confirm(`Buy ${pct}% of the public float at market (personal bank)? You stay CEO.`)) {
+    return;
+  }
+  const result = buyFounderSharesPartial(sessionState, pct);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Stock purchase failed.', true);
+    refresh();
+    return;
+  }
+  appendLog(
+    sessionState,
+    `Bought ${result.sharesBought.toLocaleString('en-US')} shares (${result.pctOfFloat}% of float) for ${formatMoney(result.cost)} — ownership now ${result.founderPctAfter}%.`
+  );
+  showFinanceFeedback(`Bought ${result.pctOfFloat}% of float for ${formatMoney(result.cost)} from personal bank.`);
+  refresh();
+}
+
+function handleTakePrivate() {
+  if (!sessionState) return;
+  if (
+    !window.confirm(
+      'Pay the go-private tender from your personal bank and delist? You keep running the company as CEO.'
+    )
+  ) {
+    return;
+  }
+  const result = takeCompanyPrivate(sessionState);
+  if (!result.ok) {
+    showFinanceFeedback(result.reason || 'Take-private failed.', true);
+    refresh();
+    return;
+  }
+  appendLog(sessionState, result.summary);
+  showFinanceFeedback(result.summary);
+  refresh();
+}
+
+function handleAcquisitionBuyPersonal(id) {
+  if (!sessionState) return;
+  const result = purchaseTargetPersonal(sessionState, id);
+  if (!result.ok) {
+    showCompaniesFeedback(result.reason || 'Could not acquire.', true);
+    refresh();
+    return;
+  }
+  const name = result.company?.isRival
+    ? sessionState.world?.competitor?.name ?? result.company.name
+    : result.company?.name;
+  appendLog(
+    sessionState,
+    `Personally acquired ${name} for ${formatMoney(result.price)} (+${formatMoney(result.mrr)}/mo to personal bank).`
+  );
+  showCompaniesFeedback(`Personally acquired ${name} — MRR pays to your CEO bank.`);
+  refresh();
+}
+
+function handleAcquisitionSellPersonal(id) {
+  if (!sessionState) return;
+  const result = sellPersonalSubsidiary(sessionState, id);
+  if (!result.ok) {
+    showCompaniesFeedback(result.reason || 'Could not sell.', true);
+    refresh();
+    return;
+  }
+  const name = result.company?.isRival
+    ? sessionState.world?.competitor?.name ?? result.company.name
+    : result.company?.name;
+  appendLog(sessionState, `Sold personal holding ${name} for ${formatMoney(result.proceeds)}.`);
+  showCompaniesFeedback(`Sold ${name} for ${formatMoney(result.proceeds)} (personal bank).`);
   refresh();
 }
 
@@ -2027,9 +2106,19 @@ function bindGameInteractions() {
       handleAcquisitionBuy(acqBuy.getAttribute('data-acquisition-buy'));
       return;
     }
+    const acqBuyPersonal = e.target.closest('[data-acquisition-buy-personal]');
+    if (acqBuyPersonal) {
+      handleAcquisitionBuyPersonal(acqBuyPersonal.getAttribute('data-acquisition-buy-personal'));
+      return;
+    }
     const acqSell = e.target.closest('[data-acquisition-sell]');
     if (acqSell) {
       handleAcquisitionSell(acqSell.getAttribute('data-acquisition-sell'));
+      return;
+    }
+    const acqSellPersonal = e.target.closest('[data-acquisition-sell-personal]');
+    if (acqSellPersonal) {
+      handleAcquisitionSellPersonal(acqSellPersonal.getAttribute('data-acquisition-sell-personal'));
       return;
     }
     const acqReinvestPick = e.target.closest('[data-acquisition-reinvest-pick]');
@@ -2091,6 +2180,20 @@ function bindGameInteractions() {
     if (e.target.id === 'btn-sell-founder-custom' && sessionState) {
       const input = document.getElementById('ceo-sell-pct-input');
       handleSellFounderStock(input?.value);
+      return;
+    }
+    const buyPctBtn = e.target.closest('[data-buy-founder-pct]');
+    if (buyPctBtn && sessionState) {
+      handleBuyFounderStock(buyPctBtn.getAttribute('data-buy-founder-pct'));
+      return;
+    }
+    if (e.target.id === 'btn-buy-founder-custom' && sessionState) {
+      const input = document.getElementById('ceo-buy-pct-input');
+      handleBuyFounderStock(input?.value);
+      return;
+    }
+    if (e.target.id === 'btn-take-private' && sessionState) {
+      handleTakePrivate();
       return;
     }
     const guidanceBtn = e.target.closest('[data-stock-guidance]');
