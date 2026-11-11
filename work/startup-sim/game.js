@@ -160,6 +160,12 @@ import {
   syncCooSalaryToWorkspace,
   previewCooSalaryMonthly
 } from './modules/Coo.js';
+import {
+  hireExecutive,
+  releaseExecutive,
+  syncExecutiveSalariesToWorkspace,
+  EXECUTIVE_ROLES
+} from './modules/ExecutiveTeam.js';
 import { loadAccelerators } from './modules/Accelerators.js';
 import { onLayoffSentiment, seatInstitutionalBoard } from './modules/Sentiment.js';
 import {
@@ -1158,6 +1164,7 @@ function bindGameInteractions() {
       if (!result.ok) showOfficesFeedback(result.reason, true);
       else {
         syncCooSalaryToWorkspace(sessionState);
+        syncExecutiveSalariesToWorkspace(sessionState);
         appendLog(sessionState, `Leased ${tier} office — rent added to monthly burn.`);
         showOfficesFeedback('Office leased.');
         syncStageFromProgress(sessionState);
@@ -1481,6 +1488,35 @@ function bindGameInteractions() {
     if (e.target.id === 'btn-release-coo' && sessionState) {
       const result = releaseCoo(sessionState);
       if (!result.ok) showPeopleFeedback(result.reason || 'Could not release COO.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showPeopleFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const hireExecBtn = e.target.closest('[id^="btn-hire-exec-"]');
+    if (hireExecBtn && sessionState) {
+      const role = hireExecBtn.getAttribute('data-exec-role');
+      if (!EXECUTIVE_ROLES.includes(role)) return;
+      const slug = role.toLowerCase();
+      const first = document.getElementById(`exec-${slug}-first-name`)?.value;
+      const last = document.getElementById(`exec-${slug}-last-name`)?.value;
+      const result = hireExecutive(sessionState, role, { firstName: first, lastName: last });
+      if (!result.ok) showPeopleFeedback(result.reason || `Could not hire ${role}.`, true);
+      else {
+        appendLog(sessionState, result.summary);
+        showPeopleFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const releaseExecBtn = e.target.closest('[id^="btn-release-exec-"]');
+    if (releaseExecBtn && sessionState) {
+      const role = releaseExecBtn.getAttribute('data-exec-role');
+      if (!EXECUTIVE_ROLES.includes(role)) return;
+      const result = releaseExecutive(sessionState, role);
+      if (!result.ok) showPeopleFeedback(result.reason || `Could not release ${role}.`, true);
       else {
         appendLog(sessionState, result.summary);
         showPeopleFeedback(result.summary);

@@ -44,6 +44,7 @@ import {
 } from './CeoEconomics.js';
 import { prepareCompanyOverheadForMonth } from './CompanyOverhead.js';
 import { createInitialCooState, hireCoo, isCooHired } from './Coo.js';
+import { createInitialExecutiveTeamState } from './ExecutiveTeam.js';
 import { clampCeoBirthMonth, clampCeoBirthYear } from './CeoProfile.js';
 import { defaultAlmaMaterId, getAlmaMaterById } from './CeoAlumniGiving.js';
 import { ensureAlmaMaterGrades } from './CeoAlmaMaterGrades.js';
@@ -144,6 +145,7 @@ export function createInitialState(options) {
     offices: createInitialOffices(),
     xc: createInitialXcState(),
     coo: createInitialCooState(),
+    executiveTeam: createInitialExecutiveTeamState(),
     sentiment: createInitialSentiment(),
     world: { competitor: createCompetitorForCategory(category.id), competitorAcquired: false },
     acquisitions: createInitialAcquisitionsState(),
@@ -283,6 +285,7 @@ export function normalizeSave(raw) {
     if (!state.coo) state.coo = createInitialCooState();
     if (state.coo.hired === undefined) state.coo.hired = false;
     if (state.coo.capTableId === undefined) state.coo.capTableId = null;
+    if (!state.executiveTeam) state.executiveTeam = createInitialExecutiveTeamState();
     if (state.executives?.roster?.length && !isCooHired(state)) {
       const legacy = state.executives.roster.find((e) => e.roleTitle === 'COO');
       if (legacy?.name) {

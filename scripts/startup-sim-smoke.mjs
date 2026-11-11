@@ -2350,6 +2350,38 @@ if (!failed) {
       console.log(`OK: public COO comp tracks CEO (${cooMo}/mo ≥ 60% floor)`);
     }
   }
+  const { hireExecutive, execSalaryMonthly, EXECUTIVE_ROLES } = await import(
+    `file://${join(sim, 'modules/ExecutiveTeam.js')}`
+  );
+  const capBeforeCfo = publicCoo.capTable?.length ?? 0;
+  const cfoHire = hireExecutive(publicCoo, 'CFO', { firstName: 'Pat', lastName: 'Ledger' });
+  if (!cfoHire.ok) {
+    console.error(`FAIL: public CFO hire: ${cfoHire.reason}`);
+    failed = true;
+  } else {
+    const ceoMo = Math.round(20_000_000 / 12);
+    const cfoMo = execSalaryMonthly(publicCoo, 'CFO');
+    const cooMo = cooSalaryMonthly(publicCoo);
+    const cfoFloor = Math.round(ceoMo * 0.42);
+    if (cfoMo < cfoFloor) {
+      console.error(`FAIL: public CFO ${cfoMo} < 42% CEO floor ${cfoFloor}`);
+      failed = true;
+    } else if (cfoMo >= cooMo) {
+      console.error(`FAIL: CFO comp should sit below COO (CFO ${cfoMo}, COO ${cooMo})`);
+      failed = true;
+    } else if (EXECUTIVE_ROLES.length !== 4) {
+      console.error('FAIL: expected 4 cash-only executive roles');
+      failed = true;
+    } else if (publicCoo.capTable?.find((r) => r.name?.includes('(CFO)'))) {
+      console.error('FAIL: CFO hire should not add cap table equity');
+      failed = true;
+    } else if ((publicCoo.capTable?.length ?? 0) !== capBeforeCfo) {
+      console.error('FAIL: CFO hire changed cap table row count');
+      failed = true;
+    } else {
+      console.log(`OK: cash-only exec team (CFO ${cfoMo}/mo < COO ${cooMo}/mo, 4 roles, no CFO equity)`);
+    }
+  }
 }
 
 const {

@@ -9,6 +9,7 @@ import {
 import { setGameFeedback } from './GameFeedback.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { renderLeadershipOrgChart, cooSalaryMonthly } from './Coo.js';
+import { executiveTeamSalaryMonthly, mountExecutiveTeamOrgChart } from './ExecutiveTeam.js';
 import { panelStatCard, panelMetricGroup, panelMetricGrid, panelMetricStack, panelSnapshotSection } from './PanelChrome.js';
 
 const STAGE_ORDER = [STAGES.GARAGE, STAGES.OFFICE, STAGES.XC, STAGES.POST_XC, STAGES.PUBLIC];
@@ -402,7 +403,7 @@ export function projectStaffEconomics(state) {
   const draft = state.staff?.draftHeadcountByDept ?? emptyHeadcount();
   const payroll = computePayroll(draft, state.stage, state);
   const fixed = workspaceRentMonthly(state);
-  const execPay = cooSalaryMonthly(state);
+  const execPay = cooSalaryMonthly(state) + executiveTeamSalaryMonthly(state);
   const burn = payroll + fixed + execPay;
   const revenue =
     (state.calendar?.monthRevenue ?? 0) > 0
@@ -570,6 +571,7 @@ export function renderPeopleStaffingPanel(container, state) {
     </section>
   `;
   renderLeadershipOrgChart(document.getElementById('org-chart-mount'), state);
+  mountExecutiveTeamOrgChart(state, state.flags?.gameOver ? 'disabled' : '');
 }
 
 export function showPeopleFeedback(message, isError = false) {

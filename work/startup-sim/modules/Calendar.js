@@ -32,6 +32,7 @@ import { archiveCurrentNews } from './News.js';
 import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
 import { tickAcceleratorBoost } from './Accelerators.js';
 import { tickCooCompensationReview } from './Coo.js';
+import { tickExecutiveCompensationReview } from './ExecutiveTeam.js';
 import { resetGrowthCampaignsMonth, growthRosterRefreshLine } from './GrowthCampaigns.js';
 import { resetProductActionsMonth } from './ProductActions.js';
 import { resetEmployeeBenefitsMonth } from './EmployeeBenefits.js';
@@ -167,6 +168,9 @@ export function endMonth(state) {
     appendLog(state, line);
   }
   for (const line of tickCooCompensationReview(state)) {
+    appendLog(state, line);
+  }
+  for (const line of tickExecutiveCompensationReview(state)) {
     appendLog(state, line);
   }
   for (const line of tickMarketSalaryDemand(state)) {
