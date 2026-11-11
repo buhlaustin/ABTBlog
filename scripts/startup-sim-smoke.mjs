@@ -2821,6 +2821,73 @@ if (!isTaxFilingRequired(taxState)) {
 }
 
 const {
+  isQuarterlyEstimatedTaxRequired,
+  isQuarterlyEstimatedTaxSeason,
+  completeQuarterlyEstimatedTaxTask,
+  computeQuarterlyEstimatedTaxLiability,
+  estimatedRevenueNextThreeMonths,
+  QUARTERLY_TAX_ESTIMATE_TASK_ID
+} = await import(`file://${join(sim, 'modules/CorporateTax.js')}`);
+const qPreSeed = createInitialState({ companyName: 'Q Tax', categoryId: 'b2b-saas', mode: 'career' });
+qPreSeed.calendar.monthIndex = 1;
+if (isQuarterlyEstimatedTaxRequired(qPreSeed)) {
+  console.error('FAIL: quarterly estimated tax should not run before seed close');
+  failed = true;
+} else {
+  console.log('OK: quarterly tax gated until after seed');
+}
+const qState = createInitialState({ companyName: 'Q Tax', categoryId: 'b2b-saas', mode: 'career' });
+qState.flags.seedRoundClosed = true;
+qState.calendar.year = 2026;
+qState.calendar.monthIndex = 4;
+if (isQuarterlyEstimatedTaxRequired(qState)) {
+  console.error('FAIL: April should have annual return only, not quarterly estimate');
+  failed = true;
+}
+qState.calendar.monthIndex = 1;
+qState.finance.mrr = 100_000;
+qState.finance.cash = 500_000;
+ensureFiscal(qState);
+const qRev = estimatedRevenueNextThreeMonths(qState);
+const qOwed = computeQuarterlyEstimatedTaxLiability(qState);
+if (!isQuarterlyEstimatedTaxRequired(qState) || qOwed !== Math.round(qRev * 0.21)) {
+  console.error(`FAIL: quarterly liability (rev est ${qRev}, owed ${qOwed})`);
+  failed = true;
+} else {
+  const qPaid = completeQuarterlyEstimatedTaxTask(qState);
+  if (!qPaid.ok || qState.finance.fiscal.current.estimatedTaxPrepaid !== qOwed) {
+    console.error(`FAIL: quarterly tax payment: ${qPaid.reason ?? 'bad prepaid'}`);
+    failed = true;
+  } else {
+    console.log(`OK: January quarterly estimated tax (${formatMoney(qOwed)} on ${formatMoney(qRev)} est.)`);
+  }
+}
+const qCredit = createInitialState({ companyName: 'Q Tax', categoryId: 'b2b-saas', mode: 'career' });
+qCredit.meta.calendarStartYear = 2024;
+qCredit.calendar.year = 2026;
+qCredit.calendar.monthIndex = 4;
+qCredit.finance.cash = 100_000;
+ensureFiscal(qCredit);
+qCredit.finance.fiscal.prior = {
+  year: 2025,
+  revenue: 100_000,
+  expenses: 40_000,
+  profit: 60_000,
+  estimatedTaxPrepaid: Math.round(100_000 * 0.21)
+};
+const aprilOwed = computeTaxLiability(qCredit);
+if (aprilOwed !== 0) {
+  console.error(`FAIL: April should be zero after full quarterly prepayment (got ${aprilOwed})`);
+  failed = true;
+} else {
+  console.log('OK: quarterly prepayments credit against April annual liability');
+}
+if (!getTaskDefinitions().some((t) => t.id === QUARTERLY_TAX_ESTIMATE_TASK_ID)) {
+  console.error('FAIL: quarterly tax desk task missing from catalog');
+  failed = true;
+}
+
+const {
   isCeoPersonalTaxFilingRequired,
   CEO_PERSONAL_TAX_FILING_TASK_ID,
   completeCeoPersonalTaxFilingTask,
@@ -3561,7 +3628,10 @@ if (!signConf.ok) {
     } else {
       dealMonthlyTasks(confState);
       const pool = getEligibleDeskTasks(confState);
-      if (!pool.length || pool.some((t) => !t.startupConference && !t.taxFiling && !t.ceoPersonalTaxFiling)) {
+      if (
+        !pool.length ||
+        pool.some((t) => !t.startupConference && !t.taxFiling && !t.quarterlyTaxEstimate && !t.ceoPersonalTaxFiling)
+      ) {
         console.error('FAIL: conference month desk pool should be conference tasks only');
         failed = true;
       } else if (!pool.some((t) => t.id === CONFERENCE_KEYNOTE_TASK_ID)) {

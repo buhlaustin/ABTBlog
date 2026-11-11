@@ -1,0 +1,17 @@
+{
+  "tasks": [
+    {
+      "id": "required-quarterly-estimated-tax",
+      "title": "Pay quarterly estimated corporate tax",
+      "description": "Federal estimated payment — 21% of your next-quarter revenue run-rate (from MRR and whisper targets). Credits against the April return.",
+      "types": ["support"],
+      "stages": ["post_xc", "public"],
+      "quarterlyTaxEstimate": true,
+      "cost": 0,
+      "revenue": [0, 0],
+      "product": 0,
+      "buzz": 0,
+      "mandatoryQuarterlyTax": true
+    }
+  ]
+}

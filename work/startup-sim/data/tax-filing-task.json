@@ -3,7 +3,7 @@
     {
       "id": "required-annual-tax-filing",
       "title": "File & pay annual corporate taxes",
-      "description": "April deadline — pay 21% flat corporate tax on last fiscal year revenue from company cash.",
+      "description": "April only — file the prior calendar year (Jan–Dec) and pay remaining 21% corporate tax after quarterly estimates.",
       "types": ["support"],
       "stages": ["garage", "office", "xc", "post_xc", "public"],
       "taxFiling": true,

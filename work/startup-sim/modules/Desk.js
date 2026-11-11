@@ -13,7 +13,12 @@ import { hasActiveDecision } from './DecisionEvents.js';
 import { estimateTaskPayoutBand, estimateTaskMrrBand } from './Finance.js';
 import { runwayLabel } from './MonthSummary.js';
 import { activeModifierLabels } from './ScenarioEffects.js';
-import { isTaxFilingRequired, TAX_FILING_TASK_ID } from './CorporateTax.js';
+import {
+  isTaxFilingRequired,
+  isQuarterlyEstimatedTaxRequired,
+  TAX_FILING_TASK_ID,
+  QUARTERLY_TAX_ESTIMATE_TASK_ID
+} from './CorporateTax.js';
 import {
   isCeoPersonalTaxFilingRequired,
   CEO_PERSONAL_TAX_FILING_TASK_ID
@@ -102,6 +107,7 @@ export function autoSelectRecommendedLineup(state) {
     mandatoryIds.push(XC_DEMO_DAY_TASK_ID);
   }
   if (isTaxFilingRequired(state)) mandatoryIds.push(TAX_FILING_TASK_ID);
+  if (isQuarterlyEstimatedTaxRequired(state)) mandatoryIds.push(QUARTERLY_TAX_ESTIMATE_TASK_ID);
   if (isCeoPersonalTaxFilingRequired(state)) {
     mandatoryIds.push(CEO_PERSONAL_TAX_FILING_TASK_ID);
   }
