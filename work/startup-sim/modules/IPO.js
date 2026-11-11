@@ -4,10 +4,12 @@ import { getArr } from './Workspace.js';
 import { calendarTurn } from './XC.js';
 import {
   applyPublicListingCapTable,
+  ensurePublicListingShareScale,
   getFounderRow,
   issueFollowOnShares,
   recalculateCapTablePercentages,
   retirePublicFloatShares,
+  scaleCapTableShareCount,
   targetIpoSharePrice,
   totalOutstandingShares,
   PUBLIC_FLOAT_ROW_ID,
@@ -41,11 +43,15 @@ import {
   consumeInstantStockMoveBudget,
   effectiveBlockSalePrice,
   effectiveBlockBuyPrice,
+  clampSharePriceToMacro,
+  GLOBAL_GDP_USD_BENCHMARK,
   guardListingOperatingPrice,
   macroAdjustedPsCap,
   macroMeanReversionBoost,
   macroStabilizationFee,
+  PUBLIC_MAX_SHARE_STICKER,
   publicFloatShares,
+  publicMarketCapCeiling,
   reconcileTradingPriceToMacro,
   resetInstantStockMoveBudget,
   softPrivateEquityCap
@@ -170,6 +176,11 @@ export function fileIpo(state) {
     primaryFdPct: IPO_PRIMARY_FD_PCT
   });
   openPrice = listing.listingPrice;
+  const liquidity = ensurePublicListingShareScale(state, openValuation, Math.min(85, openPrice));
+  if (liquidity.mult > 1) {
+    openPrice = liquidity.listingPrice;
+    listing.listingPrice = openPrice;
+  }
   const primaryProceeds = listing.primaryProceeds ?? 0;
   if (primaryProceeds > 0) {
     state.finance.cash = (state.finance.cash ?? 0) + primaryProceeds;
@@ -203,6 +214,8 @@ export function fileIpo(state) {
   pushMarketTape(state, `Listed at ${formatMoney(openPrice)} — opening pop ${Math.round((pop - 1) * 100)}%.`);
   refreshAnalystCoverage(state, { force: true });
   computeFundamentalSharePrice(state);
+  enforcePublicTapeScale(state);
+  openPrice = state.publicMarket.sharePrice ?? openPrice;
 
   state.finance.valuation = Math.round(openPrice * totalOutstandingShares(state));
   state.publicMarket.ipoPrimaryProceeds = primaryProceeds;
@@ -296,7 +309,8 @@ export function computeFundamentalSharePrice(state) {
   pm.priceSalesMultiple = Math.round(ps * 10) / 10;
   const operatingCap = arr * ps;
   const netCash = Math.max(0, treasuryNetCash(state));
-  const fairCap = operatingCap + netCash;
+  const macroCeiling = publicMarketCapCeiling(state);
+  const fairCap = Math.min(operatingCap + netCash, macroCeiling);
   pm.fundamentalOperatingCap = Math.round(operatingCap);
   pm.treasuryNetCashInModel = netCash;
   const floor = priceFloor(state, pm.sharePrice ?? pm.ipoPrice ?? 1);
@@ -397,9 +411,10 @@ export function applyStockPctMove(state, pct) {
   pm.priorSharePrice = price;
   pm.sharePrice = next;
   pushPriceHistory(state, next);
+  enforcePublicTapeScale(state);
   computeFundamentalSharePrice(state);
   refreshAnalystCoverage(state);
-  return next;
+  return pm.sharePrice;
 }
 
 export function refreshAnalystCoverage(state, opts = {}) {
@@ -493,16 +508,23 @@ export function fileFollowOnOffering(state) {
   };
 }
 
-export function executeStockSplit(state, { auto = false } = {}) {
+export function executeStockSplit(state, { auto = false, force = false } = {}) {
   if (!isPublicCompany(state)) return { ok: false, reason: 'Splits require a listed stock.' };
   const pm = state.publicMarket;
   const price = pm.sharePrice ?? 0;
-  if (price < 180) {
-    return { ok: false, reason: 'Board waits until the share price is at least $180.' };
+  const minSticker = force && auto ? 80 : 180;
+  if (price < minSticker) {
+    return {
+      ok: false,
+      reason: force
+        ? `Sticker ${formatMoney(price)} is already retail-sized.`
+        : 'Board waits until the share price is at least $180.'
+    };
   }
   const turn = calendarTurn(state);
   const sandbox = state.mode === 'sandbox';
   if (
+    !force &&
     !sandbox &&
     pm.lastSplitTurn != null &&
     turn - pm.lastSplitTurn < 6
@@ -532,6 +554,64 @@ export function executeStockSplit(state, { auto = false } = {}) {
     ok: true,
     summary: `2-for-1 split — ${totalOutstandingShares(state).toLocaleString('en-US')} shares @ ${formatMoney(pm.sharePrice)} (cap table updated).`
   };
+}
+
+/**
+ * Keep the tape retail-sized: macro cap ceiling, then repeat 2-for-1 splits if needed.
+ * @returns {string[]} tape lines for the month
+ */
+export function enforcePublicTapeScale(state) {
+  const lines = [];
+  if (!isPublicCompany(state)) return lines;
+  const pm = state.publicMarket;
+  if (!pm) return lines;
+
+  let price = clampSharePriceToMacro(state, reconcileTradingPriceToMacro(state, pm.sharePrice ?? 0));
+  const ceiling = publicMarketCapCeiling(state);
+  const shares = totalOutstandingShares(state);
+  if (shares > 0 && shares * price > ceiling) {
+    price = Math.max(priceFloor(state, price), ceiling / shares);
+    pushMarketTape(
+      state,
+      `Index rebalance: cap held near ${formatMoney(ceiling)} (${(
+        (ceiling / GLOBAL_GDP_USD_BENCHMARK) *
+        100
+      ).toFixed(1)}% of global GDP).`
+    );
+    lines.push('Macro cap trim on the tape.');
+  }
+  pm.sharePrice = Math.round(price * 100) / 100;
+  state.finance.valuation = Math.round(pm.sharePrice * shares);
+
+  let guard = 0;
+  while ((pm.sharePrice ?? 0) > PUBLIC_MAX_SHARE_STICKER && guard < 14) {
+    const split = executeStockSplit(state, { auto: true, force: true });
+    guard += 1;
+    if (!split.ok) {
+      const px = pm.sharePrice ?? 0;
+      const outstanding = totalOutstandingShares(state);
+      if (px > PUBLIC_MAX_SHARE_STICKER && outstanding > 0) {
+        const targetShares = Math.ceil((outstanding * px) / (PUBLIC_MAX_SHARE_STICKER * 0.95));
+        const mult = targetShares / outstanding;
+        if (mult > 1.05) {
+          scaleCapTableShareCount(state, mult);
+          const adj = Math.round((px / mult) * 100) / 100;
+          pm.sharePrice = adj;
+          if (pm.ipoPrice) pm.ipoPrice = Math.round((pm.ipoPrice / mult) * 100) / 100;
+          if (pm.fundamentalPrice) pm.fundamentalPrice = Math.round((pm.fundamentalPrice / mult) * 100) / 100;
+          state.finance.valuation = Math.round(adj * totalOutstandingShares(state));
+          lines.push(
+            `Share count scaled to ${totalOutstandingShares(state).toLocaleString('en-US')} outstanding (sticker ${formatMoney(adj)}).`
+          );
+        }
+      }
+      break;
+    }
+    lines.push(split.summary);
+  }
+  pm.sharePrice = clampSharePriceToMacro(state, pm.sharePrice ?? 0);
+  state.finance.valuation = Math.round((pm.sharePrice ?? 0) * totalOutstandingShares(state));
+  return lines;
 }
 
 export function declareStockDividend(state) {
@@ -768,11 +848,8 @@ export function tickPublicMarket(state) {
   const squeezeLine = maybeShortSqueeze(state, deltaPct);
   if (squeezeLine) lines.push(squeezeLine);
 
-  if (pm.sharePrice >= 480) {
-    const autoSplit = executeStockSplit(state, { auto: true });
-    if (autoSplit.ok) {
-      lines.push(`Board auto-split: ${autoSplit.summary}`);
-    }
+  for (const scaleLine of enforcePublicTapeScale(state)) {
+    lines.push(scaleLine);
   }
 
   lines.unshift(

@@ -12,7 +12,7 @@ export function targetIpoSharePrice(state, valuation) {
   let price = Math.round(((fromArr + fromVal) / 2) * 100) / 100;
   if (ps > 28) price *= 0.68;
   if (ps > 45) price *= 0.58;
-  return Math.max(8, Math.min(95, price));
+  return Math.max(8, Math.min(85, price));
 }
 
 /** ESOP created at seed — 8% fully-diluted (was 10%). */
@@ -722,6 +722,34 @@ function escapeHtml(s) {
 export function totalOutstandingShares(state) {
   const total = (state.capTable ?? []).reduce((s, r) => s + (r.shares ?? 0), 0);
   return total > 0 ? total : 10_000_000;
+}
+
+/** Multiply every cap-table row — used for listing liquidity and stock splits. */
+export function scaleCapTableShareCount(state, factor) {
+  const mult = Math.max(1, Number(factor) || 1);
+  if (mult <= 1.001) return 1;
+  const rows = (state.capTable ?? []).map((r) => ({ ...r, shares: Math.round((r.shares ?? 0) * mult) }));
+  state.capTable = recalculateCapTablePercentages(rows);
+  return mult;
+}
+
+/**
+ * Raise fully-diluted share count so market cap ÷ shares stays a normal sticker price.
+ * @returns {{ mult: number, listingPrice: number }}
+ */
+export function ensurePublicListingShareScale(state, marketCapUsd, maxSticker = 85) {
+  const cap = Math.max(0, Number(marketCapUsd) || 0);
+  const sticker = Math.max(8, Number(maxSticker) || 85);
+  let total = totalOutstandingShares(state);
+  if (cap <= 0 || total <= 0) return { mult: 1, listingPrice: sticker };
+  const minShares = Math.max(25_000_000, Math.ceil(cap / sticker));
+  if (total >= minShares) {
+    return { mult: 1, listingPrice: Math.round((cap / total) * 100) / 100 };
+  }
+  const mult = minShares / total;
+  scaleCapTableShareCount(state, mult);
+  total = totalOutstandingShares(state);
+  return { mult, listingPrice: Math.round((cap / total) * 100) / 100 };
 }
 
 export function renderCapTableRows(state) {

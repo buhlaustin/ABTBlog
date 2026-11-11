@@ -3,7 +3,13 @@ import { getArr } from './Workspace.js';
 import { PUBLIC_FLOAT_ROW_ID, totalOutstandingShares } from './CapTable.js';
 
 /** Rough 2026 global GDP (USD) — soft anchor, not a hard wealth cap. */
-export const GLOBAL_GDP_USD_BENCHMARK = 142_000_000_000_000;
+export const GLOBAL_GDP_USD_BENCHMARK = 141_000_000_000_000;
+
+/** Target max trading price before the board splits (retail-sized sticker). */
+export const PUBLIC_MAX_SHARE_STICKER = 165;
+
+/** Minimum fully-diluted shares after listing — keeps cap in dollars, not BTC-style stickers. */
+export const PUBLIC_MIN_OUTSTANDING_SHARES = 25_000_000;
 
 /** Personal / company marks around here are rare but plausible (≈ trillionaire). */
 export const TRILLIONAIRE_BAND_USD = 1_000_000_000_000;
@@ -135,8 +141,48 @@ export function resetInstantStockMoveBudget(state) {
 /** Optional board split when sticker runs hot — max once per 6 months (same gate as manual). */
 export function autoStockSplitIfNeeded(state) {
   const price = state.publicMarket?.sharePrice ?? 0;
-  if (price < 420) return null;
+  if (price < PUBLIC_MAX_SHARE_STICKER) return null;
   return { needed: true, reason: 'high sticker' };
+}
+
+/**
+ * Macro ceiling for equity value — ramps with months public, ARR, and GDP share.
+ * Keeps multi-hundred-trillion fantasy caps out of the tape.
+ */
+export function publicMarketCapCeiling(state) {
+  if (!isPublicCompanyState(state)) return GLOBAL_GDP_USD_BENCHMARK * 0.01;
+  const gdp = GLOBAL_GDP_USD_BENCHMARK;
+  const months = Math.max(0, state.publicMarket?.monthsPublic ?? 0);
+  const arr = Math.max(getArr(state), (state.finance?.mrr ?? 0) * 12, 1);
+  const capNow = marketCapFromState(state);
+  const pressure = macroCapPressureRatio(Math.max(capNow, arr * 20));
+
+  let timeCeiling =
+    months <= 12
+      ? 320_000_000_000
+      : months <= 24
+        ? 750_000_000_000
+        : months <= 48
+          ? 1_800_000_000_000
+          : gdp * 0.07;
+  timeCeiling = Math.round(timeCeiling * (1 - pressure * 0.4));
+
+  const psCap = months <= 18 ? 24 : months <= 42 ? 32 : 38;
+  const arrCeiling = arr * psCap;
+  const gdpCeiling = gdp * (0.035 + Math.min(0.045, months / 600));
+  return Math.round(Math.min(timeCeiling, arrCeiling, gdpCeiling));
+}
+
+export function clampSharePriceToMacro(state, proposedPrice) {
+  if (!isPublicCompanyState(state)) return proposedPrice;
+  const shares = totalOutstandingShares(state);
+  if (shares <= 0) return proposedPrice;
+  const ceiling = publicMarketCapCeiling(state);
+  const maxFromCap = ceiling / shares;
+  const sticker = PUBLIC_MAX_SHARE_STICKER;
+  const clamped = Math.min(proposedPrice, maxFromCap, sticker);
+  const floor = (state.publicMarket?.ipoPrice ?? proposedPrice) * 0.15;
+  return Math.round(Math.max(floor, clamped) * 100) / 100;
 }
 
 /**
@@ -150,19 +196,27 @@ export function reconcileTradingPriceToMacro(state, proposedPrice) {
   const arr = Math.max((state.finance?.mrr ?? 0) * 12, getArr(state), 1);
   const netCash = Math.max(0, treasuryNetCash(state));
   const tradingCap = shares * proposedPrice;
+  const macroCeiling = publicMarketCapCeiling(state);
   const pressure = macroCapPressureRatio(tradingCap);
-  const ps = Math.min(45, (pm.priceSalesMultiple ?? 12) * (1 - pressure * 0.35));
-  let fairCap = arr * ps + netCash;
-  if (tradingCap > GLOBAL_GDP_USD_BENCHMARK * 0.5) {
-    fairCap = Math.min(fairCap, GLOBAL_GDP_USD_BENCHMARK * (0.45 + (1 - pressure) * 0.35));
+  const ps = Math.min(38, (pm.priceSalesMultiple ?? 12) * (1 - pressure * 0.4));
+  let fairCap = Math.min(arr * ps + netCash, macroCeiling);
+  if (tradingCap > GLOBAL_GDP_USD_BENCHMARK * 0.25) {
+    fairCap = Math.min(fairCap, GLOBAL_GDP_USD_BENCHMARK * (0.12 + (1 - pressure) * 0.2));
   }
-  if (pressure < 0.08 || fairCap <= 0) return proposedPrice;
-  const maxPremium = 1.22 + (1 - pressure) * 0.55;
-  const capAllowed = fairCap * maxPremium;
-  if (tradingCap <= capAllowed) return proposedPrice;
   const floor = (pm.ipoPrice ?? proposedPrice) * 0.15;
+  if (tradingCap > macroCeiling) {
+    return clampSharePriceToMacro(state, proposedPrice);
+  }
+  if (pressure < 0.05 || fairCap <= 0) {
+    return clampSharePriceToMacro(state, proposedPrice);
+  }
+  const maxPremium = 1.12 + (1 - pressure) * 0.35;
+  const capAllowed = Math.min(fairCap * maxPremium, macroCeiling);
+  if (tradingCap <= capAllowed) {
+    return clampSharePriceToMacro(state, proposedPrice);
+  }
   const clamped = Math.max(floor, capAllowed / shares);
-  return Math.round(clamped * 100) / 100;
+  return clampSharePriceToMacro(state, clamped);
 }
 
 /** Headless: $1T-scale marks are fine; hundreds of trillions are not. */
