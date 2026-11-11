@@ -4,6 +4,7 @@ import { accrueCeoTaxableIncome } from './CeoPersonalTax.js';
 import { calendarTurn } from './GameCalendar.js';
 import { isPublicCompany } from './IPO.js';
 import bundledAlmaMaterCatalog from '../data/ceo-alma-maters.json' with { type: 'json' };
+import { influenceAlmaGradesFromInvestment } from './CeoAlmaMaterGrades.js';
 
 function resolveCompanyAlmaMater(state) {
   const id = state.company?.almaMaterId;
@@ -215,6 +216,7 @@ export function commitAlumniInvestment(state, amountRaw, vehicleId) {
   }
 
   const effectLines = applyInvestCommitEffects(state, vehicle, paid);
+  const gradeLines = influenceAlmaGradesFromInvestment(state, vehicle.id, paid);
   return {
     ok: true,
     amount: paid,
@@ -223,7 +225,8 @@ export function commitAlumniInvestment(state, amountRaw, vehicleId) {
     investLifetime: ceo.alumniInvestLifetime,
     investorRecognition: alumniInvestorRecognitionLabel(ceo.alumniInvestLifetime),
     effectLines,
-    summary: `Committed ${formatMoney(paid)} to ${school.label} — ${vehicle.label} (balance ${formatMoney(pos.balance)}). Investor status: ${alumniInvestorRecognitionLabel(ceo.alumniInvestLifetime)}.${effectLines.length ? ` ${effectLines.join(' ')}` : ''}`
+    gradeLines,
+    summary: `Committed ${formatMoney(paid)} to ${school.label} — ${vehicle.label} (balance ${formatMoney(pos.balance)}). Investor status: ${alumniInvestorRecognitionLabel(ceo.alumniInvestLifetime)}.${effectLines.length ? ` ${effectLines.join(' ')}` : ''}${gradeLines.length ? ` Campus: ${gradeLines.join('; ')}.` : ''}`
   };
 }
 

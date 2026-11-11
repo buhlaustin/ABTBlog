@@ -3286,6 +3286,44 @@ if (!signConf.ok) {
   } else {
     console.log('OK: CEO alumni investing sleeves');
   }
+  const {
+    gradeLetter,
+    ensureAlmaMaterGrades,
+    liberalArtsAcademicsBeatAthletics,
+    influenceAlmaGradesFromGift,
+    ALMA_GRADE_AF_EXAMPLES
+  } = await import(`file://${join(sim, 'modules/CeoAlmaMaterGrades.js')}`);
+  if (ALMA_GRADE_AF_EXAMPLES.length !== 2) {
+    console.error('FAIL: expected two A–F report card examples');
+    failed = true;
+  } else if (gradeLetter(88) !== 'B+' || gradeLetter(41) !== 'F') {
+    console.error('FAIL: A–F letter mapping');
+    failed = true;
+  } else {
+    const gradeState = createInitialState({
+      companyName: 'Grade Co',
+      categoryId: 'b2b-saas',
+      mode: 'sandbox',
+      almaMaterId: 'maryville-college'
+    });
+    const g = ensureAlmaMaterGrades(gradeState);
+    if (!g?.academics || !g.arts_culture) {
+      console.error('FAIL: alma mater grade dimensions not rolled');
+      failed = true;
+    } else if (!liberalArtsAcademicsBeatAthletics(g, getAlmaMaterById('maryville-college'))) {
+      console.error('FAIL: liberal arts academics should not trail athletics on fixed band');
+      failed = true;
+    } else {
+      const acBefore = g.athletics;
+      influenceAlmaGradesFromGift(gradeState, { fundId: 'annual-fund', amount: 500_000, athletics: true, programId: 'boosters' });
+      if (g.athletics <= acBefore) {
+        console.error('FAIL: athletics gift should raise athletics letter/score');
+        failed = true;
+      } else {
+        console.log('OK: CEO alma mater A–F grades (examples, roll, gifts)');
+      }
+    }
+  }
 }
 
 {

@@ -45,6 +45,7 @@ import { prepareCompanyOverheadForMonth } from './CompanyOverhead.js';
 import { createInitialCooState, hireCoo, isCooHired } from './Coo.js';
 import { clampCeoBirthMonth, clampCeoBirthYear } from './CeoProfile.js';
 import { defaultAlmaMaterId, getAlmaMaterById } from './CeoAlumniGiving.js';
+import { ensureAlmaMaterGrades } from './CeoAlmaMaterGrades.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -204,6 +205,7 @@ export function createInitialState(options) {
 
   applyWorkspaceBurn(state);
   initializeCeoPersonalFinances(state);
+  ensureAlmaMaterGrades(state);
   state.meta.runStartedTurn = calendarTurn(state);
   startMonth(state);
   return state;
@@ -396,6 +398,7 @@ export function normalizeSave(raw) {
     if (!state.company.almaMaterId || !getAlmaMaterById(state.company.almaMaterId)) {
       state.company.almaMaterId = defaultAlmaMaterId();
     }
+    ensureAlmaMaterGrades(state);
     {
       const cat = getCategoryById(state.company?.categoryId);
       if (!cat) return null;

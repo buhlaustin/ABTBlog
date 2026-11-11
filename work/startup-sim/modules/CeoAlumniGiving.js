@@ -9,6 +9,7 @@ import {
   alumniInvestingBalance,
   alumniInvestorRecognitionLabel
 } from './CeoAlumniInvesting.js';
+import { ensureAlmaMaterGrades, influenceAlmaGradesFromGift, renderAlmaMaterGradesPanel } from './CeoAlmaMaterGrades.js';
 
 const BUILTIN_ALMA_MATERS = Array.isArray(bundledAlmaMaterCatalog) ? bundledAlmaMaterCatalog : [];
 
@@ -333,13 +334,15 @@ export function donateToAlmaMater(state, amountRaw, fundId = 'annual-fund') {
   const ceo = ensureAlumniGiving(state);
   const recognition = alumniRecognitionLabel(ceo.alumniGivingLifetime);
   const effectLines = applyAlumniGiftEffects(state, paid);
+  const gradeLines = influenceAlmaGradesFromGift(state, { fundId: fund.id, amount: paid, athletics: false });
   return {
     ok: true,
     amount: paid,
     lifetime: ceo.alumniGivingLifetime,
     recognition,
     effectLines,
-    summary: `Gave ${formatMoney(paid)} to ${school.label} (${fund.label}). Lifetime alumni giving ${formatMoney(ceo.alumniGivingLifetime)} — ${recognition}.${effectLines.length ? ` ${effectLines.join(' ')}` : ''}`
+    gradeLines,
+    summary: `Gave ${formatMoney(paid)} to ${school.label} (${fund.label}). Lifetime alumni giving ${formatMoney(ceo.alumniGivingLifetime)} — ${recognition}.${effectLines.length ? ` ${effectLines.join(' ')}` : ''}${gradeLines.length ? ` Campus: ${gradeLines.join('; ')}.` : ''}`
   };
 }
 
@@ -371,6 +374,12 @@ export function donateToAlmaMaterAthletics(state, amountRaw, programId = 'booste
     ...applyAlumniGiftEffects(state, paid),
     ...applyAthleticsGiftEffects(state, paid, program)
   ];
+  const gradeLines = influenceAlmaGradesFromGift(state, {
+    fundId: `athletics:${program.id}`,
+    amount: paid,
+    athletics: true,
+    programId: program.id
+  });
   return {
     ok: true,
     amount: paid,
@@ -379,7 +388,8 @@ export function donateToAlmaMaterAthletics(state, amountRaw, programId = 'booste
     recognition,
     booster,
     effectLines,
-    summary: `Gave ${formatMoney(paid)} to ${school.label} athletics (${program.label}). Athletics giving ${formatMoney(ceo.alumniAthleticsLifetime)} — ${booster}. Total alumni ${formatMoney(ceo.alumniGivingLifetime)} — ${recognition}.${effectLines.length ? ` ${effectLines.join(' ')}` : ''}`
+    gradeLines,
+    summary: `Gave ${formatMoney(paid)} to ${school.label} athletics (${program.label}). Athletics giving ${formatMoney(ceo.alumniAthleticsLifetime)} — ${booster}. Total alumni ${formatMoney(ceo.alumniGivingLifetime)} — ${recognition}.${effectLines.length ? ` ${effectLines.join(' ')}` : ''}${gradeLines.length ? ` Campus: ${gradeLines.join('; ')}.` : ''}`
   };
 }
 
@@ -491,6 +501,7 @@ export function renderCeoAlumniSection(state, { disabled = '' } = {}) {
       panelStatCard('Committed to sleeves', investLifetime > 0 ? formatMoney(investLifetime) : '—'),
       panelStatCard('Investor status', investorRecognition)
     ])}
+    ${renderAlmaMaterGradesPanel(state)}
     <h4 class="finance-subhead">Alumni investing</h4>
     <p class="fine-print">Capital that stays on campus balance sheets — monthly marks, partial giving credit toward recognition, taxable returns in your personal filing.</p>
     ${investBlocks}
