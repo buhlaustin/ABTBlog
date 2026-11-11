@@ -89,6 +89,10 @@ export function usedSatelliteTemplateIds(state) {
     const tid = satelliteTemplateIdFromEntry(s);
     if (tid) claimed.add(tid);
   }
+  const hubTid = hubSatelliteTemplateId(offices.hubId);
+  if (hubTid && !hubSatelliteAlreadyOpen(state, hubTid)) {
+    claimed.delete(hubTid);
+  }
   return claimed;
 }
 
@@ -99,6 +103,32 @@ export function availableSatelliteTemplates(state, list = hubsCache) {
 
 export function getHubById(hubId, list = hubsCache) {
   return getHubs(list).find((h) => h.id === hubId);
+}
+
+/** Satellite city template paired with a worldwide hub HQ (same metro may be HQ + satellite). */
+export function hubSatelliteTemplateId(hubId, list = hubsCache) {
+  if (!hubId) return null;
+  const hub = getHubById(hubId, list);
+  if (hub?.satelliteTemplateId) return hub.satelliteTemplateId;
+  return `sat-${hubId}`;
+}
+
+export function hubSatelliteAlreadyOpen(state, templateId = null) {
+  const tid = templateId ?? hubSatelliteTemplateId(state.offices?.hubId);
+  if (!tid) return false;
+  return (state.offices?.satellites ?? []).some((s) => satelliteTemplateIdFromEntry(s) === tid);
+}
+
+/** Hub selection must not consume the paired satellite city in the one-time catalog. */
+export function releaseHubCitySatelliteSlot(state) {
+  const hubId = state.offices?.hubId;
+  if (!hubId || !state.offices) return;
+  const tid = hubSatelliteTemplateId(hubId);
+  if (!tid || hubSatelliteAlreadyOpen(state, tid)) return;
+  const used = state.offices.usedSatelliteTemplateIds ?? [];
+  if (used.includes(tid)) {
+    state.offices.usedSatelliteTemplateIds = used.filter((id) => id !== tid);
+  }
 }
 
 /** @deprecated use headcountCap from Workspace.js */
@@ -168,6 +198,7 @@ export function selectHub(state, hubId) {
   applyWorkspaceBurn(state);
   state.company.location = hub.label;
   state.stage = STAGES.POST_XC;
+  releaseHubCitySatelliteSlot(state);
   return { ok: true, hub };
 }
 
@@ -181,7 +212,8 @@ export function addSatellite(state, templateId, sizeId = 'medium') {
 
   if (!state.offices.usedSatelliteTemplateIds) state.offices.usedSatelliteTemplateIds = [];
   const used = usedSatelliteTemplateIds(state);
-  if (used.has(t.id)) {
+  const alreadyOpen = (state.offices.satellites ?? []).some((s) => satelliteTemplateIdFromEntry(s) === t.id);
+  if (alreadyOpen || used.has(t.id)) {
     return { ok: false, reason: `${t.label} satellite was already opened this run — pick another city.` };
   }
 
@@ -357,7 +389,7 @@ export function renderOfficesPanel(container, state) {
     state.offices?.hubId
       ? `
     <h3 class="log-head">Satellite offices</h3>
-    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Pick a <strong>city</strong> and footprint (<strong>Small → Extra-large</strong>) — alpha markets cost more and add more seats (<strong>once per city per run</strong>).</p>
+    <p class="fine-print">${(state.offices.satellites ?? []).length} open · ${available.length} of ${allTemplates.length} cities still available · ${formatMoney(satRentTotal)}/mo satellite rent. Pick a <strong>city</strong> and footprint (<strong>Small → Extra-large</strong>) — alpha markets cost more and add more seats (<strong>once per city per run</strong>). Your hub city stays in the list until you open a satellite there.</p>
     <div class="table-scroll">
       <table class="data-table">
         <thead><tr><th>City</th><th>Size</th><th>Seats</th><th>Rent/mo</th><th></th></tr></thead>

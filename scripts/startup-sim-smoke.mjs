@@ -2048,9 +2048,17 @@ if (!failed) {
     console.log(`OK: hub city rent (${hubMo}/mo) above campus HQ (${campusRent}/mo)`);
   }
 
-  const { addSatellite, getSatelliteTemplates, availableSatelliteTemplates } = await import(
-    `file://${join(sim, 'modules/Offices.js')}`
-  );
+  const {
+    addSatellite,
+    getHubs,
+    getSatelliteTemplates,
+    availableSatelliteTemplates,
+    hubSatelliteTemplateId
+  } = await import(`file://${join(sim, 'modules/Offices.js')}`);
+  if (!getHubs().some((h) => h.id === 'knoxville')) {
+    console.error('FAIL: Knoxville hub missing from catalog');
+    failed = true;
+  }
   const catalog = getSatelliteTemplates();
   if (catalog.length < 30) {
     console.error(`FAIL: expected 30+ satellite cities (got ${catalog.length})`);
@@ -2069,6 +2077,24 @@ if (!failed) {
     failed = true;
   } else if (!failed) {
     console.log(`OK: satellite catalog (${catalog.length} cities, one-time open)`);
+  }
+  const nashHub = createInitialState({ companyName: 'Nash Hub', categoryId: 'b2b-saas', mode: 'sandbox' });
+  nashHub.offices = {
+    hubId: 'nashville',
+    hubLabel: 'Nashville',
+    satellites: [],
+    usedSatelliteTemplateIds: [hubSatelliteTemplateId('nashville')]
+  };
+  const nashAvail = availableSatelliteTemplates(nashHub);
+  const nashOpen = addSatellite(nashHub, 'sat-nashville', 'small');
+  if (!nashAvail.some((t) => t.id === 'sat-nashville')) {
+    console.error('FAIL: hub city satellite should stay available while only HQ is in that hub');
+    failed = true;
+  } else if (!nashOpen.ok) {
+    console.error(`FAIL: open hub-city satellite: ${nashOpen.reason ?? 'unknown'}`);
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: hub cities remain available as satellite offices');
   }
   const { computeSatelliteOffice } = await import(`file://${join(sim, 'modules/SatelliteOffices.js')}`);
   const denverTpl = catalog.find((t) => t.id === 'sat-denver');

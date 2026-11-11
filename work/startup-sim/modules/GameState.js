@@ -7,7 +7,8 @@ import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './Ca
 import {
   createInitialOffices,
   satelliteTemplateIdFromEntry,
-  refreshSatelliteFootprints
+  refreshSatelliteFootprints,
+  releaseHubCitySatelliteSlot
 } from './Offices.js';
 import {
   createInitialWorkspace,
@@ -498,6 +499,7 @@ export function normalizeSave(raw) {
         }
       }
     }
+    releaseHubCitySatelliteSlot(state);
     if ((state.offices?.satellites?.length ?? 0) > 0) {
       refreshSatelliteFootprints(state);
     }
