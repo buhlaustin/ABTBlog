@@ -53,7 +53,7 @@ function autoWeek(state) {
     for (let i = 0; i < 3; i++) queueIfPossible(state, 'fundraise_calls', {});
     queueIfPossible(state, 'town_hall', { stateId: state.candidate.homeState });
     queueIfPossible(state, 'debate_prep', {});
-    queueIfPossible(state, 'social_post', { socialTopicId: 'vision', socialTone: 'safe' });
+    queueIfPossible(state, 'social_post', { socialTopicId: 'future_work', socialTone: 'safe' });
     queueIfPossible(state, 'hire_role', { staffRoleId: 'comms_director' });
   }
   if (phase === 'general') {
