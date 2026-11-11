@@ -1,0 +1,26 @@
+[
+  {
+    "id": "governor",
+    "label": "Governor",
+    "blurb": "Statehouse executive experience; strong on retail politics.",
+    "mods": { "organization": 12, "fundraising": 4, "media": 6, "debate": 5, "stamina": 3 }
+  },
+  {
+    "id": "senator",
+    "label": "U.S. Senator",
+    "blurb": "National name ID and committee gravitas.",
+    "mods": { "organization": 6, "fundraising": 8, "media": 10, "debate": 8, "stamina": 2 }
+  },
+  {
+    "id": "biz",
+    "label": "Business Executive",
+    "blurb": "Deep pockets and outsider energy — light on ground game.",
+    "mods": { "organization": -4, "fundraising": 14, "media": 5, "debate": 4, "stamina": 6 }
+  },
+  {
+    "id": "outsider",
+    "label": "Grassroots Outsider",
+    "blurb": "Authentic base fire; skeptics in the establishment.",
+    "mods": { "organization": 3, "fundraising": -2, "media": 12, "debate": 6, "stamina": 8 }
+  }
+]

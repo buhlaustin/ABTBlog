@@ -12,6 +12,7 @@ const projects = [
   { slug: "hos", dir: "hos" },
   { slug: "eer", dir: "eer" },
   { slug: "startup-sim", dir: "startup-sim" },
+  { slug: "white-house-2028", dir: "white-house-2028" },
 ];
 
 for (const { slug, dir } of projects) {

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "hope",
+    "label": "Hopeful unity",
+    "text": "Cast the race as a turning point for everyday families.",
+    "effects": { "approval": 4, "buzz": 6, "base": 5, "mediaRisk": 0 }
+  },
+  {
+    "id": "fighter",
+    "label": "Fighter tone",
+    "text": "Promise to take on the powerful and protect the vulnerable.",
+    "effects": { "approval": 1, "buzz": 8, "base": 9, "mediaRisk": 2 }
+  },
+  {
+    "id": "pragmatic",
+    "label": "Steady pragmatist",
+    "text": "Emphasize competence, budgets, and bipartisan results.",
+    "effects": { "approval": 6, "buzz": 2, "base": 3, "mediaRisk": -2 }
+  },
+  {
+    "id": "populist",
+    "label": "Populist surge",
+    "text": "Rally the crowd against elites and broken systems.",
+    "effects": { "approval": -2, "buzz": 12, "base": 11, "mediaRisk": 5 }
+  }
+]

@@ -1,0 +1,177 @@
+[
+  {
+    "week": 1,
+    "states": [
+      "AL",
+      "AK"
+    ]
+  },
+  {
+    "week": 2,
+    "states": [
+      "AZ",
+      "AR"
+    ]
+  },
+  {
+    "week": 3,
+    "states": [
+      "CA",
+      "CO"
+    ]
+  },
+  {
+    "week": 4,
+    "states": [
+      "CT",
+      "DE"
+    ]
+  },
+  {
+    "week": 5,
+    "states": [
+      "DC",
+      "FL"
+    ]
+  },
+  {
+    "week": 6,
+    "states": [
+      "GA",
+      "HI"
+    ]
+  },
+  {
+    "week": 7,
+    "states": [
+      "ID",
+      "IL"
+    ]
+  },
+  {
+    "week": 8,
+    "states": [
+      "IN",
+      "IA"
+    ]
+  },
+  {
+    "week": 9,
+    "states": [
+      "KS",
+      "KY"
+    ]
+  },
+  {
+    "week": 10,
+    "states": [
+      "LA",
+      "ME"
+    ]
+  },
+  {
+    "week": 11,
+    "states": [
+      "MD",
+      "MA"
+    ]
+  },
+  {
+    "week": 12,
+    "states": [
+      "MI",
+      "MN"
+    ]
+  },
+  {
+    "week": 13,
+    "states": [
+      "MS",
+      "MO"
+    ]
+  },
+  {
+    "week": 14,
+    "states": [
+      "MT",
+      "NE"
+    ]
+  },
+  {
+    "week": 15,
+    "states": [
+      "NV",
+      "NH"
+    ]
+  },
+  {
+    "week": 16,
+    "states": [
+      "NJ",
+      "NM"
+    ]
+  },
+  {
+    "week": 17,
+    "states": [
+      "NY",
+      "NC"
+    ]
+  },
+  {
+    "week": 18,
+    "states": [
+      "ND",
+      "OH"
+    ]
+  },
+  {
+    "week": 19,
+    "states": [
+      "OK",
+      "OR"
+    ]
+  },
+  {
+    "week": 20,
+    "states": [
+      "PA",
+      "RI"
+    ]
+  },
+  {
+    "week": 21,
+    "states": [
+      "SC",
+      "SD"
+    ]
+  },
+  {
+    "week": 22,
+    "states": [
+      "TN",
+      "TX"
+    ]
+  },
+  {
+    "week": 23,
+    "states": [
+      "UT",
+      "VT"
+    ]
+  },
+  {
+    "week": 24,
+    "states": [
+      "VA",
+      "WA"
+    ]
+  },
+  {
+    "week": 25,
+    "states": [
+      "WV",
+      "WI"
+    ]
+  }
+]

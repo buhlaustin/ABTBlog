@@ -1,0 +1,177 @@
+[
+  {
+    "id": "economic_wobble",
+    "label": "Jobs report surprises",
+    "weight": 9,
+    "phase": "any",
+    "text": "A soft jobs print dominates cable news.",
+    "choices": [
+      { "label": "Blame the incumbent party", "effects": { "approval": 2, "momentum": 2 } },
+      { "label": "Call for steady leadership", "effects": { "approval": 1, "base": 2 } }
+    ]
+  },
+  {
+    "id": "rival_gaffe",
+    "label": "Rival stumbles on camera",
+    "weight": 7,
+    "phase": "primary",
+    "text": "A primary opponent flubs a policy question at a diner stop.",
+    "choices": [
+      { "label": "Stay classy", "effects": { "approval": 3, "momentum": 2 } },
+      { "label": "Contrast ad within hours", "effects": { "approval": 1, "momentum": 5, "cash": -95000, "scandal": 4 } }
+    ]
+  },
+  {
+    "id": "endorsement_surprise",
+    "label": "Surprise endorsement",
+    "weight": 7,
+    "phase": "any",
+    "text": "A popular regional leader picks a side.",
+    "effects": { "approval": 3, "base": 4, "momentum": 3 }
+  },
+  {
+    "id": "scandal_rumor",
+    "label": "Anonymous tip hits tabloids",
+    "weight": 6,
+    "phase": "any",
+    "text": "A thin-sourced story circulates about your past.",
+    "choices": [
+      { "label": "Full press conference", "effects": { "approval": -1, "momentum": 4, "energy": -15, "scandal": -8 } },
+      { "label": "Short denial and move on", "effects": { "approval": -3, "momentum": 2, "scandal": 6 } }
+    ]
+  },
+  {
+    "id": "debate_night",
+    "label": "Debate night",
+    "weight": 0,
+    "phase": "debate",
+    "text": "The stage lights are hot; moderators promise fact-checks.",
+    "effects": { "debateCheck": true }
+  },
+  {
+    "id": "news_cycle",
+    "label": "Slow news week",
+    "weight": 10,
+    "phase": "any",
+    "text": "Your story competes with a weather special.",
+    "effects": { "momentum": -2, "nameRec": -1 }
+  },
+  {
+    "id": "viral_moment",
+    "label": "Clip goes viral",
+    "weight": 8,
+    "phase": "any",
+    "text": "A rally moment lands on every feed.",
+    "effects": { "momentum": 8, "nameRec": 5, "approval": 2 }
+  },
+  {
+    "id": "attack_ad",
+    "label": "Incoming attack ads",
+    "weight": 8,
+    "phase": "general",
+    "text": "Issue-group spots question your record.",
+    "choices": [
+      { "label": "Respond on air", "effects": { "approval": 1, "cash": -110000, "momentum": 3 } },
+      { "label": "Ignore and stay positive", "effects": { "approval": -2, "base": 2 } }
+    ]
+  },
+  {
+    "id": "polling_surge",
+    "label": "Pollsters detect movement",
+    "weight": 7,
+    "phase": "any",
+    "text": "A respected poll shows you gaining nationally.",
+    "effects": { "momentum": 6, "approval": 2, "nameRec": 2 }
+  },
+  {
+    "id": "donor_revolt",
+    "label": "Bundlers threaten to walk",
+    "weight": 5,
+    "phase": "any",
+    "text": "Major donors want a sharper message or they sit out the month.",
+    "choices": [
+      { "label": "Shift rhetoric toward base", "effects": { "base": 6, "approval": -2, "cash": -50000 } },
+      { "label": "Hold the coalition line", "effects": { "approval": 1, "cash": -80000 } }
+    ]
+  },
+  {
+    "id": "grassroots_surge",
+    "label": "Volunteer surge",
+    "weight": 6,
+    "phase": "primary",
+    "text": "College campuses and union halls report overflow crowds.",
+    "effects": { "base": 5, "momentum": 4, "nameRec": 2 }
+  },
+  {
+    "id": "leak oppo",
+    "label": "Your oppo file leaks",
+    "weight": 4,
+    "phase": "any",
+    "text": "A thumb drive of old briefing notes hits a tip line.",
+    "effects": { "scandal": 12, "momentum": 3, "approval": -2 }
+  },
+  {
+    "id": "supreme_framing",
+    "label": "Court vacancy framing war",
+    "weight": 5,
+    "phase": "general",
+    "text": "Both parties fight to own the judicial narrative.",
+    "choices": [
+      { "label": "Emphasize stability", "effects": { "approval": 2, "base": -1 } },
+      { "label": "Fire up base turnout", "effects": { "base": 5, "approval": -1, "momentum": 3 } }
+    ]
+  },
+  {
+    "id": "october_surprise",
+    "label": "Late-cycle surprise",
+    "weight": 4,
+    "phase": "general",
+    "minWeek": 48,
+    "text": "A foreign-policy flare-up scrambles the Sunday shows.",
+    "choices": [
+      { "label": "Commander-in-chief tone", "effects": { "approval": 3, "securityStates": 2 } },
+      { "label": "Focus on domestic kitchen table", "effects": { "approval": 1, "base": 3 } }
+    ]
+  },
+  {
+    "id": "running_mate_scrutiny",
+    "label": "Running mate in the crosshairs",
+    "weight": 5,
+    "phase": "general",
+    "text": "Cable panels obsess over your VP pick's old votes.",
+    "choices": [
+      { "label": "Full defense", "effects": { "approval": 1, "scandal": -5, "energy": -10 } },
+      { "label": "Pivot to your agenda", "effects": { "approval": -1, "momentum": 2 } }
+    ]
+  },
+  {
+    "id": "petition_court",
+    "label": "Ballot access court fight",
+    "weight": 6,
+    "phase": "independent_primary",
+    "text": "A state challenges your petition signatures.",
+    "choices": [
+      { "label": "Lawyer up", "effects": { "cash": -120000, "scandal": -2 } },
+      { "label": "Rally public pressure", "effects": { "momentum": 4, "nameRec": 3, "scandal": 3 } }
+    ]
+  },
+  {
+    "id": "convention_counter",
+    "label": "Rival convention counter-programming",
+    "weight": 5,
+    "phase": "convention_prep",
+    "text": "The other party schedules a star-studded rival event.",
+    "effects": { "momentum": -2, "nameRec": -1 }
+  },
+  {
+    "id": "economy_boom",
+    "label": "Markets rally",
+    "weight": 6,
+    "phase": "any",
+    "text": "Equities hit highs; voters debate who deserves credit.",
+    "choices": [
+      { "label": "Share the credit", "effects": { "approval": 1, "base": -1 } },
+      { "label": "Argue workers lag behind", "effects": { "approval": 2, "base": 3 } }
+    ]
+  }
+]
