@@ -1,0 +1,274 @@
+:root {
+  --bg: #0c1016;
+  --panel: #151c28;
+  --border: #2a3548;
+  --text: #e9eef6;
+  --muted: #8fa0b8;
+  --accent: #3d6ee8;
+  --accent-dim: #2a4fa8;
+  --r: #c8384d;
+  --d: #2f5fbe;
+  --i: #7d6aae;
+  --good: #2d9d78;
+  --radius: 12px;
+  font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(1200px 500px at 30% -20%, #1a2640 0%, var(--bg) 55%);
+  color: var(--text);
+}
+
+#app {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem 2.5rem;
+}
+
+.screen[hidden] {
+  display: none !important;
+}
+
+.hero .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.hero h1 {
+  font-size: 2.25rem;
+  margin: 0 0 0.75rem;
+  line-height: 1.1;
+}
+
+.hero.compact h1 {
+  font-size: 1.75rem;
+}
+
+.lede {
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 58ch;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+.setup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 1.5rem 0;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+input,
+select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.setup-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: #4a5f82;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent-dim);
+  color: #fff;
+}
+
+.btn-ghost {
+  background: transparent;
+}
+
+.btn-small {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+}
+
+.btn-action {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 0.4rem;
+}
+
+.card-list {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.card,
+.stat-block {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.card h3,
+.stat-block h3 {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 280px;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  padding: 0.15rem 0;
+}
+
+.tag {
+  font-size: 0.75rem;
+  background: #24314a;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  margin-left: 0.35rem;
+}
+
+.end-week {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.news-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.news-feed li {
+  border-bottom: 1px solid var(--border);
+  padding: 0.55rem 0;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.news-feed .delta {
+  color: var(--good);
+  font-size: 0.78rem;
+}
+
+.choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.vp-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.vp-card.selected {
+  border-color: var(--accent);
+  background: #1a2640;
+}
+
+.map-card #map-preview svg,
+.night-map svg,
+#end-map svg {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.ev-bar {
+  display: flex;
+  gap: 1rem;
+  font-size: 1rem;
+  margin: 0.75rem 0 1rem;
+  font-weight: 600;
+}
+
+.end-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: #24314a;
+  border: 1px solid var(--border);
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+}
+
+.rival-row {
+  font-size: 0.85rem;
+  padding: 0.2rem 0;
+}

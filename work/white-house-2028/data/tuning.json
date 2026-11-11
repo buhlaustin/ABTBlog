@@ -1,0 +1,22 @@
+{
+  "totalWeeks": 52,
+  "electoralVotes": 538,
+  "winThreshold": 270,
+  "actionPointsPerWeek": 6,
+  "debateWeeksPrimary": [8, 16, 22],
+  "debateWeeksGeneral": [40, 46],
+  "primaryElectionWeek": 26,
+  "conventionPrepStart": 27,
+  "conventionWeek": 34,
+  "generalStart": 35,
+  "electionNightWeek": 52,
+  "independentBallotTargetEv": 270,
+  "weeklyPayrollBase": 42000,
+  "payrollPerStaff": 12000,
+  "energyMax": 100,
+  "energyRegenRest": 35,
+  "gaffeEnergyThreshold": 25,
+  "independentAdCostMult": 1.45,
+  "independentFundraisingMult": 0.82,
+  "independentMediaPenalty": 0.88
+}

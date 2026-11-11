@@ -1,0 +1,86 @@
+[
+  {
+    "id": "economic_wobble",
+    "label": "Jobs report surprises",
+    "weight": 10,
+    "phase": "any",
+    "text": "A soft jobs print dominates cable news.",
+    "choices": [
+      { "label": "Blame the incumbent party", "effects": { "approval": 2, "buzz": 3 } },
+      { "label": "Call for steady leadership", "effects": { "approval": 1, "base": 2 } }
+    ]
+  },
+  {
+    "id": "rival_gaffe",
+    "label": "Rival stumbles on camera",
+    "weight": 8,
+    "phase": "primary",
+    "text": "A primary opponent flubs a policy question.",
+    "choices": [
+      { "label": "Stay classy", "effects": { "approval": 3, "buzz": 2 } },
+      { "label": "Contrast ad within hours", "effects": { "approval": 1, "buzz": 5, "cash": -80000 } }
+    ]
+  },
+  {
+    "id": "endorsement_surprise",
+    "label": "Surprise endorsement",
+    "weight": 7,
+    "phase": "any",
+    "text": "A popular regional leader picks a side.",
+    "effects": { "approval": 3, "base": 4, "buzz": 4 }
+  },
+  {
+    "id": "scandal_rumor",
+    "label": "Anonymous tip hits tabloids",
+    "weight": 6,
+    "phase": "any",
+    "text": "A thin-sourced story circulates about your past.",
+    "choices": [
+      { "label": "Full press conference", "effects": { "approval": -1, "buzz": 6, "energy": -15 } },
+      { "label": "Short denial and move on", "effects": { "approval": -3, "buzz": 4 } }
+    ]
+  },
+  {
+    "id": "debate_night",
+    "label": "Primary debate night",
+    "weight": 0,
+    "phase": "debate",
+    "text": "The stage lights are hot; moderators promise fact-checks.",
+    "effects": { "debateCheck": true }
+  },
+  {
+    "id": "news_cycle",
+    "label": "Slow news week",
+    "weight": 12,
+    "phase": "any",
+    "text": "Your story competes with a weather special.",
+    "effects": { "buzz": -2, "nameRec": -1 }
+  },
+  {
+    "id": "viral_moment",
+    "label": "Clip goes viral",
+    "weight": 9,
+    "phase": "any",
+    "text": "A rally moment lands on every feed.",
+    "effects": { "buzz": 8, "nameRec": 5, "approval": 2 }
+  },
+  {
+    "id": "attack_ad",
+    "label": "Incoming attack ads",
+    "weight": 8,
+    "phase": "general",
+    "text": "Dark-money spots question your record.",
+    "choices": [
+      { "label": "Respond on air", "effects": { "approval": 1, "cash": -100000, "buzz": 3 } },
+      { "label": "Ignore and stay positive", "effects": { "approval": -2, "base": 2 } }
+    ]
+  },
+  {
+    "id": "polling_surge",
+    "label": "Pollsters detect movement",
+    "weight": 7,
+    "phase": "any",
+    "text": "A respected poll shows you gaining nationally.",
+    "effects": { "momentum": 6, "approval": 2, "buzz": 3 }
+  }
+]

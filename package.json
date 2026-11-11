@@ -11,6 +11,7 @@
     "lint": "eslint",
     "copy-work": "node scripts/copy-work-assets.mjs",
     "smoke:startup-sim": "node scripts/startup-sim-smoke.mjs",
+    "smoke:white-house-2028": "node scripts/white-house-2028-smoke.mjs",
     "generate:startup-sim-tasks": "node scripts/generate-startup-sim-tasks.mjs",
     "audit:startup-sim-wiring": "node scripts/startup-sim-wiring-audit.mjs",
     "smoke:startup-sim-ai": "node scripts/startup-sim-ai-smoke.mjs",

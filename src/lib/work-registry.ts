@@ -38,6 +38,17 @@ export const workItems: WorkItem[] = [
     hostedEntry: "/play/startup-sim/index.html",
   },
   {
+    slug: "white-house-2028",
+    title: "2028: Win the White House",
+    summary:
+      "52-week presidential campaign sim: primaries, convention, and election night on a 538-vote map. Fictional candidates, action points, fundraising, and rival AI.",
+    kind: "hosted",
+    status: "live",
+    tags: ["game", "javascript", "simulation"],
+    featured: true,
+    hostedEntry: "/play/white-house-2028/index.html",
+  },
+  {
     slug: "hos",
     title: "House of Strategy",
     summary:

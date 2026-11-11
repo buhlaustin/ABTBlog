@@ -1,0 +1,156 @@
+[
+  {
+    "id": "fundraise_calls",
+    "label": "Donor call block",
+    "phase": "any",
+    "ap": 1,
+    "cashCost": 0,
+    "energy": 8,
+    "description": "Work the phones with major donors.",
+    "effects": { "cash": [85000, 140000], "approval": 0, "buzz": 1, "base": 2 }
+  },
+  {
+    "id": "fundraise_event",
+    "label": "Fundraising gala",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 25000,
+    "energy": 12,
+    "description": "Black-tie dinner with bundlers.",
+    "effects": { "cash": [180000, 320000], "approval": -1, "buzz": 3, "base": 4 }
+  },
+  {
+    "id": "small_dollar",
+    "label": "Small-dollar push",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 15000,
+    "energy": 10,
+    "description": "Email and text burst to grassroots lists.",
+    "effects": { "cash": [60000, 110000], "approval": 1, "buzz": 4, "base": 7, "nameRec": 2 }
+  },
+  {
+    "id": "social_safe",
+    "label": "Social — on-message post",
+    "phase": "any",
+    "ap": 1,
+    "cashCost": 0,
+    "energy": 4,
+    "description": "Policy clip or family snapshot.",
+    "effects": { "buzz": [2, 5], "nameRec": 2, "gaffeRisk": 0.04 }
+  },
+  {
+    "id": "social_hot",
+    "label": "Social — edgy post",
+    "phase": "any",
+    "ap": 1,
+    "cashCost": 0,
+    "energy": 5,
+    "description": "Quote-tweet a rival; could go viral or blow up.",
+    "effects": { "buzz": [-3, 14], "nameRec": [3, 9], "gaffeRisk": 0.18 }
+  },
+  {
+    "id": "town_hall",
+    "label": "Town hall",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 35000,
+    "energy": 14,
+    "description": "Take unfiltered questions in a key state.",
+    "effects": { "approval": [2, 6], "base": 4, "stateBoost": 5, "nameRec": 3 }
+  },
+  {
+    "id": "state_visit",
+    "label": "Targeted state visit",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 45000,
+    "energy": 12,
+    "description": "Rally and local ops in one state you pick.",
+    "requiresStatePick": true,
+    "effects": { "stateBoost": 8, "approval": 1, "nameRec": 2 }
+  },
+  {
+    "id": "endorsement",
+    "label": "Endorsement hunt",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 20000,
+    "energy": 10,
+    "description": "Courts mayors, labor, or niche groups.",
+    "effects": { "approval": [1, 4], "base": [3, 7], "buzz": 2 }
+  },
+  {
+    "id": "ads_regional",
+    "label": "TV/digital ad buy",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 120000,
+    "energy": 6,
+    "description": "Positive spots in a region you select.",
+    "requiresRegionPick": true,
+    "effects": { "approval": [2, 5], "nameRec": 4, "stateBoost": 4 }
+  },
+  {
+    "id": "debate_prep",
+    "label": "Debate prep retreat",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 40000,
+    "energy": 10,
+    "description": "Mock debates and briefing books.",
+    "effects": { "debateBuff": 8, "approval": 0, "buzz": 1 }
+  },
+  {
+    "id": "hire_staff",
+    "label": "Hire campaign staff",
+    "phase": "any",
+    "ap": 2,
+    "cashCost": 60000,
+    "energy": 8,
+    "description": "Field organizers and comms deputies.",
+    "effects": { "staff": 1, "organization": 1, "weeklyBurn": 8000 }
+  },
+  {
+    "id": "oppo",
+    "label": "Opposition research",
+    "phase": "any",
+    "ap": 1,
+    "cashCost": 35000,
+    "energy": 6,
+    "description": "Dirt and contrast memos on rivals.",
+    "effects": { "rivalDamage": [2, 5], "buzz": 2, "gaffeRisk": 0.06 }
+  },
+  {
+    "id": "rest",
+    "label": "Rest / recharge",
+    "phase": "any",
+    "ap": 1,
+    "cashCost": 0,
+    "energy": -30,
+    "description": "Sleep, exercise, hide from cameras.",
+    "effects": { "energyRestore": 35, "buzz": -1 }
+  },
+  {
+    "id": "petition",
+    "label": "Ballot access petition drive",
+    "phase": "independent_primary",
+    "ap": 2,
+    "cashCost": 80000,
+    "energy": 14,
+    "description": "Qualify for the ballot in another state.",
+    "requiresStatePick": true,
+    "effects": { "petitionProgress": 1 }
+  },
+  {
+    "id": "vet_vp",
+    "label": "Vet running mate",
+    "phase": "convention_prep",
+    "ap": 2,
+    "cashCost": 25000,
+    "energy": 8,
+    "description": "Reveal a hidden trait on a shortlist candidate.",
+    "requiresVpPick": true,
+    "effects": { "vetReveal": 1 }
+  }
+]

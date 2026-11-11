@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2028: Win the White House</title>
+  <link rel="stylesheet" href="/play/white-house-2028/style.css">
+</head>
+<body>
+  <div id="app">
+    <section id="screen-setup" class="screen">
+      <header class="hero">
+        <p class="eyebrow">52-week campaign simulation</p>
+        <h1>2028: Win the White House</h1>
+        <p class="lede">Build a fictional candidacy from announcement through election night. Manage time, money, and energy across primaries, convention, and the general. Fictional candidates only — no real politicians.</p>
+      </header>
+      <div class="setup-grid">
+        <label>Name<input id="cand-name" type="text" maxlength="40" placeholder="Alex Morgan" autocomplete="off"></label>
+        <label>Home state<select id="cand-state"></select></label>
+        <label>Background<select id="cand-bg"></select></label>
+        <label>Party
+          <select id="cand-party">
+            <option value="D">Democrat</option>
+            <option value="R">Republican</option>
+            <option value="I">Independent (ballot access — no primary)</option>
+          </select>
+        </label>
+        <label>Run seed (optional)<input id="cand-seed" type="number" placeholder="Random" min="1"></label>
+      </div>
+      <div class="setup-actions">
+        <button id="btn-new" class="btn btn-primary" type="button">New campaign</button>
+        <button id="btn-continue" class="btn btn-ghost" type="button" hidden>Continue save</button>
+      </div>
+    </section>
+
+    <section id="screen-announce" class="screen" hidden>
+      <h2>Announcement week</h2>
+      <p class="muted">Choose your launch tone.</p>
+      <div id="announce-list" class="card-list"></div>
+    </section>
+
+    <section id="screen-play" class="screen" hidden>
+      <header class="hud">
+        <div>
+          <h2 id="hud-title">Week 1</h2>
+          <p id="hud-sub" class="muted"></p>
+        </div>
+        <button id="btn-save" class="btn btn-small btn-ghost" type="button">Save</button>
+      </header>
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="stat-block" id="resource-panel"></div>
+          <div class="stat-block" id="delegate-panel" hidden></div>
+          <div class="stat-block" id="ballot-panel" hidden></div>
+        </aside>
+        <main class="main">
+          <div class="card" id="rival-panel"></div>
+          <button id="btn-end-week" class="btn btn-primary end-week" type="button">End week</button>
+          <section class="card" id="actions-card">
+            <h3>Schedule <span id="ap-label" class="tag"></span></h3>
+            <div id="actions-list"></div>
+            <p class="muted small">Queued: <span id="queued-actions">—</span></p>
+          </section>
+          <section class="card" id="event-card" hidden>
+            <h3>This week's decision</h3>
+            <p id="event-text"></p>
+            <div id="event-choices" class="choice-row"></div>
+          </section>
+          <section class="card" id="convention-card" hidden>
+            <h3>National convention</h3>
+            <div id="vp-list"></div>
+            <label>Acceptance speech
+              <select id="speech-tone">
+                <option value="unity">Unity and optimism</option>
+                <option value="vision">Bold vision</option>
+                <option value="attack">Contrast and fight</option>
+              </select>
+            </label>
+            <button id="btn-convention" class="btn btn-primary" type="button">Confirm ticket</button>
+          </section>
+          <section class="card">
+            <h3>Campaign wire</h3>
+            <ul id="news-feed" class="news-feed"></ul>
+          </section>
+        </main>
+        <aside class="sidebar map-side">
+          <div class="card map-card">
+            <h3>Map snapshot</h3>
+            <div id="map-preview"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="screen-night" class="screen" hidden>
+      <header class="hero compact">
+        <h1>Election Night in America</h1>
+        <p id="night-progress" class="lede">Polls are closed.</p>
+      </header>
+      <div class="ev-bar" id="ev-bar"></div>
+      <div id="night-map" class="night-map"></div>
+      <ul id="night-feed" class="news-feed night"></ul>
+    </section>
+
+    <section id="screen-end" class="screen" hidden>
+      <h2 id="end-title">Results</h2>
+      <p id="end-lede" class="lede"></p>
+      <div id="end-map"></div>
+      <div id="end-stats" class="stat-block"></div>
+      <div class="end-actions">
+        <button id="btn-cert" class="btn btn-primary" type="button">Print certificate</button>
+        <button id="btn-map-dl" class="btn btn-ghost" type="button">Download map PNG</button>
+        <button id="btn-new-game" class="btn btn-ghost" type="button">New campaign</button>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" role="status" hidden></div>
+  </div>
+  <script type="module" src="/play/white-house-2028/game.js"></script>
+</body>
+</html>

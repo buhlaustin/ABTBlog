@@ -1,0 +1,461 @@
+[
+  {
+    "id": "AL",
+    "name": "Alabama",
+    "ev": 9,
+    "region": "south",
+    "cx": 720,
+    "cy": 420,
+    "timezone": "central"
+  },
+  {
+    "id": "AK",
+    "name": "Alaska",
+    "ev": 3,
+    "region": "west",
+    "cx": 80,
+    "cy": 80,
+    "timezone": "mountain"
+  },
+  {
+    "id": "AZ",
+    "name": "Arizona",
+    "ev": 11,
+    "region": "west",
+    "cx": 180,
+    "cy": 380,
+    "timezone": "mountain"
+  },
+  {
+    "id": "AR",
+    "name": "Arkansas",
+    "ev": 6,
+    "region": "south",
+    "cx": 580,
+    "cy": 400,
+    "timezone": "central"
+  },
+  {
+    "id": "CA",
+    "name": "California",
+    "ev": 54,
+    "region": "west",
+    "cx": 60,
+    "cy": 320,
+    "timezone": "mountain"
+  },
+  {
+    "id": "CO",
+    "name": "Colorado",
+    "ev": 10,
+    "region": "west",
+    "cx": 280,
+    "cy": 300,
+    "timezone": "mountain"
+  },
+  {
+    "id": "CT",
+    "name": "Connecticut",
+    "ev": 7,
+    "region": "northeast",
+    "cx": 880,
+    "cy": 220,
+    "timezone": "eastern"
+  },
+  {
+    "id": "DE",
+    "name": "Delaware",
+    "ev": 3,
+    "region": "south",
+    "cx": 860,
+    "cy": 280,
+    "timezone": "eastern"
+  },
+  {
+    "id": "DC",
+    "name": "District of Columbia",
+    "ev": 3,
+    "region": "south",
+    "cx": 840,
+    "cy": 300,
+    "timezone": "eastern"
+  },
+  {
+    "id": "FL",
+    "name": "Florida",
+    "ev": 30,
+    "region": "south",
+    "cx": 780,
+    "cy": 480,
+    "timezone": "eastern"
+  },
+  {
+    "id": "GA",
+    "name": "Georgia",
+    "ev": 16,
+    "region": "south",
+    "cx": 720,
+    "cy": 440,
+    "timezone": "eastern"
+  },
+  {
+    "id": "HI",
+    "name": "Hawaii",
+    "ev": 4,
+    "region": "west",
+    "cx": 200,
+    "cy": 520,
+    "timezone": "mountain"
+  },
+  {
+    "id": "ID",
+    "name": "Idaho",
+    "ev": 4,
+    "region": "west",
+    "cx": 140,
+    "cy": 200,
+    "timezone": "mountain"
+  },
+  {
+    "id": "IL",
+    "name": "Illinois",
+    "ev": 19,
+    "region": "midwest",
+    "cx": 620,
+    "cy": 280,
+    "timezone": "central"
+  },
+  {
+    "id": "IN",
+    "name": "Indiana",
+    "ev": 11,
+    "region": "midwest",
+    "cx": 660,
+    "cy": 260,
+    "timezone": "central"
+  },
+  {
+    "id": "IA",
+    "name": "Iowa",
+    "ev": 6,
+    "region": "midwest",
+    "cx": 560,
+    "cy": 240,
+    "timezone": "central"
+  },
+  {
+    "id": "KS",
+    "name": "Kansas",
+    "ev": 6,
+    "region": "midwest",
+    "cx": 480,
+    "cy": 320,
+    "timezone": "central"
+  },
+  {
+    "id": "KY",
+    "name": "Kentucky",
+    "ev": 8,
+    "region": "south",
+    "cx": 680,
+    "cy": 340,
+    "timezone": "central"
+  },
+  {
+    "id": "LA",
+    "name": "Louisiana",
+    "ev": 8,
+    "region": "south",
+    "cx": 600,
+    "cy": 460,
+    "timezone": "central"
+  },
+  {
+    "id": "ME",
+    "name": "Maine",
+    "ev": 4,
+    "region": "northeast",
+    "cx": 900,
+    "cy": 120,
+    "timezone": "eastern"
+  },
+  {
+    "id": "MD",
+    "name": "Maryland",
+    "ev": 10,
+    "region": "south",
+    "cx": 840,
+    "cy": 260,
+    "timezone": "eastern"
+  },
+  {
+    "id": "MA",
+    "name": "Massachusetts",
+    "ev": 11,
+    "region": "northeast",
+    "cx": 900,
+    "cy": 200,
+    "timezone": "eastern"
+  },
+  {
+    "id": "MI",
+    "name": "Michigan",
+    "ev": 15,
+    "region": "midwest",
+    "cx": 660,
+    "cy": 200,
+    "timezone": "central"
+  },
+  {
+    "id": "MN",
+    "name": "Minnesota",
+    "ev": 10,
+    "region": "midwest",
+    "cx": 540,
+    "cy": 180,
+    "timezone": "central"
+  },
+  {
+    "id": "MS",
+    "name": "Mississippi",
+    "ev": 6,
+    "region": "south",
+    "cx": 640,
+    "cy": 440,
+    "timezone": "central"
+  },
+  {
+    "id": "MO",
+    "name": "Missouri",
+    "ev": 10,
+    "region": "midwest",
+    "cx": 580,
+    "cy": 320,
+    "timezone": "central"
+  },
+  {
+    "id": "MT",
+    "name": "Montana",
+    "ev": 4,
+    "region": "west",
+    "cx": 260,
+    "cy": 140,
+    "timezone": "mountain"
+  },
+  {
+    "id": "NE",
+    "name": "Nebraska",
+    "ev": 5,
+    "region": "midwest",
+    "cx": 460,
+    "cy": 260,
+    "timezone": "central"
+  },
+  {
+    "id": "NV",
+    "name": "Nevada",
+    "ev": 6,
+    "region": "west",
+    "cx": 120,
+    "cy": 300,
+    "timezone": "mountain"
+  },
+  {
+    "id": "NH",
+    "name": "New Hampshire",
+    "ev": 4,
+    "region": "northeast",
+    "cx": 880,
+    "cy": 160,
+    "timezone": "eastern"
+  },
+  {
+    "id": "NJ",
+    "name": "New Jersey",
+    "ev": 14,
+    "region": "northeast",
+    "cx": 860,
+    "cy": 240,
+    "timezone": "eastern"
+  },
+  {
+    "id": "NM",
+    "name": "New Mexico",
+    "ev": 5,
+    "region": "west",
+    "cx": 300,
+    "cy": 400,
+    "timezone": "mountain"
+  },
+  {
+    "id": "NY",
+    "name": "New York",
+    "ev": 28,
+    "region": "northeast",
+    "cx": 840,
+    "cy": 180,
+    "timezone": "eastern"
+  },
+  {
+    "id": "NC",
+    "name": "North Carolina",
+    "ev": 16,
+    "region": "south",
+    "cx": 800,
+    "cy": 380,
+    "timezone": "eastern"
+  },
+  {
+    "id": "ND",
+    "name": "North Dakota",
+    "ev": 3,
+    "region": "midwest",
+    "cx": 500,
+    "cy": 160,
+    "timezone": "central"
+  },
+  {
+    "id": "OH",
+    "name": "Ohio",
+    "ev": 17,
+    "region": "midwest",
+    "cx": 700,
+    "cy": 260,
+    "timezone": "central"
+  },
+  {
+    "id": "OK",
+    "name": "Oklahoma",
+    "ev": 7,
+    "region": "south",
+    "cx": 500,
+    "cy": 380,
+    "timezone": "central"
+  },
+  {
+    "id": "OR",
+    "name": "Oregon",
+    "ev": 8,
+    "region": "west",
+    "cx": 80,
+    "cy": 180,
+    "timezone": "mountain"
+  },
+  {
+    "id": "PA",
+    "name": "Pennsylvania",
+    "ev": 19,
+    "region": "northeast",
+    "cx": 820,
+    "cy": 240,
+    "timezone": "eastern"
+  },
+  {
+    "id": "RI",
+    "name": "Rhode Island",
+    "ev": 4,
+    "region": "northeast",
+    "cx": 900,
+    "cy": 240,
+    "timezone": "eastern"
+  },
+  {
+    "id": "SC",
+    "name": "South Carolina",
+    "ev": 9,
+    "region": "south",
+    "cx": 760,
+    "cy": 420,
+    "timezone": "eastern"
+  },
+  {
+    "id": "SD",
+    "name": "South Dakota",
+    "ev": 3,
+    "region": "midwest",
+    "cx": 480,
+    "cy": 200,
+    "timezone": "central"
+  },
+  {
+    "id": "TN",
+    "name": "Tennessee",
+    "ev": 11,
+    "region": "south",
+    "cx": 680,
+    "cy": 400,
+    "timezone": "central"
+  },
+  {
+    "id": "TX",
+    "name": "Texas",
+    "ev": 40,
+    "region": "south",
+    "cx": 420,
+    "cy": 440,
+    "timezone": "central"
+  },
+  {
+    "id": "UT",
+    "name": "Utah",
+    "ev": 6,
+    "region": "west",
+    "cx": 200,
+    "cy": 260,
+    "timezone": "mountain"
+  },
+  {
+    "id": "VT",
+    "name": "Vermont",
+    "ev": 3,
+    "region": "northeast",
+    "cx": 880,
+    "cy": 140,
+    "timezone": "eastern"
+  },
+  {
+    "id": "VA",
+    "name": "Virginia",
+    "ev": 13,
+    "region": "south",
+    "cx": 800,
+    "cy": 320,
+    "timezone": "eastern"
+  },
+  {
+    "id": "WA",
+    "name": "Washington",
+    "ev": 12,
+    "region": "west",
+    "cx": 100,
+    "cy": 120,
+    "timezone": "mountain"
+  },
+  {
+    "id": "WV",
+    "name": "West Virginia",
+    "ev": 4,
+    "region": "south",
+    "cx": 760,
+    "cy": 300,
+    "timezone": "pacific"
+  },
+  {
+    "id": "WI",
+    "name": "Wisconsin",
+    "ev": 10,
+    "region": "midwest",
+    "cx": 600,
+    "cy": 200,
+    "timezone": "central"
+  },
+  {
+    "id": "WY",
+    "name": "Wyoming",
+    "ev": 3,
+    "region": "west",
+    "cx": 320,
+    "cy": 240,
+    "timezone": "mountain"
+  }
+]
