@@ -60,7 +60,7 @@ export function canJoinAccelerator(state, programId) {
     return {
       ok: false,
       reason: state.flags?.seedRoundClosed
-        ? 'After your priced seed round, new accelerator SAFE programs are closed.'
+        ? 'After your seed round, new accelerator SAFE programs are closed.'
         : 'After Series A or going public, new accelerator programs are closed.'
     };
   }
@@ -144,6 +144,6 @@ export function renderAcceleratorsBlock(state) {
     })
     .join('');
 
-  const capNote = `<p class="fine-print">Limit: ${MAX_ACCELERATOR_PROGRAMS} accelerator programs total (X Combinator counts as one), before priced seed. Programs hide after seed close.</p>`;
+  const capNote = `<p class="fine-print">Limit: ${MAX_ACCELERATOR_PROGRAMS} accelerator programs total (X Combinator counts as one), before seed. Programs hide after seed close.</p>`;
   return `<h3 class="log-head">Other accelerators & SAFE paths</h3>${capNote}${cards}`;
 }
