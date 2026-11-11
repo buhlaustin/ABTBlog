@@ -1278,6 +1278,9 @@ const {
   treasuryNetCash,
   estimateEquityValue
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+const { displayOutstandingShares, macroCapPressureRatio, GLOBAL_GDP_USD_BENCHMARK } = await import(
+  `file://${join(sim, 'modules/PublicMarketRealism.js')}`
+);
 const { calendarTurn } = await import(`file://${join(sim, 'modules/XC.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 pub.stage = ST.PUBLIC;
@@ -1464,6 +1467,7 @@ if (!ipo.ok) {
       ...pub.publicMarket,
       sharePrice: 400,
       ipoPrice: 400,
+      displaySplitMultiplier: 1,
       lastSplitTurn: null
     };
     careerSplitState.capTable = JSON.parse(JSON.stringify(pub.capTable));
@@ -1478,6 +1482,31 @@ if (!ipo.ok) {
     } else if (!failed) {
       console.log('OK: sandbox unlimited stock splits; career keeps 6-month gate');
     }
+  }
+  const sharesBeforeSplit = totalOutstandingShares(pub);
+  const capBeforeCosmetic = marketCap(pub);
+  pub.publicMarket.displaySplitMultiplier = 1;
+  pub.publicMarket.sharePrice = 360;
+  const cosmeticSplit = executeStockSplit(pub);
+  const sharesAfterSplit = totalOutstandingShares(pub);
+  const capAfterCosmetic = marketCap(pub);
+  if (!cosmeticSplit.ok) {
+    console.error(`FAIL: cosmetic split: ${cosmeticSplit.reason}`);
+    failed = true;
+  } else if (sharesAfterSplit !== sharesBeforeSplit) {
+    console.error('FAIL: stock split must not multiply economic cap-table shares');
+    failed = true;
+  } else if (displayOutstandingShares(pub) < sharesBeforeSplit * 1.9) {
+    console.error('FAIL: split should raise street-facing share count');
+    failed = true;
+  } else if (Math.abs(capAfterCosmetic - capBeforeCosmetic) > capBeforeCosmetic * 0.02) {
+    console.error('FAIL: split should preserve market cap');
+    failed = true;
+  } else if (macroCapPressureRatio(GLOBAL_GDP_USD_BENCHMARK * 2) < 0.85) {
+    console.error('FAIL: macro cap pressure should be high above global GDP');
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: cosmetic splits + macro valuation pressure');
   }
   const { tickPublicMarketAtMonthStart } = await import(`file://${join(sim, 'modules/IPO.js')}`);
   tickPublicMarketAtMonthStart(pub);

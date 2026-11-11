@@ -1,5 +1,6 @@
 import { formatMoney } from './constants.js';
 import { isPublicCompany, marketCap } from './IPO.js';
+import { macroCapPressureRatio } from './PublicMarketRealism.js';
 
 /** Market-cap bands after listing — gates desk tasks and wealth heat. */
 export const PUBLIC_CAP_TIER_LABELS = [
@@ -44,8 +45,9 @@ export function publicWealthHeat(state) {
   const monthsRamp = 1 - Math.exp(-months / 20);
   const tier = publicCapTier(state);
   const capRamp = (tier + 1) / PUBLIC_CAP_TIER_LABELS.length;
+  const macroDrag = macroCapPressureRatio(marketCap(state)) * 0.35;
   const blended = monthsRamp * 0.52 + capRamp * 0.48;
-  return Math.min(1, Math.max(0, Math.round(blended * 1000) / 1000));
+  return Math.min(1, Math.max(0, Math.round((blended * (1 - macroDrag)) * 1000) / 1000));
 }
 
 /** Scale instant stock moves (desk, IR, board) — floor 15% of catalog pct at IPO. */

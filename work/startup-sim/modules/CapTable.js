@@ -39,11 +39,13 @@ export function applyPublicListingCapTable(state, valuation, sharePrice, opts = 
   const maxFloatFdPct = opts.maxFloatFdPct ?? IPO_MAX_FLOAT_FD_PCT;
 
   const fromFloatTarget = Math.round(insider / (1 - floatFdPct));
-  const fromValuation = Math.round(valuation / price);
   const capTotal = Math.round(insider / (1 - maxFloatFdPct));
-  let totalShares = Math.max(fromFloatTarget, fromValuation);
-  totalShares = Math.min(totalShares, capTotal);
-  totalShares = Math.max(totalShares, insider + 1);
+  let totalShares = Math.min(Math.max(fromFloatTarget, insider + 1), capTotal);
+  let listingPrice = price;
+  const impliedCap = totalShares * listingPrice;
+  if (valuation > impliedCap * 1.04 && totalShares > 0) {
+    listingPrice = Math.max(price, Math.ceil((valuation / totalShares) * 100) / 100);
+  }
 
   const newPublicShares = totalShares - insider;
   const primaryShares = Math.min(
@@ -51,7 +53,7 @@ export function applyPublicListingCapTable(state, valuation, sharePrice, opts = 
     newPublicShares
   );
   const liquidityShares = newPublicShares - primaryShares;
-  const primaryProceeds = Math.round(primaryShares * price);
+  const primaryProceeds = Math.round(primaryShares * listingPrice);
 
   rows.push({
     id: PUBLIC_FLOAT_ROW_ID,
@@ -65,7 +67,8 @@ export function applyPublicListingCapTable(state, valuation, sharePrice, opts = 
     primaryShares,
     primaryProceeds,
     liquidityShares,
-    publicFloatShares: newPublicShares
+    publicFloatShares: newPublicShares,
+    listingPrice
   };
 }
 
