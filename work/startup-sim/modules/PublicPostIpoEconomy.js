@@ -1,6 +1,48 @@
 import { formatMoney } from './constants.js';
 import { isPublicCompany, marketCap } from './IPO.js';
 import { macroCapPressureRatio } from './PublicMarketRealism.js';
+import { getArr } from './Workspace.js';
+
+/** Paid growth rev× cap after listing (desk tasks can still use full career/sandbox cap). */
+export const PUBLIC_GROWTH_REV_MULT_CAP_CAREER = 42;
+export const PUBLIC_GROWTH_REV_MULT_CAP_SANDBOX = 88;
+
+export function publicGrowthRevenueMultCap(state) {
+  return state.mode === 'sandbox' ? PUBLIC_GROWTH_REV_MULT_CAP_SANDBOX : PUBLIC_GROWTH_REV_MULT_CAP_CAREER;
+}
+
+/** One campaign payout ceiling — fraction of spot MRR, ramps with wealth heat. */
+export function publicGrowthPerCampaignRevenueCap(state) {
+  const mrr = Math.max(state.finance?.mrr ?? 0, 1);
+  const heat = publicWealthHeat(state);
+  const frac = 0.035 + heat * 0.1;
+  return Math.round(Math.max(mrr * 0.02, mrr * frac));
+}
+
+/** Total paid growth revenue allowed in a single month while public. */
+export function publicGrowthMonthlyRevenueCap(state) {
+  const mrr = Math.max(state.finance?.mrr ?? 0, 1);
+  const arr = Math.max(getArr(state), mrr * 12);
+  const heat = publicWealthHeat(state);
+  const macroDrag = macroCapPressureRatio(marketCap(state)) * 0.5;
+  const monthlyFrac = (0.1 + heat * 0.16) * (1 - macroDrag);
+  return Math.round(Math.max(mrr * 0.06, (arr * monthlyFrac) / 12));
+}
+
+export function capPublicGrowthCampaignRevenue(state, rawRevenue) {
+  if (!isPublicCompany(state)) return rawRevenue;
+  const used = state.growth?.monthCampaignRevenue ?? 0;
+  const monthlyCap = publicGrowthMonthlyRevenueCap(state);
+  const perCap = publicGrowthPerCampaignRevenueCap(state);
+  const room = Math.max(0, monthlyCap - used);
+  return Math.max(0, Math.min(rawRevenue, perCap, room));
+}
+
+/** Post-IPO marketing bandwidth — never unlimited even at worldwide hub. */
+export function publicGrowthCampaignSlotCap(state) {
+  const heat = publicWealthHeat(state);
+  return Math.min(8, Math.max(4, 4 + Math.round(heat * 4)));
+}
 
 /** Market-cap bands after listing — gates desk tasks and wealth heat. */
 export const PUBLIC_CAP_TIER_LABELS = [

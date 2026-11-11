@@ -165,9 +165,7 @@ export function fileIpo(state) {
     floatFdPct: IPO_TARGET_FLOAT_FD_PCT,
     primaryFdPct: IPO_PRIMARY_FD_PCT
   });
-  if (listing.listingPrice > openPrice) {
-    openPrice = listing.listingPrice;
-  }
+  openPrice = listing.listingPrice;
   const primaryProceeds = listing.primaryProceeds ?? 0;
   if (primaryProceeds > 0) {
     state.finance.cash = (state.finance.cash ?? 0) + primaryProceeds;

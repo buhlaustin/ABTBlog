@@ -1,7 +1,10 @@
 import { getWorkspaceTier, WORKSPACE_TIER } from './Workspace.js';
 import { progressionTier } from './ProgressionEconomy.js';
+import { isPublicCompany } from './IPO.js';
+import { publicGrowthCampaignSlotCap } from './PublicPostIpoEconomy.js';
 
 export function isHubUnlimitedSideTasks(state) {
+  if (isPublicCompany(state)) return false;
   return getWorkspaceTier(state) === WORKSPACE_TIER.HUB;
 }
 
@@ -56,6 +59,10 @@ export function growthCampaignSlots(state) {
   if (ws === WORKSPACE_TIER.LARGE) slots += 1;
   if (ws === WORKSPACE_TIER.CAMPUS) slots += 1;
 
+  if (isPublicCompany(state)) {
+    slots = Math.min(slots, publicGrowthCampaignSlotCap(state));
+  }
+
   return Math.max(1, slots);
 }
 
@@ -73,6 +80,10 @@ export function sideTaskCapacityRemaining(limit, used) {
 export function sideTaskLimitHint(state) {
   if (isHubUnlimitedSideTasks(state)) {
     return 'Worldwide hub — unlimited side plays this month (still pay cash per play).';
+  }
+  if (isPublicCompany(state) && getWorkspaceTier(state) === WORKSPACE_TIER.HUB) {
+    const cap = publicGrowthCampaignSlotCap(state);
+    return `Public company at hub — paid growth capped at ${cap} campaign${cap === 1 ? '' : 's'}/mo (SEC disclosure bandwidth).`;
   }
   const tier = progressionTier(state);
   const plays = sideTaskPlaysPerMonth(state);

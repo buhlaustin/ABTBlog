@@ -25,6 +25,12 @@ import { growthCampaignSlots, growthCampaignsRemaining } from './GrowthBudget.js
 import { formatMonthlySideTaskLimit } from './SideTaskProgression.js';
 import { applyCampaignRivalEffects } from './WorldDynamics.js';
 import { applyStockPctMove, isPublicCompany } from './IPO.js';
+import {
+  capPublicGrowthCampaignRevenue,
+  publicGrowthCampaignSlotCap,
+  publicGrowthMonthlyRevenueCap,
+  publicGrowthRevenueMultCap
+} from './PublicPostIpoEconomy.js';
 
 function mergeCampaignCatalog(base, ...extras) {
   const campaigns = [...(base?.campaigns ?? [])];
@@ -226,7 +232,9 @@ export function growthCampaignCatalogSize() {
 }
 
 function campaignRevenueMult(state) {
-  return getTaskRevenueMultiplierPreview(state);
+  const preview = getTaskRevenueMultiplierPreview(state);
+  if (!isPublicCompany(state)) return preview;
+  return Math.min(preview, publicGrowthRevenueMultCap(state));
 }
 
 function campaignCategoryAllowed(def, state) {
@@ -278,7 +286,8 @@ export function runGrowthCampaign(state, campaignId) {
   const [rMin, rMax] = def.revenue ?? [0, 0];
   const base = rMin + Math.random() * Math.max(0, rMax - rMin);
   const era = eraBaseRevenueScaleForCampaign(def, state);
-  const revenue = Math.round(base * era * campaignRevenueMult(state));
+  let revenue = Math.round(base * era * campaignRevenueMult(state));
+  revenue = capPublicGrowthCampaignRevenue(state, revenue);
 
   state.finance.cash -= cost;
   state.finance.cash += revenue;
@@ -289,6 +298,9 @@ export function runGrowthCampaign(state, campaignId) {
   state.calendar.monthSpend = (state.calendar.monthSpend ?? 0) + cost;
   state.product.buzz = (state.product.buzz ?? 0) + (def.buzz ?? 0);
   state.growth.campaignsThisMonth.push(def.id);
+  if (isPublicCompany(state)) {
+    state.growth.monthCampaignRevenue = (state.growth.monthCampaignRevenue ?? 0) + revenue;
+  }
   const recent = state.growth.recentCampaignIds ?? [];
   state.growth.recentCampaignIds = [...recent, def.id].slice(
     -GROWTH_MONTHLY_OFFER_COUNT * GROWTH_CAMPAIGN_COOLDOWN_MONTHS
@@ -308,9 +320,21 @@ export function runAllRemainingGrowthCampaigns(state) {
   let totalRevenue = 0;
   let totalBuzz = 0;
 
-  for (let guard = 0; guard < 512; guard += 1) {
+  const loopCap = isPublicCompany(state)
+    ? Math.min(
+        24,
+        Number.isFinite(growthCampaignsRemaining(state))
+          ? growthCampaignsRemaining(state)
+          : publicGrowthCampaignSlotCap(state)
+      )
+    : 512;
+  for (let guard = 0; guard < loopCap; guard += 1) {
     const remaining = growthCampaignsRemaining(state);
     if (remaining !== Infinity && remaining <= 0) break;
+    if (isPublicCompany(state)) {
+      const usedRev = state.growth?.monthCampaignRevenue ?? 0;
+      if (usedRev >= publicGrowthMonthlyRevenueCap(state)) break;
+    }
 
     const campaigns = availableCampaigns(state);
     if (!campaigns.length) break;
@@ -362,6 +386,7 @@ export function canBuyAllRemainingGrowthCampaigns(state) {
 export function resetGrowthCampaignsMonth(state) {
   if (!state.growth) state.growth = { campaignsThisMonth: [] };
   state.growth.campaignsThisMonth = [];
+  state.growth.monthCampaignRevenue = 0;
   refreshGrowthCampaignOffers(state);
 }
 

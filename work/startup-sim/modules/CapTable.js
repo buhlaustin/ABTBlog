@@ -8,10 +8,11 @@ export function targetIpoSharePrice(state, valuation) {
   const arr = Math.max(getArr(state), (state.finance?.mrr ?? 0) * 12, 1);
   const ps = valuation / arr;
   const fromArr = 16 + Math.log10(Math.max(arr, 1e6)) * 10.5;
-  const fromVal = Math.sqrt(valuation / 40_000_000) * 4.2;
+  const fromVal = Math.sqrt(valuation / 40_000_000) * 2.6;
   let price = Math.round(((fromArr + fromVal) / 2) * 100) / 100;
-  if (ps > 35) price *= 0.72;
-  return Math.max(8, Math.min(165, price));
+  if (ps > 28) price *= 0.68;
+  if (ps > 45) price *= 0.58;
+  return Math.max(8, Math.min(95, price));
 }
 
 /** ESOP created at seed — 8% fully-diluted (was 10%). */
@@ -41,11 +42,7 @@ export function applyPublicListingCapTable(state, valuation, sharePrice, opts = 
   const fromFloatTarget = Math.round(insider / (1 - floatFdPct));
   const capTotal = Math.round(insider / (1 - maxFloatFdPct));
   let totalShares = Math.min(Math.max(fromFloatTarget, insider + 1), capTotal);
-  let listingPrice = price;
-  const impliedCap = totalShares * listingPrice;
-  if (valuation > impliedCap * 1.04 && totalShares > 0) {
-    listingPrice = Math.max(price, Math.ceil((valuation / totalShares) * 100) / 100);
-  }
+  const listingPrice = price;
 
   const newPublicShares = totalShares - insider;
   const primaryShares = Math.min(

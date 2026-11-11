@@ -1304,7 +1304,7 @@ if (!ipo.ok) {
 } else if (!floatRow?.shares || floatRow.shares < 1000) {
   console.error('FAIL: IPO should add public float shares on cap table');
   failed = true;
-} else if (listPrice > 450 || listPrice < 5) {
+} else if (listPrice > 165 || listPrice < 5) {
   console.error(`FAIL: IPO share price out of band (${listPrice})`);
   failed = true;
 } else if ((pub.finance.cash ?? 0) <= cashBeforeIpo) {
@@ -2400,6 +2400,38 @@ if (
   failed = true;
 } else {
   console.log(`OK: dynamic side limits (${earlyPlays}→${scaledPlays} plays, hub unlimited)`);
+}
+
+const pubHubSlots = createInitialState({ companyName: 'Pub Hub', categoryId: 'b2b-saas', mode: 'career' });
+pubHubSlots.flags.ipoFiled = true;
+pubHubSlots.stage = STAGES.PUBLIC;
+pubHubSlots.workspace.tier = WORKSPACE_TIER.HUB;
+pubHubSlots.offices = { ...(pubHubSlots.offices ?? {}), hubId: 'test-hub' };
+pubHubSlots.finance.mrr = 8_000_000;
+if (growthCampaignSlots(pubHubSlots) === Infinity || growthCampaignSlots(pubHubSlots) > 10) {
+  console.error(`FAIL: public hub should cap paid growth slots (got ${growthCampaignSlots(pubHubSlots)})`);
+  failed = true;
+} else {
+  const whale = getGrowthCampaigns().find((c) => (c.revenue?.[1] ?? 0) >= 50_000_000);
+  if (whale) {
+    resetGrowthCampaignsMonth(pubHubSlots);
+    const offers = pubHubSlots.growth.monthCampaignOffers ?? [];
+    if (!offers.includes(whale.id)) {
+      pubHubSlots.growth.monthCampaignOffers = [whale.id, ...offers.slice(0, 27)];
+    }
+    pubHubSlots.finance.cash = 500_000_000;
+    const beforeMrr = pubHubSlots.finance.mrr;
+    const run = runGrowthCampaign(pubHubSlots, whale.id);
+    if (!run.ok) {
+      console.error(`FAIL: public whale growth smoke: ${run.reason}`);
+      failed = true;
+    } else if (run.revenue > beforeMrr * 0.2) {
+      console.error(`FAIL: public growth payout too high (${run.revenue} vs mrr ${beforeMrr})`);
+      failed = true;
+    } else {
+      console.log(`OK: public hub growth caps (slots ${growthCampaignSlots(pubHubSlots)}, whale payout ${run.revenue})`);
+    }
+  }
 }
 
 const spaceState = createInitialState({
