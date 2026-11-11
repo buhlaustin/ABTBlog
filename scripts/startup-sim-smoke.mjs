@@ -1825,6 +1825,41 @@ const {
   preparePersonalExpensesForMonth,
   rollPersonalExpenseTotal
 } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
+if (!failed) {
+  const megaCeo = createInitialState({ companyName: 'Mega CEO', categoryId: 'b2b-saas', mode: 'sandbox' });
+  megaCeo.flags.seedRoundClosed = true;
+  megaCeo.flags.seriesAClosed = true;
+  megaCeo.flags.ipoFiled = true;
+  megaCeo.stage = STAGES.PUBLIC;
+  const { purchaseWorkspaceTier, WORKSPACE_TIER } = await import(
+    `file://${join(sim, 'modules/Workspace.js')}`
+  );
+  megaCeo.finance.cash = 50_000_000;
+  megaCeo.finance.arr = 2_000_000;
+  megaCeo.finance.mrr = Math.round(megaCeo.finance.arr / 12);
+  const officeBuy = purchaseWorkspaceTier(megaCeo, WORKSPACE_TIER.SMALL);
+  if (!officeBuy.ok) {
+    console.error(`FAIL: mega CEO office: ${officeBuy.reason}`);
+    failed = true;
+  }
+  setCeoSalaryAnnual(megaCeo, 20_000_000);
+  const band20 = personalExpenseBandForSalary(20_000_000);
+  preparePersonalExpensesForMonth(megaCeo);
+  const megaSched = scheduledPersonalExpense(megaCeo);
+  const foodLine = megaSched.breakdown.find((l) => l.label === 'Food & household')?.amount ?? 0;
+  if (megaSched.total > band20.max * 1.02) {
+    console.error(`FAIL: $20M CEO personal debits ${megaSched.total} above band max ${band20.max}`);
+    failed = true;
+  } else if (foodLine > 50_000) {
+    console.error(`FAIL: $20M CEO food debit unrealistic: ${foodLine}/mo`);
+    failed = true;
+  } else if (megaSched.total > 200_000) {
+    console.error(`FAIL: $20M CEO monthly personal burn too high: ${megaSched.total}`);
+    failed = true;
+  } else {
+    console.log(`OK: $20M CEO personal debits ${megaSched.total} (food ${foodLine})`);
+  }
+}
 const bankA = createInitialState({ companyName: 'Bank A', categoryId: 'b2b-saas', mode: 'career', ceoFirstName: 'A', ceoLastName: 'One' });
 const bankB = createInitialState({ companyName: 'Bank B', categoryId: 'b2b-saas', mode: 'career', ceoFirstName: 'B', ceoLastName: 'Two' });
 const openA = ceoPersonalBankBalance(bankA);
