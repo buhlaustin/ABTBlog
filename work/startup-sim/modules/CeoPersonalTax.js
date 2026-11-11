@@ -1,11 +1,16 @@
 import { formatMoney } from './constants.js';
 import { isAprilTaxSeason } from './CorporateTax.js';
+import {
+  computeIndividualIncomeTax,
+  indexedIndividualBrackets,
+  topMarginalRate
+} from './IndividualIncomeTax.js';
 
 /** Desk task id — injected every April until CEO personal tax is paid. */
 export const CEO_PERSONAL_TAX_FILING_TASK_ID = 'required-ceo-personal-tax-filing';
 
-/** Simplified combined rate on W-2 + draws + bonus + secondary sales (game fiction). */
-export const CEO_PERSONAL_TAX_RATE = 0.28;
+/** @deprecated Use marginal brackets — kept for UI labels referencing “up to 37%”. */
+export const CEO_PERSONAL_TAX_TOP_RATE = 0.37;
 
 export function createInitialCeoPersonalTax() {
   return {
@@ -63,10 +68,26 @@ export function ceoPersonalTaxBaseIncome(state) {
   return Math.max(0, pt.current.income ?? 0);
 }
 
+/** Tax year attached to the April filing (prior calendar year after year one). */
+export function ceoPersonalTaxLiabilityYear(state) {
+  const pt = ensureCeoPersonalTax(state);
+  const startY = state.meta?.calendarStartYear ?? pt.current.year;
+  const calY = state.calendar?.year ?? startY;
+  if (pt.prior?.year != null && calY > startY) return pt.prior.year;
+  return pt.current.year ?? calY ?? startY;
+}
+
+export function ceoPersonalTaxBracketsForFiling(state) {
+  const taxYear = ceoPersonalTaxLiabilityYear(state);
+  const startY = state.meta?.calendarStartYear ?? taxYear;
+  return indexedIndividualBrackets(taxYear, startY);
+}
+
 export function computeCeoPersonalTaxLiability(state) {
   const base = ceoPersonalTaxBaseIncome(state);
   if (base <= 0) return 0;
-  return Math.max(250, Math.round(base * CEO_PERSONAL_TAX_RATE));
+  const brackets = ceoPersonalTaxBracketsForFiling(state);
+  return Math.max(250, computeIndividualIncomeTax(base, brackets));
 }
 
 export function isCeoPersonalTaxFilingRequired(state) {
@@ -79,12 +100,18 @@ export function ceoPersonalTaxDisplay(state) {
   const pt = ensureCeoPersonalTax(state);
   const base = ceoPersonalTaxBaseIncome(state);
   const owed = computeCeoPersonalTaxLiability(state);
+  const brackets = ceoPersonalTaxBracketsForFiling(state);
+  const liabilityYear = ceoPersonalTaxLiabilityYear(state);
+  const effectiveRate = base > 0 ? owed / base : 0;
   return {
     currentYear: pt.current.year,
     currentIncome: pt.current.income ?? 0,
     priorYear: pt.prior?.year ?? null,
     priorIncome: pt.prior?.income ?? 0,
     baseIncome: base,
+    liabilityYear,
+    marginalRate: topMarginalRate(base, brackets),
+    effectiveRate,
     liability: owed,
     taxPaid: ceoPersonalTaxPaidForYear(state),
     careerTaxPaid: pt.careerTaxPaid ?? 0,

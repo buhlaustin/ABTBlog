@@ -137,6 +137,7 @@ import {
   donateToAlmaMater,
   donateToAlmaMaterAthletics
 } from './modules/CeoAlumniGiving.js';
+import { commitAlumniInvestment, withdrawAlumniInvestment } from './modules/CeoAlumniInvesting.js';
 import { preloadCeoWlbCatalog, completeCeoWlbTask } from './modules/CeoHappiness.js';
 import {
   preparePersonalExpensesForMonth,
@@ -1668,6 +1669,36 @@ function bindGameInteractions() {
         alumniGiveBtn.getAttribute('data-ceo-alumni-fund') || 'annual-fund'
       );
       if (!result.ok) showCeoFeedback(result.reason || 'Alumni gift failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const alumniInvestBtn = e.target.closest('[data-ceo-alumni-invest]');
+    if (alumniInvestBtn && sessionState) {
+      const result = commitAlumniInvestment(
+        sessionState,
+        alumniInvestBtn.getAttribute('data-ceo-alumni-invest'),
+        alumniInvestBtn.getAttribute('data-ceo-alumni-vehicle')
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Alumni investment failed.', true);
+      else {
+        appendLog(sessionState, result.summary);
+        showCeoFeedback(result.summary);
+      }
+      refresh();
+      return;
+    }
+    const alumniInvestWithdrawBtn = e.target.closest('[data-ceo-alumni-invest-withdraw]');
+    if (alumniInvestWithdrawBtn && sessionState) {
+      const result = withdrawAlumniInvestment(
+        sessionState,
+        alumniInvestWithdrawBtn.getAttribute('data-ceo-alumni-invest-withdraw'),
+        alumniInvestWithdrawBtn.getAttribute('data-ceo-alumni-vehicle')
+      );
+      if (!result.ok) showCeoFeedback(result.reason || 'Withdrawal failed.', true);
       else {
         appendLog(sessionState, result.summary);
         showCeoFeedback(result.summary);

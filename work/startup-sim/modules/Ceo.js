@@ -39,7 +39,8 @@ import {
   ceoLifestyleLifetimeSpend,
   lifestylePurchaseGate,
   standardMortgagePayment,
-  HOUSING_MODE
+  HOUSING_MODE,
+  STACKABLE_EXCLUSIVE_GROUPS
 } from './CeoLifestyle.js';
 import { isPublicCompany, canSellFounderStock } from './IPO.js';
 import { formatCalendarStamp } from './GameCalendar.js';
@@ -274,7 +275,7 @@ function renderCeoOverviewSection(ctx) {
     : '';
   const personalTaxAlert =
     ctx.personalTax?.filingRequired && !ctx.personalTax?.taxPaid
-      ? `<p class="finance-alert finance-alert--tax" role="status"><strong>April personal taxes</strong> — ${formatMoney(ctx.personalTax.liability)} on ${formatMoney(ctx.personalTax.baseIncome)} taxable income (salary, draws, bonuses, stock sales). Pay via the mandatory desk task from your personal bank.</p>`
+      ? `<p class="finance-alert finance-alert--tax" role="status"><strong>April personal taxes</strong> — ${formatMoney(ctx.personalTax.liability)} on ${formatMoney(ctx.personalTax.baseIncome)} taxable income (TY ${ctx.personalTax.liabilityYear ?? '—'}; top bracket ${Math.round((ctx.personalTax.marginalRate ?? 0) * 100)}%). Pay via the mandatory desk task from your personal bank.</p>`
       : ctx.personalTax?.taxPaid && (state.calendar?.monthIndex ?? 0) === 4
         ? `<p class="finance-alert finance-alert--ok">Personal taxes filed for ${state.calendar?.year ?? ''} (career paid ${formatMoney(ctx.personalTax.careerTaxPaid)}).</p>`
         : '';
@@ -420,7 +421,11 @@ function renderCeoWealthSection(ctx) {
         <h3 class="finance-section-title">Founder stake (public)</h3>
         <span class="ceo-ticker-pill">${escapeHtml(shares.ticker ?? '—')} ${formatMoney(shares.markPx)}/sh</span>
       </div>
-      <p class="ceo-stake-headline">Your block <strong>${formatMoney(shares.stakeValue)}</strong></p>
+      <p class="ceo-stake-headline">Paper <strong>${formatMoney(shares.stakeValue)}</strong>${
+        shares.liquidationValue < shares.stakeValue * 0.98
+          ? ` · est. cash-out <strong>${formatMoney(shares.liquidationValue)}</strong> after float depth`
+          : ''
+      }</p>
       ${panelMetricGrid('3', [
         panelStatCard('Your shares', shares.shares.toLocaleString('en-US')),
         panelStatCard('Ownership', `${comp.pct}%`),
@@ -432,7 +437,7 @@ function renderCeoWealthSection(ctx) {
       ])}
       ${
         exitPrev
-          ? `<p class="fine-print">Step-down today ≈ ${formatMoney(exitPrev.combined)} (${formatMoney(exitPrev.payout)} stock + ${formatMoney(exitPrev.liquid)} bank).</p>`
+          ? `<p class="fine-print">Step-down today ≈ ${formatMoney(exitPrev.combined)} (${formatMoney(exitPrev.payout)} after liquidity, ${formatMoney(exitPrev.paperStake ?? exitPrev.payout)} on tape + ${formatMoney(exitPrev.liquid)} bank).</p>`
           : lockup > 0
             ? `<p class="fine-print">Paper value after lockup: ${formatMoney(shares.stakeValue)} (credits personal bank on step-down).</p>`
             : ''
@@ -451,7 +456,7 @@ function renderCeoWealthSection(ctx) {
     publicCo && !state.flags?.cashedOut
       ? `<section class="finance-section finance-card">
         <h3 class="finance-section-title">Sell founder stock (secondary)</h3>
-        <p class="fine-print">Market price · you stay CEO · proceeds to personal bank</p>
+        <p class="fine-print">Last trade minus liquidity + sale costs · you stay CEO · net proceeds to personal bank</p>
         ${
           lockup > 0
             ? `<p class="fine-print">Lockup: ${lockup} month(s) remaining.</p>`
@@ -640,12 +645,14 @@ function renderCeoLifestyleSection(ctx) {
     const gate = lifestylePurchaseGate(state, item, { ok: !item.minNetWorth || netWorth >= item.minNetWorth });
     const canBuy = gate.ok && !disabled;
     const tags = [
-      item.exclusiveGroup ? 'One per category' : null,
-      item.requiresPublic ? 'Public co.' : null,
+      item.exclusiveGroup && STACKABLE_EXCLUSIVE_GROUPS.has(item.exclusiveGroup)
+        ? 'Garage / club collectible'
+        : item.exclusiveGroup
+          ? 'One per category'
+          : null,
       item.resalePct ? `Resell ~${Math.round(item.resalePct * 100)}%` : null,
       item.buzzOnPurchase ? `+${item.buzzOnPurchase} buzz` : null,
       item.sentimentOnPurchase ? `+${item.sentimentOnPurchase} sentiment` : null,
-      item.requiresOwned?.length ? 'Requires prior purchase' : null,
       item.minHomeEquity ? `≥${formatMoney(item.minHomeEquity)} home equity` : null
     ]
       .filter(Boolean)
@@ -690,7 +697,7 @@ function renderCeoLifestyleSection(ctx) {
             return `<li><strong>${escapeHtml(p.label)}</strong>${p.monthlyDebitBump ? ` · +${formatMoney(p.monthlyDebitBump)}/mo` : ''}${sell}</li>`;
           })
           .join('')}</ul>`
-      : '<p class="fine-print">No splurges yet — e-bike, standing desk, or premium gym are affordable early; cars and clubs are exclusive picks.</p>';
+      : '<p class="fine-print">No splurges yet — e-bike, standing desk, or premium gym are affordable early; build a full garage and stack club memberships as you scale.</p>';
 
   const housingStatusLine =
     housing.mode === HOUSING_MODE.RENT
@@ -752,7 +759,7 @@ function renderCeoLifestyleSection(ctx) {
       <h4 class="finance-section-title">Homes</h4>
       <div class="people-perk-grid ceo-home-grid">${homeCards}</div>
       <h4 class="finance-section-title">Splurge catalog</h4>
-      <p class="fine-print">${getCeoLifestylePurchasesSync().length} purchases across ${getCeoLifestyleCategoriesSync().length} categories — exclusive groups (one car, one club), prerequisites, resell on select items, optional buzz/sentiment on flagship buys.</p>
+      <p class="fine-print">${getCeoLifestylePurchasesSync().length} purchases across ${getCeoLifestyleCategoriesSync().length} categories — collect every vehicle and club tier (net worth and cash gates still apply), resell on select items, optional buzz/sentiment on flagship buys.</p>
       ${lifestyleByCategory}
     </section>
   `;

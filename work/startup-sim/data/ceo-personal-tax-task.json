@@ -3,7 +3,7 @@
     {
       "id": "required-ceo-personal-tax-filing",
       "title": "File & pay CEO personal taxes",
-      "description": "April deadline — pay estimated personal income tax on last year’s salary, draws, bonuses, and stock sales from your personal bank.",
+      "description": "April deadline — pay federal income tax (10–37% marginal brackets; thresholds index 3.2%/yr) on last year’s salary, draws, bonuses, and stock sales from your personal bank.",
       "types": ["support"],
       "stages": ["garage", "office", "xc", "post_xc", "public"],
       "ceoPersonalTaxFiling": true,

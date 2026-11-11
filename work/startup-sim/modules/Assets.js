@@ -51,7 +51,8 @@ const HUB_BACKDROP = {
   miami: 'assets/backgrounds/hub-miami.jpg',
   dallas: 'assets/backgrounds/hub-dallas.jpg',
   atlanta: 'assets/backgrounds/hub-atlanta.jpg',
-  nashville: 'assets/backgrounds/hub-nashville.jpg'
+  nashville: 'assets/backgrounds/hub-nashville.jpg',
+  knoxville: 'assets/backgrounds/hub-nashville.jpg'
 };
 
 /** Wide stage / hub backdrop for the main game shell. */

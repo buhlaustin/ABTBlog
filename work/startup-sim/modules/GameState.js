@@ -7,7 +7,8 @@ import { migratePublicFloatCapTable, recalculateCapTablePercentages } from './Ca
 import {
   createInitialOffices,
   satelliteTemplateIdFromEntry,
-  refreshSatelliteFootprints
+  refreshSatelliteFootprints,
+  releaseHubCitySatelliteSlot
 } from './Offices.js';
 import {
   createInitialWorkspace,
@@ -45,6 +46,7 @@ import { prepareCompanyOverheadForMonth } from './CompanyOverhead.js';
 import { createInitialCooState, hireCoo, isCooHired } from './Coo.js';
 import { clampCeoBirthMonth, clampCeoBirthYear } from './CeoProfile.js';
 import { defaultAlmaMaterId, getAlmaMaterById } from './CeoAlumniGiving.js';
+import { ensureAlmaMaterGrades } from './CeoAlmaMaterGrades.js';
 import {
   STAGES,
   REVENUE_GATES,
@@ -204,6 +206,7 @@ export function createInitialState(options) {
 
   applyWorkspaceBurn(state);
   initializeCeoPersonalFinances(state);
+  ensureAlmaMaterGrades(state);
   state.meta.runStartedTurn = calendarTurn(state);
   startMonth(state);
   return state;
@@ -231,6 +234,9 @@ export function normalizeSave(raw) {
       if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
       if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
       if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
+      if (!state.ceo.alumniInvestPositions) state.ceo.alumniInvestPositions = {};
+      if (state.ceo.alumniInvestLifetime == null) state.ceo.alumniInvestLifetime = 0;
+      if (state.ceo.alumniInvestReturns == null) state.ceo.alumniInvestReturns = 0;
       if (state.ceo.personalHappiness == null) state.ceo.personalHappiness = 62;
       if (!state.ceo.wlbOffers) state.ceo.wlbOffers = [];
       if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];
@@ -393,6 +399,7 @@ export function normalizeSave(raw) {
     if (!state.company.almaMaterId || !getAlmaMaterById(state.company.almaMaterId)) {
       state.company.almaMaterId = defaultAlmaMaterId();
     }
+    ensureAlmaMaterGrades(state);
     {
       const cat = getCategoryById(state.company?.categoryId);
       if (!cat) return null;
@@ -458,6 +465,9 @@ export function normalizeSave(raw) {
       if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
       if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
       if (!state.ceo.alumniDonationLog) state.ceo.alumniDonationLog = [];
+      if (!state.ceo.alumniInvestPositions) state.ceo.alumniInvestPositions = {};
+      if (state.ceo.alumniInvestLifetime == null) state.ceo.alumniInvestLifetime = 0;
+      if (state.ceo.alumniInvestReturns == null) state.ceo.alumniInvestReturns = 0;
       if (state.ceo.personalHappiness == null) state.ceo.personalHappiness = 62;
       if (!state.ceo.wlbOffers) state.ceo.wlbOffers = [];
       if (!state.ceo.wlbRecentIds) state.ceo.wlbRecentIds = [];
@@ -489,6 +499,7 @@ export function normalizeSave(raw) {
         }
       }
     }
+    releaseHubCitySatelliteSlot(state);
     if ((state.offices?.satellites?.length ?? 0) > 0) {
       refreshSatelliteFootprints(state);
     }

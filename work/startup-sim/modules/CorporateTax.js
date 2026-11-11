@@ -4,7 +4,7 @@ import { recordCashOutflow } from './Finance.js';
 /** Desk task id — injected every April until paid for that calendar year. */
 export const TAX_FILING_TASK_ID = 'required-annual-tax-filing';
 
-/** Simplified effective rate on taxable revenue base (game fiction). */
+/** Federal corporate rate (flat) on the game’s taxable revenue base. */
 export const CORPORATE_TAX_RATE = 0.21;
 
 export function createInitialFiscal() {

@@ -252,8 +252,8 @@ export function renderFinancePanel(container, state) {
 
   const angelGate = canCloseAngelSafe(state);
   const angelCount = angelSafesClosedCount(state);
-  const angelBlock =
-    angelGate.ok || angelCount > 0
+  const showAngelSafeUi = !state.flags?.seedRoundClosed && (angelGate.ok || angelCount > 0);
+  const angelBlock = showAngelSafeUi
       ? `<div class="finance-action">
         <p><strong>Angel SAFE (garage)</strong> — ${formatMoney(ANGEL_SAFE_AMOUNT)} on ${formatMoney(ANGEL_SAFE_CAP)} post-money cap (~${Math.round((ANGEL_SAFE_AMOUNT / ANGEL_SAFE_CAP) * 1000) / 10}% est.)</p>
         <p class="fine-print">${angelCount}/${ANGEL_SAFE_MAX_ROUNDS} closed.${angelGate.ok ? '' : ` ${angelGate.reason}`}</p>

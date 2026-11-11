@@ -69,6 +69,9 @@ if (!getTaskDefinitions().some((t) => t.id === 'whale-fortune50-platform-renewal
 } else if (!getTaskDefinitions().some((t) => t.id === 'public-ipo-first-earnings-dry-run')) {
   console.error('FAIL: public post-IPO handcrafted pack not merged');
   failed = true;
+} else if (!getTaskDefinitions().some((t) => t.id === 'public-tier0-lockup-tour')) {
+  console.error('FAIL: public post-IPO engine pack not merged');
+  failed = true;
 } else if (!getTaskDefinitions().some((t) => t.id === 'mid-soc2-type2-evidence-sprint')) {
   console.error('FAIL: mid-game handcrafted pack not merged');
   failed = true;
@@ -1275,6 +1278,14 @@ const {
   treasuryNetCash,
   estimateEquityValue
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+const {
+  macroCapPressureRatio,
+  GLOBAL_GDP_USD_BENCHMARK,
+  TRILLIONAIRE_BAND_USD,
+  guardListingOperatingPrice,
+  macroPressureAllowsTrillionaire,
+  macroPressureBlocksFantasyWealth
+} = await import(`file://${join(sim, 'modules/PublicMarketRealism.js')}`);
 const { calendarTurn } = await import(`file://${join(sim, 'modules/XC.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
 pub.stage = ST.PUBLIC;
@@ -1318,6 +1329,32 @@ if (!ipo.ok) {
     console.log(
       `OK: IPO primary + float (${formatMoney(ipo.primaryProceeds)} primary, float ${floatPct}%, founder ${founder?.pct}%, ${formatMoney(listPrice)}/share)`
     );
+    if ((pub.publicMarket?.lockupMonthsRemaining ?? 0) !== 6) {
+      console.error(`FAIL: founder lockup should be 6 months (got ${pub.publicMarket?.lockupMonthsRemaining})`);
+      failed = true;
+    }
+    const { publicWealthHeat } = await import(`file://${join(sim, 'modules/PublicPostIpoEconomy.js')}`);
+    const { founderLiquidationValue, founderStakeValue } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+    const { effectiveBlockSalePrice } = await import(`file://${join(sim, 'modules/PublicMarketRealism.js')}`);
+    if (publicWealthHeat(pub) > 0.25) {
+      console.error(`FAIL: public wealth heat should be low at IPO (got ${publicWealthHeat(pub)})`);
+      failed = true;
+    } else {
+      const founder = getFounderRow(pub);
+      const paper = founderStakeValue(pub);
+      const liquid = founderLiquidationValue(pub);
+      const effPx = effectiveBlockSalePrice(pub, founder?.shares ?? 0);
+      const tape = pub.publicMarket?.sharePrice ?? 0;
+      if (effPx >= tape * 0.98) {
+        console.error('FAIL: full-block sale should haircut vs last trade when float is thin at IPO');
+        failed = true;
+      } else if (liquid >= paper * 0.98) {
+        console.error('FAIL: founder liquidation should be below paper mark at IPO');
+        failed = true;
+      } else {
+        console.log('OK: public wealth heat + real liquidity on stock sales (not cosmetic tape)');
+      }
+    }
     pub.finance.cash = 1_000_000_000_000;
     pub.finance.mrr = 250_000;
     const fundPx = computeFundamentalSharePrice(pub);
@@ -1460,6 +1497,66 @@ if (!ipo.ok) {
       console.log('OK: sandbox unlimited stock splits; career keeps 6-month gate');
     }
   }
+  pub.publicMarket.sharePrice = 360;
+  const sharesBeforeSplit = totalOutstandingShares(pub);
+  const capBeforeSplit = marketCap(pub);
+  const realSplit = executeStockSplit(pub);
+  const sharesAfterSplit = totalOutstandingShares(pub);
+  const capAfterSplit = marketCap(pub);
+  if (!realSplit.ok) {
+    console.error(`FAIL: real stock split: ${realSplit.reason}`);
+    failed = true;
+  } else if (sharesAfterSplit < sharesBeforeSplit * 1.9) {
+    console.error('FAIL: split should double cap-table shares');
+    failed = true;
+  } else if (Math.abs(capAfterSplit - capBeforeSplit) > capBeforeSplit * 0.03) {
+    console.error('FAIL: split should preserve market cap');
+    failed = true;
+  } else if (!macroPressureAllowsTrillionaire(TRILLIONAIRE_BAND_USD * 1.5)) {
+    console.error('FAIL: ~$1.5T marks should stay in trillionaire band (low macro pressure)');
+    failed = true;
+  } else if (!macroPressureBlocksFantasyWealth(720_000_000_000_000)) {
+    console.error('FAIL: ~$720T fantasy wealth should face max macro pressure');
+    failed = true;
+  } else if (macroCapPressureRatio(GLOBAL_GDP_USD_BENCHMARK * 2) < 0.85) {
+    console.error('FAIL: macro cap pressure should be high above global GDP');
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: real splits + trillionaire-friendly macro pressure');
+  }
+  const reRate = createInitialState({ companyName: 'ReRate Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+  reRate.stage = ST.PUBLIC;
+  reRate.flags.seedRoundClosed = true;
+  reRate.flags.ipoFiled = true;
+  reRate.finance.mrr = 2_000_000;
+  reRate.finance.arr = 24_000_000;
+  reRate.finance.cash = 80_000_000;
+  reRate.publicMarket = {
+    sharePrice: 88,
+    ipoPrice: 85,
+    monthsPublic: 0,
+    priorMonthMrr: 1_900_000,
+    priorYtdRunRateMrr: 1_900_000,
+    guidanceTone: 'inline',
+    guidanceBeatStreak: 0
+  };
+  reRate.capTable = JSON.parse(JSON.stringify(pub.capTable));
+  computeFundamentalSharePrice(reRate);
+  const wildModel = reRate.finance.arr * 200 / totalOutstandingShares(reRate);
+  const guarded = guardListingOperatingPrice(reRate, wildModel);
+  if (guarded > 88 * 1.15) {
+    console.error(`FAIL: listing fundamental guard too loose (${guarded} vs trade 88)`);
+    failed = true;
+  }
+  const pxBefore = reRate.publicMarket.sharePrice;
+  tickPublicMarket(reRate);
+  const pxAfter = reRate.publicMarket.sharePrice;
+  if (pxAfter > pxBefore * 1.12) {
+    console.error(`FAIL: month-1 tick moved ${pxBefore} → ${pxAfter} (>12%)`);
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: post-IPO month-1 tape stays near listing print');
+  }
   const { tickPublicMarketAtMonthStart } = await import(`file://${join(sim, 'modules/IPO.js')}`);
   tickPublicMarketAtMonthStart(pub);
   if (!pub.publicMarket.marketTape?.length) {
@@ -1485,8 +1582,11 @@ if (!ipo.ok) {
     console.log('OK: public IR event (analyst briefing, credibility, activity log)');
   }
   pub.publicMarket.lockupMonthsRemaining = 0;
+  pub.publicMarket.monthsPublic = 30;
+  const { publicFounderSellPctCap } = await import(`file://${join(sim, 'modules/PublicPostIpoEconomy.js')}`);
+  const sellPct = Math.min(10, publicFounderSellPctCap(pub));
   const founderBefore = getFounderRow(pub)?.shares ?? 0;
-  const partial = sellFounderSharesPartial(pub, 10);
+  const partial = sellFounderSharesPartial(pub, sellPct);
   const founderAfter = getFounderRow(pub)?.shares ?? 0;
   if (!partial.ok || partial.proceeds <= 0) {
     console.error(`FAIL: partial founder stock sale: ${partial.reason ?? 'bad result'}`);
@@ -1530,6 +1630,19 @@ if (!ja.ok) {
   failed = true;
 } else if (joinAccelerator(xcAccel, 'techlot').ok) {
   console.error('FAIL: third accelerator should be blocked');
+  failed = true;
+}
+const postSeedAccel = createInitialState({ companyName: 'Post Seed', categoryId: 'b2b-saas', mode: 'sandbox' });
+postSeedAccel.flags.seedRoundClosed = true;
+postSeedAccel.finance.arr = 200_000;
+postSeedAccel.finance.mrr = Math.round(200_000 / 12);
+if (joinAccelerator(postSeedAccel, 'angel-rail').ok) {
+  console.error('FAIL: accelerator after seed close should be blocked');
+  failed = true;
+}
+const { renderAcceleratorsBlock } = await import(`file://${join(sim, 'modules/Accelerators.js')}`);
+if (renderAcceleratorsBlock(postSeedAccel)) {
+  console.error('FAIL: other accelerator SAFE UI should hide after seed');
   failed = true;
 }
 const postASeries = createInitialState({ companyName: 'Post A', categoryId: 'b2b-saas', mode: 'sandbox' });
@@ -1797,11 +1910,25 @@ if (!failed) {
     seedEra.flags.seedRoundClosed = true;
     const pubEra = createInitialState({ companyName: 'Era', categoryId: 'b2b-saas', mode: 'career' });
     pubEra.flags.ipoFiled = true;
+    pubEra.flags.seedRoundClosed = true;
     pubEra.stage = STAGES.PUBLIC;
-    const seedRoll = rollTaskOutcome(sharedTask, seedEra).revenue;
-    const pubRoll = rollTaskOutcome(sharedTask, pubEra).revenue;
-    if (pubRoll <= seedRoll * 50) {
-      console.error(`FAIL: era base scale seed=${seedRoll} public=${pubRoll}`);
+    pubEra.finance.mrr = 4_000_000;
+    pubEra.capTable = [
+      { id: 'founder', name: 'Founder', shares: 52_000_000, pct: 74, class: 'founder' },
+      { id: 'public-float', name: 'Float', shares: 18_000_000, pct: 26, class: 'public' }
+    ];
+    pubEra.publicMarket = {
+      sharePrice: 220,
+      ipoPrice: 180,
+      monthsPublic: 18,
+      ticker: 'ERA'
+    };
+    pubEra.finance.valuation = Math.round(70_000_000 * 220);
+    const { estimateTaskPayoutBand } = await import(`file://${join(sim, 'modules/Finance.js')}`);
+    const seedBand = estimateTaskPayoutBand(sharedTask, seedEra);
+    const pubBand = estimateTaskPayoutBand(sharedTask, pubEra);
+    if (pubBand.max <= seedBand.max * 50) {
+      console.error(`FAIL: era base scale seed=${seedBand.max} public=${pubBand.max}`);
       failed = true;
     }
   }
@@ -1825,6 +1952,41 @@ const {
   preparePersonalExpensesForMonth,
   rollPersonalExpenseTotal
 } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
+if (!failed) {
+  const megaCeo = createInitialState({ companyName: 'Mega CEO', categoryId: 'b2b-saas', mode: 'sandbox' });
+  megaCeo.flags.seedRoundClosed = true;
+  megaCeo.flags.seriesAClosed = true;
+  megaCeo.flags.ipoFiled = true;
+  megaCeo.stage = STAGES.PUBLIC;
+  const { purchaseWorkspaceTier, WORKSPACE_TIER } = await import(
+    `file://${join(sim, 'modules/Workspace.js')}`
+  );
+  megaCeo.finance.cash = 50_000_000;
+  megaCeo.finance.arr = 2_000_000;
+  megaCeo.finance.mrr = Math.round(megaCeo.finance.arr / 12);
+  const officeBuy = purchaseWorkspaceTier(megaCeo, WORKSPACE_TIER.SMALL);
+  if (!officeBuy.ok) {
+    console.error(`FAIL: mega CEO office: ${officeBuy.reason}`);
+    failed = true;
+  }
+  setCeoSalaryAnnual(megaCeo, 20_000_000);
+  const band20 = personalExpenseBandForSalary(20_000_000);
+  preparePersonalExpensesForMonth(megaCeo);
+  const megaSched = scheduledPersonalExpense(megaCeo);
+  const foodLine = megaSched.breakdown.find((l) => l.label === 'Food & household')?.amount ?? 0;
+  if (megaSched.total > band20.max * 1.02) {
+    console.error(`FAIL: $20M CEO personal debits ${megaSched.total} above band max ${band20.max}`);
+    failed = true;
+  } else if (foodLine > 50_000) {
+    console.error(`FAIL: $20M CEO food debit unrealistic: ${foodLine}/mo`);
+    failed = true;
+  } else if (megaSched.total > 200_000) {
+    console.error(`FAIL: $20M CEO monthly personal burn too high: ${megaSched.total}`);
+    failed = true;
+  } else {
+    console.log(`OK: $20M CEO personal debits ${megaSched.total} (food ${foodLine})`);
+  }
+}
 const bankA = createInitialState({ companyName: 'Bank A', categoryId: 'b2b-saas', mode: 'career', ceoFirstName: 'A', ceoLastName: 'One' });
 const bankB = createInitialState({ companyName: 'Bank B', categoryId: 'b2b-saas', mode: 'career', ceoFirstName: 'B', ceoLastName: 'Two' });
 const openA = ceoPersonalBankBalance(bankA);
@@ -1978,9 +2140,17 @@ if (!failed) {
     console.log(`OK: hub city rent (${hubMo}/mo) above campus HQ (${campusRent}/mo)`);
   }
 
-  const { addSatellite, getSatelliteTemplates, availableSatelliteTemplates } = await import(
-    `file://${join(sim, 'modules/Offices.js')}`
-  );
+  const {
+    addSatellite,
+    getHubs,
+    getSatelliteTemplates,
+    availableSatelliteTemplates,
+    hubSatelliteTemplateId
+  } = await import(`file://${join(sim, 'modules/Offices.js')}`);
+  if (!getHubs().some((h) => h.id === 'knoxville')) {
+    console.error('FAIL: Knoxville hub missing from catalog');
+    failed = true;
+  }
   const catalog = getSatelliteTemplates();
   if (catalog.length < 30) {
     console.error(`FAIL: expected 30+ satellite cities (got ${catalog.length})`);
@@ -1999,6 +2169,24 @@ if (!failed) {
     failed = true;
   } else if (!failed) {
     console.log(`OK: satellite catalog (${catalog.length} cities, one-time open)`);
+  }
+  const nashHub = createInitialState({ companyName: 'Nash Hub', categoryId: 'b2b-saas', mode: 'sandbox' });
+  nashHub.offices = {
+    hubId: 'nashville',
+    hubLabel: 'Nashville',
+    satellites: [],
+    usedSatelliteTemplateIds: [hubSatelliteTemplateId('nashville')]
+  };
+  const nashAvail = availableSatelliteTemplates(nashHub);
+  const nashOpen = addSatellite(nashHub, 'sat-nashville', 'small');
+  if (!nashAvail.some((t) => t.id === 'sat-nashville')) {
+    console.error('FAIL: hub city satellite should stay available while only HQ is in that hub');
+    failed = true;
+  } else if (!nashOpen.ok) {
+    console.error(`FAIL: open hub-city satellite: ${nashOpen.reason ?? 'unknown'}`);
+    failed = true;
+  } else if (!failed) {
+    console.log('OK: hub cities remain available as satellite offices');
   }
   const { computeSatelliteOffice } = await import(`file://${join(sim, 'modules/SatelliteOffices.js')}`);
   const denverTpl = catalog.find((t) => t.id === 'sat-denver');
@@ -2638,8 +2826,12 @@ const {
   completeCeoPersonalTaxFilingTask,
   ceoPersonalTaxBaseIncome,
   accrueCeoTaxableIncome,
-  ensureCeoPersonalTax
+  ensureCeoPersonalTax,
+  computeCeoPersonalTaxLiability
 } = await import(`file://${join(sim, 'modules/CeoPersonalTax.js')}`);
+const { computeIndividualIncomeTax, indexedIndividualBrackets } = await import(
+  `file://${join(sim, 'modules/IndividualIncomeTax.js')}`
+);
 const { payCeoPersonalTaxFromBank } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
 
 const ceoTaxState = createInitialState({ companyName: 'CEO Tax Co', categoryId: 'b2b-saas', mode: 'career' });
@@ -2653,7 +2845,12 @@ if (!isCeoPersonalTaxFilingRequired(ceoTaxState)) {
   console.error('FAIL: April CEO personal tax filing should be required with prior-year income');
   failed = true;
 } else {
-  const ceoOwed = Math.max(250, Math.round(200_000 * 0.28));
+  const ceoBrackets = indexedIndividualBrackets(2025, 2024);
+  const ceoOwed = Math.max(250, computeIndividualIncomeTax(200_000, ceoBrackets));
+  if (computeCeoPersonalTaxLiability(ceoTaxState) !== ceoOwed) {
+    console.error('FAIL: CEO personal tax liability bracket math');
+    failed = true;
+  }
   const ceoFiled = completeCeoPersonalTaxFilingTask(ceoTaxState, payCeoPersonalTaxFromBank);
   if (!ceoFiled.ok || ceoTaxState.ceo.personalTax.taxPaidYear !== 2026) {
     console.error(`FAIL: complete CEO personal tax filing: ${ceoFiled.reason ?? 'bad state'}`);
@@ -2667,6 +2864,15 @@ if (!isCeoPersonalTaxFilingRequired(ceoTaxState)) {
   } else {
     console.log(`OK: April CEO personal tax filing (${formatMoney(ceoFiled.owed)})`);
   }
+}
+
+const idxBracketsY0 = indexedIndividualBrackets(2024, 2024);
+const idxBracketsY2 = indexedIndividualBrackets(2026, 2024);
+if (idxBracketsY0[0].upTo !== 11_925 || idxBracketsY2[0].upTo !== Math.round(11_925 * 1.032 ** 2)) {
+  console.error('FAIL: individual bracket threshold inflation (3.2%/yr)');
+  failed = true;
+} else {
+  console.log('OK: individual tax brackets inflate 3.2% per calendar year');
 }
 
 const accrualState = createInitialState({ companyName: 'Accrual Co', categoryId: 'b2b-saas', mode: 'career' });
@@ -2797,7 +3003,7 @@ const {
 await preloadCeoLifestyleCatalog();
 const lifestyleCatalogCount = getCeoLifestylePurchasesSync().length;
 const lifestyleCategoryCount = getCeoLifestyleCategoriesSync().length;
-if (lifestyleCatalogCount < 68) {
+if (lifestyleCatalogCount < 105) {
   console.error(`FAIL: CEO lifestyle catalog too small (${lifestyleCatalogCount})`);
   failed = true;
 } else if (lifestyleCategoryCount < 9) {
@@ -2872,21 +3078,24 @@ if (!bought.ok) {
             categoryId: 'b2b-saas',
             mode: 'sandbox'
           });
-          lifestyleState.ceo.bankBalance = 300_000;
+          lifestyleState.ceo.bankBalance = 600_000;
           const gym = purchaseCeoLifestyle(lifestyleState, 'premium-gym');
           const car = purchaseCeoLifestyle(lifestyleState, 'electric-sedan');
-          const carClash = purchaseCeoLifestyle(lifestyleState, 'sports-car');
+          const car2 = purchaseCeoLifestyle(lifestyleState, 'sports-car');
+          const car3 = purchaseCeoLifestyle(lifestyleState, 'hybrid-crossover');
           const resale = sellCeoLifestyle(lifestyleState, 'electric-sedan');
-          if (!gym.ok || ceoLifestyleMonthlyDebit(lifestyleState) !== 380) {
+          if (!gym.ok || ceoLifestyleMonthlyDebit(lifestyleState) !== 380 + 320) {
             console.error(`FAIL: CEO lifestyle purchase: ${gym.reason ?? 'debit bump'}`);
             failed = true;
-          } else if (!car.ok || carClash.ok) {
-            console.error('FAIL: CEO lifestyle exclusive vehicle group');
+          } else if (!car.ok || !car2.ok || !car3.ok) {
+            console.error(
+              `FAIL: CEO lifestyle multi-vehicle garage: ${car.reason ?? ''} ${car2.reason ?? ''} ${car3.reason ?? ''}`
+            );
             failed = true;
           } else if (!resale.ok || resale.proceeds <= 0) {
             console.error(`FAIL: CEO lifestyle resale: ${resale.reason ?? 'proceeds'}`);
             failed = true;
-          } else if (ceoLifestyleLifetimeSpend(lifestyleState) !== 4200 + 78000) {
+          } else if (ceoLifestyleLifetimeSpend(lifestyleState) !== 4200 + 78000 + 185000 + 68000) {
             console.error('FAIL: CEO lifestyle lifetime spend');
             failed = true;
           } else {
@@ -3189,6 +3398,61 @@ if (!signConf.ok) {
       failed = true;
     } else {
       console.log('OK: CEO alma mater alumni giving (incl. athletics funding)');
+    }
+  }
+  const { commitAlumniInvestment, alumniInvestingBalance } = await import(
+    `file://${join(sim, 'modules/CeoAlumniInvesting.js')}`
+  );
+  const investState = createInitialState({
+    companyName: 'Alumni Invest Co',
+    categoryId: 'b2b-saas',
+    mode: 'sandbox',
+    almaMaterId: 'maryville-college'
+  });
+  investState.ceo.bankBalance = 400_000;
+  const invest = commitAlumniInvestment(investState, 50_000, 'university-daf');
+  if (!invest.ok || alumniInvestingBalance(investState) !== 50_000) {
+    console.error(`FAIL: alumni investing commit: ${invest.reason ?? 'balance'}`);
+    failed = true;
+  } else {
+    console.log('OK: CEO alumni investing sleeves');
+  }
+  const {
+    gradeLetter,
+    ensureAlmaMaterGrades,
+    liberalArtsAcademicsBeatAthletics,
+    influenceAlmaGradesFromGift,
+    ALMA_GRADE_AF_EXAMPLES
+  } = await import(`file://${join(sim, 'modules/CeoAlmaMaterGrades.js')}`);
+  if (ALMA_GRADE_AF_EXAMPLES.length !== 2) {
+    console.error('FAIL: expected two A–F report card examples');
+    failed = true;
+  } else if (gradeLetter(88) !== 'B+' || gradeLetter(41) !== 'F') {
+    console.error('FAIL: A–F letter mapping');
+    failed = true;
+  } else {
+    const gradeState = createInitialState({
+      companyName: 'Grade Co',
+      categoryId: 'b2b-saas',
+      mode: 'sandbox',
+      almaMaterId: 'maryville-college'
+    });
+    const g = ensureAlmaMaterGrades(gradeState);
+    if (!g?.academics || !g.arts_culture) {
+      console.error('FAIL: alma mater grade dimensions not rolled');
+      failed = true;
+    } else if (!liberalArtsAcademicsBeatAthletics(g, getAlmaMaterById('maryville-college'))) {
+      console.error('FAIL: liberal arts academics should not trail athletics on fixed band');
+      failed = true;
+    } else {
+      const acBefore = g.athletics;
+      influenceAlmaGradesFromGift(gradeState, { fundId: 'annual-fund', amount: 500_000, athletics: true, programId: 'boosters' });
+      if (g.athletics <= acBefore) {
+        console.error('FAIL: athletics gift should raise athletics letter/score');
+        failed = true;
+      } else {
+        console.log('OK: CEO alma mater A–F grades (examples, roll, gifts)');
+      }
     }
   }
 }

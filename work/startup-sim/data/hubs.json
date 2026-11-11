@@ -3,6 +3,7 @@
     {
       "id": "bay",
       "label": "Bay Area",
+      "satelliteTemplateId": "sat-san-francisco",
       "costMult": 1.15,
       "revenueMult": 1.12,
       "salaryMult": 1.12,
@@ -11,6 +12,7 @@
     {
       "id": "nyc",
       "label": "New York City",
+      "satelliteTemplateId": "sat-new-york",
       "costMult": 1.1,
       "revenueMult": 1.08,
       "salaryMult": 1.08,
@@ -19,6 +21,7 @@
     {
       "id": "miami",
       "label": "Miami",
+      "satelliteTemplateId": "sat-miami",
       "costMult": 0.95,
       "revenueMult": 1.02,
       "salaryMult": 0.95,
@@ -27,6 +30,7 @@
     {
       "id": "dallas",
       "label": "Dallas",
+      "satelliteTemplateId": "sat-dallas",
       "costMult": 0.88,
       "revenueMult": 0.98,
       "salaryMult": 0.9,
@@ -35,6 +39,7 @@
     {
       "id": "atlanta",
       "label": "Atlanta",
+      "satelliteTemplateId": "sat-atlanta",
       "costMult": 0.9,
       "revenueMult": 1.0,
       "salaryMult": 0.92,
@@ -43,10 +48,20 @@
     {
       "id": "nashville",
       "label": "Nashville",
+      "satelliteTemplateId": "sat-nashville",
       "costMult": 0.93,
       "revenueMult": 1.03,
       "salaryMult": 0.94,
       "fixedBase": 125000
+    },
+    {
+      "id": "knoxville",
+      "label": "Knoxville, TN",
+      "satelliteTemplateId": "sat-knoxville",
+      "costMult": 0.87,
+      "revenueMult": 0.99,
+      "salaryMult": 0.89,
+      "fixedBase": 92000
     }
   ],
   "satelliteTemplates": [
@@ -66,10 +81,13 @@
     { "id": "sat-toronto", "label": "Toronto", "costTier": 4, "capacityTier": 4 },
     { "id": "sat-vancouver", "label": "Vancouver", "costTier": 4, "capacityTier": 4 },
     { "id": "sat-amsterdam", "label": "Amsterdam", "costTier": 4, "capacityTier": 4 },
+    { "id": "sat-dallas", "label": "Dallas", "costTier": 3, "capacityTier": 3 },
     { "id": "sat-denver", "label": "Denver", "costTier": 3, "capacityTier": 3 },
+    { "id": "sat-atlanta", "label": "Atlanta", "costTier": 3, "capacityTier": 3 },
     { "id": "sat-austin", "label": "Austin", "costTier": 3, "capacityTier": 3 },
     { "id": "sat-houston", "label": "Houston", "costTier": 3, "capacityTier": 3 },
     { "id": "sat-philadelphia", "label": "Philadelphia", "costTier": 3, "capacityTier": 3 },
+    { "id": "sat-miami", "label": "Miami", "costTier": 3, "capacityTier": 4 },
     { "id": "sat-minneapolis", "label": "Minneapolis", "costTier": 3, "capacityTier": 3 },
     { "id": "sat-detroit", "label": "Detroit", "costTier": 3, "capacityTier": 3 },
     { "id": "sat-raleigh", "label": "Raleigh–Durham", "costTier": 3, "capacityTier": 3 },
@@ -78,7 +96,9 @@
     { "id": "sat-berlin", "label": "Berlin", "costTier": 3, "capacityTier": 3 },
     { "id": "sat-sao-paulo", "label": "São Paulo", "costTier": 3, "capacityTier": 3 },
     { "id": "sat-mexico-city", "label": "Mexico City", "costTier": 3, "capacityTier": 3 },
+    { "id": "sat-nashville", "label": "Nashville", "costTier": 3, "capacityTier": 3 },
     { "id": "sat-knoxville", "label": "Knoxville", "costTier": 2, "capacityTier": 2 },
+    { "id": "sat-san-francisco", "label": "San Francisco", "costTier": 5, "capacityTier": 5 },
     { "id": "sat-columbus", "label": "Columbus", "costTier": 2, "capacityTier": 2 },
     { "id": "sat-tampa", "label": "Tampa", "costTier": 2, "capacityTier": 2 },
     { "id": "sat-phoenix", "label": "Phoenix", "costTier": 2, "capacityTier": 2 },

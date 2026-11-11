@@ -2174,12 +2174,307 @@ h1 {
   margin-right: 0.25rem;
 }
 
-.ceo-alumni-section .ceo-alumni-fund {
-  margin-bottom: 0.75rem;
-}
-
 .ceo-alumni-section .finance-inline-form select {
   min-width: 10rem;
+}
+
+.ceo-alumni-panel {
+  margin-top: 0.75rem;
+}
+
+.ceo-alumni-kpi-strip {
+  margin-bottom: 0.35rem;
+}
+
+.ceo-alumni-lane {
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ceo-alumni-lane summary {
+  cursor: pointer;
+  font-weight: 600;
+  list-style-position: outside;
+}
+
+.ceo-alumni-action-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+  margin-top: 0.65rem;
+}
+
+@media (min-width: 720px) {
+  .ceo-alumni-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ceo-alumni-action-card {
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  background: rgba(91, 156, 255, 0.04);
+}
+
+.ceo-alumni-action-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.ceo-alumni-quick-give {
+  border: 1px dashed var(--border);
+  border-radius: 0.65rem;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ceo-alma-report {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.1rem;
+  background: linear-gradient(145deg, rgba(91, 156, 255, 0.08), rgba(255, 255, 255, 0.02));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ceo-alma-report__hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.ceo-alma-report__kicker {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+  margin: 0 0 0.25rem;
+}
+
+.ceo-alma-report__school {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+}
+
+.ceo-alma-report__composite {
+  min-width: 7.5rem;
+  text-align: center;
+  padding: 0.65rem 1rem;
+  border-radius: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.ceo-alma-report__composite-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+.ceo-alma-report__composite-letter {
+  font-size: 2.35rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ceo-alma-report__composite-scale {
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+.ceo-alma-letter-badge--a {
+  background: rgba(72, 187, 120, 0.18);
+  border: 1px solid rgba(72, 187, 120, 0.35);
+}
+
+.ceo-alma-letter-badge--b {
+  background: rgba(91, 156, 255, 0.15);
+  border: 1px solid rgba(91, 156, 255, 0.35);
+}
+
+.ceo-alma-letter-badge--c {
+  background: rgba(237, 201, 72, 0.12);
+  border: 1px solid rgba(237, 201, 72, 0.35);
+}
+
+.ceo-alma-letter-badge--d {
+  background: rgba(237, 137, 54, 0.12);
+  border: 1px solid rgba(237, 137, 54, 0.35);
+}
+
+.ceo-alma-letter-badge--f {
+  background: rgba(245, 101, 101, 0.12);
+  border: 1px solid rgba(245, 101, 101, 0.35);
+}
+
+.ceo-alma-dim-grid {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 840px) {
+  .ceo-alma-dim-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.ceo-alma-dim {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 0.2rem 0.5rem;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.ceo-alma-dim__letter {
+  grid-row: 1 / span 2;
+  font-size: 1.35rem;
+  font-weight: 700;
+  min-width: 2.25rem;
+}
+
+.ceo-alma-dim__label {
+  font-size: 0.78rem;
+  opacity: 0.9;
+}
+
+.ceo-alma-dim__bar {
+  grid-column: 2;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.ceo-alma-dim__fill {
+  display: block;
+  height: 100%;
+  width: var(--ceo-alma-pct, 50%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(91, 156, 255, 0.35), rgba(91, 156, 255, 0.85));
+}
+
+.ceo-alma-dim--a .ceo-alma-dim__fill {
+  background: linear-gradient(90deg, rgba(72, 187, 120, 0.45), rgba(72, 187, 120, 0.95));
+}
+
+.ceo-alma-dim--f .ceo-alma-dim__fill {
+  background: linear-gradient(90deg, rgba(245, 101, 101, 0.45), rgba(245, 101, 101, 0.9));
+}
+
+.ceo-alma-playbook-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .ceo-alma-playbook-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.ceo-alma-playbook-card {
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  padding: 0.65rem 0.75rem;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ceo-alma-playbook-card__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.92rem;
+}
+
+.ceo-alma-playbook-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  opacity: 0.92;
+}
+
+.ceo-alma-example-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 1fr;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .ceo-alma-example-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ceo-alma-example-card {
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.ceo-alma-example-card__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.45rem;
+}
+
+.ceo-alma-example-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.ceo-alma-example-chip {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.35rem;
+  border: 1px solid var(--border);
+  opacity: 0.92;
+}
+
+.ceo-alma-boost-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.ceo-alma-boost-tag {
+  font-size: 0.72rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(91, 156, 255, 0.35);
+  background: rgba(91, 156, 255, 0.1);
+}
+
+.ceo-alma-shift-log {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.86rem;
+}
+
+.ceo-alma-shift-log li {
+  margin-bottom: 0.25rem;
 }
 
 #ceo-alma-mater {

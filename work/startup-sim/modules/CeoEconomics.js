@@ -6,7 +6,7 @@ import {
   projectMonthlyBurn,
   companyRunwayDisplay
 } from './Finance.js';
-import { founderStakeValue, isPublicCompany, canCashOut } from './IPO.js';
+import { founderLiquidationValue, founderStakeValue, isPublicCompany, canCashOut } from './IPO.js';
 import { getFounderRow } from './CapTable.js';
 import { calendarTurn } from './XC.js';
 import {
@@ -89,6 +89,9 @@ export function createInitialCeoState() {
     alumniGivingLifetime: 0,
     alumniAthleticsLifetime: 0,
     alumniDonationLog: [],
+    alumniInvestPositions: {},
+    alumniInvestLifetime: 0,
+    alumniInvestReturns: 0,
     netWorthHistory: [],
     investmentBalance: 0,
     careerInvestmentReturns: 0,
@@ -180,6 +183,18 @@ export function payCeoPersonalTaxFromBank(state, amount) {
   return { ok: true, amount: paid };
 }
 
+/** Spend rate on gross monthly pay — tapers at top comp (taxes/savings aren't all debited here). */
+function personalSpendRateBand(annualSalary) {
+  const a = Math.max(0, Math.round(Number(annualSalary) || 0));
+  if (a <= 80_000) return { min: 0.36, max: 0.5 };
+  if (a <= 200_000) return { min: 0.3, max: 0.44 };
+  if (a <= 500_000) return { min: 0.24, max: 0.36 };
+  if (a <= 2_000_000) return { min: 0.16, max: 0.24 };
+  if (a <= 5_000_000) return { min: 0.1, max: 0.14 };
+  if (a <= 10_000_000) return { min: 0.07, max: 0.1 };
+  return { min: 0.05, max: 0.08 };
+}
+
 /** Monthly lifestyle spend band — driven only by CEO salary, not company ARR. */
 export function personalExpenseBandForSalary(annualSalary) {
   const a = Math.max(0, Math.round(Number(annualSalary) || 0));
@@ -191,13 +206,20 @@ export function personalExpenseBandForSalary(annualSalary) {
     };
   }
   const monthlyGross = a / 12;
-  const min = Math.max(1_650, Math.round(monthlyGross * 0.36));
-  const max = Math.max(min + 350, Math.round(monthlyGross * 0.68));
+  const rates = personalSpendRateBand(a);
+  let min = Math.max(1_650, Math.round(monthlyGross * rates.min));
+  let max = Math.max(min + 350, Math.round(monthlyGross * rates.max));
+  if (a >= 5_000_000) {
+    const hardCap = Math.round(monthlyGross * 0.09);
+    max = Math.min(max, hardCap);
+    min = Math.min(min, Math.max(120_000, Math.round(hardCap * 0.72)));
+  }
   let label = 'Household band tied to your CEO salary';
   if (a <= 80_000) label = 'Frugal professional household';
   else if (a <= 200_000) label = 'Mid-career executive household';
-  else if (a <= 400_000) label = 'Senior executive household';
-  else label = 'Top-comp public-CEO lifestyle band';
+  else if (a <= 500_000) label = 'Senior executive household';
+  else if (a <= 2_000_000) label = 'Late-stage private CEO household';
+  else label = 'Top-comp public-CEO household (capped burn vs gross)';
   return { min, max, label, annual: a };
 }
 
@@ -222,15 +244,47 @@ function personalExpenseRollUnit(state, salt = 0) {
   return h / 0xffffffff;
 }
 
+/** Base household mix — food stays a small slice even at yacht-CEO salaries. */
+const PERSONAL_EXPENSE_MIX = [
+  { label: 'Housing', share: 0.36 },
+  { label: 'Food & household', share: 0.1 },
+  { label: 'Insurance & health', share: 0.14 },
+  { label: 'Transport', share: 0.1 },
+  { label: 'Family & childcare', share: 0.12 },
+  { label: 'Discretionary', share: 0.18 }
+];
+
+function maxFoodDebitForSalary(annualSalary) {
+  const a = Math.max(0, Math.round(Number(annualSalary) || 0));
+  if (a <= 120_000) return 1_200;
+  if (a <= 400_000) return 3_500;
+  if (a <= 2_000_000) return 12_000;
+  if (a <= 10_000_000) return 28_000;
+  return 45_000;
+}
+
 function buildPersonalExpenseBreakdown(state, total) {
-  const weights = EXPENSE_DEBIT_CATEGORIES.map((_, i) => 0.45 + personalExpenseRollUnit(state, 30 + i));
-  const weightSum = weights.reduce((s, w) => s + w, 0);
-  const parts = EXPENSE_DEBIT_CATEGORIES.map((label, i) => ({
-    label,
-    amount: Math.max(i === 0 ? 280 : 60, Math.round((weights[i] / weightSum) * total))
+  const annual = Math.round(ceoState(state).salaryAnnual ?? 0);
+  const jitter = (i) => 0.92 + personalExpenseRollUnit(state, 30 + i) * 0.16;
+  const weighted = PERSONAL_EXPENSE_MIX.map((row, i) => ({
+    label: row.label,
+    share: row.share * jitter(i)
   }));
+  const shareSum = weighted.reduce((s, r) => s + r.share, 0);
+  const foodCap = maxFoodDebitForSalary(annual);
+  const parts = weighted.map((row) => {
+    let amount = Math.round((row.share / shareSum) * total);
+    if (row.label === 'Housing') amount = Math.max(280, amount);
+    else if (row.label === 'Food & household') amount = Math.min(amount, foodCap);
+    else amount = Math.max(60, amount);
+    return { label: row.label, amount };
+  });
   let delta = total - parts.reduce((s, p) => s + p.amount, 0);
-  parts[0].amount += delta;
+  const housingIdx = parts.findIndex((p) => p.label === 'Housing');
+  const discIdx = parts.findIndex((p) => p.label === 'Discretionary');
+  if (delta > 0 && discIdx >= 0) parts[discIdx].amount += delta;
+  else if (delta < 0 && housingIdx >= 0) parts[housingIdx].amount = Math.max(280, parts[housingIdx].amount + delta);
+  else if (housingIdx >= 0) parts[housingIdx].amount += delta;
   return parts;
 }
 
@@ -242,10 +296,13 @@ export function rollPersonalExpenseTotal(state) {
   const band = personalExpenseBand(state);
   const u = personalExpenseRollUnit(state, 0);
   let total = Math.round(band.min + u * (band.max - band.min));
+  const annual = Math.round(ceoState(state).salaryAnnual ?? 0);
   const spikeRoll = personalExpenseRollUnit(state, 1);
-  if (spikeRoll < 0.1) {
-    total = Math.round(total * (1.05 + spikeRoll * 0.35));
-    total = Math.min(total, Math.round(band.max * 1.15));
+  const spikeChance = annual >= 2_000_000 ? 0.04 : 0.1;
+  if (spikeRoll < spikeChance) {
+    const bump = annual >= 2_000_000 ? 0.03 + spikeRoll * 0.05 : 0.05 + spikeRoll * 0.12;
+    total = Math.round(total * (1 + bump));
+    total = Math.min(total, Math.round(band.max * 1.05));
   }
   return Math.max(band.min, total);
 }
@@ -308,7 +365,7 @@ export function recommendedPersonalBurnMonthly(state) {
   return typicalPersonalExpenseMonthly(state);
 }
 
-function creditPersonalBank(state, amount, label, kind) {
+export function creditCeoPersonalBank(state, amount, label, kind) {
   const pay = Math.round(Number(amount) || 0);
   if (pay <= 0) return 0;
   const ceo = ceoState(state);
@@ -520,7 +577,7 @@ export function recordCeoSalaryForMonth(state) {
     month: state.calendar?.monthIndex,
     year: state.calendar?.year
   });
-  creditPersonalBank(state, pay, 'CEO salary deposit', 'salary');
+  creditCeoPersonalBank(state, pay, 'CEO salary deposit', 'salary');
   accrueCeoTaxableIncome(state, pay);
   return [
     `CEO salary ${formatMoney(pay)} deposited — personal bank ${formatMoney(ceo.bankBalance)} (career ${formatMoney(ceo.careerSalaryPaid)}).`
@@ -707,7 +764,7 @@ export function payCeoArrBonus(state, pctRaw) {
     year: state.calendar?.year,
     monthIndex: state.calendar?.monthIndex
   };
-  creditPersonalBank(
+  creditCeoPersonalBank(
     state,
     pay,
     `CEO ARR bonus (${pct}% of prior-year revenue)`,
@@ -749,7 +806,7 @@ export function takeOwnerDraw(state, amount) {
     month: state.calendar?.monthIndex,
     year: state.calendar?.year
   });
-  creditPersonalBank(state, draw, 'Owner draw deposit', 'draw');
+  creditCeoPersonalBank(state, draw, 'Owner draw deposit', 'draw');
   accrueCeoTaxableIncome(state, draw);
   return {
     ok: true,
@@ -759,7 +816,7 @@ export function takeOwnerDraw(state, amount) {
 }
 
 export function depositStockCashOutToPersonalBank(state, payout) {
-  const pay = creditPersonalBank(state, payout, 'Founder stake cash-out', 'cash_out');
+  const pay = creditCeoPersonalBank(state, payout, 'Founder stake cash-out', 'cash_out');
   accrueCeoTaxableIncome(state, pay);
   return pay;
 }
@@ -780,6 +837,7 @@ export function founderShareStats(state) {
   const impliedPrivatePx = val > 0 && totalShares > 0 ? val / totalShares : 0;
   const markPx = publicCo ? pm.sharePrice ?? 0 : impliedPrivatePx;
   const stakeValue = publicCo ? founderStakeValue(state) : founderValuationStake(state) ?? Math.round(shares * markPx);
+  const liquidationValue = publicCo ? founderLiquidationValue(state) : stakeValue;
   const ipoPx = pm.ipoPrice ?? markPx;
   const gainSinceIpo =
     publicCo && ipoPx > 0 ? Math.round((markPx - ipoPx) * shares) : null;
@@ -793,6 +851,7 @@ export function founderShareStats(state) {
     pct,
     markPx,
     stakeValue: stakeValue ?? 0,
+    liquidationValue: liquidationValue ?? stakeValue ?? 0,
     ipoPx,
     gainSinceIpo,
     lastDividend,
@@ -897,7 +956,7 @@ export function withdrawPersonalInvestment(state, amountRaw) {
     return { ok: false, reason: `Portfolio holds ${formatMoney(bal)}.` };
   }
   ceo.investmentBalance = bal - amount;
-  creditPersonalBank(state, amount, 'Portfolio withdrawal', 'invest_withdraw');
+  creditCeoPersonalBank(state, amount, 'Portfolio withdrawal', 'invest_withdraw');
   return {
     ok: true,
     amount,
@@ -959,10 +1018,16 @@ export function ceoFinancialHealth(state) {
   };
 }
 
+export function alumniInvestingBalanceFromState(state) {
+  const positions = state.ceo?.alumniInvestPositions ?? {};
+  return Object.values(positions).reduce((sum, p) => sum + Math.max(0, Math.round(p.balance ?? 0)), 0);
+}
+
 export function ceoNetWorth(state) {
   return (
     ceoPersonalBankBalance(state) +
     personalInvestmentBalance(state) +
+    alumniInvestingBalanceFromState(state) +
     (founderEquityValue(state) ?? 0) +
     ceoHomeEquity(state)
   );
@@ -1074,10 +1139,11 @@ export function cashOutPreview(state) {
   if (!canCashOut(state) && !isPublicCompany(state)) return null;
   const stats = founderShareStats(state);
   if (!stats.publicCo) return null;
-  const payout = founderStakeValue(state);
+  const payout = founderLiquidationValue(state);
   const bank = ceoPersonalBankBalance(state);
   return {
     payout,
+    paperStake: stats.stakeValue,
     liquid: bank,
     combined: payout + bank,
     sharePrice: stats.markPx,
