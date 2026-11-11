@@ -4,10 +4,12 @@ import { getArr } from './Workspace.js';
 import { calendarTurn } from './XC.js';
 import {
   applyPublicListingCapTable,
+  ensurePublicListingShareScale,
   getFounderRow,
   issueFollowOnShares,
   recalculateCapTablePercentages,
   retirePublicFloatShares,
+  scaleCapTableShareCount,
   targetIpoSharePrice,
   totalOutstandingShares,
   PUBLIC_FLOAT_ROW_ID,
@@ -17,7 +19,9 @@ import {
 import {
   ceoEndgameCompSnapshot,
   depositStockCashOutToPersonalBank,
-  creditCeoStockSale
+  creditCeoStockSale,
+  debitCeoStockPurchase,
+  ensureCeoPersonalBank
 } from './CeoEconomics.js';
 import { ceoPersonalWealthEndgame } from './FacilitiesEconomics.js';
 import { formatCalendarStamp } from './GameCalendar.js';
@@ -38,10 +42,16 @@ import {
   clampPublicMonthlyDelta,
   consumeInstantStockMoveBudget,
   effectiveBlockSalePrice,
+  effectiveBlockBuyPrice,
+  clampSharePriceToMacro,
+  GLOBAL_GDP_USD_BENCHMARK,
   guardListingOperatingPrice,
   macroAdjustedPsCap,
   macroMeanReversionBoost,
   macroStabilizationFee,
+  PUBLIC_MAX_SHARE_STICKER,
+  publicFloatShares,
+  publicMarketCapCeiling,
   reconcileTradingPriceToMacro,
   resetInstantStockMoveBudget,
   softPrivateEquityCap
@@ -91,7 +101,7 @@ export function canFileIpo(state) {
 }
 
 export function isPublicCompany(state) {
-  return Boolean(state.flags?.ipoFiled && state.stage === STAGES.PUBLIC);
+  return Boolean(state.flags?.ipoFiled && state.stage === STAGES.PUBLIC && !state.flags?.takenPrivate);
 }
 
 /** Cash minus bank debt and revenue-advance balance (counts toward equity value in the model). */
@@ -165,8 +175,11 @@ export function fileIpo(state) {
     floatFdPct: IPO_TARGET_FLOAT_FD_PCT,
     primaryFdPct: IPO_PRIMARY_FD_PCT
   });
-  if (listing.listingPrice > openPrice) {
-    openPrice = listing.listingPrice;
+  openPrice = listing.listingPrice;
+  const liquidity = ensurePublicListingShareScale(state, openValuation, Math.min(85, openPrice));
+  if (liquidity.mult > 1) {
+    openPrice = liquidity.listingPrice;
+    listing.listingPrice = openPrice;
   }
   const primaryProceeds = listing.primaryProceeds ?? 0;
   if (primaryProceeds > 0) {
@@ -201,6 +214,8 @@ export function fileIpo(state) {
   pushMarketTape(state, `Listed at ${formatMoney(openPrice)} — opening pop ${Math.round((pop - 1) * 100)}%.`);
   refreshAnalystCoverage(state, { force: true });
   computeFundamentalSharePrice(state);
+  enforcePublicTapeScale(state);
+  openPrice = state.publicMarket.sharePrice ?? openPrice;
 
   state.finance.valuation = Math.round(openPrice * totalOutstandingShares(state));
   state.publicMarket.ipoPrimaryProceeds = primaryProceeds;
@@ -294,7 +309,8 @@ export function computeFundamentalSharePrice(state) {
   pm.priceSalesMultiple = Math.round(ps * 10) / 10;
   const operatingCap = arr * ps;
   const netCash = Math.max(0, treasuryNetCash(state));
-  const fairCap = operatingCap + netCash;
+  const macroCeiling = publicMarketCapCeiling(state);
+  const fairCap = Math.min(operatingCap + netCash, macroCeiling);
   pm.fundamentalOperatingCap = Math.round(operatingCap);
   pm.treasuryNetCashInModel = netCash;
   const floor = priceFloor(state, pm.sharePrice ?? pm.ipoPrice ?? 1);
@@ -395,9 +411,10 @@ export function applyStockPctMove(state, pct) {
   pm.priorSharePrice = price;
   pm.sharePrice = next;
   pushPriceHistory(state, next);
+  enforcePublicTapeScale(state);
   computeFundamentalSharePrice(state);
   refreshAnalystCoverage(state);
-  return next;
+  return pm.sharePrice;
 }
 
 export function refreshAnalystCoverage(state, opts = {}) {
@@ -491,16 +508,23 @@ export function fileFollowOnOffering(state) {
   };
 }
 
-export function executeStockSplit(state, { auto = false } = {}) {
+export function executeStockSplit(state, { auto = false, force = false } = {}) {
   if (!isPublicCompany(state)) return { ok: false, reason: 'Splits require a listed stock.' };
   const pm = state.publicMarket;
   const price = pm.sharePrice ?? 0;
-  if (price < 180) {
-    return { ok: false, reason: 'Board waits until the share price is at least $180.' };
+  const minSticker = force && auto ? 80 : 180;
+  if (price < minSticker) {
+    return {
+      ok: false,
+      reason: force
+        ? `Sticker ${formatMoney(price)} is already retail-sized.`
+        : 'Board waits until the share price is at least $180.'
+    };
   }
   const turn = calendarTurn(state);
   const sandbox = state.mode === 'sandbox';
   if (
+    !force &&
     !sandbox &&
     pm.lastSplitTurn != null &&
     turn - pm.lastSplitTurn < 6
@@ -530,6 +554,64 @@ export function executeStockSplit(state, { auto = false } = {}) {
     ok: true,
     summary: `2-for-1 split — ${totalOutstandingShares(state).toLocaleString('en-US')} shares @ ${formatMoney(pm.sharePrice)} (cap table updated).`
   };
+}
+
+/**
+ * Keep the tape retail-sized: macro cap ceiling, then repeat 2-for-1 splits if needed.
+ * @returns {string[]} tape lines for the month
+ */
+export function enforcePublicTapeScale(state) {
+  const lines = [];
+  if (!isPublicCompany(state)) return lines;
+  const pm = state.publicMarket;
+  if (!pm) return lines;
+
+  let price = clampSharePriceToMacro(state, reconcileTradingPriceToMacro(state, pm.sharePrice ?? 0));
+  const ceiling = publicMarketCapCeiling(state);
+  const shares = totalOutstandingShares(state);
+  if (shares > 0 && shares * price > ceiling) {
+    price = Math.max(priceFloor(state, price), ceiling / shares);
+    pushMarketTape(
+      state,
+      `Index rebalance: cap held near ${formatMoney(ceiling)} (${(
+        (ceiling / GLOBAL_GDP_USD_BENCHMARK) *
+        100
+      ).toFixed(1)}% of global GDP).`
+    );
+    lines.push('Macro cap trim on the tape.');
+  }
+  pm.sharePrice = Math.round(price * 100) / 100;
+  state.finance.valuation = Math.round(pm.sharePrice * shares);
+
+  let guard = 0;
+  while ((pm.sharePrice ?? 0) > PUBLIC_MAX_SHARE_STICKER && guard < 14) {
+    const split = executeStockSplit(state, { auto: true, force: true });
+    guard += 1;
+    if (!split.ok) {
+      const px = pm.sharePrice ?? 0;
+      const outstanding = totalOutstandingShares(state);
+      if (px > PUBLIC_MAX_SHARE_STICKER && outstanding > 0) {
+        const targetShares = Math.ceil((outstanding * px) / (PUBLIC_MAX_SHARE_STICKER * 0.95));
+        const mult = targetShares / outstanding;
+        if (mult > 1.05) {
+          scaleCapTableShareCount(state, mult);
+          const adj = Math.round((px / mult) * 100) / 100;
+          pm.sharePrice = adj;
+          if (pm.ipoPrice) pm.ipoPrice = Math.round((pm.ipoPrice / mult) * 100) / 100;
+          if (pm.fundamentalPrice) pm.fundamentalPrice = Math.round((pm.fundamentalPrice / mult) * 100) / 100;
+          state.finance.valuation = Math.round(adj * totalOutstandingShares(state));
+          lines.push(
+            `Share count scaled to ${totalOutstandingShares(state).toLocaleString('en-US')} outstanding (sticker ${formatMoney(adj)}).`
+          );
+        }
+      }
+      break;
+    }
+    lines.push(split.summary);
+  }
+  pm.sharePrice = clampSharePriceToMacro(state, pm.sharePrice ?? 0);
+  state.finance.valuation = Math.round((pm.sharePrice ?? 0) * totalOutstandingShares(state));
+  return lines;
 }
 
 export function declareStockDividend(state) {
@@ -766,11 +848,8 @@ export function tickPublicMarket(state) {
   const squeezeLine = maybeShortSqueeze(state, deltaPct);
   if (squeezeLine) lines.push(squeezeLine);
 
-  if (pm.sharePrice >= 480) {
-    const autoSplit = executeStockSplit(state, { auto: true });
-    if (autoSplit.ok) {
-      lines.push(`Board auto-split: ${autoSplit.summary}`);
-    }
+  for (const scaleLine of enforcePublicTapeScale(state)) {
+    lines.push(scaleLine);
   }
 
   lines.unshift(
@@ -904,6 +983,156 @@ export function sellFounderSharesPartial(state, pctOfFounderRaw) {
     pctOfFounder: pct,
     sharePrice: price,
     founderPctAfter: founderRow.pct
+  };
+}
+
+export function canBuyFounderStock(state) {
+  const lockup = state.publicMarket?.lockupMonthsRemaining ?? 0;
+  if (!isPublicCompany(state) || state.flags?.gameOver || state.flags?.cashedOut) return false;
+  if (lockup > 0) return false;
+  const float = publicFloatShares(state);
+  return float > 1;
+}
+
+/** Open-market purchase — personal bank funds shares moved from the public float. */
+export function buyFounderSharesPartial(state, pctOfFloatRaw) {
+  if (!canBuyFounderStock(state)) {
+    const lockup = state.publicMarket?.lockupMonthsRemaining ?? 0;
+    if (lockup > 0) {
+      return { ok: false, reason: `Founder lockup — wait ${lockup} more month(s) before buying stock.` };
+    }
+    return { ok: false, reason: 'Open-market purchases unlock after IPO once lockup ends.' };
+  }
+  const pct = Number(pctOfFloatRaw);
+  const maxPct = Math.max(1, publicFounderSellPctCap(state) - 1);
+  if (!Number.isFinite(pct) || pct <= 0 || pct > maxPct) {
+    return { ok: false, reason: `Buy 1%–${maxPct}% of tradable float per trade.` };
+  }
+
+  const floatRow = state.capTable?.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
+  const floatShares = Math.max(0, floatRow?.shares ?? 0);
+  if (floatShares < 1) return { ok: false, reason: 'No tradable float left on the exchange.' };
+
+  let buyShares = Math.max(1, Math.floor(floatShares * (pct / 100)));
+  if (buyShares > floatShares) buyShares = floatShares;
+
+  const price = state.publicMarket?.sharePrice ?? 0;
+  if (price <= 0) return { ok: false, reason: 'No market price for your stock.' };
+
+  const effectivePx = effectiveBlockBuyPrice(state, buyShares);
+  const cost = Math.round(buyShares * effectivePx);
+  ensureCeoPersonalBank(state);
+  const bank = state.ceo?.bankBalance ?? 0;
+  if (bank < cost) {
+    return {
+      ok: false,
+      reason: `Need ${formatMoney(cost)} in your personal bank (have ${formatMoney(bank)}).`
+    };
+  }
+
+  const rows = state.capTable.map((r) => ({ ...r }));
+  const founderRow = rows.find((r) => r.id === 'founder');
+  const pubRow = rows.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
+  if (!founderRow || !pubRow) return { ok: false, reason: 'Cap table missing founder or float row.' };
+  pubRow.shares = Math.max(0, (pubRow.shares ?? 0) - buyShares);
+  founderRow.shares = (founderRow.shares ?? 0) + buyShares;
+  state.capTable = recalculateCapTablePercentages(rows);
+
+  debitCeoStockPurchase(
+    state,
+    cost,
+    `Bought ${buyShares.toLocaleString('en-US')} shares @ ~${formatMoney(effectivePx)}/sh (${formatMoney(price)} last) after slippage + fees`
+  );
+  state.finance.valuation = Math.round(price * totalOutstandingShares(state));
+  applyStockPctMove(state, Math.min(0.8, pct * 0.06));
+
+  return {
+    ok: true,
+    cost,
+    sharesBought: buyShares,
+    pctOfFloat: pct,
+    sharePrice: price,
+    founderPctAfter: founderRow.pct
+  };
+}
+
+/** Cost for a full take-private of remaining float (premium over open-market slippage). */
+export function takePrivateQuote(state) {
+  if (!isPublicCompany(state)) return null;
+  const founder = getFounderRow(state);
+  const float = publicFloatShares(state);
+  if (float < 1) return null;
+  const px = effectiveBlockBuyPrice(state, float);
+  const base = Math.round(float * px);
+  const premium = Math.round(base * 0.14);
+  const totalCost = base + premium;
+  return {
+    floatShares: float,
+    baseCost: base,
+    premium,
+    totalCost,
+    founderPct: founder?.pct ?? 0,
+    sharePrice: state.publicMarket?.sharePrice ?? 0
+  };
+}
+
+export function canTakeCompanyPrivate(state) {
+  if (!isPublicCompany(state)) return { ok: false, reason: 'Company must be public to go private.' };
+  if (state.flags?.gameOver) return { ok: false, reason: 'Run ended.' };
+  const quote = takePrivateQuote(state);
+  if (!quote) return { ok: false, reason: 'No tradable float remains.' };
+  if (quote.founderPct < 50) {
+    return {
+      ok: false,
+      reason: `Need majority ownership (≥50% — you have ${quote.founderPct}%). Buy more shares first.`
+    };
+  }
+  ensureCeoPersonalBank(state);
+  const bank = state.ceo?.bankBalance ?? 0;
+  if (bank < quote.totalCost) {
+    return {
+      ok: false,
+      reason: `Need ${formatMoney(quote.totalCost)} personal cash for the go-private tender (have ${formatMoney(bank)}).`
+    };
+  }
+  return { ok: true, quote };
+}
+
+/** Founder-led take-private — delist and merge remaining float into your stake. */
+export function takeCompanyPrivate(state) {
+  const gate = canTakeCompanyPrivate(state);
+  if (!gate.ok) return gate;
+  const { quote } = gate;
+  const buyShares = quote.floatShares;
+
+  const rows = state.capTable.map((r) => ({ ...r }));
+  const founderRow = rows.find((r) => r.id === 'founder');
+  const pubRow = rows.find((r) => r.id === PUBLIC_FLOAT_ROW_ID);
+  if (!founderRow || !pubRow) return { ok: false, reason: 'Cap table missing founder or float row.' };
+
+  pubRow.shares = 0;
+  founderRow.shares = (founderRow.shares ?? 0) + buyShares;
+  state.capTable = recalculateCapTablePercentages(rows);
+
+  debitCeoStockPurchase(
+    state,
+    quote.totalCost,
+    `Take-private tender — ${buyShares.toLocaleString('en-US')} float shares @ premium (${formatMoney(quote.premium)} control fee)`
+  );
+
+  state.flags.takenPrivate = true;
+  state.publicMarket.takenPrivateTurn = calendarTurn(state);
+  state.publicMarket.takenPrivatePremium = quote.premium;
+  pushMarketTape(
+    state,
+    `Founder take-private — ${state.publicMarket.ticker ?? 'Ticker'} delisted after ${formatMoney(quote.totalCost)} personal tender.`
+  );
+
+  return {
+    ok: true,
+    cost: quote.totalCost,
+    founderPctAfter: founderRow.pct,
+    summary: `Took the company private — paid ${formatMoney(quote.totalCost)} for the remaining float. You now own ${founderRow.pct}% and the stock no longer trades.`
   };
 }
 

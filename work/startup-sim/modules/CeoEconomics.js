@@ -885,6 +885,25 @@ export function creditCeoStockSale(state, amount, label) {
   return pay;
 }
 
+export function debitCeoStockPurchase(state, amount, label) {
+  const cost = Math.round(Number(amount) || 0);
+  if (cost <= 0) return 0;
+  ensureCeoPersonalBank(state);
+  const ceo = ceoState(state);
+  if ((ceo.bankBalance ?? 0) < cost) return 0;
+  ceo.bankBalance -= cost;
+  ceo.careerStockPurchases = (ceo.careerStockPurchases ?? 0) + cost;
+  pushCeoLog(ceo, 'bankLog', {
+    kind: 'stock_purchase',
+    amount: cost,
+    delta: -cost,
+    balanceAfter: ceo.bankBalance,
+    label,
+    ...logStamp(state)
+  });
+  return cost;
+}
+
 export function ceoPersonalCashComp(state) {
   const ceo = state.ceo ?? {};
   return (

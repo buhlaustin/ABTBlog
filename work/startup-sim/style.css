@@ -373,6 +373,32 @@ h1 {
   background: var(--border);
 }
 
+.org-chart-executives {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 52rem;
+  margin-top: 0.25rem;
+}
+
+.org-node-exec-secondary {
+  min-width: 0;
+  text-align: left;
+}
+
+.exec-hire-panel .exec-name-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.exec-hire-panel input[type='text'] {
+  min-width: 8rem;
+}
+
 .workspace-purchase-row {
   display: flex;
   flex-wrap: wrap;

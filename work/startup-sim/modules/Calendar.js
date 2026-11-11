@@ -32,6 +32,7 @@ import { archiveCurrentNews } from './News.js';
 import { maybeStartScheduledXcBatch, tickXcGraduateBoost } from './XC.js';
 import { tickAcceleratorBoost } from './Accelerators.js';
 import { tickCooCompensationReview } from './Coo.js';
+import { tickExecutiveCompensationReview } from './ExecutiveTeam.js';
 import { resetGrowthCampaignsMonth, growthRosterRefreshLine } from './GrowthCampaigns.js';
 import { resetProductActionsMonth } from './ProductActions.js';
 import { resetEmployeeBenefitsMonth } from './EmployeeBenefits.js';
@@ -53,7 +54,11 @@ import {
   scorePublicGuidanceBeat
 } from './WorldDynamics.js';
 import { tickScenarioModifiers } from './ScenarioEffects.js';
-import { applySubsidiaryMrrPayout, tickAcquisitionsAtMonthStart } from './Acquisitions.js';
+import {
+  applyPersonalSubsidiaryMrrPayout,
+  applySubsidiaryMrrPayout,
+  tickAcquisitionsAtMonthStart
+} from './Acquisitions.js';
 import { dealCeoWlbOffers, tickPersonalHappinessAtMonthEnd } from './CeoHappiness.js';
 import {
   tickStartupConferenceAtMonthStart,
@@ -169,6 +174,9 @@ export function endMonth(state) {
   for (const line of tickCooCompensationReview(state)) {
     appendLog(state, line);
   }
+  for (const line of tickExecutiveCompensationReview(state)) {
+    appendLog(state, line);
+  }
   for (const line of tickMarketSalaryDemand(state)) {
     appendLog(state, line);
   }
@@ -195,7 +203,11 @@ export function endMonth(state) {
     appendLog(state, line);
   }
   const portfolio = applySubsidiaryMrrPayout(state);
+  const personalPortfolio = applyPersonalSubsidiaryMrrPayout(state);
   for (const line of portfolio.lines ?? []) {
+    appendLog(state, line);
+  }
+  for (const line of personalPortfolio.lines ?? []) {
     appendLog(state, line);
   }
   onMonthEndSentiment(state, priorMonthRevenue, state.finance?.monthlyRevenue ?? 0);

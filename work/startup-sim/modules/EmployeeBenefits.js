@@ -8,6 +8,7 @@ import {
 } from './Staff.js';
 import { ceoSalaryMonthly } from './CeoEconomics.js';
 import { cooSalaryMonthly } from './Coo.js';
+import { executiveTeamSalaryMonthly } from './ExecutiveTeam.js';
 import { adjustSentiment } from './Sentiment.js';
 import { easeCompetitorPressure } from './Competitor.js';
 import {
@@ -263,11 +264,13 @@ export function totalEmployeeSalaryMassMonthly(state) {
   const payroll = computePayroll(hc, state.stage, state);
   const ceo = ceoSalaryMonthly(state);
   const coo = cooSalaryMonthly(state);
+  const otherExec = executiveTeamSalaryMonthly(state);
   return {
     payroll,
     ceo,
     coo,
-    total: payroll + ceo + coo,
+    otherExec,
+    total: payroll + ceo + coo + otherExec,
     headcount: totalHeadcount(hc)
   };
 }
@@ -584,7 +587,7 @@ export function renderEmployeeBenefitsPanel(container, state) {
         <h3 class="finance-section-title">Company bonus</h3>
         <span class="growth-channel-badge growth-channel-badge--inline">${bonusPaidLabel}</span>
       </div>
-      <p class="fine-print">Payroll ${formatMoney(mass.payroll)}/mo · CEO+COO ${formatMoney(mass.ceo + mass.coo)}/mo · ${mass.headcount} employees · bonus base ${formatMoney(bonusBase)}${annualMode ? ' (annual)' : ''}.</p>
+      <p class="fine-print">Payroll ${formatMoney(mass.payroll)}/mo · Leadership ${formatMoney(mass.ceo + mass.coo + (mass.otherExec ?? 0))}/mo · ${mass.headcount} employees · bonus base ${formatMoney(bonusBase)}${annualMode ? ' (annual)' : ''}.</p>
       <label class="people-bonus-annual-toggle fine-print">
         <input type="checkbox" id="company-bonus-annual" data-company-bonus-annual ${annualMode ? 'checked' : ''} ${bonusDone != null || !annualEligible ? 'disabled' : ''} />
         Annual bonus — apply % to monthly salary mass × 12 (once every 12 months; monthly % bonuses still available)

@@ -1209,6 +1209,13 @@ if (!buy.ok) {
     console.log(`OK: acquisition + portfolio MRR (${formatMoney(totalSubsidiaryMrr(acqState))}/mo)`);
   }
   const holding = acqState.acquisitions.owned[0];
+  if (subsidiarySalePrice(acqState, holding, small) < buy.price) {
+    console.error('FAIL: acquisition exit mark should not start below purchase price');
+    failed = true;
+  } else if ((holding.health ?? 1) < 0.99) {
+    console.error(`FAIL: new acquisition should open at 1.0× health (got ${holding.health})`);
+    failed = true;
+  }
   const implied = subsidiarySalePrice(acqState, holding, small);
   const quote5 = computeReinvestQuote(acqState, small.id, 5, 'product');
   if (!quote5.ok) {
@@ -1223,9 +1230,14 @@ if (!buy.ok) {
       );
       failed = true;
     } else {
-      const rein = reinvestInSubsidiary(acqState, small.id, { pctOfValue: 2, program: 'gtm' });
+      const healthBeforeReinvest = holding.health ?? 1;
+      const markBeforeReinvest = subsidiaryValuationMark(holding);
+      const rein = reinvestInSubsidiary(acqState, small.id, { pctOfValue: 2, program: 'integration' });
       if (!rein.ok || rein.pctOfValue !== 2) {
         console.error(`FAIL: pct-based reinvest: ${rein.reason ?? 'bad result'}`);
+        failed = true;
+      } else if ((holding.health ?? 1) < healthBeforeReinvest || subsidiaryValuationMark(holding) < markBeforeReinvest) {
+        console.error('FAIL: reinvest should only raise health and valuation mark');
         failed = true;
       } else {
         console.log(`OK: portfolio reinvest scales with value (${formatMoney(rein.amount)} for 2%)`);
@@ -1242,14 +1254,14 @@ if (!buy.ok) {
   tickAcquisitionsAtMonthStart(acqState);
   const markAfter = subsidiaryValuationMark(holding);
   const exitAfter = subsidiarySalePrice(acqState, holding, small);
-  if (markAfter === markBefore && exitAfter === exitBefore) {
-    console.error('FAIL: portfolio valuation mark should drift monthly');
+  if (markAfter < markBefore || exitAfter < exitBefore) {
+    console.error(`FAIL: portfolio mark should not fall month-one (${markBefore}→${markAfter}, exit ${exitBefore}→${exitAfter})`);
     failed = true;
   } else if (markAfter < 0.65 || markAfter > 1.85) {
     console.error(`FAIL: valuation mark out of bounds (${markAfter})`);
     failed = true;
   } else {
-    console.log(`OK: portfolio mark drift (${markBefore.toFixed(3)}× → ${markAfter.toFixed(3)}×)`);
+    console.log(`OK: portfolio mark stable/up (${markBefore.toFixed(3)}× → ${markAfter.toFixed(3)}×)`);
   }
   const pulse = portfolioPulseSummary(acqState);
   if (pulse.portfolioMrr < 1 || pulse.exitVal <= 0 || pulse.invested <= 0) {
@@ -1276,15 +1288,19 @@ const {
   computeFundamentalSharePrice,
   marketCap,
   treasuryNetCash,
-  estimateEquityValue
+  estimateEquityValue,
+  enforcePublicTapeScale
 } = await import(`file://${join(sim, 'modules/IPO.js')}`);
 const {
   macroCapPressureRatio,
   GLOBAL_GDP_USD_BENCHMARK,
+  PUBLIC_MAX_SHARE_STICKER,
+  PUBLIC_MIN_OUTSTANDING_SHARES,
   TRILLIONAIRE_BAND_USD,
   guardListingOperatingPrice,
   macroPressureAllowsTrillionaire,
-  macroPressureBlocksFantasyWealth
+  macroPressureBlocksFantasyWealth,
+  publicMarketCapCeiling
 } = await import(`file://${join(sim, 'modules/PublicMarketRealism.js')}`);
 const { calendarTurn } = await import(`file://${join(sim, 'modules/XC.js')}`);
 const pub = createInitialState({ companyName: 'Ticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
@@ -1304,8 +1320,13 @@ if (!ipo.ok) {
 } else if (!floatRow?.shares || floatRow.shares < 1000) {
   console.error('FAIL: IPO should add public float shares on cap table');
   failed = true;
-} else if (listPrice > 450 || listPrice < 5) {
+} else if (listPrice > PUBLIC_MAX_SHARE_STICKER || listPrice < 5) {
   console.error(`FAIL: IPO share price out of band (${listPrice})`);
+  failed = true;
+} else if (totalOutstandingShares(pub) < PUBLIC_MIN_OUTSTANDING_SHARES) {
+  console.error(
+    `FAIL: IPO should scale to at least ${PUBLIC_MIN_OUTSTANDING_SHARES.toLocaleString()} shares (got ${totalOutstandingShares(pub)})`
+  );
   failed = true;
 } else if ((pub.finance.cash ?? 0) <= cashBeforeIpo) {
   console.error(`FAIL: IPO should add primary proceeds to company cash (before ${cashBeforeIpo}, after ${pub.finance.cash})`);
@@ -1523,6 +1544,38 @@ if (!ipo.ok) {
     failed = true;
   } else if (!failed) {
     console.log('OK: real splits + trillionaire-friendly macro pressure');
+  }
+  const btcSticker = createInitialState({ companyName: 'Sticker Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+  btcSticker.stage = ST.PUBLIC;
+  btcSticker.flags.seedRoundClosed = true;
+  btcSticker.flags.ipoFiled = true;
+  btcSticker.finance.mrr = 80_000_000;
+  btcSticker.publicMarket = {
+    sharePrice: 28_500,
+    ipoPrice: 85,
+    monthsPublic: 72,
+    priorMonthMrr: 75_000_000,
+    priorYtdRunRateMrr: 75_000_000
+  };
+  btcSticker.capTable = JSON.parse(JSON.stringify(pub.capTable));
+  const capBeforeEnforce = marketCap(btcSticker);
+  enforcePublicTapeScale(btcSticker);
+  const pxEnforced = btcSticker.publicMarket?.sharePrice ?? 0;
+  const capAfterEnforce = marketCap(btcSticker);
+  const macroCeil = publicMarketCapCeiling(btcSticker);
+  if (pxEnforced > PUBLIC_MAX_SHARE_STICKER + 0.5) {
+    console.error(`FAIL: enforcePublicTapeScale left BTC sticker ${pxEnforced}`);
+    failed = true;
+  } else if (capAfterEnforce > macroCeil * 1.08) {
+    console.error(`FAIL: cap ${capAfterEnforce} should respect macro ceiling ${macroCeil}`);
+    failed = true;
+  } else if (capAfterEnforce > GLOBAL_GDP_USD_BENCHMARK * 0.12) {
+    console.error('FAIL: late-game cap should stay far below a double-digit GDP share');
+    failed = true;
+  } else if (!failed) {
+    console.log(
+      `OK: public tape scale (${formatMoney(capBeforeEnforce)} → ${formatMoney(capAfterEnforce)} @ ${formatMoney(pxEnforced)}/sh)`
+    );
   }
   const reRate = createInitialState({ companyName: 'ReRate Co', categoryId: 'b2b-saas', mode: 'sandbox' });
   reRate.stage = ST.PUBLIC;
@@ -2350,6 +2403,104 @@ if (!failed) {
       console.log(`OK: public COO comp tracks CEO (${cooMo}/mo ≥ 60% floor)`);
     }
   }
+  const { hireExecutive, execSalaryMonthly, EXECUTIVE_ROLES } = await import(
+    `file://${join(sim, 'modules/ExecutiveTeam.js')}`
+  );
+  const capBeforeCfo = publicCoo.capTable?.length ?? 0;
+  const cfoHire = hireExecutive(publicCoo, 'CFO', { firstName: 'Pat', lastName: 'Ledger' });
+  if (!cfoHire.ok) {
+    console.error(`FAIL: public CFO hire: ${cfoHire.reason}`);
+    failed = true;
+  } else {
+    const ceoMo = Math.round(20_000_000 / 12);
+    const cfoMo = execSalaryMonthly(publicCoo, 'CFO');
+    const cooMo = cooSalaryMonthly(publicCoo);
+    const cfoFloor = Math.round(ceoMo * 0.42);
+    if (cfoMo < cfoFloor) {
+      console.error(`FAIL: public CFO ${cfoMo} < 42% CEO floor ${cfoFloor}`);
+      failed = true;
+    } else if (cfoMo >= cooMo) {
+      console.error(`FAIL: CFO comp should sit below COO (CFO ${cfoMo}, COO ${cooMo})`);
+      failed = true;
+    } else if (EXECUTIVE_ROLES.length !== 4) {
+      console.error('FAIL: expected 4 cash-only executive roles');
+      failed = true;
+    } else if (publicCoo.capTable?.find((r) => r.name?.includes('(CFO)'))) {
+      console.error('FAIL: CFO hire should not add cap table equity');
+      failed = true;
+    } else if ((publicCoo.capTable?.length ?? 0) !== capBeforeCfo) {
+      console.error('FAIL: CFO hire changed cap table row count');
+      failed = true;
+    } else {
+      console.log(`OK: cash-only exec team (CFO ${cfoMo}/mo < COO ${cooMo}/mo, 4 roles, no CFO equity)`);
+    }
+  }
+  const { buyFounderSharesPartial, takePrivateQuote } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+  const stockTrade = createInitialState({ companyName: 'Buy Co', categoryId: 'b2b-saas', mode: 'sandbox' });
+  stockTrade.flags.seedRoundClosed = true;
+  stockTrade.flags.ipoUnlocked = true;
+  stockTrade.flags.xcResidencyComplete = true;
+  stockTrade.finance.mrr = 4_000_000;
+  stockTrade.finance.cash = 80_000_000;
+  const { fileIpo: fileIpoFn } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+  const listed = fileIpoFn(stockTrade);
+  if (!listed.ok) {
+    console.error(`FAIL: buy-stock smoke IPO: ${listed.reason}`);
+    failed = true;
+  } else {
+    stockTrade.publicMarket.lockupMonthsRemaining = 0;
+    stockTrade.ceo.bankBalance = 500_000_000;
+    const founderBefore = stockTrade.capTable?.find((r) => r.id === 'founder')?.shares ?? 0;
+    const buy = buyFounderSharesPartial(stockTrade, 2);
+    if (!buy.ok) {
+      console.error(`FAIL: founder stock buy: ${buy.reason}`);
+      failed = true;
+    } else {
+      const founderAfter = stockTrade.capTable?.find((r) => r.id === 'founder')?.shares ?? 0;
+      if (founderAfter <= founderBefore) {
+        console.error('FAIL: founder block should grow after open-market buy');
+        failed = true;
+      } else if (!takePrivateQuote(stockTrade)) {
+        console.error('FAIL: take-private quote should exist while float remains');
+        failed = true;
+      } else {
+        const {
+          purchaseTargetPersonal,
+          getAcquisitionCatalog,
+          targetAskPrice,
+          applyPersonalSubsidiaryMrrPayout,
+          portfolioSynergyMult,
+          PERSONAL_PORTFOLIO_MRR_MULT
+        } = await import(`file://${join(sim, 'modules/Acquisitions.js')}`);
+        const cashBefore = stockTrade.finance.cash;
+        const target = getAcquisitionCatalog().find((c) => targetAskPrice(stockTrade, c) <= 5_000_000);
+        if (target) {
+          const personalBuy = purchaseTargetPersonal(stockTrade, target.id);
+          if (!personalBuy.ok) {
+            console.error(`FAIL: personal acquisition smoke: ${personalBuy.reason}`);
+            failed = true;
+          } else if (stockTrade.finance.cash !== cashBefore) {
+            console.error('FAIL: personal acquisition should not debit company cash');
+            failed = true;
+          } else {
+            const corpEquiv = Math.round(personalBuy.mrr * portfolioSynergyMult(stockTrade));
+            const personalPayout = applyPersonalSubsidiaryMrrPayout(stockTrade);
+            const expectedFloor = corpEquiv * PERSONAL_PORTFOLIO_MRR_MULT * 0.95;
+            if (personalPayout.total < expectedFloor) {
+              console.error(
+                `FAIL: personal portfolio MRR should be ~10× corporate (got ${personalPayout.total} vs floor ${expectedFloor})`
+              );
+              failed = true;
+            } else {
+              console.log('OK: founder stock buy + personal M&A (10× MRR, company cash untouched)');
+            }
+          }
+        } else {
+          console.log('OK: founder stock buy');
+        }
+      }
+    }
+  }
 }
 
 const {
@@ -2400,6 +2551,38 @@ if (
   failed = true;
 } else {
   console.log(`OK: dynamic side limits (${earlyPlays}→${scaledPlays} plays, hub unlimited)`);
+}
+
+const pubHubSlots = createInitialState({ companyName: 'Pub Hub', categoryId: 'b2b-saas', mode: 'career' });
+pubHubSlots.flags.ipoFiled = true;
+pubHubSlots.stage = STAGES.PUBLIC;
+pubHubSlots.workspace.tier = WORKSPACE_TIER.HUB;
+pubHubSlots.offices = { ...(pubHubSlots.offices ?? {}), hubId: 'test-hub' };
+pubHubSlots.finance.mrr = 8_000_000;
+if (growthCampaignSlots(pubHubSlots) === Infinity || growthCampaignSlots(pubHubSlots) > 10) {
+  console.error(`FAIL: public hub should cap paid growth slots (got ${growthCampaignSlots(pubHubSlots)})`);
+  failed = true;
+} else {
+  const whale = getGrowthCampaigns().find((c) => (c.revenue?.[1] ?? 0) >= 50_000_000);
+  if (whale) {
+    resetGrowthCampaignsMonth(pubHubSlots);
+    const offers = pubHubSlots.growth.monthCampaignOffers ?? [];
+    if (!offers.includes(whale.id)) {
+      pubHubSlots.growth.monthCampaignOffers = [whale.id, ...offers.slice(0, 27)];
+    }
+    pubHubSlots.finance.cash = 500_000_000;
+    const beforeMrr = pubHubSlots.finance.mrr;
+    const run = runGrowthCampaign(pubHubSlots, whale.id);
+    if (!run.ok) {
+      console.error(`FAIL: public whale growth smoke: ${run.reason}`);
+      failed = true;
+    } else if (run.revenue > beforeMrr * 0.2) {
+      console.error(`FAIL: public growth payout too high (${run.revenue} vs mrr ${beforeMrr})`);
+      failed = true;
+    } else {
+      console.log(`OK: public hub growth caps (slots ${growthCampaignSlots(pubHubSlots)}, whale payout ${run.revenue})`);
+    }
+  }
 }
 
 const spaceState = createInitialState({

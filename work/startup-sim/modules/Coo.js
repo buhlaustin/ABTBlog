@@ -278,10 +278,11 @@ export function renderLeadershipOrgChart(container, state) {
 
   container.innerHTML = `
     <h3 class="log-head">Leadership</h3>
-    <div class="org-chart">
+    <div class="org-chart" id="leadership-org-chart">
       <div class="org-node org-node-ceo"><span class="org-role">CEO</span><strong>${escapeHtml(ceoLabel)}</strong></div>
       <div class="org-connector" aria-hidden="true"></div>
       ${cooBlock}
+      <div id="executive-team-mount" class="executive-team-mount" aria-live="polite"></div>
     </div>
   `;
 }

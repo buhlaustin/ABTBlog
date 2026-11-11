@@ -165,7 +165,12 @@ export function eraBaseRevenueScaleForCampaign(def, state) {
   const anchor = campaignCatalogAnchorTier(def);
   const cur = TIER_ERA_BASE_REVENUE_MULT[tier] ?? 1;
   const anch = TIER_ERA_BASE_REVENUE_MULT[anchor] ?? 1;
-  return cur / anch;
+  let scale = cur / anch;
+  if (tier === 7 && isPublicCompany(state)) {
+    const heat = publicWealthHeat(state);
+    scale *= 0.15 + 0.55 * heat;
+  }
+  return scale;
 }
 
 export function getTierRevenueProfile(tier) {
@@ -191,7 +196,7 @@ export function progressionRevenueMult(state) {
 
   if (isPublicCompany(state)) {
     const heat = publicWealthHeat(state);
-    m *= 1 + 5 * heat;
+    m *= 1 + 0.75 * heat;
   }
 
   /** Flat ARR milestones — no continuous feedback from monthly desk revenue. */

@@ -4,6 +4,7 @@ import { calendarTurn } from './XC.js';
 import { formatCalendarStamp } from './GameCalendar.js';
 import { progressionTier } from './ProgressionEconomy.js';
 import { recordCashOutflow } from './Finance.js';
+import { ensureCeoPersonalBank } from './CeoEconomics.js';
 import { accrueFiscalRevenue } from './CorporateTax.js';
 import { easeCompetitorPressure, bumpCompetitorPressure } from './Competitor.js';
 import { setGameFeedback } from './GameFeedback.js';
@@ -11,6 +12,8 @@ import bundled from '../data/acquisition-targets.json' with { type: 'json' };
 
 export const MARKET_PAGE_SIZE = 18;
 export const ACQUISITION_DILIGENCE_COST = 10_000;
+/** Personal portfolio subsidiaries pay this multiple vs the same target owned on the balance sheet. */
+export const PERSONAL_PORTFOLIO_MRR_MULT = 10;
 const CATEGORY_IDS = [
   'b2b-saas',
   'consumer-social',
@@ -31,6 +34,7 @@ let hydrated = false;
 export function createInitialAcquisitionsState() {
   return {
     owned: [],
+    personalOwned: [],
     marketSegment: 'all',
     marketSort: 'ask',
     marketSearch: '',
@@ -80,6 +84,7 @@ export function acquisitionsUnlocked(state) {
 function ensureAcquisitions(state) {
   if (!state.acquisitions) state.acquisitions = createInitialAcquisitionsState();
   if (!state.acquisitions.owned) state.acquisitions.owned = [];
+  if (!state.acquisitions.personalOwned) state.acquisitions.personalOwned = [];
   if (!state.acquisitions.dealLog) state.acquisitions.dealLog = [];
   if (!state.acquisitions.marketSegment) state.acquisitions.marketSegment = 'all';
   if (state.acquisitions.marketPage == null) state.acquisitions.marketPage = 0;
@@ -147,7 +152,12 @@ export function portfolioMix(state) {
 }
 
 function ownedIds(state) {
-  return new Set((state.acquisitions?.owned ?? []).map((h) => h.id));
+  ensureAcquisitions(state);
+  const ids = [
+    ...(state.acquisitions.owned ?? []).map((h) => h.id),
+    ...(state.acquisitions.personalOwned ?? []).map((h) => h.id)
+  ];
+  return new Set(ids);
 }
 
 export function isTargetVisible(state, company) {
@@ -184,12 +194,8 @@ function integrationMonthsForSegment(segment, isRival) {
   return 0;
 }
 
-export function holdingIntegrationMrrFactor(holding) {
-  const left = Math.max(0, holding.integrationMonthsLeft ?? 0);
-  if (left === 0) return 1;
-  if (left === 1) return 0.78;
-  if (left === 2) return 0.55;
-  return 0.4;
+export function holdingIntegrationMrrFactor(_holding) {
+  return 1;
 }
 
 function integrationMrrFactor(holding) {
@@ -259,7 +265,10 @@ function applyMonthlyValuationDrift(state, holding) {
   if (holding.lastMarkTurn === turn) return null;
   holding.lastMarkTurn = turn;
   if (holding.valuationMark == null) holding.valuationMark = 1;
-  const drift = monthlyValuationDriftPct(state, holding.id);
+  let drift = monthlyValuationDriftPct(state, holding.id);
+  const held = monthsHeld(state, holding);
+  if (held <= 2) drift = Math.max(0, drift);
+  if (holding.lastReinvestTurn === turn) drift = Math.max(drift, 0.012);
   holding.lastValuationDriftPct = drift;
   holding.valuationMark = Math.max(
     VALUATION_MARK_MIN,
@@ -307,7 +316,9 @@ export function subsidiarySalePrice(state, holding, company) {
   const held = monthsHeld(state, holding);
   const holdBonus = 1 + Math.min(0.12, Math.floor(held / 6) * 0.02);
   const core = company.basePrice * health * mark * categorySynergyMult(state, company) * holdBonus;
-  return Math.round(core + invested * 0.82);
+  const sale = Math.round(core + invested * 0.82);
+  const costBasis = (holding.purchasePrice ?? 0) + (holding.investedTotal ?? 0);
+  return Math.max(sale, costBasis);
 }
 
 /** Implied equity value for reinvestment sizing (exit mark, not purchase price). */
@@ -334,7 +345,7 @@ export const REINVEST_PROGRAMS = [
     id: 'integration',
     label: 'Integration sprint',
     blurb: 'PMO, systems migration, and synergy capture.',
-    healthFactor: 0.75,
+    healthFactor: 1.1,
     integrationMonths: 1
   },
   {
@@ -381,8 +392,8 @@ export function computeReinvestQuote(state, targetId, pctOfValue, programId = 'p
   }
 
   const program = reinvestProgram(programId);
-  const healthDelta = (amount / Math.max(impliedValue, 1)) * 0.42 * program.healthFactor;
-  const projectedHealth = Math.min(2.2, holdingHealth(holding) + healthDelta);
+  const healthDelta = (amount / Math.max(impliedValue, 1)) * 0.42 * Math.max(1, program.healthFactor);
+  const projectedHealth = Math.min(2.2, holdingHealth(holding) + Math.max(healthDelta, 0.01));
 
   return {
     ok: true,
@@ -452,10 +463,10 @@ export function runDueDiligence(state, targetId) {
   state.finance.cash -= DILIGENCE_COST;
   recordCashOutflow(state, DILIGENCE_COST, 'acquisition-diligence');
   const seed = state.meta?.runSeed ?? 1;
-  const healthRoll = Math.round((0.9 + hash01(seed, targetId, 404) * 0.18) * 100) / 100;
+  const qualityScore = Math.round((0.96 + hash01(seed, targetId, 404) * 0.08) * 100) / 100;
   const hiddenDebt = hash01(seed, targetId, 405) > 0.82;
   state.acquisitions.diligenceReports[targetId] = {
-    healthRoll,
+    qualityScore,
     hiddenDebt,
     integrationExtra: hiddenDebt ? 1 : 0
   };
@@ -464,11 +475,11 @@ export function runDueDiligence(state, targetId) {
     ok: true,
     company,
     name,
-    healthRoll,
+    qualityScore,
     hiddenDebt,
     summary: hiddenDebt
-      ? `${name}: opens at ${healthRoll}× health — hidden integration debt (+1 mo).`
-      : `${name}: clean file — expect ~${healthRoll}× starting health.`
+      ? `${name}: quality ${qualityScore} — hidden integration debt (+1 mo); closes at 1.0× health like any deal.`
+      : `${name}: clean file — quality ${qualityScore}; all acquisitions open at 1.0× health.`
   };
 }
 
@@ -506,6 +517,22 @@ function filteredMarketTargets(state) {
   return list;
 }
 
+function newAcquisitionHolding(state, company, price, report, integrationMonthsLeft) {
+  return {
+    id: company.id,
+    acquiredTurn: calendarTurn(state),
+    purchasePrice: price,
+    health: 1,
+    investedTotal: 0,
+    integrationMonthsLeft,
+    lastReinvestTurn: calendarTurn(state),
+    valuationMark: 1,
+    lastValuationDriftPct: 0,
+    lastMarkTurn: calendarTurn(state),
+    dueDiligenceQuality: report?.qualityScore ?? null
+  };
+}
+
 export function purchaseTarget(state, targetId) {
   if (!acquisitionsUnlocked(state)) {
     return { ok: false, reason: 'Finish your X Combinator batch before buying companies.' };
@@ -526,18 +553,7 @@ export function purchaseTarget(state, targetId) {
   const report = state.acquisitions.diligenceReports?.[company.id];
   let integrationMonthsLeft = integrationMonthsForSegment(company.segment, company.isRival);
   if (report?.integrationExtra) integrationMonthsLeft += 1;
-  const holding = {
-    id: company.id,
-    acquiredTurn: calendarTurn(state),
-    purchasePrice: price,
-    health: report?.healthRoll ?? 1,
-    investedTotal: 0,
-    integrationMonthsLeft,
-    lastReinvestTurn: calendarTurn(state),
-    valuationMark: 1,
-    lastValuationDriftPct: 0,
-    lastMarkTurn: null
-  };
+  const holding = newAcquisitionHolding(state, company, price, report, integrationMonthsLeft);
   state.acquisitions.owned.push(holding);
   if (report) delete state.acquisitions.diligenceReports[company.id];
   state.acquisitions.fireSaleIds = (state.acquisitions.fireSaleIds ?? []).filter((id) => id !== company.id);
@@ -560,6 +576,104 @@ export function purchaseTarget(state, targetId) {
   return { ok: true, company, price, mrr, integrationMonthsLeft };
 }
 
+/** Buy a target with CEO personal bank — MRR pays to personal cash, not the company. */
+export function purchaseTargetPersonal(state, targetId) {
+  if (!acquisitionsUnlocked(state)) {
+    return { ok: false, reason: 'Finish your X Combinator batch before buying companies.' };
+  }
+  ensureAcquisitions(state);
+  const company = catalog.find((c) => c.id === targetId);
+  if (!company) return { ok: false, reason: 'Company not on the market.' };
+  if (!isTargetVisible(state, company)) return { ok: false, reason: 'That target is not in your market.' };
+  if (ownedIds(state).has(company.id)) return { ok: false, reason: 'You already own this company.' };
+
+  const price = targetAskPrice(state, company);
+  ensureCeoPersonalBank(state);
+  const bank = state.ceo?.bankBalance ?? 0;
+  if (bank < price) {
+    return {
+      ok: false,
+      reason: `Need ${formatMoney(price)} in your personal bank (have ${formatMoney(bank)}).`
+    };
+  }
+
+  state.ceo.bankBalance = bank - price;
+  const report = state.acquisitions.diligenceReports?.[company.id];
+  let integrationMonthsLeft = integrationMonthsForSegment(company.segment, company.isRival);
+  if (report?.integrationExtra) integrationMonthsLeft += 1;
+  const holding = { ...newAcquisitionHolding(state, company, price, report, integrationMonthsLeft), funding: 'personal' };
+  state.acquisitions.personalOwned.push(holding);
+  if (report) delete state.acquisitions.diligenceReports[company.id];
+  state.acquisitions.fireSaleIds = (state.acquisitions.fireSaleIds ?? []).filter((id) => id !== company.id);
+
+  if (company.isRival) {
+    state.world.competitorAcquired = true;
+    if (state.world?.competitor) state.world.competitor.pressure = 0;
+    easeCompetitorPressure(state, 5);
+  }
+
+  const mrr = subsidiaryMrr(state, holding, company);
+  pushDealLog(state, {
+    kind: 'buy-personal',
+    name: company.isRival ? state.world?.competitor?.name ?? company.name : company.name,
+    amount: price,
+    detail: integrationMonthsLeft
+      ? `Personal deal · integration ${integrationMonthsLeft} mo`
+      : 'Personal deal · fully integrated'
+  });
+  return { ok: true, company, price, mrr, integrationMonthsLeft, personal: true };
+}
+
+function totalPersonalSubsidiaryMrr(state) {
+  if (!state.acquisitions?.personalOwned?.length) return 0;
+  let sum = 0;
+  for (const h of state.acquisitions.personalOwned) {
+    const def = catalog.find((c) => c.id === h.id);
+    if (def) sum += subsidiaryMrr(state, h, def);
+  }
+  return Math.round(sum * portfolioSynergyMult(state) * PERSONAL_PORTFOLIO_MRR_MULT);
+}
+
+export function applyPersonalSubsidiaryMrrPayout(state) {
+  const total = totalPersonalSubsidiaryMrr(state);
+  if (!total) return { total: 0, lines: [] };
+  ensureCeoPersonalBank(state);
+  state.ceo.bankBalance = (state.ceo.bankBalance ?? 0) + total;
+  state.ceo.careerPersonalPortfolioIncome = (state.ceo.careerPersonalPortfolioIncome ?? 0) + total;
+  return {
+    total,
+    lines: [`Personal portfolio MRR: +${formatMoney(total)} deposited to your bank.`]
+  };
+}
+
+export function sellPersonalSubsidiary(state, targetId) {
+  ensureAcquisitions(state);
+  const idx = (state.acquisitions.personalOwned ?? []).findIndex((h) => h.id === targetId);
+  if (idx < 0) return { ok: false, reason: 'You do not personally own that company.' };
+  const holding = state.acquisitions.personalOwned[idx];
+  const company = catalog.find((c) => c.id === targetId);
+  if (!company) return { ok: false, reason: 'Unknown subsidiary.' };
+
+  const proceeds = subsidiarySalePrice(state, holding, company);
+  ensureCeoPersonalBank(state);
+  state.ceo.bankBalance = (state.ceo.bankBalance ?? 0) + proceeds;
+  state.acquisitions.personalOwned.splice(idx, 1);
+
+  if (company.isRival) {
+    state.world.competitorAcquired = false;
+    bumpCompetitorPressure(state, 2);
+  }
+
+  pushDealLog(state, {
+    kind: 'sell-personal',
+    name: company.isRival ? state.world?.competitor?.name ?? company.name : company.name,
+    amount: proceeds,
+    detail: 'Personal exit'
+  });
+
+  return { ok: true, company, proceeds, personal: true };
+}
+
 /** Deploy capital as a % of implied subsidiary value (see computeReinvestQuote). */
 export function reinvestInSubsidiary(state, targetId, options = {}) {
   const pct = options.pctOfValue ?? options.pct;
@@ -574,8 +688,16 @@ export function reinvestInSubsidiary(state, targetId, options = {}) {
   holding.lastReinvestTurn = calendarTurn(state);
   holding.lastReinvestProgram = program.id;
 
-  const delta = (amount / Math.max(impliedValue, 1)) * 0.42 * program.healthFactor;
-  holding.health = holdingHealth(holding) + delta;
+  const delta = Math.max(
+    0.01,
+    (amount / Math.max(impliedValue, 1)) * 0.42 * Math.max(1, program.healthFactor)
+  );
+  holding.health = Math.min(2.2, holdingHealth(holding) + delta);
+  const markBoost = (amount / Math.max(impliedValue, 1)) * 0.06;
+  holding.valuationMark = Math.min(
+    VALUATION_MARK_MAX,
+    subsidiaryValuationMark(holding) + Math.max(markBoost, 0.005)
+  );
   if (holding.integrationMonthsLeft > 0 && program.integrationMonths > 0) {
     holding.integrationMonthsLeft = Math.max(
       0,
@@ -639,9 +761,13 @@ export function tickAcquisitionsAtMonthStart(state) {
   if ((state.acquisitions?.fireSaleIds?.length ?? 0) > 0) {
     lines.push('M&A desk: fire-sale listings live on the Companies tab (−15% ask).');
   }
-  if (!state.acquisitions?.owned?.length) return lines;
+  const ownedAll = [
+    ...(state.acquisitions?.owned ?? []),
+    ...(state.acquisitions?.personalOwned ?? [])
+  ];
+  if (!ownedAll.length) return lines;
   const turn = calendarTurn(state);
-  for (const h of state.acquisitions.owned) {
+  for (const h of ownedAll) {
     h.monthsHeld = monthsHeld(state, h);
     const def = catalog.find((c) => c.id === h.id);
     if (!def) continue;
@@ -693,7 +819,8 @@ export function portfolioPulseSummary(state) {
   const unrealized = exitVal - invested;
   const unrealizedPct = invested > 0 ? (unrealized / invested) * 100 : 0;
   const synergy = portfolioSynergyMult(state);
-  const owned = state.acquisitions?.owned?.length ?? 0;
+  const owned =
+    (state.acquisitions?.owned?.length ?? 0) + (state.acquisitions?.personalOwned?.length ?? 0);
   return {
     portfolioMrr,
     exitVal,

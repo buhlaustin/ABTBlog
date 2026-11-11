@@ -9,14 +9,19 @@ function hubCostMult(state) {
 }
 import { loanOverheadMonthly } from './BankLoan.js';
 import { isPublicCompany } from './IPO.js';
+import { cooSalaryMonthly } from './Coo.js';
+import { executiveTeamSalaryMonthly } from './ExecutiveTeam.js';
 
 function ceoCompMonthly(state) {
   return Math.round((state.ceo?.salaryAnnual ?? 0) / 12);
 }
 
 function cooCompMonthly(state) {
-  if (!state.coo?.hired) return 0;
-  return Math.round(state.coo.salaryMonthly ?? 0);
+  return Math.round(cooSalaryMonthly(state));
+}
+
+function otherExecutiveCompMonthly(state) {
+  return Math.round(executiveTeamSalaryMonthly(state));
 }
 
 /** Rolled monthly OPEX lines (excludes payroll, exec comp, rent, debt). */
@@ -115,6 +120,7 @@ export function computeCompanyOverheadBreakdown(state) {
   const loan = loanOverheadMonthly(state);
   const ceoMo = ceoCompMonthly(state);
   const cooMo = cooCompMonthly(state);
+  const execMo = otherExecutiveCompMonthly(state);
   const variableTotal = rollVariableOverheadTotal(state);
   const band = companyVariableOverheadBand(state);
 
@@ -122,6 +128,7 @@ export function computeCompanyOverheadBreakdown(state) {
   if (payroll > 0) breakdown.push({ label: 'Payroll', amount: payroll });
   if (ceoMo > 0) breakdown.push({ label: 'CEO compensation', amount: ceoMo });
   if (cooMo > 0) breakdown.push({ label: 'COO compensation', amount: cooMo });
+  if (execMo > 0) breakdown.push({ label: 'Other executive compensation', amount: execMo });
   if (workspaceRent > 0) breakdown.push({ label: 'Workspace rent', amount: workspaceRent });
   if (satellite > 0) breakdown.push({ label: 'Satellite offices', amount: satellite });
   if (loan > 0) breakdown.push({ label: 'Debt service', amount: loan });
