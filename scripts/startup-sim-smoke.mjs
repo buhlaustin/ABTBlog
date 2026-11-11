@@ -2673,8 +2673,12 @@ const {
   completeCeoPersonalTaxFilingTask,
   ceoPersonalTaxBaseIncome,
   accrueCeoTaxableIncome,
-  ensureCeoPersonalTax
+  ensureCeoPersonalTax,
+  computeCeoPersonalTaxLiability
 } = await import(`file://${join(sim, 'modules/CeoPersonalTax.js')}`);
+const { computeIndividualIncomeTax, indexedIndividualBrackets } = await import(
+  `file://${join(sim, 'modules/IndividualIncomeTax.js')}`
+);
 const { payCeoPersonalTaxFromBank } = await import(`file://${join(sim, 'modules/CeoEconomics.js')}`);
 
 const ceoTaxState = createInitialState({ companyName: 'CEO Tax Co', categoryId: 'b2b-saas', mode: 'career' });
@@ -2688,7 +2692,12 @@ if (!isCeoPersonalTaxFilingRequired(ceoTaxState)) {
   console.error('FAIL: April CEO personal tax filing should be required with prior-year income');
   failed = true;
 } else {
-  const ceoOwed = Math.max(250, Math.round(200_000 * 0.28));
+  const ceoBrackets = indexedIndividualBrackets(2025, 2024);
+  const ceoOwed = Math.max(250, computeIndividualIncomeTax(200_000, ceoBrackets));
+  if (computeCeoPersonalTaxLiability(ceoTaxState) !== ceoOwed) {
+    console.error('FAIL: CEO personal tax liability bracket math');
+    failed = true;
+  }
   const ceoFiled = completeCeoPersonalTaxFilingTask(ceoTaxState, payCeoPersonalTaxFromBank);
   if (!ceoFiled.ok || ceoTaxState.ceo.personalTax.taxPaidYear !== 2026) {
     console.error(`FAIL: complete CEO personal tax filing: ${ceoFiled.reason ?? 'bad state'}`);
@@ -2702,6 +2711,15 @@ if (!isCeoPersonalTaxFilingRequired(ceoTaxState)) {
   } else {
     console.log(`OK: April CEO personal tax filing (${formatMoney(ceoFiled.owed)})`);
   }
+}
+
+const idxBracketsY0 = indexedIndividualBrackets(2024, 2024);
+const idxBracketsY2 = indexedIndividualBrackets(2026, 2024);
+if (idxBracketsY0[0].upTo !== 11_925 || idxBracketsY2[0].upTo !== Math.round(11_925 * 1.032 ** 2)) {
+  console.error('FAIL: individual bracket threshold inflation (3.2%/yr)');
+  failed = true;
+} else {
+  console.log('OK: individual tax brackets inflate 3.2% per calendar year');
 }
 
 const accrualState = createInitialState({ companyName: 'Accrual Co', categoryId: 'b2b-saas', mode: 'career' });

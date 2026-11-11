@@ -275,7 +275,7 @@ function renderCeoOverviewSection(ctx) {
     : '';
   const personalTaxAlert =
     ctx.personalTax?.filingRequired && !ctx.personalTax?.taxPaid
-      ? `<p class="finance-alert finance-alert--tax" role="status"><strong>April personal taxes</strong> — ${formatMoney(ctx.personalTax.liability)} on ${formatMoney(ctx.personalTax.baseIncome)} taxable income (salary, draws, bonuses, stock sales). Pay via the mandatory desk task from your personal bank.</p>`
+      ? `<p class="finance-alert finance-alert--tax" role="status"><strong>April personal taxes</strong> — ${formatMoney(ctx.personalTax.liability)} on ${formatMoney(ctx.personalTax.baseIncome)} taxable income (TY ${ctx.personalTax.liabilityYear ?? '—'}; top bracket ${Math.round((ctx.personalTax.marginalRate ?? 0) * 100)}%). Pay via the mandatory desk task from your personal bank.</p>`
       : ctx.personalTax?.taxPaid && (state.calendar?.monthIndex ?? 0) === 4
         ? `<p class="finance-alert finance-alert--ok">Personal taxes filed for ${state.calendar?.year ?? ''} (career paid ${formatMoney(ctx.personalTax.careerTaxPaid)}).</p>`
         : '';
