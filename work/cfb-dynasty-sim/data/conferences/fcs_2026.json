@@ -1,0 +1,90 @@
+[
+  {
+    "id": "big-sky",
+    "name": "Big Sky Conference",
+    "shortName": "Big Sky",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "caa",
+    "name": "Coastal Athletic Association",
+    "shortName": "CAA",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "ivy",
+    "name": "Ivy League",
+    "shortName": "Ivy",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "meac",
+    "name": "Mid-Eastern Athletic Conference",
+    "shortName": "MEAC",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "mvfc",
+    "name": "Missouri Valley Football Conference",
+    "shortName": "MVFC",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "nec",
+    "name": "Northeast Conference",
+    "shortName": "NEC",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "ovc",
+    "name": "Ohio Valley Conference",
+    "shortName": "OVC",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "patriot",
+    "name": "Patriot League",
+    "shortName": "Patriot",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "pioneer",
+    "name": "Pioneer Football League",
+    "shortName": "Pioneer",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "socon",
+    "name": "Southern Conference",
+    "shortName": "SoCon",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "southland",
+    "name": "Southland Conference",
+    "shortName": "Southland",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "swac",
+    "name": "Southwestern Athletic Conference",
+    "shortName": "SWAC",
+    "divisions": [
+      "East",
+      "West"
+    ],
+    "subdivision": "FCS"
+  },
+  {
+    "id": "uac",
+    "name": "United Athletic Conference",
+    "shortName": "UAC",
+    "subdivision": "FCS"
+  },
+  {
+    "id": "fcs-independent",
+    "name": "FCS Independents",
+    "shortName": "Independent",
+    "subdivision": "FCS"
+  }
+]

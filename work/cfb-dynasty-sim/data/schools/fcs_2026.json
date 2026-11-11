@@ -1,0 +1,999 @@
+{
+  "meta": {
+    "dataVersion": "2026.11.11",
+    "alignmentEffective": "2026-07-01",
+    "sources": [
+      "https://fbschedules.com/college-football-realignment-conference-changes-for-2026-take-effect-today/",
+      "https://fearthefcs.com/fcs-conferences-and-teams/",
+      "https://theanalyst.com/articles/fcs-football-conference-previews-2026"
+    ]
+  },
+  "conferences": [
+    {
+      "id": "big-sky",
+      "name": "Big Sky Conference",
+      "shortName": "Big Sky",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "caa",
+      "name": "Coastal Athletic Association",
+      "shortName": "CAA",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "ivy",
+      "name": "Ivy League",
+      "shortName": "Ivy",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "meac",
+      "name": "Mid-Eastern Athletic Conference",
+      "shortName": "MEAC",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "mvfc",
+      "name": "Missouri Valley Football Conference",
+      "shortName": "MVFC",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "nec",
+      "name": "Northeast Conference",
+      "shortName": "NEC",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "ovc",
+      "name": "Ohio Valley Conference",
+      "shortName": "OVC",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "patriot",
+      "name": "Patriot League",
+      "shortName": "Patriot",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "pioneer",
+      "name": "Pioneer Football League",
+      "shortName": "Pioneer",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "socon",
+      "name": "Southern Conference",
+      "shortName": "SoCon",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "southland",
+      "name": "Southland Conference",
+      "shortName": "Southland",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "swac",
+      "name": "Southwestern Athletic Conference",
+      "shortName": "SWAC",
+      "divisions": [
+        "East",
+        "West"
+      ],
+      "subdivision": "FCS"
+    },
+    {
+      "id": "uac",
+      "name": "United Athletic Conference",
+      "shortName": "UAC",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "fcs-independent",
+      "name": "FCS Independents",
+      "shortName": "Independent",
+      "subdivision": "FCS"
+    }
+  ],
+  "schools": [
+    {
+      "id": "cal-poly",
+      "name": "Cal Poly",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "eastern-washington",
+      "name": "Eastern Washington",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "idaho",
+      "name": "Idaho",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "idaho-state",
+      "name": "Idaho State",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "montana",
+      "name": "Montana",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "montana-state",
+      "name": "Montana State",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "northern-arizona",
+      "name": "Northern Arizona",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "northern-colorado",
+      "name": "Northern Colorado",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "portland-state",
+      "name": "Portland State",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "southern-utah",
+      "name": "Southern Utah",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "uc-davis",
+      "name": "UC Davis",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "utah-tech",
+      "name": "Utah Tech",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "weber-state",
+      "name": "Weber State",
+      "conferenceId": "big-sky",
+      "conferenceName": "Big Sky Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "ualbany",
+      "name": "UAlbany",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "bryant",
+      "name": "Bryant",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "campbell",
+      "name": "Campbell",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "elon",
+      "name": "Elon",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "hampton",
+      "name": "Hampton",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "maine",
+      "name": "Maine",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "monmouth",
+      "name": "Monmouth",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "new-hampshire",
+      "name": "New Hampshire",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "north-carolina-aandt",
+      "name": "North Carolina A&T",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "rhode-island",
+      "name": "Rhode Island",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "sacred-heart",
+      "name": "Sacred Heart",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "stony-brook",
+      "name": "Stony Brook",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "towson",
+      "name": "Towson",
+      "conferenceId": "caa",
+      "conferenceName": "Coastal Athletic Association",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "brown",
+      "name": "Brown",
+      "conferenceId": "ivy",
+      "conferenceName": "Ivy League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "columbia",
+      "name": "Columbia",
+      "conferenceId": "ivy",
+      "conferenceName": "Ivy League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "cornell",
+      "name": "Cornell",
+      "conferenceId": "ivy",
+      "conferenceName": "Ivy League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "dartmouth",
+      "name": "Dartmouth",
+      "conferenceId": "ivy",
+      "conferenceName": "Ivy League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "harvard",
+      "name": "Harvard",
+      "conferenceId": "ivy",
+      "conferenceName": "Ivy League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "penn",
+      "name": "Penn",
+      "conferenceId": "ivy",
+      "conferenceName": "Ivy League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "princeton",
+      "name": "Princeton",
+      "conferenceId": "ivy",
+      "conferenceName": "Ivy League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "yale",
+      "name": "Yale",
+      "conferenceId": "ivy",
+      "conferenceName": "Ivy League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "delaware-state",
+      "name": "Delaware State",
+      "conferenceId": "meac",
+      "conferenceName": "Mid-Eastern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "howard",
+      "name": "Howard",
+      "conferenceId": "meac",
+      "conferenceName": "Mid-Eastern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "morgan-state",
+      "name": "Morgan State",
+      "conferenceId": "meac",
+      "conferenceName": "Mid-Eastern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "norfolk-state",
+      "name": "Norfolk State",
+      "conferenceId": "meac",
+      "conferenceName": "Mid-Eastern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "north-carolina-central",
+      "name": "North Carolina Central",
+      "conferenceId": "meac",
+      "conferenceName": "Mid-Eastern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "south-carolina-state",
+      "name": "South Carolina State",
+      "conferenceId": "meac",
+      "conferenceName": "Mid-Eastern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "illinois-state",
+      "name": "Illinois State",
+      "conferenceId": "mvfc",
+      "conferenceName": "Missouri Valley Football Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "indiana-state",
+      "name": "Indiana State",
+      "conferenceId": "mvfc",
+      "conferenceName": "Missouri Valley Football Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "murray-state",
+      "name": "Murray State",
+      "conferenceId": "mvfc",
+      "conferenceName": "Missouri Valley Football Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "north-dakota",
+      "name": "North Dakota",
+      "conferenceId": "mvfc",
+      "conferenceName": "Missouri Valley Football Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "northern-iowa",
+      "name": "Northern Iowa",
+      "conferenceId": "mvfc",
+      "conferenceName": "Missouri Valley Football Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "south-dakota",
+      "name": "South Dakota",
+      "conferenceId": "mvfc",
+      "conferenceName": "Missouri Valley Football Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "south-dakota-state",
+      "name": "South Dakota State",
+      "conferenceId": "mvfc",
+      "conferenceName": "Missouri Valley Football Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "southern-illinois",
+      "name": "Southern Illinois",
+      "conferenceId": "mvfc",
+      "conferenceName": "Missouri Valley Football Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "youngstown-state",
+      "name": "Youngstown State",
+      "conferenceId": "mvfc",
+      "conferenceName": "Missouri Valley Football Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "central-connecticut-state",
+      "name": "Central Connecticut State",
+      "conferenceId": "nec",
+      "conferenceName": "Northeast Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "duquesne",
+      "name": "Duquesne",
+      "conferenceId": "nec",
+      "conferenceName": "Northeast Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "liu",
+      "name": "LIU",
+      "conferenceId": "nec",
+      "conferenceName": "Northeast Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "mercyhurst",
+      "name": "Mercyhurst",
+      "conferenceId": "nec",
+      "conferenceName": "Northeast Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "new-haven",
+      "name": "New Haven",
+      "conferenceId": "nec",
+      "conferenceName": "Northeast Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "robert-morris",
+      "name": "Robert Morris",
+      "conferenceId": "nec",
+      "conferenceName": "Northeast Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "stonehill",
+      "name": "Stonehill",
+      "conferenceId": "nec",
+      "conferenceName": "Northeast Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "wagner",
+      "name": "Wagner",
+      "conferenceId": "nec",
+      "conferenceName": "Northeast Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "charleston-southern",
+      "name": "Charleston Southern",
+      "conferenceId": "ovc",
+      "conferenceName": "Ohio Valley Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "eastern-illinois",
+      "name": "Eastern Illinois",
+      "conferenceId": "ovc",
+      "conferenceName": "Ohio Valley Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "gardner-webb",
+      "name": "Gardner-Webb",
+      "conferenceId": "ovc",
+      "conferenceName": "Ohio Valley Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "lindenwood",
+      "name": "Lindenwood",
+      "conferenceId": "ovc",
+      "conferenceName": "Ohio Valley Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "southeast-missouri",
+      "name": "Southeast Missouri",
+      "conferenceId": "ovc",
+      "conferenceName": "Ohio Valley Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "tennessee-state",
+      "name": "Tennessee State",
+      "conferenceId": "ovc",
+      "conferenceName": "Ohio Valley Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "ut-martin",
+      "name": "UT Martin",
+      "conferenceId": "ovc",
+      "conferenceName": "Ohio Valley Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "western-illinois",
+      "name": "Western Illinois",
+      "conferenceId": "ovc",
+      "conferenceName": "Ohio Valley Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "bucknell",
+      "name": "Bucknell",
+      "conferenceId": "patriot",
+      "conferenceName": "Patriot League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "colgate",
+      "name": "Colgate",
+      "conferenceId": "patriot",
+      "conferenceName": "Patriot League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "fordham",
+      "name": "Fordham",
+      "conferenceId": "patriot",
+      "conferenceName": "Patriot League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "georgetown",
+      "name": "Georgetown",
+      "conferenceId": "patriot",
+      "conferenceName": "Patriot League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "holy-cross",
+      "name": "Holy Cross",
+      "conferenceId": "patriot",
+      "conferenceName": "Patriot League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "lafayette",
+      "name": "Lafayette",
+      "conferenceId": "patriot",
+      "conferenceName": "Patriot League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "lehigh",
+      "name": "Lehigh",
+      "conferenceId": "patriot",
+      "conferenceName": "Patriot League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "richmond",
+      "name": "Richmond",
+      "conferenceId": "patriot",
+      "conferenceName": "Patriot League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "villanova",
+      "name": "Villanova",
+      "conferenceId": "patriot",
+      "conferenceName": "Patriot League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "william-and-mary",
+      "name": "William & Mary",
+      "conferenceId": "patriot",
+      "conferenceName": "Patriot League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "butler",
+      "name": "Butler",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "davidson",
+      "name": "Davidson",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "dayton",
+      "name": "Dayton",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "drake",
+      "name": "Drake",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "marist",
+      "name": "Marist",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "morehead-state",
+      "name": "Morehead State",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "presbyterian",
+      "name": "Presbyterian",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "st-thomas",
+      "name": "St. Thomas",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "san-diego",
+      "name": "San Diego",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "stetson",
+      "name": "Stetson",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "valparaiso",
+      "name": "Valparaiso",
+      "conferenceId": "pioneer",
+      "conferenceName": "Pioneer Football League",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "chattanooga",
+      "name": "Chattanooga",
+      "conferenceId": "socon",
+      "conferenceName": "Southern Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "etsu",
+      "name": "ETSU",
+      "conferenceId": "socon",
+      "conferenceName": "Southern Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "furman",
+      "name": "Furman",
+      "conferenceId": "socon",
+      "conferenceName": "Southern Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "mercer",
+      "name": "Mercer",
+      "conferenceId": "socon",
+      "conferenceName": "Southern Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "samford",
+      "name": "Samford",
+      "conferenceId": "socon",
+      "conferenceName": "Southern Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "tennessee-tech",
+      "name": "Tennessee Tech",
+      "conferenceId": "socon",
+      "conferenceName": "Southern Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "the-citadel",
+      "name": "The Citadel",
+      "conferenceId": "socon",
+      "conferenceName": "Southern Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "vmi",
+      "name": "VMI",
+      "conferenceId": "socon",
+      "conferenceName": "Southern Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "western-carolina",
+      "name": "Western Carolina",
+      "conferenceId": "socon",
+      "conferenceName": "Southern Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "wofford",
+      "name": "Wofford",
+      "conferenceId": "socon",
+      "conferenceName": "Southern Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "east-texas-aandm",
+      "name": "East Texas A&M",
+      "conferenceId": "southland",
+      "conferenceName": "Southland Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "houston-christian",
+      "name": "Houston Christian",
+      "conferenceId": "southland",
+      "conferenceName": "Southland Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "lamar",
+      "name": "Lamar",
+      "conferenceId": "southland",
+      "conferenceName": "Southland Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "mcneese",
+      "name": "McNeese",
+      "conferenceId": "southland",
+      "conferenceName": "Southland Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "nicholls",
+      "name": "Nicholls",
+      "conferenceId": "southland",
+      "conferenceName": "Southland Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "northwestern-state",
+      "name": "Northwestern State",
+      "conferenceId": "southland",
+      "conferenceName": "Southland Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "stephen-f-austin",
+      "name": "Stephen F. Austin",
+      "conferenceId": "southland",
+      "conferenceName": "Southland Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "southeastern-louisiana",
+      "name": "Southeastern Louisiana",
+      "conferenceId": "southland",
+      "conferenceName": "Southland Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "incarnate-word",
+      "name": "Incarnate Word",
+      "conferenceId": "southland",
+      "conferenceName": "Southland Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "utrgv",
+      "name": "UTRGV",
+      "conferenceId": "southland",
+      "conferenceName": "Southland Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "alabama-aandm",
+      "name": "Alabama A&M",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "alabama-state",
+      "name": "Alabama State",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "alcorn-state",
+      "name": "Alcorn State",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "arkansas-pine-bluff",
+      "name": "Arkansas-Pine Bluff",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "bethune-cookman",
+      "name": "Bethune-Cookman",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "florida-aandm",
+      "name": "Florida A&M",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "grambling-state",
+      "name": "Grambling State",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "jackson-state",
+      "name": "Jackson State",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "mississippi-valley-state",
+      "name": "Mississippi Valley State",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "prairie-view-aandm",
+      "name": "Prairie View A&M",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "southern",
+      "name": "Southern",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "texas-southern",
+      "name": "Texas Southern",
+      "conferenceId": "swac",
+      "conferenceName": "Southwestern Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "abilene-christian",
+      "name": "Abilene Christian",
+      "conferenceId": "uac",
+      "conferenceName": "United Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "austin-peay",
+      "name": "Austin Peay",
+      "conferenceId": "uac",
+      "conferenceName": "United Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "central-arkansas",
+      "name": "Central Arkansas",
+      "conferenceId": "uac",
+      "conferenceName": "United Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "eastern-kentucky",
+      "name": "Eastern Kentucky",
+      "conferenceId": "uac",
+      "conferenceName": "United Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "north-alabama",
+      "name": "North Alabama",
+      "conferenceId": "uac",
+      "conferenceName": "United Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "tarleton-state",
+      "name": "Tarleton State",
+      "conferenceId": "uac",
+      "conferenceName": "United Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "west-florida",
+      "name": "West Florida",
+      "conferenceId": "uac",
+      "conferenceName": "United Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "west-georgia",
+      "name": "West Georgia",
+      "conferenceId": "uac",
+      "conferenceName": "United Athletic Conference",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "chicago-state",
+      "name": "Chicago State",
+      "conferenceId": "fcs-independent",
+      "conferenceName": "FCS Independents",
+      "subdivision": "FCS"
+    },
+    {
+      "id": "merrimack",
+      "name": "Merrimack",
+      "conferenceId": "fcs-independent",
+      "conferenceName": "FCS Independents",
+      "subdivision": "FCS"
+    }
+  ]
+}

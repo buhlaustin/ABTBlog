@@ -1,0 +1,72 @@
+[
+  {
+    "id": "acc",
+    "name": "Atlantic Coast Conference",
+    "shortName": "ACC",
+    "subdivision": "FBS"
+  },
+  {
+    "id": "american",
+    "name": "American Athletic Conference",
+    "shortName": "American",
+    "subdivision": "FBS"
+  },
+  {
+    "id": "big-12",
+    "name": "Big 12 Conference",
+    "shortName": "Big 12",
+    "subdivision": "FBS"
+  },
+  {
+    "id": "big-ten",
+    "name": "Big Ten Conference",
+    "shortName": "Big Ten",
+    "subdivision": "FBS"
+  },
+  {
+    "id": "conference-usa",
+    "name": "Conference USA",
+    "shortName": "CUSA",
+    "subdivision": "FBS"
+  },
+  {
+    "id": "fbs-independent",
+    "name": "FBS Independents",
+    "shortName": "Independent",
+    "subdivision": "FBS"
+  },
+  {
+    "id": "mac",
+    "name": "Mid-American Conference",
+    "shortName": "MAC",
+    "subdivision": "FBS"
+  },
+  {
+    "id": "mountain-west",
+    "name": "Mountain West Conference",
+    "shortName": "MWC",
+    "subdivision": "FBS"
+  },
+  {
+    "id": "pac-12",
+    "name": "Pac-12 Conference",
+    "shortName": "Pac-12",
+    "subdivision": "FBS"
+  },
+  {
+    "id": "sec",
+    "name": "Southeastern Conference",
+    "shortName": "SEC",
+    "subdivision": "FBS"
+  },
+  {
+    "id": "sun-belt",
+    "name": "Sun Belt Conference",
+    "shortName": "Sun Belt",
+    "divisions": [
+      "East",
+      "West"
+    ],
+    "subdivision": "FBS"
+  }
+]

@@ -1,0 +1,1051 @@
+{
+  "meta": {
+    "dataVersion": "2026.11.11",
+    "alignmentEffective": "2026-07-01",
+    "sources": [
+      "https://fbschedules.com/college-football-realignment-conference-changes-for-2026-take-effect-today/",
+      "https://fearthefcs.com/fcs-conferences-and-teams/",
+      "https://theanalyst.com/articles/fcs-football-conference-previews-2026"
+    ]
+  },
+  "conferences": [
+    {
+      "id": "acc",
+      "name": "Atlantic Coast Conference",
+      "shortName": "ACC",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "american",
+      "name": "American Athletic Conference",
+      "shortName": "American",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "big-12",
+      "name": "Big 12 Conference",
+      "shortName": "Big 12",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "big-ten",
+      "name": "Big Ten Conference",
+      "shortName": "Big Ten",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "conference-usa",
+      "name": "Conference USA",
+      "shortName": "CUSA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "fbs-independent",
+      "name": "FBS Independents",
+      "shortName": "Independent",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "mac",
+      "name": "Mid-American Conference",
+      "shortName": "MAC",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "mountain-west",
+      "name": "Mountain West Conference",
+      "shortName": "MWC",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "pac-12",
+      "name": "Pac-12 Conference",
+      "shortName": "Pac-12",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "sec",
+      "name": "Southeastern Conference",
+      "shortName": "SEC",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "sun-belt",
+      "name": "Sun Belt Conference",
+      "shortName": "Sun Belt",
+      "divisions": [
+        "East",
+        "West"
+      ],
+      "subdivision": "FBS"
+    }
+  ],
+  "schools": [
+    {
+      "id": "boston-college",
+      "name": "Boston College",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "california",
+      "name": "California",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "clemson",
+      "name": "Clemson",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "duke",
+      "name": "Duke",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "florida-state",
+      "name": "Florida State",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "georgia-tech",
+      "name": "Georgia Tech",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "louisville",
+      "name": "Louisville",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "miami",
+      "name": "Miami",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "nc-state",
+      "name": "NC State",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "north-carolina",
+      "name": "North Carolina",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "pittsburgh",
+      "name": "Pittsburgh",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "smu",
+      "name": "SMU",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "stanford",
+      "name": "Stanford",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "syracuse",
+      "name": "Syracuse",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "virginia",
+      "name": "Virginia",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "virginia-tech",
+      "name": "Virginia Tech",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "wake-forest",
+      "name": "Wake Forest",
+      "conferenceId": "acc",
+      "conferenceName": "Atlantic Coast Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "army",
+      "name": "Army",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "charlotte",
+      "name": "Charlotte",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "east-carolina",
+      "name": "East Carolina",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "florida-atlantic",
+      "name": "Florida Atlantic",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "memphis",
+      "name": "Memphis",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "navy",
+      "name": "Navy",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "north-texas",
+      "name": "North Texas",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "rice",
+      "name": "Rice",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "temple",
+      "name": "Temple",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "tulane",
+      "name": "Tulane",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "tulsa",
+      "name": "Tulsa",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "uab",
+      "name": "UAB",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "usf",
+      "name": "USF",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "utsa",
+      "name": "UTSA",
+      "conferenceId": "american",
+      "conferenceName": "American Athletic Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "arizona",
+      "name": "Arizona",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "arizona-state",
+      "name": "Arizona State",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "baylor",
+      "name": "Baylor",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "byu",
+      "name": "BYU",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "cincinnati",
+      "name": "Cincinnati",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "colorado",
+      "name": "Colorado",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "houston",
+      "name": "Houston",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "iowa-state",
+      "name": "Iowa State",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "kansas",
+      "name": "Kansas",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "kansas-state",
+      "name": "Kansas State",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "oklahoma-state",
+      "name": "Oklahoma State",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "tcu",
+      "name": "TCU",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "texas-tech",
+      "name": "Texas Tech",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "ucf",
+      "name": "UCF",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "utah",
+      "name": "Utah",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "west-virginia",
+      "name": "West Virginia",
+      "conferenceId": "big-12",
+      "conferenceName": "Big 12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "illinois",
+      "name": "Illinois",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "indiana",
+      "name": "Indiana",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "iowa",
+      "name": "Iowa",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "maryland",
+      "name": "Maryland",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "michigan",
+      "name": "Michigan",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "michigan-state",
+      "name": "Michigan State",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "minnesota",
+      "name": "Minnesota",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "nebraska",
+      "name": "Nebraska",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "northwestern",
+      "name": "Northwestern",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "ohio-state",
+      "name": "Ohio State",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "oregon",
+      "name": "Oregon",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "penn-state",
+      "name": "Penn State",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "purdue",
+      "name": "Purdue",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "rutgers",
+      "name": "Rutgers",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "ucla",
+      "name": "UCLA",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "usc",
+      "name": "USC",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "washington",
+      "name": "Washington",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "wisconsin",
+      "name": "Wisconsin",
+      "conferenceId": "big-ten",
+      "conferenceName": "Big Ten Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "delaware",
+      "name": "Delaware",
+      "conferenceId": "conference-usa",
+      "conferenceName": "Conference USA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "fiu",
+      "name": "FIU",
+      "conferenceId": "conference-usa",
+      "conferenceName": "Conference USA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "jacksonville-state",
+      "name": "Jacksonville State",
+      "conferenceId": "conference-usa",
+      "conferenceName": "Conference USA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "kennesaw-state",
+      "name": "Kennesaw State",
+      "conferenceId": "conference-usa",
+      "conferenceName": "Conference USA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "liberty",
+      "name": "Liberty",
+      "conferenceId": "conference-usa",
+      "conferenceName": "Conference USA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "middle-tennessee",
+      "name": "Middle Tennessee",
+      "conferenceId": "conference-usa",
+      "conferenceName": "Conference USA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "missouri-state",
+      "name": "Missouri State",
+      "conferenceId": "conference-usa",
+      "conferenceName": "Conference USA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "new-mexico-state",
+      "name": "New Mexico State",
+      "conferenceId": "conference-usa",
+      "conferenceName": "Conference USA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "sam-houston",
+      "name": "Sam Houston",
+      "conferenceId": "conference-usa",
+      "conferenceName": "Conference USA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "wku",
+      "name": "WKU",
+      "conferenceId": "conference-usa",
+      "conferenceName": "Conference USA",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "notre-dame",
+      "name": "Notre Dame",
+      "conferenceId": "fbs-independent",
+      "conferenceName": "FBS Independents",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "uconn",
+      "name": "UConn",
+      "conferenceId": "fbs-independent",
+      "conferenceName": "FBS Independents",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "akron",
+      "name": "Akron",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "ball-state",
+      "name": "Ball State",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "bowling-green",
+      "name": "Bowling Green",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "buffalo",
+      "name": "Buffalo",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "central-michigan",
+      "name": "Central Michigan",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "eastern-michigan",
+      "name": "Eastern Michigan",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "kent-state",
+      "name": "Kent State",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "miami-ohio",
+      "name": "Miami (Ohio)",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "ohio",
+      "name": "Ohio",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "sacramento-state",
+      "name": "Sacramento State",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "toledo",
+      "name": "Toledo",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "umass",
+      "name": "UMass",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "western-michigan",
+      "name": "Western Michigan",
+      "conferenceId": "mac",
+      "conferenceName": "Mid-American Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "air-force",
+      "name": "Air Force",
+      "conferenceId": "mountain-west",
+      "conferenceName": "Mountain West Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "hawaii",
+      "name": "Hawaii",
+      "conferenceId": "mountain-west",
+      "conferenceName": "Mountain West Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "nevada",
+      "name": "Nevada",
+      "conferenceId": "mountain-west",
+      "conferenceName": "Mountain West Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "new-mexico",
+      "name": "New Mexico",
+      "conferenceId": "mountain-west",
+      "conferenceName": "Mountain West Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "north-dakota-state",
+      "name": "North Dakota State",
+      "conferenceId": "mountain-west",
+      "conferenceName": "Mountain West Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "northern-illinois",
+      "name": "Northern Illinois",
+      "conferenceId": "mountain-west",
+      "conferenceName": "Mountain West Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "san-jose-state",
+      "name": "San Jose State",
+      "conferenceId": "mountain-west",
+      "conferenceName": "Mountain West Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "unlv",
+      "name": "UNLV",
+      "conferenceId": "mountain-west",
+      "conferenceName": "Mountain West Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "utep",
+      "name": "UTEP",
+      "conferenceId": "mountain-west",
+      "conferenceName": "Mountain West Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "wyoming",
+      "name": "Wyoming",
+      "conferenceId": "mountain-west",
+      "conferenceName": "Mountain West Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "boise-state",
+      "name": "Boise State",
+      "conferenceId": "pac-12",
+      "conferenceName": "Pac-12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "colorado-state",
+      "name": "Colorado State",
+      "conferenceId": "pac-12",
+      "conferenceName": "Pac-12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "fresno-state",
+      "name": "Fresno State",
+      "conferenceId": "pac-12",
+      "conferenceName": "Pac-12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "oregon-state",
+      "name": "Oregon State",
+      "conferenceId": "pac-12",
+      "conferenceName": "Pac-12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "san-diego-state",
+      "name": "San Diego State",
+      "conferenceId": "pac-12",
+      "conferenceName": "Pac-12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "texas-state",
+      "name": "Texas State",
+      "conferenceId": "pac-12",
+      "conferenceName": "Pac-12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "utah-state",
+      "name": "Utah State",
+      "conferenceId": "pac-12",
+      "conferenceName": "Pac-12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "washington-state",
+      "name": "Washington State",
+      "conferenceId": "pac-12",
+      "conferenceName": "Pac-12 Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "alabama",
+      "name": "Alabama",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "arkansas",
+      "name": "Arkansas",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "auburn",
+      "name": "Auburn",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "florida",
+      "name": "Florida",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "georgia",
+      "name": "Georgia",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "kentucky",
+      "name": "Kentucky",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "lsu",
+      "name": "LSU",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "mississippi-state",
+      "name": "Mississippi State",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "missouri",
+      "name": "Missouri",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "oklahoma",
+      "name": "Oklahoma",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "ole-miss",
+      "name": "Ole Miss",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "south-carolina",
+      "name": "South Carolina",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "tennessee",
+      "name": "Tennessee",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "texas",
+      "name": "Texas",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "texas-aandm",
+      "name": "Texas A&M",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "vanderbilt",
+      "name": "Vanderbilt",
+      "conferenceId": "sec",
+      "conferenceName": "Southeastern Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "appalachian-state",
+      "name": "Appalachian State",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "arkansas-state",
+      "name": "Arkansas State",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "coastal-carolina",
+      "name": "Coastal Carolina",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "georgia-southern",
+      "name": "Georgia Southern",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "georgia-state",
+      "name": "Georgia State",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "james-madison",
+      "name": "James Madison",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "louisiana",
+      "name": "Louisiana",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "louisiana-tech",
+      "name": "Louisiana Tech",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "marshall",
+      "name": "Marshall",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "old-dominion",
+      "name": "Old Dominion",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "south-alabama",
+      "name": "South Alabama",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "southern-miss",
+      "name": "Southern Miss",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "troy",
+      "name": "Troy",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    },
+    {
+      "id": "ulm",
+      "name": "ULM",
+      "conferenceId": "sun-belt",
+      "conferenceName": "Sun Belt Conference",
+      "subdivision": "FBS"
+    }
+  ]
+}
