@@ -360,8 +360,16 @@ function categoryAllowed(task, categoryId) {
   return cats.includes(categoryId);
 }
 
-function stageAllowed(task, stage) {
+function stageAllowed(task, stage, state) {
   const stages = task.stages ?? ['garage'];
+  if (
+    task.launchPhase &&
+    launchLifecycleActive(state) &&
+    stages.includes('garage') &&
+    (stage === STAGES.GARAGE || stage === STAGES.OFFICE)
+  ) {
+    return true;
+  }
   if (stage === STAGES.GARAGE || stage === STAGES.OFFICE) {
     return stages.includes(stage);
   }
@@ -476,7 +484,7 @@ function taskEligibleForState(t, state, taskStage, categoryId) {
   const launchOk = t.startupConference ? true : launchPhaseAllowed(t, state);
   const tierOk = t.startupConference ? true : taskTierAllowed(t, state);
   return (
-    stageAllowed(t, taskStage) &&
+    stageAllowed(t, taskStage, state) &&
     categoryAllowed(t, categoryId) &&
     tierOk &&
     launchOk

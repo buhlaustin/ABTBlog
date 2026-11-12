@@ -30,7 +30,12 @@ import { createInitialFinancePropertyState } from './FinanceProperty.js';
 import { createInitialCrisisState } from './Crisis.js';
 import { createInitialDecisionState } from './DecisionEvents.js';
 import { createInitialModifiers } from './ScenarioEffects.js';
-import { createInitialLaunchState } from './LaunchLifecycle.js';
+import {
+  createInitialLaunchState,
+  repairStuckScheduleLaunchTasks,
+  graduateLaunchIfLeftGarage
+} from './LaunchLifecycle.js';
+import { getTaskDef } from './Tasks.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
 import { syncLifetimeProfit } from './Finance.js';
@@ -708,6 +713,21 @@ export function normalizeSave(raw) {
       state.workspace.tier = 'small';
       state.workspace.smallOfficeOwned = true;
       applyWorkspaceBurn(state);
+    }
+
+    for (const _line of graduateLaunchIfLeftGarage(state)) {
+      /* save load: clear stale pre-launch phase after leaving garage */
+    }
+    const launchRepair = repairStuckScheduleLaunchTasks(state, getTaskDef);
+    if (launchRepair.length && state.calendar.log) {
+      for (const message of launchRepair) {
+        state.calendar.log.unshift({
+          month: state.calendar.monthIndex,
+          year: state.calendar.year,
+          message
+        });
+      }
+      state.calendar.log = state.calendar.log.slice(0, 24);
     }
 
     if (!state.calendar.monthTasks.length && !state.flags.gameOver) {

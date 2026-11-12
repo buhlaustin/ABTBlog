@@ -60,9 +60,7 @@ import { completeCeoPersonalTaxFilingTask } from './modules/CeoPersonalTax.js';
 import { completeTaskInstance, endMonth, appendLog } from './modules/Calendar.js';
 import {
   onScheduleLaunchTaskCompleted,
-  canSchedulePublicLaunch,
-  PRE_LAUNCH_BUZZ_REQUIRED,
-  PRE_LAUNCH_PRODUCT_REQUIRED,
+  scheduleLaunchBlockReason,
   recordPreLaunchTaskOutcome,
   usesChatXgptLaunchPlaybook,
   CHATXGPT_PRODUCT_NAME
@@ -385,12 +383,12 @@ function handleCompleteTask(instanceId) {
   const def = getTaskDef(inst.taskId);
   if (!def) return;
 
-  if (def.scheduleLaunch && !canSchedulePublicLaunch(sessionState)) {
-    showDeskFeedback(
-      `Need ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz (now ${sessionState.product?.buzz ?? 0}) and product ${PRE_LAUNCH_PRODUCT_REQUIRED}+ (now ${sessionState.product?.level ?? 0}) before scheduling.`,
-      true
-    );
-    return;
+  if (def.scheduleLaunch) {
+    const scheduleBlock = scheduleLaunchBlockReason(sessionState);
+    if (scheduleBlock) {
+      showDeskFeedback(scheduleBlock, true);
+      return;
+    }
   }
 
   if (def.taxFiling) {
