@@ -379,23 +379,33 @@ function renderCeoOverviewSection(ctx) {
   `;
 }
 
+/** Always resolve from state so Wealth & exit never throws on a stale panel context object. */
+function founderMarketControls(state, ctx = {}) {
+  return {
+    canSellStock: Boolean(ctx.canSellStock ?? canSellFounderStock(state)),
+    canBuyStock: Boolean(ctx.canBuyStock ?? canBuyFounderStock(state)),
+    takePrivateGate: ctx.takePrivateGate ?? canTakeCompanyPrivate(state),
+    takePrivate: ctx.takePrivate ?? takePrivateQuote(state)
+  };
+}
+
 function renderCeoWealthSection(ctx) {
+  const state = ctx.state ?? ctx;
+  if (!state?.ceo) {
+    return '<p class="finance-alert" role="alert">CEO state missing — reload your save.</p>';
+  }
   const {
-    comp,
-    shares,
-    exitPrev,
-    lockup,
-    disabled,
-    givingLifetime,
-    netWorthHist,
-    portfolio,
-    investRate,
-    state
+    comp = renderCeoCompBreakdown(state),
+    shares = founderShareStats(state),
+    exitPrev = cashOutPreview(state),
+    lockup = state.publicMarket?.lockupMonthsRemaining ?? 0,
+    disabled = state.flags?.gameOver ? 'disabled' : '',
+    givingLifetime = state.ceo?.personalGivingLifetime ?? 0,
+    netWorthHist = state.ceo?.netWorthHistory ?? [],
+    portfolio = personalInvestmentBalance(state),
+    investRate = personalInvestmentReturnRate(state)
   } = ctx;
-  const canSellStock = ctx.canSellStock ?? canSellFounderStock(state);
-  const canBuyStock = ctx.canBuyStock ?? canBuyFounderStock(state);
-  const takePrivateGate = ctx.takePrivateGate ?? canTakeCompanyPrivate(state);
-  const takePrivate = ctx.takePrivate ?? takePrivateQuote(state);
+  const { canSellStock, canBuyStock, takePrivateGate, takePrivate } = founderMarketControls(state, ctx);
   const publicCo = comp.publicCo;
   const investRateLabel = `${(investRate * 100).toFixed(2)}%/mo est.`;
   const portfolioBlock = `<section class="finance-section finance-card">
@@ -812,6 +822,20 @@ function renderCeoLifestyleSection(ctx) {
   `;
 }
 
+function renderCeoSectionWithFallback(ctx) {
+  try {
+    return renderCeoSectionHtml(ctx);
+  } catch (err) {
+    console.error('CEO section render failed', ctx.section, err);
+    const label = ctx.section === 'wealth' ? 'Wealth & exit' : ctx.section ?? 'section';
+    return `<div class="finance-alert" role="alert">
+      <p><strong>${escapeHtml(label)} could not render.</strong></p>
+      <p class="fine-print">${escapeHtml(err?.message ?? 'Unknown error')}</p>
+      <p class="fine-print">Hard-refresh the page (deploy may still be rolling out). If this persists, export your save and report the error.</p>
+    </div>`;
+  }
+}
+
 export function renderCeoPanel(container, state) {
   if (!container) return;
   if (!state.ceo) {
@@ -823,14 +847,9 @@ export function renderCeoPanel(container, state) {
   try {
     ctx = buildCeoPanelContext(state);
   } catch (err) {
-    console.error('CEO panel render failed', err);
-    if (state.ceo?.section === 'wealth') state.ceo.section = 'overview';
-    try {
-      ctx = buildCeoPanelContext(state);
-    } catch (retryErr) {
-      container.innerHTML = `<div class="finance-alert" role="alert"><p><strong>CEO tab could not render.</strong></p><p class="fine-print">${escapeHtml(retryErr?.message ?? 'Unknown error')} — try another sub-tab or reload.</p></div>`;
-      return;
-    }
+    console.error('CEO panel context failed', err);
+    container.innerHTML = `<div class="finance-alert" role="alert"><p><strong>CEO tab could not load.</strong></p><p class="fine-print">${escapeHtml(err?.message ?? 'Unknown error')}</p></div>`;
+    return;
   }
   const drawsOpen = ownerDrawsUnlocked(state);
   const compTabLabel = drawsOpen ? 'Comp & draws' : 'Comp & pay';
@@ -860,7 +879,7 @@ export function renderCeoPanel(container, state) {
         ${tab('lifestyle', 'Homes & splurges')}
         ${tab('alumni', 'Alma mater')}
       </nav>
-      <div id="ceo-section-mount">${renderCeoSectionHtml(ctx)}</div>
+      <div id="ceo-section-mount">${renderCeoSectionWithFallback(ctx)}</div>
       <p id="ceo-feedback" class="desk-feedback" hidden></p>
     </div>
   `;
