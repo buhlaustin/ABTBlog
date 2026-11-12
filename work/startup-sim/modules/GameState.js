@@ -35,6 +35,7 @@ import {
   repairStuckScheduleLaunchTasks,
   graduateLaunchIfLeftGarage
 } from './LaunchLifecycle.js';
+import { refreshMarketValuationFromFundamentals } from './IPO.js';
 import { getTaskDef } from './Tasks.js';
 import { applySandboxStartingStage } from './SandboxTuning.js';
 import { syncStageFromProgress } from './Progression.js';
@@ -237,6 +238,8 @@ export function normalizeSave(raw) {
     migrateStaffHeadcount(state);
     if (state.ceo) {
       if (!state.ceo.section) state.ceo.section = 'overview';
+      const ceoSections = new Set(['overview', 'wealth', 'comp', 'balance', 'lifestyle', 'alumni']);
+      if (!ceoSections.has(state.ceo.section)) state.ceo.section = 'overview';
       if (state.ceo.personalGivingLifetime == null) state.ceo.personalGivingLifetime = 0;
       if (state.ceo.alumniGivingLifetime == null) state.ceo.alumniGivingLifetime = 0;
       if (state.ceo.alumniAthleticsLifetime == null) state.ceo.alumniAthleticsLifetime = 0;
@@ -738,6 +741,10 @@ export function normalizeSave(raw) {
     applyWorkspaceBurn(state);
     syncLifetimeProfit(state);
     migrateBoardForPublicSave(state);
+
+    if (state.flags?.ipoFiled && !state.flags?.takenPrivate) {
+      refreshMarketValuationFromFundamentals(state);
+    }
 
     state.version = SAVE_VERSION;
     return state;

@@ -1696,7 +1696,10 @@ if (!ipo.ok) {
     lockupMonthsRemaining: 0
   };
   cashWhale.capTable = JSON.parse(JSON.stringify(pub.capTable));
-  refreshMarketValuationFromFundamentals(cashWhale);
+  const { enterpriseValueUsd, syncPublicEnterpriseValuation } = await import(
+    `file://${join(sim, 'modules/IPO.js')}`
+  );
+  syncPublicEnterpriseValuation(cashWhale);
   const valAfterCash = cashWhale.finance.valuation ?? 0;
   if (valAfterCash < 900_000_000_000) {
     console.error(
@@ -1705,6 +1708,17 @@ if (!ipo.ok) {
     failed = true;
   } else if (!failed) {
     console.log(`OK: treasury cash in public valuation (${formatMoney(valAfterCash)})`);
+  }
+  cashWhale.finance.cash = 200_000_000_000;
+  cashWhale.acquisitions = cashWhale.acquisitions ?? { owned: [] };
+  const { portfolioExitValue } = await import(`file://${join(sim, 'modules/Acquisitions.js')}`);
+  const portMarks = portfolioExitValue(cashWhale);
+  const ev = enterpriseValueUsd(cashWhale);
+  if (portMarks <= 0) {
+    console.log('OK: enterprise valuation (no test subsidiaries in smoke)');
+  } else if (ev < cashWhale.finance.cash * 0.9) {
+    console.error(`FAIL: enterprise value ${formatMoney(ev)} should include cash + portfolio`);
+    failed = true;
   }
   const { publicFounderSellPctCap } = await import(`file://${join(sim, 'modules/PublicPostIpoEconomy.js')}`);
   const sellPct = Math.min(10, publicFounderSellPctCap(pub));

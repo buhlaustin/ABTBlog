@@ -202,6 +202,9 @@ function buildCeoPanelContext(state) {
     monthly,
     comp,
     canSellStock,
+    canBuyStock,
+    takePrivate,
+    takePrivateGate,
     equityLabel,
     lockup,
     band,
@@ -508,8 +511,8 @@ function renderCeoWealthSection(ctx) {
           ${
             takePrivate
               ? `<p class="fine-print">Go-private tender (≥50% ownership): ~${formatMoney(takePrivate.totalCost)} for ${takePrivate.floatShares.toLocaleString('en-US')} remaining float shares.</p>
-          <button type="button" class="btn btn-primary btn-small" id="btn-take-private" ${takePrivateGate.ok ? '' : disabled} title="${escapeHtml(takePrivateGate.reason ?? '')}">Take company private</button>
-          ${!takePrivateGate.ok && takePrivateGate.reason ? `<p class="fine-print">${escapeHtml(takePrivateGate.reason)}</p>` : ''}`
+          <button type="button" class="btn btn-primary btn-small" id="btn-take-private" ${takePrivateGate?.ok ? '' : disabled} title="${escapeHtml(takePrivateGate?.reason ?? '')}">Take company private</button>
+          ${takePrivateGate && !takePrivateGate.ok && takePrivateGate.reason ? `<p class="fine-print">${escapeHtml(takePrivateGate.reason)}</p>` : ''}`
               : ''
           }`
         }
@@ -811,8 +814,24 @@ function renderCeoLifestyleSection(ctx) {
 
 export function renderCeoPanel(container, state) {
   if (!container) return;
-  if (!state.ceo) return;
-  const ctx = buildCeoPanelContext(state);
+  if (!state.ceo) {
+    container.innerHTML =
+      '<p class="fine-print finance-alert">CEO profile missing — reload or start a new run.</p>';
+    return;
+  }
+  let ctx;
+  try {
+    ctx = buildCeoPanelContext(state);
+  } catch (err) {
+    console.error('CEO panel render failed', err);
+    if (state.ceo?.section === 'wealth') state.ceo.section = 'overview';
+    try {
+      ctx = buildCeoPanelContext(state);
+    } catch (retryErr) {
+      container.innerHTML = `<div class="finance-alert" role="alert"><p><strong>CEO tab could not render.</strong></p><p class="fine-print">${escapeHtml(retryErr?.message ?? 'Unknown error')} — try another sub-tab or reload.</p></div>`;
+      return;
+    }
+  }
   const drawsOpen = ownerDrawsUnlocked(state);
   const compTabLabel = drawsOpen ? 'Comp & draws' : 'Comp & pay';
   const panelLede = drawsOpen

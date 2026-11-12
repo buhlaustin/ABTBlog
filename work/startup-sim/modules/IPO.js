@@ -29,7 +29,7 @@ import { requestNarrative, shouldUseNarrativeAi } from './NarrativeApi.js';
 import { buildGameSnapshot } from './GameContext.js';
 import { recordCashOutflow } from './Finance.js';
 import { ensureFiscal } from './CorporateTax.js';
-import { totalSubsidiaryMrr } from './Acquisitions.js';
+import { totalSubsidiaryMrr, portfolioExitValue } from './Acquisitions.js';
 import { panelStatCard, panelMetricGroup, panelMetricGrid, panelMetricStack } from './PanelChrome.js';
 import {
   publicFundamentalPsCap,
@@ -131,30 +131,64 @@ function computeIpoValuation(state) {
   return estimateEquityValue(state);
 }
 
-/** Keep finance.valuation aligned with operations + treasury (public: market cap). */
-export function refreshMarketValuationFromFundamentals(state) {
-  if (isPublicCompany(state)) {
-    const fundamental = computeFundamentalSharePrice(state);
-    const shares = totalOutstandingShares(state);
-    const pm = state.publicMarket ?? {};
-    const tradeCap = marketCap(state);
-    const modelCap = fundamental > 0 && shares > 0 ? Math.round(fundamental * shares) : 0;
-    const netCash = Math.max(0, treasuryNetCash(state));
+/** Operating + treasury + subsidiary marks (public conglomerate book). */
+export function enterpriseValueUsd(state) {
+  if (!isPublicCompany(state)) return estimateEquityValue(state);
+  computeFundamentalSharePrice(state);
+  const pm = state.publicMarket ?? {};
+  const operating = pm.fundamentalOperatingCap ?? 0;
+  const netCash = Math.max(0, treasuryNetCash(state));
+  const portfolio = portfolioExitValue(state);
+  return Math.round(operating + netCash + portfolio);
+}
 
-    if (
-      shares > 0 &&
-      fundamental != null &&
-      modelCap > tradeCap * 1.03 &&
-      (netCash > tradeCap * 0.25 || modelCap > tradeCap * 1.15)
-    ) {
-      const px = clampSharePriceToMacro(state, reconcileTradingPriceToMacro(state, fundamental));
-      pm.sharePrice = px;
-    }
+const MAX_ENTERPRISE_SHARE_SCALE_PER_SYNC = 16;
 
-    const cap = Math.max(marketCap(state), modelCap);
-    if (cap > 0) state.finance.valuation = cap;
-    return cap;
+/**
+ * `finance.valuation` = operating + net cash + subsidiary marks (enterprise).
+ * Gently nudge share price toward EV without unbounded cap-table inflation.
+ */
+export function syncPublicEnterpriseValuation(state) {
+  if (!isPublicCompany(state)) {
+    const est = estimateEquityValue(state);
+    state.finance.valuation = est;
+    return est;
   }
+  const pm = state.publicMarket ?? {};
+  const ev = enterpriseValueUsd(state);
+  state.finance.valuation = ev;
+
+  let shares = totalOutstandingShares(state);
+  if (shares <= 0 || ev <= 0) return ev;
+
+  const tapeCap = marketCap(state);
+  if (tapeCap >= ev * 0.98) return ev;
+
+  let targetPx = ev / shares;
+  if (targetPx > PUBLIC_MAX_SHARE_STICKER) {
+    const mult = Math.min(
+      MAX_ENTERPRISE_SHARE_SCALE_PER_SYNC,
+      targetPx / (PUBLIC_MAX_SHARE_STICKER * 0.95)
+    );
+    if (mult > 1.05) {
+      scaleCapTableShareCount(state, mult);
+      shares = totalOutstandingShares(state);
+      targetPx = ev / shares;
+    }
+  }
+  targetPx = Math.round(
+    Math.min(
+      PUBLIC_MAX_SHARE_STICKER,
+      Math.max(priceFloor(state, pm.sharePrice ?? targetPx), targetPx)
+    ) * 100
+  ) / 100;
+  pm.sharePrice = clampSharePriceToMacro(state, reconcileTradingPriceToMacro(state, targetPx));
+  return ev;
+}
+
+/** Keep finance.valuation aligned with operations + treasury (public: enterprise value). */
+export function refreshMarketValuationFromFundamentals(state) {
+  if (isPublicCompany(state)) return syncPublicEnterpriseValuation(state);
   const est = estimateEquityValue(state);
   state.finance.valuation = est;
   return est;
