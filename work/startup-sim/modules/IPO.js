@@ -52,6 +52,7 @@ import {
   PUBLIC_MAX_SHARE_STICKER,
   publicFloatShares,
   publicMarketCapCeiling,
+  publicOperatingCapCeiling,
   reconcileTradingPriceToMacro,
   resetInstantStockMoveBudget,
   softPrivateEquityCap
@@ -133,8 +134,24 @@ function computeIpoValuation(state) {
 /** Keep finance.valuation aligned with operations + treasury (public: market cap). */
 export function refreshMarketValuationFromFundamentals(state) {
   if (isPublicCompany(state)) {
-    computeFundamentalSharePrice(state);
-    const cap = marketCap(state);
+    const fundamental = computeFundamentalSharePrice(state);
+    const shares = totalOutstandingShares(state);
+    const pm = state.publicMarket ?? {};
+    const tradeCap = marketCap(state);
+    const modelCap = fundamental > 0 && shares > 0 ? Math.round(fundamental * shares) : 0;
+    const netCash = Math.max(0, treasuryNetCash(state));
+
+    if (
+      shares > 0 &&
+      fundamental != null &&
+      modelCap > tradeCap * 1.03 &&
+      (netCash > tradeCap * 0.25 || modelCap > tradeCap * 1.15)
+    ) {
+      const px = clampSharePriceToMacro(state, reconcileTradingPriceToMacro(state, fundamental));
+      pm.sharePrice = px;
+    }
+
+    const cap = Math.max(marketCap(state), modelCap);
     if (cap > 0) state.finance.valuation = cap;
     return cap;
   }
@@ -309,12 +326,12 @@ export function computeFundamentalSharePrice(state) {
   pm.priceSalesMultiple = Math.round(ps * 10) / 10;
   const operatingCap = arr * ps;
   const netCash = Math.max(0, treasuryNetCash(state));
-  const macroCeiling = publicMarketCapCeiling(state);
-  const fairCap = Math.min(operatingCap + netCash, macroCeiling);
-  pm.fundamentalOperatingCap = Math.round(operatingCap);
+  const operatingCeiling = publicOperatingCapCeiling(state);
+  const operatingCapped = Math.min(operatingCap, operatingCeiling);
+  pm.fundamentalOperatingCap = Math.round(operatingCapped);
   pm.treasuryNetCashInModel = netCash;
   const floor = priceFloor(state, pm.sharePrice ?? pm.ipoPrice ?? 1);
-  const operatingPx = operatingCap / shares;
+  const operatingPx = operatingCapped / shares;
   const guardedOperating = guardListingOperatingPrice(state, operatingPx);
   const px = Math.round(((guardedOperating * shares + netCash) / shares) * 100) / 100;
   pm.fundamentalPrice = Math.max(floor, px);

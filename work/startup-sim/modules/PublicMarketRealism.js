@@ -146,10 +146,9 @@ export function autoStockSplitIfNeeded(state) {
 }
 
 /**
- * Macro ceiling for equity value — ramps with months public, ARR, and GDP share.
- * Keeps multi-hundred-trillion fantasy caps out of the tape.
+ * Operating-asset ceiling (excludes balance-sheet cash) — ramps with months public and ARR.
  */
-export function publicMarketCapCeiling(state) {
+export function publicOperatingCapCeiling(state) {
   if (!isPublicCompanyState(state)) return GLOBAL_GDP_USD_BENCHMARK * 0.01;
   const gdp = GLOBAL_GDP_USD_BENCHMARK;
   const months = Math.max(0, state.publicMarket?.monthsPublic ?? 0);
@@ -171,6 +170,14 @@ export function publicMarketCapCeiling(state) {
   const arrCeiling = arr * psCap;
   const gdpCeiling = gdp * (0.035 + Math.min(0.045, months / 600));
   return Math.round(Math.min(timeCeiling, arrCeiling, gdpCeiling));
+}
+
+/** Total equity ceiling — operating cap plus treasury (cash is not clipped by operating multiples). */
+export function publicMarketCapCeiling(state) {
+  const operating = publicOperatingCapCeiling(state);
+  if (!isPublicCompanyState(state)) return operating;
+  const netCash = Math.max(0, treasuryNetCash(state));
+  return Math.round(operating + netCash);
 }
 
 export function clampSharePriceToMacro(state, proposedPrice) {
@@ -196,10 +203,12 @@ export function reconcileTradingPriceToMacro(state, proposedPrice) {
   const arr = Math.max((state.finance?.mrr ?? 0) * 12, getArr(state), 1);
   const netCash = Math.max(0, treasuryNetCash(state));
   const tradingCap = shares * proposedPrice;
+  const operatingCeiling = publicOperatingCapCeiling(state);
   const macroCeiling = publicMarketCapCeiling(state);
   const pressure = macroCapPressureRatio(tradingCap);
   const ps = Math.min(38, (pm.priceSalesMultiple ?? 12) * (1 - pressure * 0.4));
-  let fairCap = Math.min(arr * ps + netCash, macroCeiling);
+  let fairCap = Math.min(arr * ps, operatingCeiling) + netCash;
+  fairCap = Math.min(fairCap, macroCeiling);
   if (tradingCap > GLOBAL_GDP_USD_BENCHMARK * 0.25) {
     fairCap = Math.min(fairCap, GLOBAL_GDP_USD_BENCHMARK * (0.12 + (1 - pressure) * 0.2));
   }
