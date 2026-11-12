@@ -1659,6 +1659,53 @@ if (!ipo.ok) {
   }
   pub.publicMarket.lockupMonthsRemaining = 0;
   pub.publicMarket.monthsPublic = 30;
+  const { renderCeoPanel } = await import(`file://${join(sim, 'modules/Ceo.js')}`);
+  pub.ceo = pub.ceo ?? {};
+  pub.ceo.section = 'wealth';
+  const ceoPanelStub = { innerHTML: '' };
+  try {
+    renderCeoPanel(ceoPanelStub, pub);
+    if (!ceoPanelStub.innerHTML.includes('btn-cash-out')) {
+      console.error('FAIL: CEO wealth tab should render cash-out after lockup');
+      failed = true;
+    } else if (!failed) {
+      console.log('OK: CEO wealth tab after lockup');
+    }
+  } catch (err) {
+    console.error(`FAIL: CEO wealth tab render crashed: ${err.message}`);
+    failed = true;
+  }
+  const { refreshMarketValuationFromFundamentals } = await import(`file://${join(sim, 'modules/IPO.js')}`);
+  const cashWhale = createInitialState({
+    companyName: 'CashFort Co',
+    categoryId: 'b2b-saas',
+    mode: 'sandbox'
+  });
+  cashWhale.stage = ST.PUBLIC;
+  cashWhale.flags.seedRoundClosed = true;
+  cashWhale.flags.ipoFiled = true;
+  cashWhale.finance.mrr = 50_000_000;
+  cashWhale.finance.arr = 600_000_000;
+  cashWhale.finance.cash = 1_000_000_000_000;
+  cashWhale.publicMarket = {
+    sharePrice: 120,
+    ipoPrice: 85,
+    monthsPublic: 36,
+    priorMonthMrr: 48_000_000,
+    priorYtdRunRateMrr: 48_000_000,
+    lockupMonthsRemaining: 0
+  };
+  cashWhale.capTable = JSON.parse(JSON.stringify(pub.capTable));
+  refreshMarketValuationFromFundamentals(cashWhale);
+  const valAfterCash = cashWhale.finance.valuation ?? 0;
+  if (valAfterCash < 900_000_000_000) {
+    console.error(
+      `FAIL: $1T cash should lift market cap (got ${formatMoney(valAfterCash)}, expected ~cash + ops)`
+    );
+    failed = true;
+  } else if (!failed) {
+    console.log(`OK: treasury cash in public valuation (${formatMoney(valAfterCash)})`);
+  }
   const { publicFounderSellPctCap } = await import(`file://${join(sim, 'modules/PublicPostIpoEconomy.js')}`);
   const sellPct = Math.min(10, publicFounderSellPctCap(pub));
   const founderBefore = getFounderRow(pub)?.shares ?? 0;
