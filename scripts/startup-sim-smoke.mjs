@@ -323,6 +323,29 @@ if (!state.launch.waitlistSignups || !wl.length) {
   console.log(`OK: pre-launch gates (${PRE_LAUNCH_BUZZ_REQUIRED} buzz, ${PRE_LAUNCH_PRODUCT_REQUIRED} product)`);
 }
 
+const { launchLifecycleActive, scheduleLaunchBlockReason } = await import(
+  `file://${join(sim, 'modules/LaunchLifecycle.js')}`
+);
+const officeLaunch = createInitialState({
+  companyName: 'DeskCo',
+  categoryId: 'b2b-saas',
+  mode: 'career'
+});
+officeLaunch.product.buzz = PRE_LAUNCH_BUZZ_REQUIRED + 5;
+officeLaunch.product.level = PRE_LAUNCH_PRODUCT_REQUIRED + 5;
+officeLaunch.workspace.tier = 'small';
+officeLaunch.workspace.smallOfficeOwned = true;
+officeLaunch.stage = STAGES.OFFICE;
+if (!launchLifecycleActive(officeLaunch) || scheduleLaunchBlockReason(officeLaunch)) {
+  console.error('FAIL: small office should not block schedule launch when gates met');
+  failed = true;
+} else if (!canSchedulePublicLaunch(officeLaunch)) {
+  console.error('FAIL: canSchedulePublicLaunch with small office + gates');
+  failed = true;
+} else if (!failed) {
+  console.log('OK: schedule launch with leased small office');
+}
+
 const crowdPreLaunch = getTaskDefinitions().filter(
   (t) => t.launchPhase === 'pre_launch' && t.crowdfunding
 );

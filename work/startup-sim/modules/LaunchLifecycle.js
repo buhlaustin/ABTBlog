@@ -45,10 +45,47 @@ export function isPreLaunchDeskPhase(state) {
 
 export function canSchedulePublicLaunch(state) {
   if (!launchLifecycleActive(state)) return false;
-  if (state.launch?.phase !== 'pre_launch') return false;
+  const phase = state.launch?.phase ?? 'pre_launch';
+  if (phase === 'scheduled') return true;
+  if (phase !== 'pre_launch') return false;
   const buzz = state.product?.buzz ?? 0;
   const level = state.product?.level ?? 0;
   return buzz >= PRE_LAUNCH_BUZZ_REQUIRED && level >= PRE_LAUNCH_PRODUCT_REQUIRED;
+}
+
+/** User-facing reason when a schedule-launch desk card cannot be completed; null = allowed. */
+export function scheduleLaunchBlockReason(state) {
+  const phase = state.launch?.phase ?? 'pre_launch';
+  if (phase === 'graduated') {
+    return 'Launch arc finished — drop this card and close the month.';
+  }
+  if (phase === 'launch_month' || phase === 'post_launch') {
+    return 'Public launch is already in motion — this scheduling step no longer applies.';
+  }
+  if (phase === 'scheduled') return null;
+  if (!launchLifecycleActive(state)) {
+    return 'Launch scheduling is unavailable right now.';
+  }
+  const g = preLaunchGateStatus(state);
+  if (g.buzzOk && g.productOk) return null;
+  return `Need ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz (now ${g.buzz}) and product ${PRE_LAUNCH_PRODUCT_REQUIRED}+ (now ${g.level}) before scheduling.`;
+}
+
+/** Auto-resolve stale "Schedule public launch" cards left on the desk after scheduling. */
+export function repairStuckScheduleLaunchTasks(state, getTaskDef) {
+  if (!state.calendar?.monthTasks?.length || typeof getTaskDef !== 'function') return [];
+  const phase = state.launch?.phase ?? 'pre_launch';
+  if (phase === 'pre_launch') return [];
+  const lines = [];
+  for (const inst of state.calendar.monthTasks) {
+    if (inst.status !== 'pending') continue;
+    const def = getTaskDef(inst.taskId);
+    if (!def?.scheduleLaunch) continue;
+    inst.status = 'done';
+    state.calendar.tasksCompleted = (state.calendar.tasksCompleted ?? 0) + 1;
+    lines.push(`Cleared obsolete "${def.title}" — launch was already on the calendar.`);
+  }
+  return lines;
 }
 
 export function preLaunchGateStatus(state) {
@@ -159,10 +196,15 @@ export function createInitialLaunchState() {
   };
 }
 
-/** Garage launch arc still gating the desk catalog. */
+const ACTIVE_LAUNCH_PHASES = new Set(['pre_launch', 'scheduled', 'launch_month', 'post_launch']);
+
+/** Launch playbook until graduated — garage or small office, not YC/post-YC/public. */
 export function launchLifecycleActive(state) {
-  if (getTaskStage(state) !== STAGES.GARAGE) return false;
-  return state.launch?.phase !== 'graduated';
+  const phase = state.launch?.phase ?? 'pre_launch';
+  if (phase === 'graduated') return false;
+  if (!ACTIVE_LAUNCH_PHASES.has(phase)) return false;
+  const taskStage = getTaskStage(state);
+  return taskStage === STAGES.GARAGE || taskStage === STAGES.OFFICE;
 }
 
 export function launchPhaseLabel(state) {
@@ -230,8 +272,14 @@ export function launchPhaseAllowed(task, state) {
   if (!needed) return true;
   if (!task.launchPhase) return false;
   if (needed === 'pre_launch') {
-    if (task.scheduleLaunch && state.launch?.phase === 'scheduled') return false;
-    if (task.scheduleLaunch && !canSchedulePublicLaunch(state)) return false;
+    if (task.scheduleLaunch) {
+      const phase = state.launch?.phase ?? 'pre_launch';
+      if (phase === 'scheduled') return false;
+      if (phase === 'pre_launch') {
+        const g = preLaunchGateStatus(state);
+        if (!g.buzzOk || !g.productOk) return false;
+      } else return false;
+    }
     return task.launchPhase === 'pre_launch';
   }
   return task.launchPhase === needed;
@@ -263,12 +311,17 @@ export function onScheduleLaunchTaskCompleted(state) {
   if (state.launch.phase !== 'pre_launch' && state.launch.phase !== 'scheduled') {
     return { ok: false, reason: 'Launch already scheduled or shipped.' };
   }
-  if (!canSchedulePublicLaunch(state)) {
-    const g = preLaunchGateStatus(state);
+  if (state.launch.phase === 'scheduled') {
+    const when = formatCalendarMonth(state.launch.launchYear, state.launch.launchMonthIndex);
+    const product = launchPublicProductName(state);
     return {
-      ok: false,
-      reason: `Need ${PRE_LAUNCH_BUZZ_REQUIRED}+ buzz (${g.buzz}) and product ${PRE_LAUNCH_PRODUCT_REQUIRED}+ (${g.level}) before scheduling launch.`
+      ok: true,
+      lines: [`${product} is already scheduled for ${when}. Finish pre-launch desk work until then.`]
     };
+  }
+  const block = scheduleLaunchBlockReason(state);
+  if (block) {
+    return { ok: false, reason: block };
   }
   const next = addCalendarMonths(state.calendar.year, state.calendar.monthIndex, 1);
   state.launch.phase = 'scheduled';
