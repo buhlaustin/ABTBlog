@@ -1671,6 +1671,21 @@ if (!ipo.ok) {
     } else if (!failed) {
       console.log('OK: CEO wealth tab after lockup');
     }
+    pub.ceo.section = 'wealth';
+    const wealthStub = { innerHTML: '' };
+    Object.defineProperty(wealthStub, 'innerHTML', {
+      set(v) {
+        this._h = v;
+      },
+      get() {
+        return this._h;
+      }
+    });
+    renderCeoPanel(wealthStub, pub);
+    if (!wealthStub.innerHTML?.includes('btn-cash-out')) {
+      console.error('FAIL: wealth tab HTML missing after render');
+      failed = true;
+    }
   } catch (err) {
     console.error(`FAIL: CEO wealth tab render crashed: ${err.message}`);
     failed = true;

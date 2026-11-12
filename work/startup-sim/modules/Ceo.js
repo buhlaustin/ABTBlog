@@ -385,10 +385,6 @@ function renderCeoWealthSection(ctx) {
     shares,
     exitPrev,
     lockup,
-    canSellStock,
-    canBuyStock,
-    takePrivate,
-    takePrivateGate,
     disabled,
     givingLifetime,
     netWorthHist,
@@ -396,6 +392,10 @@ function renderCeoWealthSection(ctx) {
     investRate,
     state
   } = ctx;
+  const canSellStock = ctx.canSellStock ?? canSellFounderStock(state);
+  const canBuyStock = ctx.canBuyStock ?? canBuyFounderStock(state);
+  const takePrivateGate = ctx.takePrivateGate ?? canTakeCompanyPrivate(state);
+  const takePrivate = ctx.takePrivate ?? takePrivateQuote(state);
   const publicCo = comp.publicCo;
   const investRateLabel = `${(investRate * 100).toFixed(2)}%/mo est.`;
   const portfolioBlock = `<section class="finance-section finance-card">
