@@ -28,7 +28,12 @@ import { renderBoardPanel } from './Board.js';
 import { hasActiveCrisis } from './Crisis.js';
 import { hasActiveDecision, renderDeskDecisionBlock } from './DecisionEvents.js';
 import { activeModifierLabels } from './ScenarioEffects.js';
-import { isPublicCompany, founderStakeValue, stockHudChangeLabel } from './IPO.js';
+import {
+  isPublicCompany,
+  founderStakeValue,
+  stockHudChangeLabel,
+  refreshMarketValuationFromFundamentals
+} from './IPO.js';
 import { stageIconUrl, applyGameBackdrop } from './Assets.js';
 import { playUiClick } from './Audio.js';
 import { activeTutorialStep, renderTutorialBanner } from './Tutorial.js';
@@ -196,6 +201,9 @@ export function syncStartScreen() {
 }
 
 export function renderGameHud(state) {
+  if (isPublicCompany(state)) {
+    refreshMarketValuationFromFundamentals(state);
+  }
   const company = document.getElementById('hud-company');
   const stage = document.getElementById('hud-stage');
   const cash = document.getElementById('hud-cash');
