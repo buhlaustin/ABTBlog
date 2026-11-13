@@ -34,7 +34,12 @@ I split "source of truth for tinkering" from "what the build copies into the thi
 
 Throwaway experiments live in a source tree you do not serve directly—something like `work/invoice-wizard/` in a monorepo, or `packages/demo-ui/` if you split packages. A build step copies only that folder into whatever directory your host uploads (`public/…`, `dist/…`, an asset prefix inside a Next app). The deployable unit is the build output, not the whole repo and not the raw source folder.
 
-That boundary does two jobs. It keeps deploy size predictable. It also gives you a place to say no when a session starts editing files that aren't part of the prototype's public surface. Agents don't naturally respect product boundaries; directories do.
+That boundary does two jobs:
+
+- Deploy size stays predictable.
+- You have a place to say no when a session starts editing files that aren't part of the prototype's public surface.
+
+Agents don't naturally respect product boundaries; directories do.
 
 If your prototype is a single Next route plus static assets, same idea: one folder or one route group owns the demo. The pipeline publishes that slice. Everything else can be broken on `main` without taking down the link you sent your coworker.
 
@@ -42,7 +47,13 @@ If your prototype is a single Next route plus static assets, same idea: one fold
 
 The prototypes I actually share are the ones where deploy is merge (or push) and wait. Not "SSH in and remember the rsync flags."
 
-My personal site flow is deliberately dull: install, lint-ish checks, a domain-specific smoke script, copy assets, build whatever the host expects, upload or let CI publish that output. If the host caches aggressively, purge or bust caches as part of the same step—not as a separate ritual you forget. The prototype doesn't earn a second deploy path. If the only way to ship is a script in your notes app, you won't ship when you're tired.
+My personal site flow is deliberately dull:
+
+- Install deps, run lint-ish checks, run a domain-specific smoke script.
+- Copy assets, build whatever the host expects, upload or let CI publish that output.
+- If the host caches aggressively, purge or bust caches in the same step—not as a separate ritual you forget.
+
+The prototype doesn't earn a second deploy path. If the only way to ship is a script in your notes app, you won't ship when you're tired.
 
 Dull has a side benefit when AI is in the loop. The model can propose workflow YAML or a new npm script, but the human rule is simple: every change to how the thing runs must pass through the same front door. Otherwise you can't tell whether main is broken or your laptop-only shortcut is broken.
 
@@ -66,11 +77,9 @@ Entry-point cache busting alone is a trap. The user downloads fresh `app.js`, wh
 
 Fixes that actually stick, in order of preference:
 
-Bundle to one file when the prototype is small enough that build time doesn't hurt. You get one hashable artifact; caches become simple.
-
-If you stay unbundled, stamp a build id on every relative import at copy or build time. Same id on the script tag in `index.html`. Write the id somewhere public (`build-id.txt`) so a confused user can paste what they loaded without opening devtools rituals.
-
-If you must ship quick without tooling, accept that you're debugging cache until you add stamping. Don't argue with people about hard refresh. They're telling you your deploy isn't complete.
+- Bundle to one file when the prototype is small enough that build time doesn't hurt. One hashable artifact; caches become simple.
+- If you stay unbundled, stamp a build id on every relative import at copy or build time. Same id on the script tag in `index.html`. Write the id somewhere public (`build-id.txt`) so a confused user can paste what they loaded without opening devtools rituals.
+- If you must ship quick without tooling, accept that you're debugging cache until you add stamping. Don't argue with people about hard refresh. They're telling you your deploy isn't complete.
 
 After we stamped imports with the git short SHA in the copy step, the broken settings panel vanished for anyone who actually loaded a new build. Not because users became more diligent. Because the dependency graph carried the version.
 
@@ -90,11 +99,9 @@ When only you click the link, deploying `main` on every merge is fine. When some
 
 Options, from light to heavier:
 
-Same host, path prefix for staging (`/preview/…` or a subdomain). Build artifact from `main` vs from a named branch. Document which URL is canonical in the README one-liner agents can't delete if it's in the repo root.
-
-Preview deploy per PR if your host supports it. Vercel, Netlify, and similar platforms made that normal for frontends. Rolling your own static host works too; you just pay in YAML and DNS until pain justifies the wiring.
-
-"Read `build-id.txt`" is a cheap staging discriminator when you only have production. Support emails get easier: paste the contents of the small build-id file next to the demo's `index.html`, whatever URL path that ends up on.
+- Same host, path prefix for staging (`/preview/…` or a subdomain). Build artifact from `main` vs from a named branch. Document which URL is canonical in the README one-liner agents can't delete if it's in the repo root.
+- Preview deploy per PR if your host supports it. Vercel, Netlify, and similar platforms made that normal for frontends. Rolling your own static host works too; you just pay in YAML and DNS until pain justifies the wiring.
+- When you only have production, ask people to read `build-id.txt`—the small file next to the demo's `index.html`. Support emails get easier when they paste that instead of guessing which build they loaded.
 
 AI increases branch churn. More PRs, more half-finished ideas. Previews matter because "try main" is no longer obvious when main moved four times since lunch.
 
@@ -104,11 +111,9 @@ Prototypes will break in public. The goal is ten-minute recovery, not zero incid
 
 What works at small scale:
 
-Keep the previous build artifact around for one version if your host allows it, or rely on git and redeploy the last known good commit. Pick one and write it in six words in the deploy doc.
-
-Tag releases when you show something important. `git tag demo-nov-13` costs nothing.
-
-Don't migrate production databases for a prototype that doesn't have production users. If you need persistence in the browser, version your client-side state with a loud failure on mismatch instead of silent corruption.
+- Keep the previous build artifact for one version if your host allows it, or redeploy the last known good commit from git. Pick one and write it in six words in the deploy doc.
+- Tag releases when you show something important. `git tag demo-nov-13` costs nothing.
+- Don't migrate production databases for a prototype that doesn't have production users. If you need persistence in the browser, version client-side state and fail loudly on mismatch instead of silent corruption.
 
 Rollback is a product feature for demos. If a stakeholder can click the broken build, being able to say "revert landed, give it ninety seconds" beats debugging under pressure while they watch.
 
@@ -116,17 +121,12 @@ Rollback is a product feature for demos. If a stakeholder can click the broken b
 
 Models are strong at local reasoning and weak at distributed consequences unless you spell them out. Before merge, I skim for:
 
-New static imports without a corresponding copy step or public path.
-
-Client bundles touching secrets.
-
-Fixes that only work with `next dev` (middleware assumptions, server-only imports in client components).
-
-Assumptions that a cache purge at the edge refreshes every nested module URL the browser might still have locally.
-
-Missing migration for client state when the stored JSON shape changed.
-
-Feature flags nobody will turn off because the prototype only has one environment.
+- New static imports without a corresponding copy step or public path.
+- Client bundles touching secrets.
+- Fixes that only work with `next dev` (middleware assumptions, server-only imports in client components).
+- Assumptions that a cache purge at the edge refreshes every nested module URL the browser might still have locally.
+- Missing migration for client state when the stored JSON shape changed.
+- Feature flags nobody will turn off because the prototype only has one environment.
 
 None of that requires a security team. It requires a human diff habit: deploy-shaped questions, not syntax questions.
 
@@ -134,13 +134,10 @@ None of that requires a security team. It requires a human diff habit: deploy-sh
 
 Full observability stacks are overkill for a browser prototype. Minimum viable truth:
 
-Public build id.
-
-Client-side errors you can reproduce (keep `console.error` on render failures; swallowing errors makes remote debug impossible).
-
-One health check if you have a backend (even `GET /health` returning ok).
-
-Optional: a single analytics event on "app booted" so you know anyone loaded the thing after deploy.
+- Public build id.
+- Client-side errors you can reproduce (keep `console.error` on render failures; swallowing errors makes remote debug impossible).
+- One health check if you have a backend (even `GET /health` returning ok).
+- Optional: a single analytics event on "app booted" so you know anyone loaded the thing after deploy.
 
 That's enough to answer "is anyone on the new build" without paying for a dashboard.
 
@@ -150,31 +147,30 @@ Graduation isn't a bigger platform. It's when the cost of being wrong exceeds th
 
 Signals I use:
 
-Real users with data they care about → schema migrations, backward compatibility, changelog discipline.
-
-Money or compliance → separate staging, secret rotation, access logs.
-
-More than one person deploying → kill laptop scripts, enforce code review on workflow files.
-
-Repeated cache or config incidents → invest in bundling or infrastructure as code, whichever actually fixes the class of bug.
+- Real users with data they care about → schema migrations, backward compatibility, changelog discipline.
+- Money or compliance → separate staging, secret rotation, access logs.
+- More than one person deploying → kill laptop scripts, enforce code review on workflow files.
+- Repeated cache or config incidents → invest in bundling or infrastructure as code, whichever actually fixes the class of bug.
 
 Until then, a boring static deploy, one smoke test, stamped imports, and a rollback sentence are enough. Fancy infrastructure won't fix a panel that still loads last week's JavaScript.
 
 ## What I still don't do
 
-I don't containerize a static export because it sounds professional.
-
-I don't add feature flags for every half-baked idea; I branch in git instead.
-
-I don't block deploy on a hundred eslint rules when five behavioral tests catch what users would notice.
-
-I don't pretend AI output is reviewed because I "vibed" with it in the editor. Review is checking deploy shape: artifacts, caches, secrets, smoke paths.
+- Containerize a static export because it sounds professional.
+- Add feature flags for every half-baked idea; I branch in git instead.
+- Block deploy on a hundred eslint rules when five behavioral tests catch what users would notice.
+- Pretend AI output is reviewed because I "vibed" with it in the editor. Review is checking deploy shape: artifacts, caches, secrets, smoke paths.
 
 ## Close
 
 AI gets you to "it works here" faster than any toolchain I've used before. Deploy is still the act of deciding what "it" is and making strangers load the same graph of files you tested, through the same caches, with the same build id.
 
-If your prototype only runs on localhost, the fix is usually smaller than a rewrite: narrow the artifact, wire one pipeline, write one smoke test that would embarrass you if it failed on main, and version every module URL if you're not bundling.
+If your prototype only runs on localhost, the fix is usually smaller than a rewrite:
+
+- Narrow the artifact.
+- Wire one pipeline.
+- Write one smoke test that would embarrass you if it failed on main.
+- Version every module URL if you're not bundling.
 
 The prototypes that graduate are the ones someone else could open without you in the room. The ones that don't aren't failures; they're notes you didn't have to pretend were products.
 
