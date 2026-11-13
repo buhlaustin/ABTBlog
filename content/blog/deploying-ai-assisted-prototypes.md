@@ -32,7 +32,7 @@ Assistants are context-hungry. Ask for a deploy fix and you might get a blog dra
 
 I split "source of truth for tinkering" from "what the build copies into the thing the host actually serves."
 
-Throwaway experiments live under something like `prototypes/billing-wizard/`. The site build runs a copy step that mirrors only that tree into `public/demos/…` and nothing else from the messier parts of the repo. The deployable unit is the output of `npm run build`, not the git repo as a whole.
+Throwaway experiments live in a source tree you do not serve directly—something like `work/invoice-wizard/` in a monorepo, or `packages/demo-ui/` if you split packages. A build step copies only that folder into whatever directory your host uploads (`public/…`, `dist/…`, an asset prefix inside a Next app). The deployable unit is the build output, not the whole repo and not the raw source folder.
 
 That boundary does two jobs. It keeps deploy size predictable. It also gives you a place to say no when a session starts editing files that aren't part of the prototype's public surface. Agents don't naturally respect product boundaries; directories do.
 
@@ -94,7 +94,7 @@ Same host, path prefix for staging (`/preview/…` or a subdomain). Build artifa
 
 Preview deploy per PR if your host supports it. Vercel, Netlify, and similar platforms made that normal for frontends. Rolling your own static host works too; you just pay in YAML and DNS until pain justifies the wiring.
 
-"Read `build-id.txt`" is a cheap staging discriminator when you only have production. Support emails get easier: "What does `/demos/foo/build-id.txt` say?"
+"Read `build-id.txt`" is a cheap staging discriminator when you only have production. Support emails get easier: paste the contents of the small build-id file next to the demo's `index.html`, whatever URL path that ends up on.
 
 AI increases branch churn. More PRs, more half-finished ideas. Previews matter because "try main" is no longer obvious when main moved four times since lunch.
 
