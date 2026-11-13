@@ -12,52 +12,170 @@ tags:
 
 Speed is the whole point of leaning on agents and autocomplete for a first cut. You can have a playable thing in a day. The part that still bites people is the gap between "runs on my laptop" and "someone else can open a link without you screen-sharing."
 
-I'm not talking about enterprise platform engineering. I'm talking about the side project, the internal demo, the "we hacked this in Cursor and now the VP wants to click it" moment. The methods that work for me are boring on purpose.
+I've been living in that gap lately. Browser sims, narrative games, half-finished tools that went from idea to clickable because a model wrote the boring glue while I argued about game balance. Deploying them taught me the same lesson production software always teaches, just faster: the hard part isn't writing code anymore. It's proving the right bytes left your machine and arrived intact on someone else's.
 
-## Treat the prototype as one artifact, not the whole repo
+This isn't a platform maturity guide. It's what I do when the audience is a friend, a teammate, or Future Me three weeks from now who forgot which branch was "the real one."
 
-AI-assisted sessions love to touch five folders because you asked for "a small fix" and the model wandered. Before you deploy, decide what actually has to ship. For browser toys that's often a static tree or a single Next route plus copied assets, not every experiment in the monorepo.
+## The failure mode is now "merged but not lived"
 
-I keep playable stuff under something like `work/` and copy only what the build needs into `public/` at build time. The deploy artifact is whatever `npm run build` emits, not your entire git history. That separation matters twice when AI has been editing both the game and the blog in the same branch.
+Before agents, prototypes often died of neglect: nobody deployed because setup took an afternoon. Now prototypes die of false confidence. You fixed the bug. CI went green. You merged. You told someone to refresh. They still see the old behavior and assume you lied.
 
-## One path to production, no mystery branches
+That specific sting happened to me on a post-IPO screen in a browser sim. The source fix was obvious once you read it: a variable used in a template before it existed in that function. Tests passed on main. The deploy workflow finished green. I still got the same stack trace in the console, line number and everything, as if the merge never happened.
 
-Prototypes die when the demo runs on "that machine" with hand-rolled `scp` and a forgot-to-document env var. Pick one pipeline early: push to main (or a named deploy branch), CI runs the same command every time, hosting syncs the output.
+The live site was running new `game.js` and stale `Ceo.js`. The entry file had a cache-busting query param from an earlier manual edit. Every nested `import './modules/Whatever.js'` did not. Browsers treat those as different cache keys. AI didn't cause that bug; AI-speed development made me ship the fix and move on without noticing that my hosting story and my module graph disagreed.
 
-Here that's build, smoke, sync to object storage, invalidate the CDN. The prototype doesn't get a special snowflake script you'll never run again in three weeks. If deploying is one button or one merge, you'll actually do it while the idea still matters.
+That's the prototype deploy problem in one sentence: you can outrun your own release mechanism.
 
-## Smoke tests that match user behavior, not file existence
+## Decide what "shipping" means before the agent rewrites half the tree
 
-Agents are great at adding files. They're mediocre at proving the happy path still works. I want a script that imports the modules, runs a few representative game states, and fails the build if something throws. Not a thousand assertions—enough that "CEO tab renders after IPO" or "launch schedule works in small office" can't regress silently.
+Assistants are context-hungry. Ask for a deploy fix and you might get a blog draft, a workflow tweak, and a refactor in a JSON loader because they looked related. None of that is wrong. It's just not all one artifact.
 
-Playwright on top is optional gravy for UI wiring. The headless import test is the guardrail that catches the ReferenceError you didn't see because you had hot reload open for six hours.
+I split "source of truth for tinkering" from "what the build copies into the thing the host actually serves."
 
-## Versioning for anything loaded as ES modules
+Playable experiments live under something like `work/startup-sim/`. The site build runs a copy step that mirrors only that tree into `public/play/…` and nothing else from the messier parts of the repo. The deployable unit is the output of `npm run build`, not the git repo as a whole.
 
-This one burned me recently. We fixed a bug in a nested `Ceo.js`, merged, deployed, CloudFront invalidated—and people still hit the old file because only the entry script had a cache-busting query string. Nested imports didn't.
+That boundary does two jobs. It keeps deploy size predictable. It also gives you a place to say no when a session starts editing files that aren't part of the prototype's public surface. Agents don't naturally respect product boundaries; directories do.
 
-If your prototype is plain modules in the browser, version every relative import at build time or bundle the thing. "Hard refresh" is not a deployment strategy. AI won't remind you; the browser will.
+If your prototype is a single Next route plus static assets, same idea: one folder or one route group owns the demo. The pipeline publishes that slice. Everything else can be broken on `main` without taking down the link you sent your coworker.
 
-## Environment and secrets stay out of the prototype
+## One pipeline, no heroic scripts
 
-Don't let the agent paste API keys into client-side code because the demo "needs one fetch." Prototype deploy should work with public env only, or a tiny server route that holds the key server-side. If the prototype can't ship without a secret in the bundle, pause and split backend from frontend before you share the URL.
+The prototypes I actually share are the ones where deploy is merge (or push) and wait. Not "SSH in and remember the rsync flags."
 
-For narrative or LLM features I've used a Lambda behind API Gateway so the static site stays static. More moving parts, but you can hand someone a link without handing them your OpenAI bill.
+My personal site flow is deliberately dull: install, lint-ish checks, a domain-specific smoke script, copy assets, build whatever the host expects, upload or let CI publish that output. If the host caches aggressively, purge or bust caches as part of the same step—not as a separate ritual you forget. The prototype doesn't earn a second deploy path. If the only way to ship is a script in your notes app, you won't ship when you're tired.
 
-## Staging is worth it when the audience isn't you
+Dull has a side benefit when AI is in the loop. The model can propose workflow YAML or a new npm script, but the human rule is simple: every change to how the thing runs must pass through the same front door. Otherwise you can't tell whether main is broken or your laptop-only shortcut is broken.
 
-If only you will click it, production on every merge is fine. If a client or a teammate will poke at it while you're asleep, give them a stable staging host or a preview deploy per PR. The goal is to stop explaining which commit is live. AI churn makes that confusion worse, not better.
+Major eng orgs preach the same thing under different names. Stripe talks about making the default path the safe path. Cloudflare engineers write postmortems around automation gaps, not around "Dave ran a command once." For a weekend sim, the scale is smaller; the psychology isn't.
 
-## Roll back in your head before you ship
+## CI is the contract, not the badge
 
-Keep deploys reversible: previous build still in the bucket, or git tag on what went out, or "flip DNS back" documented in one sentence in the repo. Prototypes break in public constantly. The win isn't never breaking; it's fixing in ten minutes without panic.
+Green CI on a prototype repo is not virtue signaling. It's a contract with tomorrow-you.
 
-## What I don't do
+I run a headless smoke script before the site build copies game assets. It imports modules the way the browser will, exercises a few saves that used to break production, and exits non-zero on any throw. That test added maybe twenty minutes the first time I wrote it. It has since paid for itself in incidents that never reached a user because merge was blocked.
 
-I don't run a full security audit on a weekend sim. I don't containerize a static site because it sounds grown-up. I don't leave seventeen feature flags for a prototype nobody has used yet.
+Playwright against a local static server is the next layer if you have UI affordances that only exist after click wiring (tabs, modals, canvas). I don't skip straight to browser tests. Import-level smoke is cheaper and catches the dumb ReferenceErrors agents leave behind when they split a function and forget half the destructuring.
 
-I do make deploy boring, copy only what ships, and run one smoke test that would have embarrassed me if it failed on main. AI gets you to "it works here" faster than ever. The deploy method is still you deciding what "it" is and making sure the next person loads the same bytes you did.
+The mistake I see in AI-assisted teams is treating CI as "typecheck and vibes." For prototypes, pick three user stories that must not regress. Encode them as data in the smoke script, not as a markdown checklist in the PR description nobody rereads.
 
----
+## Cache is part of your API surface
 
-Side projects that survive a real deploy end up under [Work](/work/). If one of yours is still localhost-only, the fix is usually narrower than you think: smaller artifact, one pipeline, one smoke test that would embarrass you on main.
+If you ship native ES modules without a bundler, you have two audiences: the JavaScript engine and every cache layer between you and the user. Those audiences do not negotiate.
+
+Entry-point cache busting alone is a trap. The user downloads fresh `game.js`, which statically imports `modules/Ceo.js` with a bare URL. That nested file can sit in disk cache for days. Your invalidation pattern might not even name it if you only version the HTML shell.
+
+Fixes that actually stick, in order of preference:
+
+Bundle to one file when the prototype is small enough that build time doesn't hurt. You get one hashable artifact; caches become simple.
+
+If you stay unbundled, stamp a build id on every relative import at copy or build time. Same id on the script tag in `index.html`. Write the id somewhere public (`build-id.txt`) so a confused user can paste what they loaded without opening devtools rituals.
+
+If you must ship quick without tooling, accept that you're debugging cache until you add stamping. Don't argue with people about hard refresh. They're telling you your deploy isn't complete.
+
+After we stamped imports with the git short SHA in the copy step, the CEO wealth tab issue vanished for anyone who actually loaded a new build. Not because users became more diligent. Because the dependency graph carried the version.
+
+## Secrets, LLM calls, and the static-site fiction
+
+Agents love to inline API keys into client components because that's the fastest route to a working demo. For a prototype you'll show in a Zoom, that's tempting. For a prototype you'll email as a URL, it's a bill and a bot magnet.
+
+My split: static HTML/JS for anything that doesn't need custody of secrets. A tiny HTTP endpoint for anything that does—a route on your app server, a serverless function, an edge worker, whatever your stack already has. The static files stay public; the key stays server-side. The front end calls your route; the route calls the model API; nothing sensitive ships in the bundle.
+
+If you're not there yet, ship without the LLM feature. A prototype with a disabled narrated mode beats a prototype that mines crypto on a visitor's GPU because someone left a key in `NEXT_PUBLIC_`.
+
+Environment variables in serverful Next routes follow the same rule: server-only names, no symmetry with client bundle env. Agents will conflate them unless you grep for `NEXT_PUBLIC` before merge.
+
+## Staging, previews, and the "which commit is live" problem
+
+When only you click the link, deploying `main` on every merge is fine. When someone else tests while you sleep, you need a story they can understand without a Slack thread archaeology degree.
+
+Options, from light to heavier:
+
+Same host, path prefix for staging (`/preview/…` or a subdomain). Build artifact from `main` vs from a named branch. Document which URL is canonical in the README one-liner agents can't delete if it's in the repo root.
+
+Preview deploy per PR if your host supports it. Vercel, Netlify, and similar platforms made that normal for frontends. Rolling your own static host works too; you just pay in YAML and DNS until pain justifies the wiring.
+
+"Read `build-id.txt`" is a cheap staging discriminator when you only have production. Support emails get easier: "What does `/play/foo/build-id.txt` say?"
+
+AI increases branch churn. More PRs, more half-finished ideas. Previews matter because "try main" is no longer obvious when main moved four times since lunch.
+
+## Rollback without theater
+
+Prototypes will break in public. The goal is ten-minute recovery, not zero incidents.
+
+What works at small scale:
+
+Keep the previous build artifact around for one version if your host allows it, or rely on git and redeploy the last known good commit. Pick one and write it in six words in the deploy doc.
+
+Tag releases when you show something important. `git tag demo-nov-13` costs nothing.
+
+Don't migrate production databases for a prototype that doesn't have production users. If you need persistence, use localStorage and version your save format with a loud failure on mismatch, like you would for a game jam.
+
+Rollback is a product feature for demos. If your CEO can click the broken build, being able to say "revert landed, give it ninety seconds" beats debugging under pressure while they watch.
+
+## What agents get wrong about deploy (so you check for it)
+
+Models are strong at local reasoning and weak at distributed consequences unless you spell them out. Before merge, I skim for:
+
+New static imports without a corresponding copy step or public path.
+
+Client bundles touching secrets.
+
+Fixes that only work with `next dev` (middleware assumptions, server-only imports in client components).
+
+Assumptions that a cache purge at the edge refreshes every nested module URL the browser might still have locally.
+
+Missing migration for save format when game state shape changed.
+
+Feature flags nobody will turn off because the prototype only has one environment.
+
+None of that requires a security team. It requires a human diff habit: deploy-shaped questions, not syntax questions.
+
+## Observability for things that aren't worth Datadog
+
+Full observability stacks are overkill for a browser toy. Minimum viable truth:
+
+Public build id.
+
+Client-side errors you can reproduce (keep `console.error` on render failures; swallowing errors makes remote debug impossible).
+
+One health check if you have a backend (even `GET /health` returning ok).
+
+Optional: a single analytics event on "app booted" so you know anyone loaded the thing after deploy.
+
+That's enough to answer "is anyone on the new build" without paying for a dashboard.
+
+## When to stop calling it a prototype
+
+Graduation isn't a bigger platform. It's when the cost of being wrong exceeds the cost of structure.
+
+Signals I use:
+
+Real users with saves they care about → save migrations, backward compatibility, changelog discipline.
+
+Money or compliance → separate staging, secret rotation, access logs.
+
+More than one person deploying → kill laptop scripts, enforce code review on workflow files.
+
+Repeated cache or config incidents → invest in bundling or infrastructure as code, whichever actually fixes the class of bug.
+
+Until then, a boring static deploy, one smoke test, stamped imports, and a rollback sentence are enough. The sim doesn't need fancy infrastructure. It needs the CEO tab to load after IPO without gaslighting your players.
+
+## What I still don't do
+
+I don't containerize a static export because it sounds professional.
+
+I don't add feature flags for every half-baked idea; I branch in git instead.
+
+I don't block deploy on a hundred eslint rules when five behavioral tests catch what users would notice.
+
+I don't pretend AI output is reviewed because I "vibed" with it in the editor. Review is checking deploy shape: artifacts, caches, secrets, smoke paths.
+
+## Close
+
+AI gets you to "it works here" faster than any toolchain I've used before. Deploy is still the act of deciding what "it" is and making strangers load the same graph of files you tested, through the same caches, with the same build id.
+
+If your prototype only runs on localhost, the fix is usually smaller than a rewrite: narrow the artifact, wire one pipeline, write one smoke test that would embarrass you if it failed on main, and version every module URL if you're not bundling.
+
+Side projects that survive that bar end up under [Work](/work/) on this site. The ones that don't survive it aren't failures; they're notes. The difference is whether you shipped a link anyone could open without you in the room.
+
+If you're debugging a similar "merged but not fixed" ghost, start in the network tab, not the model. The code on main is often already right. The caches are just telling an older story.
