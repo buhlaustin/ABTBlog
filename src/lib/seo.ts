@@ -5,6 +5,8 @@ import {
   serviceOfferings,
   servicesContact,
   servicesFaqs,
+  servicesPageSeo,
+  servicesSchema,
 } from "@/lib/services";
 import { siteConfig } from "@/lib/site";
 
@@ -166,8 +168,24 @@ export function faqPageJsonLd(
   };
 }
 
+export function breadcrumbJsonLd(
+  items: ReadonlyArray<{ name: string; path: string }>,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
+  };
+}
+
 export function technicalServicesJsonLd() {
   const pageUrl = absoluteUrl("/services/");
+  const blogUrl = absoluteUrl("/blog/open-for-professional-services/");
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -175,11 +193,34 @@ export function technicalServicesJsonLd() {
         "@type": "WebPage",
         "@id": `${pageUrl}#webpage`,
         url: pageUrl,
-        name: "Technical Services — Software Development & Consultation",
-        description:
-          "Software development and technical consultation from Austin Buhl, Knoxville, TN.",
+        name: `${servicesPageSeo.h1} | ${siteConfig.name}`,
+        description: servicesPageSeo.metaDescription,
         isPartOf: { "@id": `${siteConfig.url}/#website` },
         about: { "@id": `${pageUrl}#service` },
+        breadcrumb: { "@id": `${pageUrl}#breadcrumb` },
+        speakable: {
+          "@type": "SpeakableSpecification",
+          cssSelector: [".services-hero-lead", ".services-hero-support"],
+        },
+        significantLink: [blogUrl, absoluteUrl("/work/"), absoluteUrl("/about/")],
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${pageUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: siteConfig.url,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Technical Services",
+            item: pageUrl,
+          },
+        ],
       },
       {
         "@type": "WebSite",
@@ -190,17 +231,25 @@ export function technicalServicesJsonLd() {
       {
         "@type": "ProfessionalService",
         "@id": `${pageUrl}#service`,
-        name: `${siteConfig.name} — Technical Services`,
+        name: `${siteConfig.name} — ${servicesPageSeo.h1}`,
+        alternateName: [
+          "Knoxville software consultant",
+          "Freelance software developer Knoxville TN",
+        ],
         url: pageUrl,
         image: absoluteUrl(siteConfig.ogImage),
-        description:
-          "Software development, consultation, and prototyping. Knoxville, TN; remote US.",
+        description: servicesPageSeo.metaDescription,
         telephone: servicesContact.phoneTel,
         email: servicesContact.email,
         priceRange: "$$",
+        serviceType: [...servicesSchema.serviceTypes],
         areaServed: [
           { "@type": "Country", name: "United States" },
           { "@type": "State", name: "Tennessee" },
+          {
+            "@type": "AdministrativeArea",
+            name: "East Tennessee",
+          },
           {
             "@type": "City",
             name: serviceGeo.locality,
@@ -226,6 +275,7 @@ export function technicalServicesJsonLd() {
           name: siteConfig.name,
           url: siteConfig.url,
           jobTitle: "Software Engineer & Founder",
+          knowsAbout: [...servicesSchema.knowsAbout],
           sameAs: [
             siteConfig.github,
             siteConfig.twitter,
@@ -242,6 +292,7 @@ export function technicalServicesJsonLd() {
               "@type": "Service",
               name: offering.name,
               description: offering.summary,
+              areaServed: "United States",
             },
           })),
         },
