@@ -34,7 +34,7 @@ function PlayStartupSimBanner() {
   return (
     <Link
       href="/work/startup-sim/"
-      className="group lift-card relative block overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-6 py-8 text-white shadow-lg transition hover:border-zinc-600 sm:px-8 sm:py-10"
+      className="group lift-card relative block overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-7 text-white shadow-lg transition hover:border-zinc-600 sm:px-8 sm:py-10"
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-40"
@@ -84,7 +84,7 @@ export default function HomePage() {
           className="hero-mesh pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(250,250,250,0)_0%,rgb(255_255_255)_85%),radial-gradient(ellipse_90%_60%_at_50%_-20%,rgba(37,99,235,0.12),transparent)]"
           aria-hidden
         />
-        <div className="relative mx-auto grid max-w-5xl gap-10 px-safe py-12 sm:py-20 lg:grid-cols-[1fr_minmax(0,17rem)] lg:items-start lg:gap-14">
+        <div className="relative mx-auto grid max-w-5xl gap-8 px-safe py-10 sm:gap-10 sm:py-12 md:py-20 lg:grid-cols-[1fr_minmax(0,17rem)] lg:items-start lg:gap-14">
           <div className="min-w-0">
             <Reveal when="mount">
               <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
@@ -111,17 +111,17 @@ export default function HomePage() {
               </p>
             </Reveal>
             <Reveal when="mount" delayMs={260}>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div className="cta-mobile-stack mt-8">
                 <Link
                   href="/work/"
-                  className="btn-press inline-flex min-h-11 items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 active:bg-zinc-700"
+                  className="btn-press inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 active:bg-zinc-700 sm:w-auto"
                 >
                   {hero.sideProjectsCta}
                   <span aria-hidden>↓</span>
                 </Link>
                 <Link
                   href="/services/"
-                  className="btn-press inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
+                  className="btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised sm:w-auto"
                 >
                   Services
                 </Link>
@@ -129,15 +129,39 @@ export default function HomePage() {
                   href={siteConfig.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-press inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
+                  className="btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised sm:w-auto"
                 >
                   GitHub
                 </a>
               </div>
             </Reveal>
+            <Reveal when="mount" delayMs={320} className="mt-5 lg:hidden">
+              <div className="mobile-quick-row">
+                <Link
+                  href="/work/startup-sim/"
+                  className="mobile-quick-chip lift-card rounded-full border border-border bg-white px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm"
+                >
+                  ▶ Startup Sim
+                </Link>
+                <Link
+                  href="/work/"
+                  className="mobile-quick-chip lift-card rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-foreground"
+                >
+                  All demos
+                </Link>
+                <a
+                  href={siteConfig.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mobile-quick-chip lift-card rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-foreground"
+                >
+                  GitHub ↗
+                </a>
+              </div>
+            </Reveal>
           </div>
 
-          <aside className="flex flex-col gap-3 lg:pt-2">
+          <aside className="hidden flex-col gap-3 lg:flex lg:pt-2">
             <Reveal when="mount" delayMs={180} className="lift-card flex items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-sm">
               <Image
                 src={profile.avatarUrl}
@@ -185,9 +209,9 @@ export default function HomePage() {
               Focus
             </h2>
           </Reveal>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="mobile-snap-row mt-6 md:grid md:grid-cols-3 md:gap-4">
             {focusPillars.map((pillar, index) => (
-              <Reveal key={pillar.title} delayMs={index * 70}>
+              <Reveal key={pillar.title} delayMs={index * 70} className="mobile-snap-card md:w-auto">
                 <article className="lift-card h-full rounded-2xl border border-border bg-surface p-6">
                   <h3 className="font-display text-lg font-bold tracking-tight text-foreground">
                     {pillar.title}

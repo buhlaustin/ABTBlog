@@ -73,18 +73,18 @@ export default function ServicesPage() {
             </p>
           </Reveal>
           <Reveal when="mount" delayMs={240}>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href={`mailto:${servicesContact.email}`}
-                className="btn-press inline-flex min-h-11 items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
-              >
-                Email {servicesContact.email}
-              </a>
+            <div className="cta-mobile-stack mt-8">
               <a
                 href={`tel:${servicesContact.phoneTel}`}
-                className="btn-press inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface"
+                className="btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 sm:w-auto"
               >
                 Call {servicesContact.phoneDisplay}
+              </a>
+              <a
+                href={`mailto:${servicesContact.email}`}
+                className="btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface sm:w-auto sm:max-w-md sm:truncate"
+              >
+                Email {servicesContact.email}
               </a>
             </div>
           </Reveal>
@@ -156,18 +156,18 @@ export default function ServicesPage() {
                 A few sentences on the problem and your timeline is enough—no
                 formal RFP required.
               </p>
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                <a
-                  href={`mailto:${servicesContact.email}`}
-                  className="btn-press inline-flex min-h-11 items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
-                >
-                  Email me
-                </a>
+              <div className="cta-mobile-stack mx-auto mt-6 max-w-sm sm:max-w-none sm:justify-center">
                 <a
                   href={`tel:${servicesContact.phoneTel}`}
-                  className="btn-press inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface"
+                  className="btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 sm:w-auto"
                 >
-                  {servicesContact.phoneDisplay}
+                  Call {servicesContact.phoneDisplay}
+                </a>
+                <a
+                  href={`mailto:${servicesContact.email}`}
+                  className="btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface sm:w-auto"
+                >
+                  Email me
                 </a>
               </div>
             </section>
