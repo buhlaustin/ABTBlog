@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
+import { servicesContact } from "@/lib/services";
 import { siteConfig } from "@/lib/site";
 
 const nav = [
@@ -14,6 +15,9 @@ const nav = [
 
 const linkClass =
   "flex min-h-11 items-center rounded-lg px-3 py-2 text-muted transition hover:bg-surface-raised hover:text-foreground active:bg-surface-raised";
+
+const contactCtaClass =
+  "btn-press ml-1 inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800";
 
 export function SiteNav() {
   const [open, setOpen] = useState(false);
@@ -49,6 +53,9 @@ export function SiteNav() {
           rel="noopener noreferrer"
         >
           GitHub
+        </a>
+        <a href={`mailto:${servicesContact.email}`} className={contactCtaClass}>
+          Contact
         </a>
       </nav>
 
@@ -121,6 +128,15 @@ export function SiteNav() {
               onClick={() => setOpen(false)}
             >
               GitHub ↗
+            </a>
+          </li>
+          <li className="mt-2 border-t border-border pt-2">
+            <a
+              href={`mailto:${servicesContact.email}`}
+              className={`${contactCtaClass} w-full`}
+              onClick={() => setOpen(false)}
+            >
+              Contact
             </a>
           </li>
         </ul>
