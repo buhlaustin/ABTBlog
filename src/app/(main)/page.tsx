@@ -255,9 +255,8 @@ export default function HomePage() {
               Contract development &amp; consulting
             </h2>
             <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
-              Freelance builds, architecture reviews, and prototypes—usually when
-              founder work at ClassQuip and Novux leaves bandwidth. Knoxville or
-              remote US.
+              Freelance builds, architecture reviews, and prototypes. Knoxville
+              or remote US.
             </p>
             <Link
               href="/services/"

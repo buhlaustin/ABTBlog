@@ -1,12 +1,7 @@
 import Link from "next/link";
 import { JsonLd } from "@/components/json-ld";
-import { profile, siteConfig, ventures } from "@/lib/profile";
-import {
-  serviceGeo,
-  serviceOfferings,
-  servicesContact,
-  servicesFaqs,
-} from "@/lib/services";
+import { profile, siteConfig } from "@/lib/profile";
+import { serviceOfferings, servicesContact, servicesFaqs } from "@/lib/services";
 import {
   faqPageJsonLd,
   pageMetadata,
@@ -107,15 +102,6 @@ export default function ServicesPage() {
                 </li>
               ))}
             </ul>
-          </ServiceSection>
-
-          <ServiceSection title="Engagements">
-            <p>
-              {serviceGeo.locality}, {serviceGeo.region} and US Eastern time.
-              Ongoing product hiring for {ventures.classQuip.name} or{" "}
-              {ventures.novuxGames.name} goes through those companies—not this
-              page.
-            </p>
           </ServiceSection>
 
           <ServiceSection title="FAQ">

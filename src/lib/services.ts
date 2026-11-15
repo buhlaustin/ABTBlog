@@ -1,4 +1,4 @@
-import { profile, siteConfig, ventures } from "@/lib/profile";
+import { profile, siteConfig } from "@/lib/profile";
 
 export const servicesContact = {
   email: profile.email,
@@ -53,7 +53,8 @@ export const servicesFaqs = [
   },
   {
     question: "Full-time hire?",
-    answer: `Day job is ${ventures.classQuip.name} and ${ventures.novuxGames.name}. Side engagements are project or retainer shaped—see About for résumé detail.`,
+    answer:
+      "Usually project or retainer work. Email me with what you need and we can see if timing fits.",
   },
 ] as const;
 
