@@ -54,8 +54,8 @@ export function SiteNav() {
         >
           GitHub
         </a>
-        <a href={`mailto:${servicesContact.email}`} className={contactCtaClass}>
-          Contact
+        <a href={`tel:${servicesContact.phoneTel}`} className={contactCtaClass}>
+          Call
         </a>
       </nav>
 
@@ -132,11 +132,11 @@ export function SiteNav() {
           </li>
           <li className="mt-2 border-t border-border pt-2">
             <a
-              href={`mailto:${servicesContact.email}`}
+              href={`tel:${servicesContact.phoneTel}`}
               className={`${contactCtaClass} w-full`}
               onClick={() => setOpen(false)}
             >
-              Contact
+              Call {servicesContact.phoneDisplay}
             </a>
           </li>
         </ul>
