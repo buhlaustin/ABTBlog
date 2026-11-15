@@ -115,7 +115,7 @@ export default function HomePage() {
                 href="/services/"
                 className="inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
               >
-                Technical services
+                Services
               </Link>
               <Link
                 href="/blog/"

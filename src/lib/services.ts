@@ -8,73 +8,52 @@ export const servicesContact = {
 
 export const serviceOfferings = [
   {
-    name: "Custom software development",
+    name: "Software development",
     summary:
-      "Full-stack web apps, internal tools, APIs, and integrations—built for maintainability and real production constraints.",
+      "Web apps, APIs, and integrations—usually Next.js/React/Node, with an eye toward what breaks in production.",
     bullets: [
-      "Next.js, React, and Node backends",
-      "Real-time features (WebRTC, live dashboards, classroom-scale load)",
-      "Third-party APIs, LMS and payment integrations",
-      "Performance, observability, and deployment pipelines",
+      "Greenfield products and hardened legacy code",
+      "Real-time and classroom-scale systems",
+      "LMS, payments, and third-party integrations",
     ],
   },
   {
-    name: "Technical consulting",
+    name: "Consultation",
     summary:
-      "Architecture reviews, roadmap input, and hands-on guidance when you need a senior engineer who has shipped under pressure.",
+      "Architecture reviews, scope sanity checks, and pairing when you need another senior set of eyes.",
     bullets: [
-      "System design and trade-off documentation",
-      "Codebase audits and refactor planning",
-      "Edtech, SaaS, and data-heavy product domains",
-      "Team onboarding and technical hiring support",
+      "System design and codebase audits",
+      "Edtech, SaaS, and simulation-heavy domains",
     ],
   },
   {
-    name: "Prototyping & simulation",
+    name: "Prototypes",
     summary:
-      "Browser games, simulators, and interactive demos—like the Work projects on this site—useful for pitches, training, or R&D.",
+      "Browser demos and sims in the vein of the projects under Work—good for pitches, training, or trying mechanics.",
     bullets: [
-      "Gameplay and simulation logic in TypeScript",
-      "Physics and strategy mechanics",
-      "Playable web demos without app-store friction",
-      "Iterative prototyping with clear milestones",
-    ],
-  },
-  {
-    name: "Founder & product engineering",
-    summary:
-      "Early-stage build partner work: MVP scope, foundation code, and the first features investors and users can touch.",
-    bullets: [
-      "MVP definition and thin-slice delivery",
-      "Auth, billing, and admin foundations",
-      "Analytics and error tracking from day one",
-      "Honest timelines for solo-founder bandwidth",
+      "TypeScript gameplay and simulation logic",
+      "Shipped in the browser, no store required",
     ],
   },
 ] as const;
 
 export const servicesFaqs = [
   {
-    question: "What kinds of technical services do you offer?",
+    question: "What do you actually do for clients?",
     answer:
-      "Software development, architecture and code consultation, interactive prototypes, and founder-stage engineering—especially for web products, edtech, and simulation-heavy experiences.",
+      "Build software, advise on architecture, or ship a prototype. Most of my depth is web product work, K–12 edtech, and simulation-style apps.",
   },
   {
-    question: "Where are you located? Do you work remotely?",
-    answer: `I'm based in ${siteConfig.location} and work with clients across the United States. Remote collaboration is the default; on-site or local meetings in East Tennessee can be arranged when useful.`,
+    question: "Where are you based?",
+    answer: `${siteConfig.location}. Remote is normal; local meetings in East Tennessee when it helps.`,
   },
   {
-    question: "How do I start a project or consultation?",
-    answer: `Email ${servicesContact.email} or call ${servicesContact.phoneDisplay} with a short description of your goals, timeline, and budget range. I'll reply with next steps—no contact form on this site.`,
+    question: "How do we start?",
+    answer: `Email ${servicesContact.email} or call ${servicesContact.phoneDisplay}. A few sentences on what you need and your timeline is enough.`,
   },
   {
-    question: "Are you available for contract or part-time work?",
-    answer:
-      "Yes. Engagements are typically project-based or a defined monthly retainer, depending on scope. Full-time employment is not the focus of this page; founder roles at ClassQuip and Novux Games remain my primary commitments.",
-  },
-  {
-    question: "What is your background?",
-    answer: `Nearly a decade in K–12 edtech (including Stride/K12), co-founding ${ventures.classQuip.name}, founding ${ventures.novuxGames.name}, and shipping personal browser projects documented under Work on this site.`,
+    question: "Full-time hire?",
+    answer: `Day job is ${ventures.classQuip.name} and ${ventures.novuxGames.name}. Side engagements are project or retainer shaped—see About for résumé detail.`,
   },
 ] as const;
 

@@ -173,7 +173,7 @@ export function technicalServicesJsonLd() {
         url: pageUrl,
         name: "Technical Services — Software Development & Consultation",
         description:
-          "Freelance software development and technical consultation from Austin Buhl in Knoxville, TN. Custom web apps, architecture reviews, prototypes, and founder engineering.",
+          "Software development and technical consultation from Austin Buhl, Knoxville, TN.",
         isPartOf: { "@id": `${siteConfig.url}/#website` },
         about: { "@id": `${pageUrl}#service` },
       },
@@ -190,7 +190,7 @@ export function technicalServicesJsonLd() {
         url: pageUrl,
         image: absoluteUrl(siteConfig.ogImage),
         description:
-          "Software development, technical consultation, and prototyping for teams and founders. Based in Knoxville, Tennessee; serving clients across the United States.",
+          "Software development, consultation, and prototyping. Knoxville, TN; remote US.",
         telephone: servicesContact.phoneTel,
         email: servicesContact.email,
         priceRange: "$$",
