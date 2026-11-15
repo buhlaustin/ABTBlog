@@ -9,7 +9,7 @@ import { WorkCard } from "@/components/work-card";
 
 export const metadata = pageMetadata({
   title: siteConfig.defaultTitle,
-  description: siteConfig.description,
+  description: `${siteConfig.description} Contract software development and consulting when capacity allows.`,
   path: "/",
   absoluteTitle: true,
 });
@@ -95,7 +95,11 @@ export default function HomePage() {
               {hero.lead}
             </p>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-              {hero.support}
+              {hero.support.before}
+              <Link href="/services/" className="text-foreground hover:text-accent">
+                Services
+              </Link>
+              {hero.support.after}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
@@ -106,16 +110,16 @@ export default function HomePage() {
                 <span aria-hidden>↓</span>
               </Link>
               <Link
-                href="/about/"
-                className="inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
-              >
-                About
-              </Link>
-              <Link
                 href="/services/"
                 className="inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
               >
                 Services
+              </Link>
+              <Link
+                href="/about/"
+                className="inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
+              >
+                About
               </Link>
               <Link
                 href="/blog/"
@@ -245,20 +249,21 @@ export default function HomePage() {
 
           <article className="flex flex-col rounded-2xl border border-border bg-surface p-6 sm:p-8">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-              About
+              Services
             </p>
             <h2 className="font-display mt-3 text-2xl font-bold tracking-tight text-foreground">
-              Resume, experience &amp; quick facts
+              Contract development &amp; consulting
             </h2>
             <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
-              Eight years in K–12 edtech, ClassQuip, Novux, and the personal
-              projects collected here.
+              Freelance builds, architecture reviews, and prototypes—usually when
+              founder work at ClassQuip and Novux leaves bandwidth. Knoxville or
+              remote US.
             </p>
             <Link
-              href="/about/"
+              href="/services/"
               className="mt-6 text-sm font-semibold text-accent hover:text-blue-700"
             >
-              Full about page →
+              Services →
             </Link>
           </article>
         </section>

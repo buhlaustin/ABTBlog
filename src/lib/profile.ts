@@ -63,11 +63,15 @@ export const profile = {
   email: "abuhl@classquip.com",
   /** Homepage hero only. */
   hero: {
-    tagline: "Software Engineer & Builder | Knoxville, TN",
+    tagline: "Software engineer & founder · Knoxville, TN",
     lead:
       "Driven by hard problems, clean architectures, and data-heavy systems. My work spans everything from founding and building ed-tech infrastructure at ClassQuip to engineering possession-level simulation engines with Novux Games (Dynasty: College Basketball).",
-    support:
-      "The projects under Work are my personal sandbox—simulators, tools, and side projects built to explore mechanics independently of Novux releases.",
+    support: {
+      before:
+        "I also take on contract development and consulting when there's room on the calendar—",
+      after:
+        ". The projects under Work are my personal sandbox: simulators, tools, and side builds outside Novux releases.",
+    },
     sideProjectsCta: "View Side Projects",
   } as const,
   /** About page header — longer than homepage hero. */
