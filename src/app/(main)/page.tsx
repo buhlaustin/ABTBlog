@@ -52,8 +52,8 @@ function PlayStartupSimBanner() {
             Startup Simulator
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-zinc-400 sm:text-base">
-            Garage-to-IPO tycoon: fundraising, cap table, AI headlines and social
-            feeds, and a chief-of-staff advisor. Career or Sandbox.
+            Take a company from a garage to an IPO. Manage cap tables, survive AI
+            news cycles, and fend off your board in Career or Sandbox mode.
           </p>
         </div>
         <span className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition group-hover:bg-emerald-50 sm:w-auto">
@@ -97,7 +97,7 @@ export default function HomePage() {
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
               {hero.support.before}
               <Link href="/services/" className="text-foreground hover:text-accent">
-                Services
+                {hero.support.linkLabel}
               </Link>
               {hero.support.after}
             </p>
@@ -115,25 +115,13 @@ export default function HomePage() {
               >
                 Services
               </Link>
-              <Link
-                href="/about/"
-                className="inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
-              >
-                About
-              </Link>
-              <Link
-                href="/blog/"
-                className="inline-flex min-h-11 items-center rounded-full px-5 py-2.5 text-sm font-semibold text-muted transition hover:text-foreground active:text-foreground"
-              >
-                Blog
-              </Link>
               <a
-                href={siteConfig.twitter}
+                href={siteConfig.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
               >
-                Follow on Twitter
+                GitHub
               </a>
             </div>
           </div>
@@ -201,10 +189,10 @@ export default function HomePage() {
           <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="font-display text-2xl font-bold tracking-tight">
-                Selected work
+                Selected Work
               </h2>
               <p className="mt-1 text-sm text-muted">
-                Hosted demos and open-source projects.
+                Interactive sims, political games, and scientific computing.
               </p>
             </div>
             <Link
