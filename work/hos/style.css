@@ -457,8 +457,8 @@ body {
 .story-panel {
   display: flex;
   flex-direction: column;
-  min-height: 380px;
-  max-height: 55vh;
+  min-height: 0;
+  max-height: none;
 }
 
 .story-panel h2 {

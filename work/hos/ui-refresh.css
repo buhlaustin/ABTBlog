@@ -182,11 +182,20 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+/* Game shell — fill viewport; scroll inside panels, not under sticky chrome */
+#game-screen.active {
+  min-height: 0;
+  height: calc(100dvh - var(--space-4) * 2);
+  max-height: calc(100dvh - var(--space-4) * 2);
+  overflow: hidden;
+}
+
 /* Game header */
 .game-header-bar {
-  position: sticky;
-  top: var(--space-2);
-  z-index: 20;
+  position: relative;
+  top: auto;
+  flex-shrink: 0;
+  z-index: 1;
   padding: var(--space-3) var(--space-4);
   margin-bottom: 0;
 }
@@ -236,19 +245,18 @@ body {
   display: block;
 }
 
-/* Layout */
-#game-screen.active {
-  min-height: calc(100vh - 2rem);
-}
-
 .game-layout {
   grid-template-columns: minmax(0, 1.35fr) minmax(300px, 380px);
   gap: var(--space-4);
   align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .story-panel {
-  min-height: min(62vh, 560px);
+  min-height: 0;
+  height: 100%;
   max-height: none;
 }
 
@@ -299,7 +307,8 @@ body {
 /* Sidebar */
 .sidebar {
   gap: var(--space-3);
-  max-height: calc(100vh - 11rem);
+  min-height: 0;
+  max-height: 100%;
   overflow-y: auto;
   padding-right: 2px;
 }
@@ -363,9 +372,14 @@ body {
 
 /* Action bar */
 .action-bar {
-  position: sticky;
-  bottom: var(--space-2);
-  z-index: 15;
+  position: relative;
+  bottom: auto;
+  flex-shrink: 0;
+  z-index: 1;
+  max-height: min(34vh, 300px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   border: 1px solid var(--border-strong);
   background: linear-gradient(180deg, rgba(30, 40, 56, 0.97), rgba(18, 24, 34, 0.98));
 }
@@ -383,6 +397,16 @@ body {
 
 .action-buttons {
   gap: var(--space-2);
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.action-detail:not(.hidden) {
+  flex-shrink: 0;
+  max-height: 8rem;
+  overflow-y: auto;
 }
 
 /* End screen */
@@ -483,18 +507,18 @@ body {
 }
 
 @media (max-width: 900px) {
-  .game-header-bar {
-    position: relative;
-    top: auto;
+  #game-screen.active {
+    height: calc(100dvh - var(--space-3) * 2);
+    max-height: calc(100dvh - var(--space-3) * 2);
+  }
+
+  .game-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1.1fr) minmax(0, 0.9fr);
   }
 
   .action-bar {
-    position: relative;
-    bottom: auto;
-  }
-
-  .sidebar {
-    max-height: none;
+    max-height: min(40vh, 320px);
   }
 }
 
