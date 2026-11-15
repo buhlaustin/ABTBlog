@@ -30,6 +30,14 @@ const ACTION_TONES = {
   comp: 'live'
 };
 
+function storyEntryBody(entry) {
+  const raw = entry?.text;
+  if (raw == null) return '';
+  if (typeof raw === 'string') return raw;
+  if (typeof raw === 'object' && typeof raw.text === 'string') return raw.text;
+  return escapeHtml(String(raw));
+}
+
 function guestInitials(contestant) {
   const raw = (contestant?.name || '?').trim();
   const parts = raw.split(/\s+/).filter(Boolean);
@@ -229,7 +237,7 @@ export class UIManager {
       const type = entry.type || 'narrative';
       div.className = `story-entry ${type}${hostTag}`;
       const label = STORY_TYPE_LABELS[type] || 'Feed';
-      div.innerHTML = `<span class="story-entry-meta">${escapeHtml(label)}</span><div class="story-entry-body">${entry.text}</div>`;
+      div.innerHTML = `<span class="story-entry-meta">${escapeHtml(label)}</span><div class="story-entry-body">${storyEntryBody(entry)}</div>`;
       this.elements.storyLog.appendChild(div);
       div.classList.add('story-entry-enter');
       window.setTimeout(() => div.classList.remove('story-entry-enter'), 420);

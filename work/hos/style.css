@@ -305,30 +305,35 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 3.1rem;
-  padding: 0.3rem 0.35rem;
+  min-width: 3.35rem;
+  padding: 0.4rem 0.4rem;
   border-radius: 8px;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-  background: rgba(0, 0, 0, 0.12);
-  font-size: 0.68rem;
+  border: 1px solid rgba(148, 163, 184, 0.38);
+  background: rgba(34, 45, 63, 0.92);
+  font-size: 0.7rem;
   line-height: 1.2;
-  color: var(--text-muted);
+  color: #c8d4e4;
   flex-shrink: 0;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .week-calendar .cal-cell.cal-done {
-  opacity: 0.72;
+  opacity: 0.82;
+  background: rgba(26, 35, 50, 0.88);
+  color: #a8b8cc;
 }
 
 .week-calendar .cal-cell.cal-future {
-  opacity: 0.55;
+  opacity: 0.92;
+  color: #b8c6d8;
+  border-color: rgba(148, 163, 184, 0.32);
 }
 
 .week-calendar .cal-cell.cal-today {
-  border-color: var(--info);
-  background: rgba(69, 123, 157, 0.22);
-  color: var(--text);
-  box-shadow: 0 0 0 1px rgba(69, 123, 157, 0.35);
+  border-color: #7eb8e8;
+  background: linear-gradient(165deg, rgba(69, 123, 157, 0.42), rgba(34, 45, 63, 0.95));
+  color: #f0f4fa;
+  box-shadow: 0 0 0 1px rgba(126, 184, 232, 0.45), 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
 .week-calendar .cal-cell.cal-now {
@@ -366,26 +371,37 @@ body {
 }
 
 .week-calendar .cal-day {
-  font-weight: 700;
-  font-size: 0.72rem;
-  margin-top: 0.1rem;
+  font-weight: 800;
+  font-size: 0.78rem;
+  margin-top: 0.12rem;
+  letter-spacing: 0.02em;
+  color: inherit;
 }
 
 .week-calendar .cal-tag {
-  font-size: 0.58rem;
-  margin-top: 0.12rem;
-  max-width: 3.4rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  margin-top: 0.14rem;
+  max-width: 3.6rem;
   text-align: center;
-  line-height: 1.15;
-  opacity: 0.92;
+  line-height: 1.2;
+  color: #d8e2ee;
+  opacity: 1;
+}
+
+.week-calendar .cal-cell.cal-today .cal-tag,
+.week-calendar .cal-cell.cal-now .cal-tag {
+  color: #f5f8fc;
 }
 
 .week-calendar .cal-kind {
-  font-size: 0.52rem;
+  font-size: 0.54rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  opacity: 0.7;
-  margin-top: 0.08rem;
+  letter-spacing: 0.06em;
+  color: #9eb4cc;
+  opacity: 0.95;
+  margin-top: 0.1rem;
 }
 
 .week-calendar--finale .cal-cell {

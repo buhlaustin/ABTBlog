@@ -459,6 +459,27 @@ body {
 
 .week-calendar .cal-cell {
   border-radius: var(--radius-sm);
+  border-width: 1px;
+}
+
+.week-calendar .cal-cell .cal-icon {
+  font-size: 0.72rem;
+  filter: drop-shadow(0 0 4px rgba(233, 196, 106, 0.35));
+}
+
+.week-calendar .cal-cell.cal-live .cal-kind {
+  color: #f4c97a;
+}
+
+.week-calendar .cal-cell.cal-social .cal-kind {
+  color: #a8c4dc;
+}
+
+.week-calendar-legend {
+  font-size: 0.68rem;
+  color: #a8b8cc;
+  opacity: 1;
+  font-weight: 600;
 }
 
 @media (max-width: 900px) {

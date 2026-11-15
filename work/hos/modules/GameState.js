@@ -294,8 +294,14 @@ export class GameState {
     return this.getActiveContestants().filter((c) => c.id !== contestant.id);
   }
 
-  addStory(text, type = 'narrative') {
-    const entry = { text, type, week: this.week, day: this.day, phase: this.phase };
+  addStory(textOrEntry, type = 'narrative') {
+    let text = textOrEntry;
+    let entryType = type;
+    if (textOrEntry && typeof textOrEntry === 'object' && 'text' in textOrEntry) {
+      text = textOrEntry.text;
+      entryType = textOrEntry.type ?? type;
+    }
+    const entry = { text, type: entryType, week: this.week, day: this.day, phase: this.phase };
     this.storyLog.push(entry);
     return entry;
   }
