@@ -22,13 +22,13 @@ Yet, that second scenario is the baseline reality for millions of students acros
 
 Early in my career supporting platforms like Engageli and Newrow within massive virtual learning operations, the systemic flaws of off-the-shelf virtual classroom architectures became impossible to ignore:
 
-**CPU throttling and hardware bottlenecks:** Traditional web-conferencing platforms rely heavily on client-side canvas manipulation, unoptimized WebGL calls, and heavy JavaScript frameworks. Put 30 video tiles on a budget Chromebook, and the CPU spikes to 100%. The fan spins up, the audio begins to robotize, and the browser tab freezes.
+CPU throttling and hardware bottlenecks: Traditional web-conferencing platforms rely heavily on client-side canvas manipulation, unoptimized WebGL calls, and heavy JavaScript frameworks. Put 30 video tiles on a budget Chromebook, and the CPU spikes to 100%. The fan spins up, the audio begins to robotize, and the browser tab freezes.
 
-**Strict firewalls and network constraints:** K–12 network environments are notoriously lock-down heavy. UDP traffic is frequently throttled or blocked outright by aggressive district web filters (e.g., Securly, GoGuardian, Lightspeed), forcing fallback to TCP/TLS TURN servers that introduce massive latency.
+Strict firewalls and network constraints: K–12 network environments are notoriously lock-down heavy. UDP traffic is frequently throttled or blocked outright by aggressive district web filters (e.g., Securly, GoGuardian, Lightspeed), forcing fallback to TCP/TLS TURN servers that introduce massive latency.
 
-**Teacher cognitive overload:** The average virtual educator is expected to manage a video feed, chat moderation, screen sharing, external slide decks, attendance tracking, LMS gradebook syncing, and student engagement tools simultaneously. When every tool lives in a separate browser tab or iframe, teachers spend more time managing windows than teaching kids.
+Teacher cognitive overload: The average virtual educator is expected to manage a video feed, chat moderation, screen sharing, external slide decks, attendance tracking, LMS gradebook syncing, and student engagement tools simultaneously. When every tool lives in a separate browser tab or iframe, teachers spend more time managing windows than teaching kids.
 
-**Administrative and compliance friction:** In state-funded virtual schools, attendance isn't just about marking "present." It requires audit-ready time-in-room logging, active participation verification, and seamless synchronization back to Student Information Systems (SIS) via standards like OneRoster and LTI 1.3. When platforms fail to automate this, teachers end up spending hours after school manually compiling attendance spreadsheets.
+Administrative and compliance friction: In state-funded virtual schools, attendance isn't just about marking "present." It requires audit-ready time-in-room logging, active participation verification, and seamless synchronization back to Student Information Systems (SIS) via standards like OneRoster and LTI 1.3. When platforms fail to automate this, teachers end up spending hours after school manually compiling attendance spreadsheets.
 
 ## Why I Built ClassQuip
 
@@ -38,13 +38,13 @@ That led to building ClassQuip from the ground up—not as a general video meeti
 
 ### Architectural priorities
 
-**Custom low-bandwidth AWS WebRTC stack:** Rather than routing streams through generic third-party video APIs that add heavy client overhead, we built a custom WebRTC media engine on AWS. By optimizing selective forwarding unit (SFU) architecture, dynamic bitrate adaptation, and packet loss concealment (PLC), we keep latency low on degraded connections while staying lean on budget hardware.
+Custom low-bandwidth AWS WebRTC stack: Rather than routing streams through generic third-party video APIs that add heavy client overhead, we built a custom WebRTC media engine on AWS. By optimizing selective forwarding unit (SFU) architecture, dynamic bitrate adaptation, and packet loss concealment (PLC), we keep latency low on degraded connections while staying lean on budget hardware.
 
-**The single-deck model:** To solve teacher cognitive overload, ClassQuip unifies presentation slides, interactive whiteboards, live AI-driven polls, and exit tickets into a single, cohesive presentation deck. Teachers don't manage five open applications; they advance through a single unified interface that drives the student experience in real time.
+The single-deck model: To solve teacher cognitive overload, ClassQuip unifies presentation slides, interactive whiteboards, live AI-driven polls, and exit tickets into a single, cohesive presentation deck. Teachers don't manage five open applications; they advance through a single unified interface that drives the student experience in real time.
 
-**Native AI workflow tools:** Lesson preparation is one of the biggest drivers of teacher burnout. We integrated AI engines directly into the platform flow, allowing educators to generate aligned lesson plans, dynamic comprehension polls, and end-of-class exit tickets on the fly without leaving the browser tab.
+Native AI workflow tools: Lesson preparation is one of the biggest drivers of teacher burnout. We integrated AI engines directly into the platform flow, allowing educators to generate aligned lesson plans, dynamic comprehension polls, and end-of-class exit tickets on the fly without leaving the browser tab.
 
-**Automated compliance logging:** Attendance is tracked passively and continuously using cryptographic, audit-ready time-in-room logging. District administrators get the compliance data required for state funding automatically pushed straight through OneRoster/LTI connections, completely removing manual logging from the teacher's plate.
+Automated compliance logging: Attendance is tracked passively and continuously using cryptographic, audit-ready time-in-room logging. District administrators get the compliance data required for state funding automatically pushed straight through OneRoster/LTI connections, completely removing manual logging from the teacher's plate.
 
 ## Engineering Beyond the Day Job
 
@@ -70,10 +70,10 @@ This isn't a polished corporate PR outlet or a high-level marketing funnel. It's
 
 Moving forward, you can expect long-form posts focused on:
 
-- **Deep dives into WebRTC and infrastructure:** Technical write-ups on low-latency streaming, SFU architecture, and optimizing web performance on memory-constrained devices.
-- **EdTech system design:** Analysis of LMS standards (LTI 1.3, OneRoster, SAML/OAuth SSO), data privacy frameworks (FERPA, COPPA), and building compliant software at scale.
-- **Browser game engine and simulation experiments:** Case studies and post-mortems on personal game prototypes, custom physics implementations, and WebGL experiments.
-- **Product strategy and bootstrapping:** Thoughts on building real software that solves unglamorous, high-friction operational problems for real institutions.
+- Deep dives into WebRTC and infrastructure: Technical write-ups on low-latency streaming, SFU architecture, and optimizing web performance on memory-constrained devices.
+- EdTech system design: Analysis of LMS standards (LTI 1.3, OneRoster, SAML/OAuth SSO), data privacy frameworks (FERPA, COPPA), and building compliant software at scale.
+- Browser game engine and simulation experiments: Case studies and post-mortems on personal game prototypes, custom physics implementations, and WebGL experiments.
+- Product strategy and bootstrapping: Thoughts on building real software that solves unglamorous, high-friction operational problems for real institutions.
 
 Whether you're a fellow real-time systems engineer, an edtech founder, a district administrator, or just someone who enjoys tinkering with code, I'm glad you're here.
 
