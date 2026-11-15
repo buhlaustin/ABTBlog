@@ -112,6 +112,12 @@ export default function HomePage() {
                 About
               </Link>
               <Link
+                href="/services/"
+                className="inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
+              >
+                Technical services
+              </Link>
+              <Link
                 href="/blog/"
                 className="inline-flex min-h-11 items-center rounded-full px-5 py-2.5 text-sm font-semibold text-muted transition hover:text-foreground active:text-foreground"
               >

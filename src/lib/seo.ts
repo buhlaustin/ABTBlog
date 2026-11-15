@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 import { ventures } from "@/lib/profile";
+import {
+  serviceGeo,
+  serviceOfferings,
+  servicesContact,
+  servicesFaqs,
+} from "@/lib/services";
 import { siteConfig } from "@/lib/site";
 
 const ogImage = {
@@ -136,6 +142,103 @@ export function personJsonLd() {
       },
     ],
     sameAs: [siteConfig.github, "https://www.linkedin.com/in/austinbuhl20"],
+  };
+}
+
+export function faqPageJsonLd(
+  items: ReadonlyArray<{ question: string; answer: string }>,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+}
+
+export function technicalServicesJsonLd() {
+  const pageUrl = absoluteUrl("/services/");
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: "Technical Services — Software Development & Consultation",
+        description:
+          "Freelance software development and technical consultation from Austin Buhl in Knoxville, TN. Custom web apps, architecture reviews, prototypes, and founder engineering.",
+        isPartOf: { "@id": `${siteConfig.url}/#website` },
+        about: { "@id": `${pageUrl}#service` },
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteConfig.url}/#website`,
+        url: siteConfig.url,
+        name: siteConfig.name,
+      },
+      {
+        "@type": "ProfessionalService",
+        "@id": `${pageUrl}#service`,
+        name: `${siteConfig.name} — Technical Services`,
+        url: pageUrl,
+        image: absoluteUrl(siteConfig.ogImage),
+        description:
+          "Software development, technical consultation, and prototyping for teams and founders. Based in Knoxville, Tennessee; serving clients across the United States.",
+        telephone: servicesContact.phoneTel,
+        email: servicesContact.email,
+        priceRange: "$$",
+        areaServed: [
+          { "@type": "Country", name: "United States" },
+          { "@type": "State", name: "Tennessee" },
+          {
+            "@type": "City",
+            name: serviceGeo.locality,
+            containedInPlace: {
+              "@type": "State",
+              name: "Tennessee",
+            },
+          },
+        ],
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: serviceGeo.locality,
+          addressRegion: serviceGeo.region,
+          addressCountry: serviceGeo.country,
+        },
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: serviceGeo.latitude,
+          longitude: serviceGeo.longitude,
+        },
+        provider: {
+          "@type": "Person",
+          name: siteConfig.name,
+          url: siteConfig.url,
+          jobTitle: "Software Engineer & Founder",
+          sameAs: [siteConfig.github, "https://www.linkedin.com/in/austinbuhl20"],
+        },
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "Technical services",
+          itemListElement: serviceOfferings.map((offering, index) => ({
+            "@type": "Offer",
+            position: index + 1,
+            itemOffered: {
+              "@type": "Service",
+              name: offering.name,
+              description: offering.summary,
+            },
+          })),
+        },
+      },
+    ],
   };
 }
 

@@ -8,6 +8,9 @@ export function SiteFooter() {
           © {new Date().getFullYear()} {siteConfig.name}
         </p>
         <p className="flex flex-wrap gap-x-5 gap-y-1">
+          <a href="/services/" className="transition hover:text-accent">
+            Services
+          </a>
           <a
             href={siteConfig.github}
             className="transition hover:text-accent"
