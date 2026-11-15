@@ -167,9 +167,11 @@ export function SiteNav() {
         className={`mobile-menu-list flex flex-1 flex-col gap-1 overflow-y-auto px-4 py-4 ${open ? "mobile-menu-list--open" : ""}`}
       >
         {nav.map((item) => {
+          const base = item.href.replace(/\/$/, "");
           const active =
             pathname === item.href ||
-            (item.href !== "/" && pathname.startsWith(item.href.slice(0, -1)));
+            pathname === base ||
+            pathname.startsWith(`${base}/`);
           return (
             <li key={item.href}>
               <Link
