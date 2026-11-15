@@ -72,6 +72,22 @@ export default function ServicesPage() {
               .
             </p>
           </Reveal>
+          <Reveal when="mount" delayMs={240}>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href={`mailto:${servicesContact.email}`}
+                className="btn-press inline-flex min-h-11 items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
+              >
+                Email {servicesContact.email}
+              </a>
+              <a
+                href={`tel:${servicesContact.phoneTel}`}
+                className="btn-press inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface"
+              >
+                Call {servicesContact.phoneDisplay}
+              </a>
+            </div>
+          </Reveal>
         </header>
 
         <div className="mt-14">
@@ -130,6 +146,32 @@ export default function ServicesPage() {
               ))}
             </dl>
           </ServiceSection>
+
+          <Reveal>
+            <section className="lift-card mt-12 rounded-2xl border border-border bg-surface-raised px-6 py-8 text-center sm:px-10 sm:py-10">
+              <h2 className="font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+                Ready to talk?
+              </h2>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted">
+                A few sentences on the problem and your timeline is enough—no
+                formal RFP required.
+              </p>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <a
+                  href={`mailto:${servicesContact.email}`}
+                  className="btn-press inline-flex min-h-11 items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
+                >
+                  Email me
+                </a>
+                <a
+                  href={`tel:${servicesContact.phoneTel}`}
+                  className="btn-press inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface"
+                >
+                  {servicesContact.phoneDisplay}
+                </a>
+              </div>
+            </section>
+          </Reveal>
         </div>
       </main>
     </>
