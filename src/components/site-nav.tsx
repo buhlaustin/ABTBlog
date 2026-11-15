@@ -54,10 +54,20 @@ export function SiteNav() {
         >
           GitHub
         </a>
-        <a href={`tel:${servicesContact.phoneTel}`} className={contactCtaClass}>
-          Call
+        <a
+          href={`mailto:${servicesContact.email}`}
+          className={contactCtaClass}
+        >
+          Email
         </a>
       </nav>
+
+      <a
+        href={`tel:${servicesContact.phoneTel}`}
+        className={`${contactCtaClass} md:hidden`}
+      >
+        Call
+      </a>
 
       <button
         type="button"
