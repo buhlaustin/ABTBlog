@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/json-ld";
 import { profile, siteConfig } from "@/lib/profile";
 import { pageMetadata, personJsonLd } from "@/lib/seo";
 import { workItems } from "@/lib/work-registry";
+import { Reveal } from "@/components/reveal";
 import { WorkCard } from "@/components/work-card";
 
 export const metadata = pageMetadata({
@@ -33,7 +34,7 @@ function PlayStartupSimBanner() {
   return (
     <Link
       href="/work/startup-sim/"
-      className="group relative block overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-6 py-8 text-white shadow-lg transition hover:border-zinc-600 sm:px-8 sm:py-10"
+      className="group lift-card relative block overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-6 py-8 text-white shadow-lg transition hover:border-zinc-600 sm:px-8 sm:py-10"
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-40"
@@ -80,54 +81,64 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative border-b border-border">
         <div
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(250,250,250,0)_0%,rgb(255_255_255)_85%),radial-gradient(ellipse_90%_60%_at_50%_-20%,rgba(37,99,235,0.12),transparent)]"
+          className="hero-mesh pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(250,250,250,0)_0%,rgb(255_255_255)_85%),radial-gradient(ellipse_90%_60%_at_50%_-20%,rgba(37,99,235,0.12),transparent)]"
           aria-hidden
         />
         <div className="relative mx-auto grid max-w-5xl gap-10 px-safe py-12 sm:py-20 lg:grid-cols-[1fr_minmax(0,17rem)] lg:items-start lg:gap-14">
           <div className="min-w-0">
-            <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              {siteConfig.name}
-            </h1>
-            <p className="mt-3 font-mono text-sm text-muted sm:text-base">
-              {hero.tagline}
-            </p>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-foreground">
-              {hero.lead}
-            </p>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-              {hero.support.before}
-              <Link href="/services/" className="text-foreground hover:text-accent">
-                {hero.support.linkLabel}
-              </Link>
-              {hero.support.after}
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href="/work/"
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 active:bg-zinc-700"
-              >
-                {hero.sideProjectsCta}
-                <span aria-hidden>↓</span>
-              </Link>
-              <Link
-                href="/services/"
-                className="inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
-              >
-                Services
-              </Link>
-              <a
-                href={siteConfig.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
-              >
-                GitHub
-              </a>
-            </div>
+            <Reveal when="mount">
+              <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+                {siteConfig.name}
+              </h1>
+            </Reveal>
+            <Reveal when="mount" delayMs={80}>
+              <p className="mt-3 font-mono text-sm text-muted sm:text-base">
+                {hero.tagline}
+              </p>
+            </Reveal>
+            <Reveal when="mount" delayMs={140}>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-foreground">
+                {hero.lead}
+              </p>
+            </Reveal>
+            <Reveal when="mount" delayMs={200}>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
+                {hero.support.before}
+                <Link href="/services/" className="text-foreground hover:text-accent">
+                  {hero.support.linkLabel}
+                </Link>
+                {hero.support.after}
+              </p>
+            </Reveal>
+            <Reveal when="mount" delayMs={260}>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/work/"
+                  className="btn-press inline-flex min-h-11 items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 active:bg-zinc-700"
+                >
+                  {hero.sideProjectsCta}
+                  <span aria-hidden>↓</span>
+                </Link>
+                <Link
+                  href="/services/"
+                  className="btn-press inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
+                >
+                  Services
+                </Link>
+                <a
+                  href={siteConfig.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-press inline-flex min-h-11 items-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised"
+                >
+                  GitHub
+                </a>
+              </div>
+            </Reveal>
           </div>
 
           <aside className="flex flex-col gap-3 lg:pt-2">
-            <div className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-sm">
+            <Reveal when="mount" delayMs={180} className="lift-card flex items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-sm">
               <Image
                 src={profile.avatarUrl}
                 alt=""
@@ -139,54 +150,59 @@ export default function HomePage() {
                 <p className="font-semibold text-foreground">{siteConfig.name}</p>
                 <p className="text-muted">{profile.hero.tagline}</p>
               </div>
-            </div>
-            <Link
-              href="/work/startup-sim/"
-              className="flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
-            >
-              Play Startup Simulator →
-            </Link>
-            <a
-              href={siteConfig.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
-            >
-              GitHub @
-              {siteConfig.githubUsername} ↗
-            </a>
+            </Reveal>
+            <Reveal when="mount" delayMs={240}>
+              <Link
+                href="/work/startup-sim/"
+                className="lift-card flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
+              >
+                Play Startup Simulator →
+              </Link>
+            </Reveal>
+            <Reveal when="mount" delayMs={300}>
+              <a
+                href={siteConfig.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="lift-card flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
+              >
+                GitHub @
+                {siteConfig.githubUsername} ↗
+              </a>
+            </Reveal>
           </aside>
         </div>
       </section>
 
       <div className="mx-auto max-w-5xl px-safe pb-20 pt-12 sm:pb-24 sm:pt-16">
-        <section className="mb-16">
+        <Reveal className="mb-16">
           <PlayStartupSimBanner />
-        </section>
+        </Reveal>
 
         <section className="mb-16">
-          <h2 className="font-display text-sm font-bold uppercase tracking-[0.15em] text-muted">
-            Focus
-          </h2>
+          <Reveal>
+            <h2 className="font-display text-sm font-bold uppercase tracking-[0.15em] text-muted">
+              Focus
+            </h2>
+          </Reveal>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {focusPillars.map((pillar) => (
-              <article
-                key={pillar.title}
-                className="rounded-2xl border border-border bg-surface p-6"
-              >
-                <h3 className="font-display text-lg font-bold tracking-tight text-foreground">
-                  {pillar.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">
-                  {pillar.body}
-                </p>
-              </article>
+            {focusPillars.map((pillar, index) => (
+              <Reveal key={pillar.title} delayMs={index * 70}>
+                <article className="lift-card h-full rounded-2xl border border-border bg-surface p-6">
+                  <h3 className="font-display text-lg font-bold tracking-tight text-foreground">
+                    {pillar.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                    {pillar.body}
+                  </p>
+                </article>
+              </Reveal>
             ))}
           </div>
         </section>
 
         <section className="mb-16">
-          <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <Reveal className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="font-display text-2xl font-bold tracking-tight">
                 Selected Work
@@ -201,17 +217,20 @@ export default function HomePage() {
             >
               View all →
             </Link>
-          </div>
+          </Reveal>
           <div className="grid gap-6 sm:grid-cols-2">
-            {otherFeatured.map((item) => (
-              <WorkCard key={item.slug} item={item} />
+            {otherFeatured.map((item, index) => (
+              <Reveal key={item.slug} delayMs={index * 80}>
+                <WorkCard item={item} />
+              </Reveal>
             ))}
           </div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
           {latestPost ? (
-            <article className="flex flex-col rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
+            <Reveal>
+            <article className="lift-card flex flex-col rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
                 Latest post
               </p>
@@ -233,9 +252,11 @@ export default function HomePage() {
                 Read post →
               </Link>
             </article>
+            </Reveal>
           ) : null}
 
-          <article className="flex flex-col rounded-2xl border border-border bg-surface p-6 sm:p-8">
+          <Reveal delayMs={80}>
+          <article className="lift-card flex flex-col rounded-2xl border border-border bg-surface p-6 sm:p-8">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
               Services
             </p>
@@ -253,6 +274,7 @@ export default function HomePage() {
               Services →
             </Link>
           </article>
+          </Reveal>
         </section>
       </div>
     </main>

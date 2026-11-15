@@ -10,6 +10,7 @@ import {
 } from "@/lib/profile";
 import { focusAreas, resumeGroups } from "@/lib/resume";
 import { workItems } from "@/lib/work-registry";
+import { Reveal } from "@/components/reveal";
 import { WorkCard } from "@/components/work-card";
 import { pageMetadata } from "@/lib/seo";
 
@@ -31,20 +32,22 @@ function AboutSection({
   centered?: boolean;
 }) {
   return (
-    <section
+    <Reveal
       className={`mt-12 border-t border-border pt-10 first:mt-0 first:border-t-0 first:pt-0 ${className ?? ""}`}
     >
-      <h2
-        className={`font-display text-xl font-bold tracking-tight text-foreground ${centered ? "text-center" : ""}`}
-      >
-        {title}
-      </h2>
-      <div
-        className={`mt-4 space-y-4 text-base leading-relaxed text-muted ${centered ? "mx-auto text-center" : ""}`}
-      >
-        {children}
-      </div>
-    </section>
+      <section>
+        <h2
+          className={`font-display text-xl font-bold tracking-tight text-foreground ${centered ? "text-center" : ""}`}
+        >
+          {title}
+        </h2>
+        <div
+          className={`mt-4 space-y-4 text-base leading-relaxed text-muted ${centered ? "mx-auto text-center" : ""}`}
+        >
+          {children}
+        </div>
+      </section>
+    </Reveal>
   );
 }
 
@@ -53,6 +56,7 @@ export default function AboutPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-safe py-10 sm:py-16">
+      <Reveal when="mount">
       <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
         <Image
           src={profile.avatarUrl}
@@ -110,6 +114,7 @@ export default function AboutPage() {
           </p>
         </div>
       </header>
+      </Reveal>
 
       <div className="mt-14">
         <AboutSection title="Quick facts" centered>
@@ -117,7 +122,7 @@ export default function AboutPage() {
             {quickFacts.map((fact) => (
               <div
                 key={fact.label}
-                className="rounded-lg border border-border bg-surface px-4 py-3 text-center"
+                className="lift-card rounded-lg border border-border bg-surface px-4 py-3 text-center"
               >
                 <dt className="font-mono text-[11px] font-medium uppercase tracking-wider text-muted">
                   {fact.label}

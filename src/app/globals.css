@@ -47,3 +47,121 @@
     @apply bg-blue-200 text-zinc-900;
   }
 }
+
+/* --- Marketing shell: ambient background + scroll reveals + card lift --- */
+
+.marketing-ambient__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+  animation: marketing-drift 22s ease-in-out infinite alternate;
+}
+
+.marketing-ambient__blob--a {
+  top: -12%;
+  left: -8%;
+  width: min(52vw, 28rem);
+  height: min(52vw, 28rem);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.22), transparent 70%);
+}
+
+.marketing-ambient__blob--b {
+  top: 28%;
+  right: -14%;
+  width: min(48vw, 24rem);
+  height: min(48vw, 24rem);
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.14), transparent 70%);
+  animation-duration: 28s;
+  animation-delay: -6s;
+}
+
+.marketing-ambient__blob--c {
+  bottom: -18%;
+  left: 22%;
+  width: min(56vw, 26rem);
+  height: min(56vw, 26rem);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent 70%);
+  animation-duration: 26s;
+  animation-delay: -12s;
+}
+
+@keyframes marketing-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(3%, 4%) scale(1.06);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 1.25rem, 0);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal--in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.lift-card {
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+@media (hover: hover) {
+  .lift-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 12px 28px -12px rgba(24, 24, 27, 0.18),
+      0 4px 12px -6px rgba(24, 24, 27, 0.08);
+  }
+}
+
+.hero-mesh {
+  animation: hero-mesh-shift 18s ease-in-out infinite alternate;
+}
+
+@keyframes hero-mesh-shift {
+  0% {
+    opacity: 1;
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    opacity: 0.92;
+    filter: hue-rotate(12deg);
+  }
+}
+
+.btn-press {
+  transition: transform 0.15s ease, background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.btn-press:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-ambient__blob,
+  .hero-mesh {
+    animation: none !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .lift-card:hover {
+    transform: none;
+  }
+}

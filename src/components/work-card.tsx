@@ -26,7 +26,7 @@ export function WorkCard({ item }: { item: WorkItem }) {
     item.kind === "hosted" ? "Play" : item.repoUrl ? "View repo" : "Details";
 
   return (
-    <article className="group flex flex-col rounded-2xl border border-border bg-white p-6 shadow-sm transition hover:border-zinc-300 hover:shadow-md">
+    <article className="group lift-card flex flex-col rounded-2xl border border-border bg-white p-6 shadow-sm hover:border-zinc-300">
       <div className="mb-4 flex items-start justify-between gap-3">
         <h2 className="font-display text-xl font-bold tracking-tight text-foreground">
           <Link href={href} className="hover:text-accent">

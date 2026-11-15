@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Reveal } from "@/components/reveal";
 import { getAllPosts } from "@/lib/blog";
 import { pageMetadata } from "@/lib/seo";
 
@@ -14,13 +15,18 @@ export default function BlogIndexPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-10 sm:py-16">
-      <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-        Blog
-      </h1>
-      <p className="mt-4 text-muted">Notes on what I&apos;m building and learning.</p>
+      <Reveal when="mount">
+        <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+          Blog
+        </h1>
+      </Reveal>
+      <Reveal when="mount" delayMs={80}>
+        <p className="mt-4 text-muted">Notes on what I&apos;m building and learning.</p>
+      </Reveal>
       <ul className="mt-12 divide-y divide-border/80">
-        {posts.map((post) => (
-          <li key={post.slug} className="py-8 first:pt-0">
+        {posts.map((post, index) => (
+          <Reveal key={post.slug} delayMs={index * 50}>
+          <li className="py-8 first:pt-0">
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <time
                 dateTime={post.date}
@@ -51,6 +57,7 @@ export default function BlogIndexPage() {
               {post.description}
             </p>
           </li>
+          </Reveal>
         ))}
       </ul>
     </main>
