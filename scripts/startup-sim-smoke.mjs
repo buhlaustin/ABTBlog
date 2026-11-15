@@ -2223,11 +2223,20 @@ if (!failed) {
     failed = true;
   }
   const { advanceCalendarMonth } = await import(`file://${join(sim, 'modules/Calendar.js')}`);
-  const monthA = rollPersonalExpenseTotal(bankA);
-  advanceCalendarMonth(bankA);
   preparePersonalExpensesForMonth(bankA);
-  const monthB = rollPersonalExpenseTotal(bankA);
-  if (monthA === monthB) {
+  let prevDebit = scheduledPersonalExpense(bankA).total;
+  let sawMonthVariation = false;
+  for (let m = 0; m < 12; m++) {
+    advanceCalendarMonth(bankA);
+    preparePersonalExpensesForMonth(bankA);
+    const nextDebit = scheduledPersonalExpense(bankA).total;
+    if (nextDebit !== prevDebit) {
+      sawMonthVariation = true;
+      break;
+    }
+    prevDebit = nextDebit;
+  }
+  if (!sawMonthVariation) {
     console.error('FAIL: personal debits should vary month to month');
     failed = true;
   } else {

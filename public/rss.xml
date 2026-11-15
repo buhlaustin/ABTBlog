@@ -6,6 +6,22 @@
     <description>Writing on software engineering, edtech, personal browser projects, and life as a founder.</description>
     
     <item>
+      <title>Open for Consulting — Knoxville &amp; Remote</title>
+      <link>https://austinbuhltech.com/blog/open-for-professional-services/</link>
+      <guid>https://austinbuhltech.com/blog/open-for-professional-services/</guid>
+      <pubDate>Sun, 15 Nov 2026 00:00:00 GMT</pubDate>
+      <description>Select software consulting and retainers from Austin Buhl—full-stack builds, architecture reviews, and browser prototypes. Knoxville, TN or remote US.</description>
+      <author>Austin Buhl</author>
+    </item>
+    <item>
+      <title>Shipping prototypes you mostly built with AI help</title>
+      <link>https://austinbuhltech.com/blog/deploying-ai-assisted-prototypes/</link>
+      <guid>https://austinbuhltech.com/blog/deploying-ai-assisted-prototypes/</guid>
+      <pubDate>Fri, 13 Nov 2026 00:00:00 GMT</pubDate>
+      <description>How I get AI-sped browser prototypes onto a real URL without pretending they're production—one pipeline, one smoke test, and a deploy that matches what you actually changed.</description>
+      <author>Austin Buhl</author>
+    </item>
+    <item>
       <title>Launching Novux Games</title>
       <link>https://austinbuhltech.com/blog/launching-novux-games/</link>
       <guid>https://austinbuhltech.com/blog/launching-novux-games/</guid>

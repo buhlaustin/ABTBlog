@@ -236,10 +236,15 @@ export function personalExpenseBand(state) {
 
 function personalExpenseRollUnit(state, salt = 0) {
   const turn = calendarTurn(state);
+  const month = state.calendar?.monthIndex ?? 0;
+  const year = state.calendar?.year ?? 0;
   const annual = Math.round(ceoState(state).salaryAnnual ?? 0);
   const seed = state.meta?.runSeed ?? 0;
   let h =
-    (seed ^ Math.imul(turn + salt * 19, 2_654_435_761) ^ Math.imul(annual, 1_597_334_677)) >>> 0;
+    (seed ^
+      Math.imul(turn + salt * 19, 2_654_435_761) ^
+      Math.imul(annual, 1_597_334_677) ^
+      Math.imul(month + year * 16, 3_456_789_011)) >>> 0;
   h = Math.imul(h ^ 0x9e3779b9, 0x85ebca6b) >>> 0;
   return h / 0xffffffff;
 }
