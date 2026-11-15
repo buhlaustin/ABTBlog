@@ -1,8 +1,8 @@
 ---
-title: "Open for Professional Services — Knoxville and Remote"
+title: "Open for Consulting — Knoxville & Remote"
 slug: open-for-professional-services
 date: 2026-11-15
-description: "Taking on select contract engineering and consulting in East Tennessee or nationwide—production software, architecture reviews, and browser-based prototypes."
+description: "Select software consulting and retainers from Austin Buhl—full-stack builds, architecture reviews, and browser prototypes. Knoxville, TN or remote US."
 author: Austin Buhl
 tags:
   - consulting
@@ -12,36 +12,33 @@ tags:
   - remote
 ---
 
-Between ClassQuip and Novux Games, most of my calendar is spoken for—but not all of it. I’m open for professional services on a project and retainer basis: teams in the Knoxville, TN area (happy to meet in person) or nationwide, remote.
+I’m taking on a few select software consulting projects and retainers. If you need a senior engineer to build a product from scratch, untangle a messy codebase, or sanity-check your architecture, I have bandwidth to jump in—in person around Knoxville, TN, or remotely anywhere in the US.
 
-This isn’t a pivot away from building products. It’s the same senior engineering I use on my own stack, offered when the problem and the timeline line up.
+When I’m not building my own products at ClassQuip and Novux Games, I like helping other teams ship hard technical work.
 
-## What I take on
+## What I build
 
-The short version lives on [Technical Services](/services/). In practice it usually falls into three buckets:
+You can see the full breakdown on my [Technical Services](/services/) page, but here is where I spend most of my time:
 
-- Ship production software — End-to-end web apps and APIs (typically Next.js, React, and Node), including real-time classroom data, payment flows, LMS integrations (LTI, OneRoster), and dragging legacy code toward something deployable.
-- Sanity-check your architecture — Second-opinion reviews and pairing before you commit quarters to a stack or a refactor. EdTech, SaaS, and simulation-heavy products are where I’ve lived longest.
-- Build interactive sims and demos — High-performance TypeScript prototypes in the browser, for game mechanics, training flows, or stakeholder demos before a full build.
+- Full-stack web apps and APIs: Next.js, React, Node, and TypeScript. I specialize in real-time classroom data, payment flows, LMS integrations (LTI, OneRoster), and getting legacy codebases into a state where you can actually deploy them reliably.
+- Architecture reviews: Second-opinion reviews and hands-on pairing before you burn six months on a new stack or a major refactor. My deepest experience is in EdTech, B2B SaaS, and simulation-heavy apps.
+- Interactive browser prototypes: Fast TypeScript sims, training tools, or game mechanics right in the browser so you have something real to show stakeholders before committing to a full build. Check out my [Work](/work/) page for browser sims and physics toys. Full commercial game dev runs through [Novux](https://novux.dev/)—this consulting is strictly for your software product.
 
-If you’ve poked around [Work](/work/) on this site, that’s the same muscle: browser sims, political games, physics toys. Commercial game work routes through [Novux](https://novux.dev); consulting is for your product.
+## Who I work best with
 
-## Who this is for
+- Founders or small teams with a defined scope and a real deadline (not looking for vague “technical cofounder” arrangements).
+- EdTech vendors, startups, or agencies that need someone who has actually dealt with K–12 Chromebooks and district firewalls firsthand.
+- US-based teams comfortable with remote work (I’m on Eastern Time, so overlapping hours is easy).
 
-- A founder or small team with a clear slice of work and a realistic deadline—not a vague “we need a technical cofounder” fishing trip.
-- A district-adjacent vendor, startup, or agency that needs someone who has actually supported K–12 hardware and firewalls, not just read a slide deck about them.
-- A company anywhere in the US that’s fine with remote collaboration; Eastern Time is easy, other US zones work with async discipline.
+## How we'll work
 
-Full-time employment isn’t the default. Project-based and retainer arrangements are.
+If you're in East Tennessee, we can meet for coffee, hit a whiteboard, or work on-site. If you're remote, I keep things lightweight: shared GitHub repos, async updates, and clear written decisions so nobody is stuck in pointless meetings.
 
-## East Tennessee vs. remote
+You don't need a formal RFP. Send a quick note about what you're building or what's broken, what "done" looks like, and your timeline.
 
-I’m based in Knoxville. Local partners can do coffee, whiteboard sessions, or on-site working sessions when it helps. Everyone else gets the same delivery rhythm I use with distributed teams: shared repos, recorded check-ins, written decisions.
+## Get in touch
 
-You don’t need an RFP. A short note on the problem, what “done” looks like, and when you need it is enough to start a conversation.
-
-## How to reach me
-
-Email [abuhl@classquip.com](mailto:abuhl@classquip.com), call [865.441.5476](tel:+18654415476), or see [/services/](/services/) for detail.
-
-I’ll keep writing here about engineering, edtech, and whatever I’m shipping on the side. If you’re trying to get something across the finish line and want a senior solo builder—not a bench of juniors learning on your dime—that’s what this post is for.
+- [Email abuhl@classquip.com](mailto:abuhl@classquip.com)
+- [Call 865.441.5476](tel:+18654415476)
+- [Technical Services](/services/) — scope, FAQ, and how we start
+- [Connect on LinkedIn](https://www.linkedin.com/in/austinbuhl20)
