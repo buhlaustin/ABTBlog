@@ -9,6 +9,8 @@ export const siteConfig = {
   locale: "en_US",
   github: "https://github.com/buhlaustin",
   githubUsername: "buhlaustin",
+  twitter: "https://x.com/buhlaustin",
+  twitterUsername: "buhlaustin",
   location: "Knoxville, TN",
   logoSignature: "/abuhl-signature.svg",
   favicon: "/ab-favicon.svg",

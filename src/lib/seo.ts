@@ -141,7 +141,11 @@ export function personJsonLd() {
         url: ventures.novuxGames.url,
       },
     ],
-    sameAs: [siteConfig.github, "https://www.linkedin.com/in/austinbuhl20"],
+    sameAs: [
+      siteConfig.github,
+      siteConfig.twitter,
+      "https://www.linkedin.com/in/austinbuhl20",
+    ],
   };
 }
 
@@ -222,7 +226,11 @@ export function technicalServicesJsonLd() {
           name: siteConfig.name,
           url: siteConfig.url,
           jobTitle: "Software Engineer & Founder",
-          sameAs: [siteConfig.github, "https://www.linkedin.com/in/austinbuhl20"],
+          sameAs: [
+            siteConfig.github,
+            siteConfig.twitter,
+            "https://www.linkedin.com/in/austinbuhl20",
+          ],
         },
         hasOfferCatalog: {
           "@type": "OfferCatalog",

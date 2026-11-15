@@ -19,6 +19,14 @@ export function SiteFooter() {
           >
             GitHub
           </a>
+          <a
+            href={siteConfig.twitter}
+            className="transition hover:text-accent"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Twitter
+          </a>
           <a href="/rss.xml" className="transition hover:text-accent">
             RSS
           </a>
