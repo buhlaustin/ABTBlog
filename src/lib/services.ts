@@ -1,4 +1,4 @@
-import { profile, siteConfig } from "@/lib/profile";
+import { profile } from "@/lib/profile";
 
 export const servicesContact = {
   email: profile.email,
@@ -8,53 +8,37 @@ export const servicesContact = {
 
 export const serviceOfferings = [
   {
-    name: "Software development",
+    name: "Ship Production Software",
     summary:
-      "Web apps, APIs, and integrations—usually Next.js/React/Node, with an eye toward what breaks in production.",
-    bullets: [
-      "Greenfield products and hardened legacy code",
-      "Real-time and classroom-scale systems",
-      "LMS, payments, and third-party integrations",
-    ],
+      "End-to-end web apps and APIs using Next.js, React, and Node. I handle the messy parts: real-time classroom data, payment pipelines, LMS integrations, and stabilizing legacy systems.",
   },
   {
-    name: "Consultation",
+    name: "Sanity-Check Your Architecture",
     summary:
-      "Architecture reviews, scope sanity checks, and pairing when you need another senior set of eyes.",
-    bullets: [
-      "System design and codebase audits",
-      "Edtech, SaaS, and simulation-heavy domains",
-    ],
+      "Second-opinion system reviews and technical pairing. If you need to know whether your current stack will hold up—or how to untangle it—we can figure it out before you waste months of dev time.",
   },
   {
-    name: "Prototypes",
+    name: "Build Interactive Sims & Demos",
     summary:
-      "Browser demos and sims in the vein of the projects under Work—good for pitches, training, or trying mechanics.",
-    bullets: [
-      "TypeScript gameplay and simulation logic",
-      "Shipped in the browser, no store required",
-    ],
+      "High-performance TypeScript prototypes that run right in the browser. Great for testing game mechanics, interactive training, or giving stakeholders something tangible to click.",
   },
 ] as const;
 
 export const servicesFaqs = [
   {
-    question: "What do you actually do for clients?",
+    question: "How do we kick things off?",
     answer:
-      "Build software, advise on architecture, or ship a prototype. Most of my depth is web product work, K–12 edtech, and simulation-style apps.",
+      "Email abuhl@classquip.com or call 865.441.5476. You don't need a formal RFP—just a few sentences about the problem you're solving and when you need it done.",
   },
   {
-    question: "Where are you based?",
-    answer: `${siteConfig.location}. Remote is normal; local meetings in East Tennessee when it helps.`,
-  },
-  {
-    question: "How do we start?",
-    answer: `Email ${servicesContact.email} or call ${servicesContact.phoneDisplay}. A few sentences on what you need and your timeline is enough.`,
-  },
-  {
-    question: "Full-time hire?",
+    question: "Are you open to full-time roles?",
     answer:
-      "Usually project or retainer work. Email me with what you need and we can see if timing fits.",
+      "I focus on project-based and retainer work, though I'm always open to hearing about interesting problems.",
+  },
+  {
+    question: "Do we have to meet in person?",
+    answer:
+      "No, I work remotely with teams across the US. If you're in East Tennessee, happy to grab coffee.",
   },
 ] as const;
 
