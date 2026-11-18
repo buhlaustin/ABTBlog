@@ -106,6 +106,7 @@ export type QuickFact = {
 
 export const quickFacts: QuickFact[] = [
   { label: "Based in", value: "Knoxville, TN" },
+  { label: "Born", value: "June 5, 1998" },
   {
     label: "Focus",
     value: "Edtech integrations, web, Android (Studio/SDK), real-time",
