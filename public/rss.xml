@@ -6,6 +6,14 @@
     <description>Writing on software engineering, edtech, personal browser projects, and life as a founder.</description>
     
     <item>
+      <title>Your LTI 1.3 Launch Works in the Sandbox and Fails on District Devices</title>
+      <link>https://austinbuhltech.com/blog/lti-launch-cookies-district-devices/</link>
+      <guid>https://austinbuhltech.com/blog/lti-launch-cookies-district-devices/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 GMT</pubDate>
+      <description>Why the OIDC state cookie breaks LTI 1.3 launches inside LMS iframes on iPads and managed Chromebooks, and the fallback chain that keeps the launch working.</description>
+      <author>Austin Buhl</author>
+    </item>
+    <item>
       <title>From Prototype to Production in the Browser</title>
       <link>https://austinbuhltech.com/blog/prototype-to-production-in-the-browser/</link>
       <guid>https://austinbuhltech.com/blog/prototype-to-production-in-the-browser/</guid>
