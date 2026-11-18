@@ -8,7 +8,12 @@ import {
   siteConfig,
   ventures,
 } from "@/lib/profile";
-import { focusAreas, resumeGroups } from "@/lib/resume";
+import { BookCallButton } from "@/components/book-call-button";
+import {
+  EARLIER_COMMUNITY_GROUP_NAME,
+  focusAreas,
+  resumeGroups,
+} from "@/lib/resume";
 import { workItems } from "@/lib/work-registry";
 import { Reveal } from "@/components/reveal";
 import { WorkCard } from "@/components/work-card";
@@ -53,6 +58,12 @@ function AboutSection({
 
 export default function AboutPage() {
   const featuredWork = workItems.filter((item) => item.featured);
+  const primaryResumeGroups = resumeGroups.filter(
+    (group) => group.name !== EARLIER_COMMUNITY_GROUP_NAME,
+  );
+  const earlierCommunityGroup = resumeGroups.find(
+    (group) => group.name === EARLIER_COMMUNITY_GROUP_NAME,
+  );
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-safe py-10 sm:py-16">
@@ -83,7 +94,16 @@ export default function AboutPage() {
                 <span className="font-semibold text-foreground">
                   {pillar.label}:
                 </span>{" "}
-                <span className="text-muted">{pillar.body}</span>
+                {"href" in pillar && pillar.href ? (
+                  <Link
+                    href={pillar.href}
+                    className="text-muted underline-offset-2 hover:text-accent hover:underline"
+                  >
+                    {pillar.body}
+                  </Link>
+                ) : (
+                  <span className="text-muted">{pillar.body}</span>
+                )}
               </li>
             ))}
           </ul>
@@ -137,7 +157,28 @@ export default function AboutPage() {
 
         <AboutSection title="Experience">
           <div className="text-foreground">
-            <ResumeTimeline groups={resumeGroups} />
+            <ResumeTimeline groups={primaryResumeGroups} />
+            {earlierCommunityGroup ? (
+              <details className="group mt-10 rounded-xl border border-border bg-surface open:bg-white open:shadow-sm">
+                <summary className="font-display cursor-pointer list-none rounded-xl px-5 py-4 text-lg font-bold tracking-tight text-foreground marker:content-none [&::-webkit-details-marker]:hidden">
+                  <span className="flex items-center justify-between gap-2">
+                    Earlier and community
+                    <span
+                      className="text-sm font-normal text-muted transition group-open:rotate-180"
+                      aria-hidden
+                    >
+                      ↓
+                    </span>
+                  </span>
+                </summary>
+                <div className="border-t border-border px-5 pb-5 pt-2">
+                  <ResumeTimeline
+                    groups={[earlierCommunityGroup]}
+                    hideGroupHeadings
+                  />
+                </div>
+              </details>
+            ) : null}
           </div>
         </AboutSection>
 
@@ -238,6 +279,9 @@ export default function AboutPage() {
         </AboutSection>
 
         <AboutSection title="Contact">
+          <div className="not-prose mb-4">
+            <BookCallButton />
+          </div>
           <p>
             <a
               href={`mailto:${profile.email}`}

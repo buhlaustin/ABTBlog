@@ -1,10 +1,24 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BookCallButton } from "@/components/book-call-button";
 import { JsonLd } from "@/components/json-ld";
 import { MarkdownContent } from "@/components/markdown-content";
 import { PostAuthorCard } from "@/components/post-author-card";
 import { getAllPostSlugs, getPostBySlug } from "@/lib/blog";
 import { articleJsonLd, pageMetadata } from "@/lib/seo";
+
+const EDTECH_CONVERSION_TAGS = [
+  "edtech",
+  "lti",
+  "oneroster",
+  "integrations",
+  "consulting",
+] as const;
+
+function postShowsEdtechCta(tags: string[]): boolean {
+  const normalized = new Set(tags.map((tag) => tag.toLowerCase()));
+  return EDTECH_CONVERSION_TAGS.some((tag) => normalized.has(tag));
+}
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -70,6 +84,23 @@ export default async function BlogPostPage({ params }: PageProps) {
         <div className="mt-8">
           <MarkdownContent content={post.content} />
         </div>
+        {postShowsEdtechCta(post.tags) ? (
+          <aside className="lift-card mt-10 rounded-2xl border border-border bg-surface-raised p-6 sm:p-8">
+            <p className="text-sm leading-relaxed text-muted">
+              Working through an LTI or rostering problem right now? I do this
+              as fixed-scope sprints and monthly retainers.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              <Link
+                href="/services/lti-oneroster-integration-sprint/"
+                className="text-sm font-semibold text-accent hover:text-blue-700"
+              >
+                LTI 1.3 + OneRoster Integration Sprint →
+              </Link>
+              <BookCallButton variant="secondary" />
+            </div>
+          </aside>
+        ) : null}
         <aside
           aria-labelledby="about-author-heading"
           className="mt-12 border-t border-border/80 pt-10"

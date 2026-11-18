@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/blog";
+import { getAllCaseStudies } from "@/lib/case-studies";
+import { getAllServiceOfferSlugs } from "@/lib/services";
 import { siteConfig } from "@/lib/site";
 import { workItems } from "@/lib/work-registry";
 
@@ -17,9 +19,39 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    {
+      url: `${siteConfig.url}/contact/`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${siteConfig.url}/case-studies/`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
     { url: `${siteConfig.url}/blog/`, lastModified, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteConfig.url}/work/`, lastModified, changeFrequency: "weekly", priority: 0.9 },
   ];
+
+  const offerPages: MetadataRoute.Sitemap = getAllServiceOfferSlugs().map(
+    (slug) => ({
+      url: `${siteConfig.url}/services/${slug}/`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    }),
+  );
+
+  const caseStudies: MetadataRoute.Sitemap = getAllCaseStudies().map(
+    (study) => ({
+      url: `${siteConfig.url}/case-studies/${study.slug}/`,
+      lastModified: new Date(study.date),
+      changeFrequency: "monthly" as const,
+      priority: study.featured ? 0.85 : 0.75,
+    }),
+  );
 
   const posts: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
     url: `${siteConfig.url}/blog/${post.slug}/`,
@@ -35,5 +67,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: item.featured ? 0.85 : 0.65,
   }));
 
-  return [...staticRoutes, ...posts, ...work];
+  return [
+    ...staticRoutes,
+    ...offerPages,
+    ...caseStudies,
+    ...posts,
+    ...work,
+  ];
 }
