@@ -1,14 +1,24 @@
 import type { ResumeGroup } from "@/lib/resume";
 
-export function ResumeTimeline({ groups }: { groups: ResumeGroup[] }) {
+export function ResumeTimeline({
+  groups,
+  hideGroupHeadings,
+}: {
+  groups: ResumeGroup[];
+  hideGroupHeadings?: boolean;
+}) {
   return (
     <div className="space-y-10">
       {groups.map((group) => (
         <div key={group.name}>
-          <h3 className="font-display text-lg font-bold tracking-tight text-foreground">
-            {group.name}
-          </h3>
-          <ul className="mt-5 list-none space-y-8 pl-0">
+          {hideGroupHeadings ? null : (
+            <h3 className="font-display text-lg font-bold tracking-tight text-foreground">
+              {group.name}
+            </h3>
+          )}
+          <ul
+            className={`${hideGroupHeadings ? "mt-0" : "mt-5"} list-none space-y-8 pl-0`}
+          >
             {group.roles.map((role) => (
               <li
                 key={`${group.name}-${role.organization}-${role.title}`}

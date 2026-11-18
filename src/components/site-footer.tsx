@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { profile } from "@/lib/profile";
+import { servicesContact } from "@/lib/services";
 import { siteConfig } from "@/lib/site";
 
 export function SiteFooter() {
@@ -8,8 +11,27 @@ export function SiteFooter() {
           © {new Date().getFullYear()} {siteConfig.name}
         </p>
         <p className="flex flex-wrap gap-x-5 gap-y-1">
-          <a href="/services/" className="transition hover:text-accent">
+          <a
+            href={servicesContact.bookingUrl}
+            className="transition hover:text-accent"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Book a call
+          </a>
+          <Link href="/services/" className="transition hover:text-accent">
             Services
+          </Link>
+          <Link href="/contact/" className="transition hover:text-accent">
+            Contact
+          </Link>
+          <a
+            href={profile.linkedIn}
+            className="transition hover:text-accent"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            LinkedIn
           </a>
           <a
             href={siteConfig.github}
