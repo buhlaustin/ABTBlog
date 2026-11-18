@@ -22,7 +22,8 @@ export function BookCallButton({
       rel="noopener noreferrer"
       className={`${variant === "primary" ? primaryClass : secondaryClass} ${className}`.trim()}
     >
-      {servicesContact.bookingLabel}
+      <span className="sm:hidden">Book call</span>
+      <span className="hidden sm:inline">{servicesContact.bookingLabel}</span>
     </a>
   );
 }

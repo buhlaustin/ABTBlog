@@ -13,7 +13,7 @@ export const metadata = pageMetadata({
 
 export default function WorkIndexPage() {
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-safe py-10 sm:py-16">
+    <main className="mx-auto w-full max-w-5xl flex-1 px-safe py-7 sm:py-16">
       <Reveal when="mount">
         <p className="font-mono text-xs uppercase tracking-wider text-muted">
           Client and company work

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookCallButton } from "@/components/book-call-button";
+import { MobileEmailButton } from "@/components/mobile-email-button";
 import { JsonLd } from "@/components/json-ld";
 import { Reveal } from "@/components/reveal";
 import {
@@ -61,7 +62,7 @@ export default function ServicesPage() {
           { name: "Services", path: "/services/" },
         ])}
       />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-safe py-10 sm:py-16">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-safe py-7 sm:py-16">
         <header>
           <Reveal when="mount">
             <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -95,7 +96,7 @@ export default function ServicesPage() {
             <ul className="list-none space-y-4 pl-0">
               {serviceOffers.map((offer, index) => (
                 <Reveal key={offer.slug} delayMs={index * 60}>
-                  <li className="lift-card rounded-2xl border border-border bg-white p-6 shadow-sm">
+                  <li className="lift-card rounded-2xl border border-border bg-white p-4 shadow-sm sm:p-6">
                     <h3 className="font-display text-lg font-bold tracking-tight text-foreground">
                       {offer.name}
                     </h3>
@@ -111,14 +112,17 @@ export default function ServicesPage() {
                     <p className="mt-0.5 text-sm font-semibold text-foreground">
                       {offer.price}
                     </p>
-                    <div className="mt-4 flex flex-wrap items-center gap-4">
+                    <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                       <Link
                         href={`/services/${offer.slug}/`}
-                        className="text-sm font-semibold text-accent hover:text-blue-700"
+                        className="inline-flex min-h-10 items-center text-sm font-semibold text-accent hover:text-blue-700"
                       >
                         Details →
                       </Link>
-                      <BookCallButton variant="secondary" />
+                      <BookCallButton
+                        variant="secondary"
+                        className="hidden sm:inline-flex"
+                      />
                     </div>
                   </li>
                 </Reveal>
@@ -203,7 +207,7 @@ export default function ServicesPage() {
           <Reveal>
             <section
               id="contact"
-              className="lift-card mt-12 rounded-2xl border border-border bg-surface-raised px-6 py-8 text-center sm:px-10 sm:py-10"
+              className="lift-card mt-10 rounded-2xl border border-border bg-surface-raised px-4 py-6 text-center sm:mt-12 sm:px-10 sm:py-10"
             >
               <h2 className="font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl">
                 Tell me what&apos;s stuck
@@ -212,14 +216,9 @@ export default function ServicesPage() {
                 A few sentences is plenty: your product, the districts or LMSs
                 involved, and your deadline. No RFP needed.
               </p>
-              <div className="cta-mobile-stack mx-auto mt-6 max-w-sm sm:max-w-none sm:justify-center">
+              <div className="cta-mobile-stack mx-auto mt-5 justify-center sm:mt-6">
                 <BookCallButton />
-                <a
-                  href={`mailto:${servicesContact.email}`}
-                  className="btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface sm:w-auto"
-                >
-                  Email me
-                </a>
+                <MobileEmailButton />
                 <a
                   href={`tel:${servicesContact.phoneTel}`}
                   className="btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface sm:w-auto"

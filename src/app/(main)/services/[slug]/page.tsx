@@ -40,7 +40,7 @@ export default async function ServiceOfferPage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={serviceOfferJsonLd(offer)} />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-safe py-10 sm:py-16">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-safe py-7 sm:py-16">
         <Link
           href="/services/"
           className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:text-blue-700"

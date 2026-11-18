@@ -20,7 +20,7 @@ export function SiteLogo({ variant = "header", className = "" }: SiteLogoProps) 
       className={
         isHero
           ? `h-auto w-full max-w-[min(100%,20rem)] sm:max-w-md ${className}`
-          : `h-8 w-auto max-w-[min(55vw,11rem)] sm:h-10 sm:max-w-none ${className}`
+          : `h-7 w-auto max-w-[9.5rem] sm:h-10 sm:max-w-none ${className}`
       }
     />
   );

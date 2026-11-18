@@ -6,11 +6,11 @@ import { siteConfig } from "@/lib/site";
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-border/60">
-      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-safe pb-safe pt-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto flex max-w-5xl flex-col gap-4 px-safe pb-safe pt-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:pt-10">
         <p>
           © {new Date().getFullYear()} {siteConfig.name}
         </p>
-        <p className="flex flex-wrap gap-x-5 gap-y-1">
+        <p className="flex flex-wrap gap-x-4 gap-y-2 sm:gap-x-5 sm:gap-y-1">
           <a
             href={servicesContact.bookingUrl}
             className="transition hover:text-accent"

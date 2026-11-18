@@ -59,7 +59,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={jsonLd} />
-    <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-10 sm:py-16">
+    <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-7 sm:py-16">
       <Link
         href="/blog/"
         className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:text-blue-700 active:text-blue-800"

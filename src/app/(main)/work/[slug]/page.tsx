@@ -35,7 +35,7 @@ function ExternalWorkDetail({ item }: { item: WorkItem }) {
   const extra = getWorkMarkdown(item.slug);
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-10 sm:py-16">
+    <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-7 sm:py-16">
       <Link
         href="/work/"
         className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:text-blue-700 active:text-blue-800"

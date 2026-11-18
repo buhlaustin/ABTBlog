@@ -14,7 +14,7 @@ export default function BlogIndexPage() {
   const posts = getAllPosts();
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-10 sm:py-16">
+    <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-7 sm:py-16">
       <Reveal when="mount">
         <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
           Blog

@@ -67,7 +67,7 @@ export default function AboutPage() {
   );
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-safe py-10 sm:py-16">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-safe py-7 sm:py-16">
       <Reveal when="mount">
       <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
         <Image

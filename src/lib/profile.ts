@@ -67,6 +67,8 @@ export const profile = {
     headline: "I make edtech products work inside school districts.",
     lead:
       "LTI 1.3 launches that don't break mid-lesson. Roster sync that matches what the SIS actually sent. Live video that holds up behind district firewalls and on budget Chromebooks. I built these systems for ClassQuip, and before that I spent years at Stride supporting virtual schools on Canvas, Brightspace, Clever, ClassLink, and PowerSchool.",
+    leadMobile:
+      "I fix LTI 1.3, rostering, and live video in districts—and take web and Android product work for other teams when that is the job.",
   } as const,
   /** About page header — longer than homepage hero. */
   about: {
