@@ -4,7 +4,7 @@ export const servicesContact = {
   email: profile.email,
   phoneDisplay: "865.441.5476",
   phoneTel: "+18654415476",
-  bookingUrl: "[BOOKING_URL]",
+  bookingUrl: "https://calendar.app.google/CUc5tzMPk5HLYCeC7",
   bookingLabel: "Book a 20-minute call",
 } as const;
 
@@ -57,10 +57,10 @@ export const serviceOffers: readonly ServiceOffer[] = [
       "60-minute walkthrough with your team",
       "Rough estimate for each fix",
     ],
-    timeframe: "[confirm] 2 weeks",
-    price: "[PRICE]",
+    timeframe: "2 weeks",
+    price: "$7,500",
     priceNote:
-      "Fixed fee. [confirm] Credited toward an Integration Sprint if you start within 30 days.",
+      "Fixed fee. Credited in full toward an Integration Sprint if you start within 30 days of the audit report.",
     cta: "Book a 20-minute call",
     seoTitle: "District-Readiness Audit for EdTech Products",
     seoDescription:
@@ -78,7 +78,7 @@ export const serviceOffers: readonly ServiceOffer[] = [
       "LTI 1.3 tool launch (OIDC login, JWT validation, deployments, deep linking as needed)",
       "LTI Advantage services in scope: Names and Roles, Assignment and Grade Services",
       "OneRoster rostering sync with drift and late-roster handling, plus Clever/ClassLink if your districts use them",
-      "Testing against [LMS_LIST] sandboxes",
+      "Testing against Canvas, Brightspace, and Moodle sandboxes (plus your target LMS when you name one in scope)",
       "Weekly demo and written status",
     ],
     deliverables: [
@@ -87,8 +87,8 @@ export const serviceOffers: readonly ServiceOffer[] = [
       "Runbook for your support team",
       "Handoff session with your engineers",
     ],
-    timeframe: "[confirm] 6 weeks",
-    price: "[PRICE]",
+    timeframe: "6 weeks",
+    price: "$48,000",
     priceNote: "Fixed scope, agreed in writing before we start.",
     cta: "Book a 20-minute call",
     seoTitle: "LTI 1.3 + OneRoster Integration Sprint for EdTech Teams",
@@ -104,18 +104,18 @@ export const serviceOffers: readonly ServiceOffer[] = [
     idealFor:
       "Teams with live district customers who need integrations kept healthy and new ones shipped.",
     includes: [
-      "[confirm] [HOURS_OR_DAYS] per month of hands-on engineering",
+      "2 days (about 16 hours) per month of hands-on engineering",
       "Ownership of LMS, rostering, and SSO integrations",
       "Escalation help when a district's IT team reports a problem",
       "Architecture and code review for your team",
-      "Priority availability in back-to-school windows [confirm]",
+      "Priority scheduling July through September for active retainer clients",
     ],
     deliverables: [
       "Monthly written summary of shipped work and open risks",
-      "Shared channel with a [RESPONSE_TIME] response target on business days",
+      "Shared channel with a same-business-day response target on urgent district escalations",
     ],
-    timeframe: "Monthly, [confirm] 3-month minimum",
-    price: "[PRICE]/month",
+    timeframe: "Monthly, 3-month minimum",
+    price: "$12,000/month",
     priceNote: "Billed monthly in advance. Limited to a few clients at a time.",
     cta: "Book a 20-minute call",
     seoTitle: "Fractional EdTech Engineering Retainer",
@@ -136,7 +136,7 @@ export function getAllServiceOfferSlugs(): string[] {
 
 export const serviceProcess = [
   "20-minute call: you tell me what's blocking the deal.",
-  "Written scope and fixed price within [confirm] 2 business days.",
+  "Written scope and fixed price within 2 business days.",
   "Work happens in your repo, with weekly demos.",
   "Handoff with docs your team and district admins can use.",
 ] as const;
@@ -207,7 +207,7 @@ export const servicesFaqs = [
   {
     question: "How soon can you start?",
     answer:
-      "Usually within [START_WINDOW]. Retainer spots are limited, so ask early if you have a back-to-school or pilot deadline.",
+      "Usually within 48 hours for audits and sprints once scope is clear. Retainer spots are limited, so ask early if you have a back-to-school or pilot deadline.",
   },
   {
     question: "Who owns the code?",
@@ -217,7 +217,7 @@ export const servicesFaqs = [
   {
     question: "Which LMS and SIS platforms have you worked with?",
     answer:
-      "Canvas, Brightspace, Clever, ClassLink, and PowerSchool from my years supporting virtual schools at Stride, plus LTI 1.3 Advantage and OneRoster in ClassQuip. [ADD_OTHERS]",
+      "Canvas, Brightspace, Clever, ClassLink, PowerSchool, Engageli, and Newrow from my years supporting virtual schools at Stride, plus LTI 1.3 Advantage and OneRoster in ClassQuip. Moodle and Google Classroom LTI launches come up often in RFP language—I test against Moodle in sprint work and can extend to others when your pipeline requires it.",
   },
   {
     question: "Are you open to full-time roles?",
