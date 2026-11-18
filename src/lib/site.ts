@@ -4,7 +4,7 @@ export const siteConfig = {
   defaultTitle: "Austin Buhl — Software Engineer & Founder",
   /** Appended by root layout for inner pages: `%s · Austin Buhl`. */
   description:
-    "Software engineer and founder in Knoxville, TN. ClassQuip (K–12 edtech), Novux Games (Dynasty: College Basketball on Android), plus personal projects and open source.",
+    "Software engineer and founder in Knoxville, TN. I build LTI 1.3, OneRoster, and real-time classroom systems for edtech teams. Co-founder of ClassQuip, founder of Novux Games.",
   url: "https://austinbuhltech.com",
   locale: "en_US",
   github: "https://github.com/buhlaustin",
@@ -16,7 +16,7 @@ export const siteConfig = {
   favicon: "/ab-favicon.svg",
   ogImage: "/social-open-graph.png",
   ogImageAlt:
-    "Austin Buhl — software engineer and founder (ClassQuip, Novux Games) in Knoxville, TN",
+    "Austin Buhl — edtech integration engineer for LTI 1.3, OneRoster, and WebRTC classroom systems in Knoxville, TN",
   rss: {
     channelTitle: "Austin Buhl",
     channelDescription:

@@ -37,6 +37,8 @@ export const focusAreas = [
   },
 ] as const;
 
+export const EARLIER_COMMUNITY_GROUP_NAME = "Community operations & leadership";
+
 export const resumeGroups: ResumeGroup[] = [
   {
     name: "Executive & founder leadership",
@@ -127,7 +129,7 @@ export const resumeGroups: ResumeGroup[] = [
     ],
   },
   {
-    name: "Community operations & leadership",
+    name: EARLIER_COMMUNITY_GROUP_NAME,
     roles: [
       {
         title: "Regional Registrar",

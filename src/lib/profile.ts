@@ -63,19 +63,14 @@ export const profile = {
   email: "abuhl@classquip.com",
   /** Homepage hero only. */
   hero: {
-    tagline: "Software engineer & founder · Knoxville, TN",
+    tagline: "Software engineer & founder · Knoxville, TN · Remote US",
+    headline: "I make edtech products work inside school districts.",
     lead:
-      "By day, I architect real-time classroom software at ClassQuip and possession-level sports engines at Novux Games. By night, I ship playable browser simulations and relativistic physics code.",
-    support: {
-      before: "Available for select ",
-      linkLabel: "contract engineering & technical consulting",
-      after: ".",
-    },
-    sideProjectsCta: "Play the Demos",
+      "LTI 1.3 launches that don't break mid-lesson. Roster sync that matches what the SIS actually sent. Live video that holds up behind district firewalls and on budget Chromebooks. I built these systems for ClassQuip, and before that I spent years at Stride supporting virtual schools on Canvas, Brightspace, Clever, ClassLink, and PowerSchool.",
   } as const,
   /** About page header — longer than homepage hero. */
   about: {
-    tagline: "Builder & Software Engineer • Knoxville, TN",
+    tagline: "Software engineer & founder · Knoxville, TN",
     headline:
       "Co-Founder & CEO of ClassQuip and founder of Novux Games.",
     intro:
@@ -86,11 +81,16 @@ export const profile = {
         body: "Custom classroom engine built from scratch using low-latency WebRTC on AWS, streamlined educator workflows, and full interoperability (LTI 1.3, OneRoster).",
       },
       {
+        label: "Consulting",
+        body: "Integration sprints, audits, and retainers for edtech teams.",
+        href: "/services/",
+      },
+      {
         label: "Novux Games",
         body: `Developing ${novuxFlagship.name}, an upcoming ${novuxFlagship.pitch} for ${novuxFlagship.platform}.`,
       },
       {
-        label: "Personal Lab (Work)",
+        label: "Personal Lab",
         body: "Independent browser experiments and open-source builds like House of Strategy and Startup Simulator—built independently of studio releases.",
       },
     ],
@@ -103,10 +103,9 @@ export type QuickFact = {
 };
 
 export const quickFacts: QuickFact[] = [
-  { label: "Born", value: "June 5, 1998" },
-  { label: "Sign", value: "Gemini" },
   { label: "Based in", value: "Knoxville, TN" },
-  { label: "Politics", value: "Independent" },
+  { label: "Focus", value: "LTI 1.3, OneRoster, WebRTC for edtech" },
+  { label: "Consulting", value: "Sprints and retainers, remote US" },
   { label: "ClassQuip", value: ventures.classQuip.role },
   { label: "Novux Games", value: ventures.novuxGames.role },
 ];

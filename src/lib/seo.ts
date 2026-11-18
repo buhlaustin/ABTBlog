@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { ventures } from "@/lib/profile";
+import type { ServiceOffer } from "@/lib/services";
 import {
   serviceGeo,
-  serviceOfferings,
+  serviceOffers,
   servicesContact,
-  servicesFaqs,
   servicesPageSeo,
   servicesSchema,
 } from "@/lib/services";
@@ -123,8 +123,20 @@ export function personJsonLd() {
     "@type": "Person",
     name: siteConfig.name,
     url: siteConfig.url,
-    jobTitle: "Founder & Software Engineer",
+    jobTitle: "EdTech Integration Engineer & Founder",
     description: siteConfig.description,
+    knowsAbout: [
+      "LTI 1.3",
+      "LTI Advantage",
+      "OneRoster",
+      "Clever",
+      "ClassLink",
+      "WebRTC",
+      "Next.js",
+      "TypeScript",
+      "Node.js",
+      "AWS",
+    ],
     address: {
       "@type": "PostalAddress",
       addressLocality: "Knoxville",
@@ -231,17 +243,19 @@ export function technicalServicesJsonLd() {
       {
         "@type": "ProfessionalService",
         "@id": `${pageUrl}#service`,
-        name: `${siteConfig.name} — ${servicesPageSeo.h1}`,
+        name: "Austin Buhl: EdTech Integration and Real-Time Engineering",
         alternateName: [
+          "LTI 1.3 developer",
+          "OneRoster integration consultant",
+          "EdTech integration consultant",
           "Knoxville software consultant",
-          "Freelance software developer Knoxville TN",
         ],
         url: pageUrl,
         image: absoluteUrl(siteConfig.ogImage),
         description: servicesPageSeo.metaDescription,
         telephone: servicesContact.phoneTel,
         email: servicesContact.email,
-        priceRange: "$$",
+        priceRange: "$$$",
         serviceType: [...servicesSchema.serviceTypes],
         areaServed: [
           { "@type": "Country", name: "United States" },
@@ -274,7 +288,7 @@ export function technicalServicesJsonLd() {
           "@type": "Person",
           name: siteConfig.name,
           url: siteConfig.url,
-          jobTitle: "Software Engineer & Founder",
+          jobTitle: "EdTech Integration Engineer & Founder",
           knowsAbout: [...servicesSchema.knowsAbout],
           sameAs: [
             siteConfig.github,
@@ -284,20 +298,76 @@ export function technicalServicesJsonLd() {
         },
         hasOfferCatalog: {
           "@type": "OfferCatalog",
-          name: "Technical services",
-          itemListElement: serviceOfferings.map((offering, index) => ({
-            "@type": "Offer",
-            position: index + 1,
-            itemOffered: {
-              "@type": "Service",
-              name: offering.name,
-              description: offering.summary,
-              areaServed: "United States",
-            },
-          })),
+          name: "EdTech integration offers",
+          itemListElement: serviceOffers.map((offering, index) => {
+            const offer: Record<string, unknown> = {
+              "@type": "Offer",
+              position: index + 1,
+              itemOffered: {
+                "@type": "Service",
+                name: offering.name,
+                description: offering.oneLiner,
+                url: absoluteUrl(`/services/${offering.slug}/`),
+                areaServed: "United States",
+              },
+            };
+            if (!offering.price.includes("[")) {
+              offer.priceSpecification = {
+                "@type": "PriceSpecification",
+                price: offering.price,
+              };
+            }
+            return offer;
+          }),
         },
       },
     ],
+  };
+}
+
+export function serviceOfferJsonLd(offer: ServiceOffer) {
+  const pageUrl = absoluteUrl(`/services/${offer.slug}/`);
+  const graph: Record<string, unknown>[] = [
+    {
+      "@type": "Service",
+      "@id": `${pageUrl}#service`,
+      name: offer.name,
+      description: offer.oneLiner,
+      url: pageUrl,
+      provider: {
+        "@type": "Person",
+        name: siteConfig.name,
+        url: siteConfig.url,
+      },
+      areaServed: "United States",
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: siteConfig.url,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Services",
+          item: absoluteUrl("/services/"),
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: offer.name,
+          item: pageUrl,
+        },
+      ],
+    },
+  ];
+  return {
+    "@context": "https://schema.org",
+    "@graph": graph,
   };
 }
 
