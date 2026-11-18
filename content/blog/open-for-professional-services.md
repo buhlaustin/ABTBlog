@@ -14,7 +14,9 @@ tags:
 
 I’m taking on a few select software consulting projects and retainers. If you need a senior engineer to build a product from scratch, untangle a messy codebase, or sanity-check your architecture, I have bandwidth to jump in—in person around Knoxville, TN, or remotely anywhere in the US.
 
-When I’m not building my own products at ClassQuip and Novux Games, I like helping other teams ship hard technical work.
+Alongside ClassQuip and Novux Games, I take on a small number of edtech teams who need integrations and real-time systems done right.
+
+For packaged work, see the [District-Readiness Audit](/services/district-readiness-audit/), [LTI 1.3 + OneRoster Integration Sprint](/services/lti-oneroster-integration-sprint/), and [Fractional EdTech Engineering Retainer](/services/fractional-edtech-engineering-retainer/) pages—or the full [services overview](/services/).
 
 ## What I build
 

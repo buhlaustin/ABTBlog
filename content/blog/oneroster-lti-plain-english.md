@@ -97,3 +97,5 @@ If you’re integrating an LMS for the first time, read the specs—but spend eq
 - [OneRoster® specification](https://www.imsglobal.org/activity/onerosterlis)
 
 If you want a follow-up post on a specific LMS (Canvas vs. Brightspace launch quirks) or a deep dive on NRPS vs. bulk OneRoster sync strategies, say which district shape you care about—charter single-tenant vs. large multi-district SSO—and I’ll write to that.
+
+If you need this built in your product, see the [LTI 1.3 + OneRoster Integration Sprint](/services/lti-oneroster-integration-sprint/) and [District-Readiness Audit](/services/district-readiness-audit/) offers.
