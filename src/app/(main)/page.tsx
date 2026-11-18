@@ -1,21 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getAllPosts, getPostBySlug } from "@/lib/blog";
-import { getAllCaseStudies } from "@/lib/case-studies";
 import { BookCallButton } from "@/components/book-call-button";
 import { JsonLd } from "@/components/json-ld";
 import { profile, siteConfig } from "@/lib/profile";
 import { pageMetadata, personJsonLd } from "@/lib/seo";
-import { serviceOffers, servicesContact } from "@/lib/services";
-import { workItems } from "@/lib/work-registry";
+import { offerPriceKind, serviceOffers, servicesContact } from "@/lib/services";
 import { Reveal } from "@/components/reveal";
-import { WorkCard } from "@/components/work-card";
 
 export const metadata = pageMetadata({
   title:
     "Austin Buhl · LTI 1.3, OneRoster and WebRTC engineer for edtech teams",
   description:
-    "I help edtech companies pass district IT: LTI 1.3 launches, OneRoster and Clever/ClassLink rostering, and live video that holds up on school networks. Fixed-scope sprints and monthly retainers. Knoxville, TN, remote US.",
+    "Edtech integrations and senior product engineering: LTI 1.3, OneRoster, WebRTC, web, and Android. Fixed sprints and retainers. Knoxville, remote US.",
   path: "/",
   absoluteTitle: true,
 });
@@ -35,57 +31,7 @@ const whereIHelp = [
   },
 ] as const;
 
-const proofPostSlugs = [
-  "oneroster-lti-plain-english",
-  "live-class-attendance-is-a-clock-problem",
-] as const;
-
-function PlayStartupSimBanner() {
-  return (
-    <Link
-      href="/work/startup-sim/"
-      className="group lift-card relative block overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-7 text-white shadow-lg transition hover:border-zinc-600 sm:px-8 sm:py-10"
-    >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-40"
-        aria-hidden
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 100% 0%, rgba(52, 211, 153, 0.35), transparent 55%), radial-gradient(ellipse 60% 50% at 0% 100%, rgba(37, 99, 235, 0.35), transparent 50%)",
-        }}
-      />
-      <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="max-w-xl">
-          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.25em] text-emerald-300/90">
-            Playable in the browser
-          </p>
-          <h2 className="font-display mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            Startup Simulator
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-400 sm:text-base">
-            Take a company from a garage to an IPO. Manage cap tables, survive AI
-            news cycles, and fend off your board in Career or Sandbox mode.
-          </p>
-        </div>
-        <span className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition group-hover:bg-emerald-50 sm:w-auto">
-          Play now
-          <span aria-hidden className="transition group-hover:translate-x-0.5">
-            →
-          </span>
-        </span>
-      </div>
-    </Link>
-  );
-}
-
 export default function HomePage() {
-  const featuredWork = workItems.filter((item) => item.featured);
-  const otherFeatured = featuredWork.filter((item) => item.slug !== "startup-sim");
-  const latestPost = getAllPosts()[0];
-  const featuredCaseStudy = getAllCaseStudies().find((s) => s.featured);
-  const proofPosts = proofPostSlugs
-    .map((slug) => getPostBySlug(slug))
-    .filter((post): post is NonNullable<typeof post> => Boolean(post));
   const { hero } = profile;
 
   return (
@@ -176,13 +122,9 @@ export default function HomePage() {
                 Where I help
               </h2>
             </Reveal>
-            <div className="mobile-snap-row mt-6 md:grid md:grid-cols-3 md:gap-4">
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {whereIHelp.map((pillar, index) => (
-                <Reveal
-                  key={pillar.title}
-                  delayMs={index * 70}
-                  className="mobile-snap-card md:w-auto"
-                >
+                <Reveal key={pillar.title} delayMs={index * 70}>
                   <article className="lift-card h-full rounded-2xl border border-border bg-surface p-6">
                     <h3 className="font-display text-lg font-bold tracking-tight text-foreground">
                       {pillar.title}
@@ -216,8 +158,11 @@ export default function HomePage() {
                     <p className="mt-3 font-mono text-xs text-muted">
                       {offer.timeframe}
                     </p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">
-                      From {offer.price}
+                    <p className="mt-1 font-mono text-xs text-muted">
+                      {offerPriceKind(offer.slug)}
+                    </p>
+                    <p className="mt-0.5 text-sm font-semibold text-foreground">
+                      {offer.price}
                     </p>
                     <Link
                       href={`/services/${offer.slug}/`}
@@ -231,110 +176,24 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mb-16">
-            <Reveal>
-              <h2 className="font-display text-2xl font-bold tracking-tight">
-                Proof
-              </h2>
-            </Reveal>
-            <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              {featuredCaseStudy ? (
-                <Reveal>
-                  <article className="lift-card rounded-2xl border border-border bg-white p-6 shadow-sm lg:col-span-2">
-                    <p className="font-mono text-xs uppercase tracking-wider text-muted">
-                      Case study · {featuredCaseStudy.client}
-                    </p>
-                    <h3 className="font-display mt-2 text-xl font-bold tracking-tight">
-                      <Link
-                        href={`/case-studies/${featuredCaseStudy.slug}/`}
-                        className="text-foreground hover:text-accent"
-                      >
-                        {featuredCaseStudy.title}
-                      </Link>
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted">
-                      {featuredCaseStudy.summary}
-                    </p>
-                    <Link
-                      href={`/case-studies/${featuredCaseStudy.slug}/`}
-                      className="mt-4 inline-flex text-sm font-semibold text-accent hover:text-blue-700"
-                    >
-                      Read case study →
-                    </Link>
-                  </article>
-                </Reveal>
-              ) : null}
-              {proofPosts.map((post, index) => (
-                <Reveal key={post.slug} delayMs={index * 50}>
-                  <article className="lift-card rounded-2xl border border-border bg-surface p-5">
-                    <p className="font-mono text-xs uppercase tracking-wider text-muted">
-                      Writing
-                    </p>
-                    <h3 className="font-display mt-2 text-lg font-bold tracking-tight">
-                      <Link
-                        href={`/blog/${post.slug}/`}
-                        className="text-foreground hover:text-accent"
-                      >
-                        {post.title}
-                      </Link>
-                    </h3>
-                  </article>
-                </Reveal>
-              ))}
-            </div>
-          </section>
-
-          <section className="mb-16">
-            <Reveal>
-              <h2 className="font-display text-2xl font-bold tracking-tight">
-                Lab
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm text-muted">
-                Things I build for fun. Browser sims and games you can play
-                without installing anything.
-              </p>
-            </Reveal>
-            <Reveal className="mt-8">
-              <PlayStartupSimBanner />
-            </Reveal>
-            <Reveal className="mb-8 mt-12 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <h3 className="font-display text-lg font-bold tracking-tight">
-                Selected work
-              </h3>
+          <section className="mb-12 border-t border-border pt-10">
+            <Reveal className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
+              <div>
+                <h2 className="font-display text-lg font-bold tracking-tight">
+                  Lab
+                </h2>
+                <p className="mt-1 max-w-xl text-sm text-muted">
+                  Personal browser projects and games I host here—not typical
+                  client work unless you specifically want a prototype.
+                </p>
+              </div>
               <Link
                 href="/work/"
                 className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:text-blue-700"
               >
-                View all →
+                Browse the lab →
               </Link>
             </Reveal>
-            <div className="grid gap-6 sm:grid-cols-2">
-              {otherFeatured.map((item, index) => (
-                <Reveal key={item.slug} delayMs={index * 80}>
-                  <WorkCard item={item} />
-                </Reveal>
-              ))}
-            </div>
-            {latestPost ? (
-              <Reveal className="mt-10">
-                <article className="lift-card rounded-2xl border border-border bg-white p-6 shadow-sm">
-                  <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-                    Latest post
-                  </p>
-                  <h3 className="font-display mt-3 text-xl font-bold tracking-tight">
-                    <Link
-                      href={`/blog/${latestPost.slug}/`}
-                      className="text-foreground hover:text-accent"
-                    >
-                      {latestPost.title}
-                    </Link>
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">
-                    {latestPost.description}
-                  </p>
-                </article>
-              </Reveal>
-            ) : null}
           </section>
 
           <Reveal>

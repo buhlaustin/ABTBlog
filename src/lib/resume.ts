@@ -26,6 +26,11 @@ export const focusAreas = [
       "Real-time systems, scalable classroom infrastructure, LMS integrations",
   },
   {
+    area: "Mobile",
+    detail:
+      "Android Studio, SDK, Gradle, and Play releases—production apps, not throwaway prototypes",
+  },
+  {
     area: "Education",
     detail:
       "K–12 live, hybrid, and remote instruction that keeps students participating",

@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps) {
   if (!study) return {};
   return pageMetadata({
     title: study.title,
-    description: study.summary,
+    description: study.metaDescription,
     path: `/case-studies/${study.slug}/`,
     openGraphType: "article",
     publishedTime: new Date(study.date).toISOString(),
@@ -53,7 +53,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
       <JsonLd
         data={articleJsonLd({
           title: study.title,
-          description: study.summary,
+          description: study.metaDescription,
           path,
           datePublished: new Date(study.date).toISOString(),
           authorName: siteConfig.name,

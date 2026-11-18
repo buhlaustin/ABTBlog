@@ -21,7 +21,8 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "About",
-  description: `About ${siteConfig.name}—builder and software engineer in Knoxville. ClassQuip, Novux Games (Dynasty: College Basketball), and personal Work lab.`,
+  description:
+    "Software engineer and founder in Knoxville. Edtech integrations at ClassQuip; consulting sprints and retainers for edtech and other SaaS teams. Remote US.",
   path: "/about/",
 });
 

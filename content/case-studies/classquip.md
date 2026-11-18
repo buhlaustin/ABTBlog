@@ -12,8 +12,9 @@ stack:
   - OneRoster
   - TypeScript
 summary: Enterprise virtual classroom platform for K-12 districts—custom engine, district-ready auth, rostering, and attendance logging built for filtered networks and audit requests.
+metaDescription: "ClassQuip live classroom: LTI 1.3, OneRoster, WebRTC. 99.1% first-try Canvas/Brightspace launches, ~4s join on school networks. ClassLink partner."
 problem: Districts need live instruction that launches from the LMS, respects roster truth from the SIS, and keeps working on low-bandwidth school networks without fighting browser policies or cookie rules.
-approach: Build a classroom engine from scratch on AWS with low-latency WebRTC, zero-cookie LTI 1.3 Advantage auth, OneRoster interoperability, network fallbacks for constrained environments, and attendance and session logging aligned with what districts ask for in audits. Pilot programs run through the AltaIR Capital AltaLab Fall 2026 cohort with district partners.
+approach: Built a classroom engine from scratch on AWS with low-latency WebRTC, zero-cookie LTI 1.3 Advantage auth, OneRoster interoperability, network fallbacks for constrained environments, and attendance and session logging aligned with what districts ask for in audits. Pilot programs run through the AltaIR Capital AltaLab Fall 2026 cohort with district partners.
 results:
   - "99.1% of LTI launches from Canvas and Brightspace succeed on the first attempt"
   - "Around 4 seconds median time to join a live class on typical school networks"

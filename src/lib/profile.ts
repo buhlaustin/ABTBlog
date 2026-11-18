@@ -104,8 +104,14 @@ export type QuickFact = {
 
 export const quickFacts: QuickFact[] = [
   { label: "Based in", value: "Knoxville, TN" },
-  { label: "Focus", value: "LTI 1.3, OneRoster, WebRTC for edtech" },
-  { label: "Consulting", value: "Sprints and retainers, remote US" },
+  {
+    label: "Focus",
+    value: "Edtech integrations, web, Android (Studio/SDK), real-time",
+  },
+  {
+    label: "Consulting",
+    value: "Sprints and retainers—edtech, SaaS, mobile; remote US",
+  },
   { label: "ClassQuip", value: ventures.classQuip.role },
   { label: "Novux Games", value: ventures.novuxGames.role },
 ];

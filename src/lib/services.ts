@@ -28,13 +28,13 @@ export type ServiceOffer = {
 export const servicesPageSeo = {
   title: "EdTech Integration Consultant: LTI 1.3, OneRoster, WebRTC",
   metaDescription:
-    "Fixed-scope LTI 1.3 and OneRoster integration sprints, district-readiness audits, and fractional edtech engineering retainers. Austin Buhl, Knoxville, TN, remote US.",
-  h1: "Integration and real-time engineering for edtech teams",
+    "LTI 1.3, OneRoster, and WebRTC for edtech teams, plus senior SWE for any SaaS or web product. Fixed audits, integration sprints, monthly retainer. Remote US.",
+  h1: "Integration and production engineering for product teams",
   locationLine: "Knoxville, TN · Remote US",
   lead:
     "Districts buy products that plug into their LMS, sync their rosters, and run on their network. I build that part, so your sales team stops losing deals in IT review.",
   support:
-    "Three ways to work together, from a two-week audit to an ongoing retainer. Other Next.js, Node, AWS, and browser-sim work is welcome too. See the bottom of the page.",
+    "Edtech integrations are my deepest specialty; retainers and other scoped work are open to any industry—SaaS, APIs, real-time apps, and AWS deploys. Three packaged offers below, plus other work at the bottom.",
 } as const;
 
 export const serviceOffers: readonly ServiceOffer[] = [
@@ -64,7 +64,7 @@ export const serviceOffers: readonly ServiceOffer[] = [
     cta: "Book a 20-minute call",
     seoTitle: "District-Readiness Audit for EdTech Products",
     seoDescription:
-      "A hard look at your edtech product before a pilot or district IT review—LTI 1.3, roster sync, live video, and audit-ready logging with a ranked fix list.",
+      "Fixed-fee district-readiness audit: LTI 1.3, roster sync, live video on school networks, and audit logging—ranked fix list before pilot or IT review.",
     relatedWritingPath: "/blog/oneroster-lti-plain-english/",
   },
   {
@@ -93,34 +93,33 @@ export const serviceOffers: readonly ServiceOffer[] = [
     cta: "Book a 20-minute call",
     seoTitle: "LTI 1.3 + OneRoster Integration Sprint for EdTech Teams",
     seoDescription:
-      "Fixed-scope sprint: LTI 1.3 tool launch, LTI Advantage, OneRoster and Clever/ClassLink rostering, tested in your repo and ready for district IT review.",
+      "Six-week fixed-scope sprint: LTI 1.3 launch, LTI Advantage, OneRoster and Clever/ClassLink sync, merged in your repo for district rollout.",
     relatedWritingPath: "/blog/oneroster-lti-plain-english/",
   },
   {
     slug: "fractional-edtech-engineering-retainer",
-    name: "Fractional EdTech Engineering Retainer",
+    name: "Fractional Software Engineering Retainer",
     oneLiner:
-      "A senior engineer who owns your integrations and real-time stack every month, without a full-time hire.",
+      "Senior hands-on engineering each month—edtech integrations, product features, or infrastructure—without a full-time hire.",
     idealFor:
-      "Teams with live district customers who need integrations kept healthy and new ones shipped.",
+      "Teams that need steady senior capacity across integrations, APIs, real-time systems, or production fires.",
     includes: [
-      "2 days (about 16 hours) per month of hands-on engineering",
-      "Ownership of LMS, rostering, and SSO integrations",
-      "Escalation help when a district's IT team reports a problem",
-      "Architecture and code review for your team",
+      "6 days per month (up to 48 hours) of hands-on engineering in your repo",
+      "Edtech: LMS, rostering, SSO, and district escalations when you need that depth",
+      "General: web and Android product work, APIs, AWS, real-time systems, code review, and architecture",
       "Priority scheduling July through September for active retainer clients",
     ],
     deliverables: [
       "Monthly written summary of shipped work and open risks",
-      "Shared channel with a same-business-day response target on urgent district escalations",
+      "Shared channel with a same-business-day response target on urgent production issues",
     ],
     timeframe: "Monthly, 3-month minimum",
     price: "$12,000/month",
     priceNote: "Billed monthly in advance. Limited to a few clients at a time.",
     cta: "Book a 20-minute call",
-    seoTitle: "Fractional EdTech Engineering Retainer",
+    seoTitle: "Fractional Software Engineering Retainer",
     seoDescription:
-      "Monthly retainer: a senior engineer owns LMS integrations, rostering, SSO, and real-time classroom systems for edtech teams with live district customers.",
+      "Monthly retainer: up to 48 hours of senior engineering for edtech integrations or general SaaS and web products. Knoxville, remote US.",
   },
 ] as const;
 
@@ -134,6 +133,15 @@ export function getAllServiceOfferSlugs(): string[] {
   return serviceOffers.map((offer) => offer.slug);
 }
 
+/** Short label shown above the price on offer cards (not a quote prefix). */
+export function offerPriceKind(
+  slug: string,
+): "Fixed fee" | "Fixed scope" | "Monthly" {
+  if (slug === "district-readiness-audit") return "Fixed fee";
+  if (slug === "lti-oneroster-integration-sprint") return "Fixed scope";
+  return "Monthly";
+}
+
 export const serviceProcess = [
   "20-minute call: you tell me what's blocking the deal.",
   "Written scope and fixed price within 2 business days.",
@@ -145,7 +153,7 @@ export const serviceOfferings = [
   {
     name: "Ship Production Software",
     summary:
-      "Next.js and Node web apps through deploy—real-time data, AWS, and legacy stabilization when you need a release.",
+      "Web and mobile through deploy—Next.js, Node, real-time data, Android, AWS, and legacy stabilization when you need a release.",
   },
   {
     name: "Sanity-Check Your Architecture",
@@ -153,9 +161,9 @@ export const serviceOfferings = [
       "System reviews and senior pairing before you commit months to a rewrite or the wrong stack.",
   },
   {
-    name: "Build Interactive Sims & Demos",
+    name: "Android product engineering",
     summary:
-      "Browser TypeScript prototypes for training sims, game mechanics, or stakeholder demos without app-store friction.",
+      "Production Android apps in Android Studio—SDK, Gradle, Play release tracks, and Kotlin/Java—with backends on Node or AWS when you need them.",
   },
 ] as const;
 
@@ -180,7 +188,7 @@ export const serviceTechnologies = [
   "WebRTC & real-time systems",
   "LTI 1.3 · OneRoster · LMS APIs",
   "AWS · Postgres · payments",
-  "Browser games & simulations",
+  "Android · Android Studio / SDK",
 ] as const;
 
 export const servicesFaqs = [
@@ -207,7 +215,7 @@ export const servicesFaqs = [
   {
     question: "How soon can you start?",
     answer:
-      "Usually within 48 hours for audits and sprints once scope is clear. Retainer spots are limited, so ask early if you have a back-to-school or pilot deadline.",
+      "After the intro call I send written scope and fixed pricing within 2 business days. Kickoff is usually within one to two weeks of a signed agreement, depending on calendar and ClassQuip commitments. Retainer spots are limited—ask early for back-to-school or pilot deadlines.",
   },
   {
     question: "Who owns the code?",
@@ -267,6 +275,8 @@ export const servicesSchema = {
     "K-12 rostering",
     "Grade passback",
     "WebRTC",
+    "Android",
+    "Android Studio",
     "SaaS",
     "System architecture",
   ],

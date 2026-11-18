@@ -6,6 +6,7 @@ import { Reveal } from "@/components/reveal";
 import {
   getAllServiceOfferSlugs,
   getServiceOfferBySlug,
+  offerPriceKind,
   servicesContact,
 } from "@/lib/services";
 import { pageMetadata, serviceOfferJsonLd } from "@/lib/seo";
@@ -34,9 +35,7 @@ export default async function ServiceOfferPage({ params }: PageProps) {
   const offer = getServiceOfferBySlug(slug);
   if (!offer) notFound();
 
-  const priceLabel = offer.price.includes("[")
-    ? `From ${offer.price}`
-    : offer.price;
+  const priceKind = offerPriceKind(offer.slug);
 
   return (
     <>
@@ -101,7 +100,9 @@ export default async function ServiceOfferPage({ params }: PageProps) {
               <dt className="font-mono text-xs uppercase tracking-wider text-muted">
                 Investment
               </dt>
-              <dd className="mt-1 text-foreground">{priceLabel}</dd>
+              <dd className="mt-1 text-foreground">
+                {priceKind}: {offer.price}
+              </dd>
               <dd className="mt-2 text-muted">{offer.priceNote}</dd>
             </div>
           </dl>

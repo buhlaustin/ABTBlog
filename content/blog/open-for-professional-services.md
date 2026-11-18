@@ -16,7 +16,7 @@ I’m taking on a few select software consulting projects and retainers. If you 
 
 Alongside ClassQuip and Novux Games, I take on a small number of edtech teams who need integrations and real-time systems done right.
 
-For packaged work, see the [District-Readiness Audit](/services/district-readiness-audit/), [LTI 1.3 + OneRoster Integration Sprint](/services/lti-oneroster-integration-sprint/), and [Fractional EdTech Engineering Retainer](/services/fractional-edtech-engineering-retainer/) pages—or the full [services overview](/services/).
+For packaged work, see the [District-Readiness Audit](/services/district-readiness-audit/), [LTI 1.3 + OneRoster Integration Sprint](/services/lti-oneroster-integration-sprint/), and [Fractional Software Engineering Retainer](/services/fractional-edtech-engineering-retainer/) pages—or the full [services overview](/services/).
 
 ## What I build
 

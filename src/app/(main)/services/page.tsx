@@ -5,6 +5,7 @@ import { Reveal } from "@/components/reveal";
 import {
   serviceAudience,
   serviceOfferings,
+  offerPriceKind,
   serviceOffers,
   serviceProcess,
   serviceTechnologies,
@@ -104,8 +105,11 @@ export default function ServicesPage() {
                     <p className="mt-3 font-mono text-xs text-muted">
                       {offer.timeframe}
                     </p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">
-                      From {offer.price}
+                    <p className="mt-1 font-mono text-xs text-muted">
+                      {offerPriceKind(offer.slug)}
+                    </p>
+                    <p className="mt-0.5 text-sm font-semibold text-foreground">
+                      {offer.price}
                     </p>
                     <div className="mt-4 flex flex-wrap items-center gap-4">
                       <Link
@@ -164,8 +168,9 @@ export default function ServicesPage() {
 
           <ServiceSection title="Technologies & focus" id="tech">
             <p className="text-sm">
-              Senior contract work across modern web stacks—especially where
-              real-time data, education integrations, or simulation UX matter.
+              Senior contract work across modern web and mobile stacks—edtech
+              integrations, real-time systems, APIs, and AWS. Browser
+              prototypes are rare client work unless you ask for one.
             </p>
             <ul className="mt-4 flex flex-wrap gap-2">
               {serviceTechnologies.map((tech) => (

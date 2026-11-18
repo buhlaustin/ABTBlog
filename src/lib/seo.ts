@@ -136,6 +136,8 @@ export function personJsonLd() {
       "TypeScript",
       "Node.js",
       "AWS",
+      "Android",
+      "Android Studio",
     ],
     address: {
       "@type": "PostalAddress",

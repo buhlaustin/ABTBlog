@@ -14,6 +14,7 @@ export interface CaseStudy {
   timeframe: string;
   stack: string[];
   summary: string;
+  metaDescription: string;
   problem: string;
   approach: string;
   results: string[];
@@ -54,6 +55,9 @@ export function getAllCaseStudies(): CaseStudy[] {
         timeframe: String(data.timeframe ?? ""),
         stack: Array.isArray(data.stack) ? data.stack.map(String) : [],
         summary: String(data.summary ?? ""),
+        metaDescription: String(
+          data.metaDescription ?? data.summary ?? "",
+        ),
         problem: String(data.problem ?? ""),
         approach: String(data.approach ?? ""),
         results: Array.isArray(data.results) ? data.results.map(String) : [],

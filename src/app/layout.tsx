@@ -39,6 +39,14 @@ export default function RootLayout({
       lang="en"
       className={`${dmSans.variable} ${syne.variable} ${geistMono.variable} h-full`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'document.documentElement.classList.add("reveal-enhanced")',
+          }}
+        />
+      </head>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
