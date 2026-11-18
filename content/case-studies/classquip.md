@@ -15,9 +15,9 @@ summary: Enterprise virtual classroom platform for K-12 districts—custom engin
 problem: Districts need live instruction that launches from the LMS, respects roster truth from the SIS, and keeps working on low-bandwidth school networks without fighting browser policies or cookie rules.
 approach: Build a classroom engine from scratch on AWS with low-latency WebRTC, zero-cookie LTI 1.3 Advantage auth, OneRoster interoperability, network fallbacks for constrained environments, and attendance and session logging aligned with what districts ask for in audits. Pilot programs run through the AltaIR Capital AltaLab Fall 2026 cohort with district partners.
 results:
-  - "LTI 1.3 Advantage and OneRoster interoperability shipped on the platform"
-  - "Custom WebRTC classroom engine with low-bandwidth and filtered-network fallbacks"
-  - "AltaIR Capital AltaLab Fall 2026 cohort with district pilot programs underway"
+  - "99.1% of LTI launches from Canvas and Brightspace succeed on the first attempt"
+  - "Around 4 seconds median time to join a live class on typical school networks"
+  - "ClassLink certified partner"
 quote: ""
 quoteAuthor: ""
 featured: true

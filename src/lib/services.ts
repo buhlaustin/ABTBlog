@@ -78,7 +78,7 @@ export const serviceOffers: readonly ServiceOffer[] = [
       "LTI 1.3 tool launch (OIDC login, JWT validation, deployments, deep linking as needed)",
       "LTI Advantage services in scope: Names and Roles, Assignment and Grade Services",
       "OneRoster rostering sync with drift and late-roster handling, plus Clever/ClassLink if your districts use them",
-      "Testing against Canvas, Brightspace, and Moodle sandboxes (plus your target LMS when you name one in scope)",
+      "Testing against Canvas, Brightspace, Moodle, Agilix Buzz, and Blackboard sandboxes (plus your target LMS when you name one in scope)",
       "Weekly demo and written status",
     ],
     deliverables: [
@@ -217,7 +217,7 @@ export const servicesFaqs = [
   {
     question: "Which LMS and SIS platforms have you worked with?",
     answer:
-      "Canvas, Brightspace, Clever, ClassLink, PowerSchool, Engageli, and Newrow from my years supporting virtual schools at Stride, plus LTI 1.3 Advantage and OneRoster in ClassQuip. Moodle and Google Classroom LTI launches come up often in RFP language—I test against Moodle in sprint work and can extend to others when your pipeline requires it.",
+      "Canvas, Brightspace, Agilix Buzz, Blackboard, Clever, ClassLink, PowerSchool, Engageli, and Newrow from virtual-school ops at Stride and production work at ClassQuip, plus LTI 1.3 Advantage and OneRoster in ClassQuip. Moodle and Google Classroom LTI launches come up often in RFP language—I test against Moodle in sprint work and can extend to others when your pipeline requires it.",
   },
   {
     question: "Are you open to full-time roles?",
