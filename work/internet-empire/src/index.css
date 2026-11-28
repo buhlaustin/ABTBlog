@@ -134,6 +134,26 @@
   @apply mb-1 mt-3 text-sm font-semibold uppercase tracking-wide opacity-80;
 }
 
+.ie-header-actions {
+  @apply flex flex-wrap gap-2;
+}
+
+.ie-btn-ghost {
+  @apply opacity-90;
+}
+
+.ie-era-banner {
+  @apply my-2 overflow-hidden text-ellipsis whitespace-nowrap text-sm italic opacity-80;
+}
+
+[data-skin="dotcom"] .ie-era-banner {
+  @apply rounded-full bg-white/20 px-3 py-1 text-center not-italic;
+}
+
+.ie-channel-list {
+  @apply list-none space-y-2 p-0 text-sm;
+}
+
 .ie-flash {
   @apply my-2 flex flex-wrap items-center gap-2 rounded border border-amber-400/40 bg-amber-400/10 p-2 text-sm;
 }

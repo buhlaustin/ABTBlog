@@ -3,6 +3,7 @@ import { advanceCalendar } from "./calendar";
 import { END_MONTH_INDEX, moodForYear } from "./eras";
 import { evaluate2030 } from "./endgame";
 import { fireScriptedEvents, randomHeadline } from "./events";
+import { laneDef } from "./lanes";
 import { unlockResearchForYear } from "./research";
 import { tickRivals } from "./rivals";
 import { monthRng } from "./rng";
@@ -32,7 +33,7 @@ function organicVisitors(state: GameState, rng: ReturnType<typeof monthRng>): nu
   return Math.max(0, base + noise);
 }
 
-function productTick(state: GameState): void {
+function productTick(state: GameState, revenueMult = 1): void {
   for (const p of state.products) {
     if (p.stage === "building") {
       const boost = state.headcount.developers * 8;
@@ -44,7 +45,7 @@ function productTick(state: GameState): void {
       }
     } else if (p.stage === "live") {
       p.monthsLive += 1;
-      state.revenue += p.revenueMonthly;
+      state.revenue += Math.round(p.revenueMonthly * revenueMult);
       if (p.kind === "ai") state.computeBurn += 200;
     }
   }
@@ -72,16 +73,17 @@ export function resolveMonth(state: GameState): GameState {
   applyQueuedActions(state);
 
   const rng = monthRng(state, 1);
+  const lane = laneDef(state.lane);
   state.revenue = 0;
-  productTick(state);
-
-  const organic = organicVisitors(state, rng);
+  productTick(state, lane.revenueMult);
+  const organic = Math.round(organicVisitors(state, rng) * lane.visitorMult);
   state.visitors += organic;
 
-  const adRevenue = Math.round(state.visitors * 0.04 * state.macro.adCpm);
+  const adRevenue = Math.round(state.visitors * 0.04 * state.macro.adCpm * lane.revenueMult);
   state.revenue += adRevenue;
 
-  state.expenses = payroll(state) + hostingCost(state) + state.computeBurn;
+  const hosting = Math.round(hostingCost(state) * (1 - lane.hostingDiscount));
+  state.expenses = payroll(state) + hosting + state.computeBurn;
   state.cash += state.revenue - state.expenses;
 
   infraStress(state, rng);

@@ -1,4 +1,5 @@
 import { deriveUiEra } from "./eras";
+import { laneDef } from "./lanes";
 import type { ActionDef, GameState } from "./types";
 
 const ERA_ORDER = ["early", "dotcom", "web2", "mobile", "platform", "ai", "enterprise"] as const;
@@ -255,7 +256,7 @@ export function applyQueuedActions(state: GameState): void {
         state.log.push("Upgraded hosting tier.");
         break;
       case "seo":
-        state.brand += 5;
+        state.brand += Math.round(5 * laneDef(state.lane).brandMult);
         state.visitors += 60;
         state.log.push("Climbed directory listings.");
         break;

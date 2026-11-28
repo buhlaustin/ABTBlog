@@ -1,10 +1,14 @@
 import { lazy, Suspense, type ReactNode } from "react";
 import type { GameState, TabId } from "@/sim";
-import { eraAt } from "@/sim/eras";
+import { END_MONTH_INDEX, eraAt } from "@/sim/eras";
 import { formatMonth } from "@/lib/format";
 import { useGameStore } from "@/store/gameStore";
 import { ActionPanel } from "./ActionPanel";
 import { FinanceCharts } from "./FinanceCharts";
+import { MarketingPanel } from "./MarketingPanel";
+import { laneDef } from "@/sim/lanes";
+import { runwayMonths } from "@/lib/runway";
+import { EraBanner } from "./EraBanner";
 import { FlashBar } from "./FlashBar";
 import { StatHud } from "./StatHud";
 
@@ -28,6 +32,9 @@ export function GameShell({ state }: { state: GameState }) {
   const setTab = useGameStore((s) => s.setTab);
   const endMonth = useGameStore((s) => s.endMonth);
   const era = eraAt(state.calendar.year);
+  const monthsLeft = END_MONTH_INDEX - state.calendar.index;
+  const runway = runwayMonths(state);
+  const lane = laneDef(state.lane);
 
   return (
     <div className="ie-game-shell">
@@ -35,14 +42,23 @@ export function GameShell({ state }: { state: GameState }) {
         <div>
           <p className="ie-eyebrow">Internet Empire · {era.label}</p>
           <h1>{state.companyName}</h1>
-          <p className="ie-muted">{formatMonth(state.calendar.year, state.calendar.month)}</p>
+          <p className="ie-muted">
+            {formatMonth(state.calendar.year, state.calendar.month)} · {monthsLeft} months to 2030 · {lane.label}
+            {runway != null && ` · ~${runway} mo runway`}
+          </p>
         </div>
-        <button type="button" className="ie-btn ie-btn-primary" onClick={() => endMonth()}>
-          End month
-        </button>
+        <div className="ie-header-actions">
+          <button type="button" className="ie-btn ie-btn-ghost" onClick={() => useGameStore.getState().persist()}>
+            Save
+          </button>
+          <button type="button" className="ie-btn ie-btn-primary" onClick={() => endMonth()}>
+            End month
+          </button>
+        </div>
       </header>
 
       <StatHud state={state} />
+      <EraBanner state={state} />
       <FlashBar />
 
       {state.calendar.index < 12 && (
@@ -104,12 +120,7 @@ function renderPanel(tab: TabId, state: GameState) {
         </Panel>
       );
     case "marketing":
-      return (
-        <Panel title="Marketing">
-          <p>Brand {state.brand} · Ad CPM ×{state.macro.adCpm.toFixed(2)}</p>
-          <p className="ie-muted">Queue ads and SEO from the Desk tab.</p>
-        </Panel>
-      );
+      return <MarketingPanel state={state} />;
     case "people":
       return (
         <Panel title="People">
@@ -121,17 +132,24 @@ function renderPanel(tab: TabId, state: GameState) {
           </ul>
         </Panel>
       );
-    case "finance":
+    case "finance": {
+      const runway = runwayMonths(state);
       return (
         <Panel title="Finance">
           <p>
             Revenue (last tick) ${state.revenue.toLocaleString()} · Expenses $
             {state.expenses.toLocaleString()}
           </p>
+          {runway != null ? (
+            <p className="ie-muted">~{runway} months runway at current burn</p>
+          ) : (
+            <p className="ie-muted">Cash-flow positive last tick</p>
+          )}
           {state.computeBurn > 0 && <p>Compute burn ${state.computeBurn.toLocaleString()}/mo</p>}
           <FinanceCharts state={state} />
         </Panel>
       );
+    }
     case "rivals":
       return (
         <Panel title="Competition">

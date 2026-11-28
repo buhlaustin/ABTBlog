@@ -172,6 +172,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   persist: () => {
     const state = get().state;
-    if (state) saveToDisk(state);
+    if (state) {
+      saveToDisk(state);
+      set({ flash: "Saved." });
+    }
   },
 }));
