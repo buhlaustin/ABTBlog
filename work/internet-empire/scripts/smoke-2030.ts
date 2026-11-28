@@ -14,7 +14,8 @@ const months = END_MONTH_INDEX - s.calendar.index + 1;
 for (let i = 0; i < months; i++) {
   const snap = structuredClone(s);
   if (snap.apLeft >= 2 && !snap.flags.hasWebsite) queueAction(snap, "build_website");
-  if (snap.apLeft >= 1 && i % 6 === 0) queueAction(snap, "ai_product");
+  if (snap.apLeft >= 1 && i % 4 === 0) queueAction(snap, "ai_product");
+  if (snap.apLeft >= 1 && i % 5 === 1) queueAction(snap, "research_tick");
   s = resolveMonth(snap);
 }
 

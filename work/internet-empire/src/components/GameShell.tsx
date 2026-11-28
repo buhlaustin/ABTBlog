@@ -5,6 +5,7 @@ import { formatMonth } from "@/lib/format";
 import { useGameStore } from "@/store/gameStore";
 import { ActionPanel } from "./ActionPanel";
 import { FinanceCharts } from "./FinanceCharts";
+import { FlashBar } from "./FlashBar";
 import { StatHud } from "./StatHud";
 
 const SideStage = lazy(() =>
@@ -42,6 +43,7 @@ export function GameShell({ state }: { state: GameState }) {
       </header>
 
       <StatHud state={state} />
+      <FlashBar />
 
       {state.calendar.index < 12 && (
         <p className="ie-year-one-hint">

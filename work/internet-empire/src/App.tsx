@@ -20,8 +20,16 @@ export function App() {
       : "win95";
   const skinClass = SKIN_CLASSES[skinKey] ?? SKIN_CLASSES.win95;
 
+  const win95Chrome = skinKey === "win95" && screen === "game";
+
   return (
     <div className={`ie-root ${skinClass}`} {...(state ? skinAttrs(state, simplifiedUi) : {})}>
+      {win95Chrome && (
+        <div className="ie-win95-taskbar">
+          <span>Start</span>
+          <span className="ie-win95-taskbar-title">Internet Empire</span>
+        </div>
+      )}
       <label className="ie-a11y-toggle">
         <input
           type="checkbox"
@@ -30,10 +38,12 @@ export function App() {
         />
         Simplified modern UI
       </label>
-      {screen === "menu" && <MenuScreen />}
-      {screen === "setup" && <SetupScreen />}
-      {screen === "game" && state && <GameShell state={state} />}
-      {screen === "end" && state && <EndScreen state={state} />}
+      <div className={win95Chrome ? "ie-win95-window" : undefined}>
+        {screen === "menu" && <MenuScreen />}
+        {screen === "setup" && <SetupScreen />}
+        {screen === "game" && state && <GameShell state={state} />}
+        {screen === "end" && state && <EndScreen state={state} />}
+      </div>
     </div>
   );
 }

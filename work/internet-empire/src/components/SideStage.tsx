@@ -27,6 +27,7 @@ export function SideStage({ state }: { state: GameState }) {
       visitors: state.visitors,
       mood: state.macro.mood,
       year: state.calendar.year,
+      companyName: state.companyName,
     });
   }, [state]);
 

@@ -130,6 +130,34 @@
   @apply my-2 rounded border border-white/20 bg-black/10 p-2 text-sm;
 }
 
+.ie-starter-head {
+  @apply mb-1 mt-3 text-sm font-semibold uppercase tracking-wide opacity-80;
+}
+
+.ie-flash {
+  @apply my-2 flex flex-wrap items-center gap-2 rounded border border-amber-400/40 bg-amber-400/10 p-2 text-sm;
+}
+
+.ie-hof {
+  @apply my-6 rounded border border-white/20 p-3 text-sm;
+}
+
+.ie-hof ul {
+  @apply mt-2 list-none space-y-1 p-0;
+}
+
+[data-ui-skin="win95"] .ie-win95-taskbar {
+  @apply mb-2 flex items-center gap-2 border-2 border-gray-600 bg-[#c0c0c0] px-2 py-1 text-black;
+}
+
+[data-ui-skin="win95"] .ie-win95-taskbar-title {
+  @apply flex-1 border border-gray-500 bg-[#000080] px-2 py-0.5 text-xs text-white;
+}
+
+[data-ui-skin="win95"] .ie-win95-window {
+  @apply border-2 border-t-white border-l-white border-r-gray-800 border-b-gray-800 bg-[#c0c0c0] p-2;
+}
+
 .ie-stat {
   @apply rounded p-2 tabular-nums;
 }

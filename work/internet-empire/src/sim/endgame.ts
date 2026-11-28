@@ -10,8 +10,14 @@ export function evaluate2030(state: GameState): void {
   const leader = state.visitors >= 50_000;
   const bigExit = state.valuation >= 20_000_000;
   const icon = state.brand >= 70 && state.visitors >= 25_000;
+  const hasAiProduct = state.products.some((p) => p.kind === "ai" && p.stage === "live");
+  const aiStack =
+    hasAiProduct &&
+    state.research.some((r) => r.id === "ai-models" && r.completed) &&
+    state.computeBurn > 0 &&
+    state.cash > 0;
 
-  if (profitable || leader || bigExit || icon) {
+  if (profitable || leader || bigExit || icon || aiStack) {
     state.flags.won = true;
     state.log.push("2030: You survived the AI era with a seat at the table.");
     return;

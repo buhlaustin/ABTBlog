@@ -11,6 +11,44 @@ import {
 } from "@/sim";
 
 const STORAGE_KEY = "internet-empire-save-v1";
+const HOF_KEY = "internet-empire-hof-v1";
+const HOF_MAX = 8;
+
+export interface HallOfFameEntry {
+  companyName: string;
+  endedAt: string;
+  won: boolean;
+  visitors: number;
+  valuation: number;
+  lane: string;
+}
+
+function pushHallOfFame(state: GameState) {
+  if (!state.flags.ended) return;
+  try {
+    const raw = localStorage.getItem(HOF_KEY);
+    const list: HallOfFameEntry[] = raw ? JSON.parse(raw) : [];
+    list.unshift({
+      companyName: state.companyName,
+      endedAt: `${state.calendar.year}-${state.calendar.month}`,
+      won: state.flags.won,
+      visitors: state.visitors,
+      valuation: state.valuation,
+      lane: state.lane,
+    });
+    localStorage.setItem(HOF_KEY, JSON.stringify(list.slice(0, HOF_MAX)));
+  } catch {
+  }
+}
+
+export function readHallOfFame(): HallOfFameEntry[] {
+  try {
+    const raw = localStorage.getItem(HOF_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
 
 interface GameStore {
   screen: "menu" | "setup" | "game" | "end";
@@ -36,6 +74,8 @@ interface GameStore {
   unqueue: (id: string) => void;
   endMonth: () => void;
   persist: () => void;
+  flash: string | null;
+  clearFlash: () => void;
 }
 
 function saveToDisk(state: GameState) {
@@ -50,6 +90,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   state: null,
   tab: "desk",
   simplifiedUi: false,
+  flash: null,
+  clearFlash: () => set({ flash: null }),
   newGameSetup: {
     mode: "career",
     companyName: "",
@@ -120,10 +162,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const snap = structuredClone(state);
     resolveMonth(snap);
     saveToDisk(snap);
-  if (snap.flags.gameOver || snap.flags.ended) {
-      set({ state: snap, screen: "end" });
+    const last = snap.log[snap.log.length - 1] ?? "Month closed.";
+    if (snap.flags.gameOver || snap.flags.ended) {
+      pushHallOfFame(snap);
+      set({ state: snap, screen: "end", flash: last });
     } else {
-      set({ state: snap });
+      set({ state: snap, flash: last });
     }
   },
   persist: () => {

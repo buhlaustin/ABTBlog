@@ -70,7 +70,7 @@ export class SceneRuntime {
     loop();
   }
 
-  apply(params: SceneParams) {
+  apply(params: SceneParams & { companyName?: string }) {
     const moodColor =
       params.mood === "bust" ? 0x553333 : params.mood === "boom" ? 0x335544 : 0x444455;
     (this.scene.background as THREE.Color | null) =

@@ -168,11 +168,15 @@ export function cashForAction(state: GameState, def: ActionDef): number {
   return typeof def.cashCost === "function" ? def.cashCost(state) : def.cashCost;
 }
 
+function plannedCash(state: GameState): number {
+  return state.plannedActions.reduce((sum, p) => sum + p.cashCost, 0);
+}
+
 export function canQueueAction(state: GameState, def: ActionDef): { ok: boolean; reason?: string } {
   if (state.flags.gameOver || state.flags.ended) return { ok: false, reason: "Run ended." };
   if (state.apLeft < def.ap) return { ok: false, reason: "Not enough action points." };
   const cash = cashForAction(state, def);
-  if (state.cash < cash) return { ok: false, reason: "Not enough cash." };
+  if (state.cash < plannedCash(state) + cash) return { ok: false, reason: "Not enough cash." };
   if (def.requires) {
     const r = def.requires(state);
     if (r) return { ok: false, reason: r };

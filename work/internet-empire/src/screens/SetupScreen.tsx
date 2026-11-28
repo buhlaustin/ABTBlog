@@ -22,6 +22,16 @@ export function SetupScreen() {
         />
       </label>
       <label>
+        Lane
+        <select value={setup.lane} onChange={(e) => patchSetup({ lane: e.target.value })}>
+          <option value="content">Content & media</option>
+          <option value="commerce">Commerce</option>
+          <option value="tools">Search & tools</option>
+          <option value="enterprise">Enterprise B2B</option>
+          <option value="hosting">Infrastructure & hosting</option>
+        </select>
+      </label>
+      <label>
         Mode
         <select
           value={setup.mode}
