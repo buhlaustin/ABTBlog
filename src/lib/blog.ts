@@ -13,6 +13,35 @@ export interface BlogPlayable {
   workHref?: string;
 }
 
+/**
+ * gray-matter parses an unquoted YAML date as a Date. String(date) is a
+ * locale string, not YYYY-MM-DD, so slicing it and parsing again is Invalid Date.
+ */
+export function blogDateToIso(value: unknown): string {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const year = value.getUTCFullYear();
+    const month = String(value.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(value.getUTCDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+  if (typeof value === "string") {
+    const match = /^(\d{4}-\d{2}-\d{2})/.exec(value.trim());
+    if (match) return match[1];
+  }
+  return "";
+}
+
+/** Calendar date from a YYYY-MM-DD string. Stays on that day in static HTML. */
+export function formatBlogDate(isoDate: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return "";
+  return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 export interface BlogPost {
   slug: string;
   title: string;
@@ -55,7 +84,7 @@ export function getAllPosts(): BlogPost[] {
       return {
         slug,
         title: String(data.title ?? slug),
-        date: String(data.date ?? ""),
+        date: blogDateToIso(data.date),
         description: String(data.description ?? ""),
         tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
         author: String(data.author ?? defaultBlogAuthor),

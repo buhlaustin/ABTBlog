@@ -1,10 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BookShelf } from "@/components/book-shelf";
 import { JsonLd } from "@/components/json-ld";
 import { Reveal } from "@/components/reveal";
 import { WorkCard } from "@/components/work-card";
-import { getAllPosts } from "@/lib/blog";
+import { formatBlogDate, getAllPosts } from "@/lib/blog";
 import { novuxFlagship, profile, siteConfig, ventures } from "@/lib/profile";
 import { pageMetadata, personJsonLd } from "@/lib/seo";
 import { workItems } from "@/lib/work-registry";
@@ -24,16 +23,6 @@ const primaryButton =
 
 const secondaryButton =
   "btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised sm:w-auto";
-
-function formatPostDate(isoDate: string): string {
-  const day = isoDate.slice(0, 10);
-  return new Date(`${day}T00:00:00Z`).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
 
 export default function HomePage() {
   const { hero } = profile;
@@ -62,8 +51,27 @@ export default function HomePage() {
               </Reveal>
               <Reveal when="mount" delayMs={120}>
                 <p className="mt-4 max-w-2xl text-base leading-relaxed text-foreground sm:mt-6 sm:text-lg">
-                  <span className="md:hidden">{hero.leadMobile}</span>
-                  <span className="hidden md:inline">{hero.lead}</span>
+                  I&apos;m Austin, a builder in Knoxville. I make the games I
+                  want to play, like{" "}
+                  <a
+                    href={novuxFlagship.storeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-accent underline-offset-2 hover:text-blue-700 hover:underline"
+                  >
+                    Dynasty: College Basketball
+                  </a>
+                  , now in Early Access, and I run{" "}
+                  <a
+                    href={ventures.classQuip.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-accent underline-offset-2 hover:text-blue-700 hover:underline"
+                  >
+                    ClassQuip
+                  </a>
+                  , which helps teachers run live online classes. Everything
+                  I&apos;m building, breaking and learning ends up here.
                 </p>
               </Reveal>
               <Reveal when="mount" delayMs={200}>
@@ -216,7 +224,7 @@ export default function HomePage() {
                       dateTime={post.date.slice(0, 10)}
                       className="font-mono text-[11px] uppercase tracking-wider text-muted"
                     >
-                      {formatPostDate(post.date)}
+                      {formatBlogDate(post.date)}
                     </time>
                     <h3 className="font-display mt-2 text-[15px] font-bold leading-snug text-foreground sm:text-base">
                       <Link
@@ -330,21 +338,6 @@ export default function HomePage() {
                   <WorkCard item={item} />
                 </Reveal>
               ))}
-            </div>
-          </section>
-
-          <section className="mobile-section mb-10 sm:mb-16">
-            <Reveal>
-              <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-                Earlier stories
-              </h2>
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
-                Older work, from before the games and the company. Nightwave is
-                the novel. The other two are short stories.
-              </p>
-            </Reveal>
-            <div className="mt-4 sm:mt-6">
-              <BookShelf />
             </div>
           </section>
 
