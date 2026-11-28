@@ -1,39 +1,43 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BookCallButton } from "@/components/book-call-button";
+import { BookShelf } from "@/components/book-shelf";
 import { JsonLd } from "@/components/json-ld";
-import { MobileEmailButton } from "@/components/mobile-email-button";
-import { profile, siteConfig } from "@/lib/profile";
-import { pageMetadata, personJsonLd } from "@/lib/seo";
-import { offerPriceKind, serviceOffers } from "@/lib/services";
 import { Reveal } from "@/components/reveal";
+import { WorkCard } from "@/components/work-card";
+import { getAllPosts } from "@/lib/blog";
+import { novuxFlagship, profile, siteConfig, ventures } from "@/lib/profile";
+import { pageMetadata, personJsonLd } from "@/lib/seo";
+import { workItems } from "@/lib/work-registry";
 
 export const metadata = pageMetadata({
-  title:
-    "Austin Buhl · LTI 1.3, OneRoster and WebRTC engineer for edtech teams",
+  title: "Austin Buhl · Games and classroom software",
   description:
-    "Edtech integrations and senior product engineering: LTI 1.3, OneRoster, WebRTC, web, and Android. Fixed sprints and retainers. Knoxville, remote US.",
+    "Austin Buhl builds games and classroom software in Knoxville. Dynasty: College Basketball is in Early Access, ClassQuip is the company, and this site holds the browser projects and the writing.",
   path: "/",
   absoluteTitle: true,
 });
 
-const whereIHelp = [
-  {
-    title: "LTI 1.3 and LTI Advantage",
-    body: "Launches, deep linking, names and roles, grade passback. Tested against the LMSs your districts actually run.",
-  },
-  {
-    title: "Rostering",
-    body: "OneRoster and Clever/ClassLink sync that handles late rosters, term changes, and students who exist in one system but not the other.",
-  },
-  {
-    title: "Live classroom video",
-    body: "WebRTC tuned for filtered networks and low bandwidth, with attendance you can defend in an audit.",
-  },
-] as const;
+const latestPostCount = 3;
+
+const primaryButton =
+  "btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 active:bg-zinc-700 sm:w-auto";
+
+const secondaryButton =
+  "btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised sm:w-auto";
+
+function formatPostDate(isoDate: string): string {
+  const day = isoDate.slice(0, 10);
+  return new Date(`${day}T00:00:00Z`).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
 
 export default function HomePage() {
   const { hero } = profile;
+  const posts = getAllPosts().slice(0, latestPostCount);
 
   return (
     <>
@@ -44,7 +48,7 @@ export default function HomePage() {
             className="hero-mesh pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(250,250,250,0)_0%,rgb(255_255_255)_85%),radial-gradient(ellipse_90%_60%_at_50%_-20%,rgba(37,99,235,0.12),transparent)]"
             aria-hidden
           />
-          <div className="relative mx-auto grid max-w-5xl gap-6 px-safe py-8 sm:gap-10 sm:py-12 md:py-20 lg:grid-cols-[1fr_minmax(0,17rem)] lg:items-start lg:gap-14">
+          <div className="relative mx-auto grid max-w-5xl gap-6 px-safe py-8 sm:gap-10 sm:py-12 md:py-20 lg:grid-cols-[1fr_minmax(0,18rem)] lg:items-start lg:gap-14">
             <div className="min-w-0">
               <Reveal when="mount">
                 <p className="font-mono text-xs leading-snug text-muted sm:text-sm">
@@ -64,30 +68,31 @@ export default function HomePage() {
               </Reveal>
               <Reveal when="mount" delayMs={200}>
                 <div className="cta-mobile-stack mt-6 sm:mt-8">
-                  <BookCallButton />
-                  <Link
-                    href="/services/#offers"
-                    className="btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised sm:w-auto"
-                  >
-                    See the offers
+                  <Link href="/blog/" className={primaryButton}>
+                    Read the blog
+                  </Link>
+                  <Link href="/work/" className={secondaryButton}>
+                    Browse the lab
                   </Link>
                 </div>
               </Reveal>
               <ul className="mt-5 flex flex-wrap gap-2 lg:hidden">
                 <li>
-                  <Link
-                    href="/case-studies/classquip/"
+                  <a
+                    href={novuxFlagship.storeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex min-h-10 items-center rounded-full border border-border bg-surface px-3.5 text-xs font-semibold text-foreground"
                   >
-                    ClassQuip case study
-                  </Link>
+                    Dynasty on Google Play
+                  </a>
                 </li>
                 <li>
                   <Link
-                    href="/services/"
+                    href="/work/"
                     className="inline-flex min-h-10 items-center rounded-full border border-border bg-surface px-3.5 text-xs font-semibold text-foreground"
                   >
-                    Services
+                    Lab
                   </Link>
                 </li>
               </ul>
@@ -104,32 +109,31 @@ export default function HomePage() {
                   alt=""
                   width={48}
                   height={48}
+                  loading="eager"
                   className="h-12 w-12 rounded-xl border border-border object-cover"
                 />
                 <div className="min-w-0 text-sm leading-snug">
-                  <p className="font-semibold text-foreground">
-                    {siteConfig.name}
-                  </p>
-                  <p className="text-muted">{profile.hero.tagline}</p>
+                  <p className="font-semibold text-foreground">{siteConfig.name}</p>
+                  <p className="text-muted">{hero.tagline}</p>
                 </div>
               </Reveal>
               <Reveal when="mount" delayMs={240}>
-                <Link
-                  href="/case-studies/classquip/"
-                  className="lift-card flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
-                >
-                  ClassQuip case study →
-                </Link>
-              </Reveal>
-              <Reveal when="mount" delayMs={300}>
                 <a
-                  href={profile.linkedIn}
+                  href={novuxFlagship.storeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="lift-card flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
+                  className="lift-card flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised"
                 >
-                  LinkedIn ↗
+                  Dynasty on Google Play →
                 </a>
+              </Reveal>
+              <Reveal when="mount" delayMs={300}>
+                <Link
+                  href="/work/"
+                  className="lift-card flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised"
+                >
+                  Browser games →
+                </Link>
               </Reveal>
             </aside>
           </div>
@@ -139,56 +143,97 @@ export default function HomePage() {
           <section className="mobile-section mb-10 sm:mb-16">
             <Reveal>
               <h2 className="font-display text-sm font-bold uppercase tracking-[0.15em] text-muted">
-                Where I help
+                Now
               </h2>
             </Reveal>
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-              {whereIHelp.map((pillar, index) => (
-                <Reveal key={pillar.title} delayMs={index * 70}>
-                  <article className="lift-card h-full rounded-2xl border border-border bg-surface p-4 sm:p-6">
-                    <h3 className="font-display text-base font-bold tracking-tight text-foreground sm:text-lg">
-                      {pillar.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted">
-                      {pillar.body}
-                    </p>
-                  </article>
-                </Reveal>
-              ))}
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-3 sm:gap-4">
+              <Reveal>
+                <a
+                  href={novuxFlagship.storeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="lift-card flex h-full flex-col rounded-2xl border border-border bg-surface p-4 sm:p-6"
+                >
+                  <h3 className="font-display text-base font-bold tracking-tight text-foreground sm:text-lg">
+                    {novuxFlagship.name}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                    Early Access on Google Play. Novux Games. You run a college
+                    basketball program on your phone.
+                  </p>
+                </a>
+              </Reveal>
+              <Reveal delayMs={70}>
+                <a
+                  href={ventures.classQuip.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="lift-card flex h-full flex-col rounded-2xl border border-border bg-surface p-4 sm:p-6"
+                >
+                  <h3 className="font-display text-base font-bold tracking-tight text-foreground sm:text-lg">
+                    {ventures.classQuip.name}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                    The classroom company. I started it, and I still build the
+                    product.
+                  </p>
+                </a>
+              </Reveal>
+              <Reveal delayMs={140}>
+                <Link
+                  href="/work/"
+                  className="lift-card flex h-full flex-col rounded-2xl border border-border bg-surface p-4 sm:p-6"
+                >
+                  <h3 className="font-display text-base font-bold tracking-tight text-foreground sm:text-lg">
+                    The lab
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                    Browser games you can open from this site. Startup
+                    Simulator, House of Strategy, and the rest.
+                  </p>
+                </Link>
+              </Reveal>
             </div>
           </section>
 
-          <section id="offers" className="mobile-section mb-10 sm:mb-16">
+          <section className="mobile-section mb-10 sm:mb-16">
             <Reveal className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
               <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-                Offers
+                Blog
               </h2>
-              <BookCallButton
-                variant="secondary"
-                className="hidden sm:inline-flex"
-              />
+              <Link
+                href="/blog/"
+                className="text-sm font-semibold text-accent hover:text-blue-700"
+              >
+                All posts →
+              </Link>
             </Reveal>
-            <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
-              {serviceOffers.map((offer, index) => (
-                <Reveal key={offer.slug} delayMs={index * 60}>
+            <div className="grid gap-3 sm:gap-4 lg:grid-cols-3">
+              {posts.map((post, index) => (
+                <Reveal key={post.slug} delayMs={index * 60}>
                   <article className="lift-card flex h-full flex-col rounded-2xl border border-border bg-white p-4 shadow-sm sm:p-5">
-                    <h3 className="font-display text-[15px] font-bold leading-snug text-foreground sm:text-base">
-                      {offer.name}
+                    <time
+                      dateTime={post.date.slice(0, 10)}
+                      className="font-mono text-[11px] uppercase tracking-wider text-muted"
+                    >
+                      {formatPostDate(post.date)}
+                    </time>
+                    <h3 className="font-display mt-2 text-[15px] font-bold leading-snug text-foreground sm:text-base">
+                      <Link
+                        href={`/blog/${post.slug}/`}
+                        className="hover:text-accent"
+                      >
+                        {post.title}
+                      </Link>
                     </h3>
                     <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
-                      {offer.oneLiner}
-                    </p>
-                    <p className="mt-3 font-mono text-[11px] text-muted sm:text-xs">
-                      {offer.timeframe} · {offerPriceKind(offer.slug)}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">
-                      {offer.price}
+                      {post.description}
                     </p>
                     <Link
-                      href={`/services/${offer.slug}/`}
+                      href={`/blog/${post.slug}/`}
                       className="mt-3 inline-flex min-h-10 items-center text-sm font-semibold text-accent hover:text-blue-700"
                     >
-                      Details →
+                      Read →
                     </Link>
                   </article>
                 </Reveal>
@@ -196,38 +241,124 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="mobile-section mb-8 border-t border-border pt-8 sm:mb-12 sm:pt-10">
-            <Reveal className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
+          <section className="mobile-section mb-10 sm:mb-16">
+            <Reveal className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <h2 className="font-display text-lg font-bold tracking-tight">
-                  Lab
+                <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
+                  Work
                 </h2>
                 <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
-                  Personal browser projects—not typical client work unless you
-                  ask for a prototype.
+                  The company, the phone game, and the browser projects I build
+                  for myself.
                 </p>
               </div>
               <Link
                 href="/work/"
-                className="inline-flex min-h-10 items-center text-sm font-semibold text-accent hover:text-blue-700"
+                className="text-sm font-semibold text-accent hover:text-blue-700"
               >
-                Browse the lab →
+                All projects →
               </Link>
             </Reveal>
+            <div className="grid gap-3 sm:gap-4 lg:grid-cols-3">
+              <Reveal className="lg:col-span-2">
+                <article className="lift-card flex h-full flex-col rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-8">
+                  <p className="font-mono text-[11px] font-medium uppercase tracking-wider text-muted">
+                    Novux Games · Early Access
+                  </p>
+                  <h3 className="font-display mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                    {novuxFlagship.name}
+                  </h3>
+                  <p className="mt-3 max-w-xl flex-1 text-sm leading-relaxed text-muted sm:text-base">
+                    You take over a college basketball program. Recruit, play
+                    the season, and find out if the roster holds up next year.
+                    It&apos;s on your phone, and it&apos;s live.
+                  </p>
+                  <div className="cta-mobile-stack mt-5">
+                    <a
+                      href={novuxFlagship.storeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={primaryButton}
+                    >
+                      Google Play
+                    </a>
+                    <a
+                      href={ventures.novuxGames.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={secondaryButton}
+                    >
+                      Novux Games
+                    </a>
+                  </div>
+                </article>
+              </Reveal>
+              <Reveal delayMs={80}>
+                <article className="lift-card flex h-full flex-col rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-6">
+                  <p className="font-mono text-[11px] font-medium uppercase tracking-wider text-muted">
+                    Company
+                  </p>
+                  <h3 className="font-display mt-2 text-xl font-bold tracking-tight text-foreground">
+                    {ventures.classQuip.name}
+                  </h3>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-muted">
+                    Classroom software I started and still build. Knoxville
+                    company, schools on the other end of it.
+                  </p>
+                  <div className="mt-4 flex flex-col gap-2 text-sm font-semibold">
+                    <a
+                      href={ventures.classQuip.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-accent hover:text-blue-700"
+                    >
+                      classquip.com →
+                    </a>
+                    <Link
+                      href="/case-studies/classquip/"
+                      className="text-accent hover:text-blue-700"
+                    >
+                      Case study →
+                    </Link>
+                  </div>
+                </article>
+              </Reveal>
+            </div>
+            <div className="mt-4 grid gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4">
+              {workItems.map((item, index) => (
+                <Reveal key={item.slug} delayMs={index * 40}>
+                  <WorkCard item={item} />
+                </Reveal>
+              ))}
+            </div>
+          </section>
+
+          <section className="mobile-section mb-10 sm:mb-16">
+            <Reveal>
+              <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
+                Earlier stories
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+                Older work, from before the games and the company. Nightwave is
+                the novel. The other two are short stories.
+              </p>
+            </Reveal>
+            <div className="mt-4 sm:mt-6">
+              <BookShelf />
+            </div>
           </section>
 
           <Reveal>
-            <section className="lift-card rounded-2xl border border-border bg-surface-raised px-4 py-6 text-center sm:px-10 sm:py-10">
-              <h2 className="font-display text-lg font-bold tracking-tight text-foreground sm:text-xl md:text-2xl">
-                Have a district deal waiting on an integration?
-              </h2>
-              <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-muted">
-                Send me the details or grab 20 minutes.
+            <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <p className="text-sm leading-relaxed text-muted">
+                <span className="font-semibold text-foreground">
+                  I also take on some consulting work.
+                </span>{" "}
+                Details are on the services page.
               </p>
-              <div className="cta-mobile-stack mx-auto mt-5 justify-center sm:mt-6">
-                <BookCallButton />
-                <MobileEmailButton />
-              </div>
+              <Link href="/services/" className={secondaryButton}>
+                Services
+              </Link>
             </section>
           </Reveal>
         </div>

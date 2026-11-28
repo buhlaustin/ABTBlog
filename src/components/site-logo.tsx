@@ -16,7 +16,7 @@ export function SiteLogo({ variant = "header", className = "" }: SiteLogoProps) 
       alt={siteConfig.name}
       width={isHero ? 400 : 200}
       height={isHero ? 160 : 80}
-      priority={isHero}
+      loading="eager"
       className={
         isHero
           ? `h-auto w-full max-w-[min(100%,20rem)] sm:max-w-md ${className}`

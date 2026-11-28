@@ -26,6 +26,46 @@ export const metadata = pageMetadata({
   path: "/about/",
 });
 
+function PillarBody({
+  pillar,
+}: {
+  pillar: (typeof profile.about.pillars)[number];
+}) {
+  if ("href" in pillar && pillar.href) {
+    return (
+      <Link
+        href={pillar.href}
+        className="text-muted underline-offset-2 hover:text-accent hover:underline"
+      >
+        {pillar.body}
+      </Link>
+    );
+  }
+
+  if ("externalHref" in pillar && pillar.externalHref) {
+    const marker = "Google Play";
+    const index = pillar.body.indexOf(marker);
+    if (index >= 0) {
+      return (
+        <span className="text-muted">
+          {pillar.body.slice(0, index)}
+          <a
+            href={pillar.externalHref}
+            className="underline decoration-border underline-offset-2 hover:text-foreground"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {marker}
+          </a>
+          {pillar.body.slice(index + marker.length)}
+        </span>
+      );
+    }
+  }
+
+  return <span className="text-muted">{pillar.body}</span>;
+}
+
 function AboutSection({
   title,
   children,
@@ -95,16 +135,7 @@ export default function AboutPage() {
                 <span className="font-semibold text-foreground">
                   {pillar.label}:
                 </span>{" "}
-                {"href" in pillar && pillar.href ? (
-                  <Link
-                    href={pillar.href}
-                    className="text-muted underline-offset-2 hover:text-accent hover:underline"
-                  >
-                    {pillar.body}
-                  </Link>
-                ) : (
-                  <span className="text-muted">{pillar.body}</span>
-                )}
+                <PillarBody pillar={pillar} />
               </li>
             ))}
           </ul>

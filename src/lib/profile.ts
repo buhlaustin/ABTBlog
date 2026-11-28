@@ -31,12 +31,13 @@ export const ventures = {
   },
 } satisfies Record<string, Venture>;
 
-/** Novux’s in-development title (not the personal projects on this site). */
+/** Novux’s flagship. Live in Early Access on Google Play. */
 export const novuxFlagship = {
   name: "Dynasty: College Basketball",
   platform: "Android",
-  status: "in development",
+  status: "Early Access",
   pitch: "text-based sports management sim",
+  storeUrl: "https://play.google.com/store/apps/details?id=com.dynasty.cbb",
 } as const;
 
 /** Founder roles in display order (newest venture first). */
@@ -63,12 +64,11 @@ export const profile = {
   email: "abuhl@classquip.com",
   /** Homepage hero only. */
   hero: {
-    tagline: "Software engineer & founder · Knoxville, TN · Remote US",
-    headline: "I make edtech products work inside school districts.",
-    lead:
-      "LTI 1.3 launches that don't break mid-lesson. Roster sync that matches what the SIS actually sent. Live video that holds up behind district firewalls and on budget Chromebooks. I built these systems for ClassQuip, and before that I spent years at Stride supporting virtual schools on Canvas, Brightspace, Clever, ClassLink, and PowerSchool.",
+    tagline: "Builder · Knoxville, TN · Vols on Saturdays",
+    headline: "I build games and classroom software.",
+    lead: "I'm Austin. Dynasty: College Basketball is in Early Access on Google Play. I run ClassQuip. The browser games on this site are the ones I build because I want to play them, and the writing is here too.",
     leadMobile:
-      "I fix LTI 1.3, rostering, and live video in districts—and take web and Android product work for other teams when that is the job.",
+      "I'm Austin, in Knoxville. Dynasty is in Early Access. I run ClassQuip. The browser games and the writing are on this site.",
   } as const,
   /** About page header — longer than homepage hero. */
   about: {
@@ -89,7 +89,8 @@ export const profile = {
       },
       {
         label: "Novux Games",
-        body: `Developing ${novuxFlagship.name}, an upcoming ${novuxFlagship.pitch} for ${novuxFlagship.platform}.`,
+        body: `${novuxFlagship.name} is live in Early Access on Google Play. It is a ${novuxFlagship.pitch} for ${novuxFlagship.platform}.`,
+        externalHref: novuxFlagship.storeUrl,
       },
       {
         label: "Personal Lab",

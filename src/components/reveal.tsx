@@ -25,8 +25,8 @@ export function Reveal({
       "(prefers-reduced-motion: reduce)",
     ).matches;
     if (reduced) {
-      setVisible(true);
-      return;
+      const id = window.setTimeout(() => setVisible(true), 0);
+      return () => window.clearTimeout(id);
     }
 
     if (when === "mount") {
