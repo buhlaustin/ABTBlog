@@ -102,6 +102,23 @@ export function normalizeSave(raw: unknown): GameState | null {
     fundingMultiplier:
       typeof macro.fundingMultiplier === "number" ? macro.fundingMultiplier : 1,
   };
-  unlockResearchForYear(o.calendar.year, o.research ?? defaultResearch());
+  if (!o.flags) {
+    o.flags = {
+      hasWebsite: false,
+      hasDomain: false,
+      hasFirstProduct: false,
+      ipoCompleted: false,
+      gameOver: false,
+      won: false,
+      legacyUrl: false,
+      ended: false,
+    };
+  }
+  if (!o.headcount) o.headcount = { developers: 0, designers: 0, sales: 0, executives: 0 };
+  if (!Array.isArray(o.plannedActions)) o.plannedActions = [];
+  if (!Array.isArray(o.research)) o.research = defaultResearch();
+  if (!Array.isArray(o.acquisitions)) o.acquisitions = [];
+  if (!Array.isArray(o.ownedAcquisitions)) o.ownedAcquisitions = [];
+  unlockResearchForYear(o.calendar.year, o.research);
   return o;
 }

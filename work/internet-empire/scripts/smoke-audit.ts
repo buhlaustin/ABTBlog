@@ -55,4 +55,51 @@ function fail(msg: string): never {
   if (cur.computeBurn < 2000) fail(`expected meaningful compute burn with AI live, got ${cur.computeBurn}`);
 }
 
+// Queued action costs are honored at resolve (two infra upgrades at tier 0 → $800 + $800).
+{
+  const mk = () =>
+    createInitialState({
+      mode: "sandbox",
+      companyName: "Infra Co",
+      seed: 3,
+      sandbox: { startingCash: 200_000, startYear: 2005 },
+    });
+  const two = mk();
+  queueAction(two, "upgrade_infra");
+  queueAction(two, "upgrade_infra");
+  const one = mk();
+  queueAction(one, "upgrade_infra");
+  resolveMonth(two);
+  resolveMonth(one);
+  if (two.infraTier !== 2) fail(`expected infra tier 2, got ${two.infraTier}`);
+  if (one.infraTier !== 1) fail(`expected infra tier 1, got ${one.infraTier}`);
+  const hostingDelta = 450;
+  const actionDelta = 800;
+  const cashDiff = one.cash - two.cash;
+  if (cashDiff !== actionDelta + hostingDelta) {
+    fail(`expected $${actionDelta + hostingDelta} cash gap from double upgrade, got ${cashDiff}`);
+  }
+}
+
+// Covid visitor spike applies before ad revenue in the same month.
+{
+  const s = createInitialState({
+    mode: "sandbox",
+    companyName: "Remote Co",
+    seed: 4,
+    sandbox: { startingCash: 100_000, startYear: 2020 },
+  });
+  s.calendar = calendarFromIndex(302);
+  s.visitors = 10_000;
+  s.flags.hasWebsite = true;
+  const snap = structuredClone(s);
+  resolveMonth(snap);
+  const noEvent = structuredClone(s);
+  noEvent.firedEvents = ["covid-spike"];
+  resolveMonth(noEvent);
+  if (snap.revenue <= noEvent.revenue) {
+    fail(`covid month revenue should beat non-event month (${snap.revenue} vs ${noEvent.revenue})`);
+  }
+}
+
 console.log("internet-empire audit smoke ok");

@@ -78,9 +78,12 @@ function infraStress(state: GameState, rng: ReturnType<typeof monthRng>): void {
 }
 
 export function resolveMonth(state: GameState): GameState {
-  if (state.flags.gameOver) return state;
+  if (state.flags.gameOver || state.flags.ended) return state;
 
   applyQueuedActions(state);
+
+  const scripted = fireScriptedEvents(state);
+  const crisis = maybeCrisis(state);
 
   const rng = monthRng(state, 1);
   const lane = laneDef(state.lane);
@@ -104,12 +107,10 @@ export function resolveMonth(state: GameState): GameState {
 
   unlockResearchForYear(state.calendar.year, state.research);
 
-  const scripted = fireScriptedEvents(state);
   state.news.push(...scripted);
+  if (crisis) state.news.push(crisis);
   const rnd = randomHeadline(state);
   if (rnd) state.news.push(rnd);
-  const crisis = maybeCrisis(state);
-  if (crisis) state.news.push(crisis);
   state.news = state.news.slice(-40);
 
   if (state.macro.mood === "boom") state.macro.adCpm = Math.min(1.6, state.macro.adCpm * 1.01);
@@ -133,6 +134,8 @@ export function resolveMonth(state: GameState): GameState {
 
   if (state.calendar.index >= END_MONTH_INDEX) {
     evaluate2030(state);
+    state.plannedActions = [];
+    state.apLeft = state.apTotal;
   } else if (!state.flags.gameOver) {
     state.calendar = advanceCalendar(state.calendar);
     state.plannedActions = [];

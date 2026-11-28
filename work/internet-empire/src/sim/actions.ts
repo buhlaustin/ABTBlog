@@ -190,8 +190,7 @@ export function applyQueuedActions(state: GameState): void {
   for (const plan of [...state.plannedActions]) {
     const def = ACTION_CATALOG.find((a) => a.key === plan.actionKey);
     if (!def) continue;
-    const cash = cashForAction(state, def);
-    state.cash -= cash;
+    state.cash -= plan.cashCost;
 
     switch (plan.actionKey) {
       case "build_website": {
@@ -314,13 +313,14 @@ export function applyQueuedActions(state: GameState): void {
       case "acquire": {
         const targetId = plan.payload?.targetId;
         const target = state.acquisitions.find((t) => t.id === targetId);
-        if (target && state.cash >= target.price) {
-          state.cash -= target.price;
+        if (target) {
           state.ownedAcquisitions.push(target.id);
           state.visitors += target.visitors;
           state.valuation += target.synergy;
           state.acquisitions = state.acquisitions.filter((t) => t.id !== target.id);
           state.log.push(`Acquired ${target.name}.`);
+        } else {
+          state.log.push("Acquisition fell through — target no longer available.");
         }
         break;
       }
@@ -356,6 +356,13 @@ export function queueAction(
     const targetId = payload?.targetId;
     const target = state.acquisitions.find((t) => t.id === targetId);
     if (!target) return { ok: false, reason: "Select a target on the Rivals tab." };
+    if (
+      state.plannedActions.some(
+        (p) => p.actionKey === "acquire" && p.payload?.targetId === targetId
+      )
+    ) {
+      return { ok: false, reason: "That target is already queued." };
+    }
     if (state.flags.gameOver || state.flags.ended) return { ok: false, reason: "Run ended." };
     if (state.apLeft < def.ap) return { ok: false, reason: "Not enough action points." };
     if (state.cash < plannedCash(state) + target.price) {

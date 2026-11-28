@@ -87,7 +87,7 @@ export const SCRIPTED_EVENTS: ScriptedEvent[] = [
     effects: (s) => {
       s.macro.mood = "bust";
       s.macro.adCpm *= 0.7;
-      s.revenue = Math.round(s.revenue * 0.85);
+      s.investorConfidence -= 5;
     },
   },
   {

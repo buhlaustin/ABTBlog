@@ -24,7 +24,7 @@ export interface HallOfFameEntry {
 }
 
 function pushHallOfFame(state: GameState) {
-  if (!state.flags.ended) return;
+  if (!state.flags.ended && !state.flags.gameOver) return;
   try {
     const raw = localStorage.getItem(HOF_KEY);
     const list: HallOfFameEntry[] = raw ? JSON.parse(raw) : [];
