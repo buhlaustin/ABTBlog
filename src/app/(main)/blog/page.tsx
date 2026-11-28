@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
-import { getAllPosts } from "@/lib/blog";
+import { formatBlogDate, getAllPosts } from "@/lib/blog";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -32,11 +32,7 @@ export default function BlogIndexPage() {
                 dateTime={post.date}
                 className="font-mono text-xs uppercase tracking-wider text-muted"
               >
-                {new Date(post.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
+                {formatBlogDate(post.date)}
               </time>
               <span className="text-xs text-muted" aria-hidden>
                 ·

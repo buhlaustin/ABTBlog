@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/json-ld";
 import { BlogPlayableEmbed } from "@/components/blog-playable-embed";
 import { MarkdownContent } from "@/components/markdown-content";
 import { PostAuthorCard } from "@/components/post-author-card";
-import { getAllPostSlugs, getPostBySlug } from "@/lib/blog";
+import { formatBlogDate, getAllPostSlugs, getPostBySlug } from "@/lib/blog";
 import { articleJsonLd, pageMetadata } from "@/lib/seo";
 
 const EDTECH_CONVERSION_TAGS = [
@@ -72,11 +72,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           dateTime={post.date}
           className="font-mono text-xs uppercase tracking-wider text-muted"
         >
-          {new Date(post.date).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
+          {formatBlogDate(post.date)}
         </time>
         <h1 className="font-display mt-3 text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
           {post.title}

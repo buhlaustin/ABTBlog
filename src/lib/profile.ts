@@ -65,10 +65,8 @@ export const profile = {
   /** Homepage hero only. */
   hero: {
     tagline: "Builder · Knoxville, TN · Vols on Saturdays",
-    headline: "I build games and classroom software.",
-    lead: "I'm Austin. Dynasty: College Basketball is in Early Access on Google Play. I run ClassQuip. The browser games on this site are the ones I build because I want to play them, and the writing is here too.",
-    leadMobile:
-      "I'm Austin, in Knoxville. Dynasty is in Early Access. I run ClassQuip. The browser games and the writing are on this site.",
+    headline: "I build the things I wish existed.",
+    lead: "I'm Austin, a builder in Knoxville. I make the games I want to play, like Dynasty: College Basketball, now in Early Access, and I run ClassQuip, which helps teachers run live online classes. Everything I'm building, breaking and learning ends up here.",
   } as const,
   /** About page header — longer than homepage hero. */
   about: {
