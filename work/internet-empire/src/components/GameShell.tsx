@@ -167,7 +167,7 @@ function renderPanel(tab: TabId, state: GameState) {
             {state.acquisitions.map((a) => (
               <li key={a.id}>
                 {a.name} — {a.price.toLocaleString()} ({a.visitors} visitors)
-                <AcquireBtn id={a.id} price={a.price} cash={state.cash} />
+                <AcquireBtn id={a.id} price={a.price} state={state} />
               </li>
             ))}
           </ul>
@@ -217,14 +217,19 @@ function renderPanel(tab: TabId, state: GameState) {
   }
 }
 
-function AcquireBtn({ id, price, cash }: { id: string; price: number; cash: number }) {
+function AcquireBtn({ id, price, state }: { id: string; price: number; state: GameState }) {
   const queue = useGameStore((s) => s.queue);
+  const planned = state.plannedActions.reduce((s, p) => s + p.cashCost, 0);
+  const disabled = state.apLeft < 2 || state.cash < planned + price;
   return (
     <button
       type="button"
       className="ie-link-btn"
-      disabled={cash < price}
-      onClick={() => queue("acquire", { targetId: id })}
+      disabled={disabled}
+      onClick={() => {
+        const err = queue("acquire", { targetId: id });
+        if (err) return;
+      }}
     >
       queue acquire
     </button>

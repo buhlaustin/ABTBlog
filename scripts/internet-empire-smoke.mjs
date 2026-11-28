@@ -12,3 +12,7 @@ execSync("npx tsx work/internet-empire/scripts/smoke-2030.ts", {
   cwd: root,
   stdio: "inherit",
 });
+execSync("npx tsx work/internet-empire/scripts/smoke-audit.ts", {
+  cwd: root,
+  stdio: "inherit",
+});

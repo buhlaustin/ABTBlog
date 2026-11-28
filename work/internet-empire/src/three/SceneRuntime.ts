@@ -129,9 +129,11 @@ export class SceneRuntime {
         ctx.fillStyle = "#94a3b8";
         ctx.font = "14px monospace";
         ctx.fillText(`${params.year} · IE`, 12, 80);
+        const oldMap = this.monitorMat.map;
         const tex = new THREE.CanvasTexture(canvas);
         this.monitorMat.map = tex;
         this.monitorMat.needsUpdate = true;
+        oldMap?.dispose();
       }
     }
   }

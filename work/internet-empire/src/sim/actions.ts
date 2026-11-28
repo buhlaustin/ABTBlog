@@ -138,7 +138,8 @@ export const ACTION_CATALOG: ActionDef[] = [
     ap: 2,
     cashCost: 0,
     eraMin: "web2",
-    effect: "Buy a target from acquisitions list.",
+    requires: (s) => (s.acquisitions.length === 0 ? "No acquisition targets left." : null),
+    effect: "Buy a target from acquisitions list (queue on Rivals tab).",
   },
   {
     key: "research_tick",
@@ -159,8 +160,8 @@ export function availableActions(state: GameState): ActionDef[] {
     }
     return true;
   }).filter((a) => {
-    // hide hire variants if too early for sales
     if (a.key === "hire_sales" && !eraMeets(state, "dotcom")) return false;
+    if (a.key === "acquire") return false;
     return true;
   });
 }
@@ -307,7 +308,6 @@ export function applyQueuedActions(state: GameState): void {
           revenueMonthly: 4500,
           monthsLive: 0,
         });
-        state.computeBurn += 3200;
         state.log.push("Launched AI product — watch the GPU bill.");
         break;
       }
@@ -351,6 +351,28 @@ export function queueAction(
 ): { ok: boolean; reason?: string } {
   const def = ACTION_CATALOG.find((a) => a.key === actionKey);
   if (!def) return { ok: false, reason: "Unknown action." };
+
+  if (actionKey === "acquire") {
+    const targetId = payload?.targetId;
+    const target = state.acquisitions.find((t) => t.id === targetId);
+    if (!target) return { ok: false, reason: "Select a target on the Rivals tab." };
+    if (state.flags.gameOver || state.flags.ended) return { ok: false, reason: "Run ended." };
+    if (state.apLeft < def.ap) return { ok: false, reason: "Not enough action points." };
+    if (state.cash < plannedCash(state) + target.price) {
+      return { ok: false, reason: "Not enough cash." };
+    }
+    state.plannedActions.push({
+      id: `${state.calendar.index}-acquire-${targetId}`,
+      actionKey,
+      label: `Acquire ${target.name}`,
+      cashCost: target.price,
+      apCost: def.ap,
+      payload,
+    });
+    state.apLeft -= def.ap;
+    return { ok: true };
+  }
+
   const check = canQueueAction(state, def);
   if (!check.ok) return check;
   const cash = cashForAction(state, def);

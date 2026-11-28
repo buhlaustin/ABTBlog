@@ -183,7 +183,7 @@
 }
 
 .ie-tabs {
-  @apply mb-3 flex flex-wrap gap-1;
+  @apply mb-3 flex max-w-full flex-wrap gap-1 overflow-x-auto pb-1;
 }
 
 .ie-tab {
@@ -196,10 +196,6 @@
 
 .ie-panels {
   @apply grid gap-4 lg:grid-cols-[1fr_min(40vw,360px)];
-}
-
-.ie-tabs {
-  @apply max-w-full overflow-x-auto pb-1;
 }
 
 .ie-tutorial {

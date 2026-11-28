@@ -1,6 +1,6 @@
 import { calendarFromIndex } from "./calendar";
 import { moodForYear } from "./eras";
-import { defaultResearch } from "./research";
+import { defaultResearch, unlockResearchForYear } from "./research";
 import { defaultRivals } from "./rivals";
 import type { GameMode, GameState } from "./types";
 import { SAVE_VERSION } from "./types";
@@ -59,7 +59,11 @@ export function createInitialState(opts: NewGameOptions): GameState {
       fundingMultiplier: 1,
     },
     rivals: defaultRivals(seed, lane, aggression),
-    research: defaultResearch(),
+    research: (() => {
+      const nodes = defaultResearch();
+      unlockResearchForYear(cal.year, nodes);
+      return nodes;
+    })(),
     acquisitions: [
       { id: "acq-1", name: "Mapstick", price: 25_000, visitors: 800, synergy: 12_000 },
       { id: "acq-2", name: "Blogstar", price: 80_000, visitors: 2200, synergy: 45_000 },
@@ -89,5 +93,15 @@ export function normalizeSave(raw: unknown): GameState | null {
   if (o.version !== SAVE_VERSION) return null;
   if (!o.calendar || typeof o.cash !== "number") return null;
   if (!o.firedEvents) o.firedEvents = [];
+  if (!o.lane) o.lane = "content";
+  if (typeof o.computeBurn !== "number") o.computeBurn = 0;
+  const macro = o.macro ?? {};
+  o.macro = {
+    mood: macro.mood ?? "neutral",
+    adCpm: typeof macro.adCpm === "number" ? macro.adCpm : 1,
+    fundingMultiplier:
+      typeof macro.fundingMultiplier === "number" ? macro.fundingMultiplier : 1,
+  };
+  unlockResearchForYear(o.calendar.year, o.research ?? defaultResearch());
   return o;
 }

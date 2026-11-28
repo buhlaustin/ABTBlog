@@ -47,9 +47,18 @@ function productTick(state: GameState, revenueMult = 1): void {
     } else if (p.stage === "live") {
       p.monthsLive += 1;
       state.revenue += Math.round(p.revenueMonthly * revenueMult);
-      if (p.kind === "ai") state.computeBurn += 200;
     }
   }
+}
+
+function refreshComputeBurn(state: GameState): void {
+  let burn = 0;
+  for (const p of state.products) {
+    if (p.kind === "ai" && p.stage === "live") {
+      burn += 2200 + Math.min(p.monthsLive * 60, 1800);
+    }
+  }
+  state.computeBurn = burn;
 }
 
 function valuationTick(state: GameState): void {
@@ -77,6 +86,7 @@ export function resolveMonth(state: GameState): GameState {
   const lane = laneDef(state.lane);
   state.revenue = 0;
   productTick(state, lane.revenueMult);
+  refreshComputeBurn(state);
   const organic = Math.round(organicVisitors(state, rng) * lane.visitorMult);
   state.visitors += organic;
 
@@ -102,9 +112,8 @@ export function resolveMonth(state: GameState): GameState {
   if (crisis) state.news.push(crisis);
   state.news = state.news.slice(-40);
 
-  state.macro.mood = moodForYear(state.calendar.year);
   if (state.macro.mood === "boom") state.macro.adCpm = Math.min(1.6, state.macro.adCpm * 1.01);
-  if (state.macro.mood === "bust") state.macro.adCpm = Math.max(0.45, state.macro.adCpm * 0.99);
+  else if (state.macro.mood === "bust") state.macro.adCpm = Math.max(0.45, state.macro.adCpm * 0.99);
 
   valuationTick(state);
 
@@ -120,12 +129,17 @@ export function resolveMonth(state: GameState): GameState {
     valuation: state.valuation,
   });
 
+  const monthYear = state.calendar.year;
+
   if (state.calendar.index >= END_MONTH_INDEX) {
     evaluate2030(state);
-  } else {
+  } else if (!state.flags.gameOver) {
     state.calendar = advanceCalendar(state.calendar);
     state.plannedActions = [];
     state.apLeft = state.apTotal;
+    if (state.calendar.year !== monthYear) {
+      state.macro.mood = moodForYear(state.calendar.year);
+    }
   }
 
   return state;
