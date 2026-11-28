@@ -369,10 +369,10 @@ Three.js side stage, SFX, tutorial, balance, Supabase hall of fame (optional), p
 ## Success criteria
 
 - [x] Product vision and stack recorded in this doc.
-- [ ] Phase 0 playable with Win95 chrome and local save.
-- [ ] UI era transitions through at least **three** themes before 2030 content complete.
-- [ ] Deterministic smoke in `prebuild`.
-- [ ] Listed on Lab (`/work/internet-empire/`).
+- [x] Phase 0 playable with Win95 chrome and local save.
+- [x] UI era transitions through **six** themes through 2030 sim.
+- [x] Deterministic smoke in `prebuild` (+ 2030 fast-forward smoke).
+- [x] Listed on Lab (`/work/internet-empire/`, status `wip`).
 
 ---
 

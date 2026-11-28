@@ -27,6 +27,17 @@ export const workItems: WorkItem[] = [
     hostedEntry: "/play/eer/index.html",
   },
   {
+    slug: "internet-empire",
+    title: "Internet Empire",
+    summary:
+      "Build the internet from a 1995 garage startup to the 2030 AI era. Monthly tycoon sim with era-evolving UI, rivals, research, and a Three.js office vignette.",
+    kind: "hosted",
+    status: "live",
+    tags: ["game", "react", "simulation"],
+    featured: true,
+    hostedEntry: "/play/internet-empire/index.html",
+  },
+  {
     slug: "startup-sim",
     title: "Startup Simulator",
     summary:

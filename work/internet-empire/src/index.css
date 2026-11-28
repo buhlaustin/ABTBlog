@@ -1,0 +1,264 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ie-root {
+  @apply mx-auto max-w-6xl px-4 py-6;
+}
+
+.ie-a11y-toggle {
+  @apply mb-4 flex items-center gap-2 text-xs opacity-80;
+}
+
+.ie-eyebrow {
+  @apply text-xs uppercase tracking-widest opacity-80;
+}
+
+.ie-lede {
+  @apply mt-2 max-w-xl text-lg;
+}
+
+.ie-muted {
+  @apply text-sm opacity-75;
+}
+
+.ie-menu h1 {
+  @apply text-4xl font-bold;
+}
+
+.ie-menu-actions {
+  @apply mt-8 flex flex-wrap gap-3;
+}
+
+.ie-setup label {
+  @apply mt-4 flex flex-col gap-1 text-sm;
+}
+
+.ie-setup input,
+.ie-setup select {
+  @apply rounded border px-2 py-1 text-black;
+}
+
+/* Win95 */
+[data-ui-skin="win95"] .ie-btn {
+  @apply border-2 border-t-white border-l-white border-r-gray-600 border-b-gray-600 bg-[#c0c0c0] px-3 py-1 text-black shadow-none;
+}
+
+[data-ui-skin="win95"] .ie-panel {
+  @apply border-2 border-gray-600 bg-[#c0c0c0] p-3 text-black;
+}
+
+[data-ui-skin="win95"] .ie-stat-grid {
+  @apply grid grid-cols-2 gap-2 border-2 border-gray-600 bg-[#c0c0c0] p-2 text-black sm:grid-cols-4;
+}
+
+[data-ui-skin="win95"] .ie-stat-label {
+  @apply block text-xs uppercase;
+}
+
+[data-ui-skin="win95"] .ie-stat-value {
+  @apply font-bold tabular-nums;
+}
+
+/* Dotcom */
+[data-ui-skin="dotcom"] .ie-btn,
+.ie-skin-dotcom .ie-btn {
+  @apply rounded-full bg-yellow-400 px-4 py-2 font-bold text-purple-900 shadow-lg;
+}
+
+[data-ui-skin="dotcom"] .ie-panel,
+.ie-skin-dotcom .ie-panel {
+  @apply rounded-2xl border-2 border-white/40 bg-white/20 p-4 backdrop-blur;
+}
+
+/* Web2 */
+[data-ui-skin="web2"] .ie-panel,
+.ie-skin-web2 .ie-panel {
+  @apply rounded-lg border border-slate-300 bg-white p-4 shadow-md;
+}
+
+[data-ui-skin="web2"] .ie-btn,
+.ie-skin-web2 .ie-btn {
+  @apply rounded-md bg-sky-600 px-3 py-1.5 text-white;
+}
+
+/* Mobile */
+.ie-skin-mobile .ie-panel,
+[data-ui-skin="mobile"] .ie-panel {
+  @apply rounded-2xl bg-zinc-800 p-4;
+}
+
+.ie-skin-mobile .ie-btn,
+[data-ui-skin="mobile"] .ie-btn {
+  @apply w-full rounded-xl bg-emerald-600 py-2 font-semibold;
+}
+
+/* Platform / enterprise */
+.ie-skin-platform .ie-panel,
+[data-ui-skin="platform"] .ie-panel,
+.ie-skin-enterprise .ie-panel,
+[data-ui-skin="enterprise"] .ie-panel {
+  @apply rounded-lg border border-slate-700 bg-slate-900/80 p-4;
+}
+
+.ie-skin-enterprise .ie-btn-primary,
+[data-ui-skin="enterprise"] .ie-btn-primary {
+  @apply bg-indigo-500 text-white;
+}
+
+.ie-btn {
+  @apply cursor-pointer disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.ie-btn-primary {
+  @apply font-semibold;
+}
+
+.ie-btn-meta {
+  @apply ml-2 text-xs opacity-70;
+}
+
+.ie-header {
+  @apply flex flex-wrap items-start justify-between gap-4;
+}
+
+.ie-stat-grid {
+  @apply my-4 grid grid-cols-2 gap-2 sm:grid-cols-4;
+}
+
+.ie-year-one-hint {
+  @apply my-2 rounded border border-white/20 bg-black/10 p-2 text-sm;
+}
+
+.ie-starter-head {
+  @apply mb-1 mt-3 text-sm font-semibold uppercase tracking-wide opacity-80;
+}
+
+.ie-header-actions {
+  @apply flex flex-wrap gap-2;
+}
+
+.ie-btn-ghost {
+  @apply opacity-90;
+}
+
+.ie-era-banner {
+  @apply my-2 overflow-hidden text-ellipsis whitespace-nowrap text-sm italic opacity-80;
+}
+
+[data-skin="dotcom"] .ie-era-banner {
+  @apply rounded-full bg-white/20 px-3 py-1 text-center not-italic;
+}
+
+.ie-channel-list {
+  @apply list-none space-y-2 p-0 text-sm;
+}
+
+.ie-flash {
+  @apply my-2 flex flex-wrap items-center gap-2 rounded border border-amber-400/40 bg-amber-400/10 p-2 text-sm;
+}
+
+.ie-hof {
+  @apply my-6 rounded border border-white/20 p-3 text-sm;
+}
+
+.ie-hof ul {
+  @apply mt-2 list-none space-y-1 p-0;
+}
+
+[data-ui-skin="win95"] .ie-win95-taskbar {
+  @apply mb-2 flex items-center gap-2 border-2 border-gray-600 bg-[#c0c0c0] px-2 py-1 text-black;
+}
+
+[data-ui-skin="win95"] .ie-win95-taskbar-title {
+  @apply flex-1 border border-gray-500 bg-[#000080] px-2 py-0.5 text-xs text-white;
+}
+
+[data-ui-skin="win95"] .ie-win95-window {
+  @apply border-2 border-t-white border-l-white border-r-gray-800 border-b-gray-800 bg-[#c0c0c0] p-2;
+}
+
+.ie-stat {
+  @apply rounded p-2 tabular-nums;
+}
+
+.ie-tabs {
+  @apply mb-3 flex max-w-full flex-wrap gap-1 overflow-x-auto pb-1;
+}
+
+.ie-tab {
+  @apply rounded px-2 py-1 text-sm opacity-70;
+}
+
+.ie-tab.active {
+  @apply font-semibold opacity-100 underline;
+}
+
+.ie-panels {
+  @apply grid gap-4 lg:grid-cols-[1fr_min(40vw,360px)];
+}
+
+.ie-tutorial {
+  @apply mb-2 rounded border border-sky-400/40 bg-sky-500/10 p-3 text-sm;
+}
+
+[data-ui-skin="web2"] .ie-header h1 {
+  @apply bg-gradient-to-r from-sky-600 to-blue-800 bg-clip-text text-transparent;
+}
+
+[data-ui-skin="platform"] .ie-tabs,
+.ie-skin-platform .ie-tabs {
+  @apply border-b border-slate-300;
+}
+
+[data-ui-skin="platform"] .ie-tab.active {
+  @apply border-b-2 border-indigo-600 text-indigo-700;
+}
+
+.ie-panel-title {
+  @apply mb-2 text-lg font-semibold;
+}
+
+.ie-action-list {
+  @apply list-none space-y-3 p-0;
+}
+
+.ie-action-list li {
+  @apply flex flex-col gap-1;
+}
+
+.ie-action-effect {
+  @apply text-xs opacity-70;
+}
+
+.ie-link-btn {
+  @apply ml-2 text-xs underline;
+}
+
+.ie-queue ul {
+  @apply mt-2 list-disc pl-5 text-sm;
+}
+
+.ie-stage {
+  @apply hidden min-h-[280px] rounded-lg border border-white/10 bg-black/20 lg:block;
+}
+
+.ie-stage-label {
+  @apply px-2 py-1 text-xs uppercase opacity-60;
+}
+
+.ie-stage-canvas canvas {
+  @apply w-full rounded-b-lg;
+}
+
+.ie-poster {
+  @apply m-2 h-64 rounded bg-gradient-to-br from-stone-500 to-stone-800;
+}
+
+.ie-news li {
+  @apply mb-3 border-b border-white/10 pb-2 text-sm;
+}
+
+.ie-end ul {
+  @apply my-4 list-disc pl-5;
+}

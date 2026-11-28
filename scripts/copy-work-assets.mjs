@@ -1,4 +1,13 @@
-import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
@@ -15,6 +24,7 @@ const projects = [
   { slug: "startup-sim", dir: "startup-sim" },
   { slug: "white-house-2028", dir: "white-house-2028" },
   { slug: "greenhouse-tick", dir: "greenhouse-tick" },
+  { slug: "internet-empire", dir: "internet-empire", distOnly: true },
 ];
 
 function resolveBuildId() {
@@ -53,11 +63,29 @@ function stampRelativeEsmImports(dir, buildId, touched = new Set()) {
 
 const buildId = resolveBuildId();
 
-for (const { slug, dir } of projects) {
+let copied = 0;
+for (const { slug, dir, distOnly } of projects) {
   const src = join(root, "work", dir);
+  if (distOnly) {
+    const dist = join(src, "dist");
+    if (!existsSync(dist)) {
+      console.warn(
+        `Skip ${slug}: work/${dir}/dist missing (run npm run build:internet-empire before copy-work)`
+      );
+      continue;
+    }
+  } else if (!existsSync(src)) {
+    console.warn(`Skip ${slug}: work/${dir} missing`);
+    continue;
+  }
   const dest = join(publicPlay, slug);
   rmSync(dest, { recursive: true, force: true });
-  cpSync(src, dest, { recursive: true });
+  if (distOnly) {
+    cpSync(join(src, "dist"), dest, { recursive: true });
+  } else {
+    cpSync(src, dest, { recursive: true });
+  }
+  copied += 1;
   if (slug === "startup-sim") {
     const indexPath = join(dest, "index.html");
     let html = readFileSync(indexPath, "utf8");
@@ -80,4 +108,4 @@ for (const { slug, dir } of projects) {
   }
 }
 
-console.log(`Copied ${projects.length} playable project(s) to public/play/`);
+console.log(`Copied ${copied}/${projects.length} playable project(s) to public/play/`);
