@@ -1,12 +1,15 @@
-import type { ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import type { GameState, TabId } from "@/sim";
 import { eraAt } from "@/sim/eras";
 import { formatMonth } from "@/lib/format";
 import { useGameStore } from "@/store/gameStore";
 import { ActionPanel } from "./ActionPanel";
 import { FinanceCharts } from "./FinanceCharts";
-import { SideStage } from "./SideStage";
 import { StatHud } from "./StatHud";
+
+const SideStage = lazy(() =>
+  import("./SideStage").then((m) => ({ default: m.SideStage }))
+);
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "desk", label: "Desk" },
@@ -40,6 +43,13 @@ export function GameShell({ state }: { state: GameState }) {
 
       <StatHud state={state} />
 
+      {state.calendar.index < 12 && (
+        <p className="ie-year-one-hint">
+          Year 1 — start with your website, domain, and first product. Survive to <strong>2030</strong>{" "}
+          to face the AI-era test.
+        </p>
+      )}
+
       <div className="ie-main">
         <nav className="ie-tabs" aria-label="Sections">
           {TABS.map((t) => (
@@ -56,7 +66,9 @@ export function GameShell({ state }: { state: GameState }) {
 
         <div className="ie-panels">
           <div className="ie-panel-stack">{renderPanel(tab, state)}</div>
-          <SideStage state={state} />
+          <Suspense fallback={<aside className="ie-stage ie-stage-poster" aria-hidden />}>
+            <SideStage state={state} />
+          </Suspense>
         </div>
       </div>
     </div>

@@ -12,5 +12,13 @@ export default defineConfig({
     outDir: "dist",
     emptyOutDir: true,
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three: ["three"],
+          recharts: ["recharts"],
+        },
+      },
+    },
   },
 });
