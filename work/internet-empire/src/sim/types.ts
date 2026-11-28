@@ -110,6 +110,20 @@ export interface MonetizationState {
   enterpriseMrr: number;
 }
 
+export interface ActiveCampaign {
+  id: string;
+  type: string;
+  label: string;
+  monthsLeft: number;
+}
+
+export interface RevenueBreakdown {
+  productMrr: number;
+  contractMrr: number;
+  adEstimate: number;
+  totalEstimate: number;
+}
+
 export interface GameState {
   version: number;
   mode: GameMode;
@@ -140,13 +154,22 @@ export interface GameState {
   news: NewsItem[];
   log: string[];
   flags: GameFlags;
-  history: { monthIndex: number; visitors: number; cash: number; valuation: number }[];
+  history: {
+    monthIndex: number;
+    visitors: number;
+    cash: number;
+    valuation: number;
+    revenue: number;
+  }[];
   firedEvents: string[];
   sandbox?: { startYear?: number; startingCash?: number; rivalAggression?: number };
   monetization: MonetizationState;
   monthlyDeck: string[];
   deckMonthIndex: number;
   actionUses: Record<string, number>;
+  activeCampaigns: ActiveCampaign[];
+  aggressionThisMonth: number;
+  lastDeckHighlight: string | null;
 }
 
 export interface ActionDef {

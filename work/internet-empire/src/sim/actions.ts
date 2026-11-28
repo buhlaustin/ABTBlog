@@ -165,6 +165,10 @@ export const ACTION_CATALOG: ActionDef[] = [
     ap: 2,
     cashCost: 8000,
     eraMin: "mobile",
+    requires: (s) =>
+      s.products.some((p) => p.name.includes("Mobile") && p.stage === "live")
+        ? "Mobile app already live."
+        : null,
     effect: "Mobile channel unlock.",
   },
   {
@@ -173,6 +177,8 @@ export const ACTION_CATALOG: ActionDef[] = [
     ap: 2,
     cashCost: 12000,
     eraMin: "ai",
+    requires: (s) =>
+      s.products.some((p) => p.kind === "ai" && p.stage === "live") ? "AI product already live." : null,
     effect: "AI revenue + compute burn.",
   },
   {

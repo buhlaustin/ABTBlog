@@ -1,5 +1,5 @@
 import { laneDef } from "./lanes";
-import type { GameState } from "./types";
+import type { GameState, RevenueBreakdown } from "./types";
 
 /** Multipliers applied when accruing product + ad revenue each month. */
 export function revenueMultipliers(state: GameState, laneRevMult = 1): number {
@@ -24,6 +24,35 @@ export function initialProductMrr(state: GameState, quality: number, tier: "stan
   const tierMult = tier === "enterprise" ? 2.8 : tier === "premium" ? 1.55 : 1;
   const qualityPart = quality * 22;
   return Math.round((eraBase + qualityPart) * tierMult * lane.revenueMult);
+}
+
+/** Rough next-month revenue if you ended the month now (no organic visitor drift). */
+export function estimateRevenueBreakdown(state: GameState): RevenueBreakdown {
+  const lane = laneDef(state.lane);
+  const years = Math.max(0, state.calendar.year - 1995);
+  const revMult = revenueMultipliers(state, lane.revenueMult);
+
+  let productMrr = 0;
+  for (const p of state.products) {
+    if (p.stage !== "live" || p.kind === "website") continue;
+    const growth = productLiveGrowth(p.monthsLive + 1);
+    productMrr += Math.round(p.revenueMonthly * revMult * growth);
+  }
+  const contractMrr = Math.round(state.monetization.enterpriseMrr * revMult);
+  const adEstimate = Math.round(
+    state.visitors *
+      0.04 *
+      state.macro.adCpm *
+      lane.revenueMult *
+      state.monetization.adArpuMult *
+      (1 + years * 0.02)
+  );
+  return {
+    productMrr,
+    contractMrr,
+    adEstimate,
+    totalEstimate: productMrr + contractMrr + adEstimate,
+  };
 }
 
 export function refreshProductMrr(state: GameState): void {

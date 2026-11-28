@@ -93,6 +93,9 @@ export function createInitialState(opts: NewGameOptions): GameState {
     monthlyDeck: [],
     deckMonthIndex: -1,
     actionUses: {},
+    activeCampaigns: [],
+    aggressionThisMonth: 0,
+    lastDeckHighlight: null,
   };
   refreshMonthlyDeck(state);
   return state;
@@ -139,5 +142,11 @@ export function normalizeSave(raw: unknown): GameState | null {
   if (!o.actionUses) o.actionUses = {};
   unlockResearchForYear(o.calendar.year, o.research);
   if (o.monthlyDeck.length === 0) refreshMonthlyDeck(o);
+  if (!Array.isArray(o.activeCampaigns)) o.activeCampaigns = [];
+  if (typeof o.aggressionThisMonth !== "number") o.aggressionThisMonth = 0;
+  if (o.lastDeckHighlight === undefined) o.lastDeckHighlight = null;
+  for (const h of o.history) {
+    if (typeof (h as { revenue?: number }).revenue !== "number") (h as { revenue: number }).revenue = 0;
+  }
   return o;
 }

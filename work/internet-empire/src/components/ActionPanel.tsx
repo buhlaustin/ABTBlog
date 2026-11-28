@@ -34,6 +34,18 @@ export function ActionPanel({ state }: { state: GameState }) {
       {deck.length > 0 && (
         <ActionList state={state} actions={deck} queue={queue} title="This month's opportunities" />
       )}
+      {state.activeCampaigns.length > 0 && (
+        <div className="ie-campaigns">
+          <h4 className="ie-starter-head">Active campaigns</h4>
+          <ul>
+            {state.activeCampaigns.map((c) => (
+              <li key={c.id}>
+                {c.label} — {c.monthsLeft} mo left
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {state.plannedActions.length > 0 && <PlannedQueue state={state} />}
     </div>
   );

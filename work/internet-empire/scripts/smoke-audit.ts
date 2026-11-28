@@ -110,7 +110,7 @@ function fail(msg: string): never {
     seed: 11,
     sandbox: { startingCash: 100_000, startYear: 2005 },
   });
-  if (s.monthlyDeck.length < 5) fail(`expected monthly deck, got ${s.monthlyDeck.length}`);
+  if (s.monthlyDeck.length < 7) fail(`expected monthly deck, got ${s.monthlyDeck.length}`);
 }
 
 // Mid-game revenue should scale past early MRR caps.

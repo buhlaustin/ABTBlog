@@ -24,8 +24,9 @@ export function defaultRivals(_seed: number, lane: string, aggression: number): 
 export function tickRivals(state: GameState): string[] {
   const logs: string[] = [];
   const rng = monthRng(state, 91);
+  const pressure = 0.04 * (state.aggressionThisMonth ?? 0);
   for (const r of state.rivals) {
-    if (rng.chance(0.25 + r.aggression * 0.05)) {
+    if (rng.chance(0.25 + r.aggression * 0.05 + pressure)) {
       const steal = rng.int(20, 120);
       state.visitors = Math.max(0, state.visitors - steal);
       r.share = Math.min(45, r.share + 1);

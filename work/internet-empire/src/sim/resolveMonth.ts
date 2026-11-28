@@ -1,5 +1,6 @@
 import { applyQueuedActions } from "./actions";
 import { ensureDeckForMonth, refreshMonthlyDeck } from "./actionDeck";
+import { tickCampaigns } from "./campaigns";
 import { advanceCalendar } from "./calendar";
 import { END_MONTH_INDEX, moodForYear } from "./eras";
 import { evaluate2030 } from "./endgame";
@@ -122,6 +123,8 @@ export function resolveMonth(state: GameState): GameState {
 
   infraStress(state, rng);
 
+  tickCampaigns(state);
+
   const rivalLogs = tickRivals(state);
   state.log.push(...rivalLogs.slice(0, 2));
 
@@ -148,6 +151,7 @@ export function resolveMonth(state: GameState): GameState {
     visitors: state.visitors,
     cash: state.cash,
     valuation: state.valuation,
+    revenue: state.revenue,
   });
 
   const monthYear = state.calendar.year;
@@ -161,6 +165,7 @@ export function resolveMonth(state: GameState): GameState {
     state.plannedActions = [];
     state.apLeft = state.apTotal;
     refreshMonthlyDeck(state);
+    state.aggressionThisMonth = 0;
     if (state.calendar.year !== monthYear) {
       state.macro.mood = moodForYear(state.calendar.year);
     }

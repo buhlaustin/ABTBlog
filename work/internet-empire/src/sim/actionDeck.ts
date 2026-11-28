@@ -2,7 +2,7 @@ import { bankActionEligible, ACTION_BANK } from "./actionBank";
 import { monthRng } from "./rng";
 import type { GameState } from "./types";
 
-const DECK_SIZE = 7;
+const DECK_SIZE = 9;
 
 export function refreshMonthlyDeck(state: GameState): void {
   const rng = monthRng(state, 902);

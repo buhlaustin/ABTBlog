@@ -1,5 +1,6 @@
 import { deriveUiEra } from "./eras";
 import { laneDef } from "./lanes";
+import { startCampaign } from "./campaigns";
 import { initialProductMrr } from "./monetization";
 import { monthRng } from "./rng";
 import type { GameState, UiEraId } from "./types";
@@ -41,6 +42,15 @@ const PRODUCT_SUFFIX = [
   "Network",
   "OS",
 ];
+
+const AGGRESSIVE_ACTIONS = new Set([
+  "price_increase",
+  "viral_stunt",
+  "land_grab_tlds",
+  "superbowl_trailer",
+  "poach_talent",
+  "undercut_rival",
+]);
 
 export function pickProductNameFromBank(state: GameState): string {
   const rng = monthRng(state, 517);
@@ -462,6 +472,241 @@ export const ACTION_BANK: BankAction[] = [
       s.log.push(`Annual plan promo — collected $${lift.toLocaleString()} upfront.`);
     },
   },
+  {
+    key: "start_series_b",
+    label: "Start Series B roadshow",
+    effect: "3-month campaign → funding.",
+    ap: 2,
+    cashCost: 2000,
+    eraMin: "web2",
+    weight: 7,
+    requires: (s) =>
+      s.activeCampaigns.some((c) => c.type === "series_b_roadshow") ? "Roadshow already running." : null,
+    apply: (s) => {
+      startCampaign(s, "series_b_roadshow");
+    },
+  },
+  {
+    key: "start_pmf_sprint",
+    label: "Start PMF sprint",
+    effect: "2-month build + monetization boost.",
+    ap: 2,
+    cashCost: 1500,
+    eraMin: "dotcom",
+    weight: 9,
+    requires: (s) =>
+      s.activeCampaigns.some((c) => c.type === "pmf_push") ? "PMF sprint already running." : null,
+    apply: (s) => {
+      startCampaign(s, "pmf_push");
+    },
+  },
+  {
+    key: "start_hypergrowth",
+    label: "Hypergrowth hiring wave",
+    effect: "2-month hiring + revenue tailwind.",
+    ap: 2,
+    cashCost: 6000,
+    eraMin: "dotcom",
+    weight: 8,
+    apply: (s) => {
+      startCampaign(s, "hypergrowth_hire");
+    },
+  },
+  {
+    key: "start_soc2",
+    label: "Begin SOC 2 certification",
+    effect: "4-month compliance → enterprise MRR.",
+    ap: 2,
+    cashCost: 8000,
+    eraMin: "platform",
+    weight: 7,
+    lanes: ["enterprise", "hosting", "tools"],
+    apply: (s) => {
+      startCampaign(s, "soc2_certification");
+    },
+  },
+  {
+    key: "start_category_blitz",
+    label: "Category marketing blitz",
+    effect: "2-month brand + ad ARPU spike.",
+    ap: 2,
+    cashCost: 5500,
+    eraMin: "web2",
+    weight: 8,
+    apply: (s) => {
+      startCampaign(s, "category_blitz");
+    },
+  },
+  {
+    key: "retargeting_pixel",
+    label: "Retargeting pixel rollout",
+    effect: "Ad efficiency + product conv.",
+    ap: 1,
+    cashCost: 900,
+    eraMin: "web2",
+    weight: 10,
+    apply: (s) => {
+      s.monetization.adArpuMult *= 1.09;
+      s.monetization.productRevenueMult *= 1.03;
+      s.visitors += 100;
+      s.log.push("Pixel chased users across the web — creepy, effective.");
+    },
+  },
+  {
+    key: "reseller_channel",
+    label: "Stand up reseller channel",
+    effect: "Enterprise MRR channel.",
+    ap: 2,
+    cashCost: 4200,
+    eraMin: "web2",
+    lanes: ["enterprise", "tools"],
+    weight: 9,
+    apply: (s) => {
+      s.monetization.enterpriseMrr += 9000;
+      s.headcount.sales += 1;
+      s.log.push("Resellers added margin — your logo, their rolodex.");
+    },
+  },
+  {
+    key: "land_grab_tlds",
+    label: "Land-grab related domains",
+    effect: "Brand + defensive traffic.",
+    ap: 1,
+    cashCost: 2400,
+    eraMin: "dotcom",
+    weight: 8,
+    apply: (s) => {
+      s.brand += 9;
+      s.visitors += 220;
+      s.cash -= 200;
+      s.log.push("Bought every typo of your .com — typosquatters cried.");
+    },
+  },
+  {
+    key: "superbowl_trailer",
+    label: "Super Bowl spot (local market)",
+    effect: "Mass awareness spike.",
+    ap: 2,
+    cashCost: 25_000,
+    eraMin: "mobile",
+    weight: 5,
+    maxPerRun: 1,
+    apply: (s) => {
+      s.visitors += 2500;
+      s.brand += 18;
+      s.monetization.adArpuMult *= 1.08;
+      s.log.push("Regional Super Bowl ad aired — water cooler discussed.");
+    },
+  },
+  {
+    key: "poach_talent",
+    label: "Poach rival engineering lead",
+    effect: "Dev velocity + rival pressure.",
+    ap: 2,
+    cashCost: 15_000,
+    eraMin: "platform",
+    weight: 6,
+    apply: (s) => {
+      s.headcount.developers += 1;
+      s.techDebt = Math.max(0, s.techDebt - 6);
+      s.brand += 6;
+      s.log.push("Poached a rival principal — NDAs were tweeted.");
+    },
+  },
+  {
+    key: "undercut_rival",
+    label: "Undercut rival pricing",
+    effect: "Share grab, margin hit.",
+    ap: 1,
+    cashCost: 500,
+    eraMin: "dotcom",
+    weight: 9,
+    apply: (s) => {
+      s.monetization.productRevenueMult *= 0.94;
+      s.visitors += 400;
+      s.brand += 4;
+      s.log.push("Price war declared — users cheered, CFO sweated.");
+    },
+  },
+  {
+    key: "tiktok_channel",
+    label: "TikTok growth channel",
+    effect: "Gen-Z traffic funnel.",
+    ap: 1,
+    cashCost: 1200,
+    eraMin: "mobile",
+    weight: 11,
+    apply: (s) => {
+      s.visitors += 650;
+      s.brand += 7;
+      s.monetization.adArpuMult *= 1.04;
+      s.log.push("Short-form funnel live — algorithm chose violence.");
+    },
+  },
+  {
+    key: "security_audit",
+    label: "Security red-team audit",
+    effect: "Reduce tech debt + brand trust.",
+    ap: 1,
+    cashCost: 3500,
+    eraMin: "platform",
+    weight: 8,
+    apply: (s) => {
+      s.techDebt = Math.max(0, s.techDebt - 12);
+      s.brand += 5;
+      s.investorConfidence += 4;
+      s.log.push("Red team found issues — you fixed the loud ones.");
+    },
+  },
+  {
+    key: "patent_defense",
+    label: "File defensive patents",
+    effect: "Investor confidence + lawsuit armor.",
+    ap: 2,
+    cashCost: 7000,
+    eraMin: "web2",
+    weight: 6,
+    apply: (s) => {
+      s.investorConfidence += 8;
+      s.cash -= 1200;
+      s.log.push("Patent stack filed — attorneys high-fived.");
+    },
+  },
+  {
+    key: "usage_based_pricing",
+    label: "Switch to usage-based pricing",
+    effect: "Spiky enterprise revenue.",
+    ap: 2,
+    cashCost: 1000,
+    eraMin: "platform",
+    weight: 10,
+    requires: (s) =>
+      !s.products.some((p) => p.stage === "live" && p.kind !== "website")
+        ? "Need live paid product."
+        : null,
+    apply: (s) => {
+      s.monetization.productRevenueMult *= 1.16;
+      s.monetization.enterpriseMrr += 5000;
+      s.brand -= 2;
+      s.log.push("Meters everywhere — finance loves the upside.");
+    },
+  },
+  {
+    key: "cloud_repatriate",
+    label: "Repatriate workloads in-house",
+    effect: "Lower hosting, higher capex.",
+    ap: 2,
+    cashCost: 18_000,
+    eraMin: "ai",
+    lanes: ["hosting", "enterprise"],
+    weight: 7,
+    apply: (s) => {
+      s.infraTier += 1;
+      s.monetization.productRevenueMult *= 1.05;
+      s.computeBurn = Math.max(0, s.computeBurn - 600);
+      s.log.push("Racks purchased — cloud bill blinked.");
+    },
+  },
 ];
 
 export function bankActionByKey(key: string): BankAction | undefined {
@@ -492,4 +737,6 @@ export function applyBankAction(state: GameState, key: string): void {
   if (!a) return;
   a.apply(state);
   state.actionUses[key] = (state.actionUses[key] ?? 0) + 1;
+  state.lastDeckHighlight = a.label;
+  if (AGGRESSIVE_ACTIONS.has(key)) state.aggressionThisMonth += 1;
 }
