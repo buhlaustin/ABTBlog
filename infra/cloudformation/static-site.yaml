@@ -107,6 +107,7 @@ Resources:
         DefaultRootObject: index.html
         Aliases:
           - !Ref SiteDomainName
+          - !Sub "www.${SiteDomainName}"
         ViewerCertificate:
           AcmCertificateArn: !Ref AcmCertificateArn
           SslSupportMethod: sni-only
@@ -180,6 +181,28 @@ Resources:
     Properties:
       HostedZoneId: !Ref HostedZoneId
       Name: !Ref SiteDomainName
+      Type: AAAA
+      AliasTarget:
+        DNSName: !GetAtt SiteDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+  DnsWwwARecord:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateDnsRecords
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "www.${SiteDomainName}"
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt SiteDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+  DnsWwwAAAARecord:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateDnsRecords
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "www.${SiteDomainName}"
       Type: AAAA
       AliasTarget:
         DNSName: !GetAtt SiteDistribution.DomainName
