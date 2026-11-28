@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Neighborhood Greenhouse</title>
+  <meta name="description" content="A twelve-week browser greenhouse sim — balance water, sun, and nutrients to reach harvest.">
+  <link rel="stylesheet" href="/play/greenhouse-tick/style.css">
+</head>
+<body>
+  <div id="app">
+    <section id="screen-setup" class="screen">
+      <header class="hero">
+        <p class="eyebrow">Tutorial simulation · 2026</p>
+        <h1>Neighborhood Greenhouse</h1>
+        <p class="lede">You have <strong>twelve weeks</strong> to bring tomatoes to full maturity. Each week you get <strong>3 action points</strong> — irrigate, shade, feed, or scout — then the simulation ticks forward. Keep moisture, sunlight, and nutrients in the comfort band or mold and wilt will eat your margins.</p>
+      </header>
+      <button id="btn-start" class="btn btn-primary" type="button">Start season</button>
+      <ul class="tips">
+        <li>Goal: <strong>100% growth</strong> before week 12 ends</li>
+        <li>Lose if <strong>plant health</strong> hits 0%</li>
+        <li>Weather rolls after your plan — you cannot control the sky</li>
+      </ul>
+    </section>
+
+    <section id="screen-game" class="screen" hidden>
+      <header class="game-header">
+        <div>
+          <p id="week-label" class="week-label">Week 1 of 12</p>
+          <p id="ap-label" class="ap-label">3 AP left</p>
+        </div>
+        <div id="weather-chip" class="weather-chip">Plan the week</div>
+      </header>
+      <p id="weather-detail" class="weather-detail">Queue actions, then end the week.</p>
+
+      <div class="meters">
+        <div class="meter"><span class="meter-label">Growth</span><span id="stat-growth" class="meter-val">0%</span><div class="meter-bar growth" id="bar-growth"></div></div>
+        <div class="meter"><span class="meter-label">Plant health</span><span id="stat-health" class="meter-val">72%</span><div class="meter-bar health" id="bar-health"></div></div>
+        <div class="meter"><span class="meter-label">Soil moisture</span><span id="stat-moisture" class="meter-val">52%</span><div class="meter-bar" id="bar-moisture"></div></div>
+        <div class="meter"><span class="meter-label">Sun exposure</span><span id="stat-sun" class="meter-val">62%</span><div class="meter-bar sun" id="bar-sun"></div></div>
+        <div class="meter"><span class="meter-label">Nutrients</span><span id="stat-nutrients" class="meter-val">44%</span><div class="meter-bar" id="bar-nutrients"></div></div>
+        <div class="meter"><span class="meter-label">Mold risk</span><span id="stat-mold" class="meter-val">6%</span><div class="meter-bar danger" id="bar-mold"></div></div>
+        <p class="reservoir-label">Reservoir <span id="stat-reservoir">78%</span></p>
+      </div>
+
+      <div class="actions">
+        <h2>Weekly plan</h2>
+        <div class="action-grid">
+          <button type="button" class="btn btn-small" id="act-water">Irrigate</button>
+          <button type="button" class="btn btn-small" id="act-mist">Light mist</button>
+          <button type="button" class="btn btn-small" id="act-shade">Shade cloth</button>
+          <button type="button" class="btn btn-small" id="act-openRoof">Open vents</button>
+          <button type="button" class="btn btn-small" id="act-feed">Nutrients</button>
+          <button type="button" class="btn btn-small" id="act-compost">Compost tea</button>
+          <button type="button" class="btn btn-small" id="act-scout">Scout beds</button>
+        </div>
+        <ul id="queue-list" class="queue-list"></ul>
+        <button id="btn-end-week" class="btn btn-primary" type="button">End week →</button>
+      </div>
+
+      <ol id="event-log" class="event-log" aria-live="polite"></ol>
+    </section>
+
+    <section id="screen-result" class="screen result" hidden>
+      <h2 id="result-title">Season lost</h2>
+      <p id="result-copy"></p>
+      <button id="btn-restart" class="btn btn-ghost" type="button">Play again</button>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script type="module" src="/play/greenhouse-tick/game.js"></script>
+</body>
+</html>

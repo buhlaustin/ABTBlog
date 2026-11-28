@@ -14,6 +14,7 @@ const projects = [
   { slug: "eer", dir: "eer" },
   { slug: "startup-sim", dir: "startup-sim" },
   { slug: "white-house-2028", dir: "white-house-2028" },
+  { slug: "greenhouse-tick", dir: "greenhouse-tick" },
 ];
 
 function resolveBuildId() {
