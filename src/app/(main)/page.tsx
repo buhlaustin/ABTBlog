@@ -122,7 +122,7 @@ export default function HomePage() {
                 />
                 <div className="min-w-0 text-sm leading-snug">
                   <p className="font-semibold text-foreground">{siteConfig.name}</p>
-                  <p className="text-muted">{hero.tagline}</p>
+                  <p className="text-muted">{hero.cardSubtitle}</p>
                 </div>
               </Reveal>
               <Reveal when="mount" delayMs={240}>
