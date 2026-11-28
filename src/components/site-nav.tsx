@@ -2,42 +2,41 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { profile } from "@/lib/profile";
-import { servicesContact } from "@/lib/services";
 import { siteConfig } from "@/lib/site";
 
 const nav = [
-  { href: "/services/", label: "Services" },
-  { href: "/case-studies/", label: "Case studies" },
   { href: "/blog/", label: "Blog" },
-  { href: "/about/", label: "About" },
   { href: "/work/", label: "Lab" },
+  { href: "/about/", label: "About" },
+  { href: "/case-studies/", label: "Case studies" },
+  { href: "/services/", label: "Services" },
 ] as const;
 
 const linkClass =
   "flex min-h-11 items-center rounded-lg px-3 py-2 text-muted transition hover:bg-surface-raised hover:text-foreground active:bg-surface-raised";
 
-const contactCtaClass =
-  "btn-press inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800";
-
-const secondaryCtaClass =
-  "btn-press inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-surface";
+function useIsClient() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+}
 
 export function SiteNav() {
-  const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const menuId = useId();
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [openPath, setOpenPath] = useState(pathname);
+  const mounted = useIsClient();
+  const menuId = useId();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
+  if (pathname !== openPath) {
+    setOpenPath(pathname);
     setOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     document.documentElement.classList.toggle("mobile-menu-open", open);
@@ -61,7 +60,7 @@ export function SiteNav() {
       />
       <nav
         id={menuId}
-        className={`fixed inset-x-0 bottom-0 z-[90] flex max-h-[min(85dvh,32rem)] flex-col rounded-t-2xl border border-b-0 border-border bg-white shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:hidden ${
+        className={`fixed inset-x-0 bottom-0 z-[90] flex max-h-[min(85dvh,32rem)] flex-col rounded-t-2xl border border-b-0 border-border bg-background shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:hidden ${
           open ? "translate-y-0" : "translate-y-full pointer-events-none"
         }`}
         aria-label="Primary mobile"
@@ -97,7 +96,7 @@ export function SiteNav() {
           </button>
         </div>
 
-        <ul className="mobile-menu-list flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain px-3 py-2">
+        <ul className="mobile-menu-list flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           {nav.map((item) => {
             const base = item.href.replace(/\/$/, "");
             const active =
@@ -143,36 +142,6 @@ export function SiteNav() {
             </a>
           </li>
         </ul>
-
-        <div className="shrink-0 border-t border-border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-          <div className="flex flex-col gap-2">
-            <a
-              href={servicesContact.bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${contactCtaClass} w-full`}
-              onClick={() => setOpen(false)}
-            >
-              Book a 20-minute call
-            </a>
-            <div className="grid grid-cols-2 gap-2">
-              <a
-                href={`tel:${servicesContact.phoneTel}`}
-                className={`${secondaryCtaClass} w-full`}
-                onClick={() => setOpen(false)}
-              >
-                Call
-              </a>
-              <a
-                href={`mailto:${servicesContact.email}`}
-                className={`${secondaryCtaClass} w-full`}
-                onClick={() => setOpen(false)}
-              >
-                Email
-              </a>
-            </div>
-          </div>
-        </div>
       </nav>
     </>
   );
@@ -204,32 +173,12 @@ export function SiteNav() {
         >
           GitHub
         </a>
-        <a
-          href={`mailto:${servicesContact.email}`}
-          className={`${secondaryCtaClass} ml-1`}
-        >
-          Email
-        </a>
-        <a
-          href={`tel:${servicesContact.phoneTel}`}
-          className={secondaryCtaClass}
-        >
-          Call
-        </a>
-        <a
-          href={servicesContact.bookingUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`${contactCtaClass} ml-1`}
-        >
-          Book a call
-        </a>
       </nav>
 
       <div className="flex items-center md:hidden">
         <button
           type="button"
-          className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
+          className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-border bg-background text-foreground"
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => setOpen((v) => !v)}

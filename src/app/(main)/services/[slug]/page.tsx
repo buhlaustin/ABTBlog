@@ -43,7 +43,7 @@ export default async function ServiceOfferPage({ params }: PageProps) {
       <main className="mx-auto w-full max-w-3xl flex-1 px-safe py-7 sm:py-16">
         <Link
           href="/services/"
-          className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:text-blue-700"
+          className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline"
         >
           ← Services
         </Link>
@@ -112,7 +112,7 @@ export default async function ServiceOfferPage({ params }: PageProps) {
           <p className="mt-10 text-sm">
             <Link
               href={offer.relatedWritingPath}
-              className="font-semibold text-accent hover:text-blue-700"
+              className="font-semibold text-accent hover:underline"
             >
               Related writing →
             </Link>

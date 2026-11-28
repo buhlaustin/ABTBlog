@@ -1,236 +1,197 @@
-import Image from "next/image";
 import Link from "next/link";
-import { BookCallButton } from "@/components/book-call-button";
+import { BookShelf } from "@/components/book-shelf";
 import { JsonLd } from "@/components/json-ld";
-import { MobileEmailButton } from "@/components/mobile-email-button";
-import { profile, siteConfig } from "@/lib/profile";
+import { SiteLogo } from "@/components/site-logo";
+import { getAllPosts } from "@/lib/blog";
+import { novuxFlagship, profile, ventures } from "@/lib/profile";
 import { pageMetadata, personJsonLd } from "@/lib/seo";
-import { offerPriceKind, serviceOffers } from "@/lib/services";
-import { Reveal } from "@/components/reveal";
+import { workItems } from "@/lib/work-registry";
 
 export const metadata = pageMetadata({
-  title:
-    "Austin Buhl · LTI 1.3, OneRoster and WebRTC engineer for edtech teams",
+  title: "Austin Buhl · Games, classroom software, and writing",
   description:
-    "Edtech integrations and senior product engineering: LTI 1.3, OneRoster, WebRTC, web, and Android. Fixed sprints and retainers. Knoxville, remote US.",
+    "I'm Austin, a builder in Knoxville. This is my personal site: what I've made, what I'm working on now, and what I'm writing.",
   path: "/",
   absoluteTitle: true,
 });
 
-const whereIHelp = [
-  {
-    title: "LTI 1.3 and LTI Advantage",
-    body: "Launches, deep linking, names and roles, grade passback. Tested against the LMSs your districts actually run.",
-  },
-  {
-    title: "Rostering",
-    body: "OneRoster and Clever/ClassLink sync that handles late rosters, term changes, and students who exist in one system but not the other.",
-  },
-  {
-    title: "Live classroom video",
-    body: "WebRTC tuned for filtered networks and low bandwidth, with attendance you can defend in an audit.",
-  },
-] as const;
+const latestPostCount = 6;
+
+function formatPostDate(isoDate: string): string {
+  const day = isoDate.slice(0, 10);
+  return new Date(`${day}T00:00:00Z`).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
 
 export default function HomePage() {
-  const { hero } = profile;
+  const posts = getAllPosts().slice(0, latestPostCount);
 
   return (
     <>
       <JsonLd data={personJsonLd()} />
       <main className="flex-1">
-        <section className="relative border-b border-border">
-          <div
-            className="hero-mesh pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(250,250,250,0)_0%,rgb(255_255_255)_85%),radial-gradient(ellipse_90%_60%_at_50%_-20%,rgba(37,99,235,0.12),transparent)]"
-            aria-hidden
-          />
-          <div className="relative mx-auto grid max-w-5xl gap-6 px-safe py-8 sm:gap-10 sm:py-12 md:py-20 lg:grid-cols-[1fr_minmax(0,17rem)] lg:items-start lg:gap-14">
-            <div className="min-w-0">
-              <Reveal when="mount">
-                <p className="font-mono text-xs leading-snug text-muted sm:text-sm">
-                  {hero.tagline}
-                </p>
-              </Reveal>
-              <Reveal when="mount" delayMs={60}>
-                <h1 className="font-display mt-2 text-[1.65rem] font-bold leading-[1.15] tracking-tight text-foreground sm:mt-3 sm:text-4xl sm:leading-tight md:text-5xl">
-                  {hero.headline}
-                </h1>
-              </Reveal>
-              <Reveal when="mount" delayMs={120}>
-                <p className="mt-4 max-w-2xl text-base leading-relaxed text-foreground sm:mt-6 sm:text-lg">
-                  <span className="md:hidden">{hero.leadMobile}</span>
-                  <span className="hidden md:inline">{hero.lead}</span>
-                </p>
-              </Reveal>
-              <Reveal when="mount" delayMs={200}>
-                <div className="cta-mobile-stack mt-6 sm:mt-8">
-                  <BookCallButton />
-                  <Link
-                    href="/services/#offers"
-                    className="btn-press inline-flex min-h-11 w-full items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-surface active:bg-surface-raised sm:w-auto"
-                  >
-                    See the offers
-                  </Link>
-                </div>
-              </Reveal>
-              <ul className="mt-5 flex flex-wrap gap-2 lg:hidden">
-                <li>
-                  <Link
-                    href="/case-studies/classquip/"
-                    className="inline-flex min-h-10 items-center rounded-full border border-border bg-surface px-3.5 text-xs font-semibold text-foreground"
-                  >
-                    ClassQuip case study
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/services/"
-                    className="inline-flex min-h-10 items-center rounded-full border border-border bg-surface px-3.5 text-xs font-semibold text-foreground"
-                  >
-                    Services
-                  </Link>
-                </li>
-              </ul>
-            </div>
+        <article className="mx-auto w-full max-w-3xl px-safe pb-16 pt-10 sm:pb-24 sm:pt-16">
+          <header>
+            <SiteLogo variant="mark" />
+            <h1 className="font-display mt-8 text-[2.35rem] font-semibold leading-[1.08] tracking-tight text-foreground sm:mt-10 sm:text-5xl sm:leading-[1.05] lg:text-[3.4rem]">
+              {profile.hero.headline}
+            </h1>
+            <p className="mt-6 max-w-[38rem] text-lg leading-relaxed text-foreground sm:text-xl">
+              {profile.hero.lead}
+            </p>
+          </header>
 
-            <aside className="hidden flex-col gap-3 lg:flex lg:pt-2">
-              <Reveal
-                when="mount"
-                delayMs={180}
-                className="lift-card flex items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-sm"
-              >
-                <Image
-                  src={profile.avatarUrl}
-                  alt=""
-                  width={48}
-                  height={48}
-                  className="h-12 w-12 rounded-xl border border-border object-cover"
-                />
-                <div className="min-w-0 text-sm leading-snug">
-                  <p className="font-semibold text-foreground">
-                    {siteConfig.name}
-                  </p>
-                  <p className="text-muted">{profile.hero.tagline}</p>
-                </div>
-              </Reveal>
-              <Reveal when="mount" delayMs={240}>
-                <Link
-                  href="/case-studies/classquip/"
-                  className="lift-card flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
-                >
-                  ClassQuip case study →
-                </Link>
-              </Reveal>
-              <Reveal when="mount" delayMs={300}>
+          <section
+            aria-labelledby="now-heading"
+            className="mt-12 border-y border-border py-8 sm:mt-16"
+          >
+            <h2
+              id="now-heading"
+              className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-muted"
+            >
+              Now
+            </h2>
+            <div className="mt-5 space-y-6">
+              <p>
+                <span className="font-display block text-2xl font-semibold tracking-tight text-foreground">
+                  {novuxFlagship.name}
+                </span>
+                <span className="mt-1 block text-sm leading-relaxed text-muted">
+                  Live in Early Access on{" "}
+                  <a
+                    href={novuxFlagship.storeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                  >
+                    Google Play
+                  </a>
+                  . Novux Games.
+                </span>
+              </p>
+              <p>
                 <a
-                  href={profile.linkedIn}
+                  href={ventures.classQuip.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="lift-card flex min-h-11 items-center rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition hover:border-zinc-300 hover:bg-surface-raised active:bg-surface-raised"
+                  className="font-display text-2xl font-semibold tracking-tight text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
                 >
-                  LinkedIn ↗
+                  {ventures.classQuip.name}
                 </a>
-              </Reveal>
-            </aside>
-          </div>
-        </section>
-
-        <div className="mx-auto max-w-5xl px-safe pb-12 pt-10 sm:pb-24 sm:pt-16">
-          <section className="mobile-section mb-10 sm:mb-16">
-            <Reveal>
-              <h2 className="font-display text-sm font-bold uppercase tracking-[0.15em] text-muted">
-                Where I help
-              </h2>
-            </Reveal>
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-              {whereIHelp.map((pillar, index) => (
-                <Reveal key={pillar.title} delayMs={index * 70}>
-                  <article className="lift-card h-full rounded-2xl border border-border bg-surface p-4 sm:p-6">
-                    <h3 className="font-display text-base font-bold tracking-tight text-foreground sm:text-lg">
-                      {pillar.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted">
-                      {pillar.body}
-                    </p>
-                  </article>
-                </Reveal>
-              ))}
+                <span className="mt-1 block text-sm leading-relaxed text-muted">
+                  Founder and CEO.
+                </span>
+              </p>
             </div>
           </section>
 
-          <section id="offers" className="mobile-section mb-10 sm:mb-16">
-            <Reveal className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
-              <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-                Offers
+          <section aria-labelledby="writing-heading" className="mt-14 sm:mt-20">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+              <h2
+                id="writing-heading"
+                className="font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl"
+              >
+                Writing
               </h2>
-              <BookCallButton
-                variant="secondary"
-                className="hidden sm:inline-flex"
-              />
-            </Reveal>
-            <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
-              {serviceOffers.map((offer, index) => (
-                <Reveal key={offer.slug} delayMs={index * 60}>
-                  <article className="lift-card flex h-full flex-col rounded-2xl border border-border bg-white p-4 shadow-sm sm:p-5">
-                    <h3 className="font-display text-[15px] font-bold leading-snug text-foreground sm:text-base">
-                      {offer.name}
-                    </h3>
-                    <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
-                      {offer.oneLiner}
-                    </p>
-                    <p className="mt-3 font-mono text-[11px] text-muted sm:text-xs">
-                      {offer.timeframe} · {offerPriceKind(offer.slug)}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">
-                      {offer.price}
-                    </p>
+              <Link
+                href="/blog/"
+                className="text-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+              >
+                All posts
+              </Link>
+            </div>
+            <ol className="mt-8">
+              {posts.map((post) => (
+                <li key={post.slug} className="border-t border-border py-6">
+                  <time
+                    dateTime={post.date.slice(0, 10)}
+                    className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted"
+                  >
+                    {formatPostDate(post.date)}
+                  </time>
+                  <h3 className="font-display mt-2 text-2xl font-semibold leading-snug tracking-tight sm:text-[1.7rem]">
                     <Link
-                      href={`/services/${offer.slug}/`}
-                      className="mt-3 inline-flex min-h-10 items-center text-sm font-semibold text-accent hover:text-blue-700"
+                      href={`/blog/${post.slug}/`}
+                      className="text-foreground underline-offset-4 hover:underline"
                     >
-                      Details →
+                      {post.title}
                     </Link>
-                  </article>
-                </Reveal>
+                  </h3>
+                  <p className="mt-2 max-w-[40rem] text-sm leading-relaxed text-muted sm:text-base">
+                    {post.description}
+                  </p>
+                </li>
               ))}
-            </div>
+            </ol>
           </section>
 
-          <section className="mobile-section mb-8 border-t border-border pt-8 sm:mb-12 sm:pt-10">
-            <Reveal className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
-              <div>
-                <h2 className="font-display text-lg font-bold tracking-tight">
-                  Lab
-                </h2>
-                <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
-                  Personal browser projects—not typical client work unless you
-                  ask for a prototype.
-                </p>
-              </div>
+          <section
+            aria-labelledby="books-heading"
+            className="mt-16 border-t border-border pt-12 sm:mt-20"
+          >
+            <BookShelf />
+          </section>
+
+          <section
+            aria-labelledby="work-heading"
+            className="mt-16 border-t border-border pt-12 sm:mt-20"
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+              <h2
+                id="work-heading"
+                className="font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl"
+              >
+                Work
+              </h2>
               <Link
                 href="/work/"
-                className="inline-flex min-h-10 items-center text-sm font-semibold text-accent hover:text-blue-700"
+                className="text-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
               >
-                Browse the lab →
+                All projects
               </Link>
-            </Reveal>
+            </div>
+            <p className="mt-4 max-w-[36rem] text-base leading-relaxed text-muted">
+              Browser games and other things I build for myself.
+            </p>
+            <ul className="mt-6">
+              {workItems.map((item) => (
+                <li key={item.slug} className="border-t border-border py-6">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <h3 className="font-display text-2xl font-semibold leading-snug tracking-tight">
+                      <Link
+                        href={`/work/${item.slug}/`}
+                        className="text-foreground underline-offset-4 hover:underline"
+                      >
+                        {item.title}
+                      </Link>
+                    </h3>
+                    {item.status !== "live" ? (
+                      <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">
+                        {item.status === "wip" ? "In progress" : "Archived"}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-2 max-w-[40rem] text-sm leading-relaxed text-muted sm:text-base">
+                    {item.summary}
+                  </p>
+                </li>
+              ))}
+            </ul>
           </section>
 
-          <Reveal>
-            <section className="lift-card rounded-2xl border border-border bg-surface-raised px-4 py-6 text-center sm:px-10 sm:py-10">
-              <h2 className="font-display text-lg font-bold tracking-tight text-foreground sm:text-xl md:text-2xl">
-                Have a district deal waiting on an integration?
-              </h2>
-              <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-muted">
-                Send me the details or grab 20 minutes.
-              </p>
-              <div className="cta-mobile-stack mx-auto mt-5 justify-center sm:mt-6">
-                <BookCallButton />
-                <MobileEmailButton />
-              </div>
-            </section>
-          </Reveal>
-        </div>
+          <p className="mt-16 border-t border-border pt-8 text-sm text-muted">
+            <Link
+              href="/services/"
+              className="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+            >
+              I also take on some consulting work.
+            </Link>
+          </p>
+        </article>
       </main>
     </>
   );

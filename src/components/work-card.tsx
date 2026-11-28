@@ -50,7 +50,7 @@ export function WorkCard({ item }: { item: WorkItem }) {
       </div>
       <Link
         href={href}
-        className="inline-flex items-center gap-1 text-sm font-semibold text-accent transition hover:text-blue-700"
+        className="inline-flex items-center gap-1 text-sm font-semibold text-accent transition hover:underline"
       >
         {cta}
         <span aria-hidden className="transition group-hover:translate-x-0.5">

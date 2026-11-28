@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: "Austin Buhl",
   /** Default `<title>` and Open Graph title for the homepage (no domain name). */
-  defaultTitle: "Austin Buhl — Software Engineer & Founder",
+  defaultTitle: "Austin Buhl · Games, classroom software, and writing",
   /** Appended by root layout for inner pages: `%s · Austin Buhl`. */
   description:
-    "Software engineer and founder in Knoxville, TN. Edtech integrations (LTI 1.3, OneRoster, WebRTC), web, and Android. ClassQuip and Novux Games.",
+    "I'm Austin, a builder in Knoxville. This is my personal site: what I've made, what I'm working on now, and what I'm writing.",
   url: "https://austinbuhltech.com",
   locale: "en_US",
   github: "https://github.com/buhlaustin",
@@ -15,8 +15,7 @@ export const siteConfig = {
   logoSignature: "/abuhl-signature.svg",
   favicon: "/ab-favicon.svg",
   ogImage: "/social-open-graph.png",
-  ogImageAlt:
-    "Austin Buhl — edtech integration engineer for LTI 1.3, OneRoster, and WebRTC classroom systems in Knoxville, TN",
+  ogImageAlt: "Austin Buhl, software developer",
   rss: {
     channelTitle: "Austin Buhl",
     channelDescription:

@@ -115,7 +115,7 @@ export default function ServicesPage() {
                     <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                       <Link
                         href={`/services/${offer.slug}/`}
-                        className="inline-flex min-h-10 items-center text-sm font-semibold text-accent hover:text-blue-700"
+                        className="inline-flex min-h-10 items-center text-sm font-semibold text-accent hover:underline"
                       >
                         Details →
                       </Link>
