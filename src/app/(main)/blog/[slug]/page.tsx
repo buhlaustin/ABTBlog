@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookCallButton } from "@/components/book-call-button";
 import { JsonLd } from "@/components/json-ld";
+import { BlogPlayableEmbed } from "@/components/blog-playable-embed";
 import { MarkdownContent } from "@/components/markdown-content";
 import { PostAuthorCard } from "@/components/post-author-card";
 import { getAllPostSlugs, getPostBySlug } from "@/lib/blog";
@@ -84,6 +85,13 @@ export default async function BlogPostPage({ params }: PageProps) {
         <div className="mt-8">
           <MarkdownContent content={post.content} />
         </div>
+        {post.playable ? (
+          <BlogPlayableEmbed
+            title={post.playable.title}
+            entryPath={post.playable.entry}
+            workHref={post.playable.workHref}
+          />
+        ) : null}
         {postShowsEdtechCta(post.tags) ? (
           <aside className="lift-card mt-10 rounded-2xl border border-border bg-surface-raised p-6 sm:p-8">
             <p className="text-sm leading-relaxed text-muted">

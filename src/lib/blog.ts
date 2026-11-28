@@ -7,6 +7,12 @@ const blogDirectory = path.join(process.cwd(), "content", "blog");
 
 export const defaultBlogAuthor = authorCard.name;
 
+export interface BlogPlayable {
+  title: string;
+  entry: string;
+  workHref?: string;
+}
+
 export interface BlogPost {
   slug: string;
   title: string;
@@ -15,6 +21,7 @@ export interface BlogPost {
   tags: string[];
   author: string;
   content: string;
+  playable?: BlogPlayable;
 }
 
 export function getAllPosts(): BlogPost[] {
@@ -32,6 +39,19 @@ export function getAllPosts(): BlogPost[] {
         (typeof data.slug === "string" ? data.slug : null) ??
         filename.replace(/\.md$/, "");
 
+      const playableRaw = data.playable;
+      let playable: BlogPlayable | undefined;
+      if (playableRaw && typeof playableRaw === "object" && !Array.isArray(playableRaw)) {
+        const p = playableRaw as Record<string, unknown>;
+        if (typeof p.title === "string" && typeof p.entry === "string") {
+          playable = {
+            title: p.title,
+            entry: p.entry,
+            workHref: typeof p.workHref === "string" ? p.workHref : undefined,
+          };
+        }
+      }
+
       return {
         slug,
         title: String(data.title ?? slug),
@@ -40,6 +60,7 @@ export function getAllPosts(): BlogPost[] {
         tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
         author: String(data.author ?? defaultBlogAuthor),
         content,
+        playable,
       };
     })
     .filter((post) => post.date)

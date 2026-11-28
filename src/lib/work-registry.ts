@@ -49,6 +49,16 @@ export const workItems: WorkItem[] = [
     hostedEntry: "/play/white-house-2028/index.html",
   },
   {
+    slug: "greenhouse-tick",
+    title: "Neighborhood Greenhouse",
+    summary:
+      "Twelve-week tutorial sim from the 2026 build-a-simulation blog — balance water, sun, nutrients, and mold to hit harvest.",
+    kind: "hosted",
+    status: "live",
+    tags: ["game", "javascript", "simulation", "tutorial"],
+    hostedEntry: "/play/greenhouse-tick/index.html",
+  },
+  {
     slug: "hos",
     title: "House of Strategy",
     summary:
