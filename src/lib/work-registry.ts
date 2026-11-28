@@ -32,7 +32,7 @@ export const workItems: WorkItem[] = [
     summary:
       "Build the internet from a 1995 garage startup to the 2030 AI era. Monthly tycoon sim with era-evolving UI, rivals, research, and a Three.js office vignette.",
     kind: "hosted",
-    status: "wip",
+    status: "live",
     tags: ["game", "react", "simulation"],
     featured: true,
     hostedEntry: "/play/internet-empire/index.html",

@@ -9,6 +9,7 @@ import { MarketingPanel } from "./MarketingPanel";
 import { laneDef } from "@/sim/lanes";
 import { runwayMonths } from "@/lib/runway";
 import { EraBanner } from "./EraBanner";
+import { TutorialCard } from "./TutorialCard";
 import { FlashBar } from "./FlashBar";
 import { StatHud } from "./StatHud";
 
@@ -58,6 +59,7 @@ export function GameShell({ state }: { state: GameState }) {
       </header>
 
       <StatHud state={state} />
+      <TutorialCard state={state} />
       <EraBanner state={state} />
       <FlashBar />
 

@@ -2,6 +2,7 @@ import { applyQueuedActions } from "./actions";
 import { advanceCalendar } from "./calendar";
 import { END_MONTH_INDEX, moodForYear } from "./eras";
 import { evaluate2030 } from "./endgame";
+import { maybeCrisis } from "./crises";
 import { fireScriptedEvents, randomHeadline } from "./events";
 import { laneDef } from "./lanes";
 import { unlockResearchForYear } from "./research";
@@ -97,6 +98,8 @@ export function resolveMonth(state: GameState): GameState {
   state.news.push(...scripted);
   const rnd = randomHeadline(state);
   if (rnd) state.news.push(rnd);
+  const crisis = maybeCrisis(state);
+  if (crisis) state.news.push(crisis);
   state.news = state.news.slice(-40);
 
   state.macro.mood = moodForYear(state.calendar.year);

@@ -1,8 +1,16 @@
 import { monthRng } from "./rng";
 import type { GameState, Rival } from "./types";
 
+const LANE_RIVALS: Record<string, string[]> = {
+  content: ["Newsdrome", "ClipBay", "FeedMatic", "PortalZine"],
+  commerce: ["BuyNow", "CartHive", "DealRocket", "ShipFaster"],
+  tools: ["GigaSearch", "LinkKit", "TabVault", "QueryPro"],
+  enterprise: ["LedgerSoft", "SuiteCo", "ProcureX", "BoardLine"],
+  hosting: ["RackNation", "PipeHost", "UptimeJoe", "BitBarn"],
+};
+
 export function defaultRivals(_seed: number, lane: string, aggression: number): Rival[] {
-  const names = ["HyperPortal", "GigaSearch", "StreamVault", "PayBridge", "ModelForge"];
+  const names = LANE_RIVALS[lane] ?? LANE_RIVALS.content!;
   return names.slice(0, 4).map((name, i) => ({
     id: `rival-${i}`,
     name,

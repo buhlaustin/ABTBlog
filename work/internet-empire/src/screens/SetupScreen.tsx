@@ -63,6 +63,17 @@ export function SetupScreen() {
               onChange={(e) => patchSetup({ startingCash: Number(e.target.value) })}
             />
           </label>
+          <label>
+            Rival aggression ({setup.rivalAggression.toFixed(2)})
+            <input
+              type="range"
+              min={0.1}
+              max={0.8}
+              step={0.05}
+              value={setup.rivalAggression}
+              onChange={(e) => patchSetup({ rivalAggression: Number(e.target.value) })}
+            />
+          </label>
         </>
       )}
       <button type="button" className="ie-btn ie-btn-primary" onClick={() => startGame()}>

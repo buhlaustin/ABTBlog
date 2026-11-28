@@ -15,6 +15,8 @@ export class SceneRuntime {
   private desk: THREE.Mesh;
   private tower: THREE.Mesh;
   private racks: THREE.Mesh[] = [];
+  private monitorMat: THREE.MeshStandardMaterial;
+  private lastScreenLabel = "";
   private raf = 0;
 
   constructor(el: HTMLElement) {
@@ -56,10 +58,12 @@ export class SceneRuntime {
     this.tower.position.set(-0.4, 1.05, 0);
     this.scene.add(this.tower);
 
-    const monitor = new THREE.Mesh(
-      new THREE.BoxGeometry(0.7, 0.5, 0.08),
-      new THREE.MeshStandardMaterial({ color: 0x222244, emissive: 0x1133aa, emissiveIntensity: 0.4 })
-    );
+    this.monitorMat = new THREE.MeshStandardMaterial({
+      color: 0x222244,
+      emissive: 0x1133aa,
+      emissiveIntensity: 0.45,
+    });
+    const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.08), this.monitorMat);
     monitor.position.set(0.3, 1.1, 0);
     this.scene.add(monitor);
 
@@ -108,6 +112,28 @@ export class SceneRuntime {
     if (params.skin === "win95") deskMat.color.setHex(0x8b7355);
     else if (params.skin === "enterprise" || params.year >= 2023) deskMat.color.setHex(0x333844);
     else deskMat.color.setHex(0x6a7a9a);
+
+    const label = (params.companyName ?? "Startup").slice(0, 24);
+    if (label !== this.lastScreenLabel) {
+      this.lastScreenLabel = label;
+      const canvas = document.createElement("canvas");
+      canvas.width = 256;
+      canvas.height = 128;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.fillStyle = "#0a1628";
+        ctx.fillRect(0, 0, 256, 128);
+        ctx.fillStyle = "#7dd3fc";
+        ctx.font = "bold 22px sans-serif";
+        ctx.fillText(label, 12, 48);
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "14px monospace";
+        ctx.fillText(`${params.year} · IE`, 12, 80);
+        const tex = new THREE.CanvasTexture(canvas);
+        this.monitorMat.map = tex;
+        this.monitorMat.needsUpdate = true;
+      }
+    }
   }
 
   dispose() {
