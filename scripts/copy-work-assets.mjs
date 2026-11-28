@@ -15,6 +15,7 @@ const projects = [
   { slug: "startup-sim", dir: "startup-sim" },
   { slug: "white-house-2028", dir: "white-house-2028" },
   { slug: "greenhouse-tick", dir: "greenhouse-tick" },
+  { slug: "internet-empire", dir: "internet-empire", distOnly: true },
 ];
 
 function resolveBuildId() {
@@ -53,11 +54,16 @@ function stampRelativeEsmImports(dir, buildId, touched = new Set()) {
 
 const buildId = resolveBuildId();
 
-for (const { slug, dir } of projects) {
+for (const { slug, dir, distOnly } of projects) {
   const src = join(root, "work", dir);
   const dest = join(publicPlay, slug);
   rmSync(dest, { recursive: true, force: true });
-  cpSync(src, dest, { recursive: true });
+  if (distOnly) {
+    const dist = join(src, "dist");
+    cpSync(dist, dest, { recursive: true });
+  } else {
+    cpSync(src, dest, { recursive: true });
+  }
   if (slug === "startup-sim") {
     const indexPath = join(dest, "index.html");
     let html = readFileSync(indexPath, "utf8");
