@@ -65,6 +65,7 @@ export const profile = {
   /** Homepage hero only. */
   hero: {
     tagline: "Builder · Knoxville, TN · Vols on Saturdays",
+    cardSubtitle: "Software & Game Developer · Knoxville, TN",
     headline: "I build the things I wish existed.",
     lead: "I'm Austin, a builder in Knoxville. I make the games I want to play, like Dynasty: College Basketball, now in Early Access, and I run ClassQuip, which helps teachers run live online classes. Everything I'm building, breaking and learning ends up here.",
   } as const,
