@@ -1,5 +1,14 @@
+import {
+  ACTION_BANK,
+  applyBankAction,
+  bankActionByKey,
+  bankActionEligible,
+  bankCashCost,
+  pickProductNameFromBank,
+} from "./actionBank";
 import { deriveUiEra } from "./eras";
 import { laneDef } from "./lanes";
+import { initialProductMrr } from "./monetization";
 import type { ActionDef, GameState } from "./types";
 
 const ERA_ORDER = ["early", "dotcom", "web2", "mobile", "platform", "ai", "enterprise"] as const;
@@ -11,6 +20,35 @@ function eraRank(id: string): number {
 
 function eraMeets(state: GameState, min: string): boolean {
   return eraRank(deriveUiEra(state)) >= eraRank(min === "enterprise" ? "ai" : min);
+}
+
+export function actionLabel(def: ActionDef, state: GameState): string {
+  return typeof def.label === "function" ? def.label(state) : def.label;
+}
+
+function bankToDef(a: (typeof ACTION_BANK)[number]): ActionDef {
+  return {
+    key: a.key,
+    label: a.label,
+    ap: a.ap,
+    cashCost: a.cashCost,
+    eraMin: a.eraMin,
+    requires: a.requires,
+    effect: a.effect,
+  };
+}
+
+function productBuilding(state: GameState): boolean {
+  return state.products.some((p) => p.kind === "product" && p.stage === "building");
+}
+
+export function resolveActionDef(state: GameState, key: string): ActionDef | undefined {
+  const core = ACTION_CATALOG.find((a) => a.key === key);
+  if (core) return core;
+  if (!state.monthlyDeck.includes(key)) return undefined;
+  const bank = bankActionByKey(key);
+  if (bank && bankActionEligible(state, bank)) return bankToDef(bank);
+  return undefined;
 }
 
 export const ACTION_CATALOG: ActionDef[] = [
@@ -67,11 +105,16 @@ export const ACTION_CATALOG: ActionDef[] = [
   },
   {
     key: "develop_product",
-    label: "Develop your first product",
+    label: (s) => (s.flags.hasFirstProduct ? "Launch next product line" : "Develop your first product"),
     ap: 2,
     cashCost: 1200,
     eraMin: "early",
-    effect: "Starts a product line.",
+    requires: (s) => {
+      if (!s.flags.hasWebsite) return "Build a website first.";
+      if (productBuilding(s)) return "Finish the product currently in build.";
+      return null;
+    },
+    effect: "Starts a product line that earns MRR when live.",
   },
   {
     key: "upgrade_infra",
@@ -122,6 +165,10 @@ export const ACTION_CATALOG: ActionDef[] = [
     ap: 2,
     cashCost: 8000,
     eraMin: "mobile",
+    requires: (s) =>
+      s.products.some((p) => p.name.includes("Mobile") && p.stage === "live")
+        ? "Mobile app already live."
+        : null,
     effect: "Mobile channel unlock.",
   },
   {
@@ -130,6 +177,8 @@ export const ACTION_CATALOG: ActionDef[] = [
     ap: 2,
     cashCost: 12000,
     eraMin: "ai",
+    requires: (s) =>
+      s.products.some((p) => p.kind === "ai" && p.stage === "live") ? "AI product already live." : null,
     effect: "AI revenue + compute burn.",
   },
   {
@@ -152,7 +201,7 @@ export const ACTION_CATALOG: ActionDef[] = [
 ];
 
 export function availableActions(state: GameState): ActionDef[] {
-  return ACTION_CATALOG.filter((a) => {
+  const core = ACTION_CATALOG.filter((a) => {
     if (!eraMeets(state, a.eraMin)) return false;
     if (a.requires) {
       const reason = a.requires(state);
@@ -164,6 +213,16 @@ export function availableActions(state: GameState): ActionDef[] {
     if (a.key === "acquire") return false;
     return true;
   });
+
+  const deck = state.monthlyDeck
+    .map((key) => {
+      const bank = bankActionByKey(key);
+      if (!bank || !bankActionEligible(state, bank)) return null;
+      return bankToDef(bank);
+    })
+    .filter((a): a is ActionDef => a != null);
+
+  return [...core, ...deck];
 }
 
 export function cashForAction(state: GameState, def: ActionDef): number {
@@ -174,10 +233,17 @@ function plannedCash(state: GameState): number {
   return state.plannedActions.reduce((sum, p) => sum + p.cashCost, 0);
 }
 
-export function canQueueAction(state: GameState, def: ActionDef): { ok: boolean; reason?: string } {
+export function canQueueAction(
+  state: GameState,
+  def: ActionDef,
+  key = def.key
+): { ok: boolean; reason?: string } {
   if (state.flags.gameOver || state.flags.ended) return { ok: false, reason: "Run ended." };
   if (state.apLeft < def.ap) return { ok: false, reason: "Not enough action points." };
-  const cash = cashForAction(state, def);
+  const cash =
+    bankActionByKey(key) && state.monthlyDeck.includes(key)
+      ? bankCashCost(state, bankActionByKey(key)!)
+      : cashForAction(state, def);
   if (state.cash < plannedCash(state) + cash) return { ok: false, reason: "Not enough cash." };
   if (def.requires) {
     const r = def.requires(state);
@@ -188,6 +254,12 @@ export function canQueueAction(state: GameState, def: ActionDef): { ok: boolean;
 
 export function applyQueuedActions(state: GameState): void {
   for (const plan of [...state.plannedActions]) {
+    if (bankActionByKey(plan.actionKey) && state.monthlyDeck.includes(plan.actionKey)) {
+      state.cash -= plan.cashCost;
+      applyBankAction(state, plan.actionKey);
+      continue;
+    }
+
     const def = ACTION_CATALOG.find((a) => a.key === plan.actionKey);
     if (!def) continue;
     state.cash -= plan.cashCost;
@@ -235,7 +307,7 @@ export function applyQueuedActions(state: GameState): void {
         state.log.push("Hired sales.");
         break;
       case "develop_product": {
-        const name = `${state.companyName} Pro`;
+        const name = pickProductNameFromBank(state);
         state.products.push({
           id: `prod-${state.calendar.index}`,
           name,
@@ -283,31 +355,33 @@ export function applyQueuedActions(state: GameState): void {
         break;
       }
       case "mobile_app": {
+        const mrr = initialProductMrr(state, 58, "premium");
         state.products.push({
           id: `mobile-${state.calendar.index}`,
           name: `${state.companyName} Mobile`,
           kind: "product",
           stage: "live",
-          quality: 55,
+          quality: 58,
           visitorsBoost: 400,
-          revenueMonthly: 1200,
+          revenueMonthly: mrr,
           monthsLive: 0,
         });
-        state.log.push("Shipped mobile app.");
+        state.log.push(`Shipped mobile app at $${mrr.toLocaleString()}/mo.`);
         break;
       }
       case "ai_product": {
+        const mrr = initialProductMrr(state, 72, "enterprise");
         state.products.push({
           id: `ai-${state.calendar.index}`,
           name: `${state.companyName} Copilot`,
           kind: "ai",
           stage: "live",
-          quality: 70,
+          quality: 72,
           visitorsBoost: 250,
-          revenueMonthly: 4500,
+          revenueMonthly: mrr,
           monthsLive: 0,
         });
-        state.log.push("Launched AI product — watch the GPU bill.");
+        state.log.push(`Launched AI product at $${mrr.toLocaleString()}/mo — watch the GPU bill.`);
         break;
       }
       case "acquire": {
@@ -380,13 +454,31 @@ export function queueAction(
     return { ok: true };
   }
 
+  const bank = bankActionByKey(actionKey);
+  if (bank && state.monthlyDeck.includes(actionKey)) {
+    const deckDef = bankToDef(bank);
+    const check = canQueueAction(state, deckDef, actionKey);
+    if (!check.ok) return check;
+    const cash = bankCashCost(state, bank);
+    state.plannedActions.push({
+      id: `${state.calendar.index}-${actionKey}-${state.plannedActions.length}`,
+      actionKey,
+      label: bank.label,
+      cashCost: cash,
+      apCost: bank.ap,
+      payload,
+    });
+    state.apLeft -= bank.ap;
+    return { ok: true };
+  }
+
   const check = canQueueAction(state, def);
   if (!check.ok) return check;
   const cash = cashForAction(state, def);
   state.plannedActions.push({
     id: `${state.calendar.index}-${actionKey}-${state.plannedActions.length}`,
     actionKey,
-    label: def.label,
+    label: actionLabel(def, state),
     cashCost: cash,
     apCost: def.ap,
     payload,

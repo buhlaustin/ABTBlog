@@ -1,6 +1,7 @@
 import { calendarFromIndex } from "./calendar";
 import { moodForYear } from "./eras";
 import { defaultResearch, unlockResearchForYear } from "./research";
+import { refreshMonthlyDeck } from "./actionDeck";
 import { defaultRivals } from "./rivals";
 import type { GameMode, GameState } from "./types";
 import { SAVE_VERSION } from "./types";
@@ -31,7 +32,7 @@ export function createInitialState(opts: NewGameOptions): GameState {
       ? opts.sandbox.startingCash
       : 5000;
 
-  return {
+  const state: GameState = {
     version: SAVE_VERSION,
     mode: opts.mode,
     seed,
@@ -84,13 +85,27 @@ export function createInitialState(opts: NewGameOptions): GameState {
     history: [],
     firedEvents: [],
     sandbox: opts.sandbox,
+    monetization: {
+      productRevenueMult: 1,
+      adArpuMult: 1,
+      enterpriseMrr: 0,
+    },
+    monthlyDeck: [],
+    deckMonthIndex: -1,
+    actionUses: {},
+    activeCampaigns: [],
+    aggressionThisMonth: 0,
+    lastDeckHighlight: null,
   };
+  refreshMonthlyDeck(state);
+  return state;
 }
 
 export function normalizeSave(raw: unknown): GameState | null {
   if (!raw || typeof raw !== "object") return null;
-  const o = raw as GameState;
-  if (o.version !== SAVE_VERSION) return null;
+  const o = raw as GameState & { version?: number };
+  if (!o.version || o.version > SAVE_VERSION) return null;
+  o.version = SAVE_VERSION;
   if (!o.calendar || typeof o.cash !== "number") return null;
   if (!o.firedEvents) o.firedEvents = [];
   if (!o.lane) o.lane = "content";
@@ -119,6 +134,19 @@ export function normalizeSave(raw: unknown): GameState | null {
   if (!Array.isArray(o.research)) o.research = defaultResearch();
   if (!Array.isArray(o.acquisitions)) o.acquisitions = [];
   if (!Array.isArray(o.ownedAcquisitions)) o.ownedAcquisitions = [];
+  if (!o.monetization) {
+    o.monetization = { productRevenueMult: 1, adArpuMult: 1, enterpriseMrr: 0 };
+  }
+  if (!Array.isArray(o.monthlyDeck)) o.monthlyDeck = [];
+  if (typeof o.deckMonthIndex !== "number") o.deckMonthIndex = -1;
+  if (!o.actionUses) o.actionUses = {};
   unlockResearchForYear(o.calendar.year, o.research);
+  if (o.monthlyDeck.length === 0) refreshMonthlyDeck(o);
+  if (!Array.isArray(o.activeCampaigns)) o.activeCampaigns = [];
+  if (typeof o.aggressionThisMonth !== "number") o.aggressionThisMonth = 0;
+  if (o.lastDeckHighlight === undefined) o.lastDeckHighlight = null;
+  for (const h of o.history) {
+    if (typeof (h as { revenue?: number }).revenue !== "number") (h as { revenue: number }).revenue = 0;
+  }
   return o;
 }

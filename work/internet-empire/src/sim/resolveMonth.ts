@@ -1,10 +1,18 @@
 import { applyQueuedActions } from "./actions";
+import { ensureDeckForMonth, refreshMonthlyDeck } from "./actionDeck";
+import { tickCampaigns } from "./campaigns";
 import { advanceCalendar } from "./calendar";
 import { END_MONTH_INDEX, moodForYear } from "./eras";
 import { evaluate2030 } from "./endgame";
 import { maybeCrisis } from "./crises";
 import { fireScriptedEvents, randomHeadline } from "./events";
 import { laneDef } from "./lanes";
+import {
+  initialProductMrr,
+  productLiveGrowth,
+  refreshProductMrr,
+  revenueMultipliers,
+} from "./monetization";
 import { unlockResearchForYear } from "./research";
 import { tickRivals } from "./rivals";
 import { monthRng } from "./rng";
@@ -34,21 +42,26 @@ function organicVisitors(state: GameState, rng: ReturnType<typeof monthRng>): nu
   return Math.max(0, base + noise);
 }
 
-function productTick(state: GameState, revenueMult = 1): void {
+function productTick(state: GameState, laneRevMult = 1): void {
+  const revMult = revenueMultipliers(state, laneRevMult);
   for (const p of state.products) {
     if (p.stage === "building") {
       const boost = state.headcount.developers * 8;
       p.quality += 10 + boost;
       if (p.quality >= 50) {
         p.stage = "live";
-        p.revenueMonthly = 400 + p.quality * 12;
-        state.log.push(`${p.name} went live.`);
+        p.revenueMonthly = initialProductMrr(state, p.quality, "standard");
+        state.log.push(`${p.name} went live at $${p.revenueMonthly.toLocaleString()}/mo.`);
       }
     } else if (p.stage === "live") {
       p.monthsLive += 1;
-      state.revenue += Math.round(p.revenueMonthly * revenueMult);
+      const growth = productLiveGrowth(p.monthsLive);
+      state.revenue += Math.round(p.revenueMonthly * revMult * growth);
     }
   }
+  const contract = Math.round(state.monetization.enterpriseMrr * revMult);
+  state.revenue += contract;
+  refreshProductMrr(state);
 }
 
 function refreshComputeBurn(state: GameState): void {
@@ -80,6 +93,7 @@ function infraStress(state: GameState, rng: ReturnType<typeof monthRng>): void {
 export function resolveMonth(state: GameState): GameState {
   if (state.flags.gameOver || state.flags.ended) return state;
 
+  ensureDeckForMonth(state);
   applyQueuedActions(state);
 
   const scripted = fireScriptedEvents(state);
@@ -93,7 +107,14 @@ export function resolveMonth(state: GameState): GameState {
   const organic = Math.round(organicVisitors(state, rng) * lane.visitorMult);
   state.visitors += organic;
 
-  const adRevenue = Math.round(state.visitors * 0.04 * state.macro.adCpm * lane.revenueMult);
+  const adRevenue = Math.round(
+    state.visitors *
+      0.04 *
+      state.macro.adCpm *
+      lane.revenueMult *
+      (state.monetization.adArpuMult ?? 1) *
+      (1 + Math.max(0, state.calendar.year - 1995) * 0.02)
+  );
   state.revenue += adRevenue;
 
   const hosting = Math.round(hostingCost(state) * (1 - lane.hostingDiscount));
@@ -101,6 +122,8 @@ export function resolveMonth(state: GameState): GameState {
   state.cash += state.revenue - state.expenses;
 
   infraStress(state, rng);
+
+  tickCampaigns(state);
 
   const rivalLogs = tickRivals(state);
   state.log.push(...rivalLogs.slice(0, 2));
@@ -128,6 +151,7 @@ export function resolveMonth(state: GameState): GameState {
     visitors: state.visitors,
     cash: state.cash,
     valuation: state.valuation,
+    revenue: state.revenue,
   });
 
   const monthYear = state.calendar.year;
@@ -140,6 +164,8 @@ export function resolveMonth(state: GameState): GameState {
     state.calendar = advanceCalendar(state.calendar);
     state.plannedActions = [];
     state.apLeft = state.apTotal;
+    refreshMonthlyDeck(state);
+    state.aggressionThisMonth = 0;
     if (state.calendar.year !== monthYear) {
       state.macro.mood = moodForYear(state.calendar.year);
     }

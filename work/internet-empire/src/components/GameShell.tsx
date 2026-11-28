@@ -4,6 +4,7 @@ import { END_MONTH_INDEX, eraAt } from "@/sim/eras";
 import { formatMonth } from "@/lib/format";
 import { useGameStore } from "@/store/gameStore";
 import { ActionPanel } from "./ActionPanel";
+import { FinanceBreakdown } from "./FinanceBreakdown";
 import { FinanceCharts } from "./FinanceCharts";
 import { MarketingPanel } from "./MarketingPanel";
 import { laneDef } from "@/sim/lanes";
@@ -116,6 +117,9 @@ function renderPanel(tab: TabId, state: GameState) {
             {state.products.map((p) => (
               <li key={p.id}>
                 {p.name} · {p.stage} · Q{p.quality}
+                {p.stage === "live" && p.revenueMonthly > 0 && (
+                  <> · ${p.revenueMonthly.toLocaleString()}/mo base</>
+                )}
               </li>
             ))}
           </ul>
@@ -148,6 +152,7 @@ function renderPanel(tab: TabId, state: GameState) {
             <p className="ie-muted">Cash-flow positive last tick</p>
           )}
           {state.computeBurn > 0 && <p>Compute burn ${state.computeBurn.toLocaleString()}/mo</p>}
+          <FinanceBreakdown state={state} />
           <FinanceCharts state={state} />
         </Panel>
       );
