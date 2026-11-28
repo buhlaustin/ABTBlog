@@ -1,5 +1,6 @@
 import type { Viewport } from "next";
 import { DM_Sans, Geist_Mono, Syne } from "next/font/google";
+import { GTM_HEAD_SCRIPT, GTM_NOSCRIPT_IFRAME_SRC } from "@/lib/gtm";
 import { rootSiteMetadata } from "@/lib/seo";
 import "./globals.css";
 
@@ -41,14 +42,8 @@ export default function RootLayout({
     >
       <head>
         <script
-          async
-          src="https://www.googletagmanager.com/gtm.js?id=GTM-PB65KQCT"
-        />
-        <script
           dangerouslySetInnerHTML={{
-            __html: `window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());`,
+            __html: GTM_HEAD_SCRIPT,
           }}
         />
         <script
@@ -58,7 +53,18 @@ gtag('js', new Date());`,
           }}
         />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <noscript>
+          <iframe
+            src={GTM_NOSCRIPT_IFRAME_SRC}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+            title="Google Tag Manager"
+          />
+        </noscript>
+        {children}
+      </body>
     </html>
   );
 }
