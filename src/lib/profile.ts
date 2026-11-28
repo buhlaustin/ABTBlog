@@ -64,9 +64,11 @@ export const profile = {
   email: "abuhl@classquip.com",
   /** Homepage hero only. */
   hero: {
-    headline:
-      "I build games, classroom software, and the stories around them.",
-    lead: "I'm Austin, a builder in Knoxville. This is my personal site: what I've made, what I'm working on now, and what I'm writing.",
+    tagline: "Builder · Knoxville, TN · Vols on Saturdays",
+    headline: "I build games and classroom software.",
+    lead: "I'm Austin. Dynasty: College Basketball is in Early Access on Google Play. I run ClassQuip. The browser games on this site are the ones I build because I want to play them, and the writing is here too.",
+    leadMobile:
+      "I'm Austin, in Knoxville. Dynasty is in Early Access. I run ClassQuip. The browser games and the writing are on this site.",
   } as const,
   /** About page header — longer than homepage hero. */
   about: {

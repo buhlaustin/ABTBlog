@@ -63,7 +63,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-7 sm:py-16">
       <Link
         href="/blog/"
-        className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline"
+        className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:text-blue-700 active:text-blue-800"
       >
         ← Blog
       </Link>
@@ -101,7 +101,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             <div className="mt-4 flex flex-wrap items-center gap-4">
               <Link
                 href="/services/lti-oneroster-integration-sprint/"
-                className="text-sm font-semibold text-accent hover:underline"
+                className="text-sm font-semibold text-accent hover:text-blue-700"
               >
                 LTI 1.3 + OneRoster Integration Sprint →
               </Link>

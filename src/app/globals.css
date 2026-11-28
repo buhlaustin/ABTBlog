@@ -2,16 +2,16 @@
 @plugin "@tailwindcss/typography";
 
 @theme inline {
-  --color-background: #f4efe6;
-  --color-foreground: #1c1612;
-  --color-muted: #6b5f54;
-  --color-accent: #6e2f28;
-  --color-accent-soft: #f3e4dc;
-  --color-surface: #faf6ef;
-  --color-surface-raised: #efe6d8;
-  --color-border: #e2d6c6;
+  --color-background: #ffffff;
+  --color-foreground: #18181b;
+  --color-muted: #71717a;
+  --color-accent: #2563eb;
+  --color-accent-soft: #eff6ff;
+  --color-surface: #fafafa;
+  --color-surface-raised: #f4f4f5;
+  --color-border: #e4e4e7;
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
@@ -44,8 +44,7 @@
   }
 
   ::selection {
-    background: #ead9c4;
-    color: #1c1612;
+    @apply bg-blue-200 text-zinc-900;
   }
 }
 
@@ -64,7 +63,7 @@
   left: -8%;
   width: min(52vw, 28rem);
   height: min(52vw, 28rem);
-  background: radial-gradient(circle, rgba(140, 90, 50, 0.16), transparent 70%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.22), transparent 70%);
 }
 
 .marketing-ambient__blob--b {
@@ -72,7 +71,7 @@
   right: -14%;
   width: min(48vw, 24rem);
   height: min(48vw, 24rem);
-  background: radial-gradient(circle, rgba(110, 47, 40, 0.1), transparent 70%);
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.14), transparent 70%);
   animation-duration: 28s;
   animation-delay: -6s;
 }
@@ -82,7 +81,7 @@
   left: 22%;
   width: min(56vw, 26rem);
   height: min(56vw, 26rem);
-  background: radial-gradient(circle, rgba(180, 150, 100, 0.14), transparent 70%);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent 70%);
   animation-duration: 26s;
   animation-delay: -12s;
 }
@@ -271,6 +270,18 @@
 }
 
 @media (max-width: 767px) {
+  html.mobile-menu-open .mobile-bottom-bar {
+    display: none;
+  }
+
+  html.mobile-menu-open .main-with-mobile-bar {
+    padding-bottom: 0;
+  }
+
+  .main-with-mobile-bar {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
   .reveal-enhanced .reveal:not(.reveal--in) {
     opacity: 1 !important;
     transform: none !important;

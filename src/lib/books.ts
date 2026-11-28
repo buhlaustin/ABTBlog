@@ -20,7 +20,7 @@ export const amazonAuthorUrl =
 export const books: readonly Book[] = [
   {
     title: "Nightwave",
-    note: "Full-length novel.",
+    note: "The novel. I wrote it before the games and the company.",
     cover: "/books/nightwave.jpg",
     href: "https://www.amazon.com/Nightwave-Book-One-Ilioneus-Chronicles-ebook/dp/B0BQC9CK42",
     featured: true,

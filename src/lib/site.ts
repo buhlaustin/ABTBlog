@@ -1,10 +1,10 @@
 export const siteConfig = {
   name: "Austin Buhl",
   /** Default `<title>` and Open Graph title for the homepage (no domain name). */
-  defaultTitle: "Austin Buhl · Games, classroom software, and writing",
+  defaultTitle: "Austin Buhl · Games and classroom software",
   /** Appended by root layout for inner pages: `%s · Austin Buhl`. */
   description:
-    "I'm Austin, a builder in Knoxville. This is my personal site: what I've made, what I'm working on now, and what I'm writing.",
+    "Austin Buhl builds games and classroom software in Knoxville. Dynasty: College Basketball is in Early Access, ClassQuip is the company, and this site holds the browser projects and the writing.",
   url: "https://austinbuhltech.com",
   locale: "en_US",
   github: "https://github.com/buhlaustin",

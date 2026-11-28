@@ -46,7 +46,7 @@ export default function CaseStudiesIndexPage() {
               </p>
               <Link
                 href={`/case-studies/${study.slug}/`}
-                className="mt-4 inline-flex text-sm font-semibold text-accent hover:underline"
+                className="mt-4 inline-flex text-sm font-semibold text-accent hover:text-blue-700"
               >
                 Read case study →
               </Link>

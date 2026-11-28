@@ -21,7 +21,7 @@ export default function WorkIndexPage() {
         <p className="mt-2 text-sm">
           <Link
             href="/case-studies/"
-            className="font-semibold text-accent hover:underline"
+            className="font-semibold text-accent hover:text-blue-700"
           >
             Case studies →
           </Link>

@@ -69,7 +69,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
       <main className="mx-auto w-full max-w-2xl flex-1 px-safe py-7 sm:py-16">
         <Link
           href="/case-studies/"
-          className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline"
+          className="inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:text-blue-700"
         >
           ← Case studies
         </Link>
@@ -145,7 +145,7 @@ export default async function CaseStudyPage({ params }: PageProps) {
             <p className="text-sm text-muted">
               <Link
                 href={`/services/${relatedOffer.slug}/`}
-                className="font-semibold text-accent hover:underline"
+                className="font-semibold text-accent hover:text-blue-700"
               >
                 {relatedOffer.name} →
               </Link>

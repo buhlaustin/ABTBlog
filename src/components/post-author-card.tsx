@@ -45,13 +45,13 @@ export function PostAuthorCard({
             <p className="mt-3 flex flex-col gap-2 text-sm font-semibold sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-1">
               <Link
                 href="/about/"
-                className="inline-flex min-h-11 items-center text-accent hover:underline sm:min-h-0"
+                className="inline-flex min-h-11 items-center text-accent hover:text-blue-700 active:text-blue-800 sm:min-h-0"
               >
                 More about me
               </Link>
               <a
                 href={siteConfig.github}
-                className="inline-flex min-h-11 items-center text-accent hover:underline sm:min-h-0"
+                className="inline-flex min-h-11 items-center text-accent hover:text-blue-700 active:text-blue-800 sm:min-h-0"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -59,7 +59,7 @@ export function PostAuthorCard({
               </a>
               <a
                 href={profile.linkedIn}
-                className="inline-flex min-h-11 items-center text-accent hover:underline sm:min-h-0"
+                className="inline-flex min-h-11 items-center text-accent hover:text-blue-700 active:text-blue-800 sm:min-h-0"
                 rel="noopener noreferrer"
                 target="_blank"
               >

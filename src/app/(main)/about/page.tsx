@@ -283,7 +283,7 @@ export default function AboutPage() {
                   <p className="mt-3 text-sm">
                     <Link
                       href={project.sitePath}
-                      className="font-semibold text-accent hover:underline"
+                      className="font-semibold text-accent hover:text-blue-700"
                     >
                       On this site →
                     </Link>
@@ -303,7 +303,7 @@ export default function AboutPage() {
           <p className="mt-6">
             <Link
               href="/work/"
-              className="font-semibold text-accent hover:underline"
+              className="font-semibold text-accent hover:text-blue-700"
             >
               All projects →
             </Link>

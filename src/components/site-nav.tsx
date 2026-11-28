@@ -60,7 +60,7 @@ export function SiteNav() {
       />
       <nav
         id={menuId}
-        className={`fixed inset-x-0 bottom-0 z-[90] flex max-h-[min(85dvh,32rem)] flex-col rounded-t-2xl border border-b-0 border-border bg-background shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:hidden ${
+        className={`fixed inset-x-0 bottom-0 z-[90] flex max-h-[min(85dvh,32rem)] flex-col rounded-t-2xl border border-b-0 border-border bg-white shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:hidden ${
           open ? "translate-y-0" : "translate-y-full pointer-events-none"
         }`}
         aria-label="Primary mobile"
@@ -178,7 +178,7 @@ export function SiteNav() {
       <div className="flex items-center md:hidden">
         <button
           type="button"
-          className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-border bg-background text-foreground"
+          className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-border bg-white text-foreground"
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => setOpen((v) => !v)}

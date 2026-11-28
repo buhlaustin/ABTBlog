@@ -1,5 +1,5 @@
 import type { Viewport } from "next";
-import { DM_Sans, Fraunces, Geist_Mono } from "next/font/google";
+import { DM_Sans, Geist_Mono, Syne } from "next/font/google";
 import { GTM_HEAD_SCRIPT, GTM_NOSCRIPT_IFRAME_SRC } from "@/lib/gtm";
 import { rootSiteMetadata } from "@/lib/seo";
 import "./globals.css";
@@ -10,11 +10,10 @@ const dmSans = DM_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  display: "swap",
+  weight: ["600", "700", "800"],
 });
 
 const geistMono = Geist_Mono({
@@ -26,7 +25,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f4efe6",
+  themeColor: "#ffffff",
 };
 
 export const metadata = rootSiteMetadata();
@@ -39,7 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${fraunces.variable} ${geistMono.variable} h-full`}
+      className={`${dmSans.variable} ${syne.variable} ${geistMono.variable} h-full`}
     >
       <head>
         <script

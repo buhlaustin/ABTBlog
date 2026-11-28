@@ -5,7 +5,7 @@ function hasText(value: string | undefined): value is string {
   return typeof value === "string" && value.length > 0;
 }
 
-function BookCover({ book, featured }: { book: Book; featured?: boolean }) {
+function Cover({ book, featured }: { book: Book; featured?: boolean }) {
   if (!hasText(book.cover)) return null;
 
   return (
@@ -16,49 +16,44 @@ function BookCover({ book, featured }: { book: Book; featured?: boolean }) {
       height={1500}
       className={
         featured
-          ? "h-auto w-44 max-w-full border border-border sm:w-full"
-          : "h-auto w-28 max-w-full border border-border"
+          ? "h-auto w-36 rounded-xl border border-border sm:w-full"
+          : "h-auto w-28 rounded-xl border border-border"
       }
     />
   );
 }
 
-function BookCopy({ book, featured }: { book: Book; featured?: boolean }) {
-  return (
-    <div className="min-w-0">
-      <h3
-        className={
-          featured
-            ? "font-display text-4xl font-semibold leading-none tracking-tight text-foreground sm:text-5xl"
-            : "font-display text-[1.65rem] font-semibold leading-tight tracking-tight text-foreground"
-        }
-      >
-        {book.title}
-      </h3>
-      <p className="mt-3 text-sm leading-relaxed text-muted">{book.note}</p>
-      {hasText(book.href) ? (
-        <p className="mt-4 text-sm text-foreground underline decoration-border underline-offset-4">
-          On Amazon
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-function BookCard({ book, featured }: { book: Book; featured?: boolean }) {
-  const body = (
+function BookFace({ book, featured }: { book: Book; featured?: boolean }) {
+  const inner = (
     <>
-      <BookCover book={book} featured={featured} />
-      <BookCopy book={book} featured={featured} />
+      <Cover book={book} featured={featured} />
+      <div className="min-w-0">
+        <p className="font-mono text-[11px] font-medium uppercase tracking-wider text-muted">
+          {featured ? "Novel" : "Short story"}
+        </p>
+        <h3
+          className={
+            featured
+              ? "font-display mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
+              : "font-display mt-2 text-xl font-bold tracking-tight text-foreground"
+          }
+        >
+          {book.title}
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{book.note}</p>
+        {hasText(book.href) ? (
+          <p className="mt-4 text-sm font-semibold text-accent">On Amazon →</p>
+        ) : null}
+      </div>
     </>
   );
 
-  const layout = featured
-    ? "grid items-center gap-6 sm:grid-cols-[minmax(0,13.5rem)_1fr]"
-    : "flex max-w-xs flex-col items-start gap-4";
+  const className = featured
+    ? "lift-card grid gap-5 rounded-2xl border border-border bg-white p-5 shadow-sm sm:grid-cols-[10.5rem_1fr] sm:items-center sm:p-6 md:col-span-2"
+    : "lift-card flex h-full flex-col gap-4 rounded-2xl border border-border bg-white p-5 shadow-sm";
 
   if (!hasText(book.href)) {
-    return <article className={layout}>{body}</article>;
+    return <article className={className}>{inner}</article>;
   }
 
   return (
@@ -66,9 +61,9 @@ function BookCard({ book, featured }: { book: Book; featured?: boolean }) {
       href={book.href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${layout} group rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-foreground`}
+      className={`${className} hover:border-zinc-300`}
     >
-      {body}
+      {inner}
     </a>
   );
 }
@@ -78,33 +73,21 @@ export function BookShelf() {
   const rest = books.filter((book) => !book.featured);
 
   return (
-    <div>
-      <h2
-        id="books-heading"
-        className="font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl"
-      >
-        Books
-      </h2>
-      <div className="mt-8 space-y-10">
-        {featured.map((book) => (
-          <BookCard key={book.title} book={book} featured />
-        ))}
-      </div>
-      {rest.length > 0 ? (
-        <div className="mt-10 grid gap-8 border-t border-border pt-8 sm:grid-cols-2">
-          {rest.map((book) => (
-            <BookCard key={book.title} book={book} />
-          ))}
-        </div>
-      ) : null}
-      <p className="mt-8">
+    <div className="grid gap-4 md:grid-cols-2">
+      {featured.map((book) => (
+        <BookFace key={book.title} book={book} featured />
+      ))}
+      {rest.map((book) => (
+        <BookFace key={book.title} book={book} />
+      ))}
+      <p className="md:col-span-2">
         <a
           href={amazonAuthorUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+          className="text-sm font-semibold text-accent hover:text-blue-700"
         >
-          All books on Amazon
+          All books on Amazon →
         </a>
       </p>
     </div>
