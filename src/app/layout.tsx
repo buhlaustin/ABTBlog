@@ -41,6 +41,17 @@ export default function RootLayout({
     >
       <head>
         <script
+          async
+          src="https://www.googletagmanager.com/gtm.js?id=GTM-PB65KQCT"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());`,
+          }}
+        />
+        <script
           dangerouslySetInnerHTML={{
             __html:
               'document.documentElement.classList.add("reveal-enhanced")',
