@@ -1,46 +1,48 @@
-import { availableActions, canQueueAction, cashForAction } from "@/sim/actions";
+import { availableActions, actionLabel, canQueueAction, cashForAction } from "@/sim/actions";
+import { bankActionByKey, bankCashCost } from "@/sim/actionBank";
 import type { ActionDef } from "@/sim/types";
 import type { GameState } from "@/sim";
 import { useGameStore } from "@/store/gameStore";
 import { formatMoney } from "@/lib/format";
 
+const CORE_KEYS = new Set([
+  "build_website",
+  "purchase_domain",
+  "advertise",
+  "hire_developer",
+  "develop_product",
+  "seo",
+  "partnership",
+  "upgrade_infra",
+]);
+
 export function ActionPanel({ state }: { state: GameState }) {
   const queue = useGameStore((s) => s.queue);
   const actions = availableActions(state);
-  const starterKeys = new Set([
-    "build_website",
-    "purchase_domain",
-    "advertise",
-    "hire_developer",
-    "develop_product",
-  ]);
-  const starters = actions.filter((a) => starterKeys.has(a.key));
-  const rest = actions.filter((a) => !starterKeys.has(a.key));
-  const showStarters = state.calendar.index < 12;
+  const core = actions.filter((a) => CORE_KEYS.has(a.key));
+  const deck = actions.filter((a) => !CORE_KEYS.has(a.key));
 
   return (
     <div className="ie-panel">
       <h3 className="ie-panel-title">Available actions</h3>
       <p className="ie-muted">
-        {state.apLeft} AP left · {state.plannedActions.length} queued
+        {state.apLeft} AP left · {state.plannedActions.length} queued · deck refreshes each month
       </p>
-      {showStarters && starters.length > 0 && (
-        <>
-          <h4 className="ie-starter-head">Year 1 starters</h4>
-          <ActionList state={state} actions={starters} queue={queue} />
-        </>
+      {core.length > 0 && (
+        <ActionList state={state} actions={core} queue={queue} title="Core playbook" />
       )}
-      <ActionList
-        state={state}
-        actions={showStarters ? rest : actions}
-        queue={queue}
-        title={showStarters && rest.length > 0 ? "Later" : undefined}
-      />
-      {state.plannedActions.length > 0 && (
-        <PlannedQueue state={state} />
+      {deck.length > 0 && (
+        <ActionList state={state} actions={deck} queue={queue} title="This month's opportunities" />
       )}
+      {state.plannedActions.length > 0 && <PlannedQueue state={state} />}
     </div>
   );
+}
+
+function actionCost(state: GameState, a: ActionDef): number {
+  const bank = bankActionByKey(a.key);
+  if (bank && state.monthlyDeck.includes(a.key)) return bankCashCost(state, bank);
+  return cashForAction(state, a);
 }
 
 function ActionList({
@@ -64,12 +66,12 @@ function ActionList({
             <button
               type="button"
               className="ie-btn"
-              disabled={!canQueueAction(state, a).ok}
+              disabled={!canQueueAction(state, a, a.key).ok}
               onClick={() => queue(a.key)}
             >
-              {a.label}
+              {actionLabel(a, state)}
               <span className="ie-btn-meta">
-                {a.ap} AP · {formatMoney(cashForAction(state, a))}
+                {a.ap} AP · {formatMoney(actionCost(state, a))}
               </span>
             </button>
             <span className="ie-action-effect">{a.effect}</span>

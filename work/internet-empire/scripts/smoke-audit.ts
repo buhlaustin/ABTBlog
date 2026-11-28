@@ -102,4 +102,40 @@ function fail(msg: string): never {
   }
 }
 
+// Monthly opportunity deck is populated.
+{
+  const s = createInitialState({
+    mode: "sandbox",
+    companyName: "Deck Co",
+    seed: 11,
+    sandbox: { startingCash: 100_000, startYear: 2005 },
+  });
+  if (s.monthlyDeck.length < 5) fail(`expected monthly deck, got ${s.monthlyDeck.length}`);
+}
+
+// Mid-game revenue should scale past early MRR caps.
+{
+  const s = createInitialState({
+    mode: "sandbox",
+    companyName: "Scale Co",
+    seed: 12,
+    sandbox: { startingCash: 800_000, startYear: 2008 },
+  });
+  s.flags.hasWebsite = true;
+  s.products.push({
+    id: "p1",
+    name: "Scale Pro",
+    kind: "product",
+    stage: "live",
+    quality: 65,
+    visitorsBoost: 200,
+    revenueMonthly: 8000,
+    monthsLive: 12,
+  });
+  s.headcount.sales = 3;
+  s.monetization.productRevenueMult = 1.2;
+  resolveMonth(s);
+  if (s.revenue < 25_000) fail(`expected scaled monthly revenue, got ${s.revenue}`);
+}
+
 console.log("internet-empire audit smoke ok");

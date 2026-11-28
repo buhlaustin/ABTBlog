@@ -1,4 +1,4 @@
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 
 export type GameMode = "career" | "sandbox";
 
@@ -103,6 +103,13 @@ export interface GameFlags {
   ended: boolean;
 }
 
+export interface MonetizationState {
+  productRevenueMult: number;
+  adArpuMult: number;
+  /** Contract-style MRR layered on product revenue. */
+  enterpriseMrr: number;
+}
+
 export interface GameState {
   version: number;
   mode: GameMode;
@@ -136,11 +143,15 @@ export interface GameState {
   history: { monthIndex: number; visitors: number; cash: number; valuation: number }[];
   firedEvents: string[];
   sandbox?: { startYear?: number; startingCash?: number; rivalAggression?: number };
+  monetization: MonetizationState;
+  monthlyDeck: string[];
+  deckMonthIndex: number;
+  actionUses: Record<string, number>;
 }
 
 export interface ActionDef {
   key: string;
-  label: string;
+  label: string | ((s: GameState) => string);
   ap: number;
   cashCost: number | ((s: GameState) => number);
   eraMin: UiEraId;

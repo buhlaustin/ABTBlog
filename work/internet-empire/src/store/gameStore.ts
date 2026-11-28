@@ -9,6 +9,7 @@ import {
   type GameState,
   type TabId,
 } from "@/sim";
+import { formatMonth } from "@/lib/format";
 
 const STORAGE_KEY = "internet-empire-save-v1";
 const HOF_KEY = "internet-empire-hof-v1";
@@ -160,14 +161,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get().state;
     if (!state) return;
     const snap = structuredClone(state);
+    const monthLabel = formatMonth(snap.calendar.year, snap.calendar.month);
     resolveMonth(snap);
     saveToDisk(snap);
-    const last = snap.log[snap.log.length - 1] ?? "Month closed.";
+    const summary = `${monthLabel} closed — revenue $${snap.revenue.toLocaleString()}, cash $${Math.round(snap.cash).toLocaleString()}.`;
     if (snap.flags.gameOver || snap.flags.ended) {
       pushHallOfFame(snap);
-      set({ state: snap, screen: "end", flash: last });
+      set({ state: snap, screen: "end", flash: summary });
     } else {
-      set({ state: snap, flash: last });
+      set({ state: snap, flash: summary });
     }
   },
   persist: () => {
